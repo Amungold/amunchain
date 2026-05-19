@@ -1,0 +1,11 @@
+crates/amun-block/src/block.rs:                .expect("Header must fit MAX_ENCODED_SIZE");
+crates/amun-cli/src/main.rs:            ).expect("keystore creation failed");
+crates/amun-cli/src/main.rs:            std::fs::write(&output, keystore.to_json()).expect("write failed");
+crates/amun-cli/src/main.rs:            let content = std::fs::read_to_string(&keyfile).expect("read failed");
+crates/amun-cli/src/main.rs:            let keystore = amun_keystore::KeyStore::from_json(&content).expect("parse failed");
+crates/amun-cli/src/main.rs:            let secret = keystore.decrypt(&password).expect("decrypt failed");
+crates/amun-cli/src/main.rs:                &secret[..32].try_into().expect("invalid seed")
+crates/amun-cli/src/main.rs:            let pk = hex::decode(&pubkey).expect("invalid pubkey hex");
+crates/amun-cli/src/main.rs:            let sig = hex::decode(&signature).expect("invalid signature hex");
+crates/amun-cli/src/main.rs:                &pk[..32].try_into().expect("invalid pubkey length"),
+crates/amun-cli/src/main.rs:                &sig[..64].try_into().expect("invalid sig length"),

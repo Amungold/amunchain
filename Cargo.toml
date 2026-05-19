@@ -1,0 +1,94 @@
+[workspace]
+members = [
+    "crates/amun-kernel-types","crates/amun-codec","crates/amun-state-types","crates/amun-constitution",
+    "crates/amun-consensus-types","crates/amun-block","crates/amun-merkle",
+    "crates/amun-evidence","crates/amun-execution","crates/amun-stf",
+    "crates/amun-transaction","crates/amun-runtime","crates/amun-storage",
+    "crates/amun-consensus","crates/amun-network","crates/amun-gossip",
+    "crates/amun-economics","crates/amun-staking","crates/amun-governance",
+    "crates/amun-rpc","crates/amun-bindings","crates/amun-cli","crates/amun-genesis",
+    "crates/amun-crypto","crates/amun-canonical","crates/amun-tls",
+    "crates/amun-keystore","crates/amun-host","crates/amun-http",
+    "crates/amun-websocket","crates/amun-mempool","crates/amun-identity",
+    "crates/amun-gas","crates/amun-scheduler","crates/amun-time",
+    "crates/amun-upgrade","crates/amun-attestation","crates/amun-fork",
+    "crates/amun-audit","crates/amun-snapshot","crates/amun-formal",
+    "crates/amun-emergency","crates/amun-economic-law",
+    "crates/amun-storage-engine","crates/amun-runtime-law",
+    "crates/amun-peer-reputation","crates/amun-serialization-audit",
+    "crates/amun-deterministic-allocator","crates/amun-consensus-proof",
+    "crates/amun-invariants","crates/amun-complexity-budget",
+    "crates/amun-truth-engine","crates/amun-attack-lab",
+    "crates/amun-failure-memory","crates/amun-survival-console",
+    "crates/amun-deterministic-arena","crates/amun-chunk-store",
+    "crates/amun-network-model","crates/amun-lock-enforcement",
+    "crates/amun-upgrade-law","crates/amun-formal-spec",
+    "crates/amun-canonical-semantics","crates/amun-entropy-transcript",
+    "crates/amun-chain-context","crates/amun-consensus-law",
+    "crates/amun-chain-position","crates/amun-replay-cert",
+    "crates/amun-binary-codec",
+    "crates/amun-protocol-event",
+    "crates/amun-protocol-event",
+    "crates/amun-state-transition","crates/amun-wal",
+    "crates/amun-snapshot-constitution",
+    "crates/amun-chunked-snapshot",
+    "crates/amun-consensus-messages",
+    "crates/amun-validator-attestation",
+    "crates/amun-quorum-certificate",
+    "crates/amun-safety-laws",
+    "crates/amun-lock-rule",
+    "crates/amun-qc-canonical",
+    "crates/amun-unlock-law",
+    "crates/amun-finality-law",
+    "crates/amun-fork-choice-law",
+    "crates/amun-consensus-signatures",
+    "crates/amun-signature-engine",
+    "crates/amun-qc-weight",
+    "crates/amun-validator-registry",
+    "crates/amun-constitutional-verifier",
+    "crates/amun-network-constitution",
+    "crates/amun-deterministic-scheduler",
+    "crates/amun-deterministic-timer",
+    "crates/amun-pacemaker",
+    "crates/amun-view-change",
+    "crates/amun-epoch-transition",
+    "crates/amun-consensus-reactor",
+    "crates/amun-consensus-execution",
+    "crates/amun-network-scheduler",
+    "crates/amun-timeout-aggregator",
+    "crates/amun-network-simulator",
+    "crates/amun-crash-persistence",
+    "crates/amun-byzantine-harness",
+    "tests/amun-distributed-tests",
+    "tests/amun-cluster-harness",
+    "tests/amun-adversarial-tests",
+    "crates/amun-timeout-law",
+    "crates/amun-constitution-core",
+    "crates/amun-unsigned-messages",
+    "crates/amun-verified-pipeline",
+    "crates/amun-replay-certificate",
+    "crates/amun-crash-recovery","crates/amun-snapshot-engine",
+    "crates/amun-bls","crates/amun-ntr","crates/amun-sdk-layer",
+    "crates/amun-unsafe","crates/amun-failure",
+    "tools/constitutional-linter","tools/amun-sdk",
+    "tests/amun-determinism-tests","tests/amun-byzantine-tests",
+    "tests/amun-byzantine-simulation",
+    "tests/amun-cross-process",
+    "tests/amun-replay-certification",
+]
+resolver = "2"
+[workspace.lints.rust]
+unsafe_code = "forbid"
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "UNLICENSED"
+[profile.reproducible]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+debug = 0
+opt-level = 3
+# Phase 14 additions included above

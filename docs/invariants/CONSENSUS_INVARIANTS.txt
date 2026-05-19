@@ -1,0 +1,51 @@
+================================================================
+  AMUNCHAIN CONSENSUS INVARIANTS
+================================================================
+
+  These invariants MUST ALWAYS HOLD. Violation = protocol failure.
+
+  I-1: VOTE UNIQUENESS
+       ∀ v ∈ Validators, ∀ (round, phase):
+         |votes(v, round, phase)| ≤ 1
+
+  I-2: QC VALIDATOR UNIQUENESS
+       ∀ qc ∈ QuorumCertificate:
+         |{v ∈ qc.votes : v.validator_id}| = |qc.votes|
+
+  I-3: LOCK MONOTONICITY
+       ∀ v ∈ Validators:
+         locked_round[t+1] ≥ locked_round[t]
+
+  I-4: FINALITY IRREVERSIBILITY
+       ∀ h ∈ Heights:
+         |finalized_blocks_at_height(h)| ≤ 1
+
+  I-5: REPLAY DETERMINISM
+       ∀ inputs, ∀ platforms:
+         replay(inputs, platform_A) == replay(inputs, platform_B)
+
+  I-6: SNAPSHOT CANONICALITY
+       ∀ state, ∀ orderings of same keys:
+         snapshot_hash(sorted(state)) is unique
+
+  I-7: EPOCH MONOTONICITY
+       ∀ transitions:
+         epoch[t+1] ≥ epoch[t]
+
+  I-8: SIGNATURE DOMAIN SEPARATION
+       No signature for domain A can validate as signature for domain B
+
+  I-9: QUORUM THRESHOLD
+       ∀ qc ∈ QuorumCertificate:
+         weight(qc) ≥ 2/3 * total_stake + 1
+
+  I-10: CANONICAL ORDERING
+       ∀ qc ∈ QuorumCertificate, ∀ i < j:
+         qc.votes[i].validator_id < qc.votes[j].validator_id
+
+  I-11: DESCENDANT FINALITY
+       A block is finalized ONLY if a descendant block is also committed
+
+  I-12: GENESIS BINDING
+       All state roots MUST trace back to the genesis root
+================================================================

@@ -1,0 +1,15 @@
+[package]
+name = "amun-fuzz"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+amun-snapshot-constitution = { path = "../crates/amun-snapshot-constitution" }
+amun-wal = { path = "../crates/amun-wal" }
+amun-protocol-event = { path = "../crates/amun-protocol-event" }
+amun-chain-position = { path = "../crates/amun-chain-position" }
+tempfile = "3"
+libfuzzer-sys = "0.4"

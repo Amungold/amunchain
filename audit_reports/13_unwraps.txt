@@ -1,0 +1,143 @@
+crates/amun-network/src/tests.rs:        d.add_peer(peer).unwrap();
+crates/amun-network/src/tests.rs:            conn.connect(peer, ip).unwrap();
+crates/amun-codec/src/tests.rs:        assert_eq!(255u8.encode(&mut buf).unwrap(), 1);
+crates/amun-codec/src/tests.rs:        0x1122u16.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        0x11223344u32.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        0x1122334455667788u64.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:            .unwrap();
+crates/amun-codec/src/tests.rs:        v.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, len) = u8::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        v.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, len) = u16::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        v.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, len) = u32::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        v.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, len) = u64::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        v.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, len) = u128::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        v.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, len) = <[u8; 32]>::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        42u64.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        42u64.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        assert_eq!(u64::decode_exact(&buf).unwrap(), 42);
+crates/amun-codec/src/tests.rs:        e.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, _) = Epoch::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        r.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, _) = Round::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        h.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, _) = PublicHash32::decode(&buf).unwrap();
+crates/amun-codec/src/tests.rs:        v.encode(&mut buf).unwrap();
+crates/amun-codec/src/tests.rs:        let (d, _) = ValidatorId::decode(&buf).unwrap();
+crates/amun-gossip/src/tests.rs:            let decoded = Topic::from_byte(b).unwrap();
+crates/amun-gossip/src/tests.rs:        let count1 = b.broadcast(Topic::Blocks, payload, 10).unwrap();
+crates/amun-gossip/src/tests.rs:        let count2 = b.broadcast(Topic::Blocks, payload, 10).unwrap();
+crates/amun-gossip/src/tests.rs:        assert!(r.receive(Topic::Votes, b"vote1").unwrap());
+crates/amun-gossip/src/tests.rs:        assert!(!r.receive(Topic::Votes, b"vote1").unwrap());
+crates/amun-gossip/src/tests.rs:        assert!(r.receive(Topic::Votes, b"vote2").unwrap());
+crates/amun-merkle/src/tests.rs:        proof.add_sibling(l2, Direction::Right).unwrap();
+crates/amun-merkle/src/tests.rs:        proof.add_sibling(l2, Direction::Right).unwrap();
+crates/amun-merkle/src/proof.rs:        proof.add_sibling(l2, Direction::Right).unwrap();
+crates/amun-merkle/src/proof.rs:        proof.add_sibling(l2, Direction::Right).unwrap();
+crates/amun-merkle/src/proof.rs:        let len = proof.encode(&mut buf).unwrap();
+crates/amun-merkle/src/proof.rs:        let decoded = MerkleProof::decode_exact(&buf[..len]).unwrap();
+crates/amun-merkle/src/proof.rs:        proof.add_sibling(l2, Direction::Right).unwrap();
+crates/amun-merkle/src/proof.rs:        let len = proof.encode(&mut buf).unwrap();
+crates/amun-bls/src/tests.rs:        let sig = sign(msg, &kp.secret).unwrap();
+crates/amun-bls/src/tests.rs:        assert!(verify(msg, &sig, &kp.public).unwrap());
+crates/amun-bls/src/tests.rs:        assert!(!verify(msg, &zero_sig, &kp.public).unwrap());
+crates/amun-bls/src/tests.rs:        let agg = aggregate_signatures(&sigs).unwrap();
+crates/amun-bls/src/tests.rs:        let agg = aggregate_public_keys(&[pk1, pk2]).unwrap();
+crates/amun-storage/src/snapshot.rs:        snap.add_entry(b"key1", b"value1").unwrap();
+crates/amun-storage/src/snapshot.rs:        snap.add_entry(b"k1", b"v1").unwrap();
+crates/amun-storage/src/snapshot.rs:        let len = snap.encode(&mut buf).unwrap();
+crates/amun-storage/src/snapshot.rs:        let (decoded, consumed) = StateSnapshot::decode(&buf[..len]).unwrap();
+crates/amun-ntr/src/tests.rs:    #[test] fn test_transfer_tax() { let mut t = NtrToken::new(1_000_000); let tax = t.transfer(100_000).unwrap(); assert!(tax > 0); assert!(t.burned > 0); }
+crates/amun-ntr/src/tests.rs:    #[test] fn test_stake() { let mut t = NtrToken::new(constants::NTR_MIN_STAKE_AMOUNT*2); t.stake(constants::NTR_MIN_STAKE_AMOUNT).unwrap(); assert_eq!(t.staked, constants::NTR_MIN_STAKE_AMOUNT); }
+crates/amun-kernel-types/src/tests.rs:        assert_eq!(Epoch::new(1).next().unwrap(), Epoch::new(2));
+crates/amun-kernel-types/src/tests.rs:        assert_eq!(Round::new(3).next().unwrap(), Round::new(4));
+crates/amun-sdk-layer/src/tests.rs:    fn test_token_api_transfer() { let mut token = TokenApi::create_account(1_000_000).data.unwrap(); let result = TokenApi::transfer(&mut token, 100_000); assert!(result.success); }
+crates/amun-sdk-layer/src/tests.rs:    fn test_sandbox_simulation() { let mut sandbox = Sandbox::new(); let a0 = sandbox.create_account(1_000_000).data.unwrap(); let a1 = sandbox.create_account(500_000).data.unwrap(); let result = sandbox.simulate_transfer(a0, a1, 100_000); assert!(result.success); }
+crates/amun-staking/src/tests.rs:    #[test] fn test_register() { let mut r = ValidatorRegistry::new(); r.register(PublicKey::new([1u8;48]), 100).unwrap(); assert_eq!(r.active_count, 1); }
+crates/amun-staking/src/tests.rs:    #[test] fn test_slash() { let mut r = ValidatorRegistry::new(); let pk = PublicKey::new([1u8;48]); r.register(pk, 10000).unwrap(); let rules = SlashingConditions::new(); assert!(r.slash(&pk, &rules).unwrap() > 0); }
+crates/amun-staking/src/tests.rs:    #[test] fn test_delegate() { let mut d = DelegationManager::new(); let mut s = 100; d.delegate(&mut s, 50).unwrap(); assert_eq!(s, 150); }
+crates/amun-block/src/tests.rs:        let l = h.encode(&mut b).unwrap();
+crates/amun-block/src/tests.rs:            BlockHeader::decode_exact(&b[..l]).unwrap().height,
+crates/amun-block/src/tests.rs:        b.add_tx_hash(PublicHash32::new([0x01u8; 32]), &l).unwrap();
+crates/amun-block/src/tests.rs:        b.add_tx_hash(PublicHash32::new([0x02u8; 32]), &l).unwrap();
+crates/amun-block/src/tests.rs:        b.add_tx_hash(PublicHash32::new([0x01u8; 32]), &l).unwrap();
+crates/amun-block/src/tests.rs:        let len = blk.encode(&mut buf).unwrap();
+crates/amun-block/src/tests.rs:        assert_eq!(Block::decode_exact(&buf[..len]).unwrap().tx_count(), 1);
+crates/amun-block/src/tests.rs:        b.add_tx_hash(PublicHash32::new([0x01u8; 32]), &l).unwrap();
+crates/amun-block/src/tests.rs:        let l = h.encode(&mut buf).unwrap();
+crates/amun-block/src/tests.rs:            .unwrap();
+crates/amun-block/src/tests.rs:            .unwrap();
+crates/amun-block/src/tests.rs:        let _len = body.encode(&mut buf).unwrap();
+crates/amun-block/src/tests.rs:            .unwrap();
+crates/amun-block/src/tests.rs:            .unwrap();
+crates/amun-block/src/tests.rs:        let _ = body.encode(&mut buf).unwrap();
+crates/amun-economics/src/tests.rs:    #[test] fn test_token_transfer() { let mut t = Token::new(1000); t.transfer(500).unwrap(); assert_eq!(t.balance, 500); }
+crates/amun-economics/src/tests.rs:    #[test] fn test_token_stake() { let mut t = Token::new(constants::MIN_STAKE_AMOUNT*2); t.stake(constants::MIN_STAKE_AMOUNT).unwrap(); assert!(t.staked > 0); }
+crates/amun-economics/src/tests.rs:    #[test] fn test_token_slash() { let mut t = Token::new(0); t.staked = 10000; t.slash(500).unwrap(); assert_eq!(t.staked, 9500); }
+crates/amun-economics/src/tests.rs:    #[test] fn test_fee() { let fm = FeeMarket::new(); assert!(fm.calculate_fee(10).unwrap() > 0); }
+crates/amun-economics/src/tests.rs:    #[test] fn test_treasury() { let mut t = Treasury::new(); t.deposit(100).unwrap(); t.withdraw(50).unwrap(); assert_eq!(t.balance, 50); }
+crates/amun-stf/src/tests.rs:        let mut key = Vec::<u8,32>::new(); key.extend_from_slice(b"k1").unwrap();
+crates/amun-stf/src/tests.rs:        let mut val = Vec::<u8,32>::new(); val.extend_from_slice(b"v1").unwrap();
+crates/amun-stf/src/tests.rs:        stf.apply_set(key, val).unwrap();
+crates/amun-stf/src/tests.rs:        let new_root = stf.commit().unwrap();
+crates/amun-stf/src/tests.rs:        let mut key = Vec::<u8,32>::new(); key.extend_from_slice(b"k1").unwrap();
+crates/amun-stf/src/tests.rs:        let mut val = Vec::<u8,32>::new(); val.extend_from_slice(b"v1").unwrap();
+crates/amun-stf/src/tests.rs:        stf.apply_set(key, val).unwrap();
+crates/amun-stf/src/tests.rs:            let mut k = Vec::<u8,32>::new(); k.extend_from_slice(&[i;8]).unwrap();
+crates/amun-stf/src/tests.rs:            let mut v = Vec::<u8,32>::new(); v.extend_from_slice(&[i;8]).unwrap();
+crates/amun-stf/src/tests.rs:            stf1.apply_set(k.clone(), v.clone()).unwrap();
+crates/amun-stf/src/tests.rs:            stf2.apply_set(k, v).unwrap();
+crates/amun-stf/src/tests.rs:        let r1 = stf1.commit().unwrap();
+crates/amun-stf/src/tests.rs:        let r2 = stf2.commit().unwrap();
+crates/amun-transaction/src/tests.rs:        let tx = r.unwrap();
+crates/amun-transaction/src/tests.rs:        assert!(r.unwrap().validate_basic().is_ok());
+crates/amun-transaction/src/tests.rs:        assert!(r.unwrap().validate_basic().is_ok());
+crates/amun-transaction/src/tests.rs:        assert!(r.unwrap().validate_basic().is_ok());
+crates/amun-transaction/src/tests.rs:        assert!(r.unwrap().validate_basic().is_err());
+crates/amun-wal/src/wal.rs:        let mut file = self.file.as_ref().unwrap().try_clone()?;
+crates/amun-wal/src/wal.rs:            let seq = u64::from_le_bytes(header[0..8].try_into().unwrap());
+crates/amun-wal/src/wal.rs:            let checksum: [u8; 32] = header[8..40].try_into().unwrap();
+crates/amun-wal/src/wal.rs:            let frame_prev_hash: [u8; 32] = header[40..72].try_into().unwrap();
+crates/amun-wal/src/wal.rs:            let payload_len = u32::from_le_bytes(header[72..76].try_into().unwrap()) as usize;
+crates/amun-wal/src/wal.rs:                    WalEntry::Transaction { payload: data[..pl].to_vec(), state_root: data[data.len()-32..].try_into().unwrap() }
+crates/amun-wal/src/wal.rs:                    WalEntry::EpochSeal { epoch: seq, seal_hash: data[..32].try_into().unwrap(), state_root: data[32..64].try_into().unwrap() }
+crates/amun-wal/src/wal.rs:                    WalEntry::Snapshot { epoch: seq, state_root: data[..32].try_into().unwrap() }
+crates/amun-wal/src/wal.rs:        let file = self.file.as_mut().unwrap();
+crates/amun-wal/src/wal.rs:        let mut file = self.file.as_ref().unwrap().try_clone()?;
+crates/amun-wal/src/wal.rs:            let seq = u64::from_le_bytes(header[0..8].try_into().unwrap());
+crates/amun-wal/src/wal.rs:            let checksum: [u8; 32] = header[8..40].try_into().unwrap();
+crates/amun-wal/src/wal.rs:            let frame_prev_hash: [u8; 32] = header[40..72].try_into().unwrap();
+crates/amun-wal/src/wal.rs:            let payload_len = u32::from_le_bytes(header[72..76].try_into().unwrap()) as usize;
+crates/amun-wal/src/wal.rs:                    WalEntry::Transaction { payload: data[..pl].to_vec(), state_root: data[data.len()-32..].try_into().unwrap() }
+crates/amun-wal/src/wal.rs:                    WalEntry::EpochSeal { epoch: seq, seal_hash: data[..32].try_into().unwrap(), state_root: data[32..64].try_into().unwrap() }
+crates/amun-wal/src/wal.rs:                    WalEntry::Snapshot { epoch: seq, state_root: data[..32].try_into().unwrap() }
+crates/amun-unsafe/src/tests.rs:        slot.write(42u64).unwrap();
+crates/amun-unsafe/src/tests.rs:        assert_eq!(slot.take().unwrap(), 42);
+crates/amun-unsafe/src/tests.rs:        slot.write(99u64).unwrap();
+crates/amun-unsafe/src/tests.rs:        assert_eq!(*slot.get().unwrap(), 99);
+crates/amun-unsafe/src/tests.rs:        slot.write(10u64).unwrap();
+crates/amun-unsafe/src/tests.rs:        *slot.get_mut().unwrap() = 20;
+crates/amun-unsafe/src/tests.rs:        assert_eq!(slot.take().unwrap(), 20);
+crates/amun-unsafe/src/tests.rs:        slot.write(1u64).unwrap();
+crates/amun-unsafe/src/tests.rs:        let old = slot.replace(2u64).unwrap();
+crates/amun-unsafe/src/tests.rs:        assert_eq!(*slot.get().unwrap(), 2);
+crates/amun-unsafe/src/tests.rs:        slot.write(1u64).unwrap();
+crates/amun-unsafe/src/tests.rs:        slot.write(1u64).unwrap();
+crates/amun-unsafe/src/tests.rs:        let _ = slot.take().unwrap();
+crates/amun-unsafe/src/tests.rs:        slot.write(2u64).unwrap();
+crates/amun-unsafe/src/tests.rs:        assert_eq!(slot.take().unwrap(), 2);
+crates/amun-unsafe/src/tests.rs:        slot.write(DropCount { c: &counter }).unwrap();
+crates/amun-consensus/src/tests.rs:    fn test_round_phase_advance() { let mut s = RoundState::new(Epoch::new(1)); s.advance_phase().unwrap(); assert_eq!(s.phase, RoundPhase::Prepare); s.advance_phase().unwrap(); assert_eq!(s.phase, RoundPhase::PreCommit); s.advance_phase().unwrap(); assert_eq!(s.phase, RoundPhase::Commit); s.advance_phase().unwrap(); assert_eq!(s.phase, RoundPhase::Proposal); }
+crates/amun-consensus/src/tests.rs:    fn test_validator_set_quorum() { let mut vs = ValidatorSet::new(); for i in 0..4u8 { vs.add_validator(ValidatorId::new([i;32]), PublicKey::new([0u8;48])).unwrap(); } assert_eq!(vs.byzantine_threshold(), 1); assert_eq!(vs.quorum_threshold(), 3); assert!(vs.is_quorum(3)); assert!(!vs.is_quorum(2)); }
+crates/amun-consensus/src/tests.rs:    fn test_finalize_block() { let mut e = ConsensusEngine::new(Epoch::new(1)); e.finalize_block(PublicHash32::new([1u8;32])).unwrap(); e.finalize_block(PublicHash32::new([2u8;32])).unwrap(); assert_eq!(e.finalized_blocks.len(), 2); }
+crates/amun-consensus/src/tests.rs:    fn test_finalize_block_deterministic() { let mut e1 = ConsensusEngine::new(Epoch::new(1)); let mut e2 = ConsensusEngine::new(Epoch::new(1)); let h1 = PublicHash32::new([0xAAu8;32]); let h2 = PublicHash32::new([0xBBu8;32]); e1.finalize_block(h1).unwrap(); e1.finalize_block(h2).unwrap(); e2.finalize_block(h1).unwrap(); e2.finalize_block(h2).unwrap(); assert_eq!(e1.finalized_blocks.len(), e2.finalized_blocks.len()); }
+crates/amun-consensus-types/src/tests.rs:        r.encode(&mut buf).unwrap();
+crates/amun-consensus-types/src/tests.rs:        let decoded = ConsensusRound::decode_exact(&buf).unwrap();
+crates/amun-consensus-types/src/tests.rs:        bm.set(0).unwrap();
+crates/amun-consensus-types/src/tests.rs:        .unwrap();
+crates/amun-consensus-types/src/tests.rs:        let len = msg.encode(&mut buf).unwrap();
+crates/amun-consensus-types/src/tests.rs:        let decoded = ConsensusMessage::decode_exact(&buf[..len]).unwrap();

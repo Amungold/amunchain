@@ -1,0 +1,17 @@
+[package]
+name = "amun-cli"
+version = "1.0.0"
+edition = "2021"
+description = "AmunChain CLI"
+
+[[bin]]
+name = "amun"
+path = "src/main.rs"
+
+[dependencies]
+amun-rpc = { path = "../amun-rpc" }
+amun-crypto = { path = "../amun-crypto" }
+amun-keystore = { path = "../amun-keystore" }
+clap = { version = "4", features = ["derive"] }
+serde_json = "1"
+hex = "0.4"
