@@ -24,10 +24,19 @@ impl ResourceAccountant {
     }
 
     pub fn charge_memory(&mut self, bytes: u64) -> Result<(), &'static str> {
-        self.memory_used = self.memory_used.checked_add(bytes).ok_or("memory overflow")?;
+        self.memory_used = self
+            .memory_used
+            .checked_add(bytes)
+            .ok_or("memory overflow")?;
         if self.memory_used > self.max_memory {
             return Err("memory budget exceeded");
         }
         Ok(())
+    }
+}
+
+impl Default for ResourceAccountant {
+    fn default() -> Self {
+        Self::new()
     }
 }

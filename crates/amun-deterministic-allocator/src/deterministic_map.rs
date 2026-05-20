@@ -6,7 +6,11 @@ pub struct DeterministicMap<K: Ord + Clone, V: Clone> {
 }
 
 impl<K: Ord + Clone, V: Clone> DeterministicMap<K, V> {
-    pub fn new() -> Self { Self { entries: Vec::with_capacity(MAX_ENTRIES) } }
+    pub fn new() -> Self {
+        Self {
+            entries: Vec::with_capacity(MAX_ENTRIES),
+        }
+    }
 
     pub fn insert(&mut self, key: K, value: V) -> Result<Option<V>, &'static str> {
         if let Some(pos) = self.entries.iter().position(|(k, _)| *k == key) {
@@ -14,19 +18,30 @@ impl<K: Ord + Clone, V: Clone> DeterministicMap<K, V> {
             self.entries[pos] = (key, value);
             Ok(Some(old))
         } else {
-            if self.entries.len() >= MAX_ENTRIES { return Err("map full"); }
-            let pos = self.entries.binary_search_by(|(k, _)| k.cmp(&key)).unwrap_or_else(|e| e);
+            if self.entries.len() >= MAX_ENTRIES {
+                return Err("map full");
+            }
+            let pos = self
+                .entries
+                .binary_search_by(|(k, _)| k.cmp(&key))
+                .unwrap_or_else(|e| e);
             self.entries.insert(pos, (key, value));
             Ok(None)
         }
     }
 
     pub fn get(&self, key: &K) -> Option<&V> {
-        self.entries.binary_search_by(|(k, _)| k.cmp(key)).ok().map(|i| &self.entries[i].1)
+        self.entries
+            .binary_search_by(|(k, _)| k.cmp(key))
+            .ok()
+            .map(|i| &self.entries[i].1)
     }
 
     pub fn remove(&mut self, key: &K) -> Option<V> {
-        self.entries.binary_search_by(|(k, _)| k.cmp(key)).ok().map(|i| self.entries.remove(i).1)
+        self.entries
+            .binary_search_by(|(k, _)| k.cmp(key))
+            .ok()
+            .map(|i| self.entries.remove(i).1)
     }
 
     pub fn contains_key(&self, key: &K) -> bool {
@@ -37,9 +52,17 @@ impl<K: Ord + Clone, V: Clone> DeterministicMap<K, V> {
         self.entries.iter().map(|(k, v)| (k, v))
     }
 
-    pub fn len(&self) -> usize { self.entries.len() }
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
 }
 
 impl<K: Ord + Clone, V: Clone> Default for DeterministicMap<K, V> {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

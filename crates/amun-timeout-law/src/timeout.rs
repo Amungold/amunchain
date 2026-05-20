@@ -26,7 +26,12 @@ impl TimeoutCertificate {
         let mut certificate_hash = [0u8; 32];
         certificate_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
-        Self { position, round, timeout_signatures, certificate_hash }
+        Self {
+            position,
+            round,
+            timeout_signatures,
+            certificate_hash,
+        }
     }
 
     pub fn verify(&self) -> bool {

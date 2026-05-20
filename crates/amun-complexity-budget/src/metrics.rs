@@ -16,11 +16,10 @@ impl ComplexityMetrics {
         attack_scenarios: usize,
         epoch: u64,
     ) -> Self {
-        let total_mass_milli = 
-            (consensus_states as u128).saturating_mul(10_000) +
-            (consensus_transitions as u128).saturating_mul(5_000) +
-            (invariant_count as u128).saturating_mul(20_000) +
-            (attack_scenarios as u128).saturating_mul(2_000);
+        let total_mass_milli = (consensus_states as u128).saturating_mul(10_000)
+            + (consensus_transitions as u128).saturating_mul(5_000)
+            + (invariant_count as u128).saturating_mul(20_000)
+            + (attack_scenarios as u128).saturating_mul(2_000);
 
         Self {
             consensus_states,

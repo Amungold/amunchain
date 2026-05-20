@@ -14,13 +14,7 @@ impl SignatureVerifier {
         chain_id: u64,
     ) -> bool {
         let transcript = signing_transcript(domain, chain_id, message_hash);
-        Ed25519Signer::verify(
-            public_key,
-            &transcript,
-            signature,
-            domain.tag(),
-            chain_id,
-        ).is_ok()
+        Ed25519Signer::verify(public_key, &transcript, signature, domain.tag(), chain_id).is_ok()
     }
 
     /// Sign a message hash with a validator's signing key.
@@ -31,7 +25,8 @@ impl SignatureVerifier {
         chain_id: u64,
     ) -> Result<[u8; 64], &'static str> {
         let transcript = signing_transcript(domain, chain_id, message_hash);
-        signer.sign(&transcript, domain.tag(), chain_id)
+        signer
+            .sign(&transcript, domain.tag(), chain_id)
             .map_err(|_| "signing failed")
     }
 }

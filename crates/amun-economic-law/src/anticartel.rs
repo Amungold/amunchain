@@ -3,6 +3,12 @@ pub struct AntiCartelLaw {
     pub min_validator_diversity: u8,
 }
 
+impl Default for AntiCartelLaw {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AntiCartelLaw {
     pub fn new() -> Self {
         Self {

@@ -76,5 +76,7 @@ impl CanonicalDecode for Block {
 }
 
 impl BlockId {
-    pub fn to_public_hash32(&self) -> PublicHash32 { self.0 }
+    pub fn to_public_hash32(&self) -> PublicHash32 {
+        self.0
+    }
 }

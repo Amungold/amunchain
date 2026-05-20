@@ -25,10 +25,8 @@ impl ValidatorSet {
         let total_stake: u64 = validators.iter().map(|v| v.stake).sum();
         let quorum_threshold = (total_stake * 2) / 3 + 1;
 
-        let validators_map: BTreeMap<u64, ValidatorInfo> = validators
-            .into_iter()
-            .map(|v| (v.id, v))
-            .collect();
+        let validators_map: BTreeMap<u64, ValidatorInfo> =
+            validators.into_iter().map(|v| (v.id, v)).collect();
 
         Ok(Self {
             epoch,

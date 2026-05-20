@@ -55,5 +55,7 @@ impl RoundState {
 }
 
 impl Default for RoundState {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

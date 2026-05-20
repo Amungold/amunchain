@@ -1,5 +1,6 @@
-use std::slice;
+#![allow(clippy::not_unsafe_ptr_arg_deref)]
 use amun_crypto::Ed25519Signer;
+use std::slice;
 
 const ERR_OK: i32 = 0;
 const ERR_NULL_PTR: i32 = -1;
@@ -8,19 +9,14 @@ const ERR_SIGN_FAILED: i32 = -3;
 const ERR_VERIFY_FAILED: i32 = -4;
 
 #[no_mangle]
-pub extern "C" fn amun_generate_keypair(
-    public_key_out: *mut u8,
-    secret_key_out: *mut u8,
-) -> i32 {
+pub extern "C" fn amun_generate_keypair(public_key_out: *mut u8, secret_key_out: *mut u8) -> i32 {
     if public_key_out.is_null() || secret_key_out.is_null() {
         return ERR_NULL_PTR;
     }
     let signer = Ed25519Signer::generate();
     unsafe {
-        slice::from_raw_parts_mut(public_key_out, 32)
-            .copy_from_slice(&signer.public_bytes());
-        slice::from_raw_parts_mut(secret_key_out, 32)
-            .copy_from_slice(&signer.to_bytes());
+        slice::from_raw_parts_mut(public_key_out, 32).copy_from_slice(&signer.public_bytes());
+        slice::from_raw_parts_mut(secret_key_out, 32).copy_from_slice(&signer.to_bytes());
     }
     ERR_OK
 }

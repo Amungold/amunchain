@@ -8,6 +8,6 @@ impl CanonicalSorter {
     }
 
     pub fn sort_validators(validators: &mut Vec<([u8; 32], u64), 128>) {
-        validators.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+        validators.sort_unstable_by_key(|a| a.0);
     }
 }

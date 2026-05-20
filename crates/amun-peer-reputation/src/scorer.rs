@@ -3,6 +3,12 @@ pub struct PeerScorer {
     pub eviction_threshold: i32,
 }
 
+impl Default for PeerScorer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PeerScorer {
     pub fn new() -> Self {
         Self {
@@ -15,7 +21,9 @@ impl PeerScorer {
         if let Ok(idx) = self.scores.binary_search_by_key(peer, |(k, _)| *k) {
             self.scores[idx].1 += 1;
         } else {
-            let pos = self.scores.binary_search_by_key(peer, |(k, _)| *k)
+            let pos = self
+                .scores
+                .binary_search_by_key(peer, |(k, _)| *k)
                 .unwrap_or_else(|e| e);
             self.scores.insert(pos, (*peer, 1));
         }
@@ -25,16 +33,20 @@ impl PeerScorer {
         if let Ok(idx) = self.scores.binary_search_by_key(peer, |(k, _)| *k) {
             self.scores[idx].1 -= severity;
         } else {
-            let pos = self.scores.binary_search_by_key(peer, |(k, _)| *k)
+            let pos = self
+                .scores
+                .binary_search_by_key(peer, |(k, _)| *k)
                 .unwrap_or_else(|e| e);
             self.scores.insert(pos, (*peer, -severity));
         }
     }
 
     pub fn should_evict(&self, peer: &[u8; 48]) -> bool {
-        self.scores.binary_search_by_key(peer, |(k, _)| *k)
+        self.scores
+            .binary_search_by_key(peer, |(k, _)| *k)
             .map(|idx| self.scores[idx].1)
-            .unwrap_or(0) < self.eviction_threshold
+            .unwrap_or(0)
+            < self.eviction_threshold
     }
 
     pub fn evict(&mut self, peer: &[u8; 48]) {

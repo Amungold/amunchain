@@ -1,5 +1,5 @@
-pub mod safety;
 pub mod liveness;
+pub mod safety;
 
-pub use safety::SafetyProof;
 pub use liveness::LivenessProof;
+pub use safety::SafetyProof;

@@ -1,5 +1,5 @@
-use rand_core::RngCore;
 use rand_core::OsRng;
+use rand_core::RngCore;
 
 pub struct EntropyAudit {
     pub last_check: u64,

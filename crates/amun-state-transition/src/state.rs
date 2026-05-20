@@ -1,8 +1,8 @@
-use crate::write_set::{WriteSet, StateOperation};
 use crate::receipt::ExecutionReceipt;
+use crate::write_set::{StateOperation, WriteSet};
 use amun_canonical::{CanonicalEncoder, SchemaVersion};
-use amun_deterministic_allocator::DeterministicMap;
 use amun_chain_position::ChainPosition;
+use amun_deterministic_allocator::DeterministicMap;
 use blake3::Hasher;
 
 pub struct StateMachine {
@@ -19,7 +19,9 @@ pub struct StateOverlay {
 }
 
 impl StateOverlay {
-    pub fn new() -> Self { Self { delta: Vec::new() } }
+    pub fn new() -> Self {
+        Self { delta: Vec::new() }
+    }
 
     pub fn put(&mut self, key: [u8; 32], value: Vec<u8>) {
         self.delta.retain(|(op, _)| match op {
@@ -35,7 +37,9 @@ impl StateOverlay {
         self.delta.push((StateOperation::Delete { key }, false));
     }
 
-    pub fn is_empty(&self) -> bool { self.delta.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.delta.is_empty()
+    }
 
     pub fn to_writeset(&self) -> WriteSet {
         WriteSet::from_overlay(&self.delta)
@@ -44,8 +48,12 @@ impl StateOverlay {
     pub fn commit_to(self, target: &mut DeterministicMap<[u8; 32], Vec<u8>>) {
         for (op, _) in &self.delta {
             match op {
-                StateOperation::Put { key, value } => { let _ = target.insert(*key, value.clone()); }
-                StateOperation::Delete { key } => { target.remove(key); }
+                StateOperation::Put { key, value } => {
+                    let _ = target.insert(*key, value.clone());
+                }
+                StateOperation::Delete { key } => {
+                    target.remove(key);
+                }
             }
         }
     }
@@ -61,8 +69,11 @@ pub struct TransitionOutput {
 impl StateMachine {
     pub fn new(genesis_root: [u8; 32], execution_version: u64) -> Self {
         Self {
-            state: DeterministicMap::new(), current_root: genesis_root, genesis_root,
-            execution_version, epoch_seal_hash: None,
+            state: DeterministicMap::new(),
+            current_root: genesis_root,
+            genesis_root,
+            execution_version,
+            epoch_seal_hash: None,
         }
     }
 
@@ -87,7 +98,10 @@ impl StateMachine {
         gas_used = gas_used.saturating_add(base_gas);
 
         if gas_used > gas_limit {
-            return (ExecutionReceipt::failed(position, from_root, from_root, gas_limit, 1), overlay);
+            return (
+                ExecutionReceipt::failed(position, from_root, from_root, gas_limit, 1),
+                overlay,
+            );
         }
 
         let storage_key = {
@@ -100,10 +114,14 @@ impl StateMachine {
         };
         overlay.put(storage_key, tx_data.to_vec());
 
-        let new_root = Self::compute_root_with_overlay(state, execution_version, epoch_seal_hash, &overlay);
+        let new_root =
+            Self::compute_root_with_overlay(state, execution_version, epoch_seal_hash, &overlay);
         let write_set = overlay.to_writeset();
 
-        (ExecutionReceipt::success(position, from_root, new_root, gas_used, write_set), overlay)
+        (
+            ExecutionReceipt::success(position, from_root, new_root, gas_used, write_set),
+            overlay,
+        )
     }
 
     /// Instance method for backward compatibility.
@@ -114,8 +132,12 @@ impl StateMachine {
         gas_limit: u64,
     ) -> (ExecutionReceipt, StateOverlay) {
         Self::execute_transition(
-            &self.state, self.execution_version, self.epoch_seal_hash,
-            position, tx_data, gas_limit,
+            &self.state,
+            self.execution_version,
+            self.epoch_seal_hash,
+            position,
+            tx_data,
+            gas_limit,
         )
     }
 
@@ -151,7 +173,9 @@ impl StateMachine {
         for (op, _) in &overlay.delta {
             match op {
                 StateOperation::Put { key, .. } | StateOperation::Delete { key } => {
-                    if !all_keys.contains(key) { all_keys.push(*key); }
+                    if !all_keys.contains(key) {
+                        all_keys.push(*key);
+                    }
                 }
             }
         }
@@ -186,5 +210,13 @@ impl StateMachine {
         self.current_root = new_root;
     }
 
-    pub fn live_root(&self) -> [u8; 32] { self.current_root }
+    pub fn live_root(&self) -> [u8; 32] {
+        self.current_root
+    }
+}
+
+impl Default for StateOverlay {
+    fn default() -> Self {
+        Self::new()
+    }
 }

@@ -1,8 +1,8 @@
 use crate::event::ReactorEvent;
 use amun_chain_position::ChainPosition;
-use amun_pacemaker::{Pacemaker, RoundPhase};
 use amun_deterministic_scheduler::{DeterministicScheduler, ResourceBudget};
 use amun_deterministic_timer::DeterministicTimerWheel;
+use amun_pacemaker::{Pacemaker, RoundPhase};
 
 #[derive(Debug, Clone)]
 pub struct ConsensusReactor {
@@ -35,7 +35,11 @@ impl ConsensusReactor {
 
         for event in self.event_queue.drain(..) {
             match &event {
-                ReactorEvent::ProposalReceived { position, round, block_hash: _ } => {
+                ReactorEvent::ProposalReceived {
+                    position,
+                    round,
+                    block_hash: _,
+                } => {
                     if *round >= self.pacemaker.current_round {
                         self.pacemaker.on_progress();
                         self.pacemaker.advance_position(*position);
@@ -70,6 +74,10 @@ impl ConsensusReactor {
         output
     }
 
-    pub fn round(&self) -> u64 { self.pacemaker.current_round }
-    pub fn phase(&self) -> &RoundPhase { &self.pacemaker.round_state.phase }
+    pub fn round(&self) -> u64 {
+        self.pacemaker.current_round
+    }
+    pub fn phase(&self) -> &RoundPhase {
+        &self.pacemaker.round_state.phase
+    }
 }

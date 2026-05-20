@@ -7,9 +7,7 @@ pub fn select_best_qc(qcs: &[QuorumCertificate]) -> Option<&QuorumCertificate> {
     }
     let mut best = &qcs[0];
     for qc in &qcs[1..] {
-        if qc.round > best.round {
-            best = qc;
-        } else if qc.round == best.round && qc.block_hash > best.block_hash {
+        if qc.round > best.round || (qc.round == best.round && qc.block_hash > best.block_hash) {
             best = qc;
         }
     }
@@ -54,8 +52,19 @@ mod tests {
     use super::*;
     use amun_chain_position::ChainPosition;
 
-    fn make_qc(round: u64, block_hash: [u8; 32], parent_hash: [u8; 32], height: u64) -> QuorumCertificate {
-        QuorumCertificate::new(ChainPosition::new(0, height), round, block_hash, parent_hash, vec![])
+    fn make_qc(
+        round: u64,
+        block_hash: [u8; 32],
+        parent_hash: [u8; 32],
+        height: u64,
+    ) -> QuorumCertificate {
+        QuorumCertificate::new(
+            ChainPosition::new(0, height),
+            round,
+            block_hash,
+            parent_hash,
+            vec![],
+        )
     }
 
     #[test]
@@ -84,7 +93,7 @@ mod tests {
         let qc2 = make_qc(2, [0x02; 32], [0x01; 32], 2);
         let qc3 = make_qc(3, [0x03; 32], [0x02; 32], 3);
         let all = vec![qc1, qc2, qc3];
-        let chain = find_chain(&all.last().unwrap(), &all);
+        let chain = find_chain(all.last().unwrap(), &all);
         assert!(chain.len() >= 2);
     }
 }

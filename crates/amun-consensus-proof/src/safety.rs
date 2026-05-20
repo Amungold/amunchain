@@ -21,12 +21,7 @@ impl SafetyProof {
         true
     }
 
-    pub fn quorum_intersection(
-        quorum_a: u64,
-        quorum_b: u64,
-        total: u64,
-        threshold: u64,
-    ) -> bool {
+    pub fn quorum_intersection(quorum_a: u64, quorum_b: u64, total: u64, threshold: u64) -> bool {
         quorum_a >= threshold && quorum_b >= threshold && quorum_a + quorum_b > total
     }
 }

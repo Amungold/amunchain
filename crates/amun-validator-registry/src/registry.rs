@@ -9,10 +9,16 @@ pub struct ValidatorRegistry {
 
 impl ValidatorRegistry {
     pub fn new() -> Self {
-        Self { keys: BTreeMap::new() }
+        Self {
+            keys: BTreeMap::new(),
+        }
     }
 
-    pub fn register(&mut self, validator_id: u64, public_key: [u8; 32]) -> Result<(), &'static str> {
+    pub fn register(
+        &mut self,
+        validator_id: u64,
+        public_key: [u8; 32],
+    ) -> Result<(), &'static str> {
         if self.keys.contains_key(&validator_id) {
             return Err("validator already registered");
         }
@@ -32,11 +38,17 @@ impl ValidatorRegistry {
         self.keys.contains_key(&validator_id)
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.keys.is_empty()
+    }
+
     pub fn len(&self) -> usize {
         self.keys.len()
     }
 }
 
 impl Default for ValidatorRegistry {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

@@ -28,20 +28,34 @@ impl DeterministicQueue {
         }
     }
 
-    pub fn push(&mut self, position: u64, priority: u8, payload: Vec<u8>) -> Result<(), &'static str> {
+    pub fn push(
+        &mut self,
+        position: u64,
+        priority: u8,
+        payload: Vec<u8>,
+    ) -> Result<(), &'static str> {
         if self.entries.len() >= self.max_capacity {
             return Err("queue full");
         }
         // Binary insertion: find position by (priority ASC, position ASC)
         // Lower priority number = higher scheduling priority (executed first)
-        let entry = QueueEntry { position, priority, payload };
-        let idx = self.entries.binary_search_by(|e| {
-            // Primary: priority (lower = higher priority)
-            // Secondary: position (lower = earlier)
-            entry.priority.cmp(&e.priority)
-                .then(entry.position.cmp(&e.position))
-        }).unwrap_or_else(|i| i);
-        
+        let entry = QueueEntry {
+            position,
+            priority,
+            payload,
+        };
+        let idx = self
+            .entries
+            .binary_search_by(|e| {
+                // Primary: priority (lower = higher priority)
+                // Secondary: position (lower = earlier)
+                entry
+                    .priority
+                    .cmp(&e.priority)
+                    .then(entry.position.cmp(&e.position))
+            })
+            .unwrap_or_else(|i| i);
+
         self.entries.insert(idx, entry);
         Ok(())
     }
@@ -64,5 +78,7 @@ impl DeterministicQueue {
 }
 
 impl Default for DeterministicQueue {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

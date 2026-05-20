@@ -1,5 +1,5 @@
+use amun_consensus_types::{ConsensusPhase, ConsensusRound, ValidatorIndex};
 use amun_kernel_types::PublicHash32;
-use amun_consensus_types::{ConsensusRound, ConsensusPhase, ValidatorIndex};
 
 #[derive(Clone, Debug)]
 pub struct ConsensusVote {

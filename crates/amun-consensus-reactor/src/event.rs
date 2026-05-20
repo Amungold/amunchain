@@ -22,17 +22,11 @@ pub enum ReactorEvent {
         block_hash: [u8; 32],
     },
     /// A round timed out
-    RoundTimeout {
-        round: u64,
-    },
+    RoundTimeout { round: u64 },
     /// Enough view-change messages to advance
-    ViewChangeQuorum {
-        new_round: u64,
-    },
+    ViewChangeQuorum { new_round: u64 },
     /// An epoch transition should occur
-    EpochTransition {
-        new_epoch: u64,
-    },
+    EpochTransition { new_epoch: u64 },
     /// Heartbeat tick
     Tick,
 }

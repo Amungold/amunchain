@@ -1,5 +1,5 @@
-use amun_quorum_certificate::QuorumCertificate;
 use crate::block_dag::{BlockDAG, BlockNode, MAX_DAG_DEPTH};
+use amun_quorum_certificate::QuorumCertificate;
 use std::collections::{BTreeMap, HashSet};
 
 /// Fork-choice rule with lock history for monotonicity verification
@@ -98,7 +98,11 @@ impl ForkChoice {
 
         if qc3.round > qc2.round && qc2.round > qc1.round {
             // 3-chain commit rule: commit block1
-            if !self.committed_qcs.iter().any(|c| c.block_hash == qc1.block_hash) {
+            if !self
+                .committed_qcs
+                .iter()
+                .any(|c| c.block_hash == qc1.block_hash)
+            {
                 self.committed_qcs.push(qc1.clone());
             }
         }

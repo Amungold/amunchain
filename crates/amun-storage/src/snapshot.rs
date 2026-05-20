@@ -1,8 +1,8 @@
-use amun_kernel_types::PublicHash32;
-use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
-use amun_codec::{CanonicalEncode, CanonicalDecode, CanonicalWriter, WriteResult};
-use heapless::Vec;
 use crate::law::StorageLaw;
+use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+use amun_kernel_types::PublicHash32;
+use heapless::Vec;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StateSnapshot {
@@ -13,22 +13,32 @@ pub struct StateSnapshot {
 
 impl StateSnapshot {
     pub fn new(block_height: u64, state_root: PublicHash32) -> Self {
-        Self { block_height, state_root, entries: Vec::new() }
+        Self {
+            block_height,
+            state_root,
+            entries: Vec::new(),
+        }
     }
 
     pub fn add_entry(&mut self, key: &[u8], value: &[u8]) -> Result<(), FailureContext> {
         if self.entries.is_full() {
             return Err(FailureContext::new(
-                ConstitutionalFault::CapacityExceeded, 0x000B, 0x0010));
+                ConstitutionalFault::CapacityExceeded,
+                0x000B,
+                0x0010,
+            ));
         }
         let mut k = Vec::new();
-        k.extend_from_slice(key).map_err(|_|
-            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x0011))?;
+        k.extend_from_slice(key).map_err(|_| {
+            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x0011)
+        })?;
         let mut v = Vec::new();
-        v.extend_from_slice(value).map_err(|_|
-            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x0012))?;
-        self.entries.push((k, v)).map_err(|_|
-            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x0013))?;
+        v.extend_from_slice(value).map_err(|_| {
+            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x0012)
+        })?;
+        self.entries.push((k, v)).map_err(|_| {
+            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x0013)
+        })?;
         Ok(())
     }
 
@@ -67,7 +77,10 @@ impl CanonicalDecode for StateSnapshot {
     fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
         if input.len() < 44 {
             return Err(FailureContext::new(
-                ConstitutionalFault::BufferTooSmall, 0x000B, 0x0030));
+                ConstitutionalFault::BufferTooSmall,
+                0x000B,
+                0x0030,
+            ));
         }
         let (block_height, len1) = u64::decode(input)?;
         let (state_root, len2) = PublicHash32::decode(&input[len1..])?;
@@ -75,7 +88,10 @@ impl CanonicalDecode for StateSnapshot {
 
         if input.len() < pos + 4 {
             return Err(FailureContext::new(
-                ConstitutionalFault::BufferTooSmall, 0x000B, 0x0031));
+                ConstitutionalFault::BufferTooSmall,
+                0x000B,
+                0x0031,
+            ));
         }
         let (entry_count, len3) = u32::decode(&input[pos..])?;
         pos += len3;
@@ -85,76 +101,102 @@ impl CanonicalDecode for StateSnapshot {
             // Bounds-checked key read
             if input.len() < pos + 2 {
                 return Err(FailureContext::new(
-                    ConstitutionalFault::BufferTooSmall, 0x000B, 0x0032));
+                    ConstitutionalFault::BufferTooSmall,
+                    0x000B,
+                    0x0032,
+                ));
             }
             let (key_len, len4) = u16::decode(&input[pos..])?;
             pos += len4;
             let key_len = key_len as usize;
             if key_len > 128 {
                 return Err(FailureContext::new(
-                    ConstitutionalFault::CapacityExceeded, 0x000B, 0x0033));
+                    ConstitutionalFault::CapacityExceeded,
+                    0x000B,
+                    0x0033,
+                ));
             }
-            let end = pos.checked_add(key_len).ok_or_else(||
-                FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x000B, 0x0034))?;
+            let end = pos.checked_add(key_len).ok_or_else(|| {
+                FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x000B, 0x0034)
+            })?;
             if input.len() < end {
                 return Err(FailureContext::new(
-                    ConstitutionalFault::BufferTooSmall, 0x000B, 0x0035));
+                    ConstitutionalFault::BufferTooSmall,
+                    0x000B,
+                    0x0035,
+                ));
             }
             let mut key = Vec::new();
-            key.extend_from_slice(&input[pos..end]).map_err(|_|
-                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x0036))?;
+            key.extend_from_slice(&input[pos..end]).map_err(|_| {
+                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x0036)
+            })?;
             pos = end;
 
             // Bounds-checked value read
             if input.len() < pos + 2 {
                 return Err(FailureContext::new(
-                    ConstitutionalFault::BufferTooSmall, 0x000B, 0x0037));
+                    ConstitutionalFault::BufferTooSmall,
+                    0x000B,
+                    0x0037,
+                ));
             }
             let (val_len, len5) = u16::decode(&input[pos..])?;
             pos += len5;
             let val_len = val_len as usize;
             if val_len > 256 {
                 return Err(FailureContext::new(
-                    ConstitutionalFault::CapacityExceeded, 0x000B, 0x0038));
+                    ConstitutionalFault::CapacityExceeded,
+                    0x000B,
+                    0x0038,
+                ));
             }
-            let end = pos.checked_add(val_len).ok_or_else(||
-                FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x000B, 0x0039))?;
+            let end = pos.checked_add(val_len).ok_or_else(|| {
+                FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x000B, 0x0039)
+            })?;
             if input.len() < end {
                 return Err(FailureContext::new(
-                    ConstitutionalFault::BufferTooSmall, 0x000B, 0x003A));
+                    ConstitutionalFault::BufferTooSmall,
+                    0x000B,
+                    0x003A,
+                ));
             }
             let mut value = Vec::new();
-            value.extend_from_slice(&input[pos..end]).map_err(|_|
-                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x003B))?;
+            value.extend_from_slice(&input[pos..end]).map_err(|_| {
+                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x003B)
+            })?;
             pos = end;
 
-            entries.push((key, value)).map_err(|_|
-                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x003C))?;
+            entries.push((key, value)).map_err(|_| {
+                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000B, 0x003C)
+            })?;
         }
-        Ok((Self { block_height, state_root, entries }, pos))
+        Ok((
+            Self {
+                block_height,
+                state_root,
+                entries,
+            },
+            pos,
+        ))
     }
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
+#[test]
+fn test_snapshot_checksum_deterministic() {
+    let mut snap = StateSnapshot::new(100, PublicHash32::new([0xAAu8; 32]));
+    snap.add_entry(b"key1", b"value1").expect("test invariant");
+    assert_eq!(snap.compute_checksum(), snap.compute_checksum());
+}
 
-    #[test]
-    fn test_snapshot_checksum_deterministic() {
-        let mut snap = StateSnapshot::new(100, PublicHash32::new([0xAAu8; 32]));
-        snap.add_entry(b"key1", b"value1").unwrap();
-        assert_eq!(snap.compute_checksum(), snap.compute_checksum());
-    }
-
-    #[test]
-    fn test_snapshot_roundtrip() {
-        let mut snap = StateSnapshot::new(42, PublicHash32::new([0xBBu8; 32]));
-        snap.add_entry(b"k1", b"v1").unwrap();
-        let mut buf = [0u8; 4096];
-        let len = snap.encode(&mut buf).unwrap();
-        let (decoded, consumed) = StateSnapshot::decode(&buf[..len]).unwrap();
-        assert_eq!(consumed, len);
-        assert_eq!(decoded.block_height, 42);
-        assert_eq!(decoded.entries.len(), 1);
-    }
+#[test]
+fn test_snapshot_roundtrip() {
+    let mut snap = StateSnapshot::new(42, PublicHash32::new([0xBBu8; 32]));
+    snap.add_entry(b"k1", b"v1").expect("test invariant");
+    let mut buf = [0u8; 4096];
+    let len = snap.encode(&mut buf).expect("test invariant");
+    let (decoded, consumed) = StateSnapshot::decode(&buf[..len]).expect("test invariant");
+    assert_eq!(consumed, len);
+    assert_eq!(decoded.block_height, 42);
+    assert_eq!(decoded.entries.len(), 1);
 }

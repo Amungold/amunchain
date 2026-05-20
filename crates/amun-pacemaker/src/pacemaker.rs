@@ -1,6 +1,6 @@
+use crate::round_state::RoundState;
 use amun_chain_position::ChainPosition;
 use amun_deterministic_timer::{DeterministicTimerWheel, TimeoutLaw};
-use crate::round_state::RoundState;
 
 /// Consensus pacemaker: drives round progression using logical time.
 /// Produces deterministic timeout behavior across all validators.

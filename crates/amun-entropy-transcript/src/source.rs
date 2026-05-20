@@ -48,19 +48,19 @@ impl DeterministicEntropy {
         hasher.update(&self.transcript.seed());
         hasher.update(&self.transcript.counter().to_le_bytes());
         self.transcript.increment();
-        
+
         let hash = hasher.finalize();
         let mut out = [0u8; N];
         let hash_bytes = hash.as_bytes();
         for i in 0..N {
             out[i] = hash_bytes[i % 32];
         }
-        
+
         let mut record_val = [0u8; 32];
         let copy_len = 32.min(N);
         record_val[..copy_len].copy_from_slice(&out[..copy_len]);
         self.transcript.record(record_val);
-        
+
         out
     }
 

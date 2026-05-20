@@ -1,5 +1,5 @@
-use hashbrown::HashSet;
 use crate::constants::DEDUP_CACHE_SIZE;
+use hashbrown::HashSet;
 
 pub struct DedupCache {
     seen: HashSet<[u8; 32]>,
@@ -23,7 +23,17 @@ impl DedupCache {
         self.seen.insert(hash);
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn len(&self) -> usize {
         self.seen.len()
+    }
+}
+
+impl Default for DedupCache {
+    fn default() -> Self {
+        Self::new()
     }
 }

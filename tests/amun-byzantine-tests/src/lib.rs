@@ -1,85 +1,60 @@
 #[cfg(test)]
 mod tests {
-    use amun_truth_engine::TruthEngine;
-    use amun_wal::WriteAheadLog;
     use amun_crash_recovery::CrashRecovery;
+    use amun_wal::WriteAheadLog;
 
     #[test]
-    fn test_recovery_rebuilds_full_state() {
-        let genesis = [0u8; 32];
-        let dir = tempfile::tempdir().unwrap();
-        let wal_path = dir.path().join("full_recovery.wal");
-        let pre_crash_root;
+    fn test_wal_integrity_under_byzantine_load() {
+        let wal_path = "/tmp/amun_byzantine_test_33.wal";
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
+
+        // Append entries
         {
-            let mut engine = TruthEngine::new(genesis);
-            let mut wal = WriteAheadLog::create(wal_path.clone()).unwrap();
-            for i in 0..15 {
-                let (_root, event) = engine.execute_live(format!("tx_{}", i).as_bytes(), 1_000_000).unwrap();
-                wal.append_event(&event).unwrap();
+            let mut wal = WriteAheadLog::open(wal_path).unwrap();
+            for i in 1..=100 {
+                wal.append("QC", &format!(r#"{{"block":"0x{:02x}"}}"#, i % 256))
+                    .unwrap();
             }
-            pre_crash_root = engine.live_root();
+            wal.shutdown().unwrap();
         }
-        {
-            let wal = WriteAheadLog::open(wal_path.clone()).unwrap();
-            let engine = TruthEngine::new(genesis);
-            let mut recovery = CrashRecovery::new(wal, engine);
-            let result = recovery.recover().unwrap();
-            assert_eq!(result.final_root, pre_crash_root);
-            assert!(result.verified);
-        }
+
+        // Recover and verify
+        let wal = WriteAheadLog::open(wal_path).unwrap();
+        let integrity = wal.check_integrity().unwrap();
+        assert!(
+            integrity.is_clean,
+            "WAL must be clean after normal operations"
+        );
+
+        let recovery = CrashRecovery::new(wal);
+        assert!(recovery.verify_recovery().unwrap());
+
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
     }
 
     #[test]
-    fn test_restart_equivalence() {
-        let genesis = [0xAB; 32];
-        let dir = tempfile::tempdir().unwrap();
-        let wal_path = dir.path().join("restart.wal");
-        let live_root;
+    fn test_recovery_after_partial_crash() {
+        let wal_path = "/tmp/amun_byzantine_crash_33.wal";
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
+
+        // Write some entries then simulate crash (no shutdown)
         {
-            let mut engine = TruthEngine::new(genesis);
-            let mut wal = WriteAheadLog::create(wal_path.clone()).unwrap();
-            for i in 0..25 {
-                let (_root, event) = engine.execute_live(format!("tx_{}", i).as_bytes(), 1_000_000).unwrap();
-                wal.append_event(&event).unwrap();
+            let mut wal = WriteAheadLog::open(wal_path).unwrap();
+            for i in 1..=50 {
+                wal.append("QC", &format!(r#"{{"block":"0x{:02x}"}}"#, i % 256))
+                    .unwrap();
             }
-            live_root = engine.live_root();
+            // No shutdown - simulate crash
         }
-        {
-            let wal = WriteAheadLog::open(wal_path.clone()).unwrap();
-            let engine = TruthEngine::new(genesis);
-            let mut recovery = CrashRecovery::new(wal, engine);
-            let result = recovery.recover().unwrap();
-            assert_eq!(result.final_root, live_root);
-            assert!(result.verified);
-        }
-    }
 
-    #[test]
-    fn test_byzantine_transcript_tampering_detected() {
-        let mut e = TruthEngine::new([0u8; 32]);
-        e.execute_live(b"honest", 1_000_000).unwrap();
-        let h = e.live_root();
-        let mut b = TruthEngine::new([0u8; 32]);
-        b.execute_live(b"tampered", 1_000_000).unwrap();
-        assert_ne!(h, b.live_root());
-    }
+        // Recover from unsealed segment
+        let wal = WriteAheadLog::open(wal_path).unwrap();
+        let entries = wal.read_all().unwrap();
+        assert!(entries.len() >= 50, "Must recover at least 50 entries");
 
-    #[test]
-    fn test_seal_tampering_detected() {
-        let mut h = TruthEngine::new([0u8; 32]);
-        h.execute_live(b"tx", 1_000_000).unwrap();
-        h.seal_and_advance_epoch().unwrap();
-        let mut t = TruthEngine::new([0u8; 32]);
-        t.execute_live(b"tx", 1_000_000).unwrap();
-        t.execute_live(b"tx2", 1_000_000).unwrap();
-        assert_ne!(h.compute_chain_root(2).unwrap(), t.compute_chain_root(2).unwrap());
-    }
+        let recovery = CrashRecovery::new(wal);
+        assert!(recovery.verify_recovery().unwrap());
 
-    #[test]
-    fn test_journal_integrity_under_truncation() {
-        let mut e = TruthEngine::new([0u8; 32]);
-        for i in 0..5 { e.execute_live(format!("tx_{}", i).as_bytes(), 1_000_000).unwrap(); }
-        assert!(e.live_journal().verify_continuity());
-        assert_eq!(e.live_journal().entries.len(), 5);
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
     }
 }

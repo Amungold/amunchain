@@ -38,7 +38,14 @@ impl UnsignedVote {
         let mut unsigned_hash = [0u8; 32];
         unsigned_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
-        Self { validator_id, position, round, phase, block_hash, unsigned_hash }
+        Self {
+            validator_id,
+            position,
+            round,
+            phase,
+            block_hash,
+            unsigned_hash,
+        }
     }
 
     pub fn verify_hash(&self) -> bool {
@@ -77,17 +84,21 @@ impl UnsignedVote {
     }
 
     pub fn decode(data: &[u8]) -> Option<Self> {
-        if data.len() < MIN_VOTE_LEN_NIL { return None; }
-        
+        if data.len() < MIN_VOTE_LEN_NIL {
+            return None;
+        }
+
         let version = data[0];
-        if version != VOTE_ENCODE_VERSION { return None; }
-        
+        if version != VOTE_ENCODE_VERSION {
+            return None;
+        }
+
         let validator_id = u64::from_le_bytes(data[1..9].try_into().ok()?);
         let epoch = u64::from_le_bytes(data[9..17].try_into().ok()?);
         let sequence = u64::from_le_bytes(data[17..25].try_into().ok()?);
         let position = ChainPosition::new(epoch, sequence);
         let round = u64::from_le_bytes(data[25..33].try_into().ok()?);
-        
+
         let phase_tag = data[33];
         let phase = match phase_tag {
             0 => ConstitutionalPhase::Propose,
@@ -95,15 +106,19 @@ impl UnsignedVote {
             2 => ConstitutionalPhase::Precommit,
             _ => return None,
         };
-        
+
         let has_block = data[34];
         let block_hash = if has_block == 1 {
-            if data.len() < MIN_VOTE_LEN_WITH_HASH { return None; }
+            if data.len() < MIN_VOTE_LEN_WITH_HASH {
+                return None;
+            }
             let mut hash = [0u8; 32];
             hash.copy_from_slice(&data[35..67]);
             Some(hash)
         } else if has_block == 0 {
-            if data.len() != MIN_VOTE_LEN_NIL { return None; }
+            if data.len() != MIN_VOTE_LEN_NIL {
+                return None;
+            }
             None
         } else {
             return None;
@@ -125,15 +140,30 @@ pub struct SignedVote {
 
 impl SignedVote {
     pub fn new(unsigned: UnsignedVote, signature: [u8; 64]) -> Self {
-        Self { unsigned, signature }
+        Self {
+            unsigned,
+            signature,
+        }
     }
 
-    pub fn verify_unsigned(&self) -> bool { self.unsigned.verify_hash() }
-    pub fn validator_id(&self) -> u64 { self.unsigned.validator_id }
-    pub fn position(&self) -> ChainPosition { self.unsigned.position }
-    pub fn round(&self) -> u64 { self.unsigned.round }
-    pub fn phase(&self) -> ConstitutionalPhase { self.unsigned.phase }
-    pub fn block_hash(&self) -> Option<[u8; 32]> { self.unsigned.block_hash }
+    pub fn verify_unsigned(&self) -> bool {
+        self.unsigned.verify_hash()
+    }
+    pub fn validator_id(&self) -> u64 {
+        self.unsigned.validator_id
+    }
+    pub fn position(&self) -> ChainPosition {
+        self.unsigned.position
+    }
+    pub fn round(&self) -> u64 {
+        self.unsigned.round
+    }
+    pub fn phase(&self) -> ConstitutionalPhase {
+        self.unsigned.phase
+    }
+    pub fn block_hash(&self) -> Option<[u8; 32]> {
+        self.unsigned.block_hash
+    }
 
     pub fn encode(&self) -> Vec<u8> {
         let mut buf = self.unsigned.encode();
@@ -150,13 +180,19 @@ impl SignedVote {
                 let unsigned = UnsignedVote::decode(&data[..MIN_VOTE_LEN_NIL])?;
                 let mut signature = [0u8; 64];
                 signature.copy_from_slice(&data[MIN_VOTE_LEN_NIL..]);
-                Some(Self { unsigned, signature })
+                Some(Self {
+                    unsigned,
+                    signature,
+                })
             }
             SIGNED_HASH_VOTE_LEN => {
                 let unsigned = UnsignedVote::decode(&data[..MIN_VOTE_LEN_WITH_HASH])?;
                 let mut signature = [0u8; 64];
                 signature.copy_from_slice(&data[MIN_VOTE_LEN_WITH_HASH..]);
-                Some(Self { unsigned, signature })
+                Some(Self {
+                    unsigned,
+                    signature,
+                })
             }
             _ => None,
         }

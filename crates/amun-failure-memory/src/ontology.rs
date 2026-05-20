@@ -50,7 +50,11 @@ impl FailureOntology {
             .iter()
             .filter(|p| p.severity == FailureSeverity::Fatal)
             .count();
-        let unmitigated = self.patterns.iter().filter(|p| !p.provably_mitigated).count();
+        let unmitigated = self
+            .patterns
+            .iter()
+            .filter(|p| !p.provably_mitigated)
+            .count();
 
         FailurePosture {
             total_patterns: total,
@@ -80,4 +84,10 @@ pub struct FailurePosture {
     pub all_fatal_mitigated: bool,
     pub ontology_version: u64,
     pub ontology_hash: [u8; 32],
+}
+
+impl Default for FailureOntology {
+    fn default() -> Self {
+        Self::new()
+    }
 }

@@ -16,7 +16,10 @@ impl RpcCostMeter {
     }
 
     pub fn charge_query(&mut self) -> Result<(), &'static str> {
-        self.used = self.used.checked_add(self.per_query_cost).ok_or("cost overflow")?;
+        self.used = self
+            .used
+            .checked_add(self.per_query_cost)
+            .ok_or("cost overflow")?;
         if self.used > self.limit {
             return Err("RPC cost budget exceeded");
         }

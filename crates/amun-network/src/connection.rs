@@ -1,5 +1,5 @@
-use crate::peer::Peer;
 use crate::constants::MAX_CONNECTIONS_PER_IP;
+use crate::peer::Peer;
 use hashbrown::HashMap;
 
 pub struct Connection {
@@ -9,11 +9,16 @@ pub struct Connection {
 
 impl Connection {
     pub fn new() -> Self {
-        Self { connections: HashMap::new(), ip_counts: HashMap::new() }
+        Self {
+            connections: HashMap::new(),
+            ip_counts: HashMap::new(),
+        }
     }
     pub fn connect(&mut self, peer: Peer, ip: [u8; 16]) -> Result<(), &'static str> {
         let count = self.ip_counts.get(&ip).copied().unwrap_or(0);
-        if count >= MAX_CONNECTIONS_PER_IP as u32 { return Err("ip connection limit"); }
+        if count >= MAX_CONNECTIONS_PER_IP as u32 {
+            return Err("ip connection limit");
+        }
         self.connections.insert(peer.id.0, peer);
         self.ip_counts.insert(ip, count.saturating_add(1));
         Ok(())
@@ -24,5 +29,13 @@ impl Connection {
     pub fn is_connected(&self, peer_id: &[u8; 48]) -> bool {
         self.connections.contains_key(peer_id)
     }
-    pub fn connection_count(&self) -> usize { self.connections.len() }
+    pub fn connection_count(&self) -> usize {
+        self.connections.len()
+    }
+}
+
+impl Default for Connection {
+    fn default() -> Self {
+        Self::new()
+    }
 }

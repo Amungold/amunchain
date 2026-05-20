@@ -19,19 +19,29 @@ impl ComplexityBudget {
 
     pub fn exceeds_budget(&self, metrics: &ComplexityMetrics) -> Option<BudgetViolation> {
         if metrics.consensus_states > self.max_consensus_states {
-            return Some(BudgetViolation { field: "consensus_states" });
+            return Some(BudgetViolation {
+                field: "consensus_states",
+            });
         }
         if metrics.consensus_transitions > self.max_consensus_transitions {
-            return Some(BudgetViolation { field: "consensus_transitions" });
+            return Some(BudgetViolation {
+                field: "consensus_transitions",
+            });
         }
         if metrics.invariant_count > self.max_invariants {
-            return Some(BudgetViolation { field: "invariant_count" });
+            return Some(BudgetViolation {
+                field: "invariant_count",
+            });
         }
         if metrics.attack_scenarios > self.max_attack_scenarios {
-            return Some(BudgetViolation { field: "attack_scenarios" });
+            return Some(BudgetViolation {
+                field: "attack_scenarios",
+            });
         }
         if metrics.total_mass_milli > self.max_total_complexity_mass_milli {
-            return Some(BudgetViolation { field: "total_complexity_mass" });
+            return Some(BudgetViolation {
+                field: "total_complexity_mass",
+            });
         }
         None
     }

@@ -40,9 +40,8 @@ impl TimeoutAggregator {
         }
 
         if self.validator_set.has_quorum(total_stake) {
-            let signatures: Vec<(u64, [u8; 64])> = seen.iter()
-                .map(|vid| (*vid, [0u8; 64]))
-                .collect();
+            let signatures: Vec<(u64, [u8; 64])> =
+                seen.iter().map(|vid| (*vid, [0u8; 64])).collect();
             Some(TimeoutCertificate::new(position, round, signatures))
         } else {
             None
@@ -50,6 +49,9 @@ impl TimeoutAggregator {
     }
 
     pub fn vote_count(&self, round: u64) -> usize {
-        self.timeout_votes.iter().filter(|(r, _)| *r == round).count()
+        self.timeout_votes
+            .iter()
+            .filter(|(r, _)| *r == round)
+            .count()
     }
 }

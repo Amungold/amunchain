@@ -1,6 +1,6 @@
-use amun_kernel_types::{ValidatorId, PublicKey};
 use amun_consensus_types::ValidatorIndex;
 use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+use amun_kernel_types::{PublicKey, ValidatorId};
 use heapless::Vec;
 
 #[derive(Clone, Debug)]
@@ -101,5 +101,11 @@ impl ValidatorSet {
                 0x0004,
             ))
         }
+    }
+}
+
+impl Default for ValidatorSet {
+    fn default() -> Self {
+        Self::new()
     }
 }

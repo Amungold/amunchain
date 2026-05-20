@@ -20,7 +20,8 @@ impl TimeoutLaw {
         self.consecutive_timeouts += 1;
         let exponent = self.consecutive_timeouts.min(6);
         let multiplier = 1u64.checked_shl(exponent as u32).unwrap_or(64);
-        self.current_timeout_rounds = self.base_timeout_rounds
+        self.current_timeout_rounds = self
+            .base_timeout_rounds
             .saturating_mul(multiplier)
             .min(self.max_timeout_rounds);
         self.current_timeout_rounds

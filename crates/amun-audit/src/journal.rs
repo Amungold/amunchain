@@ -16,7 +16,9 @@ pub struct AuditEntry {
 
 impl AuditJournal {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     pub fn record(
@@ -32,7 +34,9 @@ impl AuditJournal {
         let mut payload_hash = [0u8; 32];
         payload_hash.copy_from_slice(&hasher.finalize().as_bytes()[..32]);
 
-        let prev_hash = self.entries.last()
+        let prev_hash = self
+            .entries
+            .last()
             .map(|e| e.entry_hash)
             .unwrap_or([0u8; 32]);
 
@@ -45,7 +49,8 @@ impl AuditJournal {
         let mut entry_hash = [0u8; 32];
         entry_hash.copy_from_slice(&entry_hasher.finalize().as_bytes()[..32]);
 
-        let signature = signer.sign(&entry_hash, b"AMUN_AUDIT_V4", chain_id)
+        let signature = signer
+            .sign(&entry_hash, b"AMUN_AUDIT_V4", chain_id)
             .map_err(|_| "signing failed")?;
 
         self.entries.push(AuditEntry {
@@ -69,5 +74,11 @@ impl AuditJournal {
             prev = entry.entry_hash;
         }
         true
+    }
+}
+
+impl Default for AuditJournal {
+    fn default() -> Self {
+        Self::new()
     }
 }

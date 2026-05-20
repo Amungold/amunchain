@@ -20,10 +20,10 @@ pub mod storage;
 pub mod synchrony;
 
 // Phase 2C modules
+pub mod crypto;
+pub mod gas;
 pub mod hash_domains;
 pub mod replay;
-pub mod gas;
-pub mod crypto;
 
 pub use activation::{ActivationSchedule, ActivationStatus};
 pub use adversary_model::{AdversaryCapabilities, AdversaryLimitations};
@@ -32,14 +32,14 @@ pub use capacity::{constitutional_capacity, ProtocolCapacities};
 pub use economics::ConsensusResourceBudget;
 pub use execution_semantics::{Event, ExecutionContext, ExecutionResult, StateMachine};
 pub use fork_choice::{BlockDAG, ForkChoiceFunction, ForkChoiceState, PreferredChain};
+pub use gas::{gas_costs, GasMeter};
+pub use hash_domains::HashDomain;
 pub use liveness::{LogicalLivenessParameters, TimeoutCertificate};
 pub use quorum_transition::QuorumTransitionParameters;
+pub use replay::ReplayContext;
 pub use stake_quorum::{StakeWeight, WeightedValidator, WeightedValidatorSet};
 pub use storage::{WALEntry, WALEntryState};
 pub use synchrony::{GlobalStabilizationTime, SynchronyModel, SynchronyProof};
-pub use hash_domains::HashDomain;
-pub use replay::ReplayContext;
-pub use gas::{GasMeter, gas_costs};
 
 #[cfg(test)]
 mod tests;

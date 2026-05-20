@@ -30,5 +30,8 @@ fn main() {
     println!("cargo:rustc-env=RUSTC_HOST={}", host);
     println!("cargo:rustc-env=RUSTC_COMMIT={}", commit_hash);
     println!("cargo:rustc-env=RUSTC_LLVM={}", llvm_version);
-    println!("cargo:rustc-env=RUSTC_FULL={}", rustc_verbose.replace('\n', " | "));
+    println!(
+        "cargo:rustc-env=RUSTC_FULL={}",
+        rustc_verbose.replace('\n', " | ")
+    );
 }

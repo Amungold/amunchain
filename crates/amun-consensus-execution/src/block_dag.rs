@@ -1,5 +1,5 @@
-use amun_quorum_certificate::QuorumCertificate;
 use amun_chain_position::ChainPosition;
+use amun_quorum_certificate::QuorumCertificate;
 use std::collections::{BTreeMap, HashSet};
 
 /// Maximum ancestry traversal depth to prevent infinite loops
@@ -25,7 +25,15 @@ impl BlockNode {
         justify_qc: Option<QuorumCertificate>,
         state_root: [u8; 32],
     ) -> Self {
-        Self { block_hash, parent_hash, position, round, justify_qc, state_root, committed: false }
+        Self {
+            block_hash,
+            parent_hash,
+            position,
+            round,
+            justify_qc,
+            state_root,
+            committed: false,
+        }
     }
 
     /// Check if this block is a descendant of `ancestor`
@@ -85,21 +93,38 @@ pub struct BlockDAG {
 impl BlockDAG {
     pub fn new(genesis_hash: [u8; 32]) -> Self {
         let genesis = BlockNode {
-            block_hash: genesis_hash, parent_hash: None,
-            position: ChainPosition::new(0, 0), round: 0,
-            justify_qc: None, state_root: genesis_hash, committed: true,
+            block_hash: genesis_hash,
+            parent_hash: None,
+            position: ChainPosition::new(0, 0),
+            round: 0,
+            justify_qc: None,
+            state_root: genesis_hash,
+            committed: true,
         };
         let mut blocks = BTreeMap::new();
         blocks.insert(genesis_hash, genesis);
         let mut height_index = BTreeMap::new();
-        height_index.insert(0, { let mut s = HashSet::new(); s.insert(genesis_hash); s });
+        height_index.insert(0, {
+            let mut s = HashSet::new();
+            s.insert(genesis_hash);
+            s
+        });
         let mut round_index = BTreeMap::new();
-        round_index.insert(0, { let mut s = HashSet::new(); s.insert(genesis_hash); s });
+        round_index.insert(0, {
+            let mut s = HashSet::new();
+            s.insert(genesis_hash);
+            s
+        });
 
         Self {
-            blocks, children_index: BTreeMap::new(), height_index, round_index,
-            last_committed: Some(genesis_hash), finalized_height: 0,
-            canonical_spine: vec![genesis_hash], genesis_hash,
+            blocks,
+            children_index: BTreeMap::new(),
+            height_index,
+            round_index,
+            last_committed: Some(genesis_hash),
+            finalized_height: 0,
+            canonical_spine: vec![genesis_hash],
+            genesis_hash,
         }
     }
 
@@ -114,13 +139,13 @@ impl BlockDAG {
             }
             self.children_index
                 .entry(parent_hash)
-                .or_insert_with(HashSet::new)
+                .or_default()
                 .insert(hash);
         }
         let height = block.position.sequence;
         let round = block.round;
-        self.height_index.entry(height).or_insert_with(HashSet::new).insert(hash);
-        self.round_index.entry(round).or_insert_with(HashSet::new).insert(hash);
+        self.height_index.entry(height).or_default().insert(hash);
+        self.round_index.entry(round).or_default().insert(hash);
         self.blocks.insert(hash, block);
         Ok(())
     }
@@ -166,10 +191,14 @@ impl BlockDAG {
         let mut depth = 0;
 
         while let Some(hash) = current {
-            if depth >= MAX_DAG_DEPTH { break; }
+            if depth >= MAX_DAG_DEPTH {
+                break;
+            }
             if let Some(block) = self.blocks.get(&hash) {
                 if let Some(parent) = block.parent_hash {
-                    if !visited.insert(parent) { break; }
+                    if !visited.insert(parent) {
+                        break;
+                    }
                     spine.push(parent);
                     current = Some(parent);
                 } else {
@@ -195,7 +224,10 @@ impl BlockDAG {
     }
 
     pub fn finalize_and_prune(&mut self, height: u64, finalized_block: [u8; 32]) {
-        debug_assert!(height > self.finalized_height, "Finalized height must advance");
+        debug_assert!(
+            height > self.finalized_height,
+            "Finalized height must advance"
+        );
         self.finalized_height = height;
         self.update_canonical_spine(finalized_block);
         self.prune_safe();
@@ -211,7 +243,8 @@ impl BlockDAG {
         let spine_set: HashSet<[u8; 32]> = self.canonical_spine.iter().cloned().collect();
 
         // Collect blocks to remove
-        let to_remove: Vec<[u8; 32]> = self.blocks
+        let to_remove: Vec<[u8; 32]> = self
+            .blocks
             .iter()
             .filter(|(_, b)| {
                 b.position.sequence < self.finalized_height
@@ -229,7 +262,8 @@ impl BlockDAG {
         }
 
         // Clean indexes with O(1) contains
-        self.height_index.retain(|h, _| *h >= self.finalized_height || *h == 0);
+        self.height_index
+            .retain(|h, _| *h >= self.finalized_height || *h == 0);
         self.round_index.retain(|_, hashes| {
             hashes.retain(|h| !remove_set.contains(h));
             !hashes.is_empty()
@@ -239,7 +273,8 @@ impl BlockDAG {
             !children.is_empty()
         });
         // Clean orphaned parent entries
-        self.children_index.retain(|parent, _| self.blocks.contains_key(parent));
+        self.children_index
+            .retain(|parent, _| self.blocks.contains_key(parent));
     }
 
     pub fn highest_committed_height(&self) -> u64 {

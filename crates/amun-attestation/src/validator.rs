@@ -10,7 +10,9 @@ pub struct ValidatorAttestation {
 impl ValidatorAttestation {
     pub fn create(signer: &Ed25519Signer, chain_id: u64, epoch: u64) -> Option<Self> {
         let pk = signer.public_bytes();
-        let sig = signer.sign(&pk, b"AMUN_VALIDATOR_ATTEST_V4", chain_id).ok()?;
+        let sig = signer
+            .sign(&pk, b"AMUN_VALIDATOR_ATTEST_V4", chain_id)
+            .ok()?;
         Some(Self {
             public_key: pk,
             chain_id,
@@ -26,6 +28,7 @@ impl ValidatorAttestation {
             &self.signature,
             b"AMUN_VALIDATOR_ATTEST_V4",
             self.chain_id,
-        ).is_ok()
+        )
+        .is_ok()
     }
 }

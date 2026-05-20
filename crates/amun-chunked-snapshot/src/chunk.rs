@@ -31,7 +31,13 @@ impl SnapshotChunk {
         let mut chunk_hash = [0u8; 32];
         chunk_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
-        Self { chunk_index, total_chunks, entries, chunk_hash, previous_chunk_hash: prev_hash }
+        Self {
+            chunk_index,
+            total_chunks,
+            entries,
+            chunk_hash,
+            previous_chunk_hash: prev_hash,
+        }
     }
 
     pub fn verify(&self, prev_hash: [u8; 32]) -> bool {

@@ -19,3 +19,9 @@ impl RevocationList {
         self.revoked.contains(fingerprint)
     }
 }
+
+impl Default for RevocationList {
+    fn default() -> Self {
+        Self::new()
+    }
+}

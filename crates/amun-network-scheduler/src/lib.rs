@@ -1,5 +1,5 @@
-pub mod scheduler;
 pub mod message;
+pub mod scheduler;
 
-pub use scheduler::NetworkScheduler;
 pub use message::NetworkMessage;
+pub use scheduler::NetworkScheduler;

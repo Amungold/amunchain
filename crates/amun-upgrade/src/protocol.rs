@@ -10,6 +10,12 @@ pub struct UpgradeProtocol {
     pub current_epoch: u64,
 }
 
+impl Default for UpgradeProtocol {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl UpgradeProtocol {
     pub fn new() -> Self {
         Self {

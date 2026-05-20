@@ -47,8 +47,14 @@ pub struct AttackSimulator {
 
 #[derive(Debug, Clone)]
 pub enum SimulationResult {
-    Survived { blocks_finalized: u64, duration_steps: u64 },
-    Died { violation_description: String, at_step: u64 },
+    Survived {
+        blocks_finalized: u64,
+        duration_steps: u64,
+    },
+    Died {
+        violation_description: String,
+        at_step: u64,
+    },
 }
 
 impl AttackSimulator {
@@ -77,7 +83,7 @@ impl AttackSimulator {
         entropy_seed: [u8; 32],
     ) -> SimulationResult {
         let mut entropy = DeterministicEntropy::new(entropy_seed);
-        
+
         let mut state = SimulationState {
             validators: (0..scenario.total_nodes)
                 .map(|id| WeightedValidator {
@@ -136,7 +142,7 @@ impl AttackSimulator {
                 };
             }
 
-            if state.current_round % 3 == 0 && state.equivocation_events.len() < 3 {
+            if state.current_round.is_multiple_of(3) && state.equivocation_events.len() < 3 {
                 let hash = {
                     let mut h = [0u8; 32];
                     h[..8].copy_from_slice(&state.current_round.to_le_bytes());
@@ -170,5 +176,11 @@ impl AttackSimulator {
             let _ = height_map.insert(block.height, block.hash);
         }
         None
+    }
+}
+
+impl Default for AttackSimulator {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -12,7 +12,11 @@ mod tests {
         map.insert(4u64, "four").unwrap();
 
         let keys: Vec<u64> = map.iter().map(|(k, _)| *k).collect();
-        assert_eq!(keys, vec![1, 2, 3, 4, 5], "Iteration must be canonical sorted order");
+        assert_eq!(
+            keys,
+            vec![1, 2, 3, 4, 5],
+            "Iteration must be canonical sorted order"
+        );
     }
 
     #[test]
@@ -26,7 +30,11 @@ mod tests {
         assert_eq!(removed, Some("two"));
 
         let keys: Vec<u64> = map.iter().map(|(k, _)| *k).collect();
-        assert_eq!(keys, vec![1, 3], "After removal, ordering must remain canonical");
+        assert_eq!(
+            keys,
+            vec![1, 3],
+            "After removal, ordering must remain canonical"
+        );
 
         assert!(!map.contains_key(&2u64));
         assert!(map.contains_key(&1u64));

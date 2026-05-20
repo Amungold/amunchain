@@ -1,5 +1,5 @@
-use amun_validator_attestation::ValidatorSet;
 use amun_quorum_certificate::QuorumCertificate;
+use amun_validator_attestation::ValidatorSet;
 
 /// Derive QC weight from the ValidatorSet.
 /// NEVER trust the weight field in the QC itself.
@@ -20,7 +20,8 @@ pub fn derive_qc_weight(
             .get_validator(vote.message.validator_id)
             .ok_or("vote from unknown validator")?;
 
-        total_weight = total_weight.checked_add(validator.stake)
+        total_weight = total_weight
+            .checked_add(validator.stake)
             .ok_or("weight overflow")?;
     }
 

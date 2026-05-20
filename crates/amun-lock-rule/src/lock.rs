@@ -9,7 +9,11 @@ pub struct ValidatorLock {
 
 impl ValidatorLock {
     pub fn new() -> Self {
-        Self { locked_round: 0, locked_value: None, locked_qc: None }
+        Self {
+            locked_round: 0,
+            locked_value: None,
+            locked_qc: None,
+        }
     }
 
     pub fn try_lock(&mut self, qc: &QuorumCertificate) -> Result<(), &'static str> {
@@ -30,7 +34,9 @@ impl ValidatorLock {
     }
 
     pub fn can_prevote_for(&self, round: u64, value: [u8; 32]) -> bool {
-        if round < self.locked_round { return false; }
+        if round < self.locked_round {
+            return false;
+        }
         if round == self.locked_round {
             if let Some(locked_val) = self.locked_value {
                 return locked_val == value;
@@ -50,5 +56,7 @@ impl ValidatorLock {
 }
 
 impl Default for ValidatorLock {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

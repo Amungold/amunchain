@@ -1,6 +1,6 @@
-use amun_kernel_types::Epoch;
 use amun_consensus_types::ConsensusRound;
 use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+use amun_kernel_types::Epoch;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum RoundPhase {

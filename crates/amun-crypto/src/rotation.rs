@@ -28,8 +28,8 @@ impl KeyRotation {
     }
 
     pub fn is_legacy_key(&self, pk: &[u8; 32], current_epoch: u64) -> bool {
-        self.old_public_keys.iter().any(|(old, epoch)| {
-            old == pk && current_epoch - epoch <= self.max_key_age_epochs
-        })
+        self.old_public_keys
+            .iter()
+            .any(|(old, epoch)| old == pk && current_epoch - epoch <= self.max_key_age_epochs)
     }
 }

@@ -5,6 +5,12 @@ pub struct ConsensusClock {
     pub slots_per_epoch: u64,
 }
 
+impl Default for ConsensusClock {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ConsensusClock {
     pub fn new() -> Self {
         Self {

@@ -1,5 +1,16 @@
 #![no_std]
 #![deny(clippy::unwrap_used)]
-pub mod token; pub mod fee; pub mod reward; pub mod inflation; pub mod treasury; pub mod constants;
-pub use token::Token; pub use fee::FeeMarket; pub use reward::RewardDistributor; pub use inflation::InflationCurve; pub use treasury::Treasury; pub use constants::*;
-#[cfg(test)] mod tests;
+pub mod constants;
+pub mod fee;
+pub mod inflation;
+pub mod reward;
+pub mod token;
+pub mod treasury;
+pub use constants::*;
+pub use fee::FeeMarket;
+pub use inflation::InflationCurve;
+pub use reward::RewardDistributor;
+pub use token::Token;
+pub use treasury::Treasury;
+#[cfg(test)]
+mod tests;

@@ -7,13 +7,16 @@ pub struct DeliverySchedule {
 
 impl DeliverySchedule {
     pub fn new(base_latency_rounds: u64, jitter_rounds: u64) -> Self {
-        Self { base_latency_rounds, jitter_rounds }
+        Self {
+            base_latency_rounds,
+            jitter_rounds,
+        }
     }
 
     pub fn latency_for(&self, sender: u64, receiver: u64) -> u64 {
         // Deterministic latency based on sender/receiver pair
         let base = self.base_latency_rounds;
-        let jitter = (sender.wrapping_mul(receiver) % self.jitter_rounds.max(1)) as u64;
+        let jitter = sender.wrapping_mul(receiver) % self.jitter_rounds.max(1);
         base + jitter
     }
 }

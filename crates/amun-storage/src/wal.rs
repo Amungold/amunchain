@@ -1,14 +1,22 @@
-use amun_kernel_types::PublicHash32;
-use amun_failure::{ConstitutionalFault, FailureContext};
-use heapless::Vec;
 use crate::law::StorageLaw;
+use amun_failure::{ConstitutionalFault, FailureContext};
+use amun_kernel_types::PublicHash32;
 use blake3;
+use heapless::Vec;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum WalPayload {
-    Set { key: Vec<u8, 32>, value: Vec<u8, 64> },
-    Delete { key: Vec<u8, 32> },
-    Commit { sequence: u64, state_root: PublicHash32 },
+    Set {
+        key: Vec<u8, 32>,
+        value: Vec<u8, 64>,
+    },
+    Delete {
+        key: Vec<u8, 32>,
+    },
+    Commit {
+        sequence: u64,
+        state_root: PublicHash32,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -34,7 +42,11 @@ impl WriteAheadLog {
         }
     }
 
-    fn hash_payload(payload: &WalPayload, sequence: u64, previous_hash: &PublicHash32) -> PublicHash32 {
+    fn hash_payload(
+        payload: &WalPayload,
+        sequence: u64,
+        previous_hash: &PublicHash32,
+    ) -> PublicHash32 {
         let mut hasher = blake3::Hasher::new();
         hasher.update(&sequence.to_le_bytes());
         hasher.update(&previous_hash.0);
@@ -48,7 +60,10 @@ impl WriteAheadLog {
                 hasher.update(&[1u8]);
                 hasher.update(key);
             }
-            WalPayload::Commit { sequence: commit_seq, state_root } => {
+            WalPayload::Commit {
+                sequence: commit_seq,
+                state_root,
+            } => {
                 hasher.update(&[2u8]);
                 hasher.update(&commit_seq.to_le_bytes());
                 hasher.update(&state_root.0);
@@ -118,5 +133,11 @@ impl WriteAheadLog {
             Some(idx) => &self.records[..=idx],
             None => &[],
         }
+    }
+}
+
+impl Default for WriteAheadLog {
+    fn default() -> Self {
+        Self::new()
     }
 }

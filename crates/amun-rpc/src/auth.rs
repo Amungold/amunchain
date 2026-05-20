@@ -27,7 +27,7 @@ impl AuthValidator {
             hasher.update(token.as_bytes());
             let mut hash = [0u8; 32];
             hash.copy_from_slice(&hasher.finalize().as_bytes()[..32]);
-            
+
             // Constant-time comparison
             hash.ct_eq(&expected).into()
         } else {

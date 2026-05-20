@@ -1,5 +1,5 @@
-use crate::delivery::DeliverySchedule;
 use crate::adversary::AdversaryConfig;
+use crate::delivery::DeliverySchedule;
 use amun_deterministic_timer::DeterministicTimerWheel;
 use std::collections::BTreeMap;
 
@@ -42,11 +42,14 @@ impl NetworkSimulator {
         let msg_id = self.next_msg_id;
         self.next_msg_id += 1;
         self.messages_scheduled += 1;
-        
+
         let timer_id = self.timer.schedule(delivery_round);
         self.message_map.insert(timer_id, msg_id);
 
-        ScheduledMessage { id: msg_id, delivery_round }
+        ScheduledMessage {
+            id: msg_id,
+            delivery_round,
+        }
     }
 
     pub fn tick(&mut self) -> Vec<u64> {
@@ -67,5 +70,7 @@ impl NetworkSimulator {
         delivered
     }
 
-    pub fn current_round(&self) -> u64 { self.timer.current_round() }
+    pub fn current_round(&self) -> u64 {
+        self.timer.current_round()
+    }
 }

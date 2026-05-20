@@ -1,2 +1,2 @@
 pub mod fork_choice;
-pub use fork_choice::{select_best_qc, qc_extends, find_chain};
+pub use fork_choice::{find_chain, qc_extends, select_best_qc};

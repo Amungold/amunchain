@@ -1,5 +1,5 @@
-pub mod pool;
 pub mod ordering;
+pub mod pool;
 
-pub use pool::Mempool;
 pub use ordering::CanonicalOrdering;
+pub use pool::Mempool;

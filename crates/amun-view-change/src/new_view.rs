@@ -1,5 +1,5 @@
-use amun_chain_position::ChainPosition;
 use crate::view_change::ViewChange;
+use amun_chain_position::ChainPosition;
 use blake3::Hasher;
 
 /// NewView: the new proposer aggregates view-change messages.
@@ -23,7 +23,12 @@ impl NewView {
         let mut new_view_hash = [0u8; 32];
         new_view_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
-        Self { position, new_round, view_changes, new_view_hash }
+        Self {
+            position,
+            new_round,
+            view_changes,
+            new_view_hash,
+        }
     }
 
     pub fn verify(&self) -> bool {

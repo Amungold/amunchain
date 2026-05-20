@@ -1,6 +1,6 @@
-use crate::transcript::ReplayTranscript;
-use crate::platform::PlatformFingerprint;
 use crate::divergence::DivergenceReport;
+use crate::platform::PlatformFingerprint;
+use crate::transcript::ReplayTranscript;
 use amun_truth_engine::TruthEngine;
 use blake3::Hasher;
 
@@ -25,34 +25,33 @@ impl ReplayCertifier {
         self.platforms.push(platform);
     }
 
-    pub fn certify(
-        &mut self,
-        target_height: u64,
-    ) -> Result<CertificationResult, DivergenceReport> {
+    pub fn certify(&mut self, target_height: u64) -> Result<CertificationResult, DivergenceReport> {
         self.transcript.reset();
 
-        let reference_root = self.engine
-            .compute_chain_root(target_height)
-            .map_err(|e| DivergenceReport {
-                platform: PlatformFingerprint::current(),
-                expected_root: [0u8; 32],
-                actual_root: [0u8; 32],
-                divergence_point: 0,
-                detail: format!("{:?}", e),
-            })?;
-
-        let mut results = Vec::new();
-
-        for platform in &self.platforms {
-            let platform_root = self.engine
+        let reference_root =
+            self.engine
                 .compute_chain_root(target_height)
                 .map_err(|e| DivergenceReport {
-                    platform: platform.clone(),
-                    expected_root: reference_root,
+                    platform: PlatformFingerprint::current(),
+                    expected_root: [0u8; 32],
                     actual_root: [0u8; 32],
                     divergence_point: 0,
                     detail: format!("{:?}", e),
                 })?;
+
+        let mut results = Vec::new();
+
+        for platform in &self.platforms {
+            let platform_root =
+                self.engine
+                    .compute_chain_root(target_height)
+                    .map_err(|e| DivergenceReport {
+                        platform: platform.clone(),
+                        expected_root: reference_root,
+                        actual_root: [0u8; 32],
+                        divergence_point: 0,
+                        detail: format!("{:?}", e),
+                    })?;
 
             if platform_root != reference_root {
                 return Err(DivergenceReport {

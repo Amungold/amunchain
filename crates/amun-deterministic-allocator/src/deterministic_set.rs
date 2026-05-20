@@ -30,6 +30,10 @@ impl<T: Ord + Clone> DeterministicSet<T> {
         self.entries.binary_search(value).is_ok()
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn len(&self) -> usize {
         self.entries.len()
     }

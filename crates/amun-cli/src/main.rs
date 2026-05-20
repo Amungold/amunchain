@@ -68,8 +68,9 @@ fn main() {
                 &hex::encode(&signer.public_bytes()[..20]),
                 &password,
                 1,
-            ).expect("keystore creation failed");
-            
+            )
+            .expect("keystore creation failed");
+
             std::fs::write(&output, keystore.to_json()).expect("write failed");
             println!("Key written to {}", output);
             println!("Address: {}", hex::encode(&signer.public_bytes()[..20]));
@@ -85,14 +86,18 @@ fn main() {
             let keystore = amun_keystore::KeyStore::from_json(&content).expect("parse failed");
             let secret = keystore.decrypt(&password).expect("decrypt failed");
             let signer = amun_crypto::Ed25519Signer::from_seed(
-                &secret[..32].try_into().expect("invalid seed")
+                &secret[..32].try_into().expect("invalid seed"),
             );
             match signer.sign(message.as_bytes(), b"AMUN_CLI", 1) {
                 Ok(sig) => println!("Signature: {}", hex::encode(sig)),
                 Err(e) => eprintln!("Signing failed: {:?}", e),
             }
         }
-        Commands::Verify { pubkey, message, signature } => {
+        Commands::Verify {
+            pubkey,
+            message,
+            signature,
+        } => {
             let pk = hex::decode(&pubkey).expect("invalid pubkey hex");
             let sig = hex::decode(&signature).expect("invalid signature hex");
             match amun_crypto::Ed25519Signer::verify(

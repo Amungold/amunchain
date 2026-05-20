@@ -3,10 +3,7 @@ use blake3::Hasher;
 pub struct FinalityLaw;
 
 impl FinalityLaw {
-    pub fn is_finalized(
-        precommit_votes: u64,
-        total_stake: u64,
-    ) -> bool {
+    pub fn is_finalized(precommit_votes: u64, total_stake: u64) -> bool {
         let threshold = (total_stake * 2 / 3) + 1;
         precommit_votes >= threshold
     }

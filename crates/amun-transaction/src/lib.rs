@@ -1,11 +1,11 @@
 #![no_std]
 #![deny(clippy::unwrap_used)]
 
-pub mod tx;
 pub mod limits;
+pub mod tx;
 
-pub use tx::{UnsignedTransaction, TransactionType};
-pub use limits::{MAX_TX_BYTES_WIRE, MAX_PAYLOAD_BYTES_RUNTIME, MIN_VERSION};
+pub use limits::{MAX_PAYLOAD_BYTES_RUNTIME, MAX_TX_BYTES_WIRE, MIN_VERSION};
+pub use tx::{TransactionType, UnsignedTransaction};
 
 #[cfg(test)]
 mod tests;

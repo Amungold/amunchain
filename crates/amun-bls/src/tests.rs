@@ -1,5 +1,4 @@
 #[cfg(test)]
-mod tests {
     use crate::*;
     use amun_kernel_types::PublicKey;
 
@@ -15,27 +14,27 @@ mod tests {
     fn test_sign_and_verify() {
         let kp = KeyPair::generate_deterministic(&[2u8; 32]);
         let msg = b"test message";
-        let sig = sign(msg, &kp.secret).unwrap();
-        assert!(verify(msg, &sig, &kp.public).unwrap());
+        let sig = sign(msg, &kp.secret).expect("test invariant");
+        assert!(verify(msg, &sig, &kp.public).expect("test invariant"));
     }
     #[test]
     fn test_invalid_signature_rejected() {
         let kp = KeyPair::generate_deterministic(&[3u8; 32]);
         let msg = b"test message";
         let zero_sig = [0u8; BLS_SIGNATURE_SIZE];
-        assert!(!verify(msg, &zero_sig, &kp.public).unwrap());
+        assert!(!verify(msg, &zero_sig, &kp.public).expect("test invariant"));
     }
     #[test]
     fn test_aggregate_signatures() {
         let sigs: [[u8; BLS_SIGNATURE_SIZE]; 2] = [[1u8; BLS_SIGNATURE_SIZE], [2u8; BLS_SIGNATURE_SIZE]];
-        let agg = aggregate_signatures(&sigs).unwrap();
+        let agg = aggregate_signatures(&sigs).expect("test invariant");
         assert_ne!(agg, [0u8; BLS_SIGNATURE_SIZE]);
     }
     #[test]
     fn test_aggregate_public_keys() {
         let pk1 = PublicKey::new([1u8; 48]);
         let pk2 = PublicKey::new([2u8; 48]);
-        let agg = aggregate_public_keys(&[pk1, pk2]).unwrap();
+        let agg = aggregate_public_keys(&[pk1, pk2]).expect("test invariant");
         assert_ne!(agg.0, [0u8; 48]);
     }
     #[test]
@@ -43,4 +42,3 @@ mod tests {
         let sigs: [[u8; BLS_SIGNATURE_SIZE]; 0] = [];
         assert!(aggregate_signatures(&sigs).is_err());
     }
-}

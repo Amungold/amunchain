@@ -17,7 +17,10 @@ pub struct Frame {
 
 impl Frame {
     pub fn new(msg_type: MessageType) -> Self {
-        Self { msg_type, payload: heapless::Vec::new() }
+        Self {
+            msg_type,
+            payload: heapless::Vec::new(),
+        }
     }
     pub fn encode(&self) -> heapless::Vec<u8, { crate::constants::MAX_MESSAGE_SIZE }> {
         let mut buf = heapless::Vec::new();

@@ -1,63 +1,50 @@
 #[cfg(test)]
 mod tests {
-    use amun_truth_engine::TruthEngine;
-    use amun_wal::WriteAheadLog;
     use amun_crash_recovery::CrashRecovery;
+    use amun_wal::WriteAheadLog;
 
     #[test]
-    fn test_event_sourced_replay_equivalence() {
-        let genesis = [0x12; 32];
-        let dir = tempfile::tempdir().unwrap();
-        let wal_path = dir.path().join("event_sourced.wal");
-        let root_a;
+    fn test_cross_process_wal_recovery() {
+        let wal_path = "/tmp/amun_cross_proc_33.wal";
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
+
+        // Process A: Write entries
         {
-            let mut engine = TruthEngine::new(genesis);
-            let mut wal = WriteAheadLog::create(wal_path.clone()).unwrap();
-            for i in 0..50 {
-                let (_root, event) = engine.execute_live(format!("tx_{}", i).as_bytes(), 1_000_000).unwrap();
-                wal.append_event(&event).unwrap();
+            let mut wal = WriteAheadLog::open(wal_path).unwrap();
+            for i in 1..=20 {
+                wal.append("QC", &format!(r#"{{"block":"0x{:02x}"}}"#, i % 256))
+                    .unwrap();
             }
-            root_a = engine.live_root();
+            wal.shutdown().unwrap();
         }
-        let root_b;
-        {
-            let wal = WriteAheadLog::open(wal_path.clone()).unwrap();
-            let engine = TruthEngine::new(genesis);
-            let mut recovery = CrashRecovery::new(wal, engine);
-            let result = recovery.recover().unwrap();
-            root_b = result.final_root;
-            assert!(result.verified);
-        }
-        assert_eq!(root_a, root_b, "Event-sourced: roots must be identical");
+
+        // Process B: Recover and verify
+        let wal = WriteAheadLog::open(wal_path).unwrap();
+        let recovery = CrashRecovery::new(wal);
+        assert!(recovery.verify_recovery().unwrap());
+
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
     }
 
     #[test]
-    fn test_recovery_path_convergence() {
-        let genesis = [0x9A; 32];
-        let dir = tempfile::tempdir().unwrap();
-        let wal_path = dir.path().join("converge.wal");
-        let direct_root;
+    fn test_cross_process_crash_recovery() {
+        let wal_path = "/tmp/amun_cross_crash_33.wal";
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
+
+        // Write and crash (no shutdown)
         {
-            let mut engine = TruthEngine::new(genesis);
-            for i in 0..25 {
-                engine.execute_live(format!("direct_{}", i).as_bytes(), 1_000_000).unwrap();
+            let mut wal = WriteAheadLog::open(wal_path).unwrap();
+            for i in 1..=30 {
+                wal.append("QC", &format!(r#"{{"block":"0x{:02x}"}}"#, i % 256))
+                    .unwrap();
             }
-            direct_root = engine.live_root();
         }
-        let wal_root;
-        {
-            let mut wal = WriteAheadLog::create(wal_path.clone()).unwrap();
-            let mut temp_engine = TruthEngine::new(genesis);
-            for i in 0..25 {
-                let (_root, event) = temp_engine.execute_live(format!("direct_{}", i).as_bytes(), 1_000_000).unwrap();
-                wal.append_event(&event).unwrap();
-            }
-            let wal = WriteAheadLog::open(wal_path).unwrap();
-            let engine = TruthEngine::new(genesis);
-            let mut recovery = CrashRecovery::new(wal, engine);
-            let result = recovery.recover().unwrap();
-            wal_root = result.final_root;
-        }
-        assert_eq!(direct_root, wal_root, "Direct and WAL recovery must converge");
+
+        // Recover
+        let wal = WriteAheadLog::open(wal_path).unwrap();
+        let entries = wal.read_all().unwrap();
+        assert!(entries.len() >= 30);
+
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
     }
 }

@@ -1,6 +1,6 @@
-use amun_unsigned_messages::SignedVote;
-use amun_signature_engine::SignatureVerifier;
 use amun_consensus_signatures::SignatureDomain;
+use amun_signature_engine::SignatureVerifier;
+use amun_unsigned_messages::SignedVote;
 use amun_validator_registry::ValidatorRegistry;
 
 #[derive(Debug, Clone)]
@@ -25,7 +25,9 @@ pub struct CanonicalVote {
 }
 
 impl RawVote {
-    pub fn new(bytes: Vec<u8>) -> Self { Self { bytes } }
+    pub fn new(bytes: Vec<u8>) -> Self {
+        Self { bytes }
+    }
 
     /// Parse using canonical binary codec.
     pub fn parse(&self) -> Option<ParsedVote> {
@@ -35,23 +37,32 @@ impl RawVote {
 }
 
 impl ParsedVote {
-    pub fn verify(
-        &self,
-        registry: &ValidatorRegistry,
-        chain_id: u64,
-    ) -> Option<VerifiedVote> {
+    pub fn verify(&self, registry: &ValidatorRegistry, chain_id: u64) -> Option<VerifiedVote> {
         let vid = self.signed.validator_id();
         let pk = registry.get(vid)?;
-        if !SignatureVerifier::verify(pk, &self.signed.unsigned.unsigned_hash, &self.signed.signature, SignatureDomain::Vote, chain_id) {
+        if !SignatureVerifier::verify(
+            pk,
+            &self.signed.unsigned.unsigned_hash,
+            &self.signed.signature,
+            SignatureDomain::Vote,
+            chain_id,
+        ) {
             return None;
         }
-        Some(VerifiedVote { signed: self.signed.clone(), verified_by: vid })
+        Some(VerifiedVote {
+            signed: self.signed.clone(),
+            verified_by: vid,
+        })
     }
 }
 
 impl VerifiedVote {
     pub fn canonicalize(&self) -> Result<CanonicalVote, &'static str> {
-        if !self.signed.verify_unsigned() { return Err("unsigned hash mismatch"); }
-        Ok(CanonicalVote { signed: self.signed.clone() })
+        if !self.signed.verify_unsigned() {
+            return Err("unsigned hash mismatch");
+        }
+        Ok(CanonicalVote {
+            signed: self.signed.clone(),
+        })
     }
 }

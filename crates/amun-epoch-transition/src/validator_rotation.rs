@@ -29,5 +29,7 @@ impl ValidatorRotation {
 }
 
 impl Default for ValidatorRotation {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

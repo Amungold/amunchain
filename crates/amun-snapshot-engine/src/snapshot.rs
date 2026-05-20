@@ -11,15 +11,28 @@ pub struct StateSnapshot {
 
 impl StateSnapshot {
     pub fn new(
-        epoch: u64, sequence: u64, state_root: [u8; 32],
+        epoch: u64,
+        sequence: u64,
+        state_root: [u8; 32],
         mut state_entries: Vec<([u8; 32], Vec<u8>)>,
     ) -> Self {
-        state_entries.sort_by(|a, b| a.0.cmp(&b.0));
+        state_entries.sort_by_key(|a| a.0);
         let hash = Self::compute_hash(epoch, sequence, state_root, &state_entries);
-        Self { epoch, sequence, state_root, state_entries, snapshot_hash: hash }
+        Self {
+            epoch,
+            sequence,
+            state_root,
+            state_entries,
+            snapshot_hash: hash,
+        }
     }
 
-    fn compute_hash(epoch: u64, sequence: u64, state_root: [u8; 32], entries: &[([u8; 32], Vec<u8>)]) -> [u8; 32] {
+    fn compute_hash(
+        epoch: u64,
+        sequence: u64,
+        state_root: [u8; 32],
+        entries: &[([u8; 32], Vec<u8>)],
+    ) -> [u8; 32] {
         let mut h = Hasher::new();
         h.update(b"AMUN_SNAPSHOT_V2");
         h.update(&epoch.to_le_bytes());
@@ -38,10 +51,12 @@ impl StateSnapshot {
     pub fn verify(&self) -> bool {
         // Canonicalize before verifying: sort a clone, then hash
         let mut sorted = self.state_entries.clone();
-        sorted.sort_by(|a, b| a.0.cmp(&b.0));
+        sorted.sort_by_key(|a| a.0);
         let computed = Self::compute_hash(self.epoch, self.sequence, self.state_root, &sorted);
         computed == self.snapshot_hash
     }
 
-    pub fn entry_count(&self) -> usize { self.state_entries.len() }
+    pub fn entry_count(&self) -> usize {
+        self.state_entries.len()
+    }
 }

@@ -16,6 +16,15 @@ pub struct CommitRule {
     pub block_records: BTreeMap<[u8; 32], BlockRecord>,
     pub committed_blocks: Vec<(u64, [u8; 32])>,
     pub finalized_height: u64,
+    pub commit_index: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct CommitCheckpoint {
+    pub commit_index: u64,
+    pub finalized_height: u64,
+    pub last_committed_height: u64,
+    pub locked_qc_block: Option<[u8; 32]>,
 }
 
 impl CommitRule {
@@ -26,28 +35,37 @@ impl CommitRule {
             block_records: BTreeMap::new(),
             committed_blocks: Vec::new(),
             finalized_height: 0,
+            commit_index: 0,
         }
     }
 
-    pub fn register_block(&mut self, block_hash: [u8; 32], parent_hash: [u8; 32], height: u64, round: u64) {
-        self.block_records.insert(block_hash, BlockRecord {
-            block_hash, parent_hash, height, round,
-        });
+    pub fn register_block(
+        &mut self,
+        block_hash: [u8; 32],
+        parent_hash: [u8; 32],
+        height: u64,
+        round: u64,
+    ) {
+        self.block_records.insert(
+            block_hash,
+            BlockRecord {
+                block_hash,
+                parent_hash,
+                height,
+                round,
+            },
+        );
     }
 
-    /// Check ancestry with depth bound (>= not >) and self-check
     pub fn is_descendant(&self, child: &[u8; 32], ancestor: &[u8; 32]) -> bool {
-        // A block is NOT a descendant of itself
         if child == ancestor {
             return false;
         }
-
-        let mut current = Some(*child);
+        let mut current = self.block_records.get(child).map(|r| r.parent_hash);
         let mut visited = HashSet::new();
         visited.insert(*child);
         let mut depth = 0;
         const MAX_DEPTH: usize = 50_000;
-
         while let Some(hash) = current {
             if depth >= MAX_DEPTH || !visited.insert(hash) {
                 return false;
@@ -76,7 +94,9 @@ impl CommitRule {
                 }
             }
             let committed = last_qc.block_hash;
-            self.committed_blocks.push((last_qc.position.sequence, committed));
+            self.committed_blocks
+                .push((last_qc.position.sequence, committed));
+            self.commit_index += 1;
             self.locked_qc = Some(last_qc.clone());
             self.last_qc = Some(qc.clone());
             return Some(committed);
@@ -96,10 +116,16 @@ impl CommitRule {
         }
         let block3 = self.block_records.get(&qc3.block_hash)?;
         let block2 = self.block_records.get(&qc2.block_hash)?;
-        if block3.parent_hash != qc2.block_hash { return None; }
-        if block2.parent_hash != qc1.block_hash { return None; }
+        if block3.parent_hash != qc2.block_hash {
+            return None;
+        }
+        if block2.parent_hash != qc1.block_hash {
+            return None;
+        }
         let committed = qc1.block_hash;
-        self.committed_blocks.push((qc1.position.sequence, committed));
+        self.committed_blocks
+            .push((qc1.position.sequence, committed));
+        self.commit_index += 1;
         Some(committed)
     }
 
@@ -113,10 +139,27 @@ impl CommitRule {
 
     pub fn finalize(&mut self, height: u64) {
         self.finalized_height = height;
-        self.block_records.retain(|_, r| r.height >= height || r.height == 0);
+        self.block_records
+            .retain(|_, r| r.height >= height || r.height == 0);
+    }
+
+    pub fn checkpoint_state(&self) -> CommitCheckpoint {
+        CommitCheckpoint {
+            commit_index: self.commit_index,
+            finalized_height: self.finalized_height,
+            last_committed_height: self.last_committed_height(),
+            locked_qc_block: self.locked_qc.as_ref().map(|qc| qc.block_hash),
+        }
+    }
+
+    pub fn restore_from_checkpoint(&mut self, checkpoint: &CommitCheckpoint) {
+        self.commit_index = checkpoint.commit_index;
+        self.finalized_height = checkpoint.finalized_height;
     }
 }
 
 impl Default for CommitRule {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

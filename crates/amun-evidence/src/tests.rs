@@ -1,6 +1,4 @@
 #[cfg(test)]
-#[allow(clippy::module_inception)]
-mod tests {
     use crate::evidence::*;
     use amun_kernel_types::*;
 
@@ -62,4 +60,3 @@ mod tests {
 
         assert!(evidence.verify().is_err());
     }
-}

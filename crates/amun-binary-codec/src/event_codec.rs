@@ -1,4 +1,4 @@
-use crate::codec::{CanonicalEncoder, CanonicalDecoder};
+use crate::codec::{CanonicalDecoder, CanonicalEncoder};
 use amun_chain_position::ChainPosition;
 
 // Re-export the codec functions. The ProtocolEvent type lives in amun-protocol-event.

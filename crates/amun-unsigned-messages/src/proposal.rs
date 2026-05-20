@@ -39,7 +39,15 @@ impl UnsignedProposal {
         let mut unsigned_hash = [0u8; 32];
         unsigned_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
-        Self { proposer_id, position, round, block_hash, state_root, parent_block_hash, unsigned_hash }
+        Self {
+            proposer_id,
+            position,
+            round,
+            block_hash,
+            state_root,
+            parent_block_hash,
+            unsigned_hash,
+        }
     }
 
     pub fn verify_hash(&self) -> bool {
@@ -81,9 +89,13 @@ impl UnsignedProposal {
     }
 
     pub fn decode(data: &[u8]) -> Option<Self> {
-        if data.len() < MIN_PROPOSAL_LEN { return None; }
+        if data.len() < MIN_PROPOSAL_LEN {
+            return None;
+        }
         let version = data[0];
-        if version != PROPOSAL_ENCODE_VERSION { return None; }
+        if version != PROPOSAL_ENCODE_VERSION {
+            return None;
+        }
 
         let proposer_id = u64::from_le_bytes(data[1..9].try_into().ok()?);
         let epoch = u64::from_le_bytes(data[9..17].try_into().ok()?);
@@ -97,19 +109,32 @@ impl UnsignedProposal {
 
         let has_parent = data[97];
         let parent_block_hash = if has_parent == 1 {
-            if data.len() < PROPOSAL_LEN_WITH_PARENT { return None; }
+            if data.len() < PROPOSAL_LEN_WITH_PARENT {
+                return None;
+            }
             let mut hash = [0u8; 32];
             hash.copy_from_slice(&data[98..130]);
-            if data.len() != PROPOSAL_LEN_WITH_PARENT { return None; }
+            if data.len() != PROPOSAL_LEN_WITH_PARENT {
+                return None;
+            }
             Some(hash)
         } else if has_parent == 0 {
-            if data.len() != MIN_PROPOSAL_LEN { return None; }
+            if data.len() != MIN_PROPOSAL_LEN {
+                return None;
+            }
             None
         } else {
             return None;
         };
 
-        Some(Self::new(proposer_id, position, round, block_hash, state_root, parent_block_hash))
+        Some(Self::new(
+            proposer_id,
+            position,
+            round,
+            block_hash,
+            state_root,
+            parent_block_hash,
+        ))
     }
 }
 
@@ -121,10 +146,15 @@ pub struct SignedProposal {
 
 impl SignedProposal {
     pub fn new(unsigned: UnsignedProposal, signature: [u8; 64]) -> Self {
-        Self { unsigned, signature }
+        Self {
+            unsigned,
+            signature,
+        }
     }
 
-    pub fn verify_unsigned(&self) -> bool { self.unsigned.verify_hash() }
+    pub fn verify_unsigned(&self) -> bool {
+        self.unsigned.verify_hash()
+    }
 
     pub fn encode(&self) -> Vec<u8> {
         let mut buf = self.unsigned.encode();
@@ -134,11 +164,16 @@ impl SignedProposal {
 
     pub fn decode(data: &[u8]) -> Option<Self> {
         let total = data.len();
-        if total < MIN_PROPOSAL_LEN + 64 { return None; }
+        if total < MIN_PROPOSAL_LEN + 64 {
+            return None;
+        }
         let unsigned_len = total - 64;
         let unsigned = UnsignedProposal::decode(&data[..unsigned_len])?;
         let mut signature = [0u8; 64];
         signature.copy_from_slice(&data[unsigned_len..]);
-        Some(Self { unsigned, signature })
+        Some(Self {
+            unsigned,
+            signature,
+        })
     }
 }

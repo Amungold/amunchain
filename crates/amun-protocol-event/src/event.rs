@@ -1,5 +1,5 @@
+use amun_binary_codec::{CanonicalDecoder, CanonicalEncoder};
 use amun_chain_position::ChainPosition;
-use amun_binary_codec::{CanonicalEncoder, CanonicalDecoder};
 use blake3::Hasher;
 
 /// Constitutional schema version. Incremented when the binary format changes.
@@ -50,14 +50,23 @@ impl ProtocolEvent {
         let mut enc = CanonicalEncoder::new();
         enc.write_u8(EVENT_SCHEMA_VERSION);
         match self {
-            ProtocolEvent::ExecuteTransaction { position, payload, expected_root } => {
+            ProtocolEvent::ExecuteTransaction {
+                position,
+                payload,
+                expected_root,
+            } => {
                 enc.write_u8(0);
                 enc.write_u64(position.epoch);
                 enc.write_u64(position.sequence);
                 let _ = enc.write_bytes(payload);
                 enc.write_fixed_bytes(expected_root);
             }
-            ProtocolEvent::SealEpoch { position, epoch, seal_hash, expected_root } => {
+            ProtocolEvent::SealEpoch {
+                position,
+                epoch,
+                seal_hash,
+                expected_root,
+            } => {
                 enc.write_u8(1);
                 enc.write_u64(position.epoch);
                 enc.write_u64(position.sequence);
@@ -65,7 +74,11 @@ impl ProtocolEvent {
                 enc.write_fixed_bytes(seal_hash);
                 enc.write_fixed_bytes(expected_root);
             }
-            ProtocolEvent::CreateSnapshot { position, epoch, expected_root } => {
+            ProtocolEvent::CreateSnapshot {
+                position,
+                epoch,
+                expected_root,
+            } => {
                 enc.write_u8(2);
                 enc.write_u64(position.epoch);
                 enc.write_u64(position.sequence);
@@ -79,7 +92,7 @@ impl ProtocolEvent {
     /// Canonical binary decode with schema version check.
     pub fn decode(data: &[u8]) -> Option<Self> {
         let mut dec = CanonicalDecoder::new(data);
-        
+
         // Constitutional: verify schema version
         let schema_version = dec.read_u8()?;
         if schema_version != EVENT_SCHEMA_VERSION {
@@ -95,18 +108,31 @@ impl ProtocolEvent {
             0 => {
                 let payload = dec.read_bytes()?.to_vec();
                 let expected_root = dec.read_fixed_bytes::<32>()?;
-                Some(ProtocolEvent::ExecuteTransaction { position, payload, expected_root })
+                Some(ProtocolEvent::ExecuteTransaction {
+                    position,
+                    payload,
+                    expected_root,
+                })
             }
             1 => {
                 let seal_epoch = dec.read_u64()?;
                 let seal_hash = dec.read_fixed_bytes::<32>()?;
                 let expected_root = dec.read_fixed_bytes::<32>()?;
-                Some(ProtocolEvent::SealEpoch { position, epoch: seal_epoch, seal_hash, expected_root })
+                Some(ProtocolEvent::SealEpoch {
+                    position,
+                    epoch: seal_epoch,
+                    seal_hash,
+                    expected_root,
+                })
             }
             2 => {
                 let snap_epoch = dec.read_u64()?;
                 let expected_root = dec.read_fixed_bytes::<32>()?;
-                Some(ProtocolEvent::CreateSnapshot { position, epoch: snap_epoch, expected_root })
+                Some(ProtocolEvent::CreateSnapshot {
+                    position,
+                    epoch: snap_epoch,
+                    expected_root,
+                })
             }
             _ => None,
         };

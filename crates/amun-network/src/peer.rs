@@ -19,7 +19,13 @@ pub struct Peer {
 
 impl Peer {
     pub fn new(id: PublicKey, address: heapless::String<128>) -> Self {
-        Self { id, address, state: PeerState::Disconnected, last_seen_ms: 0, connection_count: 0 }
+        Self {
+            id,
+            address,
+            state: PeerState::Disconnected,
+            last_seen_ms: 0,
+            connection_count: 0,
+        }
     }
     pub fn is_active(&self) -> bool {
         matches!(self.state, PeerState::Connected)

@@ -14,12 +14,7 @@ impl LivenessRules {
     }
 
     /// Determine if a round has timed out based on logical rounds
-    pub fn is_timeout(
-        &self,
-        started_at_round: u64,
-        current_round: u64,
-        retry: u32,
-    ) -> bool {
+    pub fn is_timeout(&self, started_at_round: u64, current_round: u64, retry: u32) -> bool {
         self.params
             .should_timeout(started_at_round, current_round, retry)
     }
@@ -42,5 +37,11 @@ impl LivenessRules {
         // 2^retry capped at 256 rounds
         let exp = 1u32.checked_shl(retry.min(8)).unwrap_or(256);
         exp.min(256)
+    }
+}
+
+impl Default for LivenessRules {
+    fn default() -> Self {
+        Self::new()
     }
 }

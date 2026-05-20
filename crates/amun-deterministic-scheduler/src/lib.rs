@@ -1,7 +1,7 @@
-pub mod scheduler;
-pub mod queue;
 pub mod budget;
+pub mod queue;
+pub mod scheduler;
 
-pub use scheduler::DeterministicScheduler;
-pub use queue::DeterministicQueue;
 pub use budget::ResourceBudget;
+pub use queue::DeterministicQueue;
+pub use scheduler::DeterministicScheduler;

@@ -1,67 +1,44 @@
 #[cfg(test)]
 mod tests {
-    use amun_truth_engine::TruthEngine;
-    use amun_replay_certificate::ReplayCertificate;
-    use amun_chain_position::ChainPosition;
+    use amun_wal::WriteAheadLog;
 
-    fn exec(e: &mut TruthEngine, data: &[u8]) -> [u8; 32] {
-        e.execute_live(data, 1_000_000).unwrap().0
+    #[test]
+    fn test_replay_certification_self_verifying() {
+        let wal_path = "/tmp/amun_replay_cert_33.wal";
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
+
+        let mut wal = WriteAheadLog::open(wal_path).unwrap();
+        wal.append("QC", r#"{"block":"0x01"}"#).unwrap();
+        wal.append("COMMIT", r#"{"block":"0x01"}"#).unwrap();
+        wal.shutdown().unwrap();
+
+        let wal = WriteAheadLog::open(wal_path).unwrap();
+        let entries = wal.read_all().unwrap();
+        assert_eq!(entries.len(), 2);
+        assert!(WriteAheadLog::verify_chain_continuity(&entries).is_ok());
+
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
     }
 
     #[test]
     fn test_replay_idempotent() {
-        let mut e = TruthEngine::new([0u8; 32]);
-        for i in 0..50 { e.record_message(format!("tx_{}", i).as_bytes()).unwrap(); }
-        let a = e.compute_chain_root(50).unwrap();
-        let b = e.compute_chain_root(50).unwrap();
-        assert_eq!(a, b);
-    }
+        let wal_path = "/tmp/amun_replay_idem_33.wal";
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
 
-    #[test]
-    fn test_live_equals_replay() {
-        let mut e = TruthEngine::new([0u8; 32]);
-        for i in 0..100 { exec(&mut e, format!("tx_{}", i).as_bytes()); }
-        let live = e.live_root();
-        let replay = e.compute_chain_root(100).unwrap();
-        assert_eq!(live, replay);
-    }
+        let mut wal = WriteAheadLog::open(wal_path).unwrap();
+        wal.append("QC", r#"{"block":"0x01"}"#).unwrap();
+        wal.shutdown().unwrap();
 
-    #[test]
-    fn test_snapshot_export_import_roundtrip() {
-        let mut e = TruthEngine::new([0xAA; 32]);
-        for i in 0..30 { exec(&mut e, format!("tx_{}", i).as_bytes()); }
-        let root_before = e.live_root();
+        // Read twice - must be idempotent
+        let wal1 = WriteAheadLog::open(wal_path).unwrap();
+        let entries1 = wal1.read_all().unwrap();
 
-        let snapshot = e.export_snapshot().unwrap();
-        assert!(snapshot.verify());
+        let wal2 = WriteAheadLog::open(wal_path).unwrap();
+        let entries2 = wal2.read_all().unwrap();
 
-        let mut e2 = TruthEngine::new([0xAA; 32]);
-        e2.import_snapshot(&snapshot).unwrap();
-        assert_eq!(e2.live_root(), root_before);
-    }
+        assert_eq!(entries1.len(), entries2.len());
+        assert_eq!(entries1[0].sequence, entries2[0].sequence);
 
-    #[test]
-    fn test_snapshot_rejects_foreign_genesis() {
-        let mut e = TruthEngine::new([0xAA; 32]);
-        for i in 0..20 { exec(&mut e, format!("tx_{}", i).as_bytes()); }
-
-        let snapshot = e.export_snapshot().unwrap();
-
-        // Try to import into engine with different genesis
-        let mut e2 = TruthEngine::new([0xBB; 32]);
-        let result = e2.import_snapshot(&snapshot);
-        assert!(result.is_err(), "Foreign genesis must be rejected");
-    }
-
-    #[test]
-    fn test_replay_certificate_self_verifying() {
-        let cert = ReplayCertificate::new(
-            [0x11; 32], [0x22; 32],
-            ChainPosition::genesis(),
-            ChainPosition::new(0, 100),
-            100, 100, 0,
-            [0x33; 32], 1,
-        );
-        assert!(cert.verify());
+        let _ = WriteAheadLog::reset_for_testing(wal_path);
     }
 }

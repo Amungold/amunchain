@@ -1,5 +1,5 @@
-use crate::types::{RpcRequest, RpcResponse};
 use crate::auth::AuthValidator;
+use crate::types::{RpcRequest, RpcResponse};
 
 pub struct RpcHandler {
     auth: AuthValidator,
@@ -17,7 +17,8 @@ impl RpcHandler {
     pub fn handle(&self, request: &RpcRequest) -> RpcResponse {
         if self.auth.requires_auth() {
             if let serde_json::Value::Object(ref params) = request.params {
-                let token = params.get("auth_token")
+                let token = params
+                    .get("auth_token")
                     .and_then(|v| v.as_str())
                     .unwrap_or("");
                 if !self.auth.validate(token) {
@@ -29,24 +30,25 @@ impl RpcHandler {
         }
 
         match request.method.as_str() {
-            "chain_id" => {
-                RpcResponse::success(request.id, serde_json::json!({
+            "chain_id" => RpcResponse::success(
+                request.id,
+                serde_json::json!({
                     "chain_id": self.chain_id
-                }))
-            }
-            "block_height" => {
-                RpcResponse::success(request.id, serde_json::json!({
+                }),
+            ),
+            "block_height" => RpcResponse::success(
+                request.id,
+                serde_json::json!({
                     "height": 0
-                }))
-            }
-            "health" => {
-                RpcResponse::success(request.id, serde_json::json!({
+                }),
+            ),
+            "health" => RpcResponse::success(
+                request.id,
+                serde_json::json!({
                     "status": "ok"
-                }))
-            }
-            _ => {
-                RpcResponse::error(request.id, -32601, "Method not found")
-            }
+                }),
+            ),
+            _ => RpcResponse::error(request.id, -32601, "Method not found"),
         }
     }
 }

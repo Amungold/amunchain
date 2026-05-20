@@ -1,6 +1,6 @@
-use ed25519_dalek::{SigningKey, VerifyingKey, Signer, Verifier, Signature};
-use zeroize::Zeroize;
+use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use rand_core::OsRng;
+use zeroize::Zeroize;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CryptoError {
@@ -63,10 +63,11 @@ impl Ed25519Signer {
         hasher.update(&chain_id.to_le_bytes());
         hasher.update(msg);
         let digest = hasher.finalize();
-        
+
         let vk = VerifyingKey::from_bytes(pk).map_err(|_| CryptoError::InvalidPublicKey)?;
         let s = Signature::from_slice(sig).map_err(|_| CryptoError::MalformedSignature)?;
-        vk.verify(digest.as_bytes(), &s).map_err(|_| CryptoError::VerificationFailed)
+        vk.verify(digest.as_bytes(), &s)
+            .map_err(|_| CryptoError::VerificationFailed)
     }
 
     pub fn public_bytes(&self) -> [u8; 32] {

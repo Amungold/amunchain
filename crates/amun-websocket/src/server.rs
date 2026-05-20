@@ -1,6 +1,6 @@
-use tokio::net::TcpListener;
 use futures_util::{SinkExt, StreamExt};
 use std::sync::Arc;
+use tokio::net::TcpListener;
 
 pub struct WebSocketServer {
     pub port: u16,

@@ -1,5 +1,5 @@
-use crate::schema::SchemaVersion;
 use crate::error::CanonicalError;
+use crate::schema::SchemaVersion;
 
 pub struct CanonicalEncoder {
     buf: heapless::Vec<u8, 16384>,

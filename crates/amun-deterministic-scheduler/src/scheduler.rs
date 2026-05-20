@@ -1,5 +1,5 @@
-use crate::queue::DeterministicQueue;
 use crate::budget::ResourceBudget;
+use crate::queue::DeterministicQueue;
 
 /// Deterministic scheduler with weighted fairness.
 /// I/O gets a configurable share, regular tasks get the remainder.
@@ -36,11 +36,21 @@ impl DeterministicScheduler {
         }
     }
 
-    pub fn enqueue(&mut self, position: u64, priority: u8, payload: Vec<u8>) -> Result<(), &'static str> {
+    pub fn enqueue(
+        &mut self,
+        position: u64,
+        priority: u8,
+        payload: Vec<u8>,
+    ) -> Result<(), &'static str> {
         self.pending.push(position, priority, payload)
     }
 
-    pub fn enqueue_io(&mut self, position: u64, priority: u8, payload: Vec<u8>) -> Result<(), &'static str> {
+    pub fn enqueue_io(
+        &mut self,
+        position: u64,
+        priority: u8,
+        payload: Vec<u8>,
+    ) -> Result<(), &'static str> {
         self.io_pending.push(position, priority, payload)
     }
 
@@ -65,7 +75,9 @@ impl DeterministicScheduler {
                         is_io: true,
                     });
                 } else {
-                    self.io_pending.push(task.position, task.priority, task.payload).ok();
+                    self.io_pending
+                        .push(task.position, task.priority, task.payload)
+                        .ok();
                     break;
                 }
             } else {
@@ -86,7 +98,9 @@ impl DeterministicScheduler {
                         is_io: false,
                     });
                 } else {
-                    self.pending.push(task.position, task.priority, task.payload).ok();
+                    self.pending
+                        .push(task.position, task.priority, task.payload)
+                        .ok();
                     break;
                 }
             } else {
@@ -120,10 +134,18 @@ impl DeterministicScheduler {
         executed
     }
 
-    pub fn pending_count(&self) -> usize { self.pending.len() }
-    pub fn io_pending_count(&self) -> usize { self.io_pending.len() }
-    pub fn round(&self) -> u64 { self.round }
-    pub fn io_quota_remaining(&self) -> u64 { self.io_quota.saturating_sub(self.io_consumed_this_round) }
+    pub fn pending_count(&self) -> usize {
+        self.pending.len()
+    }
+    pub fn io_pending_count(&self) -> usize {
+        self.io_pending.len()
+    }
+    pub fn round(&self) -> u64 {
+        self.round
+    }
+    pub fn io_quota_remaining(&self) -> u64 {
+        self.io_quota.saturating_sub(self.io_consumed_this_round)
+    }
 }
 
 #[derive(Debug, Clone)]

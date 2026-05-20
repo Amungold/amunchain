@@ -1,6 +1,6 @@
 use crate::snapshot::{CanonicalSnapshot, SnapshotExecutionContext};
-use amun_state_transition::StateMachine;
 use amun_deterministic_allocator::DeterministicMap;
+use amun_state_transition::StateMachine;
 
 /// Import a canonical snapshot with context restoration.
 pub fn import_snapshot(

@@ -1,6 +1,6 @@
 use amun_consensus_messages::{ConsensusPhase, ConsensusVote};
-use amun_validator_attestation::ValidatorSet;
 use amun_quorum_certificate::QuorumCertificate;
+use amun_validator_attestation::ValidatorSet;
 use std::collections::{BTreeMap, HashSet};
 
 /// Equivocation proof for a validator voting for different blocks
@@ -72,13 +72,14 @@ impl VoteAggregator {
 
         match phase {
             ConsensusPhase::Prevote => {
-                let round_votes = self.prevotes.entry(key).or_insert_with(BTreeMap::new);
+                let round_votes = self.prevotes.entry(key).or_default();
                 if round_votes.contains_key(&vid) {
                     return Ok(None);
                 }
                 round_votes.insert(vid, vote.clone());
 
-                let total_weight: u64 = round_votes.values()
+                let total_weight: u64 = round_votes
+                    .values()
                     .filter(|v| !self.slashed.contains(&v.message.validator_id))
                     .filter_map(|v| self.validator_set.get_validator(v.message.validator_id))
                     .map(|vi| vi.stake)
@@ -87,20 +88,24 @@ impl VoteAggregator {
                 if self.validator_set.has_quorum(total_weight) {
                     let votes: Vec<ConsensusVote> = round_votes.values().cloned().collect();
                     return Ok(Some(QuorumCertificate::new(
-                        vote.message.position, round, block_hash,
-                        [0u8; 32], votes,
+                        vote.message.position,
+                        round,
+                        block_hash,
+                        [0u8; 32],
+                        votes,
                     )));
                 }
                 Ok(None)
             }
             ConsensusPhase::Precommit => {
-                let round_votes = self.precommits.entry(key).or_insert_with(BTreeMap::new);
+                let round_votes = self.precommits.entry(key).or_default();
                 if round_votes.contains_key(&vid) {
                     return Ok(None);
                 }
                 round_votes.insert(vid, vote.clone());
 
-                let total_weight: u64 = round_votes.values()
+                let total_weight: u64 = round_votes
+                    .values()
                     .filter(|v| !self.slashed.contains(&v.message.validator_id))
                     .filter_map(|v| self.validator_set.get_validator(v.message.validator_id))
                     .map(|vi| vi.stake)
@@ -109,8 +114,11 @@ impl VoteAggregator {
                 if self.validator_set.has_quorum(total_weight) {
                     let votes: Vec<ConsensusVote> = round_votes.values().cloned().collect();
                     return Ok(Some(QuorumCertificate::new(
-                        vote.message.position, round, block_hash,
-                        [0u8; 32], votes,
+                        vote.message.position,
+                        round,
+                        block_hash,
+                        [0u8; 32],
+                        votes,
                     )));
                 }
                 Ok(None)
@@ -120,15 +128,23 @@ impl VoteAggregator {
 
     pub fn has_voted(&self, round: u64, block_hash: &[u8; 32], validator_id: u64) -> bool {
         let key = (round, *block_hash);
-        self.prevotes.get(&key).map(|m| m.contains_key(&validator_id)).unwrap_or(false)
-            || self.precommits.get(&key).map(|m| m.contains_key(&validator_id)).unwrap_or(false)
+        self.prevotes
+            .get(&key)
+            .map(|m| m.contains_key(&validator_id))
+            .unwrap_or(false)
+            || self
+                .precommits
+                .get(&key)
+                .map(|m| m.contains_key(&validator_id))
+                .unwrap_or(false)
     }
 
     pub fn leading_block(&self, round: u64) -> Option<([u8; 32], u64)> {
         let mut best: Option<([u8; 32], u64)> = None;
         for ((r, bh), votes) in &self.prevotes {
             if *r == round {
-                let weight: u64 = votes.values()
+                let weight: u64 = votes
+                    .values()
                     .filter(|v| !self.slashed.contains(&v.message.validator_id))
                     .filter_map(|v| self.validator_set.get_validator(v.message.validator_id))
                     .map(|vi| vi.stake)

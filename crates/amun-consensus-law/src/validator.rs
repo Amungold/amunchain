@@ -9,10 +9,7 @@ pub enum ValidatorStatus {
 pub struct ValidatorObligations;
 
 impl ValidatorObligations {
-    pub fn must_prevote_on_proposal(
-        has_proposal: bool,
-        is_valid: bool,
-    ) -> bool {
+    pub fn must_prevote_on_proposal(has_proposal: bool, is_valid: bool) -> bool {
         has_proposal && is_valid
     }
 

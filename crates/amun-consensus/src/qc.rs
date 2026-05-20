@@ -1,6 +1,6 @@
-use amun_kernel_types::PublicHash32;
-use amun_consensus_types::{ConsensusRound, ConsensusPhase, ValidatorIndex};
 use crate::validator::ValidatorSet;
+use amun_consensus_types::{ConsensusPhase, ConsensusRound, ValidatorIndex};
+use amun_kernel_types::PublicHash32;
 use heapless::Vec;
 
 #[derive(Clone, Debug)]
@@ -15,7 +15,14 @@ pub struct QuorumCert {
 
 impl QuorumCert {
     pub fn new(phase: ConsensusPhase, round: ConsensusRound, block_hash: PublicHash32) -> Self {
-        Self { phase, round, block_hash, signer_count: 0, signer_indices: Vec::new(), aggregate_signature: [0u8; 96] }
+        Self {
+            phase,
+            round,
+            block_hash,
+            signer_count: 0,
+            signer_indices: Vec::new(),
+            aggregate_signature: [0u8; 96],
+        }
     }
 
     pub fn is_valid(&self, validator_set: &ValidatorSet) -> bool {

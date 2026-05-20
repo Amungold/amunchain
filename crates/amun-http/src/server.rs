@@ -1,17 +1,17 @@
-use std::sync::Arc;
-use std::time::Duration;
-use tokio::net::TcpListener;
-use tokio_rustls::TlsAcceptor;
+use amun_rpc::methods::RpcHandler;
+use amun_rpc::types::RpcRequest;
+use bytes::Bytes;
+use http_body_util::{BodyExt, Full, Limited};
 use hyper::body::Incoming;
 use hyper::service::Service;
 use hyper::{Request, Response, StatusCode};
-use http_body_util::{BodyExt, Full, Limited};
-use bytes::Bytes;
 use std::future::Future;
 use std::pin::Pin;
+use std::sync::Arc;
 use std::sync::Mutex;
-use amun_rpc::methods::RpcHandler;
-use amun_rpc::types::RpcRequest;
+use std::time::Duration;
+use tokio::net::TcpListener;
+use tokio_rustls::TlsAcceptor;
 
 const MAX_CONNECTIONS: usize = 512;
 const MAX_RPC_BODY_BYTES: usize = 1_048_576;
@@ -56,7 +56,10 @@ impl Service<Request<Incoming>> for RequestHandler {
             let body_bytes = match limited_body.collect().await {
                 Ok(collected) => collected.to_bytes(),
                 Err(_) => {
-                    return Ok(safe_response(StatusCode::PAYLOAD_TOO_LARGE, "{\"error\":\"request too large\"}"));
+                    return Ok(safe_response(
+                        StatusCode::PAYLOAD_TOO_LARGE,
+                        "{\"error\":\"request too large\"}",
+                    ));
                 }
             };
 
@@ -66,30 +69,36 @@ impl Service<Request<Incoming>> for RequestHandler {
                 Ok(mut req) => {
                     if let Some(token) = auth_header {
                         if let serde_json::Value::Object(ref mut obj) = req.params {
-                            obj.insert(
-                                "auth_token".to_string(),
-                                serde_json::Value::String(token),
-                            );
+                            obj.insert("auth_token".to_string(), serde_json::Value::String(token));
                         }
                     }
                     req
                 }
                 Err(_) => {
-                    return Ok(safe_response(StatusCode::BAD_REQUEST, "{\"error\":\"invalid request\"}"));
+                    return Ok(safe_response(
+                        StatusCode::BAD_REQUEST,
+                        "{\"error\":\"invalid request\"}",
+                    ));
                 }
             };
 
             let rpc_response = match rpc.lock() {
                 Ok(handler) => handler.handle(&rpc_request),
                 Err(_) => {
-                    return Ok(safe_response(StatusCode::INTERNAL_SERVER_ERROR, "{\"error\":\"internal error\"}"));
+                    return Ok(safe_response(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "{\"error\":\"internal error\"}",
+                    ));
                 }
             };
 
             let response_json = match serde_json::to_string(&rpc_response) {
                 Ok(json) => json,
                 Err(_) => {
-                    return Ok(safe_response(StatusCode::INTERNAL_SERVER_ERROR, "{\"error\":\"serialization failure\"}"));
+                    return Ok(safe_response(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "{\"error\":\"serialization failure\"}",
+                    ));
                 }
             };
 

@@ -1,4 +1,4 @@
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 use std::collections::HashSet;
 
 pub struct CertificatePinning {
@@ -26,5 +26,11 @@ impl CertificatePinning {
 
     pub fn remove_fingerprint(&mut self, fingerprint: &[u8; 32]) {
         self.allowed_fingerprints.remove(fingerprint);
+    }
+}
+
+impl Default for CertificatePinning {
+    fn default() -> Self {
+        Self::new()
     }
 }

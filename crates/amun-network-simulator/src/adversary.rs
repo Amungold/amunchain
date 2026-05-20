@@ -41,7 +41,7 @@ impl AdversaryConfig {
             return false;
         }
         // Deterministic drop decision based on message count
-        (message_count.wrapping_mul(1103515245).wrapping_add(12345) % 100) < 
-            (self.drop_probability * 100.0) as u64
+        (message_count.wrapping_mul(1103515245).wrapping_add(12345) % 100)
+            < (self.drop_probability * 100.0) as u64
     }
 }

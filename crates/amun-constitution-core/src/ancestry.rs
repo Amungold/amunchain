@@ -1,10 +1,7 @@
 use amun_chain_position::ChainPosition;
 
 /// Check if a child position is a direct descendant of a parent position.
-pub fn is_descendant_of(
-    child: ChainPosition,
-    parent: ChainPosition,
-) -> bool {
+pub fn is_descendant_of(child: ChainPosition, parent: ChainPosition) -> bool {
     if child.epoch < parent.epoch {
         return false;
     }

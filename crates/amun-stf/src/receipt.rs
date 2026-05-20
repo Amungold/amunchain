@@ -1,6 +1,6 @@
-use amun_kernel_types::PublicHash32;
-use amun_codec::{CanonicalEncode, CanonicalDecode, CanonicalWriter, WriteResult};
+use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
 use amun_failure::AmunResult;
+use amun_kernel_types::PublicHash32;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ExecutionReceipt {
@@ -13,8 +13,20 @@ pub struct ExecutionReceipt {
 
 impl ExecutionReceipt {
     pub const MAX_ENCODED_SIZE: usize = 77;
-    pub fn new(tx_hash: PublicHash32, tx_index: u32, gas_used: u64, logs_hash: PublicHash32, return_code: u8) -> Self {
-        Self { tx_hash, tx_index, gas_used, logs_hash, return_code }
+    pub fn new(
+        tx_hash: PublicHash32,
+        tx_index: u32,
+        gas_used: u64,
+        logs_hash: PublicHash32,
+        return_code: u8,
+    ) -> Self {
+        Self {
+            tx_hash,
+            tx_index,
+            gas_used,
+            logs_hash,
+            return_code,
+        }
     }
 }
 
@@ -34,14 +46,26 @@ impl CanonicalDecode for ExecutionReceipt {
     fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
         if input.len() < Self::MAX_ENCODED_SIZE {
             return Err(amun_failure::FailureContext::new(
-                amun_failure::ConstitutionalFault::BufferTooSmall, 0x0008, 0x0300));
+                amun_failure::ConstitutionalFault::BufferTooSmall,
+                0x0008,
+                0x0300,
+            ));
         }
         let (tx_hash, len1) = PublicHash32::decode(input)?;
         let (tx_index, len2) = u32::decode(&input[len1..])?;
-        let pos = len1+len2;
+        let pos = len1 + len2;
         let (gas_used, len3) = u64::decode(&input[pos..])?;
-        let pos = pos+len3;
+        let pos = pos + len3;
         let (logs_hash, len4) = PublicHash32::decode(&input[pos..])?;
-        Ok((Self { tx_hash, tx_index, gas_used, logs_hash, return_code: input[pos+len4] }, pos+len4+1))
+        Ok((
+            Self {
+                tx_hash,
+                tx_index,
+                gas_used,
+                logs_hash,
+                return_code: input[pos + len4],
+            },
+            pos + len4 + 1,
+        ))
     }
 }

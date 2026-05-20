@@ -1,5 +1,5 @@
-pub mod inflation;
 pub mod anticartel;
+pub mod inflation;
 
-pub use inflation::InflationLaw;
 pub use anticartel::AntiCartelLaw;
+pub use inflation::InflationLaw;

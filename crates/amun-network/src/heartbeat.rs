@@ -9,7 +9,12 @@ pub struct Heartbeat {
 
 impl Heartbeat {
     pub fn new() -> Self {
-        Self { last_sent_ms: 0, last_received_ms: 0, interval_ms: HEARTBEAT_INTERVAL_MS, missed_count: 0 }
+        Self {
+            last_sent_ms: 0,
+            last_received_ms: 0,
+            interval_ms: HEARTBEAT_INTERVAL_MS,
+            missed_count: 0,
+        }
     }
     pub fn should_send(&self, now_ms: u64) -> bool {
         now_ms.saturating_sub(self.last_sent_ms) >= self.interval_ms
@@ -27,5 +32,11 @@ impl Heartbeat {
             return true;
         }
         false
+    }
+}
+
+impl Default for Heartbeat {
+    fn default() -> Self {
+        Self::new()
     }
 }

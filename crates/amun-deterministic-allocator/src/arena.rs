@@ -49,3 +49,9 @@ impl DeterministicArena {
         &self.memory[..self.offset]
     }
 }
+
+impl Default for DeterministicArena {
+    fn default() -> Self {
+        Self::new()
+    }
+}

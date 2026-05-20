@@ -18,10 +18,7 @@ impl<T: Ord + Clone> SortedVec<T> {
         if self.entries.len() >= MAX_ENTRIES {
             return Err("sorted vec capacity exceeded");
         }
-        let pos = self
-            .entries
-            .binary_search(&value)
-            .unwrap_or_else(|e| e);
+        let pos = self.entries.binary_search(&value).unwrap_or_else(|e| e);
         self.entries.insert(pos, value);
         Ok(())
     }
@@ -32,6 +29,10 @@ impl<T: Ord + Clone> SortedVec<T> {
 
     pub fn iter(&self) -> impl Iterator<Item = &T> + '_ {
         self.entries.iter()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn len(&self) -> usize {

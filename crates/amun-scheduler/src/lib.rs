@@ -1,2 +1,2 @@
 pub mod priority;
-pub use priority::{TaskPriority, ConstitutionalScheduler};
+pub use priority::{ConstitutionalScheduler, TaskPriority};

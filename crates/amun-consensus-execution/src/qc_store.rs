@@ -19,10 +19,7 @@ impl QCStore {
         let round = qc.round;
         let block = qc.block_hash;
 
-        self.by_round
-            .entry(round)
-            .or_insert_with(Vec::new)
-            .push(qc.clone());
+        self.by_round.entry(round).or_default().push(qc.clone());
 
         self.by_block.insert(block, qc);
     }

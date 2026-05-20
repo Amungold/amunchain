@@ -8,7 +8,11 @@ pub struct RetryManager {
 
 impl RetryManager {
     pub fn new() -> Self {
-        Self { retry_count: 0, max_retries: 5, timeout_ms: GOSSIP_TIMEOUT_MS }
+        Self {
+            retry_count: 0,
+            max_retries: 5,
+            timeout_ms: GOSSIP_TIMEOUT_MS,
+        }
     }
     pub fn should_retry(&self) -> bool {
         self.retry_count < self.max_retries
@@ -21,5 +25,11 @@ impl RetryManager {
     }
     pub fn backoff_ms(&self) -> u64 {
         self.timeout_ms * (1u64 << self.retry_count.min(6))
+    }
+}
+
+impl Default for RetryManager {
+    fn default() -> Self {
+        Self::new()
     }
 }

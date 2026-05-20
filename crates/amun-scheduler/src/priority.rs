@@ -13,6 +13,12 @@ pub struct ConstitutionalScheduler {
     pub rpc_count: u32,
 }
 
+impl Default for ConstitutionalScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ConstitutionalScheduler {
     pub fn new() -> Self {
         Self {

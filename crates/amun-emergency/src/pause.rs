@@ -17,7 +17,11 @@ impl EmergencyPause {
         }
     }
 
-    pub fn approve(&mut self, validator_pk: &[u8; 32], current_epoch: u64) -> Result<(), &'static str> {
+    pub fn approve(
+        &mut self,
+        validator_pk: &[u8; 32],
+        current_epoch: u64,
+    ) -> Result<(), &'static str> {
         if self.paused {
             return Err("already paused");
         }
@@ -36,7 +40,10 @@ impl EmergencyPause {
 
     pub fn check_expiry(&mut self, current_epoch: u64) {
         if self.paused
-            && current_epoch > self.pause_epoch.saturating_add(self.max_pause_duration_epochs)
+            && current_epoch
+                > self
+                    .pause_epoch
+                    .saturating_add(self.max_pause_duration_epochs)
         {
             self.reset();
         }

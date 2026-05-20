@@ -1,7 +1,7 @@
-use amun_kernel_types::PublicHash32;
-use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
-use crate::wal::{WriteAheadLog, WalPayload};
 use crate::law::StorageLaw;
+use crate::wal::{WalPayload, WriteAheadLog};
+use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+use amun_kernel_types::PublicHash32;
 use heapless::Vec;
 
 pub struct PersistentStore {
@@ -29,8 +29,7 @@ impl PersistentStore {
                 0x0010,
             ));
         }
-        self.wal
-            .append(WalPayload::Set { key, value })?;
+        self.wal.append(WalPayload::Set { key, value })?;
         self.pending_count = self.pending_count.saturating_add(1);
         Ok(())
     }
@@ -66,5 +65,11 @@ impl PersistentStore {
                 Ok(())
             }
         }
+    }
+}
+
+impl Default for PersistentStore {
+    fn default() -> Self {
+        Self::new()
     }
 }

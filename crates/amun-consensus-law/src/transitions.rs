@@ -23,7 +23,10 @@ impl TransitionLaw {
     }
 
     pub fn requires_quorum(phase: ConsensusPhase) -> bool {
-        matches!(phase, ConsensusPhase::Prevote | ConsensusPhase::Precommit | ConsensusPhase::Commit)
+        matches!(
+            phase,
+            ConsensusPhase::Prevote | ConsensusPhase::Precommit | ConsensusPhase::Commit
+        )
     }
 
     pub fn quorum_threshold(n: u64) -> u64 {

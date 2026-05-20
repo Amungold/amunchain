@@ -17,15 +17,12 @@ impl ConstitutionalPhase {
 }
 
 /// Check if a phase transition is legal.
-pub fn is_legal_phase_transition(
-    from: ConstitutionalPhase,
-    to: ConstitutionalPhase,
-) -> bool {
+pub fn is_legal_phase_transition(from: ConstitutionalPhase, to: ConstitutionalPhase) -> bool {
     matches!(
         (from, to),
         (ConstitutionalPhase::Propose, ConstitutionalPhase::Prevote)
-        | (ConstitutionalPhase::Prevote, ConstitutionalPhase::Precommit)
-        | (ConstitutionalPhase::Precommit, ConstitutionalPhase::Propose)
-        | (ConstitutionalPhase::Prevote, ConstitutionalPhase::Propose)
+            | (ConstitutionalPhase::Prevote, ConstitutionalPhase::Precommit)
+            | (ConstitutionalPhase::Precommit, ConstitutionalPhase::Propose)
+            | (ConstitutionalPhase::Prevote, ConstitutionalPhase::Propose)
     )
 }

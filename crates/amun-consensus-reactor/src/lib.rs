@@ -1,5 +1,5 @@
-pub mod reactor;
 pub mod event;
+pub mod reactor;
 
-pub use reactor::ConsensusReactor;
 pub use event::ReactorEvent;
+pub use reactor::ConsensusReactor;

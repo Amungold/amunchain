@@ -28,12 +28,22 @@ impl ViewChange {
         h.update(&position.hash());
         h.update(&current_round.to_le_bytes());
         h.update(&new_round.to_le_bytes());
-        if let Some(qc) = &prepared_qc { h.update(qc); }
+        if let Some(qc) = &prepared_qc {
+            h.update(qc);
+        }
         h.update(&signature);
         let mut view_change_hash = [0u8; 32];
         view_change_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
-        Self { validator_id, position, current_round, new_round, prepared_qc, signature, view_change_hash }
+        Self {
+            validator_id,
+            position,
+            current_round,
+            new_round,
+            prepared_qc,
+            signature,
+            view_change_hash,
+        }
     }
 
     pub fn verify(&self) -> bool {
@@ -43,7 +53,9 @@ impl ViewChange {
         h.update(&self.position.hash());
         h.update(&self.current_round.to_le_bytes());
         h.update(&self.new_round.to_le_bytes());
-        if let Some(qc) = &self.prepared_qc { h.update(qc); }
+        if let Some(qc) = &self.prepared_qc {
+            h.update(qc);
+        }
         h.update(&self.signature);
         let mut computed = [0u8; 32];
         computed.copy_from_slice(&h.finalize().as_bytes()[..32]);

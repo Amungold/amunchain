@@ -1,5 +1,5 @@
-pub mod pattern;
 pub mod ontology;
+pub mod pattern;
 
-pub use pattern::{FailurePattern, FailureSeverity};
 pub use ontology::FailureOntology;
+pub use pattern::{FailurePattern, FailureSeverity};

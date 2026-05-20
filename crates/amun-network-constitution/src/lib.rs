@@ -1,5 +1,5 @@
-pub mod message;
 pub mod anti_replay;
+pub mod message;
 
-pub use message::{NetworkFrame, NetworkMessageType};
 pub use anti_replay::AntiReplayGuard;
+pub use message::{NetworkFrame, NetworkMessageType};

@@ -1,6 +1,6 @@
+use blake3::Hasher;
 use std::fs;
 use std::path::Path;
-use blake3::Hasher;
 
 const MAX_WAL_ENTRIES: usize = 1_000_000;
 
@@ -32,7 +32,7 @@ impl NonceStore {
 
     pub fn check_and_update(&mut self, account: &[u8; 32], nonce: u64) -> Result<(), &'static str> {
         let pos = self.nonces.binary_search_by_key(account, |(k, _)| *k);
-        
+
         match pos {
             Ok(idx) => {
                 let (_, last_nonce) = self.nonces[idx];
@@ -124,5 +124,11 @@ impl NonceStore {
         let mut out = [0u8; 32];
         out.copy_from_slice(&h.as_bytes()[..32]);
         out
+    }
+}
+
+impl Default for NonceStore {
+    fn default() -> Self {
+        Self::new()
     }
 }

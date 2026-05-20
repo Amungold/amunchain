@@ -1,6 +1,6 @@
 use amun_chain_position::ChainPosition;
 use blake3::Hasher;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReplayCertificate {
@@ -43,9 +43,16 @@ impl ReplayCertificate {
         certificate_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
         Self {
-            genesis_root, final_root, start_position, end_position,
-            event_count, transaction_count, seal_count,
-            transcript_chain_hash, certificate_hash, execution_version,
+            genesis_root,
+            final_root,
+            start_position,
+            end_position,
+            event_count,
+            transaction_count,
+            seal_count,
+            transcript_chain_hash,
+            certificate_hash,
+            execution_version,
         }
     }
 

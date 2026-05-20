@@ -11,11 +11,7 @@ impl ConsensusInvariants {
         state_roots.iter().all(|r| *r == reference)
     }
 
-    pub fn single_finality_holds(
-        finalized: &[(u64, [u8; 32])],
-        f: u64,
-        n: u64,
-    ) -> bool {
+    pub fn single_finality_holds(finalized: &[(u64, [u8; 32])], f: u64, n: u64) -> bool {
         if f > n / 3 {
             return false;
         }
@@ -31,10 +27,7 @@ impl ConsensusInvariants {
         true
     }
 
-    pub fn eventual_progress_possible(
-        active_validators: usize,
-        threshold: usize,
-    ) -> bool {
+    pub fn eventual_progress_possible(active_validators: usize, threshold: usize) -> bool {
         active_validators >= threshold
     }
 

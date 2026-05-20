@@ -30,7 +30,14 @@ impl EpochTransition {
         let mut transition_hash = [0u8; 32];
         transition_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
-        Self { previous_epoch, new_epoch, position, state_root, validator_set_hash, transition_hash }
+        Self {
+            previous_epoch,
+            new_epoch,
+            position,
+            state_root,
+            validator_set_hash,
+            transition_hash,
+        }
     }
 
     pub fn verify(&self) -> bool {

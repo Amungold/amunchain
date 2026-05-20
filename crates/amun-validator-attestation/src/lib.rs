@@ -1,2 +1,2 @@
 pub mod validator_set;
-pub use validator_set::{ValidatorSet, ValidatorInfo, ValidatorSetError};
+pub use validator_set::{ValidatorInfo, ValidatorSet, ValidatorSetError};

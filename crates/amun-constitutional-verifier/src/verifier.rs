@@ -1,5 +1,5 @@
-use amun_quorum_certificate::QuorumCertificate;
 use amun_consensus_messages::ConsensusVote;
+use amun_quorum_certificate::QuorumCertificate;
 use amun_validator_attestation::ValidatorSet;
 
 /// Verify a QuorumCertificate structurally
@@ -18,7 +18,9 @@ pub fn verify_qc(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
     }
 
     // Check quorum
-    let total_weight: u64 = qc.votes.iter()
+    let total_weight: u64 = qc
+        .votes
+        .iter()
         .filter_map(|v| validator_set.get_validator(v.message.validator_id))
         .map(|vi| vi.stake)
         .sum();
@@ -33,7 +35,10 @@ pub fn verify_qc(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
 /// Verify individual vote
 pub fn verify_vote(vote: &ConsensusVote, validator_set: &ValidatorSet) -> bool {
     // Validator must exist
-    if validator_set.get_validator(vote.message.validator_id).is_none() {
+    if validator_set
+        .get_validator(vote.message.validator_id)
+        .is_none()
+    {
         return false;
     }
 
@@ -64,7 +69,9 @@ pub fn verify_vote_uniqueness(qc: &QuorumCertificate) -> bool {
 
 /// Get quorum status for a QC
 pub fn check_quorum(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> Result<u64, String> {
-    let total_weight: u64 = qc.votes.iter()
+    let total_weight: u64 = qc
+        .votes
+        .iter()
         .filter_map(|v| validator_set.get_validator(v.message.validator_id))
         .map(|vi| vi.stake)
         .sum();
@@ -84,23 +91,53 @@ pub fn check_quorum(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> Res
 #[cfg(test)]
 mod tests {
     use super::*;
-    use amun_consensus_messages::ConsensusPhase;
     use amun_chain_position::ChainPosition;
+    use amun_consensus_messages::ConsensusPhase;
     use amun_validator_attestation::validator_set::ValidatorInfo;
 
     #[test]
     fn test_verify_qc() {
-        let set = ValidatorSet::new(1, vec![
-            ValidatorInfo { id: 1, public_key: [1u8; 32], stake: 25 },
-            ValidatorInfo { id: 2, public_key: [2u8; 32], stake: 25 },
-            ValidatorInfo { id: 3, public_key: [3u8; 32], stake: 25 },
-            ValidatorInfo { id: 4, public_key: [4u8; 32], stake: 25 },
-        ]).unwrap();
+        let set = ValidatorSet::new(
+            1,
+            vec![
+                ValidatorInfo {
+                    id: 1,
+                    public_key: [1u8; 32],
+                    stake: 25,
+                },
+                ValidatorInfo {
+                    id: 2,
+                    public_key: [2u8; 32],
+                    stake: 25,
+                },
+                ValidatorInfo {
+                    id: 3,
+                    public_key: [3u8; 32],
+                    stake: 25,
+                },
+                ValidatorInfo {
+                    id: 4,
+                    public_key: [4u8; 32],
+                    stake: 25,
+                },
+            ],
+        )
+        .unwrap();
 
         let pos = ChainPosition::new(0, 1);
         let block = [0xAA; 32];
         let votes: Vec<ConsensusVote> = (1..=4)
-            .map(|id| ConsensusVote::new(id, pos, 0, ConsensusPhase::Prevote, Some(block), [id as u8; 64], 25))
+            .map(|id| {
+                ConsensusVote::new(
+                    id,
+                    pos,
+                    0,
+                    ConsensusPhase::Prevote,
+                    Some(block),
+                    [id as u8; 64],
+                    25,
+                )
+            })
             .collect();
 
         let qc = QuorumCertificate::new(pos, 0, block, [0x00; 32], votes);

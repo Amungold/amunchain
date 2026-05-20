@@ -2,16 +2,16 @@
 #![deny(clippy::unwrap_used)]
 
 pub mod law;
-pub mod wal;
+pub mod recovery;
 pub mod snapshot;
 pub mod store;
-pub mod recovery;
+pub mod wal;
 
 pub use law::StorageLaw;
-pub use wal::{WriteAheadLog, WalRecord, WalPayload};
+pub use recovery::RecoveryEngine;
 pub use snapshot::StateSnapshot;
 pub use store::PersistentStore;
-pub use recovery::RecoveryEngine;
+pub use wal::{WalPayload, WalRecord, WriteAheadLog};
 
 #[cfg(test)]
 mod tests;

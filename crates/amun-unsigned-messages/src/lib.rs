@@ -1,5 +1,5 @@
-pub mod vote;
 pub mod proposal;
+pub mod vote;
 
-pub use vote::{UnsignedVote, SignedVote};
-pub use proposal::{UnsignedProposal, SignedProposal};
+pub use proposal::{SignedProposal, UnsignedProposal};
+pub use vote::{SignedVote, UnsignedVote};

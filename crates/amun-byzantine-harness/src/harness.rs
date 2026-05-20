@@ -1,6 +1,6 @@
-use amun_safety_laws::{check_vote_uniqueness, detect_equivocation, EquivocationEvidence};
-use amun_consensus_messages::{ConsensusVote, ConsensusPhase};
 use amun_chain_position::ChainPosition;
+use amun_consensus_messages::{ConsensusPhase, ConsensusVote};
+use amun_safety_laws::{check_vote_uniqueness, detect_equivocation, EquivocationEvidence};
 
 /// Harness for testing Byzantine scenarios
 pub struct ByzantineHarness;

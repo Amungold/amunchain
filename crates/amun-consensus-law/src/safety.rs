@@ -22,12 +22,7 @@ impl SafetyAxioms {
         quorum_a >= threshold && quorum_b >= threshold && quorum_a + quorum_b > total_validators
     }
 
-    pub fn accountable_safety(
-        votes_a: u64,
-        votes_b: u64,
-        total: u64,
-        required: u64,
-    ) -> bool {
+    pub fn accountable_safety(votes_a: u64, votes_b: u64, total: u64, required: u64) -> bool {
         votes_a >= required && votes_b >= required && votes_a + votes_b > total + required
     }
 

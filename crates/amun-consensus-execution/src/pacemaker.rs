@@ -38,7 +38,9 @@ impl Pacemaker {
     }
 
     pub fn current_timeout(&self) -> Duration {
-        let multiplier = self.timeout_multiplier.powi(self.consecutive_timeouts as i32);
+        let multiplier = self
+            .timeout_multiplier
+            .powi(self.consecutive_timeouts as i32);
         let millis = (self.base_timeout.as_millis() as f64 * multiplier) as u64;
         Duration::from_millis(millis.min(60_000))
     }

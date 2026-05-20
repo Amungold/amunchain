@@ -145,7 +145,6 @@ impl CanonicalDecode for MerkleProof {
 }
 
 #[cfg(test)]
-#[allow(clippy::module_inception)]
 mod tests {
     use super::*;
     use amun_codec::CanonicalEncode;

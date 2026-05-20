@@ -21,10 +21,10 @@ impl ForkChoiceRule {
         }
 
         let mut best: usize = 0;
-        
+
         for (i, chain) in chains.iter().enumerate() {
             let current_best = &chains[best];
-            
+
             if chain.finalized_checkpoint_height > current_best.finalized_checkpoint_height {
                 best = i;
                 continue;
@@ -32,7 +32,7 @@ impl ForkChoiceRule {
             if chain.finalized_checkpoint_height < current_best.finalized_checkpoint_height {
                 continue;
             }
-            
+
             if chain.finalized && !current_best.finalized {
                 best = i;
                 continue;
@@ -40,7 +40,7 @@ impl ForkChoiceRule {
             if !chain.finalized && current_best.finalized {
                 continue;
             }
-            
+
             if chain.height > current_best.height {
                 best = i;
                 continue;
@@ -48,7 +48,7 @@ impl ForkChoiceRule {
             if chain.height < current_best.height {
                 continue;
             }
-            
+
             if chain.stake > current_best.stake {
                 best = i;
                 continue;
@@ -56,7 +56,7 @@ impl ForkChoiceRule {
             if chain.stake < current_best.stake {
                 continue;
             }
-            
+
             // Tie-break: canonical ordering commitment
             let chain_commitment = Self::tiebreak_commitment(chain);
             let best_commitment = Self::tiebreak_commitment(current_best);
@@ -64,10 +64,10 @@ impl ForkChoiceRule {
                 best = i;
             }
         }
-        
+
         Some(best)
     }
-    
+
     fn tiebreak_commitment(chain: &ChainHead) -> [u8; 32] {
         let mut hasher = Hasher::new();
         hasher.update(b"AMUN_FORK_TIEBREAK_V1");

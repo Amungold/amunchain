@@ -17,23 +17,35 @@ impl SignedSnapshot {
         }
     }
 
-    pub fn add_signature(&mut self, signer: &Ed25519Signer, chain_id: u64) -> Result<(), &'static str> {
+    pub fn add_signature(
+        &mut self,
+        signer: &Ed25519Signer,
+        chain_id: u64,
+    ) -> Result<(), &'static str> {
         let pk = signer.public_bytes();
-        
-        if self.signatures.iter().any(|(existing_pk, _)| *existing_pk == pk) {
+
+        if self
+            .signatures
+            .iter()
+            .any(|(existing_pk, _)| *existing_pk == pk)
+        {
             return Err("duplicate signer");
         }
-        
-        let sig = signer.sign(&self.state_root, b"AMUN_SNAPSHOT_V4", chain_id)
+
+        let sig = signer
+            .sign(&self.state_root, b"AMUN_SNAPSHOT_V4", chain_id)
             .map_err(|_| "signing failed")?;
         self.signatures.push((pk, sig));
         Ok(())
     }
 
     pub fn verify(&self, chain_id: u64) -> bool {
-        let valid_count = self.signatures.iter()
+        let valid_count = self
+            .signatures
+            .iter()
             .filter(|(pk, sig)| {
-                Ed25519Signer::verify(pk, &self.state_root, sig, b"AMUN_SNAPSHOT_V4", chain_id).is_ok()
+                Ed25519Signer::verify(pk, &self.state_root, sig, b"AMUN_SNAPSHOT_V4", chain_id)
+                    .is_ok()
             })
             .count();
         valid_count >= self.required_signers as usize

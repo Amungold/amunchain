@@ -20,9 +20,10 @@ impl DeterministicTimerWheel {
         let id = self.next_id;
         self.next_id += 1;
         // Binary insert: find position maintaining sorted order
-        let idx = self.timers.binary_search_by(|(r, tid)| {
-            r.cmp(&round).then(tid.cmp(&id))
-        }).unwrap_or_else(|i| i);
+        let idx = self
+            .timers
+            .binary_search_by(|(r, tid)| r.cmp(&round).then(tid.cmp(&id)))
+            .unwrap_or_else(|i| i);
         self.timers.insert(idx, (round, id));
         id
     }
@@ -47,10 +48,16 @@ impl DeterministicTimerWheel {
         fired
     }
 
-    pub fn current_round(&self) -> u64 { self.current_round }
-    pub fn pending_count(&self) -> usize { self.timers.len() }
+    pub fn current_round(&self) -> u64 {
+        self.current_round
+    }
+    pub fn pending_count(&self) -> usize {
+        self.timers.len()
+    }
 }
 
 impl Default for DeterministicTimerWheel {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }

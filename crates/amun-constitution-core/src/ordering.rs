@@ -5,7 +5,7 @@ pub fn canonical_validator_order(ids: &[u64]) -> bool {
         return true;
     }
     for i in 1..ids.len() {
-        if ids[i] <= ids[i-1] {
+        if ids[i] <= ids[i - 1] {
             return false;
         }
     }
@@ -19,7 +19,7 @@ pub fn validate_ordering(ids: &[u64]) -> Result<(), &'static str> {
     }
     // Check uniqueness via ordering
     for i in 1..ids.len() {
-        if ids[i] == ids[i-1] {
+        if ids[i] == ids[i - 1] {
             return Err("duplicate validator in ordering");
         }
     }

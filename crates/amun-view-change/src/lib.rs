@@ -1,5 +1,5 @@
-pub mod view_change;
 pub mod new_view;
+pub mod view_change;
 
-pub use view_change::ViewChange;
 pub use new_view::NewView;
+pub use view_change::ViewChange;

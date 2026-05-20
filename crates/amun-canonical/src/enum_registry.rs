@@ -15,7 +15,12 @@ impl EnumRegistry {
         }
     }
 
-    pub fn register(&mut self, name: &str, variant_count: u8, version: u32) -> Result<(), &'static str> {
+    pub fn register(
+        &mut self,
+        name: &str,
+        variant_count: u8,
+        version: u32,
+    ) -> Result<(), &'static str> {
         let mut n = heapless::String::new();
         n.push_str(name).map_err(|_| "name overflow")?;
         self.entries
@@ -28,8 +33,14 @@ impl EnumRegistry {
     }
 
     pub fn validate(&self, name: &str, variant: u8, version: u32) -> bool {
-        self.entries.iter().any(|e| {
-            e.name.as_str() == name && e.variant_count > variant && e.version <= version
-        })
+        self.entries
+            .iter()
+            .any(|e| e.name.as_str() == name && e.variant_count > variant && e.version <= version)
+    }
+}
+
+impl Default for EnumRegistry {
+    fn default() -> Self {
+        Self::new()
     }
 }

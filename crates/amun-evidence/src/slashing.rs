@@ -23,7 +23,7 @@ impl SlashingEngine {
         if !proof.verify(chain_id) {
             return Err("invalid equivocation proof");
         }
-        
+
         // First offense: base penalty only
         // Subsequent offenses: multiplier applies
         let multiplier = if offense_count <= 1 {
@@ -33,11 +33,17 @@ impl SlashingEngine {
                 .saturating_mul(self.penalty_multiplier as u64)
                 .min(10)
         };
-        
+
         let penalty_bps = (self.base_penalty_bps as u64)
             .saturating_mul(multiplier)
             .min(10000);
-            
+
         Ok(stake.saturating_mul(penalty_bps) / 10000)
+    }
+}
+
+impl Default for SlashingEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }

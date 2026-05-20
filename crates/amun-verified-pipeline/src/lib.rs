@@ -1,3 +1,3 @@
 pub mod vote_pipeline;
 
-pub use vote_pipeline::{RawVote, ParsedVote, VerifiedVote, CanonicalVote};
+pub use vote_pipeline::{CanonicalVote, ParsedVote, RawVote, VerifiedVote};

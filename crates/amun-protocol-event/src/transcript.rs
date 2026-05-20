@@ -9,7 +9,10 @@ pub struct ProtocolTranscript {
 
 impl ProtocolTranscript {
     pub fn new() -> Self {
-        Self { events: Vec::new(), chain_hash: [0u8; 32] }
+        Self {
+            events: Vec::new(),
+            chain_hash: [0u8; 32],
+        }
     }
 
     pub fn append(&mut self, event: ProtocolEvent) {
@@ -23,7 +26,13 @@ impl ProtocolTranscript {
         self.events.push(event);
     }
 
-    pub fn len(&self) -> usize { self.events.len() }
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn len(&self) -> usize {
+        self.events.len()
+    }
 
     /// Recomputes the full chain hash and verifies it matches.
     pub fn verify_continuity(&self) -> bool {
@@ -47,5 +56,11 @@ impl ProtocolTranscript {
             transcript.append(event.clone());
         }
         transcript
+    }
+}
+
+impl Default for ProtocolTranscript {
+    fn default() -> Self {
+        Self::new()
     }
 }

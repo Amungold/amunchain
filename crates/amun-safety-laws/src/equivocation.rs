@@ -1,4 +1,4 @@
-use amun_consensus_messages::{ConsensusVote, ConsensusPhase};
+use amun_consensus_messages::{ConsensusPhase, ConsensusVote};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -14,7 +14,10 @@ impl EquivocationEvidence {
         } else {
             (vote_b, vote_a)
         };
-        Self { vote_a: first, vote_b: second }
+        Self {
+            vote_a: first,
+            vote_b: second,
+        }
     }
 
     pub fn verify(&self) -> bool {
@@ -40,7 +43,11 @@ pub fn detect_equivocation(votes: &[ConsensusVote]) -> Vec<EquivocationEvidence>
     let mut evidence = Vec::new();
 
     for vote in votes {
-        let key = (vote.message.validator_id, vote.message.round, vote.message.phase);
+        let key = (
+            vote.message.validator_id,
+            vote.message.round,
+            vote.message.phase,
+        );
         if let Some(&existing) = seen.get(&key) {
             if existing.message.block_hash != vote.message.block_hash {
                 evidence.push(EquivocationEvidence::new(existing.clone(), vote.clone()));

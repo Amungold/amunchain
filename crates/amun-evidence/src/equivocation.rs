@@ -16,14 +16,16 @@ impl EquivocationProof {
                 &self.signature_a,
                 b"AMUN_VOTE_V4",
                 chain_id,
-            ).is_ok()
+            )
+            .is_ok()
             && amun_crypto::Ed25519Signer::verify(
                 &self.validator_pk,
                 &self.block_hash_b,
                 &self.signature_b,
                 b"AMUN_VOTE_V4",
                 chain_id,
-            ).is_ok()
+            )
+            .is_ok()
     }
 
     pub fn compute_id(&self) -> [u8; 32] {

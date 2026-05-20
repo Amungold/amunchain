@@ -1,5 +1,5 @@
 use crate::cipher;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use zeroize::Zeroize;
 
 #[derive(Serialize, Deserialize)]

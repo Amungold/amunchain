@@ -8,7 +8,11 @@ pub struct RateLimiter {
 
 impl RateLimiter {
     pub fn new() -> Self {
-        Self { count: 0, window_start_ms: 0, limit: RATE_LIMIT_PER_SECOND }
+        Self {
+            count: 0,
+            window_start_ms: 0,
+            limit: RATE_LIMIT_PER_SECOND,
+        }
     }
     pub fn allow(&mut self, now_ms: u64) -> bool {
         if now_ms.saturating_sub(self.window_start_ms) >= 1000 {
@@ -20,5 +24,11 @@ impl RateLimiter {
         }
         self.count = self.count.saturating_add(1);
         true
+    }
+}
+
+impl Default for RateLimiter {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -1,6 +1,6 @@
-use crate::snapshot::{CanonicalSnapshot, SnapshotExecutionContext, SnapshotError};
-use amun_state_transition::StateMachine;
+use crate::snapshot::{CanonicalSnapshot, SnapshotError, SnapshotExecutionContext};
 use amun_chain_position::ChainPosition;
+use amun_state_transition::StateMachine;
 
 pub fn export_snapshot(
     sm: &StateMachine,
@@ -11,10 +11,7 @@ pub fn export_snapshot(
     execution_version: u64,
     sealed_epochs: Vec<u64>,
 ) -> Result<CanonicalSnapshot, SnapshotError> {
-    let entries: Vec<([u8; 32], Vec<u8>)> = sm.state
-        .iter()
-        .map(|(k, v)| (*k, v.clone()))
-        .collect();
+    let entries: Vec<([u8; 32], Vec<u8>)> = sm.state.iter().map(|(k, v)| (*k, v.clone())).collect();
 
     let context = SnapshotExecutionContext {
         genesis_root,

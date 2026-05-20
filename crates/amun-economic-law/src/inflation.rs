@@ -4,6 +4,12 @@ pub struct InflationLaw {
     pub year: u32,
 }
 
+impl Default for InflationLaw {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl InflationLaw {
     pub fn new() -> Self {
         Self {

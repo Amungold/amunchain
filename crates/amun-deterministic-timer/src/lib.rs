@@ -1,5 +1,5 @@
-pub mod wheel;
 pub mod timeout;
+pub mod wheel;
 
-pub use wheel::DeterministicTimerWheel;
 pub use timeout::TimeoutLaw;
+pub use wheel::DeterministicTimerWheel;

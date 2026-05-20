@@ -24,7 +24,9 @@ impl NetworkScheduler {
     pub fn send(&mut self, message: NetworkMessage, delay_rounds: u64) {
         let deliver_at = self.current_round + delay_rounds.max(1);
         // Binary insert to maintain ordering
-        let idx = self.queue.binary_search_by(|(r, _)| r.cmp(&deliver_at))
+        let idx = self
+            .queue
+            .binary_search_by(|(r, _)| r.cmp(&deliver_at))
             .unwrap_or_else(|i| i);
         self.queue.insert(idx, (deliver_at, message));
     }
@@ -47,14 +49,20 @@ impl NetworkScheduler {
         delivered
     }
 
-    pub fn round(&self) -> u64 { self.current_round }
-    pub fn pending(&self) -> usize { self.queue.len() }
+    pub fn round(&self) -> u64 {
+        self.current_round
+    }
+    pub fn pending(&self) -> usize {
+        self.queue.len()
+    }
 
     /// Deterministic pseudo-random delay based on seed and message content.
     pub fn compute_delay(&self, msg_hash: &[u8; 32]) -> u64 {
         let mut state = self.seed;
         for byte in msg_hash.iter() {
-            state = state.wrapping_mul(6364136223846793005).wrapping_add(*byte as u64);
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(*byte as u64);
         }
         1 + (state % 5) // 1-5 round delay
     }

@@ -18,9 +18,15 @@ impl SurvivabilityMetrics {
 
     pub fn summary(&self) -> &'static str {
         match self.confidence {
-            SurvivabilityConfidence::High => "CONFIDENCE: HIGH - all invariants hold, truth verified",
-            SurvivabilityConfidence::Medium => "CONFIDENCE: MEDIUM - core invariants hold, monitor complexity",
-            SurvivabilityConfidence::Low => "CONFIDENCE: LOW - invariants hold but verification degraded",
+            SurvivabilityConfidence::High => {
+                "CONFIDENCE: HIGH - all invariants hold, truth verified"
+            }
+            SurvivabilityConfidence::Medium => {
+                "CONFIDENCE: MEDIUM - core invariants hold, monitor complexity"
+            }
+            SurvivabilityConfidence::Low => {
+                "CONFIDENCE: LOW - invariants hold but verification degraded"
+            }
             SurvivabilityConfidence::Critical => "CONFIDENCE: CRITICAL - invariants violated",
         }
     }

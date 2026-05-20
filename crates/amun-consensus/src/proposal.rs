@@ -1,6 +1,6 @@
-use amun_kernel_types::{PublicHash32, Epoch};
 use amun_block::Block;
 use amun_consensus_types::ConsensusRound;
+use amun_kernel_types::{Epoch, PublicHash32};
 
 #[derive(Clone, Debug)]
 pub struct BlockProposal {
@@ -13,7 +13,13 @@ pub struct BlockProposal {
 
 impl BlockProposal {
     pub fn new(block: Block, epoch: Epoch, round: ConsensusRound, proposer: usize) -> Self {
-        Self { block, epoch, round, proposer, signature: [0u8; 96] }
+        Self {
+            block,
+            epoch,
+            round,
+            proposer,
+            signature: [0u8; 96],
+        }
     }
 
     pub fn block_hash(&self) -> PublicHash32 {

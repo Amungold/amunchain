@@ -60,7 +60,9 @@ pub struct NetworkFrame {
 
 impl NetworkFrame {
     pub fn encode(msg_type: NetworkMessageType, payload: &[u8]) -> Option<Vec<u8>> {
-        if payload.len() > MAX_FRAME_PAYLOAD { return None; }
+        if payload.len() > MAX_FRAME_PAYLOAD {
+            return None;
+        }
         let total_len = (7 + payload.len()) as u32;
         let mut buf = Vec::with_capacity(total_len as usize);
         buf.extend_from_slice(&total_len.to_le_bytes());
@@ -72,15 +74,25 @@ impl NetworkFrame {
     }
 
     pub fn decode(data: &[u8]) -> Option<Self> {
-        if data.len() < 8 { return None; }
+        if data.len() < 8 {
+            return None;
+        }
         let frame_len = u32::from_le_bytes(data[..4].try_into().ok()?) as usize;
-        if frame_len != data.len() { return None; }
+        if frame_len != data.len() {
+            return None;
+        }
         let version = data[4];
-        if version != NETWORK_FRAME_VERSION { return None; }
-        if data[6] != 0 { return None; }
+        if version != NETWORK_FRAME_VERSION {
+            return None;
+        }
+        if data[6] != 0 {
+            return None;
+        }
         let msg_type = NetworkMessageType::from_tag(data[5])?;
         let payload = data[7..].to_vec();
-        if payload.len() > MAX_FRAME_PAYLOAD { return None; }
+        if payload.len() > MAX_FRAME_PAYLOAD {
+            return None;
+        }
 
         let mut h = Hasher::new();
         h.update(b"AMUN_NET_FRAME_V1");
@@ -91,6 +103,10 @@ impl NetworkFrame {
         let mut frame_hash = [0u8; 32];
         frame_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
 
-        Some(Self { msg_type, payload, frame_hash })
+        Some(Self {
+            msg_type,
+            payload,
+            frame_hash,
+        })
     }
 }

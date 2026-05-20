@@ -1,6 +1,6 @@
+use crate::commit::CommitRule;
 use amun_chain_position::ChainPosition;
 use amun_quorum_certificate::QuorumCertificate;
-use crate::commit::CommitRule;
 
 #[derive(Debug, Clone)]
 pub struct BlockProposal {
@@ -46,10 +46,10 @@ impl BlockProposal {
     pub fn is_safe(&self, commit_rule: &CommitRule) -> bool {
         if let Some(ref locked_qc) = commit_rule.locked_qc {
             if let Some(ref parent) = self.parent_hash {
-                if !commit_rule.is_descendant(parent, &locked_qc.block_hash) {
-                    if *parent != locked_qc.block_hash {
-                        return false;
-                    }
+                if !commit_rule.is_descendant(parent, &locked_qc.block_hash)
+                    && *parent != locked_qc.block_hash
+                {
+                    return false;
                 }
             } else {
                 return false;
