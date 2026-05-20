@@ -1,18 +1,18 @@
-use amun_kernel::canonical::{CanonicalEncode, CanonicalEncoder};
-use amun_kernel::hashing::domain_tags;
 use super::replay::ReplayCertificate;
 use super::verifier::SealCommitment;
+use amun_kernel::canonical::{CanonicalEncode, CanonicalEncoder};
+use amun_kernel::hashing::domain_tags;
 
 #[derive(Clone)]
 pub struct ConstitutionalSnapshot {
-    pub epoch:               u64,
-    pub height:              u64,
-    pub state_root:          [u8; 32],
-    pub validator_root:      [u8; 32],
-    pub execution_root:      [u8; 32],
+    pub epoch: u64,
+    pub height: u64,
+    pub state_root: [u8; 32],
+    pub validator_root: [u8; 32],
+    pub execution_root: [u8; 32],
     pub previous_snapshot_hash: [u8; 32],
-    pub replay_certificate:  ReplayCertificate,
-    pub timestamp_slot:      u64,
+    pub replay_certificate: ReplayCertificate,
+    pub timestamp_slot: u64,
 }
 
 impl CanonicalEncode for ConstitutionalSnapshot {
@@ -36,6 +36,6 @@ impl ConstitutionalSnapshot {
 
 /// A quorum‑signed seal over a snapshot.
 pub struct SnapshotSeal {
-    pub snapshot_hash:     [u8; 32],
+    pub snapshot_hash: [u8; 32],
     pub quorum_commitment: SealCommitment,
 }

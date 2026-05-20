@@ -1,5 +1,5 @@
-use sha2::{Sha256, Digest};
 use amun_kernel::hashing::domain_tags;
+use sha2::{Digest, Sha256};
 
 pub struct MerkleProof {
     pub leaf: Vec<u8>,

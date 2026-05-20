@@ -1,11 +1,11 @@
-use std::collections::BTreeMap;
 use amun_kernel::canonical::{CanonicalEncode, CanonicalEncoder};
 use amun_kernel::hashing::domain_tags;
+use std::collections::BTreeMap;
 
 /// A single leaf in the state trie.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct StateLeaf {
-    pub key:   String,
+    pub key: String,
     pub value: Vec<u8>,
 }
 
@@ -29,7 +29,10 @@ impl StateRootEngine {
                 return Err(format!("Duplicate canonical key: {}", leaf.key));
             }
         }
-        Ok(CanonicalEncoder::hash_sorted(map.iter(), domain_tags::STATE_ROOT))
+        Ok(CanonicalEncoder::hash_sorted(
+            map.iter(),
+            domain_tags::STATE_ROOT,
+        ))
     }
 
     /// Global state root from per‑domain roots.

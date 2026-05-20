@@ -1,10 +1,10 @@
-use amun_kernel::canonical::{CanonicalEncode, encode_hash_slice};
+use amun_kernel::canonical::{encode_hash_slice, CanonicalEncode};
 
 #[derive(Clone, PartialEq)]
 pub struct ReplayEquivalenceProof {
-    pub live_root:     [u8; 32],
+    pub live_root: [u8; 32],
     pub replayed_root: [u8; 32],
-    pub identical:     bool,
+    pub identical: bool,
 }
 
 impl CanonicalEncode for ReplayEquivalenceProof {
@@ -17,13 +17,13 @@ impl CanonicalEncode for ReplayEquivalenceProof {
 
 #[derive(Clone)]
 pub struct ReplayTranscript {
-    pub tx_hashes:           Vec<[u8; 32]>,
-    pub pre_state_roots:     Vec<[u8; 32]>,
-    pub post_state_roots:    Vec<[u8; 32]>,
-    pub receipts:            Vec<[u8; 32]>,
-    pub emitted_events:      Vec<[u8; 32]>,
-    pub scheduler_trace:     Vec<[u8; 32]>,
-    pub consensus_trace:     Vec<[u8; 32]>,
+    pub tx_hashes: Vec<[u8; 32]>,
+    pub pre_state_roots: Vec<[u8; 32]>,
+    pub post_state_roots: Vec<[u8; 32]>,
+    pub receipts: Vec<[u8; 32]>,
+    pub emitted_events: Vec<[u8; 32]>,
+    pub scheduler_trace: Vec<[u8; 32]>,
+    pub consensus_trace: Vec<[u8; 32]>,
 }
 
 impl CanonicalEncode for ReplayTranscript {
@@ -40,8 +40,8 @@ impl CanonicalEncode for ReplayTranscript {
 
 #[derive(Clone)]
 pub struct ReplayCertificate {
-    pub transcript:   ReplayTranscript,
-    pub proof:        ReplayEquivalenceProof,
+    pub transcript: ReplayTranscript,
+    pub proof: ReplayEquivalenceProof,
 }
 
 impl CanonicalEncode for ReplayCertificate {
