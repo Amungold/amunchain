@@ -1,0 +1,101 @@
+crates/amun-network/src/connection.rs:3:use hashbrown::HashMap;
+crates/amun-network/src/connection.rs:6:    connections: HashMap<[u8; 48], Peer>,
+crates/amun-network/src/connection.rs:7:    ip_counts: HashMap<[u8; 16], u32>,
+crates/amun-network/src/connection.rs:13:            connections: HashMap::new(),
+crates/amun-network/src/connection.rs:14:            ip_counts: HashMap::new(),
+crates/amun-network/src/discovery.rs:3:use hashbrown::HashSet;
+crates/amun-network/src/discovery.rs:8:    seed_ids: HashSet<[u8; 48]>,
+crates/amun-network/src/discovery.rs:15:            seed_ids: HashSet::new(),
+crates/amun-fork-choice-law/src/fork_choice.rs:2:use std::collections::HashSet;
+crates/amun-fork-choice-law/src/fork_choice.rs:27:    let mut visited = HashSet::new();
+crates/amun-gossip/src/dedup.rs:2:use hashbrown::HashSet;
+crates/amun-gossip/src/dedup.rs:5:    seen: HashSet<[u8; 32]>,
+crates/amun-gossip/src/dedup.rs:11:            seen: HashSet::new(),
+crates/amun-qc-canonical/src/canonicalize.rs:8:    use std::collections::HashSet;
+crates/amun-qc-canonical/src/canonicalize.rs:10:    let mut seen_validators = HashSet::new();
+crates/amun-websocket/src/server.rs:14:    pub async fn start(&self) -> std::io::Result<()> {
+crates/amun-websocket/src/server.rs:21:            tokio::spawn(async move {
+crates/amun-safety-laws/src/uniqueness.rs:2:use std::collections::HashSet;
+crates/amun-safety-laws/src/uniqueness.rs:5:    let mut seen_validators = HashSet::new();
+crates/amun-safety-laws/src/equivocation.rs:2:use std::collections::HashMap;
+crates/amun-safety-laws/src/equivocation.rs:42:    let mut seen: HashMap<(u64, u64, ConsensusPhase), &ConsensusVote> = HashMap::new();
+crates/amun-tls/src/revocation.rs:1:use std::collections::HashSet;
+crates/amun-tls/src/revocation.rs:4:    pub revoked: HashSet<[u8; 32]>,
+crates/amun-tls/src/revocation.rs:10:            revoked: HashSet::new(),
+crates/amun-tls/src/pinning.rs:2:use std::collections::HashSet;
+crates/amun-tls/src/pinning.rs:5:    pub allowed_fingerprints: HashSet<[u8; 32]>,
+crates/amun-tls/src/pinning.rs:11:            allowed_fingerprints: HashSet::new(),
+crates/amun-constitutional-verifier/src/verifier.rs:60:    use std::collections::HashSet;
+crates/amun-constitutional-verifier/src/verifier.rs:61:    let mut seen = HashSet::new();
+crates/amun-runtime-law/src/law.rs:5:        "std::time::SystemTime",
+crates/amun-runtime-law/src/law.rs:6:        "std::time::Instant",
+crates/amun-runtime-law/src/law.rs:10:        "rand::random",
+crates/amun-http/src/server.rs:11:use std::sync::Mutex;
+crates/amun-http/src/server.rs:38:    pub rpc: Arc<Mutex<RpcHandler>>,
+crates/amun-http/src/server.rs:120:                rpc: Arc::new(Mutex::new(rpc_handler)),
+crates/amun-http/src/server.rs:132:    pub async fn start(&self) -> std::io::Result<()> {
+crates/amun-http/src/server.rs:142:            tokio::spawn(async move {
+crates/amun-consensus/src/vote_tracker.rs:3:use hashbrown::HashSet;
+crates/amun-consensus/src/vote_tracker.rs:6:    seen_votes: HashSet<(u64, u16)>,
+crates/amun-consensus/src/vote_tracker.rs:13:            seen_votes: HashSet::new(),
+crates/constitutional-linter/src/main.rs:2:use std::collections::{HashMap, HashSet, BTreeMap, VecDeque};
+crates/constitutional-linter/src/main.rs:144:    let layers: HashMap<String, Layer> = metadata.packages.iter()
+crates/constitutional-linter/src/main.rs:157:    let all_nodes: HashSet<String> = const_edges.keys().cloned()
+crates/constitutional-linter/src/main.rs:200:                    let forbidden: HashSet<Layer> = to_layers.iter().map(|l| Layer::from_id(l)).collect();
+crates/constitutional-linter/src/edge_semantics.rs:2:use std::collections::{HashMap, HashSet};
+crates/constitutional-linter/src/edge_semantics.rs:57:) -> HashMap<String, Vec<TypedEdge>> {
+crates/constitutional-linter/src/edge_semantics.rs:58:    let mut typed_edges: HashMap<String, Vec<TypedEdge>> = HashMap::new();
+crates/constitutional-linter/src/edge_semantics.rs:81:    typed_edges: &HashMap<String, Vec<TypedEdge>>,
+crates/constitutional-linter/src/edge_semantics.rs:82:) -> HashMap<String, HashSet<String>> {
+crates/constitutional-linter/src/edge_semantics.rs:83:    let mut graph: HashMap<String, HashSet<String>> = HashMap::new();
+crates/constitutional-linter/src/scc.rs:1:use std::collections::{HashMap, HashSet};
+crates/constitutional-linter/src/scc.rs:9:    pub components: Vec<HashSet<String>>,
+crates/constitutional-linter/src/scc.rs:18:    nodes: &HashSet<String>,
+crates/constitutional-linter/src/scc.rs:19:    edges: &HashMap<String, HashSet<String>>,
+crates/constitutional-linter/src/scc.rs:22:    let mut indices: HashMap<String, u32> = HashMap::new();
+crates/constitutional-linter/src/scc.rs:23:    let mut lowlink: HashMap<String, u32> = HashMap::new();
+crates/constitutional-linter/src/scc.rs:24:    let mut on_stack: HashSet<String> = HashSet::new();
+crates/constitutional-linter/src/scc.rs:26:    let mut components: Vec<HashSet<String>> = Vec::new();
+crates/constitutional-linter/src/scc.rs:31:        indices: &mut HashMap<String, u32>,
+crates/constitutional-linter/src/scc.rs:32:        lowlink: &mut HashMap<String, u32>,
+crates/constitutional-linter/src/scc.rs:33:        on_stack: &mut HashSet<String>,
+crates/constitutional-linter/src/scc.rs:35:        components: &mut Vec<HashSet<String>>,
+crates/constitutional-linter/src/scc.rs:36:        edges: &HashMap<String, HashSet<String>>,
+crates/constitutional-linter/src/scc.rs:60:            let mut component = HashSet::new();
+crates/constitutional-linter/src/scc.rs:112:        let nodes: HashSet<String> = ["A", "B", "C"].iter().map(|s| s.to_string()).collect();
+crates/constitutional-linter/src/scc.rs:113:        let edges: HashMap<String, HashSet<String>> = HashMap::from([
+crates/constitutional-linter/src/scc.rs:114:            ("A".into(), HashSet::from(["B".into()])),
+crates/constitutional-linter/src/scc.rs:115:            ("B".into(), HashSet::from(["C".into()])),
+crates/constitutional-linter/src/scc.rs:123:        let nodes: HashSet<String> = ["A", "B", "C"].iter().map(|s| s.to_string()).collect();
+crates/constitutional-linter/src/scc.rs:124:        let edges: HashMap<String, HashSet<String>> = HashMap::from([
+crates/constitutional-linter/src/scc.rs:125:            ("A".into(), HashSet::from(["B".into()])),
+crates/constitutional-linter/src/scc.rs:126:            ("B".into(), HashSet::from(["C".into()])),
+crates/constitutional-linter/src/scc.rs:127:            ("C".into(), HashSet::from(["A".into()])), // cycle!
+crates/constitutional-linter/src/scc.rs:136:        let nodes: HashSet<String> = ["A"].iter().map(|s| s.to_string()).collect();
+crates/constitutional-linter/src/scc.rs:137:        let edges: HashMap<String, HashSet<String>> = HashMap::from([
+crates/constitutional-linter/src/scc.rs:138:            ("A".into(), HashSet::from(["A".into()])),
+crates/amun-consensus-execution/src/voter.rs:4:use std::collections::{BTreeMap, HashSet};
+crates/amun-consensus-execution/src/voter.rs:23:    slashed: HashSet<u64>,
+crates/amun-consensus-execution/src/voter.rs:34:            slashed: HashSet::new(),
+crates/amun-consensus-execution/src/block_dag.rs:3:use std::collections::{BTreeMap, HashSet};
+crates/amun-consensus-execution/src/block_dag.rs:44:        let mut visited = HashSet::new();
+crates/amun-consensus-execution/src/block_dag.rs:67:        let mut visited = HashSet::new();
+crates/amun-consensus-execution/src/block_dag.rs:84:    pub children_index: BTreeMap<[u8; 32], HashSet<[u8; 32]>>,
+crates/amun-consensus-execution/src/block_dag.rs:85:    pub height_index: BTreeMap<u64, HashSet<[u8; 32]>>,
+crates/amun-consensus-execution/src/block_dag.rs:86:    pub round_index: BTreeMap<u64, HashSet<[u8; 32]>>,
+crates/amun-consensus-execution/src/block_dag.rs:108:            let mut s = HashSet::new();
+crates/amun-consensus-execution/src/block_dag.rs:114:            let mut s = HashSet::new();
+crates/amun-consensus-execution/src/block_dag.rs:189:        let mut visited = HashSet::new();
+crates/amun-consensus-execution/src/block_dag.rs:243:        let spine_set: HashSet<[u8; 32]> = self.canonical_spine.iter().cloned().collect();
+crates/amun-consensus-execution/src/block_dag.rs:258:        let remove_set: HashSet<[u8; 32]> = to_remove.iter().cloned().collect();
+crates/amun-consensus-execution/src/commit.rs:2:use std::collections::{BTreeMap, HashSet};
+crates/amun-consensus-execution/src/commit.rs:65:        let mut visited = HashSet::new();
+crates/amun-consensus-execution/src/persistent_state.rs:8:use std::collections::{BTreeMap, HashSet};
+crates/amun-consensus-execution/src/persistent_state.rs:15:    applied_sequences: HashSet<u64>,
+crates/amun-consensus-execution/src/persistent_state.rs:17:    known_blocks: HashSet<[u8; 32]>,
+crates/amun-consensus-execution/src/persistent_state.rs:18:    committed_blocks_set: HashSet<[u8; 32]>,
+crates/amun-consensus-execution/src/persistent_state.rs:92:        let mut known = HashSet::new();
+crates/amun-consensus-execution/src/persistent_state.rs:99:            applied_sequences: HashSet::new(),
+crates/amun-consensus-execution/src/persistent_state.rs:102:            committed_blocks_set: HashSet::new(),
+crates/amun-consensus-execution/src/fork_choice.rs:3:use std::collections::{BTreeMap, HashSet};
+crates/amun-consensus-execution/src/fork_choice.rs:125:        let mut visited = HashSet::new();

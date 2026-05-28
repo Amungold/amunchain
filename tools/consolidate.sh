@@ -1,0 +1,26 @@
+#!/bin/bash
+# This script consolidates crates according to the architecture plan
+# WARNING: This is a planning script, not for automatic execution
+
+echo "Architectural Consolidation Plan"
+echo "================================"
+echo ""
+echo "Phase 1: Renaming"
+echo "  mv crates/amun_state_machine crates/amun-execution-stf"
+echo "  mv crates/amun_consensus_math crates/amun-consensus-math"
+echo "  mv crates/constitutional-linter crates/amun-linter-constitutional"
+echo ""
+echo "Phase 2: Merging"
+echo "  Merge amun-replay-* into amun-test-replay"
+echo "  Merge amun-transcript-* into amun-constitution-semantics"
+echo "  Merge runtime crates into amun-execution-runtime"
+echo ""
+echo "Phase 3: Splitting"
+echo "  Split amun-consensus into 4 crates"
+echo "  Split amun-constitutional into 3 crates"
+echo ""
+echo "Phase 4: Verification"
+echo "  cargo build --workspace"
+echo "  cargo test --workspace"
+echo ""
+echo "This consolidation should be done manually after creating backup."

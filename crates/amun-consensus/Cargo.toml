@@ -2,18 +2,24 @@
 name = "amun-consensus"
 version = "1.0.0"
 edition = "2021"
-description = "Constitutional Byzantine Fault Tolerant consensus engine"
 
 [dependencies]
-amun-failure = { path = "../amun-failure" }
-amun-kernel-types = { path = "../amun-kernel-types" }
-amun-codec = { path = "../amun-codec" }
-amun-block = { path = "../amun-block" }
-amun-consensus-types = { path = "../amun-consensus-types" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_bytes = "0.11"
+thiserror = "1.0"
+blake3 = "1.5"
+hex = "0.4"
+bincode = "1.3"
+tempfile = "3.8"
+crc32fast = "1.4"
+rand = "0.8"
+rayon = "1.10"
+
+# Internal dependencies
+amun-crypto = { path = "../amun-crypto" }
 amun-constitution = { path = "../amun-constitution" }
-amun-transaction = { path = "../amun-transaction" }
-amun-stf = { path = "../amun-stf" }
-amun-runtime = { path = "../amun-runtime" }
-amun-storage = { path = "../amun-storage" }
-heapless = "0.8"
-hashbrown = "0.14"
+
+[features]
+default = ["std"]
+std = []

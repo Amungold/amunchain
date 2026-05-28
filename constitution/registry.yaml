@@ -1,0 +1,41 @@
+# AmunChain Constitutional Registry
+# This is the SINGLE SOURCE OF TRUTH for layer classification
+
+layers:
+  core:
+    crates: [amun-core]
+    purity: "no_std, no_alloc, no_deps"
+    
+  identity:
+    crates: [amun-identity]
+    depends_on: [core]
+    
+  crypto:
+    crates: [amun-crypto]
+    depends_on: [core]
+    
+  consensus:
+    crates: [amun-consensus]
+    depends_on: [core, crypto, identity]
+    determinism: required
+    
+  constitution:
+    crates: [amun-constitution]
+    depends_on: [core, consensus]
+    
+  execution:
+    crates: [amun-execution, amun-state-machine]
+    depends_on: [core, constitution]
+    
+  storage:
+    crates: [amun-storage]
+    depends_on: [core, execution]
+    
+  network:
+    crates: [amun-network]
+    depends_on: [core, storage]
+    
+  test:
+    crates: [amun-test-mocks]
+    depends_on: []
+    is_test: true

@@ -1,0 +1,21 @@
+Diff in /root/projects/amunchain/amunchain/crates/amun-consensus/src/unlock_law.rs:5:
+ 
+ /// Check if a validator can be unlocked
+ pub fn can_unlock(validator_id: u64, qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+[31m-    qc.votes.iter().any(|v| v.message.validator_id == validator_id)
+(B[m[32m+    qc.votes
+(B[m[32m+        .iter()
+(B[m[32m+        .any(|v| v.message.validator_id == validator_id)
+(B[m         && validator_set.get_validator(validator_id).is_some()
+ }
+ 
+Diff in /root/projects/amunchain/amunchain/crates/amun-consensus/src/unlock_law.rs:12:
+ /// Verify unlock condition: QC must have quorum
+ pub fn verify_unlock_condition(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+[31m-    let total: u64 = qc.votes.iter()
+(B[m[32m+    let total: u64 = qc
+(B[m[32m+        .votes
+(B[m[32m+        .iter()
+(B[m         .filter_map(|v| validator_set.get_validator(v.message.validator_id))
+         .map(|vi| vi.stake)
+         .sum();

@@ -14,3 +14,4 @@ pub mod version;
 pub use canonical::{CanonicalEncode, CanonicalEncoder};
 pub use hashing::domain_tags;
 pub use version::PROTOCOL_VERSION;
+pub mod governance;

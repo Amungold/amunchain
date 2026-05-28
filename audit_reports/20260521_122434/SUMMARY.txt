@@ -1,0 +1,52 @@
+╔══════════════════════════════════════════════════════════════╗
+║           AMUNCHAIN COMPREHENSIVE AUDIT SUMMARY              ║
+╚══════════════════════════════════════════════════════════════╝
+
+Generated: 2026-05-21T12:24:43Z
+
+1. DEPENDENCY SECURITY
+   - Duplicate dependency groups: 300
+   - Known vulnerabilities: 2
+
+2. UNSAFE CODE
+   - Files with unsafe: 7
+   - Unsafe trait impls: 20
+   - Transmute sites: 12
+   - Raw pointer sites: 10
+
+3. DETERMINISM
+   - HashMap in deterministic layers: 3
+   - Time/randomness: 0
+   - Threading/concurrency: 0
+   - I/O operations: 0
+   - Env var access: 0
+
+4. CONSTITUTIONAL VIOLATIONS
+   - See: audit_reports/20260521_122434/consensus_contamination.txt
+   - See: audit_reports/20260521_122434/async_penetration.txt
+   - See: audit_reports/20260521_122434/interface_violations.txt
+
+5. CRYPTOGRAPHY
+   - Hardcoded secrets: 14
+
+6. ERROR HANDLING
+   - See: audit_reports/20260521_122434/unwrap_expect.txt
+   - Direct indexing: 114
+
+7. ARCHITECTURE
+   - See: audit_reports/20260521_122434/dependency_tree.txt
+
+8. CLIPPY
+   - Warnings: 0
+0
+   - Errors: 0
+0
+
+CRITICAL PRIORITIES:
+  1. Fix any consensus contamination (constitutional violation)
+  2. Remove async dependencies from Layers 0-3
+  3. Replace HashMap with BTreeMap in deterministic paths
+  4. Document all unsafe blocks
+  5. Add .get() instead of direct indexing
+
+Full details: audit_reports/20260521_122434/

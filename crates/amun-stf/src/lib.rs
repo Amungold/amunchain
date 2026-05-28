@@ -14,3 +14,4 @@ pub use transition::StateTransition;
 
 #[cfg(test)]
 mod tests;
+pub mod transition_result;

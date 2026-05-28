@@ -1,0 +1,145 @@
+# AmunChain Constitutional Laws — Machine-Readable Source of Truth
+# This is the authoritative constitution. Markdown is generated from this.
+
+version: "2.1"
+generated: "2026-05-21"
+
+layers:
+  - id: Kernel
+    name: "Layer 0 — Cryptographic Kernel"
+    crates: [amun-kernel, amun-kernel-types]
+    allowlist: [sha2, serde, ed25519-dalek, blake3, zeroize, subtle, rand_core, signature, digest]
+    laws:
+      - id: "0.1"
+        text: "MUST NOT import non-Kernel amun-* crates"
+        type: forbid_dependency
+        from_layer: Kernel
+        to_layer: [Constitutional, Interface, Consensus, Execution, Persistence, Network, Governance]
+      - id: "0.2"
+        text: "Only cryptographic and serialization dependencies"
+        type: dependency_allowlist
+      - id: "0.3"
+        text: "Single source of canonical encoding truth"
+        type: sovereignty
+
+  - id: Constitutional
+    name: "Layer 0.5 — Constitutional Semantics"
+    crates: [amun-constitution, amun-constitution-core, amun-invariants]
+    laws:
+      - id: "0.5.1"
+        text: "MAY import Layer 0, MUST NOT import Layers 1-4"
+        type: forbid_dependency
+        from_layer: Constitutional
+        to_layer: [Consensus, Execution, Persistence, Network]
+
+  - id: Interface
+    name: "Interface Layer — Architectural Boundaries"
+    crates: [amun-execution-interface, amun-storage-interface, amun-network-interface]
+    laws:
+      - id: "I.1"
+        text: "Traits ONLY. No concrete service implementations"
+        type: interface_purity
+      - id: "I.2"
+        text: "NO async runtime dependencies"
+        type: forbid_dependency_exact
+        dependencies: [tokio, hyper, tungstenite]
+
+  - id: Consensus
+    name: "Layer 1 — Consensus Core"
+    crates: [amun-consensus, amun-pacemaker, amun-fork-choice-law, amun-qc-canonical, amun-view-change, amun-quorum-certificate, amun-consensus-execution, amun-consensus-messages, amun-consensus-types, amun-consensus-law, amun-consensus-reactor, amun-consensus-signatures, amun-consensus-proof]
+    laws:
+      - id: "1.1"
+        text: "MUST NOT import amun-runtime, amun-storage, amun-mempool"
+        type: forbid_dependency_exact
+        dependencies: [amun-runtime, amun-storage, amun-mempool]
+
+  - id: Execution
+    name: "Layer 2 — Deterministic Execution"
+    crates: [amun-execution, amun-runtime, amun-stf, amun-state-transition, amun-runtime-law, amun-execution-receipt]
+    laws:
+      - id: "2.1"
+        text: "MUST be deterministic and replayable"
+        type: determinism_requirement
+
+  - id: Persistence
+    name: "Layer 3 — Persistence"
+    crates: [amun-wal, amun-storage, amun-snapshot, amun-snapshot-engine, amun-snapshot-constitution, amun-state-root, amun-state-types, amun-crash-recovery, amun-crash-persistence]
+    laws:
+      - id: "3.1"
+        text: "MUST NOT depend on consensus logic"
+        type: forbid_dependency
+        from_layer: Persistence
+        to_layer: [Consensus]
+
+  - id: Network
+    name: "Layer 4 — Network"
+    crates: [amun-network, amun-gossip, amun-http, amun-websocket, amun-network-model, amun-network-constitution, amun-network-scheduler, amun-network-simulator]
+    laws:
+      - id: "4.1"
+        text: "Primary host for tokio/hyper"
+        type: async_runtime_host
+      - id: "4.2"
+        text: "MUST NOT contain consensus logic"
+        type: forbid_dependency
+        from_layer: Network
+        to_layer: [Consensus]
+
+  - id: Governance
+    name: "Layer 5 — Governance & Economics"
+    crates: [amun-governance, amun-staking, amun-economics, amun-upgrade, amun-upgrade-law, amun-economic-law, amun-epoch-transition, amun-emergency]
+    laws:
+      - id: "5.1"
+        text: "Transitions MUST be replay-deterministic"
+        type: determinism_requirement
+
+  - id: Testing
+    name: "Layer 6 — Testing & Verification"
+    crates: [amun-adversarial-tests, amun-byzantine-simulation, amun-byzantine-tests, amun-cluster-harness, amun-constitutional-tests, amun-cross-process, amun-determinism-tests, amun-distributed-tests, amun-replay-certification]
+    laws:
+      - id: "6.1"
+        text: "No production crate MAY depend on a test crate"
+        type: forbid_reverse_dependency
+
+async_laws:
+  - id: "Async.1"
+    text: "tokio/hyper MAY exist outside Layer 4 ONLY behind deterministic interfaces"
+  - id: "Async.2"
+    text: "Async runtimes MUST NOT alter deterministic protocol behavior"
+  - id: "Async.3"
+    text: "Optional async deps require constitutional review"
+
+prohibited_dependencies:
+  - from: amun-consensus
+    to: amun-runtime
+    reason: "Consensus contamination"
+  - from: amun-consensus
+    to: amun-storage
+    reason: "Storage coupling"
+  - from: amun-consensus
+    to: amun-mempool
+    reason: "Mempool coupling"
+  - from: amun-kernel
+    to: "amun-*"
+    reason: "Kernel purity"
+  - from: amun-wal
+    to: amun-consensus
+    reason: "Persistence isolation"
+
+merge_strategy:
+  - phase: A
+    crates: [amun-finality-law, amun-unlock-law, amun-timeout-law]
+    targets: [amun-consensus, amun-consensus, amun-pacemaker]
+    status: pending
+  - phase: B
+    crates: [amun-snapshot-engine, amun-snapshot-constitution]
+    targets: [amun-snapshot, amun-snapshot]
+    status: pending
+  - phase: C
+    crates: [amun-runtime-law]
+    targets: [amun-runtime]
+    status: pending
+
+crate_freeze:
+  enabled: true
+  policy: "New crates require constitutional RFC"
+  rfc_path: "docs/rfcs/"

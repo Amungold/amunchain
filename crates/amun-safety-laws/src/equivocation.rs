@@ -1,5 +1,5 @@
 use amun_consensus_messages::{ConsensusPhase, ConsensusVote};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct EquivocationEvidence {
@@ -39,7 +39,7 @@ impl EquivocationEvidence {
 }
 
 pub fn detect_equivocation(votes: &[ConsensusVote]) -> Vec<EquivocationEvidence> {
-    let mut seen: HashMap<(u64, u64, ConsensusPhase), &ConsensusVote> = HashMap::new();
+    let mut seen: BTreeMap<(u64, u64, ConsensusPhase), &ConsensusVote> = BTreeMap::new();
     let mut evidence = Vec::new();
 
     for vote in votes {

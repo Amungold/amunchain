@@ -1,16 +1,17 @@
 use amun_consensus_types::{ConsensusRound, ValidatorIndex};
 use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
-use hashbrown::HashSet;
+extern crate alloc;
+use alloc::collections::BTreeSet;
 
 pub struct VoteTracker {
-    seen_votes: HashSet<(u64, u16)>,
+    seen_votes: BTreeSet<(u64, u16)>,
     max_tracked_rounds: u64,
 }
 
 impl VoteTracker {
     pub fn new() -> Self {
         Self {
-            seen_votes: HashSet::new(),
+            seen_votes: BTreeSet::new(),
             max_tracked_rounds: 10,
         }
     }

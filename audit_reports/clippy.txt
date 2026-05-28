@@ -1,205 +1,61 @@
+    Checking constant_time_eq v0.4.2
+   Compiling blake3 v1.8.5
     Checking amun-failure v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-failure)
-    Checking serde_core v1.0.228
-error: this method could have a `#[must_use]` attribute
-  --> crates/amun-failure/src/kernel_state.rs:17:18
+    Checking amun-deterministic-allocator v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-deterministic-allocator)
+error: slicing may panic
+  --> crates/amun-deterministic-allocator/src/arena.rs:25:20
    |
-17 |     pub const fn healthy() -> Self {
-   |                  ^^^^^^^
+25 |         Some((&mut self.memory[start..start + size], start))
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    |
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-   = note: `-D clippy::must-use-candidate` implied by `-D warnings`
-   = help: to override `-D warnings` add `#[allow(clippy::must_use_candidate)]`
-help: add the attribute
-   |
-17 ~     #[must_use]
-18 ~     pub const fn healthy() -> Self {
-   |
+   = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing
+   = note: requested on the command line with `-D clippy::indexing-slicing`
 
-error: this method could have a `#[must_use]` attribute
-  --> crates/amun-failure/src/kernel_state.rs:21:12
+error: slicing may panic
+  --> crates/amun-deterministic-allocator/src/arena.rs:32:15
    |
-21 |     pub fn poison(self, fault: ConstitutionalFault, epoch: u64, round: u64) -> Self {
-   |            ^^^^^^
+32 |         Some(&self.memory[offset..offset + len])
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    |
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-   |
-21 ~     #[must_use]
-22 ~     pub fn poison(self, fault: ConstitutionalFault, epoch: u64, round: u64) -> Self {
-   |
+   = help: consider using `.get(n..m)` or `.get_mut(n..m)` instead
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing
 
-error: missing `#[must_use]` attribute on a method returning `Self`
-  --> crates/amun-failure/src/kernel_state.rs:21:5
+error: slicing may panic
+  --> crates/amun-deterministic-allocator/src/arena.rs:49:10
    |
-21 | /     pub fn poison(self, fault: ConstitutionalFault, epoch: u64, round: u64) -> Self {
-22 | |         match self {
-23 | |             Self::Poisoned { .. } => self,
-24 | |             Self::Healthy => Self::Poisoned {
-...  |
-30 | |     }
-   | |_____^
+49 |         &self.memory[..self.offset]
+   |          ^^^^^^^^^^^^^^^^^^^^^^^^^^
    |
-   = help: consider adding the `#[must_use]` attribute to the method or directly to the `Self` type
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#return_self_not_must_use
-   = note: `-D clippy::return-self-not-must-use` implied by `-D warnings`
-   = help: to override `-D warnings` add `#[allow(clippy::return_self_not_must_use)]`
+   = help: consider using `.get(..n)`or `.get_mut(..n)` instead
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing
 
-error: this method could have a `#[must_use]` attribute
-  --> crates/amun-failure/src/kernel_state.rs:32:18
+error: indexing may panic
+  --> crates/amun-deterministic-allocator/src/deterministic_map.rs:17:23
    |
-32 |     pub const fn can_participate(&self) -> bool {
-   |                  ^^^^^^^^^^^^^^^
+17 |             let old = self.entries[pos].1.clone();
+   |                       ^^^^^^^^^^^^^^^^^
    |
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-   |
-32 ~     #[must_use]
-33 ~     pub const fn can_participate(&self) -> bool {
-   |
+   = help: consider using `.get(n)` or `.get_mut(n)` instead
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing
 
-error: this method could have a `#[must_use]` attribute
-  --> crates/amun-failure/src/kernel_state.rs:36:12
+error: indexing may panic
+  --> crates/amun-deterministic-allocator/src/deterministic_map.rs:18:13
    |
-36 |     pub fn quarantine_actions(&self) -> QuarantineActions {
-   |            ^^^^^^^^^^^^^^^^^^
+18 |             self.entries[pos] = (key, value);
+   |             ^^^^^^^^^^^^^^^^^
    |
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-   |
-36 ~     #[must_use]
-37 ~     pub fn quarantine_actions(&self) -> QuarantineActions {
-   |
+   = help: consider using `.get(n)` or `.get_mut(n)` instead
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing
 
-error: more than 3 bools in a struct
-  --> crates/amun-failure/src/kernel_state.rs:51:1
+error: indexing may panic
+  --> crates/amun-deterministic-allocator/src/deterministic_map.rs:37:23
    |
-51 | / pub struct QuarantineActions {
-52 | |     pub halt_consensus: bool,
-53 | |     pub seal_journal: bool,
-54 | |     pub invalidate_snapshots: bool,
-55 | |     pub preserve_evidence: bool,
-56 | |     pub evidence_fault: Option<ConstitutionalFault>,
-57 | | }
-   | |_^
+37 |             .map(|i| &self.entries[i].1)
+   |                       ^^^^^^^^^^^^^^^
    |
-   = help: consider using a state machine or refactoring bools into two-variant enums
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#struct_excessive_bools
-   = note: `-D clippy::struct-excessive-bools` implied by `-D warnings`
-   = help: to override `-D warnings` add `#[allow(clippy::struct_excessive_bools)]`
+   = help: consider using `.get(n)` or `.get_mut(n)` instead
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing
 
-error: this method could have a `#[must_use]` attribute
-  --> crates/amun-failure/src/kernel_state.rs:81:18
-   |
-81 |     pub const fn new(chain_id: u64, epoch: u64, round: u64) -> Self {
-   |                  ^^^
-   |
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-   |
-81 ~     #[must_use]
-82 ~     pub const fn new(chain_id: u64, epoch: u64, round: u64) -> Self {
-   |
-
-error: docs for function returning `Result` missing `# Errors` section
-  --> crates/amun-failure/src/kernel_state.rs:91:5
-   |
-91 |     pub fn check_healthy(&self) -> AmunResult<()> {
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#missing_errors_doc
-   = note: `-D clippy::missing-errors-doc` implied by `-D warnings`
-   = help: to override `-D warnings` add `#[allow(clippy::missing_errors_doc)]`
-
-error: this method could have a `#[must_use]` attribute
-   --> crates/amun-failure/src/kernel_state.rs:102:12
-    |
-102 |     pub fn record_fault(mut self, ctx: &FailureContext) -> Self {
-    |            ^^^^^^^^^^^^
-    |
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-    |
-102 ~     #[must_use]
-103 ~     pub fn record_fault(mut self, ctx: &FailureContext) -> Self {
-    |
-
-error: missing `#[must_use]` attribute on a method returning `Self`
-   --> crates/amun-failure/src/kernel_state.rs:102:5
-    |
-102 | /     pub fn record_fault(mut self, ctx: &FailureContext) -> Self {
-103 | |         if ctx.fault.should_halt() {
-104 | |             self.health = self.health.poison(ctx.fault, self.epoch, self.round);
-...   |
-107 | |     }
-    | |_____^
-    |
-    = help: consider adding the `#[must_use]` attribute to the method or directly to the `Self` type
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#return_self_not_must_use
-
-error: this method could have a `#[must_use]` attribute
-  --> crates/amun-failure/src/taxonomy.rs:45:18
-   |
-45 |     pub const fn severity(self) -> FaultSeverity {
-   |                  ^^^^^^^^
-   |
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-   |
-45 ~     #[must_use]
-46 ~     pub const fn severity(self) -> FaultSeverity {
-   |
-
-error: this method could have a `#[must_use]` attribute
-  --> crates/amun-failure/src/taxonomy.rs:61:18
-   |
-61 |     pub const fn should_halt(self) -> bool {
-   |                  ^^^^^^^^^^^
-   |
-   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-   |
-61 ~     #[must_use]
-62 ~     pub const fn should_halt(self) -> bool {
-   |
-
-error: this method could have a `#[must_use]` attribute
-   --> crates/amun-failure/src/taxonomy.rs:142:18
-    |
-142 |     pub const fn new(fault: ConstitutionalFault, module_id: u16, operation_id: u16) -> Self {
-    |                  ^^^
-    |
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-    |
-142 ~     #[must_use]
-143 ~     pub const fn new(fault: ConstitutionalFault, module_id: u16, operation_id: u16) -> Self {
-    |
-
-error: this method could have a `#[must_use]` attribute
-   --> crates/amun-failure/src/taxonomy.rs:150:12
-    |
-150 |     pub fn severity(&self) -> FaultSeverity {
-    |            ^^^^^^^^
-    |
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-    |
-150 ~     #[must_use]
-151 ~     pub fn severity(&self) -> FaultSeverity {
-    |
-
-error: this method could have a `#[must_use]` attribute
-   --> crates/amun-failure/src/taxonomy.rs:154:12
-    |
-154 |     pub fn should_halt(&self) -> bool {
-    |            ^^^^^^^^^^^
-    |
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate
-help: add the attribute
-    |
-154 ~     #[must_use]
-155 ~     pub fn should_halt(&self) -> bool {
-    |
-
-error: could not compile `amun-failure` (lib) due to 15 previous errors
+error: could not compile `amun-deterministic-allocator` (lib) due to 6 previous errors
 warning: build failed, waiting for other jobs to finish...

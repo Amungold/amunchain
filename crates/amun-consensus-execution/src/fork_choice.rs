@@ -1,6 +1,6 @@
 use crate::block_dag::{BlockDAG, BlockNode, MAX_DAG_DEPTH};
 use amun_quorum_certificate::QuorumCertificate;
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 
 /// Fork-choice rule with lock history for monotonicity verification
 #[derive(Debug, Clone)]
@@ -122,7 +122,7 @@ impl ForkChoice {
     /// Get canonical chain tip using children_index (not round+1 assumption)
     pub fn canonical_tip(&self, dag: &BlockDAG) -> Option<[u8; 32]> {
         let mut current_hash = self.highest_qc()?.block_hash;
-        let mut visited = HashSet::new();
+        let mut visited = BTreeSet::new();
         let mut depth = 0;
 
         loop {

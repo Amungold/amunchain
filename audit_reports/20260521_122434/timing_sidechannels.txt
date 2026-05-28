@@ -1,0 +1,95 @@
+crates/amun-kernel/src/canonical.rs:8:    fn canonical_encode(&self) -> Vec<u8> {
+crates/amun-kernel/src/canonical.rs:14:    fn encode_canonical(&self, out: &mut Vec<u8>);
+crates/amun-kernel/src/canonical.rs:18:impl<T: CanonicalEncode + ?Sized> CanonicalEncode for &T {
+crates/amun-kernel/src/canonical.rs:19:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:25:impl<T: CanonicalEncode> CanonicalEncode for [T] {
+crates/amun-kernel/src/canonical.rs:26:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:35:impl<T: CanonicalEncode> CanonicalEncode for Vec<T> {
+crates/amun-kernel/src/canonical.rs:36:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:46:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:51:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:56:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:61:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:66:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:71:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:78:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:83:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:88:impl<T: CanonicalEncode> CanonicalEncode for Option<T> {
+crates/amun-kernel/src/canonical.rs:89:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:91:            Some(val) => {
+crates/amun-kernel/src/canonical.rs:95:            None => {
+crates/amun-kernel/src/canonical.rs:103:impl<A: CanonicalEncode, B: CanonicalEncode> CanonicalEncode for (A, B) {
+crates/amun-kernel/src/canonical.rs:104:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:112:pub struct CanonicalBytes<'a>(pub &'a [u8]);
+crates/amun-kernel/src/canonical.rs:114:impl<'a> CanonicalEncode for CanonicalBytes<'a> {
+crates/amun-kernel/src/canonical.rs:115:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:122:pub fn encode_hash_slice(items: &[[u8; 32]], out: &mut Vec<u8>) {
+crates/amun-kernel/src/canonical.rs:134:    pub fn hash_sorted<I>(items: I, domain_tag: &[u8]) -> [u8; 32]
+crates/amun-kernel/src/canonical.rs:149:                assert!(prev <= item, "hash_sorted: items not sorted");
+crates/amun-kernel/src/canonical.rs:160:    pub fn hash_unsorted_canonicalized<T>(items: &[T], domain_tag: &[u8]) -> [u8; 32]
+crates/amun-kernel/src/canonical.rs:170:    pub fn hash_value<V: CanonicalEncode + ?Sized>(value: &V, domain_tag: &[u8]) -> [u8; 32] {
+crates/amun-kernel/src/canonical.rs:201:        let v: Vec<u64> = vec![1, 2, 3];
+crates/amun-kernel/src/canonical.rs:209:        let some: Option<u64> = Some(42);
+crates/amun-kernel/src/canonical.rs:210:        let none: Option<u64> = None;
+crates/amun-kernel/src/governance.rs:16:        signer_ids: Vec<[u8; 32]>,
+crates/amun-kernel/src/governance.rs:17:        signatures: Vec<[u8; 64]>,
+crates/amun-kernel/src/governance.rs:23:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/governance.rs:25:            Signature::Ed25519(sig) => {
+crates/amun-kernel/src/governance.rs:32:            } => {
+crates/amun-kernel/src/governance.rs:42:            Signature::Emergency(sig) => {
+crates/amun-kernel/src/governance.rs:71:    ) -> Self {
+crates/amun-kernel/src/governance.rs:83:    pub fn is_valid_at(&self, timestamp: u64) -> bool {
+crates/amun-kernel/src/governance.rs:84:        timestamp >= self.valid_from && timestamp <= self.valid_until
+crates/amun-kernel/src/governance.rs:89:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/governance.rs:108:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/governance.rs:110:            AuthorityRole::Signer => 0,
+crates/amun-kernel/src/governance.rs:111:            AuthorityRole::Reviewer => 1,
+crates/amun-kernel/src/governance.rs:112:            AuthorityRole::Approver => 2,
+crates/amun-kernel/src/governance.rs:113:            AuthorityRole::EmergencyAuthority => 3,
+crates/amun-kernel/src/governance.rs:134:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/governance.rs:153:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/governance.rs:155:            FreezeDomain::WireFormat => 0,
+crates/amun-kernel/src/governance.rs:156:            FreezeDomain::DiskFormat => 1,
+crates/amun-kernel/src/governance.rs:157:            FreezeDomain::Codec => 2,
+crates/amun-kernel/src/governance.rs:158:            FreezeDomain::SnapshotSchema => 3,
+crates/amun-kernel/src/governance.rs:159:            FreezeDomain::GovernanceSchema => 4,
+crates/amun-kernel/src/governance.rs:170:    pub authorities: Vec<Authority>,
+crates/amun-kernel/src/governance.rs:175:    pub fn new(epoch: u64) -> Self {
+crates/amun-kernel/src/governance.rs:187:    pub fn registry_root(&self) -> [u8; 32] {
+crates/amun-kernel/src/governance.rs:194:    pub fn find(&self, id: &[u8; 32], at_timestamp: u64) -> Option<&Authority> {
+crates/amun-kernel/src/governance.rs:197:            .find(|a| &a.id == id && a.is_valid_at(at_timestamp))
+crates/amun-kernel/src/governance.rs:202:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/governance.rs:225:    pub fn signing_payload(&self) -> [u8; 32] {
+crates/amun-kernel/src/governance.rs:231:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/governance.rs:265:    ) -> Self {
+crates/amun-kernel/src/governance.rs:279:    pub fn snapshot_hash(&self) -> [u8; 32] {
+crates/amun-kernel/src/governance.rs:285:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-kernel/src/governance.rs:307:    pub freeze_roots: Vec<[u8; 32]>,
+crates/amun-kernel/src/governance.rs:313:    pub fn seal_hash(&self) -> [u8; 32] {
+crates/amun-kernel/src/governance.rs:317:    pub fn signing_payload(&self) -> [u8; 32] {
+crates/amun-kernel/src/governance.rs:345:    fn encode_canonical(&self, out: &mut Vec<u8>) {
+crates/amun-crypto/src/rotation.rs:5:    pub old_public_keys: heapless::Vec<([u8; 32], u64), 4>,
+crates/amun-crypto/src/rotation.rs:10:    pub fn new(rotation_epoch: u64) -> Self {
+crates/amun-crypto/src/rotation.rs:20:    pub fn check(&mut self, epoch: u64, current_pk: [u8; 32]) -> bool {
+crates/amun-crypto/src/rotation.rs:22:        if epoch >= self.rotation_epoch && !self.rotated {
+crates/amun-crypto/src/rotation.rs:30:    pub fn is_legacy_key(&self, pk: &[u8; 32], current_epoch: u64) -> bool {
+crates/amun-crypto/src/rotation.rs:33:            .any(|(old, epoch)| old == pk && current_epoch - epoch <= self.max_key_age_epochs)
+crates/amun-crypto/src/agility.rs:8:    pub migration_epoch: Option<u64>,
+crates/amun-crypto/src/agility.rs:12:    pub fn new() -> Self {
+crates/amun-crypto/src/agility.rs:24:    pub fn check_migration(&mut self, current_epoch: u64) -> bool {
+crates/amun-crypto/src/agility.rs:26:            if current_epoch >= epoch {
+crates/amun-crypto/src/agility.rs:36:    fn default() -> Self {
+crates/amun-crypto/src/audit.rs:11:    pub fn new() -> Self {
+crates/amun-crypto/src/audit.rs:19:    pub fn verify_entropy(&mut self, epoch: u64) -> bool {
+crates/amun-crypto/src/audit.rs:27:    pub fn is_catastrophic(&self) -> bool {
+crates/amun-crypto/src/audit.rs:28:        self.failure_count > 10
+crates/amun-crypto/src/audit.rs:33:    fn default() -> Self {
+crates/amun-crypto/src/ed25519.rs:19:    pub fn generate() -> Self {
+crates/amun-crypto/src/ed25519.rs:29:    pub fn from_seed(seed: &[u8; 32]) -> Self {
+crates/amun-crypto/src/ed25519.rs:38:    fn signing_key(&self) -> SigningKey {
+crates/amun-crypto/src/ed25519.rs:42:    pub fn sign(&self, msg: &[u8], domain: &[u8], chain_id: u64) -> Result<[u8; 64], CryptoError> {
+crates/amun-crypto/src/ed25519.rs:43:        if domain.is_empty() || domain.len() > 128 {
+crates/amun-crypto/src/ed25519.rs:60:    ) -> Result<(), CryptoError> {
+crates/amun-crypto/src/ed25519.rs:73:    pub fn public_bytes(&self) -> [u8; 32] {
+crates/amun-crypto/src/ed25519.rs:77:    pub fn to_bytes(&self) -> [u8; 32] {
+crates/amun-crypto/src/ed25519.rs:95:    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

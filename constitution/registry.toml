@@ -1,0 +1,141 @@
+# Amun Sovereignty Registry
+# Defines the bounded context, semantic type, and criticality for each crate.
+
+[crate.amun-kernel]
+layer = 0
+semantic_type = "kernel"
+bounded_context = "canonical"
+sovereign = true
+criticality = "kernel"
+freeze_boundary = true
+freeze_version = 1
+
+[crate.amun-state-root]
+layer = 1
+semantic_type = "truth"
+bounded_context = "state_commitment"
+sovereign = true
+criticality = "kernel"
+freeze_boundary = true
+
+[crate.amun-execution-receipt]
+layer = 1
+semantic_type = "receipt"
+bounded_context = "execution_evidence"
+sovereign = true
+criticality = "deterministic"
+
+[crate.amun-stf]
+layer = 2
+semantic_type = "execution"
+bounded_context = "state_transition"
+sovereign = true
+criticality = "deterministic"
+
+[crate.amun-consensus]
+layer = 3
+semantic_type = "consensus"
+bounded_context = "consensus_engine"
+sovereign = true
+criticality = "consensus"
+
+[crate.amun-qc-weight]
+layer = 3
+semantic_type = "quorum_math"
+bounded_context = "consensus"
+sovereign = false
+criticality = "consensus"
+
+[crate.amun-qc-canonical]
+layer = 3
+semantic_type = "canonicalization"
+bounded_context = "consensus"
+sovereign = false
+criticality = "deterministic"
+
+[crate.amun-quorum-certificate]
+layer = 3
+semantic_type = "certificate"
+bounded_context = "consensus"
+sovereign = true
+criticality = "consensus"
+
+[crate.amun-consensus-laws]
+layer = 3
+semantic_type = "law"
+bounded_context = "consensus"
+sovereign = false
+criticality = "consensus"
+
+[crate.amun-wal]
+layer = 4
+semantic_type = "persistence"
+bounded_context = "storage"
+sovereign = true
+criticality = "persistence"
+freeze_boundary = true
+
+[crate.amun-network]
+layer = 5
+semantic_type = "runtime"
+bounded_context = "network"
+sovereign = true
+criticality = "interface"
+
+[crate.amun-network-model]
+layer = 5
+semantic_type = "model"
+bounded_context = "network"
+sovereign = false
+criticality = "interface"
+
+[crate.amun-network-constitution]
+layer = 5
+semantic_type = "constitution"
+bounded_context = "network"
+sovereign = false
+criticality = "interface"
+
+[crate.amun-network-simulator]
+layer = 5
+semantic_type = "simulator"
+bounded_context = "network"
+sovereign = false
+criticality = "interface"
+
+[crate.amun-rpc]
+layer = 7
+semantic_type = "interface"
+bounded_context = "external"
+sovereign = true
+criticality = "interface"
+
+[crate.amun-cli]
+layer = 7
+semantic_type = "interface"
+bounded_context = "external"
+sovereign = true
+criticality = "interface"
+
+[crate.amun-sdk]
+layer = 7
+semantic_type = "interface"
+bounded_context = "external"
+sovereign = true
+criticality = "interface"
+
+[crate.amun-block]
+layer = 1
+semantic_type = "truth"
+bounded_context = "block_structure"
+sovereign = true
+criticality = "consensus"
+freeze_boundary = true
+
+[crate.amun-codec]
+layer = 1
+semantic_type = "truth"
+bounded_context = "encoding"
+sovereign = true
+criticality = "deterministic"
+freeze_boundary = true

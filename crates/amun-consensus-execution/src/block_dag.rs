@@ -1,6 +1,6 @@
 use amun_chain_position::ChainPosition;
 use amun_quorum_certificate::QuorumCertificate;
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 
 /// Maximum ancestry traversal depth to prevent infinite loops
 pub const MAX_DAG_DEPTH: usize = 50_000;
@@ -41,7 +41,7 @@ impl BlockNode {
     /// Depth-bounded with cycle protection
     pub fn is_descendant_of(&self, ancestor: &[u8; 32], dag: &BlockDAG) -> bool {
         let mut current = self.parent_hash;
-        let mut visited = HashSet::new();
+        let mut visited = BTreeSet::new();
         visited.insert(self.block_hash);
         let mut depth = 0;
 
@@ -64,7 +64,7 @@ impl BlockNode {
     pub fn ancestor_chain(&self, dag: &BlockDAG, depth: usize) -> Vec<[u8; 32]> {
         let mut chain = Vec::new();
         let mut current = Some(self.block_hash);
-        let mut visited = HashSet::new();
+        let mut visited = BTreeSet::new();
         let effective_depth = depth.min(MAX_DAG_DEPTH);
 
         while let Some(hash) = current {
@@ -81,9 +81,9 @@ impl BlockNode {
 #[derive(Debug, Clone)]
 pub struct BlockDAG {
     pub blocks: BTreeMap<[u8; 32], BlockNode>,
-    pub children_index: BTreeMap<[u8; 32], HashSet<[u8; 32]>>,
-    pub height_index: BTreeMap<u64, HashSet<[u8; 32]>>,
-    pub round_index: BTreeMap<u64, HashSet<[u8; 32]>>,
+    pub children_index: BTreeMap<[u8; 32], BTreeSet<[u8; 32]>>,
+    pub height_index: BTreeMap<u64, BTreeSet<[u8; 32]>>,
+    pub round_index: BTreeMap<u64, BTreeSet<[u8; 32]>>,
     pub last_committed: Option<[u8; 32]>,
     pub finalized_height: u64,
     pub canonical_spine: Vec<[u8; 32]>,
@@ -105,13 +105,13 @@ impl BlockDAG {
         blocks.insert(genesis_hash, genesis);
         let mut height_index = BTreeMap::new();
         height_index.insert(0, {
-            let mut s = HashSet::new();
+            let mut s = BTreeSet::new();
             s.insert(genesis_hash);
             s
         });
         let mut round_index = BTreeMap::new();
         round_index.insert(0, {
-            let mut s = HashSet::new();
+            let mut s = BTreeSet::new();
             s.insert(genesis_hash);
             s
         });
@@ -186,7 +186,7 @@ impl BlockDAG {
     pub fn update_canonical_spine(&mut self, finalized_block: [u8; 32]) {
         let mut spine = vec![finalized_block];
         let mut current = Some(finalized_block);
-        let mut visited = HashSet::new();
+        let mut visited = BTreeSet::new();
         visited.insert(finalized_block);
         let mut depth = 0;
 
@@ -240,7 +240,7 @@ impl BlockDAG {
     }
 
     fn prune_safe(&mut self) {
-        let spine_set: HashSet<[u8; 32]> = self.canonical_spine.iter().cloned().collect();
+        let spine_set: BTreeSet<[u8; 32]> = self.canonical_spine.iter().cloned().collect();
 
         // Collect blocks to remove
         let to_remove: Vec<[u8; 32]> = self
@@ -255,7 +255,7 @@ impl BlockDAG {
             .collect();
 
         // O(1) lookup set
-        let remove_set: HashSet<[u8; 32]> = to_remove.iter().cloned().collect();
+        let remove_set: BTreeSet<[u8; 32]> = to_remove.iter().cloned().collect();
 
         for hash in &to_remove {
             self.blocks.remove(hash);

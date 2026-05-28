@@ -1,0 +1,814 @@
+//! Canonical Sparse Merkle Patricia Tree.
+//!
+//! # Core Invariant
+//!
+//! The tree topology is a **pure function of the leaf set**.
+//! Two trees with identical `(key_hash, value_hash, version)` entries
+//! MUST have identical `internal_root` and `state_root`, regardless of
+//! insertion order or history.
+//!
+//! # Properties
+//!
+//! - **Deterministic**: same leaf set ⇒ same root.
+//! - **Immutable**: `insert` and `delete` return a new tree.
+//! - **No empty-child branches**: delete operations collapse branches
+//!   to avoid branches with a single child.
+//! - **Depth bounded**: `depth + skip_len < 256` always holds.
+
+use std::collections::BTreeMap;
+use crate::hash::{
+    Hash, bit, find_divergence, max_skip_len, hash_root, canonicalize_prefix, prefix_bytes,
+};
+use crate::node::{Node, EMPTY_NODE_HASH};
+use crate::context::Context;
+use crate::error::SmtError;
+use crate::proof::{AbsenceReason, LeafWitness, MerkleProof, ProofStep};
+
+/// A 256-bit key for the SMT.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Key256(pub [u8; 32]);
+
+/// Domain-separated state root: `H(AMUN_ROOT_V1 || internal_root_hash)`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct StateRoot(pub Hash);
+
+/// The canonical authenticated SMT.
+pub struct SparseMerkleTree {
+    internal_root: Hash,
+    ctx: Context,
+}
+
+impl SparseMerkleTree {
+    /// Create an empty tree.
+    pub fn empty() -> Self {
+        Self {
+            internal_root: *EMPTY_NODE_HASH,
+            ctx: Context::new(),
+        }
+    }
+
+    /// Create a tree with a pre-existing context.
+    pub fn with_context(ctx: Context) -> Self {
+        Self {
+            internal_root: *EMPTY_NODE_HASH,
+            ctx,
+        }
+    }
+
+    /// The domain-separated state root.
+    pub fn root(&self) -> StateRoot {
+        StateRoot(hash_root(&self.internal_root))
+    }
+
+    /// The internal root hash (before domain separation).
+    pub fn internal_root(&self) -> Hash {
+        self.internal_root
+    }
+
+    /// Reference to the context.
+    pub fn context(&self) -> &Context {
+        &self.ctx
+    }
+
+    fn ctx_mut(&mut self) -> &mut Context {
+        &mut self.ctx
+    }
+
+    // -----------------------------------------------------------------------
+    // Insert (localized split — no full subtree rebuild)
+    // -----------------------------------------------------------------------
+
+    /// Insert a key-value pair, returning a new tree.
+    pub fn insert(
+        mut self,
+        key: &Key256,
+        value_hash: &[u8; 32],
+        version: u64,
+    ) -> Result<Self, SmtError> {
+        let key_hash: [u8; 32] = blake3::hash(&key.0).into();
+        self.internal_root =
+            self.insert_at(0, self.internal_root, &key_hash, value_hash, version)?;
+        Ok(self)
+    }
+
+    fn insert_at(
+        &mut self,
+        depth: usize,
+        node_hash: Hash,
+        key_hash: &[u8; 32],
+        value_hash: &[u8; 32],
+        version: u64,
+    ) -> Result<Hash, SmtError> {
+        if depth > 255 {
+            return Err(SmtError::DepthOverflow { depth });
+        }
+
+        if node_hash == *EMPTY_NODE_HASH {
+            let leaf = Node::Leaf {
+                key_hash: *key_hash,
+                value_hash: *value_hash,
+                version,
+            };
+            return Ok(self.ctx_mut().intern(leaf)?.hash());
+        }
+
+        let node = self.ctx.get_node(&node_hash)?;
+
+        match node.as_ref() {
+            Node::Leaf {
+                key_hash: ek,
+                value_hash: ev,
+                version: ever,
+            } => {
+                if ek == key_hash {
+                    let leaf = Node::Leaf {
+                        key_hash: *key_hash,
+                        value_hash: *value_hash,
+                        version,
+                    };
+                    return Ok(self.ctx_mut().intern(leaf)?.hash());
+                }
+                // Localized split at divergence point
+                let div = find_divergence(key_hash, ek);
+                let div_depth = div.min(255);
+                self.split_at(
+                    depth, div_depth, key_hash, value_hash, version, ek, *ev, *ever,
+                )
+            }
+            Node::Branch {
+                skip_len,
+                prefix,
+                left,
+                right,
+            } => {
+                if !prefix_matches(key_hash, depth, *skip_len, prefix) {
+                    // Prefix mismatch: micro-rebuild the conflicting subtree
+                    let leaves = self.collect_leaves(depth, node_hash)?;
+                    let mut new_leaves = leaves;
+                    new_leaves.insert(*key_hash, (*value_hash, version));
+                    return self.build_canonical_subtree(&new_leaves, depth);
+                }
+
+                let next_depth = depth + *skip_len as usize;
+                if next_depth >= 256 {
+                    return Err(SmtError::DepthOverflow { depth: next_depth });
+                }
+
+                let dec = bit(key_hash, next_depth);
+                let (child, sibling) = if dec == 0 {
+                    (*left, *right)
+                } else {
+                    (*right, *left)
+                };
+
+                let new_child =
+                    self.insert_at(next_depth + 1, child, key_hash, value_hash, version)?;
+                let (new_left, new_right) = if dec == 0 {
+                    (new_child, sibling)
+                } else {
+                    (sibling, new_child)
+                };
+
+                let mut new_prefix = *prefix;
+                canonicalize_prefix(&mut new_prefix, *skip_len);
+                let branch = Node::Branch {
+                    skip_len: *skip_len,
+                    prefix: new_prefix,
+                    left: new_left,
+                    right: new_right,
+                };
+                Ok(self.ctx_mut().intern(branch)?.hash())
+            }
+        }
+    }
+
+    /// Localized split: create a branch at the exact divergence point.
+    fn split_at(
+        &mut self,
+        depth: usize,
+        div_depth: usize,
+        new_key: &[u8; 32],
+        new_value: &[u8; 32],
+        new_version: u64,
+        existing_key: &[u8; 32],
+        existing_value: [u8; 32],
+        existing_version: u64,
+    ) -> Result<Hash, SmtError> {
+        if div_depth >= 256 {
+            return Err(SmtError::DepthOverflow { depth: div_depth });
+        }
+        let skip_len = (div_depth - depth) as u8;
+        let max = max_skip_len(depth);
+        if skip_len > max {
+            return Err(SmtError::SkipLenTooLarge {
+                skip_len,
+                max,
+                depth,
+            });
+        }
+
+        let mut prefix = [0u8; 32];
+        for i in 0..skip_len as usize {
+            set_bit(&mut prefix, i, bit(new_key, depth + i));
+        }
+        canonicalize_prefix(&mut prefix, skip_len);
+
+        let new_leaf = Node::Leaf {
+            key_hash: *new_key,
+            value_hash: *new_value,
+            version: new_version,
+        };
+        let existing_leaf = Node::Leaf {
+            key_hash: *existing_key,
+            value_hash: existing_value,
+            version: existing_version,
+        };
+        let nh = self.ctx_mut().intern(new_leaf)?.hash();
+        let eh = self.ctx_mut().intern(existing_leaf)?.hash();
+
+        let nb = bit(new_key, div_depth);
+        let eb = bit(existing_key, div_depth);
+        if nb == eb {
+            return Err(SmtError::PartitionViolation {
+                key_pos: "split".into(),
+                depth: div_depth,
+            });
+        }
+
+        let (l, r) = if nb == 0 { (nh, eh) } else { (eh, nh) };
+        let branch = Node::Branch {
+            skip_len,
+            prefix,
+            left: l,
+            right: r,
+        };
+        Ok(self.ctx_mut().intern(branch)?.hash())
+    }
+
+    // -----------------------------------------------------------------------
+    // Delete (correct collapse — no empty-child branches)
+    // -----------------------------------------------------------------------
+
+    /// Delete a key, returning a new tree.
+    pub fn delete(mut self, key: &Key256) -> Result<Self, SmtError> {
+        let key_hash: [u8; 32] = blake3::hash(&key.0).into();
+        self.internal_root = self.delete_at(0, self.internal_root, &key_hash)?;
+        Ok(self)
+    }
+
+    fn delete_at(
+        &mut self,
+        depth: usize,
+        node_hash: Hash,
+        key_hash: &[u8; 32],
+    ) -> Result<Hash, SmtError> {
+        if depth > 255 {
+            return Err(SmtError::DepthOverflow { depth });
+        }
+        if node_hash == *EMPTY_NODE_HASH {
+            return Ok(*EMPTY_NODE_HASH);
+        }
+
+        let node = self.ctx.get_node(&node_hash)?;
+
+        match node.as_ref() {
+            Node::Leaf { key_hash: ek, .. } => {
+                if ek == key_hash {
+                    Ok(*EMPTY_NODE_HASH)
+                } else {
+                    Ok(node_hash)
+                }
+            }
+            Node::Branch {
+                skip_len,
+                prefix,
+                left,
+                right,
+            } => {
+                if !prefix_matches(key_hash, depth, *skip_len, prefix) {
+                    return Ok(node_hash);
+                }
+                let next_depth = depth + *skip_len as usize;
+                if next_depth >= 256 {
+                    return Err(SmtError::DepthOverflow { depth: next_depth });
+                }
+
+                let dec = bit(key_hash, next_depth);
+                let (child, sibling) = if dec == 0 {
+                    (*left, *right)
+                } else {
+                    (*right, *left)
+                };
+
+                let new_child = self.delete_at(next_depth + 1, child, key_hash)?;
+                let (new_left, new_right) = if dec == 0 {
+                    (new_child, sibling)
+                } else {
+                    (sibling, new_child)
+                };
+
+                if new_left == *EMPTY_NODE_HASH && new_right == *EMPTY_NODE_HASH {
+                    return Ok(*EMPTY_NODE_HASH);
+                }
+
+                // If one side empty, collapse — never creates a branch with empty child
+                if new_left == *EMPTY_NODE_HASH {
+                    return self.collapse_child(
+                        depth,
+                        new_right,
+                        *skip_len,
+                        prefix,
+                        bit(key_hash, next_depth),
+                    );
+                }
+                if new_right == *EMPTY_NODE_HASH {
+                    return self.collapse_child(
+                        depth,
+                        new_left,
+                        *skip_len,
+                        prefix,
+                        1 - bit(key_hash, next_depth),
+                    );
+                }
+
+                let mut p = *prefix;
+                canonicalize_prefix(&mut p, *skip_len);
+                let b = Node::Branch {
+                    skip_len: *skip_len,
+                    prefix: p,
+                    left: new_left,
+                    right: new_right,
+                };
+                Ok(self.ctx_mut().intern(b)?.hash())
+            }
+        }
+    }
+
+    /// Collapse when one child becomes empty.
+    /// Merges parent prefix + decision_bit + child prefix.
+    /// Returns the surviving child directly if it's a leaf (no wrapping).
+    fn collapse_child(
+        &mut self,
+        depth: usize,
+        child_hash: Hash,
+        extra_skip: u8,
+        extra_prefix: &[u8; 32],
+        decision_bit: u8,
+    ) -> Result<Hash, SmtError> {
+        if child_hash == *EMPTY_NODE_HASH {
+            return Ok(*EMPTY_NODE_HASH);
+        }
+        let child_node = self.ctx.get_node(&child_hash)?;
+        match child_node.as_ref() {
+            // Leaf survives directly — no wrapping in a branch
+            Node::Leaf { .. } => Ok(child_hash),
+            // Branch: merge prefixes with checked arithmetic
+            Node::Branch {
+                skip_len: cs,
+                prefix: cp,
+                left,
+                right,
+            } => {
+                let total_skip = extra_skip
+                    .checked_add(1)
+                    .and_then(|v| v.checked_add(*cs))
+                    .ok_or(SmtError::SkipLenOverflow)?;
+                let max = max_skip_len(depth);
+                if total_skip > max {
+                    return Err(SmtError::SkipLenTooLarge {
+                        skip_len: total_skip,
+                        max,
+                        depth,
+                    });
+                }
+
+                let mut merged = [0u8; 32];
+                for i in 0..extra_skip as usize {
+                    set_bit(&mut merged, i, bit(extra_prefix, i));
+                }
+                set_bit(&mut merged, extra_skip as usize, decision_bit);
+                for i in 0..*cs as usize {
+                    set_bit(
+                        &mut merged,
+                        extra_skip as usize + 1 + i,
+                        bit(cp, i),
+                    );
+                }
+                canonicalize_prefix(&mut merged, total_skip);
+
+                let b = Node::Branch {
+                    skip_len: total_skip,
+                    prefix: merged,
+                    left: *left,
+                    right: *right,
+                };
+                Ok(self.ctx_mut().intern(b)?.hash())
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Get
+    // -----------------------------------------------------------------------
+
+    /// Look up a key, returning `(value_hash, version)` if present.
+    pub fn get(&self, key: &Key256) -> Result<Option<([u8; 32], u64)>, SmtError> {
+        let key_hash: [u8; 32] = blake3::hash(&key.0).into();
+        self.get_at(0, self.internal_root, &key_hash)
+    }
+
+    fn get_at(
+        &self,
+        depth: usize,
+        node_hash: Hash,
+        key_hash: &[u8; 32],
+    ) -> Result<Option<([u8; 32], u64)>, SmtError> {
+        if depth > 255 {
+            return Err(SmtError::DepthOverflow { depth });
+        }
+        if node_hash == *EMPTY_NODE_HASH {
+            return Ok(None);
+        }
+        let node = self.ctx.get_node(&node_hash)?;
+        match node.as_ref() {
+            Node::Leaf {
+                key_hash: k,
+                value_hash,
+                version,
+            } if k == key_hash => Ok(Some((*value_hash, *version))),
+            Node::Branch {
+                skip_len,
+                prefix,
+                left,
+                right,
+            } => {
+                if !prefix_matches(key_hash, depth, *skip_len, prefix) {
+                    return Ok(None);
+                }
+                let next = depth + *skip_len as usize;
+                if next >= 256 {
+                    return Err(SmtError::DepthOverflow { depth: next });
+                }
+                let child = if bit(key_hash, next) == 0 {
+                    *left
+                } else {
+                    *right
+                };
+                self.get_at(next + 1, child, key_hash)
+            }
+            _ => Ok(None),
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Proof generation
+    // -----------------------------------------------------------------------
+
+    /// Generate an inclusion proof for `key`.
+    pub fn generate_inclusion_proof(
+        &self,
+        key: &Key256,
+    ) -> Result<Option<MerkleProof>, SmtError> {
+        let key_hash: [u8; 32] = blake3::hash(&key.0).into();
+        let mut steps = Vec::new();
+        let (vh, ver) = match self.prove_inclusion(0, self.internal_root, &key_hash, &mut steps)?
+        {
+            Some(v) => v,
+            None => return Ok(None),
+        };
+        steps.reverse();
+        MerkleProof::new_inclusion(key_hash, vh, ver, steps).map(Some)
+    }
+
+    fn prove_inclusion(
+        &self,
+        depth: usize,
+        node_hash: Hash,
+        key_hash: &[u8; 32],
+        steps: &mut Vec<ProofStep>,
+    ) -> Result<Option<([u8; 32], u64)>, SmtError> {
+        if depth > 255 {
+            return Err(SmtError::DepthOverflow { depth });
+        }
+        if node_hash == *EMPTY_NODE_HASH {
+            return Ok(None);
+        }
+        let node = self.ctx.get_node(&node_hash)?;
+        match node.as_ref() {
+            Node::Leaf {
+                key_hash: k,
+                value_hash,
+                version,
+            } if k == key_hash => Ok(Some((*value_hash, *version))),
+            Node::Branch {
+                skip_len,
+                prefix,
+                left,
+                right,
+            } => {
+                if !prefix_matches(key_hash, depth, *skip_len, prefix) {
+                    return Ok(None);
+                }
+                let next = depth + *skip_len as usize;
+                if next >= 256 {
+                    return Err(SmtError::DepthOverflow { depth: next });
+                }
+                let dec = bit(key_hash, next);
+                let (child, sibling) = if dec == 0 {
+                    (*left, *right)
+                } else {
+                    (*right, *left)
+                };
+                steps.push(ProofStep {
+                    skip_len: *skip_len,
+                    prefix_bits: prefix_bytes(prefix, *skip_len),
+                    sibling,
+                    is_left_sibling: dec != 0,
+                });
+                self.prove_inclusion(next + 1, child, key_hash, steps)
+            }
+            _ => Ok(None),
+        }
+    }
+
+    /// Generate an absence proof for `key`.
+    pub fn generate_absence_proof(
+        &self,
+        key: &Key256,
+    ) -> Result<Option<MerkleProof>, SmtError> {
+        let key_hash: [u8; 32] = blake3::hash(&key.0).into();
+        self.prove_absence(0, self.internal_root, &key_hash)
+    }
+
+    fn prove_absence(
+        &self,
+        depth: usize,
+        node_hash: Hash,
+        key_hash: &[u8; 32],
+    ) -> Result<Option<MerkleProof>, SmtError> {
+        if depth > 255 {
+            return Err(SmtError::DepthOverflow { depth });
+        }
+        if node_hash == *EMPTY_NODE_HASH {
+            return MerkleProof::new_absence(*key_hash, AbsenceReason::EmptyTree, vec![])
+                .map(Some);
+        }
+        let node = self.ctx.get_node(&node_hash)?;
+        match node.as_ref() {
+            Node::Leaf {
+                key_hash: ek,
+                value_hash,
+                version,
+            } => {
+                if ek == key_hash {
+                    return Ok(None);
+                }
+                let divergence = find_divergence(key_hash, ek);
+                MerkleProof::new_absence(
+                    *key_hash,
+                    AbsenceReason::LeafDivergence {
+                        leaf_witness: LeafWitness {
+                            key_hash: *ek,
+                            value_hash: *value_hash,
+                            version: *version,
+                        },
+                        divergence_depth: divergence as u8,
+                    },
+                    vec![],
+                )
+                .map(Some)
+            }
+            Node::Branch {
+                skip_len,
+                prefix,
+                left,
+                right,
+            } => {
+                if !prefix_matches(key_hash, depth, *skip_len, prefix) {
+                    let mismatched = (0..*skip_len)
+                        .find(|&i| {
+                            bit(key_hash, depth + i as usize)
+                                != ((prefix[i as usize / 8] >> (7 - (i % 8))) & 1)
+                        })
+                        .ok_or(SmtError::ProofVerificationFailed {
+                            reason: "no mismatch found in prefix".into(),
+                        })?;
+                    let mm_depth = depth + mismatched as usize as usize;
+                    let sibling = if bit(key_hash, mm_depth) == 0 {
+                        *right
+                    } else {
+                        *left
+                    };
+                    let step = ProofStep {
+                        skip_len: *skip_len,
+                        prefix_bits: prefix_bytes(prefix, *skip_len),
+                        sibling,
+                        is_left_sibling: bit(key_hash, mm_depth) != 0,
+                    };
+                    return MerkleProof::new_absence(
+                        *key_hash,
+                        AbsenceReason::PrefixMismatch {
+                            mismatched_bit: mismatched as u8,
+                        },
+                        vec![step],
+                    )
+                    .map(Some);
+                }
+
+                let next = depth + *skip_len as usize;
+                if next >= 256 {
+                    return Err(SmtError::DepthOverflow { depth: next });
+                }
+                let dec = bit(key_hash, next);
+                let (child, sibling) = if dec == 0 {
+                    (*left, *right)
+                } else {
+                    (*right, *left)
+                };
+                if child == *EMPTY_NODE_HASH {
+                    let step = ProofStep {
+                        skip_len: *skip_len,
+                        prefix_bits: prefix_bytes(prefix, *skip_len),
+                        sibling,
+                        is_left_sibling: dec != 0,
+                    };
+                    return MerkleProof::new_absence(
+                        *key_hash,
+                        AbsenceReason::EmptyChild,
+                        vec![step],
+                    )
+                    .map(Some);
+                }
+                let mut proof = match self.prove_absence(next + 1, child, key_hash)? {
+                    Some(p) => p,
+                    None => return Ok(None),
+                };
+                proof.prepend_step(ProofStep {
+                    skip_len: *skip_len,
+                    prefix_bits: prefix_bytes(prefix, *skip_len),
+                    sibling,
+                    is_left_sibling: dec != 0,
+                });
+                Ok(Some(proof))
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Micro-rebuild helpers (used only for prefix-mismatch insertion)
+    // -----------------------------------------------------------------------
+
+    fn collect_leaves(
+        &self,
+        depth: usize,
+        node_hash: Hash,
+    ) -> Result<BTreeMap<[u8; 32], ([u8; 32], u64)>, SmtError> {
+        let mut out = BTreeMap::new();
+        self.collect_leaves_rec(depth, node_hash, &mut out)?;
+        Ok(out)
+    }
+
+    fn collect_leaves_rec(
+        &self,
+        depth: usize,
+        node_hash: Hash,
+        out: &mut BTreeMap<[u8; 32], ([u8; 32], u64)>,
+    ) -> Result<(), SmtError> {
+        if depth > 255 {
+            return Err(SmtError::DepthOverflow { depth });
+        }
+        if node_hash == *EMPTY_NODE_HASH {
+            return Ok(());
+        }
+        let node = self.ctx.get_node(&node_hash)?;
+        match node.as_ref() {
+            Node::Leaf {
+                key_hash,
+                value_hash,
+                version,
+            } => {
+                out.insert(*key_hash, (*value_hash, *version));
+                Ok(())
+            }
+            Node::Branch {
+                skip_len, left, right, ..
+            } => {
+                let next = depth + *skip_len as usize + 1;
+                self.collect_leaves_rec(next, *left, out)?;
+                self.collect_leaves_rec(next, *right, out)?;
+                Ok(())
+            }
+        }
+    }
+
+    fn build_canonical_subtree(
+        &mut self,
+        leaves: &BTreeMap<[u8; 32], ([u8; 32], u64)>,
+        depth: usize,
+    ) -> Result<Hash, SmtError> {
+        if leaves.is_empty() {
+            return Ok(*EMPTY_NODE_HASH);
+        }
+        if leaves.len() == 1 {
+            let (k, (v, ver)) = leaves.iter().next().unwrap();
+            let leaf = Node::Leaf {
+                key_hash: *k,
+                value_hash: *v,
+                version: *ver,
+            };
+            return Ok(self.ctx_mut().intern(leaf)?.hash());
+        }
+
+        let keys: Vec<&[u8; 32]> = leaves.keys().collect();
+        let common = common_prefix_from_depth(&keys, depth);
+        let next_depth = depth + common as usize;
+        if next_depth >= 256 {
+            let (k, (v, ver)) = leaves.iter().next().unwrap();
+            let leaf = Node::Leaf {
+                key_hash: *k,
+                value_hash: *v,
+                version: *ver,
+            };
+            return Ok(self.ctx_mut().intern(leaf)?.hash());
+        }
+
+        let mut prefix = [0u8; 32];
+        for i in 0..common as usize {
+            set_bit(&mut prefix, i, bit(keys[0], depth + i));
+        }
+        canonicalize_prefix(&mut prefix, common);
+
+        let (ll, rl) = split_by_bit(leaves, next_depth);
+        let lh = self.build_canonical_subtree(&ll, next_depth + 1)?;
+        let rh = self.build_canonical_subtree(&rl, next_depth + 1)?;
+
+        if lh == *EMPTY_NODE_HASH || rh == *EMPTY_NODE_HASH {
+            return Err(SmtError::EmptyChild {
+                depth: next_depth,
+            });
+        }
+
+        let branch = Node::Branch {
+            skip_len: common,
+            prefix,
+            left: lh,
+            right: rh,
+        };
+        Ok(self.ctx_mut().intern(branch)?.hash())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Free functions
+// ---------------------------------------------------------------------------
+
+fn prefix_matches(key: &[u8; 32], depth: usize, skip_len: u8, prefix: &[u8; 32]) -> bool {
+    for i in 0..skip_len as usize {
+        if bit(key, depth + i) != ((prefix[i / 8] >> (7 - (i % 8))) & 1) {
+            return false;
+        }
+    }
+    true
+}
+
+fn set_bit(arr: &mut [u8; 32], pos: usize, value: u8) {
+    if value != 0 {
+        arr[pos / 8] |= 1 << (7 - (pos % 8));
+    } else {
+        arr[pos / 8] &= !(1 << (7 - (pos % 8)));
+    }
+}
+
+fn common_prefix_from_depth(keys: &[&[u8; 32]], depth: usize) -> u8 {
+    if keys.is_empty() {
+        return 0;
+    }
+    let first = keys[0];
+    let mut len = 0u8;
+    for i in depth..256 {
+        if keys.iter().any(|k| bit(k, i) != bit(first, i)) {
+            break;
+        }
+        len += 1;
+    }
+    len
+}
+
+fn split_by_bit(
+    leaves: &BTreeMap<[u8; 32], ([u8; 32], u64)>,
+    depth: usize,
+) -> (
+    BTreeMap<[u8; 32], ([u8; 32], u64)>,
+    BTreeMap<[u8; 32], ([u8; 32], u64)>,
+) {
+    let mut left = BTreeMap::new();
+    let mut right = BTreeMap::new();
+    for (k, v) in leaves {
+        if bit(k, depth) == 0 {
+            left.insert(*k, *v);
+        } else {
+            right.insert(*k, *v);
+        }
+    }
+    (left, right)
+}

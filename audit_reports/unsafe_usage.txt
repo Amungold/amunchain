@@ -1,0 +1,45 @@
+crates/amun-bindings/src/lib.rs:1:#![allow(clippy::not_unsafe_ptr_arg_deref)]
+crates/amun-bindings/src/lib.rs:17:    unsafe {
+crates/amun-bindings/src/lib.rs:38:    let seed = unsafe {
+crates/amun-bindings/src/lib.rs:48:    let msg = unsafe { slice::from_raw_parts(message, message_len as usize) };
+crates/amun-bindings/src/lib.rs:53:            unsafe {
+crates/amun-bindings/src/lib.rs:76:    let pk = unsafe {
+crates/amun-bindings/src/lib.rs:86:    let msg = unsafe { slice::from_raw_parts(message, message_len as usize) };
+crates/amun-bindings/src/lib.rs:88:    let sig = unsafe {
+crates/amun-constitution/src/tests.rs:24:fn test_quorum_transition_unsafe() {
+crates/amun-constitution/src/deterministic_execution.rs:2:// The unsafe version lives in amun-unsafe per constitutional law.
+crates/amun-unsafe/Cargo.toml:2:name = "amun-unsafe"
+crates/amun-unsafe/Cargo.toml:5:description = "Sole unsafe boundary for the sovereign kernel"
+crates/amun-unsafe/Cargo.toml:8:unsafe_code = "allow"
+crates/amun-unsafe/src/layout.rs:10:pub unsafe trait StableLayout: Sized + Copy {}
+crates/amun-unsafe/src/layout.rs:12:unsafe impl StableLayout for u8 {}
+crates/amun-unsafe/src/layout.rs:13:unsafe impl StableLayout for u16 {}
+crates/amun-unsafe/src/layout.rs:14:unsafe impl StableLayout for u32 {}
+crates/amun-unsafe/src/layout.rs:15:unsafe impl StableLayout for u64 {}
+crates/amun-unsafe/src/layout.rs:16:unsafe impl StableLayout for u128 {}
+crates/amun-unsafe/src/layout.rs:17:unsafe impl StableLayout for i8 {}
+crates/amun-unsafe/src/layout.rs:18:unsafe impl StableLayout for i16 {}
+crates/amun-unsafe/src/layout.rs:19:unsafe impl StableLayout for i32 {}
+crates/amun-unsafe/src/layout.rs:20:unsafe impl StableLayout for i64 {}
+crates/amun-unsafe/src/layout.rs:21:unsafe impl StableLayout for [u8; 32] {}
+crates/amun-unsafe/src/layout.rs:22:unsafe impl StableLayout for [u8; 48] {}
+crates/amun-unsafe/src/layout.rs:23:unsafe impl StableLayout for [u8; 96] {}
+crates/amun-unsafe/src/lib.rs:1:// Sole unsafe boundary for the sovereign kernel.
+crates/amun-unsafe/src/lib.rs:2:// No other crate in the system may contain unsafe blocks.
+crates/amun-unsafe/src/lib.rs:3:// Every unsafe operation is encapsulated behind a verified safe abstraction.
+crates/amun-unsafe/src/lib.rs:14:// This is the ONLY place unsafe traits are permitted.
+crates/amun-unsafe/src/lib.rs:16:pub unsafe trait StableLayout: Sized {}
+crates/amun-unsafe/src/lib.rs:17:unsafe impl StableLayout for u8 {}
+crates/amun-unsafe/src/lib.rs:18:unsafe impl StableLayout for u16 {}
+crates/amun-unsafe/src/lib.rs:19:unsafe impl StableLayout for u32 {}
+crates/amun-unsafe/src/lib.rs:20:unsafe impl StableLayout for u64 {}
+crates/amun-unsafe/src/lib.rs:21:unsafe impl StableLayout for [u8; 32] {}
+crates/amun-unsafe/src/slot.rs:52:                unsafe {
+crates/amun-unsafe/src/slot.rs:67:                let value = unsafe { self.data.assume_init_read() };
+crates/amun-unsafe/src/slot.rs:82:                let old = unsafe { self.data.assume_init_read() };
+crates/amun-unsafe/src/slot.rs:83:                unsafe {
+crates/amun-unsafe/src/slot.rs:95:            SlotState::Init => Ok(unsafe { self.data.assume_init_ref() }),
+crates/amun-unsafe/src/slot.rs:102:            SlotState::Init => Ok(unsafe { self.data.assume_init_mut() }),
+crates/amun-unsafe/src/slot.rs:115:            unsafe {
+crates/amun-unsafe/src/guard.rs:27:        unsafe { ManuallyDrop::take(&mut self.value) }
+crates/amun-unsafe/src/guard.rs:44:            unsafe {

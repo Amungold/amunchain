@@ -1,0 +1,45 @@
+# Amun Constitutional Layer Manifest
+# This file defines the sovereign layers and their member crates.
+# Used by the constitutional linter for dependency enforcement.
+
+[layer0]
+name = "Constitutional Kernel"
+crates = ["amun-kernel"]
+
+[layer1]
+name = "Truth & Evidence"
+crates = ["amun-state-root", "amun-execution-receipt"]
+
+[layer2]
+name = "Deterministic Execution"
+crates = ["amun-stf", "amun-execution", "amun-deterministic-scheduler"]
+
+[layer3]
+name = "Consensus & Finality"
+crates = ["amun-consensus", "amun-consensus-laws", "amun-pacemaker", "amun-validator-registry", "amun-quorum-certificate"]
+
+[layer4]
+name = "Persistence & Recovery"
+crates = ["amun-wal", "amun-storage", "amun-snapshot-engine", "amun-crash-recovery"]
+
+[layer5]
+name = "Network & Civilization"
+crates = ["amun-network", "amun-gossip", "amun-tls", "amun-websocket", "amun-network-simulator"]
+
+[layer6]
+name = "Governance & Economics"
+crates = ["amun-staking", "amun-governance", "amun-economics", "amun-economic-law", "amun-upgrade"]
+
+[layer7]
+name = "External Interfaces"
+crates = ["amun-rpc", "amun-cli", "amun-sdk", "amun-bindings"]
+
+# Test harnesses are not subject to layer rules
+[test]
+crates = ["amun-constitutional-tests", "amun-byzantine-tests", "amun-cluster-harness", "amun-replay-certification", "amun-determinism-tests", "amun-cross-process", "amun-adversarial-tests"]
+
+# Dependency rules
+[rules]
+# Any crate may depend on crates in the same layer or lower layers.
+# A crate MUST NOT depend on any crate in a higher layer.
+# Layer 0 has NO Amun dependencies.

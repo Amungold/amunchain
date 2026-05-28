@@ -5,17 +5,17 @@ use amun_chain_position::ChainPosition;
 use amun_quorum_certificate::QuorumCertificate;
 use amun_wal::{AuthorityValidation, RecoveryMode, WALEntry, WriteAheadLog};
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 
 pub struct PersistentConsensusState {
     wal: WriteAheadLog,
     pub fork_choice: ForkChoice,
     pub commit_rule: CommitRule,
     pub dag: BlockDAG,
-    applied_sequences: HashSet<u64>,
+    applied_sequences: BTreeSet<u64>,
     seq_payload_hashes: BTreeMap<u64, String>,
-    known_blocks: HashSet<[u8; 32]>,
-    committed_blocks_set: HashSet<[u8; 32]>,
+    known_blocks: BTreeSet<[u8; 32]>,
+    committed_blocks_set: BTreeSet<[u8; 32]>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -89,17 +89,17 @@ impl PersistentConsensusState {
     fn from_existing_wal(wal: WriteAheadLog, genesis_hash: [u8; 32]) -> Self {
         let mut cr = CommitRule::new();
         cr.register_block(genesis_hash, [0; 32], 0, 0);
-        let mut known = HashSet::new();
+        let mut known = BTreeSet::new();
         known.insert(genesis_hash);
         Self {
             wal,
             fork_choice: ForkChoice::new(),
             commit_rule: cr,
             dag: BlockDAG::new(genesis_hash),
-            applied_sequences: HashSet::new(),
+            applied_sequences: BTreeSet::new(),
             seq_payload_hashes: BTreeMap::new(),
             known_blocks: known,
-            committed_blocks_set: HashSet::new(),
+            committed_blocks_set: BTreeSet::new(),
         }
     }
 

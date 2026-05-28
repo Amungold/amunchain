@@ -1,0 +1,36 @@
+crates/amun-codec/src/encode.rs:4:// not by a separate encoded_size() method. This eliminates the
+crates/amun-codec/src/encode.rs:5:// possibility of encoded_size() diverging from actual encoding.
+crates/amun-upgrade-law/src/lib.rs:1:// amun-upgrade-law
+crates/amun-fork/src/rule.rs:17:    /// to prevent adversary grinding while maintaining determinism.
+crates/amun-chunk-store/src/lib.rs:1:// amun-chunk-store
+crates/amun-entropy-transcript/src/source.rs:72:        min + (self.next_u64() % range)
+crates/amun-timeout-aggregator/src/aggregator.rs:9:    /// timeout votes: round -> set of validator_ids
+crates/amun-kernel-types/src/lib.rs:5:// circular dependencies between amun-codec and amun-constitution.
+crates/amun-epoch-transition/src/validator_rotation.rs:26:        // and removals take effect after removal_delay_epochs
+crates/amun-lock-enforcement/src/lib.rs:1:// amun-lock-enforcement
+crates/amun-state-root/src/verifier.rs:3:/// remains serializable and replayable without coupling.
+crates/amun-state-root/src/snapshot.rs:65:    /// without panicking in production consensus.
+crates/amun-block/src/limits.rs:2:// max_tx_bytes removed — BlockBody stores only tx hashes (32 bytes each).
+crates/amun-network-model/src/lib.rs:1:// amun-network-model
+crates/amun-canonical-semantics/src/lib.rs:1:// amun-canonical-semantics
+crates/amun-wal/src/authority_index.rs:6:    /// sequence -> chain_hash (O(1) reverse lookup)
+crates/amun-wal/src/authority_index.rs:8:    /// chain_hash -> sequence (O(1) forward lookup)
+crates/amun-wal/src/authority_index.rs:10:    /// segment -> first_sequence
+crates/amun-formal-spec/src/lib.rs:1:// amun-formal-spec
+crates/amun-network-simulator/src/delivery.rs:19:        let jitter = sender.wrapping_mul(receiver) % self.jitter_rounds.max(1);
+crates/amun-state-transition/src/state.rs:85:    /// does NOT mutate self. Can be called on any StateMachine instance.
+crates/amun-deterministic-arena/src/lib.rs:1:// amun-deterministic-arena
+crates/amun-consensus/src/round.rs:69:        validator_index == (self.round.value() as usize % total_validators)
+crates/amun-consensus/src/liveness.rs:32:        (round as usize) % validator_count
+crates/constitutional-linter/src/scc.rs:127:            ("C".into(), HashSet::from(["A".into()])), // cycle!
+crates/amun-consensus-execution/src/leader.rs:15:        let idx = (round % count) as usize;
+crates/amun-consensus-execution/src/leader_schedule.rs:37:        let selection = hash % total_stake;
+crates/amun-consensus-execution/src/leader_schedule.rs:49:        ids[(round as usize) % ids.len()]
+crates/amun-replay-cert/src/verifier.rs:4:/// is self-consistent and passes hash verification.
+crates/amun-consensus-types/src/message.rs:43:    pub const MAX_ENCODED_SIZE: usize = 2 +     // protocol_version: u16
+crates/amun-consensus-types/src/message.rs:44:        8 +     // chain_id: ChainId
+crates/amun-consensus-types/src/message.rs:45:        8 +     // epoch: Epoch
+crates/amun-consensus-types/src/message.rs:46:        1 +     // phase: ConsensusPhase
+crates/amun-consensus-types/src/message.rs:47:        32 +    // constitution_hash: PublicHash32
+crates/amun-consensus-types/src/message.rs:48:        2 +     // payload_len: u16
+crates/amun-consensus-types/src/message.rs:49:        MAX_PAYLOAD_SIZE; // payload bytes

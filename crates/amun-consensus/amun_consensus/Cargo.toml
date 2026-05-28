@@ -1,0 +1,22 @@
+[package]
+name = "amun_consensus"
+version = "1.0.0"
+edition = "2021"
+authors = ["AmunChain Engineering"]
+description = "Deterministic consensus execution semantics"
+license = "Apache-2.0"
+
+[lib]
+crate-type = ["lib"]
+
+[dependencies]
+sha2 = "0.10"
+amun_consensus_math = { path = "../amun_consensus_math" }
+amun_state_machine = { path = "../amun_state_machine" }
+
+[dev-dependencies]
+
+[profile.release]
+lto = true
+overflow-checks = true
+opt-level = 3

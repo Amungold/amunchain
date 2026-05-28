@@ -1,5 +1,5 @@
 use amun_quorum_certificate::QuorumCertificate;
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone)]
 pub struct BlockRecord {
@@ -62,7 +62,7 @@ impl CommitRule {
             return false;
         }
         let mut current = self.block_records.get(child).map(|r| r.parent_hash);
-        let mut visited = HashSet::new();
+        let mut visited = BTreeSet::new();
         visited.insert(*child);
         let mut depth = 0;
         const MAX_DEPTH: usize = 50_000;

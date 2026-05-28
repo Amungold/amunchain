@@ -1,3 +1,5 @@
+#![deny(clippy::unwrap_used)]
+#![deny(clippy::expect_used)]
 pub mod block_dag;
 pub mod commit;
 pub mod fork_choice;

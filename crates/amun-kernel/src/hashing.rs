@@ -8,6 +8,13 @@ pub mod domain_tags {
     pub const VALIDATOR: &[u8] = b"AMUN_VALIDATOR_V1";
     pub const GOVERNANCE: &[u8] = b"AMUN_GOVERNANCE_V1";
     pub const ECONOMICS: &[u8] = b"AMUN_ECONOMICS_V1";
+    pub const EXECUTION_RECEIPT: &[u8] = b"AMUN_EXECUTION_RECEIPT_V1";
+    pub const EXECUTION_TRANSCRIPT: &[u8] = b"AMUN_EXECUTION_TRANSCRIPT_V1";
     pub const MERKLE_LEAF: &[u8] = b"AMUN_MERKLE_LEAF_V1";
     pub const MERKLE_NODE: &[u8] = b"AMUN_MERKLE_NODE_V1";
+    pub const GOVERNANCE_ATTESTATION: &[u8] = b"AMUN_GOVERNANCE_ATTESTATION_V1";
+    pub const RELEASE_SEAL: &[u8] = b"AMUN_RELEASE_SEAL_V1";
+    pub const AUTHORITY: &[u8] = b"AMUN_AUTHORITY_V1";
+    pub const FREEZE_BOUNDARY: &[u8] = b"AMUN_FREEZE_BOUNDARY_V1";
+    pub const SIGNATURE_PAYLOAD: &[u8] = b"AMUN_SIGNATURE_PAYLOAD_V1";
 }

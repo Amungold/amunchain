@@ -1,0 +1,15 @@
+crates/amun-wal/src/frame.rs:30:        checksum.copy_from_slice(&h.finalize().as_bytes()[..32]);
+crates/amun-wal/src/frame.rs:46:        computed.copy_from_slice(&h.finalize().as_bytes()[..32]);
+crates/amun-wal/src/lib.rs:225:        let dir = Path::new(base_path).parent().unwrap_or(Path::new("."));
+crates/amun-wal/src/lib.rs:369:        if let Some(parent) = Path::new(&self.base_path).parent() {
+crates/amun-wal/src/lib.rs:713:            for seq in expected_first..=actual_last {
+crates/amun-wal/src/lib.rs:907:        for i in 0..32 {
+crates/amun-wal/src/lib.rs:908:            arr[i] = u8::from_str_radix(&hex[i * 2..i * 2 + 2], 16)
+crates/amun-wal/src/wal.rs:56:            let seq = u64::from_le_bytes(header[0..8].try_into().unwrap());
+crates/amun-wal/src/wal.rs:57:            let checksum: [u8; 32] = header[8..40].try_into().unwrap();
+crates/amun-wal/src/wal.rs:58:            let frame_prev_hash: [u8; 32] = header[40..72].try_into().unwrap();
+crates/amun-wal/src/wal.rs:59:            let event_len = u32::from_le_bytes(header[72..76].try_into().unwrap()) as usize;
+crates/amun-wal/src/wal.rs:133:            let seq = u64::from_le_bytes(header[0..8].try_into().unwrap());
+crates/amun-wal/src/wal.rs:134:            let checksum: [u8; 32] = header[8..40].try_into().unwrap();
+crates/amun-wal/src/wal.rs:135:            let frame_prev_hash: [u8; 32] = header[40..72].try_into().unwrap();
+crates/amun-wal/src/wal.rs:136:            let event_len = u32::from_le_bytes(header[72..76].try_into().unwrap()) as usize;
