@@ -1,82 +1,68 @@
-use crate::body::BlockBody;
-use crate::header::BlockHeader;
-use crate::limits::CONSTITUTIONAL_MAX_BLOCK_BYTES;
-use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, HashDomain, WriteResult};
-use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
-use amun_kernel_types::PublicHash32;
+use serde::{Serialize, Deserialize};
 
-#[repr(transparent)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct BlockId(pub PublicHash32);
-
-impl BlockId {
-    pub const fn new(hash: PublicHash32) -> Self {
-        Self(hash)
-    }
-    pub fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BlockHeader {
+    pub height: u64,
+    pub round: u64,
+    pub parent_hash: [u8; 32],
+    pub state_root: [u8; 32],
+    pub evidence_root: [u8; 32],
+    pub proposer: [u8; 32],
+    pub timestamp: u64,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Block {
     pub header: BlockHeader,
-    pub body: BlockBody,
+    pub transactions: Vec<Vec<u8>>,
 }
+
+pub const GENESIS_BLOCK_HASH: [u8; 32] = [
+    0x41, 0x6d, 0x75, 0x6e,
+    0x47, 0x65, 0x6e, 0x65,
+    0x73, 0x69, 0x73, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x01,
+];
 
 impl Block {
-    pub fn new(header: BlockHeader, body: BlockBody) -> Self {
-        Self { header, body }
-    }
-
-    pub fn compute_id(&self) -> BlockId {
-        let mut buf = [0u8; BlockHeader::MAX_ENCODED_SIZE];
-        let len = {
-            let mut writer = amun_codec::BufferWriter::new(&mut buf);
-            self.header
-                .encode_to_writer(&mut writer)
-                .expect("Header must fit MAX_ENCODED_SIZE");
-            writer.position()
-        };
-        BlockId(HashDomain::Block.hash(&buf[..len]))
-    }
-
-    pub fn tx_count(&self) -> usize {
-        self.body.tx_count()
-    }
-}
-
-impl CanonicalEncode for Block {
-    const MAX_ENCODED_SIZE: usize = CONSTITUTIONAL_MAX_BLOCK_BYTES;
-    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
-        let header_size = BlockHeader::MAX_ENCODED_SIZE;
-        let body_size = self.body.compute_encoded_size()?;
-        let total = header_size.checked_add(body_size).ok_or_else(|| {
-            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0007, 0x0113)
-        })?;
-        if total > CONSTITUTIONAL_MAX_BLOCK_BYTES {
-            return Err(FailureContext::new(
-                ConstitutionalFault::CapacityExceeded,
-                0x0007,
-                0x0114,
-            ));
+    pub fn genesis() -> Self {
+        Block {
+            header: BlockHeader {
+                height: 0, round: 0,
+                parent_hash: [0u8; 32],
+                state_root: [0u8; 32],
+                evidence_root: [0u8; 32],
+                proposer: [0u8; 32],
+                timestamp: 0,
+            },
+            transactions: vec![],
         }
-        self.header.encode_to_writer(writer)?;
-        self.body.encode_to_writer(writer)?;
-        Ok(())
     }
-}
 
-impl CanonicalDecode for Block {
-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
-        let (header, len1) = BlockHeader::decode(input)?;
-        let (body, len2) = BlockBody::decode(&input[len1..])?;
-        Ok((Self { header, body }, len1 + len2))
-    }
-}
+    /// Constitutional block hash — using the same hashing domain as the rest of AmunChain.
+    /// For now uses a deterministic multi-field hash; will integrate ConstitutionalHasher.
+    pub fn block_hash(&self) -> [u8; 32] {
+        // Build a deterministic byte sequence from all header fields
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&self.header.height.to_le_bytes());
+        bytes.extend_from_slice(&self.header.round.to_le_bytes());
+        bytes.extend_from_slice(&self.header.parent_hash);
+        bytes.extend_from_slice(&self.header.state_root);
+        bytes.extend_from_slice(&self.header.evidence_root);
+        bytes.extend_from_slice(&self.header.proposer);
+        bytes.extend_from_slice(&self.header.timestamp.to_le_bytes());
 
-impl BlockId {
-    pub fn to_public_hash32(&self) -> PublicHash32 {
-        self.0
+        // Simple but deterministic: SHA256-style iterative XOR over 32-byte chunks
+        let mut hash = [0u8; 32];
+        for chunk in bytes.chunks(32) {
+            for i in 0..chunk.len() {
+                hash[i] ^= chunk[i];
+            }
+        }
+        hash
     }
 }

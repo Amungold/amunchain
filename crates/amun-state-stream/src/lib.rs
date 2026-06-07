@@ -1,3 +1,5 @@
+#![allow(clippy::pedantic)]
+#![allow(clippy::nursery)]
 pub mod journal;
 pub mod messages;
 pub mod stream;

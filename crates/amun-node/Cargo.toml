@@ -1,0 +1,25 @@
+[package]
+name = "amun-node"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+edition = "2021"
+description = "AmunChain constitutional validator node"
+
+[[bin]]
+name = "amun-node"
+path = "src/main.rs"
+
+[dev-dependencies]
+tempfile = "3"
+
+[dependencies]
+blake3 = "1"
+amun-networking = { path = "../amun-networking" }
+amun-consensus = { path = "../amun-consensus" }
+amun-chain-checkpoint = { path = "../amun-chain-checkpoint" }
+amun-constitutional-state = { path = "../amun-constitutional-state" }
+amun-constitutional-block = { path = "../amun-constitutional-block" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+hex = "0.4"

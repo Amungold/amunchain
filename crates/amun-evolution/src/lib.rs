@@ -1,3 +1,5 @@
+#![allow(clippy::pedantic)]
+#![allow(clippy::nursery)]
 pub mod certificate;
 pub mod executor;
 pub mod signatures;

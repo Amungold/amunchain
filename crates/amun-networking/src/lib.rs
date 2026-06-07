@@ -1,13 +1,18 @@
-// Constitutional Networking Layer - Orchestration Only
-// All constitutional semantics are delegated to dedicated crates.
-// This crate ONLY orchestrates: amun-civilizational-relations,
-// amun-constitutional-quarantine, amun-temporal-alignment,
-// amun-constitutional-treaties.
+pub mod peer;
+pub mod message;
+pub mod envelope;
+pub mod codec;
+pub mod transport;
+pub mod node;
+pub mod sync_protocol;
+pub mod transport_trait;
+pub mod peer_identity;
+pub mod signed_envelope;
+pub mod tcp_transport;
 
-pub mod messages;
-pub mod peers;
-pub mod sync;
-
-pub use messages::{ConstitutionalMessage, MessageType};
-pub use peers::{PeerIdentity, PeerTrust, TrustLevel};
-pub use sync::{SyncEngine, SyncResult, SyncState};
+pub use node::{NetworkNode, NodeLifecycle};
+pub mod crypto_identity;
+pub mod peer_discovery;
+pub mod validator_certificate;
+pub mod trust_anchor;
+pub mod validator_registry;

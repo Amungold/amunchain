@@ -3,6 +3,14 @@
 version = 4
 
 [[package]]
+name = "amun-accounts"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "serde",
+]
+
+[[package]]
 name = "amun-amendments"
 version = "1.0.0"
 dependencies = [
@@ -25,10 +33,125 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-audit-trail"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "serde",
+]
+
+[[package]]
+name = "amun-binary-codec"
+version = "1.0.0"
+dependencies = [
+ "amun-chain-position",
+]
+
+[[package]]
+name = "amun-block-builder"
+version = "0.1.0"
+dependencies = [
+ "amun-accounts",
+ "amun-consensus",
+ "amun-execution",
+ "amun-mempool",
+ "amun-transactions",
+ "blake3",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+]
+
+[[package]]
+name = "amun-block-store"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-bytecode"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-byzantine-tests"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-cross-contract",
+ "amun-evidence-engine",
+ "amun-invariant-engine",
+ "amun-proof-archive",
+ "amun-replay-verifier",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-canonical"
+version = "4.0.0"
+dependencies = [
+ "blake3",
+ "heapless 0.8.0",
+]
+
+[[package]]
 name = "amun-canonical-codec"
 version = "1.0.0"
 dependencies = [
  "blake3",
+]
+
+[[package]]
+name = "amun-certificate-network"
+version = "0.1.0"
+dependencies = [
+ "amun-constitutional-block",
+ "amun-constitutional-state",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-chain-checkpoint"
+version = "0.1.0"
+dependencies = [
+ "amun-certificate-network",
+ "amun-constitutional-block",
+ "amun-constitutional-commitments",
+ "amun-constitutional-state",
+ "amun-replay",
+ "amun-stateless-sync",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-chain-position"
+version = "1.0.0"
+dependencies = [
+ "blake3",
+ "serde",
 ]
 
 [[package]]
@@ -50,10 +173,131 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-consensus"
+version = "1.0.0"
+dependencies = [
+ "amun-constitution",
+ "amun-constitutional-commitments",
+ "amun-crypto",
+ "blake3",
+ "crc32fast",
+ "hex",
+ "postcard",
+ "rand 0.8.6",
+ "rayon",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-consensus-integration"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-evidence-engine",
+ "amun-proof-archive",
+ "amun-replay-verifier",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-consensus-network"
+version = "0.1.0"
+dependencies = [
+ "postcard",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "amun-constitution"
+version = "1.0.0"
+dependencies = [
+ "amun-canonical-codec",
+ "amun-lineage",
+]
+
+[[package]]
+name = "amun-constitution-builder"
+version = "1.0.0"
+dependencies = [
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "amun-constitutional"
 version = "0.1.0"
 dependencies = [
  "sha2",
+]
+
+[[package]]
+name = "amun-constitutional-authority"
+version = "1.0.0"
+dependencies = [
+ "amun-constitution-builder",
+ "amun-constitutional-signing",
+ "blake3",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-constitutional-authority-semantics"
+version = "1.0.0"
+dependencies = [
+ "amun-constitution-builder",
+ "amun-constitutional-authority",
+ "amun-constitutional-signing",
+ "amun-peer-identity",
+ "blake3",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-constitutional-block"
+version = "1.0.0"
+dependencies = [
+ "amun-consensus",
+ "amun-constitution-builder",
+ "amun-constitutional-commitments",
+ "amun-constitutional-kernel",
+ "amun-constitutional-state",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-constitutional-commitments"
+version = "1.0.0"
+dependencies = [
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -68,6 +312,58 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-constitutional-governance"
+version = "1.0.0"
+dependencies = [
+ "amun-constitution-builder",
+ "amun-constitutional-authority",
+ "amun-constitutional-signing",
+ "blake3",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-constitutional-integration"
+version = "0.1.0"
+dependencies = [
+ "amun-constitutional-proof",
+ "amun-verification-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-constitutional-kernel"
+version = "1.0.0"
+dependencies = [
+ "amun-constitution-builder",
+ "amun-constitutional-authority",
+ "amun-constitutional-governance",
+ "amun-constitutional-signing",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-constitutional-proof"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "amun-constitutional-quarantine"
 version = "1.0.0"
 dependencies = [
@@ -75,6 +371,59 @@ dependencies = [
  "amun-civilizational-relations",
  "amun-snapshot-engine",
  "blake3",
+]
+
+[[package]]
+name = "amun-constitutional-runtime"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-cross-contract",
+ "amun-evidence-engine",
+ "amun-gas-engine",
+ "amun-handle-resolver",
+ "amun-invariant-engine",
+ "amun-pccv",
+ "amun-proof-archive",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-constitutional-signing"
+version = "1.0.0"
+dependencies = [
+ "amun-constitution-builder",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-constitutional-sim"
+version = "1.0.0"
+dependencies = [
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-constitutional-state"
+version = "0.1.0"
+dependencies = [
+ "amun-constitutional-commitments",
+ "blake3",
+ "hex",
+ "serde",
 ]
 
 [[package]]
@@ -86,6 +435,116 @@ name = "amun-constitutional-verifier"
 version = "1.0.0"
 
 [[package]]
+name = "amun-cross-contract"
+version = "0.1.0"
+dependencies = [
+ "amun-evidence-engine",
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-crypto"
+version = "4.0.0"
+dependencies = [
+ "blake3",
+ "ed25519-dalek",
+ "heapless 0.8.0",
+ "hex",
+ "rand_core 0.6.4",
+ "subtle",
+ "zeroize",
+]
+
+[[package]]
+name = "amun-crypto-hardening"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_bytes",
+ "serde_json",
+ "thiserror 1.0.69",
+ "zeroize",
+]
+
+[[package]]
+name = "amun-deterministic-allocator"
+version = "1.0.0"
+
+[[package]]
+name = "amun-dual-verification"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-evidence-engine",
+ "amun-invariant-engine",
+ "amun-pccv",
+ "amun-proof-archive",
+ "amun-replay-verifier",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-evidence-engine"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-evidence-finality"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-evidence-engine",
+ "amun-proof-archive",
+ "amun-replay-verifier",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-evidence-root"
+version = "0.1.0"
+dependencies = [
+ "amun-block-builder",
+ "amun-mempool",
+ "amun-transactions",
+ "blake3",
+ "ed25519-dalek",
+]
+
+[[package]]
 name = "amun-evolution"
 version = "1.0.0"
 dependencies = [
@@ -95,12 +554,145 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-execution"
+version = "0.1.0"
+dependencies = [
+ "amun-accounts",
+ "amun-transactions",
+ "ed25519-dalek",
+ "rand 0.8.6",
+ "serde",
+]
+
+[[package]]
+name = "amun-experimental-framework"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-evidence-engine",
+ "amun-invariant-engine",
+ "amun-pccv",
+ "amun-proof-archive",
+ "amun-replay-verifier",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "csv",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-explorer-api"
+version = "0.1.0"
+dependencies = [
+ "amun-constitutional-proof",
+ "amun-verification-kernel",
+ "axum",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+]
+
+[[package]]
+name = "amun-finality-certificate"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+]
+
+[[package]]
+name = "amun-fuzz"
+version = "0.1.0"
+dependencies = [
+ "amun-chain-position",
+ "amun-protocol-event",
+ "amun-resource-core",
+ "amun-snapshot-constitution",
+ "amun-wal",
+ "libfuzzer-sys",
+ "tempfile",
+]
+
+[[package]]
+name = "amun-gas-engine"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-evidence-engine",
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "amun-governance"
 version = "1.0.0"
 
 [[package]]
+name = "amun-handle-resolver"
+version = "0.1.0"
+dependencies = [
+ "amun-evidence-engine",
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-header-gossip"
+version = "1.0.0"
+dependencies = [
+ "amun-constitutional-block",
+ "amun-constitutional-commitments",
+ "amun-constitutional-kernel",
+ "amun-light-client",
+ "amun-verifier-node",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-invariant-engine"
+version = "0.1.0"
+dependencies = [
+ "amun-evidence-engine",
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "amun-light-client"
 version = "1.0.0"
+dependencies = [
+ "amun-constitutional-runtime",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "amun-lineage"
@@ -118,15 +710,215 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-live-cluster"
+version = "0.1.0"
+dependencies = [
+ "amun-consensus-network",
+ "postcard",
+ "serde",
+ "serde_json",
+ "tempfile",
+]
+
+[[package]]
+name = "amun-mempool"
+version = "0.1.0"
+dependencies = [
+ "amun-transactions",
+ "ed25519-dalek",
+ "rand 0.8.6",
+ "serde",
+]
+
+[[package]]
+name = "amun-network-transport"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "hex",
+ "postcard",
+ "serde",
+ "tempfile",
+ "tokio",
+]
+
+[[package]]
 name = "amun-networking"
+version = "0.1.0"
+dependencies = [
+ "amun-certificate-network",
+ "amun-chain-checkpoint",
+ "amun-consensus",
+ "amun-constitutional-block",
+ "amun-constitutional-state",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-node"
+version = "0.1.0"
+dependencies = [
+ "amun-chain-checkpoint",
+ "amun-consensus",
+ "amun-constitutional-block",
+ "amun-constitutional-state",
+ "amun-networking",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "toml",
+]
+
+[[package]]
+name = "amun-operations"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "amun-state-sync",
+ "amun-validator-networking",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-pccv"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-evidence-engine",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-peer-identity"
 version = "1.0.0"
 dependencies = [
- "amun-canonical-codec",
- "amun-civilizational-relations",
- "amun-constitutional-quarantine",
- "amun-snapshot-engine",
- "amun-storage-kernel",
+ "amun-constitutional-authority",
+ "amun-constitutional-block",
+ "amun-constitutional-signing",
  "blake3",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-persistence"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-persistent-node"
+version = "0.1.0"
+dependencies = [
+ "amun-operations",
+ "amun-resource-core",
+ "amun-state-sync",
+ "amun-validator-networking",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-proof-archive"
+version = "0.1.0"
+dependencies = [
+ "amun-evidence-engine",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-proof-carrying"
+version = "1.0.0"
+dependencies = [
+ "amun-constitutional-block",
+ "amun-constitutional-commitments",
+ "amun-constitutional-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-protocol-event"
+version = "1.0.0"
+dependencies = [
+ "amun-binary-codec",
+ "amun-chain-position",
+ "blake3",
+]
+
+[[package]]
+name = "amun-recovery"
+version = "0.1.0"
+dependencies = [
+ "amun-block-store",
+ "amun-persistence",
+ "amun-replay-store",
+ "amun-snapshot-engine-unified",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-replay"
+version = "0.1.0"
+dependencies = [
+ "amun-constitutional-state",
+ "blake3",
+ "hex",
+ "serde",
+]
+
+[[package]]
+name = "amun-replay-consensus"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-evidence-engine",
+ "amun-proof-archive",
+ "amun-replay-verifier",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -135,6 +927,64 @@ version = "0.1.0"
 dependencies = [
  "amun-constitutional",
  "sha2",
+]
+
+[[package]]
+name = "amun-replay-store"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-replay-verifier"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-evidence-engine",
+ "amun-invariant-engine",
+ "amun-proof-archive",
+ "amun-resource-core",
+ "amun-transition-proof",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-resource-core"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-runtime-benchmarks"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-evidence-engine",
+ "amun-invariant-engine",
+ "amun-proof-archive",
+ "amun-replay-verifier",
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -148,6 +998,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-snapshot-constitution"
+version = "1.0.0"
+dependencies = [
+ "amun-canonical",
+ "amun-chain-position",
+ "amun-deterministic-allocator",
+ "amun-state-transition",
+ "blake3",
+]
+
+[[package]]
 name = "amun-snapshot-engine"
 version = "1.0.0"
 dependencies = [
@@ -155,6 +1016,15 @@ dependencies = [
  "amun-storage-kernel",
  "blake3",
  "hex",
+]
+
+[[package]]
+name = "amun-snapshot-engine-unified"
+version = "0.1.0"
+dependencies = [
+ "amun-persistence",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -174,6 +1044,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-state-sync"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-state-transition"
+version = "1.0.0"
+dependencies = [
+ "amun-canonical",
+ "amun-chain-position",
+ "amun-deterministic-allocator",
+ "blake3",
+]
+
+[[package]]
+name = "amun-stateless-sync"
+version = "0.1.0"
+dependencies = [
+ "amun-certificate-network",
+ "amun-constitutional-block",
+ "amun-constitutional-state",
+ "amun-replay",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "amun-storage-kernel"
 version = "1.0.0"
 dependencies = [
@@ -190,10 +1096,187 @@ name = "amun-temporal-alignment"
 version = "1.0.0"
 
 [[package]]
+name = "amun-testnet-sim"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-pccv",
+ "amun-proof-archive",
+ "amun-replay-consensus",
+ "amun-replay-verifier",
+ "amun-resource-core",
+ "amun-state-sync",
+ "amun-transition-proof",
+ "amun-validator-networking",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-transactions"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-transition-proof"
+version = "0.1.0"
+dependencies = [
+ "amun-evidence-engine",
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-validator-networking"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "amun-state-sync",
+ "amun-transition-proof",
+ "blake3",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-validator-runtime"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-constitutional-runtime",
+ "amun-operations",
+ "amun-persistent-node",
+ "amun-proof-archive",
+ "amun-replay-consensus",
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-verification-kernel"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-verifier-node"
+version = "1.0.0"
+dependencies = [
+ "amun-constitutional-block",
+ "amun-constitutional-commitments",
+ "amun-proof-carrying",
+ "hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "amun-vm-kernel"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-wal"
+version = "1.0.0"
+dependencies = [
+ "crc32fast",
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
+name = "amun-wallet-api"
+version = "0.1.0"
+dependencies = [
+ "amun-accounts",
+ "amun-block-store",
+ "amun-mempool",
+ "amun-networking",
+ "amun-transactions",
+ "axum",
+ "blake3",
+ "hex",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+]
+
+[[package]]
+name = "amun-wallet-management"
+version = "0.1.0"
+dependencies = [
+ "argon2",
+ "blake3",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
+ "zeroize",
+]
+
+[[package]]
 name = "anyhow"
 version = "1.0.102"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
+
+[[package]]
+name = "arbitrary"
+version = "1.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3d036a3c4ab069c7b410a2ce876bd74808d2d0888a82667669f8e783a898bf1"
+
+[[package]]
+name = "argon2"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c3610892ee6e0cbce8ae2700349fcf8f98adb0dbfbee85aec3c9179d29cc072"
+dependencies = [
+ "base64ct",
+ "blake2",
+ "cpufeatures 0.2.17",
+ "password-hash",
+]
 
 [[package]]
 name = "arrayref"
@@ -208,10 +1291,97 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
+name = "async-trait"
+version = "0.1.89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9035ad2d096bed7955a320ee7e2230574d28fd3c3a0f186cbea1ff3c7eed5dbb"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "atomic-polyfill"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8cf2bce30dfe09ef0bfaef228b9d414faaf7e563035494d7fe092dba54b300f4"
+dependencies = [
+ "critical-section",
+]
+
+[[package]]
+name = "atomic-waker"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
+
+[[package]]
+name = "axum"
+version = "0.7.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "edca88bc138befd0323b20752846e6587272d3b03b0343c8ea28a6f819e6e71f"
+dependencies = [
+ "async-trait",
+ "axum-core",
+ "bytes",
+ "futures-util",
+ "http",
+ "http-body",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "itoa",
+ "matchit",
+ "memchr",
+ "mime",
+ "percent-encoding",
+ "pin-project-lite",
+ "rustversion",
+ "serde",
+ "serde_json",
+ "serde_path_to_error",
+ "serde_urlencoded",
+ "sync_wrapper",
+ "tokio",
+ "tower",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
+name = "axum-core"
+version = "0.4.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09f2bd6146b97ae3359fa0cc6d6b376d9539582c7b4220f041a33ec24c226199"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "futures-util",
+ "http",
+ "http-body",
+ "http-body-util",
+ "mime",
+ "pin-project-lite",
+ "rustversion",
+ "sync_wrapper",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
+name = "base64ct"
+version = "1.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06"
 
 [[package]]
 name = "bit-set"
@@ -244,6 +1414,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "blake2"
+version = "0.10.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46502ad458c9a52b69d4d4d32775c788b7a1b85e8bc9d482d92250fc0e3f8efe"
+dependencies = [
+ "digest",
+]
+
+[[package]]
 name = "blake3"
 version = "1.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -267,12 +1446,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "byteorder"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
+
+[[package]]
+name = "bytes"
+version = "1.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e748733b7cbc798e1434b6ac524f0c1ff2ab456fe201501e6497c8417a4fc33"
+
+[[package]]
 name = "cc"
 version = "1.2.62"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1dce859f0832a7d088c4f1119888ab94ef4b5d6795d1ce05afb7fe159d79f98"
 dependencies = [
  "find-msvc-tools",
+ "jobserver",
+ "libc",
  "shlex",
 ]
 
@@ -281,6 +1474,21 @@ name = "cfg-if"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
+
+[[package]]
+name = "cobs"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0fa961b519f0b462e3a3b4a34b64d119eeaca1d59af726fe450bbba07a9fc0a1"
+dependencies = [
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "const-oid"
+version = "0.9.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
 
 [[package]]
 name = "constant_time_eq"
@@ -307,6 +1515,46 @@ dependencies = [
 ]
 
 [[package]]
+name = "crc32fast"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9481c1c90cbf2ac953f07c8d4a58aa3945c425b7185c9154d67a65e4230da511"
+dependencies = [
+ "cfg-if",
+]
+
+[[package]]
+name = "critical-section"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "790eea4361631c5e7d22598ecd5723ff611904e3344ce8720784c93e3d83d40b"
+
+[[package]]
+name = "crossbeam-deque"
+version = "0.8.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9dd111b7b7f7d55b72c0a6ae361660ee5853c9af73f70c3c2ef6858b950e2e51"
+dependencies = [
+ "crossbeam-epoch",
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-epoch"
+version = "0.9.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
+dependencies = [
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-utils"
+version = "0.8.21"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
+
+[[package]]
 name = "crypto-common"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -317,6 +1565,64 @@ dependencies = [
 ]
 
 [[package]]
+name = "csv"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52cd9d68cf7efc6ddfaaee42e7288d3a99d613d4b50f76ce9827ae0c6e14f938"
+dependencies = [
+ "csv-core",
+ "itoa",
+ "ryu",
+ "serde_core",
+]
+
+[[package]]
+name = "csv-core"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "704a3c26996a80471189265814dbc2c257598b96b8a7feae2d31ace646bb9782"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
+name = "curve25519-dalek"
+version = "4.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97fb8b7c4503de7d6ae7b42ab72a5a59857b4c937ec27a3d4539dba95b5ab2be"
+dependencies = [
+ "cfg-if",
+ "cpufeatures 0.2.17",
+ "curve25519-dalek-derive",
+ "digest",
+ "fiat-crypto",
+ "rustc_version",
+ "subtle",
+ "zeroize",
+]
+
+[[package]]
+name = "curve25519-dalek-derive"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f46882e17999c6cc590af592290432be3bce0428cb0d5f8b6715e4dc7b383eb3"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "der"
+version = "0.7.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7c1832837b905bbfb5101e07cc24c8deddf52f93225eee6ead5f4d63d53ddcb"
+dependencies = [
+ "const-oid",
+ "zeroize",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -324,7 +1630,51 @@ checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
 dependencies = [
  "block-buffer",
  "crypto-common",
+ "subtle",
 ]
+
+[[package]]
+name = "ed25519"
+version = "2.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "115531babc129696a58c64a4fef0a8bf9e9698629fb97e9e40767d235cfbcd53"
+dependencies = [
+ "pkcs8",
+ "signature",
+]
+
+[[package]]
+name = "ed25519-dalek"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70e796c081cee67dc755e1a36a0a172b897fab85fc3f6bc48307991f64e4eca9"
+dependencies = [
+ "curve25519-dalek",
+ "ed25519",
+ "rand_core 0.6.4",
+ "serde",
+ "sha2",
+ "subtle",
+ "zeroize",
+]
+
+[[package]]
+name = "either"
+version = "1.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "91622ff5e7162018101f2fea40d6ebf4a78bbe5a49736a2020649edf9693679e"
+
+[[package]]
+name = "embedded-io"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef1a6892d9eef45c8fa6b9e0086428a2cca8491aca8f787c534a3d6d0bcb3ced"
+
+[[package]]
+name = "embedded-io"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 
 [[package]]
 name = "equivalent"
@@ -349,6 +1699,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f1f227452a390804cdb637b74a86990f2a7d7ba4b7d5693aac9b4dd6defd8d6"
 
 [[package]]
+name = "fiat-crypto"
+version = "0.2.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28dea519a9695b9977216879a3ebfddf92f1c08c05d984f8996aecd6ecdc811d"
+
+[[package]]
 name = "find-msvc-tools"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -365,6 +1721,48 @@ name = "foldhash"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
+
+[[package]]
+name = "form_urlencoded"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf"
+dependencies = [
+ "percent-encoding",
+]
+
+[[package]]
+name = "futures-channel"
+version = "0.3.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "07bbe89c50d7a535e539b8c17bc0b49bdb77747034daa8087407d655f3f7cc1d"
+dependencies = [
+ "futures-core",
+]
+
+[[package]]
+name = "futures-core"
+version = "0.3.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e3450815272ef58cec6d564423f6e755e25379b217b0bc688e295ba24df6b1d"
+
+[[package]]
+name = "futures-task"
+version = "0.3.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "037711b3d59c33004d3856fbdc83b99d4ff37a24768fa1be9ce3538a1cde4393"
+
+[[package]]
+name = "futures-util"
+version = "0.3.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "389ca41296e6190b48053de0321d02a77f32f8a5d2461dd38762c0593805c6d6"
+dependencies = [
+ "futures-core",
+ "futures-task",
+ "pin-project-lite",
+ "slab",
+]
 
 [[package]]
 name = "generic-array"
@@ -413,6 +1811,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "hash32"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0c35f58762feb77d74ebe43bdbc3210f09be9fe6742234d573bacc26ed92b67"
+dependencies = [
+ "byteorder",
+]
+
+[[package]]
+name = "hash32"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "47d60b12902ba28e2730cd37e95b8c9223af2808df9e902d4df49588d1470606"
+dependencies = [
+ "byteorder",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.15.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -428,6 +1844,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 
 [[package]]
+name = "heapless"
+version = "0.7.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cdc6457c0eb62c71aac4bc17216026d8410337c4126773b9c5daba343f17964f"
+dependencies = [
+ "atomic-polyfill",
+ "hash32 0.2.1",
+ "rustc_version",
+ "serde",
+ "spin",
+ "stable_deref_trait",
+]
+
+[[package]]
+name = "heapless"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0bfb9eb618601c89945a70e254898da93b13be0388091d42117462b265bb3fad"
+dependencies = [
+ "hash32 0.3.1",
+ "stable_deref_trait",
+]
+
+[[package]]
 name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -438,6 +1878,86 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+
+[[package]]
+name = "http"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8be7462df143984c4598a256ef469b251d7d7f9e271135073e78fc535414f3d0"
+dependencies = [
+ "bytes",
+ "itoa",
+]
+
+[[package]]
+name = "http-body"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1efedce1fb8e6913f23e0c92de8e62cd5b772a67e7b3946df930a62566c93184"
+dependencies = [
+ "bytes",
+ "http",
+]
+
+[[package]]
+name = "http-body-util"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b021d93e26becf5dc7e1b75b1bed1fd93124b374ceb73f43d4d4eafec896a64a"
+dependencies = [
+ "bytes",
+ "futures-core",
+ "http",
+ "http-body",
+ "pin-project-lite",
+]
+
+[[package]]
+name = "httparse"
+version = "1.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87"
+
+[[package]]
+name = "httpdate"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
+
+[[package]]
+name = "hyper"
+version = "1.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55281c53a1894c864990125767da440a4e630446785086f52523b20033b74498"
+dependencies = [
+ "atomic-waker",
+ "bytes",
+ "futures-channel",
+ "futures-core",
+ "http",
+ "http-body",
+ "httparse",
+ "httpdate",
+ "itoa",
+ "pin-project-lite",
+ "smallvec",
+ "tokio",
+]
+
+[[package]]
+name = "hyper-util"
+version = "0.1.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96547c2556ec9d12fb1578c4eaf448b04993e7fb79cbaad930a656880a6bdfa0"
+dependencies = [
+ "bytes",
+ "http",
+ "http-body",
+ "hyper",
+ "pin-project-lite",
+ "tokio",
+ "tower-service",
+]
 
 [[package]]
 name = "id-arena"
@@ -478,6 +1998,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
+name = "jobserver"
+version = "0.1.34"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9afb3de4395d6b3e67a780b6de64b51c978ecf11cb9a462c66be7d4ca9039d33"
+dependencies = [
+ "getrandom 0.3.4",
+ "libc",
+]
+
+[[package]]
 name = "leb128fmt"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -488,6 +2018,16 @@ name = "libc"
 version = "0.2.186"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66"
+
+[[package]]
+name = "libfuzzer-sys"
+version = "0.4.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9fd2f41a1cba099f79a0b6b6c35656cf7c03351a7bae8ff0f28f25270f929d2"
+dependencies = [
+ "arbitrary",
+ "cc",
+]
 
 [[package]]
 name = "linux-raw-sys"
@@ -511,10 +2051,33 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "616ec5685824bcc94416c6d4a7a446eea774a31efd7062c8480ba6fd06d7a6e5"
 
 [[package]]
+name = "matchit"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e7465ac9959cc2b1404e8e2367b43684a6d13790fe23056cc8c6c5a6b7bcb94"
+
+[[package]]
 name = "memchr"
 version = "2.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b947ae49db0d222b1dbc6b113ce7248a3fc3a6ca21b696717bfc000ba4484d8"
+
+[[package]]
+name = "mime"
+version = "0.3.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
+
+[[package]]
+name = "mio"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02bd0af71c67b473010cbbc60715ee815645a4dc942899111f494b4b737d6fda"
+dependencies = [
+ "libc",
+ "wasi",
+ "windows-sys",
+]
 
 [[package]]
 name = "num-traits"
@@ -552,6 +2115,52 @@ dependencies = [
  "redox_syscall",
  "smallvec",
  "windows-link",
+]
+
+[[package]]
+name = "password-hash"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "346f04948ba92c43e8469c1ee6736c7563d71012b17d40745260fe106aac2166"
+dependencies = [
+ "base64ct",
+ "rand_core 0.6.4",
+ "subtle",
+]
+
+[[package]]
+name = "percent-encoding"
+version = "2.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
+
+[[package]]
+name = "pin-project-lite"
+version = "0.2.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
+
+[[package]]
+name = "pkcs8"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f950b2377845cebe5cf8b5165cb3cc1a5e0fa5cfa3e1f7f55707d8fd82e0a7b7"
+dependencies = [
+ "der",
+ "spki",
+]
+
+[[package]]
+name = "postcard"
+version = "1.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6764c3b5dd454e283a30e6dfe78e9b31096d9e32036b5d1eaac7a6119ccb9a24"
+dependencies = [
+ "cobs",
+ "embedded-io 0.4.0",
+ "embedded-io 0.6.1",
+ "heapless 0.7.17",
+ "serde",
 ]
 
 [[package]]
@@ -706,6 +2315,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "rayon"
+version = "1.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb39b166781f92d482534ef4b4b1b2568f42613b53e5b6c160e24cfbfa30926d"
+dependencies = [
+ "either",
+ "rayon-core",
+]
+
+[[package]]
+name = "rayon-core"
+version = "1.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91"
+dependencies = [
+ "crossbeam-deque",
+ "crossbeam-utils",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.5.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -721,6 +2350,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 
 [[package]]
+name = "rustc_version"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
+dependencies = [
+ "semver",
+]
+
+[[package]]
 name = "rustix"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -734,6 +2372,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustversion"
+version = "1.0.22"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
+
+[[package]]
 name = "rusty-fork"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -744,6 +2388,12 @@ dependencies = [
  "tempfile",
  "wait-timeout",
 ]
+
+[[package]]
+name = "ryu"
+version = "1.0.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "scopeguard"
@@ -763,6 +2413,17 @@ version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
 dependencies = [
+ "serde_core",
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_bytes"
+version = "0.11.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5d440709e79d88e51ac01c4b72fc6cb7314017bb7da9eeff678aa94c10e3ea8"
+dependencies = [
+ "serde",
  "serde_core",
 ]
 
@@ -800,6 +2461,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_path_to_error"
+version = "0.1.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10a9ff822e371bb5403e391ecd83e182e0e77ba7f6fe0160b795797109d1b457"
+dependencies = [
+ "itoa",
+ "serde",
+ "serde_core",
+]
+
+[[package]]
+name = "serde_spanned"
+version = "0.6.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf41e0cfaf7226dca15e8197172c295a782857fcb97fad1808a166870dee75a3"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "serde_urlencoded"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3491c14715ca2294c4d6a88f15e84739788c1d030eed8c110436aafdaa2f3fd"
+dependencies = [
+ "form_urlencoded",
+ "itoa",
+ "ryu",
+ "serde",
+]
+
+[[package]]
 name = "sha2"
 version = "0.10.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -817,6 +2510,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
+name = "signal-hook-registry"
+version = "1.4.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b"
+dependencies = [
+ "errno",
+ "libc",
+]
+
+[[package]]
+name = "signature"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77549399552de45a898a580c1b41d445bf730df867cc44e6c0233bbc4b8329de"
+dependencies = [
+ "rand_core 0.6.4",
+]
+
+[[package]]
 name = "sized-chunks"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -827,10 +2539,57 @@ dependencies = [
 ]
 
 [[package]]
+name = "slab"
+version = "0.4.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
+
+[[package]]
 name = "smallvec"
 version = "1.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
+
+[[package]]
+name = "socket2"
+version = "0.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52d1cfed4120b4d927bf7c0f86d2087a4a7d6027c906d9f9d525a80573b9be51"
+dependencies = [
+ "libc",
+ "windows-sys",
+]
+
+[[package]]
+name = "spin"
+version = "0.9.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+dependencies = [
+ "lock_api",
+]
+
+[[package]]
+name = "spki"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d91ed6c858b01f942cd56b37a94b3e0a1798290327d1236e4d9cf4eaca44d29d"
+dependencies = [
+ "base64ct",
+ "der",
+]
+
+[[package]]
+name = "stable_deref_trait"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
+
+[[package]]
+name = "subtle"
+version = "2.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 
 [[package]]
 name = "syn"
@@ -844,6 +2603,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "sync_wrapper"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0bf256ce5efdfa370213c1dabab5935a12e49f2c58d15e9eac2870d3b4f27263"
+
+[[package]]
 name = "tempfile"
 version = "3.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -854,6 +2619,163 @@ dependencies = [
  "once_cell",
  "rustix",
  "windows-sys",
+]
+
+[[package]]
+name = "thiserror"
+version = "1.0.69"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
+dependencies = [
+ "thiserror-impl 1.0.69",
+]
+
+[[package]]
+name = "thiserror"
+version = "2.0.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4288b5bcbc7920c07a1149a35cf9590a2aa808e0bc1eafaade0b80947865fbc4"
+dependencies = [
+ "thiserror-impl 2.0.18",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "1.0.69"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "2.0.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ebc4ee7f67670e9b64d05fa4253e753e016c6c95ff35b89b7941d6b856dec1d5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "tokio"
+version = "1.52.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8fc7f01b389ac15039e4dc9531aa973a135d7a4135281b12d7c1bc79fd57fffe"
+dependencies = [
+ "bytes",
+ "libc",
+ "mio",
+ "parking_lot",
+ "pin-project-lite",
+ "signal-hook-registry",
+ "socket2",
+ "tokio-macros",
+ "windows-sys",
+]
+
+[[package]]
+name = "tokio-macros"
+version = "2.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "385a6cb71ab9ab790c5fe8d67f1645e6c450a7ce006a33de03daa956cf70a496"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "toml"
+version = "0.8.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc1beb996b9d83529a9e75c17a1686767d148d70663143c7854d8b4a09ced362"
+dependencies = [
+ "serde",
+ "serde_spanned",
+ "toml_datetime",
+ "toml_edit",
+]
+
+[[package]]
+name = "toml_datetime"
+version = "0.6.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22cddaf88f4fbc13c51aebbf5f8eceb5c7c5a9da2ac40a13519eb5b0a0e8f11c"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "toml_edit"
+version = "0.22.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41fe8c660ae4257887cf66394862d21dbca4a6ddd26f04a3560410406a2f819a"
+dependencies = [
+ "indexmap",
+ "serde",
+ "serde_spanned",
+ "toml_datetime",
+ "toml_write",
+ "winnow",
+]
+
+[[package]]
+name = "toml_write"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
+
+[[package]]
+name = "tower"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ebe5ef63511595f1344e2d5cfa636d973292adc0eec1f0ad45fae9f0851ab1d4"
+dependencies = [
+ "futures-core",
+ "futures-util",
+ "pin-project-lite",
+ "sync_wrapper",
+ "tokio",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
+name = "tower-layer"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "121c2a6cda46980bb0fcd1647ffaf6cd3fc79a013de288782836f6df9c48780e"
+
+[[package]]
+name = "tower-service"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8df9b6e13f2d32c91b9bd719c00d1958837bc7dec474d94952798cc8e69eeec3"
+
+[[package]]
+name = "tracing"
+version = "0.1.44"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "63e71662fa4b2a2c3a26f570f037eb95bb1f85397f3cd8076caed2f026a6d100"
+dependencies = [
+ "log",
+ "pin-project-lite",
+ "tracing-core",
+]
+
+[[package]]
+name = "tracing-core"
+version = "0.1.36"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db97caf9d906fbde555dd62fa95ddba9eecfd14cb388e4f491a66d74cd5fb79a"
+dependencies = [
+ "once_cell",
 ]
 
 [[package]]
@@ -969,6 +2891,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "winnow"
+version = "0.7.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df79d97927682d2fd8adb29682d1140b343be4ac0f08fd68b7765d9c059d3945"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "wit-bindgen"
 version = "0.51.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1076,6 +3007,26 @@ name = "zerocopy-derive"
 version = "0.8.48"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "70e3cd084b1788766f53af483dd21f93881ff30d7320490ec3ef7526d203bad4"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "zeroize"
+version = "1.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b97154e67e32c85465826e8bcc1c59429aaaf107c1e4a9e53c8d8ccd5eff88d0"
+dependencies = [
+ "zeroize_derive",
+]
+
+[[package]]
+name = "zeroize_derive"
+version = "1.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85a5b4158499876c763cb03bc4e49185d3cccbabb15b33c627f7884f43db852e"
 dependencies = [
  "proc-macro2",
  "quote",

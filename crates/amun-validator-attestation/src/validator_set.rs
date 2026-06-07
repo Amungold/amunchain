@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use amun_kernel_types::epoch::Epoch;
 
 #[derive(Debug, Clone)]
 pub struct ValidatorInfo {
@@ -9,15 +10,14 @@ pub struct ValidatorInfo {
 
 #[derive(Debug, Clone)]
 pub struct ValidatorSet {
-    #[allow(dead_code)]
-    pub epoch: u64,
+    pub epoch: Epoch,
     validators: BTreeMap<u64, ValidatorInfo>,
     total_stake: u64,
     quorum_threshold: u64,
 }
 
 impl ValidatorSet {
-    pub fn new(epoch: u64, validators: Vec<ValidatorInfo>) -> Result<Self, ValidatorSetError> {
+    pub fn new(epoch: Epoch, validators: Vec<ValidatorInfo>) -> Result<Self, ValidatorSetError> {
         if validators.is_empty() {
             return Err(ValidatorSetError::EmptySet);
         }

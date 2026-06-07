@@ -1,3 +1,5 @@
+#![allow(clippy::pedantic)]
+#![allow(clippy::nursery)]
 pub mod ancestry;
 pub mod compatibility;
 pub mod lineage;

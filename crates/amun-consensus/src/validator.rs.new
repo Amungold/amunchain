@@ -1,0 +1,89 @@
+use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
+use crate::types::Hash256;
+
+/// A single validator in the active set.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Validator {
+    /// Unique identifier (certificate hash from constitutional PKI).
+    pub id: Hash256,
+    /// Relative weight for quorum calculations.
+    pub voting_power: u64,
+}
+
+/// The ordered set of validators for a given epoch.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ValidatorSet {
+    pub validators: Vec<Validator>,
+    /// Sum of all voting_power values.
+    pub total_power: u64,
+}
+
+impl ValidatorSet {
+    /// Create a new set from a list of validators.
+    /// Validators are kept in the order they are given – ordering is
+    /// consensus-critical so the caller must ensure determinism.
+    /// Duplicate IDs are rejected.
+    pub fn new(validators: Vec<Validator>) -> Result<Self, String> {
+        let mut ids = HashSet::new();
+        for v in &validators {
+            if !ids.insert(v.id) {
+                return Err(format!("duplicate validator id: {:?}", v.id));
+            }
+        }
+        let total_power = validators.iter().map(|v| v.voting_power).sum();
+        Ok(Self { validators, total_power })
+    }
+
+    /// Total voting power in the set.
+    pub fn total_power(&self) -> u64 {
+        self.total_power
+    }
+
+    /// Check whether a given amount of voting power meets the
+    /// two-thirds supermajority threshold (2f+1 safety).
+    pub fn has_quorum(&self, voting_power: u64) -> bool {
+        (voting_power as u128) * 3 > (self.total_power as u128) * 2
+    }
+
+    /// Check whether a given amount of voting power meets the
+    /// simple majority threshold (+1/2).
+    pub fn has_majority(&self, voting_power: u64) -> bool {
+        (voting_power as u128) * 2 > (self.total_power as u128)
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_validator(id: u8) -> Validator {
+        Validator { id: [id; 32], voting_power: 10 }
+    }
+
+    #[test]
+    fn test_quorum_math() {
+        let vs = ValidatorSet::new(vec![
+            make_validator(1),
+            make_validator(2),
+            make_validator(3),
+        ]).unwrap();
+
+        // 20 out of 30 is exactly two-thirds -> NOT enough for strict supermajority
+        assert!(!vs.has_quorum(20));
+        // 21 out of 30 passes
+        assert!(vs.has_quorum(21));
+        // 15 out of 30 is exactly half -> NOT a majority
+        assert!(!vs.has_majority(15));
+        // 16 out of 30 is a majority
+        assert!(vs.has_majority(16));
+    }
+
+    #[test]
+    fn test_duplicate_rejection() {
+        let result = ValidatorSet::new(vec![
+            make_validator(1),
+            make_validator(1), // duplicate
+        ]);
+        assert!(result.is_err());
+    }
+}

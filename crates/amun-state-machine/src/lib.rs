@@ -1,3 +1,5 @@
+#![allow(clippy::pedantic)]
+#![allow(clippy::nursery)]
 #![allow(clippy::all)]
 
 pub mod absolute_invariants;

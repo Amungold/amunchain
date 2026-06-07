@@ -1,3 +1,5 @@
+#![allow(clippy::pedantic)]
+#![allow(clippy::nursery)]
 // Constitutional Amendment System
 // Governed evolution through formal amendment proposals.
 

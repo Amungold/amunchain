@@ -1,0 +1,214 @@
+crates/amun-audit/tests/audit_layer06_replay.rs:    // CONST-REPLAY-001: Replay produces identical state
+crates/amun-audit/tests/audit_layer06_replay.rs:                    "CONST-REPLAY-001: Expected 1 frame, got {}",
+crates/amun-audit/tests/audit_layer06_replay.rs:                    "CONST-REPLAY-001 VIOLATION: Replayed root diverges"
+crates/amun-audit/tests/audit_layer06_replay.rs:            Err(e) => panic!("CONST-REPLAY-001: Replay failed: {}", e),
+crates/amun-audit/tests/audit_layer06_replay.rs:    // CONST-REPLAY-002: Replay detects state root divergence
+crates/amun-audit/tests/audit_layer06_replay.rs:            "CONST-REPLAY-002 VIOLATION: Must detect divergence, got Ok"
+crates/amun-audit/tests/audit_layer06_replay.rs:    // CONST-REPLAY-003: Replay detects epoch regression
+crates/amun-audit/tests/audit_layer06_replay.rs:            "CONST-REPLAY-003 VIOLATION: Must detect epoch regression, got Ok"
+crates/amun-audit/tests/audit_layer02_geometry.rs:    // CONST-GEO-005: MAX_DEPTH is exactly 256
+crates/amun-audit/tests/audit_layer02_geometry.rs:            amun_storage_kernel::smt::tree::MAX_DEPTH,
+crates/amun-audit/tests/audit_layer02_geometry.rs:            "CONST-GEO-005 VIOLATION: MAX_DEPTH must be exactly 256"
+crates/amun-audit/tests/audit_layer09_freeze.rs:    // CONST-FREEZE-001: MAX_DEPTH is frozen at 256
+crates/amun-audit/tests/audit_layer09_freeze.rs:            amun_storage_kernel::smt::tree::MAX_DEPTH,
+crates/amun-audit/tests/audit_layer09_freeze.rs:            "CONST-FREEZE-001 VIOLATION: MAX_DEPTH must be exactly 256"
+crates/amun-audit/tests/audit_layer01_physics.rs:        PROTOCOL_DOMAIN_MANIFEST, PROTOCOL_DOMAIN_SNAPSHOT, PROTOCOL_DOMAIN_WAL,
+crates/amun-audit/tests/audit_layer01_physics.rs:            ("SNAPSHOT", PROTOCOL_DOMAIN_SNAPSHOT),
+crates/amun-audit/tests/audit_layer08_domains.rs:        PROTOCOL_CHAIN_ID, PROTOCOL_DOMAIN_BRANCH, PROTOCOL_DOMAIN_CHUNK,
+crates/amun-audit/tests/audit_layer08_domains.rs:        PROTOCOL_DOMAIN_LINEAGE, PROTOCOL_DOMAIN_MANIFEST, PROTOCOL_DOMAIN_SNAPSHOT,
+crates/amun-audit/tests/audit_layer08_domains.rs:            ("SNAPSHOT", PROTOCOL_DOMAIN_SNAPSHOT),
+crates/amun-audit/tests/audit_layer08_domains.rs:            PROTOCOL_CHAIN_ID.len(),
+crates/amun-audit/tests/audit_layer08_domains.rs:            PROTOCOL_CHAIN_ID, [0u8; 32],
+crates/amun-audit/tests/audit_layer08_domains.rs:            PROTOCOL_DOMAIN_SNAPSHOT,
+crates/amun-audit/tests/audit_layer16_mutation.rs:    // CONST-MUT-001: Changing MAX_DEPTH would be detected by audit
+crates/amun-audit/tests/audit_layer16_mutation.rs:        let depth = amun_storage_kernel::smt::tree::MAX_DEPTH;
+crates/amun-audit/tests/audit_layer16_mutation.rs:            "CONST-MUT-001: MAX_DEPTH mutation detected - must be 256, got {}",
+crates/amun-audit/src/lib.rs://   CONST-REPLAY-* -> amun-storage-kernel/src/persistence/wal
+crates/amun-snapshot-constitution/src/snapshot.rs:        h.update(b"AMUN_SNAPSHOT_CTX_V3");
+crates/amun-snapshot-constitution/src/snapshot.rs:        h.update(b"AMUN_SNAPSHOT_V5");
+crates/amun-snapshot-constitution/src/snapshot.rs:        h.update(b"AMUN_SNAPSHOT_V5");
+crates/amun-canonical-codec/src/constants.rs:pub const PROTOCOL_DOMAIN_SNAPSHOT: &[u8] = b"AMUN_SNAPSHOT_V1";
+crates/amun-canonical-codec/src/constants.rs:pub const PROTOCOL_CHAIN_ID: [u8; 32] = [
+crates/amun-constitution-builder/src/treaty.rs:        b"AMUN_TREATY_V1"
+crates/amun-constitution-builder/src/treaty.rs:        lines.push("CONSTITUTIONAL TREATY v1".to_string());
+crates/amun-chain-position/src/lib.rs:        h.update(b"AMUN_EPOCH_SEAL_V1");
+crates/amun-chain-position/src/lib.rs:        h.update(b"AMUN_EPOCH_SEAL_V1");
+crates/amun-codec/src/domain.rs:            Self::Block => &BLOCK_KEY,
+crates/amun-codec/src/domain.rs:            Self::EpochBoundary => &EPOCH_KEY,
+crates/amun-codec/src/domain.rs:const BLOCK_KEY: [u8; 32] = [0x01u8; 32];
+crates/amun-codec/src/domain.rs:const EPOCH_KEY: [u8; 32] = [0x08u8; 32];
+crates/amun-replay-semantics/src/lib.rs:        let mut h = Sha256::new(); h.update(b"AMUN|REPLAY_CERT|V1"); h.update((self.domain as u8).to_le_bytes()); h.update(self.epoch.epoch_id);
+crates/amun-storage-kernel/tests/compute_real_empty_root.rs:        println!("REAL_CANONICAL_EMPTY_ROOT: {:?}", root);
+crates/amun-storage-kernel/tests/canonical_constants.rs:    use amun_storage_kernel::smt::constants::CANONICAL_EMPTY_ROOT_V1;
+crates/amun-storage-kernel/tests/canonical_constants.rs:            CANONICAL_EMPTY_ROOT_V1, computed,
+crates/amun-storage-kernel/tests/canonical_constants.rs:            "CANONICAL_EMPTY_ROOT_V1 constant must match runtime empty tree root"
+crates/amun-storage-kernel/tests/specification_compliance.rs:    use amun_storage_kernel::{smt::constants::CANONICAL_EMPTY_ROOT_V1, Key256, SparseMerkleTree};
+crates/amun-storage-kernel/tests/specification_compliance.rs:            CANONICAL_EMPTY_ROOT_V1,
+crates/amun-storage-kernel/src/smt/mod.rs:pub use constants::CANONICAL_EMPTY_ROOT_V1;
+crates/amun-storage-kernel/src/smt/constants.rs:pub const CANONICAL_EMPTY_ROOT_V1: [u8; 32] = [
+crates/amun-storage-kernel/src/smt/proof.rs:use super::tree::MAX_DEPTH;
+crates/amun-storage-kernel/src/smt/proof.rs:        if self.steps.len() != MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/proof.rs:                let actual_div = (0..MAX_DEPTH)
+crates/amun-storage-kernel/src/smt/proof.rs:                    .unwrap_or(MAX_DEPTH);
+crates/amun-storage-kernel/src/smt/proof.rs:        if step_count != MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:pub const MAX_DEPTH: usize = 256;
+crates/amun-storage-kernel/src/smt/tree.rs:        if depth >= MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:                    if div >= MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:        (start..MAX_DEPTH)
+crates/amun-storage-kernel/src/smt/tree.rs:            .unwrap_or(MAX_DEPTH)
+crates/amun-storage-kernel/src/smt/tree.rs:        if depth >= MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:            return self.empty_ladder[MAX_DEPTH];
+crates/amun-storage-kernel/src/smt/tree.rs:        if depth >= MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:        let mut steps = Vec::with_capacity(MAX_DEPTH);
+crates/amun-storage-kernel/src/smt/tree.rs:        if steps.len() != MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:        if depth >= MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:                    for d in depth..MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:                    let mut steps = Vec::with_capacity(MAX_DEPTH);
+crates/amun-storage-kernel/src/smt/tree.rs:                    for d in 0..MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:                    if steps.len() != MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:                let mut steps = Vec::with_capacity(MAX_DEPTH);
+crates/amun-storage-kernel/src/smt/tree.rs:                if steps.len() != MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:                        let div = (0..MAX_DEPTH)
+crates/amun-storage-kernel/src/smt/tree.rs:                            .unwrap_or(MAX_DEPTH);
+crates/amun-storage-kernel/src/smt/tree.rs:        if depth >= MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs:        if depth >= MAX_DEPTH {
+crates/amun-snapshot-engine/src/constitutional_identity.rs:use amun_canonical_codec::{PROTOCOL_CHAIN_ID, PROTOCOL_DOMAIN_CONSTITUTION};
+crates/amun-snapshot-engine/src/constitutional_identity.rs:            chain_id: PROTOCOL_CHAIN_ID,
+crates/amun-snapshot-engine/src/snapshot.rs:pub const SNAPSHOT_VERSION_V1: u32 = 1;
+crates/amun-snapshot-engine/src/snapshot.rs:pub const SNAPSHOT_MAGIC: &[u8; 4] = b"AMSN";
+crates/amun-snapshot-engine/src/snapshot.rs:        if [m0, m1, m2, m3] != *SNAPSHOT_MAGIC {
+crates/amun-snapshot-engine/src/snapshot.rs:        if snapshot_version != SNAPSHOT_VERSION_V1 {
+crates/amun-snapshot-engine/src/snapshot.rs:            magic: *SNAPSHOT_MAGIC,
+crates/amun-snapshot/src/state.rs:            .sign(&self.state_root, b"AMUN_SNAPSHOT_V4", chain_id)
+crates/amun-snapshot/src/state.rs:                Ed25519Signer::verify(pk, &self.state_root, sig, b"AMUN_SNAPSHOT_V4", chain_id)
+crates/amun-constitutional/src/hash_domains.rs:pub const DOMAIN_REPLAY_OUTCOME: &[u8] = b"REPLAY_OUTCOME";
+crates/amun-constitutional/src/hash_domains.rs:pub const DOMAIN_REPLAY_CERTIFICATE: &[u8] = b"REPLAY_CERTIFICATE";
+crates/amun-constitutional/src/hash_domains.rs:            DOMAIN_REPLAY_OUTCOME,
+crates/amun-constitutional/src/hash_domains.rs:            DOMAIN_REPLAY_CERTIFICATE,
+crates/amun-constitutional/src/restoration_point.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/replay_certificate.rs://!   Certificate AUTHORITY (finality) is determined by the consensus layer.
+crates/amun-constitutional/src/replay_certificate.rs:use crate::hash_domains::DOMAIN_REPLAY_CERTIFICATE;
+crates/amun-constitutional/src/replay_certificate.rs:        let mut h = ConstitutionalHasher::new(DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/witness_type.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/causality_type.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/replay_outcome.rs:        let mut h = ConstitutionalHasher::new(crate::hash_domains::DOMAIN_REPLAY_OUTCOME);
+crates/amun-constitutional/src/divergence_type.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/architectural_invariants.rs:pub const INVARIANT_CERTIFICATE_NON_AUTHORITY: &str =
+crates/amun-constitutional/src/architectural_invariants.rs:    INVARIANT_REPLAY_DERIVED_STATE_IDENTITY,
+crates/amun-constitutional/src/architectural_invariants.rs:    INVARIANT_NETWORK_PHENOMENON_AUTHORITY,
+crates/amun-constitutional/src/architectural_invariants.rs:    INVARIANT_CERTIFICATE_NON_AUTHORITY,
+crates/amun-constitutional/src/architectural_invariants.rs:pub const INVARIANT_REPLAY_DERIVED_STATE_IDENTITY: &str =
+crates/amun-constitutional/src/architectural_invariants.rs:pub const INVARIANT_NETWORK_PHENOMENON_AUTHORITY: &str =
+crates/amun-constitutional/src/architectural_invariants.rs:pub const INVARIANT_RECONCILIATION_NON_AUTHORITY: &str =
+crates/amun-constitutional/src/causality_chain.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/causality_chain.rs:                    failure_type::REPLAY_DIVERGENCE,
+crates/amun-constitutional/src/causality_chain.rs:                    failure_type::REPLAY_DIVERGENCE,
+crates/amun-constitutional/src/continuation_chain.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/continuation_chain.rs:                failure_domain::REPLAY,
+crates/amun-constitutional/src/continuation_chain.rs:                failure_domain::REPLAY,
+crates/amun-constitutional/src/divergence_resolution.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/divergence_resolution.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/certificate_scope.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/hash_domain_registry.rs:    pub const REPLAY_OUTCOME: &[u8] = b"REPLAY_OUTCOME";
+crates/amun-constitutional/src/hash_domain_registry.rs:    pub const REPLAY_CERTIFICATE: &[u8] = b"REPLAY_CERTIFICATE";
+crates/amun-constitutional/src/hash_domain_registry.rs:    pub const SNAPSHOT: &[u8] = b"SNAPSHOT";
+crates/amun-constitutional/src/hash_domain_registry.rs:    pub const SNAPSHOT_SCOPE: &[u8] = b"SNAPSHOT_SCOPE";
+crates/amun-constitutional/src/hash_domain_registry.rs:    pub const SNAPSHOT_OUTCOME: &[u8] = b"SNAPSHOT_OUTCOME";
+crates/amun-constitutional/src/hash_domain_registry.rs:            constitutional_domains::REPLAY_OUTCOME,
+crates/amun-constitutional/src/hash_domain_registry.rs:            constitutional_domains::REPLAY_CERTIFICATE,
+crates/amun-constitutional/src/hash_domain_registry.rs:            constitutional_domains::SNAPSHOT,
+crates/amun-constitutional/src/hash_domain_registry.rs:            constitutional_domains::REPLAY_CERTIFICATE,
+crates/amun-constitutional/src/divergence_point.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/state_anchor_scope.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/constitutional_witness.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/snapshot.rs://! Snapshot identity is REPLAY-DERIVED, not storage-derived.
+crates/amun-constitutional/src/snapshot.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/snapshot.rs:        h.update_bytes(b"SNAPSHOT")
+crates/amun-constitutional/src/causal_edge.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/snapshot_scope.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/snapshot_scope.rs:        h.update_bytes(b"SNAPSHOT_OUTCOME").update_u8(*self as u8);
+crates/amun-constitutional/src/snapshot_scope.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/snapshot_scope.rs:        h.update_bytes(b"SNAPSHOT_SCOPE")
+crates/amun-constitutional/src/schema_registry.rs:    pub const REPLAY_CERTIFICATE: u16 = 0x000D;
+crates/amun-constitutional/src/schema_registry.rs:    pub const SNAPSHOT: u16 = 0x000F;
+crates/amun-constitutional/src/schema_registry.rs:            REPLAY_CERTIFICATE,
+crates/amun-constitutional/src/schema_registry.rs:            SNAPSHOT,
+crates/amun-constitutional/src/schema_registry.rs:            REPLAY_CERTIFICATE,
+crates/amun-constitutional/src/schema_registry.rs:            SNAPSHOT,
+crates/amun-constitutional/src/constitutional_failure.rs:    pub const REPLAY: u8 = 0x07;
+crates/amun-constitutional/src/constitutional_failure.rs:    pub const REPLAY_DIVERGENCE: u16 = 0x05;
+crates/amun-constitutional/src/execution_journal.rs:                failure_domain::REPLAY,
+crates/amun-constitutional/src/execution_journal.rs:                failure_domain::REPLAY,
+crates/amun-constitutional/src/execution_journal.rs:                    failure_type::REPLAY_DIVERGENCE,
+crates/amun-constitutional/src/execution_journal.rs:                    failure_domain::REPLAY,
+crates/amun-constitutional/src/execution_journal.rs:                failure_type::REPLAY_DIVERGENCE,
+crates/amun-constitutional/src/execution_journal.rs:                failure_domain::REPLAY,
+crates/amun-constitutional/src/state_anchor.rs://! It is REPLAY-DERIVED: the state root is an output of replay, not storage.
+crates/amun-constitutional/src/state_anchor.rs:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-kernel/src/governance.rs:        let id = CanonicalEncoder::hash_value(&public_key, domain_tags::AUTHORITY);
+crates/amun-kernel/src/governance.rs:        CanonicalEncoder::hash_value(&sorted, domain_tags::AUTHORITY)
+crates/amun-kernel/src/governance.rs:        CanonicalEncoder::hash_value(self, domain_tags::SNAPSHOT)
+crates/amun-kernel/src/hashing.rs:    pub const SNAPSHOT: &[u8] = b"AMUN_SNAPSHOT_V1";
+crates/amun-kernel/src/hashing.rs:    pub const REPLAY: &[u8] = b"AMUN_REPLAY_V1";
+crates/amun-kernel/src/hashing.rs:    pub const AUTHORITY: &[u8] = b"AMUN_AUTHORITY_V1";
+crates/amun-ntr/src/presale.rs:            vesting_duration_blocks: NTR_PRESALE_VESTING_BLOCKS,
+crates/amun-ntr/src/constants.rs:pub const NTR_BLOCK_REWARD: u64 = 1_000_000_000_000_000;
+crates/amun-ntr/src/constants.rs:pub const NTR_PRESALE_VESTING_BLOCKS: u64 = 262_800;
+crates/amun-ntr/src/constants.rs:pub const NTR_TEAM_VESTING_BLOCKS: u64 = 525_600;
+crates/amun-constitutional-block/src/block.rs:        hasher.update(b"AMUN_BLOCK_V1");
+crates/amun-replay-engine/src/canonical.rs:// CANONICAL BYTE CONTRACT — LAYER ZERO OF REPLAY PHYSICS
+crates/amun-replay-engine/src/lib.rs:// AMUN REPLAY ENGINE — CONSTITUTIONAL REPLAY RUNTIME
+crates/amun-replay-engine/src/errors.rs:// REPLAY ERRORS — DETERMINISTIC, NO EXTERNAL DEPENDENCIES
+crates/amun-replay-engine/src/state.rs:// REPLAY STATE — IMMUTABLE-STYLE CONSTITUTIONAL STATE EVOLUTION
+crates/amun-replay-engine/src/version.rs:pub const REPLAY_PROTOCOL_VERSION: u32 = 1;
+crates/amun-replay-engine/src/version.rs:pub const PROTOCOL_VERSION_DOMAIN: &[u8] = b"AMUN_REPLAY_PROTOCOL_V1";
+crates/amun-failure/src/taxonomy.rs:    pub const QUORUM_TRANSITION: u16 = 0x0304;
+crates/amun-failure/src/taxonomy.rs:    pub const QUORUM_CONTINUITY: u16 = 0x0305;
+crates/amun-failure/src/taxonomy.rs:    pub const WEIGHTED_QUORUM_TRANSITION: u16 = 0x0A01;
+crates/amun-epoch-transition/src/transition.rs:        h.update(b"AMUN_EPOCH_TRANSITION_V1");
+crates/amun-epoch-transition/src/transition.rs:        h.update(b"AMUN_EPOCH_TRANSITION_V1");
+crates/amun-constitutional-semantics/src/lib.rs:    pub const CONSENSUS_AUTHORITATIVE: Self = Self { authority: EventAuthority::Authoritative, replay_required: true, divergence_is_violation: true, contributes_to_causality: true, can_be_checkpoint: true, requires_certification: true };
+crates/amun-constitutional-semantics/src/lib.rs:    #[test] fn test_replay_policy() { assert!(ReplayPolicy::CONSENSUS_AUTHORITATIVE.replay_required); assert!(!ReplayPolicy::EPHEMERAL.replay_required); }
+crates/amun-state-root/src/laws.rs:pub const REPLAY_EQUIVALENCE_LAW: &str = "assert_eq!(live_execution_hash, replay_hash)";
+crates/amun-state-root/src/laws.rs:pub const SNAPSHOT_CONTINUITY_LAW: &str =
+crates/amun-state-root/src/laws.rs:pub const CHAIN_IDENTITY_LAW: &str = "assert_eq!(current_identity_root, genesis_identity_root)";
+crates/amun-state-root/src/snapshot.rs:        CanonicalEncoder::hash_value(self, domain_tags::SNAPSHOT)
+crates/amun-constitution/src/economics.rs:pub const MAX_HASH_OPS_PER_BLOCK: u64 = 10_000;
+crates/amun-constitution/src/economics.rs:pub const MAX_SIGNATURE_OPS_PER_BLOCK: u64 = 1_000;
+crates/amun-constitution/src/economics.rs:            hash_ops_remaining: MAX_HASH_OPS_PER_BLOCK,
+crates/amun-constitution/src/economics.rs:            signature_ops_remaining: MAX_SIGNATURE_OPS_PER_BLOCK,
+crates/amun-constitution/src/gas.rs:    pub const MAX_GAS_PER_BLOCK: u64 = 10_000_000;
+crates/amun-constitution/src/freeze_map.rs:                field_name: "MAX_DEPTH",
+crates/amun-constitution/src/freeze_map.rs:                field_name: "CANONICAL_EMPTY_ROOT_V1",
+crates/amun-block/src/limits.rs:pub const CONSTITUTIONAL_MAX_BLOCK_BYTES: usize = 1_048_576;
+crates/amun-block/src/limits.rs:            max_block_bytes: CONSTITUTIONAL_MAX_BLOCK_BYTES as u32,
+crates/amun-block/src/block.rs:use crate::limits::CONSTITUTIONAL_MAX_BLOCK_BYTES;
+crates/amun-block/src/block.rs:    const MAX_ENCODED_SIZE: usize = CONSTITUTIONAL_MAX_BLOCK_BYTES;
+crates/amun-block/src/block.rs:        if total > CONSTITUTIONAL_MAX_BLOCK_BYTES {
+crates/amun-stf/src/transition.rs:        let mut block_gas = GasMeter::new(gas_costs::MAX_GAS_PER_BLOCK);
+crates/amun_consensus_math/tests/replay_binary.rs:    println!("\n=== BINARY REPLAY TEST PASSED ===");
+crates/amun-consensus-messages/src/message.rs:        h.update(b"AMUN_CONSENSUS_MSG_V1");
+crates/amun-consensus-messages/src/message.rs:        h.update(b"AMUN_CONSENSUS_MSG_V1");
+crates/amun-canonical-collections/src/lib.rs://!   - REPLAY-SAFE: canonical_root() produces verifiable commitments
+crates/amun-consensus/src/lib.rs:pub const CHAIN_ID: &str = "amun_constitutional";
+crates/amun-consensus/src/lib.rs:            chain_id: CHAIN_ID,
+crates/amun-consensus/src/consensus/ancestry.rs:    pub const MAX_DEPTH: usize = 100;
+crates/amun-consensus/src/consensus/ancestry.rs:        while depth < Self::MAX_DEPTH {
+crates/amun-consensus/src/consensus/invariants.rs:    pub const EPOCH_DETERMINISM: &'static str = 
+crates/amun-consensus/src/consensus/invariants.rs:    pub const AUTHORITY_CONTINUITY: &'static str = 
+crates/amun-consensus/src/consensus/invariants.rs:            Self::EPOCH_DETERMINISM,
+crates/amun-consensus/src/consensus/invariants.rs:            Self::AUTHORITY_CONTINUITY,
+crates/amun-consensus/src/consensus/pacemaker.rs://! PANIC-FREE CONSENSUS PATH - all operations return Result
+crates/amun-consensus/src/constitutional_fork/mod.rs:            Self::AuthorityForkWithOrigin => write!(f, "AUTHORITY_FORK_WITH_ORIGIN"),
+crates/amun-consensus/src/constitutional_fork/mod.rs:            Self::AuthorityForkSuffocated => write!(f, "AUTHORITY_FORK_SUFFOCATED"),
+crates/amun-consensus/src/replay/certificate.rs:        encoder.write_bytes(b"AMUN_REPLAY_CERT_V1");
+crates/amun-consensus/src/ordering.rs:        - Deviation from this order = CONSENSUS VIOLATION
+crates/amun-consensus/src/storage/constants.rs:pub const MAX_SNAPSHOT_SIZE: usize = 256 * 1024 * 1024;
+crates/amun-consensus/src/storage/traversal_law.rs:    pub const MAX_DEPTH: usize = 256;
+crates/amun-consensus-execution/src/commit.rs:        const MAX_DEPTH: usize = 50_000;
+crates/amun-consensus-execution/src/commit.rs:            if depth >= MAX_DEPTH || !visited.insert(hash) {
+crates/amun-replay-cert/src/certificate.rs:        h.update(b"AMUN_REPLAY_CERT_V2");
+crates/amun-replay-cert/src/certificate.rs:        h.update(b"AMUN_REPLAY_CERT_V2");
+crates/amun-replay-cert/src/certifier.rs:            hasher.update(b"AMUN_REPLAY_CERT_V1");
+crates/amun-state-machine/src/absolute_invariants.rs:    /// MAX_DEPTH=256 is a universal constant of this universe
+crates/amun-state-machine/src/replay_log.rs:        let mut h = CanonicalHasher::with_domain(b"AMUN_REPLAY_LOG_V1");

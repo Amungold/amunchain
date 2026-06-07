@@ -1,0 +1,17 @@
+[package]
+name = "amun-constitutional-governance"
+version = "1.0.0"
+edition = "2021"
+license = "AGPL-3.0-or-later"
+description = "Constitutional governance primitives: capabilities, delegation, quorum, voting, amendments"
+
+[dependencies]
+amun-constitution-builder = { path = "../amun-constitution-builder" }
+amun-constitutional-signing = { path = "../amun-constitutional-signing" }
+amun-constitutional-authority = { path = "../amun-constitutional-authority" }
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand = "0.8"
+hex = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+blake3 = "1"

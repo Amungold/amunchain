@@ -1,7 +1,15 @@
 [package]
 name = "amun-light-client"
-license = "MIT OR Apache-2.0"
 version = "1.0.0"
 edition = "2021"
+description = "Constitutional light client — verifies certificates, chains, and history roots"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
+amun-resource-core = { path = "../amun-resource-core" }
+amun-transition-proof = { path = "../amun-transition-proof" }
+amun-constitutional-runtime = { path = "../amun-constitutional-runtime" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+blake3 = "1"
+hex = "0.4"

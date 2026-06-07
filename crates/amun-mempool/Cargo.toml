@@ -1,9 +1,12 @@
 [package]
 name = "amun-mempool"
-version = "3.0.0"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
 edition = "2021"
-description = "AmunChain mempool"
+description = "Constitutional mempool for pending transactions"
 
 [dependencies]
-amun-transaction = { path = "../amun-transaction" }
-heapless = "0.8"
+ed25519-dalek = "2"
+rand = "0.8"
+amun-transactions = { path = "../amun-transactions" }
+serde = { version = "1", features = ["derive"] }

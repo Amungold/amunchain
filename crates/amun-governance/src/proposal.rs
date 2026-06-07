@@ -33,7 +33,7 @@ impl Proposal {
             end_block: end,
         }
     }
-    pub fn is_passing(&self, total: u64) -> bool {
+    pub const fn is_passing(&self, total: u64) -> bool {
         self.yes > self.no && self.yes > total * 33 / 100
     }
 }

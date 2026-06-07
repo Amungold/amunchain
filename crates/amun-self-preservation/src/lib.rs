@@ -1,3 +1,5 @@
+#![allow(clippy::pedantic)]
+#![allow(clippy::nursery)]
 // Constitutional Self-Preservation
 // Meta-constitutional layer: protects the constitution's ability
 // to protect itself. Prevents recursive legitimacy paradoxes,

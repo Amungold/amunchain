@@ -1,0 +1,1174 @@
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-170-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-171-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-172-                    };
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-173-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-174-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-175-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-176-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-177-                    };
+crates/amun-networking/tests/v2_014b_delivery_trace.rs:178:                    drop(node);
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-179-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-180-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-181-                    }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-182-                }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-183-            }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-184-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-185-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-186-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-190-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-191-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-192-                        };
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-193-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-194-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-195-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-196-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-197-                        };
+crates/amun-networking/tests/v2_014b_delivery_trace.rs:198:                        drop(node);
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-199-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-200-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-201-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-202-                        }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-203-                    }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-204-                }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-205-            }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-206-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-212-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-213-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-214-                        };
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-215-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-216-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-217-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-218-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-219-                        };
+crates/amun-networking/tests/v2_014b_delivery_trace.rs:220:                        drop(node);
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-221-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-222-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-223-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-224-                        }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-225-                    }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-226-                }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-227-            }
+crates/amun-networking/tests/v2_014b_delivery_trace.rs-228-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-156-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-157-                    };
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-158-                    eprintln!("[PROPOSAL_INJECTED] round={} leader={}", self.round, node_id);
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-159-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-160-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-161-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-162-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-163-                    };
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs:164:                    drop(node);
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-165-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-166-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-167-                    }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-168-                }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-169-            }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-170-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-171-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-172-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-176-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-177-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-178-                        };
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-179-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-180-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-181-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-182-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-183-                        };
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs:184:                        drop(node);
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-185-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-186-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-187-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-188-                        }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-189-                    }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-190-                }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-191-            }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-192-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-198-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-199-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-200-                        };
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-201-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-202-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-203-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-204-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-205-                        };
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs:206:                        drop(node);
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-207-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-208-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-209-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-210-                        }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-211-                    }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-212-                }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-213-            }
+crates/amun-networking/tests/v2_015b_timeout_diagnostic.rs-214-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-164-                height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-165-                round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-166-            };
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-167-            let envelope = Envelope {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-168-                sender: leader_name.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-169-                sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-170-                payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-171-            };
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:172:            drop(node);
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-173-            for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-174-                self.broadcast_message(&leader_name, envelope.clone(), true);
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-175-            }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-176-        }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-177-    }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-178-
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-179-    fn process_event(&mut self, event: ScheduledEvent) {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-180-        self.current_time = event.time;
+--
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-193-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-194-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-195-                        };
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-196-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-197-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-198-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-199-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-200-                        };
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:201:                        drop(node);
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-202-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-203-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-204-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-205-                        }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-206-                    }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-207-                }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-208-            }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-209-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-215-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-216-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-217-                        };
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-218-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-219-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-220-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-221-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-222-                        };
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:223:                        drop(node);
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-224-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-225-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-226-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-227-                        }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-228-                    }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-229-                }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-230-            }
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs-231-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-122-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-123-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-124-                    };
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-125-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-126-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-127-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-128-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-129-                    };
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs:130:                    drop(node);
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-131-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-132-                }
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-133-            }
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-134-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-135-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-136-                if !node.prevotes_broadcast {
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-137-                    if let Some(ref prop) = node.last_proposal {
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-138-                        let vote = Vote {
+--
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-140-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-141-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-142-                        };
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-143-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-144-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-145-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-146-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-147-                        };
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs:148:                        drop(node);
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-149-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-150-                        self.total_prevotes_sent += 1;
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-151-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-152-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-153-                        }
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-154-                    }
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-155-                }
+crates/amun-networking/tests/v2_007_prevote_delivery_trace.rs-156-            }
+--
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-146-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-147-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-148-                    };
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-149-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-150-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-151-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-152-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-153-                    };
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs:154:                    drop(node);
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-155-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-156-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-157-                    }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-158-                }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-159-            }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-160-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-161-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-162-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-167-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-168-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-169-                        };
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-170-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-171-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-172-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-173-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-174-                        };
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs:175:                        drop(node);
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-176-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-177-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-178-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-179-                        }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-180-                    }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-181-                }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-182-            }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-183-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-189-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-190-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-191-                        };
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-192-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-193-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-194-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-195-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-196-                        };
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs:197:                        drop(node);
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-198-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-199-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-200-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-201-                        }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-202-                    }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-203-                }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-204-            }
+crates/amun-networking/tests/v2_011_baseline_revalidation.rs-205-            EventType::ProcessInbox => {
+--
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-206-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-207-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-208-                    };
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-209-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-210-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-211-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-212-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-213-                    };
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs:214:                    drop(node);
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-215-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-216-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-217-                    }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-218-                }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-219-            }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-220-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-221-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-222-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-226-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-227-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-228-                        };
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-229-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-230-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-231-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-232-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-233-                        };
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs:234:                        drop(node);
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-235-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-236-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-237-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-238-                            n.time_entered_prevote = Some(self.current_time);
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-239-                        }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-240-                    }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-241-                }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-242-            }
+--
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-249-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-250-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-251-                        };
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-252-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-253-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-254-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-255-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-256-                        };
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs:257:                        drop(node);
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-258-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-259-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-260-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-261-                            n.time_entered_precommit = Some(self.current_time);
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-262-                        }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-263-                    }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-264-                }
+crates/amun-networking/tests/v2_011_temporal_delay_framework.rs-265-            }
+--
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-179-                            voter: node.validator.id, round: prop.round,
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-180-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-181-                        };
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-182-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-183-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-184-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-185-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-186-                        };
+crates/amun-networking/tests/v2_015c_recovery_fix.rs:187:                        drop(node);
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-188-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-189-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-190-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-191-                        }
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-192-                    }
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-193-                }
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-194-            }
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-195-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-201-                            voter: node.validator.id, round: prop.round,
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-202-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-203-                        };
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-204-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-205-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-206-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-207-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-208-                        };
+crates/amun-networking/tests/v2_015c_recovery_fix.rs:209:                        drop(node);
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-210-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-211-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-212-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-213-                        }
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-214-                    }
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-215-                }
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-216-            }
+crates/amun-networking/tests/v2_015c_recovery_fix.rs-217-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-113-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-114-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-115-                    };
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-116-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-117-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-118-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-119-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-120-                    };
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs:121:                    drop(node);
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-122-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-123-                }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-124-            }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-125-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-126-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-127-                if !node.prevotes_broadcast {
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-128-                    if let Some(ref prop) = node.last_proposal {
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-129-                        let vote = Vote {
+--
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-131-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-132-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-133-                        };
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-134-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-135-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-136-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-137-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-138-                        };
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs:139:                        drop(node);
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-140-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-141-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-142-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-143-                        }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-144-                    }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-145-                }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-146-            }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-147-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-153-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-154-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-155-                        };
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-156-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-157-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-158-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-159-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-160-                        };
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs:161:                        drop(node);
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-162-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-163-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-164-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-165-                        }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-166-                    }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-167-                }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-168-            }
+crates/amun-networking/tests/v2_010a_proposal_dedup_fix.rs-169-            EventType::ProcessInbox => {
+--
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-158-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-159-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-160-                    };
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-161-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-162-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-163-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-164-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-165-                    };
+crates/amun-networking/tests/v2_014_delay_stress_test.rs:166:                    drop(node);
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-167-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-168-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-169-                    }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-170-                }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-171-            }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-172-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-173-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-174-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-178-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-179-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-180-                        };
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-181-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-182-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-183-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-184-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-185-                        };
+crates/amun-networking/tests/v2_014_delay_stress_test.rs:186:                        drop(node);
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-187-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-188-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-189-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-190-                        }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-191-                    }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-192-                }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-193-            }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-194-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-200-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-201-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-202-                        };
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-203-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-204-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-205-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-206-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-207-                        };
+crates/amun-networking/tests/v2_014_delay_stress_test.rs:208:                        drop(node);
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-209-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-210-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-211-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-212-                        }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-213-                    }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-214-                }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-215-            }
+crates/amun-networking/tests/v2_014_delay_stress_test.rs-216-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-171-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-172-                            sender: node_id.clone(),
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-173-                            recipient: String::new(),
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-174-                            sequence: 1,
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-175-                            timestamp: 1000,
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-176-                            message_type: "proposal".into(),
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-177-                            payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-178-                        };
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs:179:                        drop(node);
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-180-                        self.broadcast_message(&node_id, envelope);
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-181-                        if let Some(node) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-182-                            node.proposals_broadcast = true;
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-183-                        }
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-184-                    }
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-185-                }
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-186-            }
+crates/amun-networking/tests/v2_003_event_scheduler_test.rs-187-            EventType::PrevoteBroadcast => {
+--
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-132-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-133-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-134-                    };
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-135-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-136-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-137-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-138-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-139-                    };
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs:140:                    drop(node);
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-141-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-142-                }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-143-            }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-144-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-145-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-146-                // V2-006 FIX: Send prevote even if step != Prevote, matching baseline behavior.
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-147-                // The node has a proposal, so it should vote.
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-148-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-152-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-153-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-154-                        };
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-155-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-156-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-157-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-158-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-159-                        };
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs:160:                        drop(node);
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-161-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-162-                        self.prevotes_sent += 1;
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-163-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-164-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-165-                        }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-166-                    }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-167-                }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-168-            }
+--
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-179-                                voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-180-                                vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-181-                            };
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-182-                            let envelope = Envelope {
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-183-                                sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-184-                                sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-185-                                payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-186-                            };
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs:187:                            drop(node);
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-188-                            self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-189-                            self.precommits_sent += 1;
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-190-                            if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-191-                                n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-192-                            }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-193-                        }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-194-                    }
+crates/amun-networking/tests/v2_006_causal_ordering_fix.rs-195-                }
+--
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-166-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-167-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-168-                    };
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-169-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-170-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-171-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-172-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-173-                    };
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs:174:                    drop(node);
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-175-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-176-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-177-                    }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-178-                }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-179-            }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-180-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-181-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-182-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-186-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-187-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-188-                        };
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-189-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-190-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-191-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-192-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-193-                        };
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs:194:                        drop(node);
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-195-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-196-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-197-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-198-                        }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-199-                    }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-200-                }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-201-            }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-202-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-208-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-209-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-210-                        };
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-211-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-212-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-213-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-214-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-215-                        };
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs:216:                        drop(node);
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-217-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-218-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-219-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-220-                        }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-221-                    }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-222-                }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-223-            }
+crates/amun-networking/tests/v2_012_temporal_delay_framework.rs-224-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-179-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-180-                            sender: node_id.clone(),
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-181-                            recipient: String::new(),
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-182-                            sequence: 1,
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-183-                            timestamp: 1000,
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-184-                            message_type: "proposal".into(),
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-185-                            payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-186-                        };
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs:187:                        drop(node);
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-188-                        self.broadcast_message(&node_id, envelope);
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-189-                        if let Some(node) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-190-                            node.proposals_broadcast = true;
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-191-                        }
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-192-                    }
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-193-                }
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-194-            }
+crates/amun-networking/tests/v2_003_event_scheduler_campaign.rs-195-            EventType::PrevoteBroadcast => {
+--
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-161-                            height: self.height, block_hash: self.block_hash,
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-162-                            proposer: leader_id, round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-163-                        };
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-164-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-165-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-166-                            sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-167-                            payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-168-                        };
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs:169:                        drop(node);
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-170-                        for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-171-                            self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-172-                        }
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-173-                        self.node_round_state.get_mut(&node_id).unwrap().0 = true;
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-174-                    }
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-175-                }
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-176-            }
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-177-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-178-                let should_broadcast = !self.node_round_state[&node_id].1;
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-179-                if should_broadcast {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-180-                    let node = self.nodes.get(&node_id).unwrap();
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-181-                    if node.state_machine.state.step == ConsensusStep::Prevote {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-182-                        let vote_data = node.last_proposal.as_ref().map(|p| (p.block_hash, node.validator.id));
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs:183:                        drop(node);
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-184-                        if let Some((block_hash, voter)) = vote_data {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-185-                            let vote = Vote {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-186-                                height: self.height, block_hash, voter, round: self.round,
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-187-                                vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-188-                            };
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-189-                            let envelope = Envelope {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-190-                                sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-191-                                sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+--
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-198-                }
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-199-            }
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-200-            EventType::PrecommitBroadcast => {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-201-                let should_broadcast = !self.node_round_state[&node_id].2;
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-202-                if should_broadcast {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-203-                    let node = self.nodes.get(&node_id).unwrap();
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-204-                    if node.state_machine.state.step == ConsensusStep::Precommit {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-205-                        let vote_data = node.last_proposal.as_ref().map(|p| (p.block_hash, node.validator.id));
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs:206:                        drop(node);
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-207-                        if let Some((block_hash, voter)) = vote_data {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-208-                            let vote = Vote {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-209-                                height: self.height, block_hash, voter, round: self.round,
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-210-                                vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-211-                            };
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-212-                            let envelope = Envelope {
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-213-                                sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_004c_recovery_rounds.rs-214-                                sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+--
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-124-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-125-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-126-                    };
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-127-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-128-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-129-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-130-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-131-                    };
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs:132:                    drop(node);
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-133-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-134-                }
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-135-            }
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-136-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-137-                let node = self.nodes.get(&node_id).unwrap();
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-138-                let step = node.state_machine.state.step;
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-139-                let has_proposal = node.last_proposal.is_some();
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-140-                // CRITICAL TRACE: Print state at broadcast event
+--
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-148-                        voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-149-                        vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-150-                    };
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-151-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-152-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-153-                        sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-154-                        payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-155-                    };
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs:156:                    drop(node);
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-157-                    self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-158-                    eprintln!("[PREVOTE_SENT] node={}", node_id);
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-159-                } else {
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs:160:                    drop(node);
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-161-                    eprintln!("[PREVOTE_SKIPPED] node={} reason: step={:?} has_proposal={}", 
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-162-                              node_id, step, has_proposal);
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-163-                }
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-164-            }
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-165-            EventType::PrecommitBroadcast => { /* simplified */ }
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-166-            EventType::ProcessInbox => {
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-167-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_005b_prevote_broadcast_trace.rs-168-                let mut received_proposal = false;
+--
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-113-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-114-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-115-                    };
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-116-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-117-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-118-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-119-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-120-                    };
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs:121:                    drop(node);
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-122-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-123-                }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-124-            }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-125-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-126-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-127-                if !node.prevotes_broadcast {
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-128-                    if let Some(ref prop) = node.last_proposal {
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-129-                        let vote = Vote {
+--
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-131-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-132-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-133-                        };
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-134-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-135-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-136-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-137-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-138-                        };
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs:139:                        drop(node);
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-140-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-141-                        self.prevotes_sent += 1; // Global count
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-142-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-143-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-144-                        }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-145-                    }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-146-                }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-147-            }
+--
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-154-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-155-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-156-                        };
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-157-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-158-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-159-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-160-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-161-                        };
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs:162:                        drop(node);
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-163-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-164-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-165-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-166-                        }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-167-                    }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-168-                }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-169-            }
+crates/amun-networking/tests/v2_010b_prevote_sent_counter.rs-170-            EventType::ProcessInbox => {
+--
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-162-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-163-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-164-                    };
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-165-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-166-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-167-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-168-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-169-                    };
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs:170:                    drop(node);
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-171-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-172-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-173-                    }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-174-                }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-175-            }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-176-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-177-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-178-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-182-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-183-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-184-                        };
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-185-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-186-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-187-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-188-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-189-                        };
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs:190:                        drop(node);
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-191-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-192-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-193-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-194-                        }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-195-                    }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-196-                }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-197-            }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-198-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-204-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-205-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-206-                        };
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-207-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-208-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-209-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-210-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-211-                        };
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs:212:                        drop(node);
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-213-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-214-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-215-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-216-                        }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-217-                    }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-218-                }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-219-            }
+crates/amun-networking/tests/v2_015_pacemaker_stress_matrix.rs-220-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-159-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-160-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-161-                    };
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-162-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-163-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-164-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-165-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-166-                    };
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs:167:                    drop(node);
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-168-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-169-                }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-170-            }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-171-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-172-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-173-                if !node.prevotes_broadcast {
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-174-                    if let Some(ref prop) = node.last_proposal {
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-175-                        let vote = Vote {
+--
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-177-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-178-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-179-                        };
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-180-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-181-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-182-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-183-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-184-                        };
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs:185:                        drop(node);
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-186-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-187-                        self.prevotes_sent += 1;
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-188-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-189-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-190-                        }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-191-                    }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-192-                }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-193-            }
+--
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-200-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-201-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-202-                        };
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-203-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-204-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-205-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-206-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-207-                        };
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs:208:                        drop(node);
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-209-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-210-                        self.precommits_sent += 1;
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-211-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-212-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-213-                        }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-214-                    }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-215-                }
+crates/amun-networking/tests/v2_008_causal_ordering_fix.rs-216-            }
+--
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-110-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-111-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-112-                    };
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-113-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-114-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-115-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-116-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-117-                    };
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs:118:                    drop(node);
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-119-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-120-                }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-121-            }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-122-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-123-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-124-                if !node.prevotes_broadcast {
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-125-                    if let Some(ref prop) = node.last_proposal {
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-126-                        let vote = Vote {
+--
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-128-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-129-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-130-                        };
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-131-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-132-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-133-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-134-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-135-                        };
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs:136:                        drop(node);
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-137-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-138-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-139-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-140-                        }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-141-                    }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-142-                }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-143-            }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-144-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-150-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-151-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-152-                        };
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-153-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-154-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-155-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-156-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-157-                        };
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs:158:                        drop(node);
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-159-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-160-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-161-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-162-                        }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-163-                    }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-164-                }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-165-            }
+crates/amun-networking/tests/v2_009_vote_gathering_fix.rs-166-            EventType::ProcessInbox => {
+--
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-153-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-154-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-155-                    };
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-156-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-157-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-158-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-159-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-160-                    };
+crates/amun-networking/tests/v2_013_baseline_matrix.rs:161:                    drop(node);
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-162-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-163-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-164-                    }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-165-                }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-166-            }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-167-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-168-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-169-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-173-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-174-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-175-                        };
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-176-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-177-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-178-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-179-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-180-                        };
+crates/amun-networking/tests/v2_013_baseline_matrix.rs:181:                        drop(node);
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-182-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-183-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-184-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-185-                        }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-186-                    }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-187-                }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-188-            }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-189-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-195-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-196-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-197-                        };
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-198-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-199-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-200-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-201-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-202-                        };
+crates/amun-networking/tests/v2_013_baseline_matrix.rs:203:                        drop(node);
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-204-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-205-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-206-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-207-                        }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-208-                    }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-209-                }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-210-            }
+crates/amun-networking/tests/v2_013_baseline_matrix.rs-211-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-129-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-130-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-131-                    };
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-132-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-133-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-134-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-135-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-136-                    };
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs:137:                    drop(node);
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-138-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-139-                }
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-140-            }
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-141-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-142-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-143-                node.prevote_broadcast_executed = true;
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-144-                if node.state_machine.state.step == ConsensusStep::Prevote {
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-145-                    if let Some(ref prop) = node.last_proposal {
+--
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-148-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-149-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-150-                        };
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-151-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-152-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-153-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-154-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-155-                        };
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs:156:                        drop(node);
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-157-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-158-                        eprintln!("[CAUSAL] node={} PREVOTE_SENT at step=Prevote (correct)", node_id);
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-159-                    }
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-160-                } else {
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs:161:                    drop(node);
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-162-                }
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-163-            }
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-164-            EventType::PrecommitBroadcast => { /* simplified */ }
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-165-            EventType::ProcessInbox => {
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-166-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-167-                while let Some(env) = node.transport.next_incoming() {
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-168-                    match env.message_type.as_str() {
+crates/amun-networking/tests/v2_005c_causal_ordering_trace.rs-169-                        "proposal" => {
+--
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-106-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-107-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-108-                    };
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-109-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-110-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-111-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-112-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-113-                    };
+crates/amun-networking/tests/v2_010_votekey_distribution.rs:114:                    drop(node);
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-115-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-116-                }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-117-            }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-118-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-119-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-120-                if !node.prevotes_broadcast {
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-121-                    if let Some(ref prop) = node.last_proposal {
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-122-                        let vote = Vote {
+--
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-124-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-125-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-126-                        };
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-127-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-128-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-129-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-130-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-131-                        };
+crates/amun-networking/tests/v2_010_votekey_distribution.rs:132:                        drop(node);
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-133-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-134-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-135-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-136-                        }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-137-                    }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-138-                }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-139-            }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-140-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-146-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-147-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-148-                        };
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-149-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-150-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-151-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-152-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-153-                        };
+crates/amun-networking/tests/v2_010_votekey_distribution.rs:154:                        drop(node);
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-155-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-156-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-157-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-158-                        }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-159-                    }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-160-                }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-161-            }
+crates/amun-networking/tests/v2_010_votekey_distribution.rs-162-            EventType::ProcessInbox => {
+--
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-140-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-141-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-142-                    };
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-143-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-144-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-145-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-146-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-147-                    };
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs:148:                    drop(node);
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-149-                    for _ in 0..3 { self.broadcast_message(&node_id, envelope.clone(), true); }
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-150-                }
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-151-            }
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-152-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-153-                let node = self.nodes.get(&node_id).unwrap();
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-154-                if node.state_machine.state.step == ConsensusStep::Prevote {
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-155-                    if let Some(ref prop) = node.last_proposal {
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-156-                        let vote = Vote {
+--
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-159-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-160-                        };
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-161-                        self.prevotes_created += 1;
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-162-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-163-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-164-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-165-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-166-                        };
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs:167:                        drop(node);
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-168-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-169-                        if let Some(node) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-170-                            node.prevote_sent_count += 1;
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-171-                            node.step_at_prevote_send = node.state_machine.state.step;
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-172-                        }
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-173-                    }
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-174-                }
+crates/amun-networking/tests/v2_005_vote_lifecycle_trace.rs-175-            }
+--
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-157-                        height: 1, block_hash: [0xAA; 32], proposer: leader_id,
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-158-                        round: self.round, timestamp: 1000,
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-159-                    };
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-160-                    let envelope = Envelope {
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-161-                        sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-162-                        sequence: 1, timestamp: 1000, message_type: "proposal".into(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-163-                        payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-164-                    };
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs:165:                    drop(node);
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-166-                    for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-167-                        self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-168-                    }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-169-                }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-170-            }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-171-            EventType::PrevoteBroadcast => {
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-172-                let node = self.nodes.get_mut(&node_id).unwrap();
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-173-                if !node.prevotes_broadcast {
+--
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-177-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-178-                            vote_type: VoteType::Prevote, timestamp: 1001,
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-179-                        };
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-180-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-181-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-182-                            sequence: 2, timestamp: 1001, message_type: "prevote".into(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-183-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-184-                        };
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs:185:                        drop(node);
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-186-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-187-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-188-                            n.prevotes_broadcast = true;
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-189-                        }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-190-                    }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-191-                }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-192-            }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-193-            EventType::PrecommitBroadcast => {
+--
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-199-                            voter: node.validator.id, round: self.round,
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-200-                            vote_type: VoteType::Precommit, timestamp: 1002,
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-201-                        };
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-202-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-203-                            sender: node_id.clone(), recipient: String::new(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-204-                            sequence: 3, timestamp: 1002, message_type: "precommit".into(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-205-                            payload: serde_json::to_vec(&vote).unwrap(),
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-206-                        };
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs:207:                        drop(node);
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-208-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-209-                        if let Some(n) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-210-                            n.precommits_broadcast = true;
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-211-                        }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-212-                    }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-213-                }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-214-            }
+crates/amun-networking/tests/v2_014c_dynamic_schedule.rs-215-            EventType::DeliverPending => {
+--
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-181-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-182-                            sender: node_id.clone(),
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-183-                            recipient: String::new(),
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-184-                            sequence: 1,
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-185-                            timestamp: 1000,
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-186-                            message_type: "proposal".into(),
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-187-                            payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-188-                        };
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs:189:                        drop(node);
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-190-                        // V2-004A: Include self in broadcast
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-191-                        self.broadcast_message(&node_id, envelope, true);
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-192-                        if let Some(node) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-193-                            node.proposals_broadcast = true;
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-194-                        }
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-195-                    }
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-196-                }
+crates/amun-networking/tests/v2_004a_self_delivery_fix.rs-197-            }
+--
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-179-                        let envelope = Envelope {
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-180-                            sender: node_id.clone(),
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-181-                            recipient: String::new(),
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-182-                            sequence: 1,
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-183-                            timestamp: 1000,
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-184-                            message_type: "proposal".into(),
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-185-                            payload: serde_json::to_vec(&proposal).unwrap(),
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-186-                        };
+crates/amun-networking/tests/v2_004b_proposal_retries.rs:187:                        drop(node);
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-188-                        // V2-004B: Broadcast proposal multiple times
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-189-                        for _ in 0..self.proposal_retries {
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-190-                            self.broadcast_message(&node_id, envelope.clone(), true);
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-191-                        }
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-192-                        if let Some(node) = self.nodes.get_mut(&node_id) {
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-193-                            node.proposals_broadcast = true;
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-194-                        }
+crates/amun-networking/tests/v2_004b_proposal_retries.rs-195-                    }

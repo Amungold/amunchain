@@ -1,0 +1,993 @@
+amun-accounts v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-accounts)
+├── blake3 v1.8.5
+│   ├── arrayref v0.3.9
+│   ├── arrayvec v0.7.6
+│   ├── cfg-if v1.0.4
+│   ├── constant_time_eq v0.4.2
+│   └── cpufeatures v0.3.0
+│   [build-dependencies]
+│   └── cc v1.2.62
+│       ├── find-msvc-tools v0.1.9
+│       └── shlex v1.3.0
+└── serde v1.0.228
+    ├── serde_core v1.0.228
+    └── serde_derive v1.0.228 (proc-macro)
+        ├── proc-macro2 v1.0.106
+        │   └── unicode-ident v1.0.24
+        ├── quote v1.0.45
+        │   └── proc-macro2 v1.0.106 (*)
+        └── syn v2.0.117
+            ├── proc-macro2 v1.0.106 (*)
+            ├── quote v1.0.45 (*)
+            └── unicode-ident v1.0.24
+
+amun-amendments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-amendments)
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec)
+│   └── blake3 v1.8.5 (*)
+├── amun-lineage v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage)
+│   ├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+│   └── blake3 v1.8.5 (*)
+└── blake3 v1.8.5 (*)
+
+amun-audit v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-audit)
+[dev-dependencies]
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+├── amun-snapshot-engine v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-engine)
+│   ├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+│   ├── amun-storage-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-storage-kernel)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── im v15.1.0
+│   │   │   ├── bitmaps v2.1.0
+│   │   │   │   └── typenum v1.20.0
+│   │   │   ├── rand_core v0.6.4
+│   │   │   │   └── getrandom v0.2.17
+│   │   │   │       ├── cfg-if v1.0.4
+│   │   │   │       └── libc v0.2.186
+│   │   │   ├── rand_xoshiro v0.6.0
+│   │   │   │   └── rand_core v0.6.4 (*)
+│   │   │   ├── sized-chunks v0.6.5
+│   │   │   │   ├── bitmaps v2.1.0 (*)
+│   │   │   │   └── typenum v1.20.0
+│   │   │   └── typenum v1.20.0
+│   │   │   [build-dependencies]
+│   │   │   └── version_check v0.9.5
+│   │   ├── parking_lot v0.12.5
+│   │   │   ├── lock_api v0.4.14
+│   │   │   │   └── scopeguard v1.2.0
+│   │   │   └── parking_lot_core v0.9.12
+│   │   │       ├── cfg-if v1.0.4
+│   │   │       ├── libc v0.2.186
+│   │   │       └── smallvec v1.15.1
+│   │   └── tempfile v3.27.0
+│   │       ├── fastrand v2.4.1
+│   │       ├── getrandom v0.4.2
+│   │       │   ├── cfg-if v1.0.4
+│   │       │   └── libc v0.2.186
+│   │       ├── once_cell v1.21.4
+│   │       └── rustix v1.1.4
+│   │           ├── bitflags v2.11.1
+│   │           └── linux-raw-sys v0.12.1
+│   │   [dev-dependencies]
+│   │   └── proptest v1.11.0
+│   │       ├── bit-set v0.8.0
+│   │       │   └── bit-vec v0.8.0
+│   │       ├── bit-vec v0.8.0
+│   │       ├── bitflags v2.11.1
+│   │       ├── num-traits v0.2.19
+│   │       │   [build-dependencies]
+│   │       │   └── autocfg v1.5.1
+│   │       ├── rand v0.9.4
+│   │       │   └── rand_core v0.9.5
+│   │       │       └── getrandom v0.3.4
+│   │       │           ├── cfg-if v1.0.4
+│   │       │           └── libc v0.2.186
+│   │       ├── rand_chacha v0.9.0
+│   │       │   ├── ppv-lite86 v0.2.21
+│   │       │   │   └── zerocopy v0.8.48
+│   │       │   └── rand_core v0.9.5 (*)
+│   │       ├── rand_xorshift v0.4.0
+│   │       │   └── rand_core v0.9.5 (*)
+│   │       ├── regex-syntax v0.8.10
+│   │       ├── rusty-fork v0.3.1
+│   │       │   ├── fnv v1.0.7
+│   │       │   ├── quick-error v1.2.3
+│   │       │   ├── tempfile v3.27.0 (*)
+│   │       │   └── wait-timeout v0.2.1
+│   │       │       └── libc v0.2.186
+│   │       ├── tempfile v3.27.0 (*)
+│   │       └── unarray v0.1.4
+│   ├── blake3 v1.8.5 (*)
+│   └── hex v0.4.3
+├── amun-storage-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-storage-kernel) (*)
+├── blake3 v1.8.5 (*)
+├── rand v0.8.6
+│   ├── libc v0.2.186
+│   ├── rand_chacha v0.3.1
+│   │   ├── ppv-lite86 v0.2.21 (*)
+│   │   └── rand_core v0.6.4 (*)
+│   └── rand_core v0.6.4 (*)
+├── rand_chacha v0.3.1 (*)
+└── tempfile v3.27.0 (*)
+
+amun-audit-trail v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-audit-trail)
+├── blake3 v1.8.5 (*)
+└── serde v1.0.228 (*)
+
+amun-block-builder v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-block-builder)
+├── amun-accounts v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-accounts) (*)
+├── amun-execution v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-execution)
+│   ├── amun-accounts v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-accounts) (*)
+│   ├── amun-transactions v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transactions)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── ed25519-dalek v2.2.0
+│   │   │   ├── curve25519-dalek v4.1.3
+│   │   │   │   ├── cfg-if v1.0.4
+│   │   │   │   ├── cpufeatures v0.2.17
+│   │   │   │   ├── curve25519-dalek-derive v0.1.1 (proc-macro)
+│   │   │   │   │   ├── proc-macro2 v1.0.106 (*)
+│   │   │   │   │   ├── quote v1.0.45 (*)
+│   │   │   │   │   └── syn v2.0.117 (*)
+│   │   │   │   ├── digest v0.10.7
+│   │   │   │   │   ├── block-buffer v0.10.4
+│   │   │   │   │   │   └── generic-array v0.14.7
+│   │   │   │   │   │       └── typenum v1.20.0
+│   │   │   │   │   │       [build-dependencies]
+│   │   │   │   │   │       └── version_check v0.9.5
+│   │   │   │   │   ├── crypto-common v0.1.7
+│   │   │   │   │   │   ├── generic-array v0.14.7 (*)
+│   │   │   │   │   │   └── typenum v1.20.0
+│   │   │   │   │   └── subtle v2.6.1
+│   │   │   │   ├── subtle v2.6.1
+│   │   │   │   └── zeroize v1.8.2
+│   │   │   │       └── zeroize_derive v1.4.3 (proc-macro)
+│   │   │   │           ├── proc-macro2 v1.0.106 (*)
+│   │   │   │           ├── quote v1.0.45 (*)
+│   │   │   │           └── syn v2.0.117 (*)
+│   │   │   │   [build-dependencies]
+│   │   │   │   └── rustc_version v0.4.1
+│   │   │   │       └── semver v1.0.28
+│   │   │   ├── ed25519 v2.2.3
+│   │   │   │   └── signature v2.2.0
+│   │   │   ├── rand_core v0.6.4 (*)
+│   │   │   ├── sha2 v0.10.9
+│   │   │   │   ├── cfg-if v1.0.4
+│   │   │   │   ├── cpufeatures v0.2.17
+│   │   │   │   └── digest v0.10.7 (*)
+│   │   │   ├── subtle v2.6.1
+│   │   │   └── zeroize v1.8.2 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── rand v0.8.6 (*)
+│   │   ├── serde v1.0.228 (*)
+│   │   └── serde_json v1.0.150
+│   │       ├── itoa v1.0.18
+│   │       ├── memchr v2.8.1
+│   │       ├── serde_core v1.0.228
+│   │       └── zmij v1.0.21
+│   └── serde v1.0.228 (*)
+│   [dev-dependencies]
+│   ├── ed25519-dalek v2.2.0 (*)
+│   └── rand v0.8.6 (*)
+├── amun-mempool v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-mempool)
+│   ├── amun-transactions v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transactions) (*)
+│   ├── ed25519-dalek v2.2.0 (*)
+│   ├── rand v0.8.6 (*)
+│   └── serde v1.0.228 (*)
+├── amun-transactions v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transactions) (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+└── serde v1.0.228 (*)
+[dev-dependencies]
+├── amun-consensus v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-consensus)
+│   ├── amun-constitution v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution)
+│   │   ├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+│   │   └── amun-lineage v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage) (*)
+│   ├── amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   └── serde_json v1.0.150 (*)
+│   ├── amun-crypto v4.0.0 (/root/projects/amunchain/amunchain/crates/amun-crypto)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── ed25519-dalek v2.2.0 (*)
+│   │   ├── heapless v0.8.0
+│   │   │   ├── hash32 v0.3.1
+│   │   │   │   └── byteorder v1.5.0
+│   │   │   └── stable_deref_trait v1.2.1
+│   │   ├── hex v0.4.3
+│   │   ├── rand_core v0.6.4 (*)
+│   │   ├── subtle v2.6.1
+│   │   └── zeroize v1.8.2 (*)
+│   ├── blake3 v1.8.5 (*)
+│   ├── crc32fast v1.5.0
+│   │   └── cfg-if v1.0.4
+│   ├── hex v0.4.3
+│   ├── postcard v1.1.3
+│   │   ├── cobs v0.3.0
+│   │   │   └── thiserror v2.0.18
+│   │   │       └── thiserror-impl v2.0.18 (proc-macro)
+│   │   │           ├── proc-macro2 v1.0.106 (*)
+│   │   │           ├── quote v1.0.45 (*)
+│   │   │           └── syn v2.0.117 (*)
+│   │   ├── heapless v0.7.17
+│   │   │   ├── hash32 v0.2.1
+│   │   │   │   └── byteorder v1.5.0
+│   │   │   ├── serde v1.0.228 (*)
+│   │   │   ├── spin v0.9.8
+│   │   │   │   └── lock_api v0.4.14 (*)
+│   │   │   └── stable_deref_trait v1.2.1
+│   │   │   [build-dependencies]
+│   │   │   └── rustc_version v0.4.1 (*)
+│   │   └── serde v1.0.228 (*)
+│   ├── rand v0.8.6 (*)
+│   ├── rayon v1.12.0
+│   │   ├── either v1.16.0
+│   │   └── rayon-core v1.13.0
+│   │       ├── crossbeam-deque v0.8.6
+│   │       │   ├── crossbeam-epoch v0.9.18
+│   │       │   │   └── crossbeam-utils v0.8.21
+│   │       │   └── crossbeam-utils v0.8.21
+│   │       └── crossbeam-utils v0.8.21
+│   ├── serde v1.0.228 (*)
+│   ├── serde_bytes v0.11.19
+│   │   └── serde_core v1.0.228
+│   ├── serde_json v1.0.150 (*)
+│   ├── tempfile v3.27.0 (*)
+│   └── thiserror v1.0.69
+│       └── thiserror-impl v1.0.69 (proc-macro)
+│           ├── proc-macro2 v1.0.106 (*)
+│           ├── quote v1.0.45 (*)
+│           └── syn v2.0.117 (*)
+├── ed25519-dalek v2.2.0 (*)
+└── rand v0.8.6 (*)
+
+amun-block-store v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-block-store)
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode)
+├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   ├── serde_json v1.0.150 (*)
+│   └── thiserror v1.0.69 (*)
+├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel)
+│   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   ├── serde_json v1.0.150 (*)
+│   └── thiserror v1.0.69 (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+└── thiserror v1.0.69 (*)
+
+amun-byzantine-tests v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-byzantine-tests)
+├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+├── amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime)
+│   ├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+│   ├── amun-cross-contract v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-cross-contract)
+│   │   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine)
+│   │   │   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   │   │   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   │   │   ├── blake3 v1.8.5 (*)
+│   │   │   ├── hex v0.4.3
+│   │   │   ├── serde v1.0.228 (*)
+│   │   │   ├── serde_json v1.0.150 (*)
+│   │   │   └── thiserror v1.0.69 (*)
+│   │   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   │   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   ├── serde_json v1.0.150 (*)
+│   │   └── thiserror v1.0.69 (*)
+│   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+│   ├── amun-gas-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-gas-engine)
+│   │   ├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+│   │   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+│   │   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   │   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   ├── serde_json v1.0.150 (*)
+│   │   └── thiserror v1.0.69 (*)
+│   ├── amun-handle-resolver v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-handle-resolver)
+│   │   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+│   │   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   │   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   ├── serde_json v1.0.150 (*)
+│   │   └── thiserror v1.0.69 (*)
+│   ├── amun-invariant-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-invariant-engine)
+│   │   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+│   │   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   │   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   ├── serde_json v1.0.150 (*)
+│   │   └── thiserror v1.0.69 (*)
+│   ├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive)
+│   │   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+│   │   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   │   ├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof)
+│   │   │   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+│   │   │   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   │   │   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   │   │   ├── blake3 v1.8.5 (*)
+│   │   │   ├── hex v0.4.3
+│   │   │   ├── serde v1.0.228 (*)
+│   │   │   ├── serde_json v1.0.150 (*)
+│   │   │   └── thiserror v1.0.69 (*)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   ├── serde_json v1.0.150 (*)
+│   │   └── thiserror v1.0.69 (*)
+│   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   ├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+│   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   ├── serde_json v1.0.150 (*)
+│   └── thiserror v1.0.69 (*)
+├── amun-cross-contract v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-cross-contract) (*)
+├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+├── amun-invariant-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-invariant-engine) (*)
+├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+├── amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier)
+│   ├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+│   ├── amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime) (*)
+│   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+│   ├── amun-invariant-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-invariant-engine) (*)
+│   ├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+│   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   ├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+│   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   ├── serde_json v1.0.150 (*)
+│   └── thiserror v1.0.69 (*)
+├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+
+amun-certificate-network v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-certificate-network)
+├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block)
+│   ├── amun-consensus v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-consensus) (*)
+│   ├── amun-constitution-builder v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution-builder)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   └── serde_json v1.0.150 (*)
+│   ├── amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments) (*)
+│   ├── amun-constitutional-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-kernel)
+│   │   ├── amun-constitution-builder v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution-builder) (*)
+│   │   ├── amun-constitutional-authority v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-authority)
+│   │   │   ├── amun-constitution-builder v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution-builder) (*)
+│   │   │   ├── amun-constitutional-signing v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-signing)
+│   │   │   │   ├── amun-constitution-builder v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution-builder) (*)
+│   │   │   │   ├── ed25519-dalek v2.2.0 (*)
+│   │   │   │   ├── hex v0.4.3
+│   │   │   │   ├── rand v0.8.6 (*)
+│   │   │   │   ├── serde v1.0.228 (*)
+│   │   │   │   └── serde_json v1.0.150 (*)
+│   │   │   ├── blake3 v1.8.5 (*)
+│   │   │   ├── ed25519-dalek v2.2.0 (*)
+│   │   │   ├── hex v0.4.3
+│   │   │   ├── rand v0.8.6 (*)
+│   │   │   ├── serde v1.0.228 (*)
+│   │   │   └── serde_json v1.0.150 (*)
+│   │   ├── amun-constitutional-governance v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-governance)
+│   │   │   ├── amun-constitution-builder v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution-builder) (*)
+│   │   │   ├── amun-constitutional-authority v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-authority) (*)
+│   │   │   ├── amun-constitutional-signing v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-signing) (*)
+│   │   │   ├── blake3 v1.8.5 (*)
+│   │   │   ├── ed25519-dalek v2.2.0 (*)
+│   │   │   ├── hex v0.4.3
+│   │   │   ├── rand v0.8.6 (*)
+│   │   │   ├── serde v1.0.228 (*)
+│   │   │   └── serde_json v1.0.150 (*)
+│   │   ├── amun-constitutional-signing v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-signing) (*)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   └── serde_json v1.0.150 (*)
+│   ├── amun-constitutional-state v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-state)
+│   │   ├── amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments) (*)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   └── serde v1.0.228 (*)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   └── serde_json v1.0.150 (*)
+├── amun-constitutional-state v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-state) (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-chain-checkpoint v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-chain-checkpoint)
+├── amun-certificate-network v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-certificate-network) (*)
+├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+├── amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments) (*)
+├── amun-constitutional-state v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-state) (*)
+├── amun-replay v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay)
+│   ├── amun-constitutional-state v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-state) (*)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   └── serde v1.0.228 (*)
+├── amun-stateless-sync v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-stateless-sync)
+│   ├── amun-certificate-network v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-certificate-network) (*)
+│   ├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+│   ├── amun-constitutional-state v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-state) (*)
+│   ├── amun-replay v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay) (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   └── serde_json v1.0.150 (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-civilizational-relations v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-civilizational-relations)
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+├── amun-lineage v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage) (*)
+├── amun-snapshot-engine v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-engine) (*)
+└── blake3 v1.8.5 (*)
+
+amun-compatibility v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-compatibility)
+├── amun-lineage v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage) (*)
+└── amun-snapshot-engine v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-engine) (*)
+
+amun-consensus v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-consensus) (*)
+
+amun-consensus-integration v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-consensus-integration)
+├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+├── amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime) (*)
+├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+├── amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier) (*)
+├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+└── thiserror v1.0.69 (*)
+
+amun-constitution v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution) (*)
+
+amun-constitution-builder v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution-builder) (*)
+
+amun-constitutional v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional)
+└── sha2 v0.10.9 (*)
+
+amun-constitutional-authority v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-authority) (*)
+
+amun-constitutional-authority-semantics v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-authority-semantics)
+├── amun-constitution-builder v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitution-builder) (*)
+├── amun-constitutional-authority v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-authority) (*)
+├── amun-constitutional-signing v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-signing) (*)
+├── amun-peer-identity v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-peer-identity)
+│   ├── amun-constitutional-authority v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-authority) (*)
+│   ├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+│   ├── amun-constitutional-signing v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-signing) (*)
+│   ├── blake3 v1.8.5 (*)
+│   ├── ed25519-dalek v2.2.0 (*)
+│   ├── hex v0.4.3
+│   ├── rand v0.8.6 (*)
+│   ├── serde v1.0.228 (*)
+│   └── serde_json v1.0.150 (*)
+├── blake3 v1.8.5 (*)
+├── ed25519-dalek v2.2.0 (*)
+├── hex v0.4.3
+├── rand v0.8.6 (*)
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+
+amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments) (*)
+
+amun-constitutional-geometry v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-geometry)
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+├── amun-civilizational-relations v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-civilizational-relations) (*)
+├── amun-lineage v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage) (*)
+├── amun-snapshot-engine v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-engine) (*)
+└── blake3 v1.8.5 (*)
+
+amun-constitutional-governance v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-governance) (*)
+
+amun-constitutional-integration v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-integration)
+├── amun-constitutional-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-proof)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   ├── serde_json v1.0.150 (*)
+│   └── thiserror v1.0.69 (*)
+├── amun-verification-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-verification-kernel)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   └── serde_json v1.0.150 (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-constitutional-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-kernel) (*)
+
+amun-constitutional-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-proof) (*)
+
+amun-constitutional-quarantine v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-quarantine)
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+├── amun-civilizational-relations v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-civilizational-relations) (*)
+├── amun-snapshot-engine v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-engine) (*)
+└── blake3 v1.8.5 (*)
+
+amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime) (*)
+
+amun-constitutional-signing v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-signing) (*)
+
+amun-constitutional-sim v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-sim)
+├── rand v0.8.6 (*)
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-constitutional-state v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-state) (*)
+
+amun-constitutional-treaties v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-treaties)
+
+amun-constitutional-verifier v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-verifier)
+
+amun-cross-contract v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-cross-contract) (*)
+
+amun-crypto v4.0.0 (/root/projects/amunchain/amunchain/crates/amun-crypto) (*)
+
+amun-dual-verification v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-dual-verification)
+├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+├── amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime) (*)
+├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+├── amun-invariant-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-invariant-engine) (*)
+├── amun-pccv v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-pccv)
+│   ├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+│   ├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+│   ├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+│   ├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+│   ├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   ├── serde_json v1.0.150 (*)
+│   └── thiserror v1.0.69 (*)
+├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+├── amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier) (*)
+├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+└── thiserror v1.0.69 (*)
+
+amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+
+amun-evidence-finality v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-finality)
+├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+├── amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime) (*)
+├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+├── amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier) (*)
+├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+└── thiserror v1.0.69 (*)
+
+amun-evidence-root v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-root)
+└── blake3 v1.8.5 (*)
+[dev-dependencies]
+├── amun-block-builder v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-block-builder) (*)
+├── amun-mempool v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-mempool) (*)
+├── amun-transactions v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transactions) (*)
+└── ed25519-dalek v2.2.0 (*)
+
+amun-evolution v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-evolution)
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+├── amun-lineage v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage) (*)
+└── blake3 v1.8.5 (*)
+
+amun-execution v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-execution) (*)
+
+amun-experimental-framework v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-experimental-framework)
+├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+├── amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime) (*)
+├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+├── amun-invariant-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-invariant-engine) (*)
+├── amun-pccv v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-pccv) (*)
+├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+├── amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier) (*)
+├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+├── blake3 v1.8.5 (*)
+├── csv v1.4.0
+│   ├── csv-core v0.1.13
+│   │   └── memchr v2.8.1
+│   ├── itoa v1.0.18
+│   ├── ryu v1.0.23
+│   └── serde_core v1.0.228
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-explorer-api v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-explorer-api)
+├── amun-constitutional-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-proof) (*)
+├── amun-verification-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-verification-kernel) (*)
+├── axum v0.7.9
+│   ├── async-trait v0.1.89 (proc-macro)
+│   │   ├── proc-macro2 v1.0.106 (*)
+│   │   ├── quote v1.0.45 (*)
+│   │   └── syn v2.0.117 (*)
+│   ├── axum-core v0.4.5
+│   │   ├── async-trait v0.1.89 (proc-macro) (*)
+│   │   ├── bytes v1.11.1
+│   │   ├── futures-util v0.3.32
+│   │   │   ├── futures-core v0.3.32
+│   │   │   ├── futures-task v0.3.32
+│   │   │   ├── pin-project-lite v0.2.17
+│   │   │   └── slab v0.4.12
+│   │   ├── http v1.4.1
+│   │   │   ├── bytes v1.11.1
+│   │   │   └── itoa v1.0.18
+│   │   ├── http-body v1.0.1
+│   │   │   ├── bytes v1.11.1
+│   │   │   └── http v1.4.1 (*)
+│   │   ├── http-body-util v0.1.3
+│   │   │   ├── bytes v1.11.1
+│   │   │   ├── futures-core v0.3.32
+│   │   │   ├── http v1.4.1 (*)
+│   │   │   ├── http-body v1.0.1 (*)
+│   │   │   └── pin-project-lite v0.2.17
+│   │   ├── mime v0.3.17
+│   │   ├── pin-project-lite v0.2.17
+│   │   ├── rustversion v1.0.22 (proc-macro)
+│   │   ├── sync_wrapper v1.0.2
+│   │   ├── tower-layer v0.3.3
+│   │   ├── tower-service v0.3.3
+│   │   └── tracing v0.1.44
+│   │       ├── log v0.4.30
+│   │       ├── pin-project-lite v0.2.17
+│   │       └── tracing-core v0.1.36
+│   │           └── once_cell v1.21.4
+│   ├── bytes v1.11.1
+│   ├── futures-util v0.3.32 (*)
+│   ├── http v1.4.1 (*)
+│   ├── http-body v1.0.1 (*)
+│   ├── http-body-util v0.1.3 (*)
+│   ├── hyper v1.10.1
+│   │   ├── atomic-waker v1.1.2
+│   │   ├── bytes v1.11.1
+│   │   ├── futures-channel v0.3.32
+│   │   │   └── futures-core v0.3.32
+│   │   ├── futures-core v0.3.32
+│   │   ├── http v1.4.1 (*)
+│   │   ├── http-body v1.0.1 (*)
+│   │   ├── httparse v1.10.1
+│   │   ├── httpdate v1.0.3
+│   │   ├── itoa v1.0.18
+│   │   ├── pin-project-lite v0.2.17
+│   │   ├── smallvec v1.15.1
+│   │   └── tokio v1.52.3
+│   │       ├── bytes v1.11.1
+│   │       ├── libc v0.2.186
+│   │       ├── mio v1.2.1
+│   │       │   └── libc v0.2.186
+│   │       ├── parking_lot v0.12.5 (*)
+│   │       ├── pin-project-lite v0.2.17
+│   │       ├── signal-hook-registry v1.4.8
+│   │       │   ├── errno v0.3.14
+│   │       │   │   └── libc v0.2.186
+│   │       │   └── libc v0.2.186
+│   │       ├── socket2 v0.6.4
+│   │       │   └── libc v0.2.186
+│   │       └── tokio-macros v2.7.0 (proc-macro)
+│   │           ├── proc-macro2 v1.0.106 (*)
+│   │           ├── quote v1.0.45 (*)
+│   │           └── syn v2.0.117 (*)
+│   ├── hyper-util v0.1.20
+│   │   ├── bytes v1.11.1
+│   │   ├── http v1.4.1 (*)
+│   │   ├── http-body v1.0.1 (*)
+│   │   ├── hyper v1.10.1 (*)
+│   │   ├── pin-project-lite v0.2.17
+│   │   ├── tokio v1.52.3 (*)
+│   │   └── tower-service v0.3.3
+│   ├── itoa v1.0.18
+│   ├── matchit v0.7.3
+│   ├── memchr v2.8.1
+│   ├── mime v0.3.17
+│   ├── percent-encoding v2.3.2
+│   ├── pin-project-lite v0.2.17
+│   ├── rustversion v1.0.22 (proc-macro)
+│   ├── serde v1.0.228 (*)
+│   ├── serde_json v1.0.150 (*)
+│   ├── serde_path_to_error v0.1.20
+│   │   ├── itoa v1.0.18
+│   │   └── serde_core v1.0.228
+│   ├── serde_urlencoded v0.7.1
+│   │   ├── form_urlencoded v1.2.2
+│   │   │   └── percent-encoding v2.3.2
+│   │   ├── itoa v1.0.18
+│   │   ├── ryu v1.0.23
+│   │   └── serde v1.0.228 (*)
+│   ├── sync_wrapper v1.0.2
+│   ├── tokio v1.52.3 (*)
+│   ├── tower v0.5.3
+│   │   ├── futures-core v0.3.32
+│   │   ├── futures-util v0.3.32 (*)
+│   │   ├── pin-project-lite v0.2.17
+│   │   ├── sync_wrapper v1.0.2
+│   │   ├── tokio v1.52.3 (*)
+│   │   ├── tower-layer v0.3.3
+│   │   ├── tower-service v0.3.3
+│   │   └── tracing v0.1.44 (*)
+│   ├── tower-layer v0.3.3
+│   ├── tower-service v0.3.3
+│   └── tracing v0.1.44 (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+├── tokio v1.52.3 (*)
+└── tower v0.5.3 (*)
+
+amun-finality-certificate v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-finality-certificate)
+└── blake3 v1.8.5 (*)
+
+amun-gas-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-gas-engine) (*)
+
+amun-governance v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-governance)
+
+amun-handle-resolver v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-handle-resolver) (*)
+
+amun-header-gossip v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-header-gossip)
+├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+├── amun-light-client v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-light-client)
+│   ├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+│   ├── amun-proof-carrying v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-proof-carrying)
+│   │   ├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+│   │   ├── amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments) (*)
+│   │   ├── amun-constitutional-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-kernel) (*)
+│   │   ├── blake3 v1.8.5 (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   └── serde_json v1.0.150 (*)
+│   ├── amun-verifier-node v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-verifier-node)
+│   │   ├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+│   │   ├── amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments) (*)
+│   │   ├── amun-proof-carrying v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-proof-carrying) (*)
+│   │   ├── hex v0.4.3
+│   │   ├── serde v1.0.228 (*)
+│   │   └── serde_json v1.0.150 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   └── serde_json v1.0.150 (*)
+│   [dev-dependencies]
+│   ├── amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments) (*)
+│   └── amun-constitutional-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-kernel) (*)
+├── amun-proof-carrying v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-proof-carrying) (*)
+├── amun-verifier-node v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-verifier-node) (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+[dev-dependencies]
+├── amun-constitutional-commitments v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitments) (*)
+└── amun-constitutional-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-kernel) (*)
+
+amun-invariant-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-invariant-engine) (*)
+
+amun-light-client v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-light-client) (*)
+
+amun-lineage v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage) (*)
+
+amun-lineage-law v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage-law)
+└── sha2 v0.10.9 (*)
+
+amun-mempool v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-mempool) (*)
+
+amun-networking v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-networking)
+├── amun-chain-checkpoint v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-chain-checkpoint) (*)
+├── amun-consensus v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-consensus) (*)
+├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+├── amun-constitutional-state v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-state) (*)
+├── ed25519-dalek v2.2.0 (*)
+├── hex v0.4.3
+├── rand v0.8.6 (*)
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+[dev-dependencies]
+└── amun-certificate-network v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-certificate-network) (*)
+
+amun-node v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-node)
+├── amun-chain-checkpoint v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-chain-checkpoint) (*)
+├── amun-consensus v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-consensus) (*)
+├── amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block) (*)
+├── amun-constitutional-state v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-state) (*)
+├── amun-networking v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-networking) (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+└── toml v0.8.23
+    ├── serde v1.0.228 (*)
+    ├── serde_spanned v0.6.9
+    │   └── serde v1.0.228 (*)
+    ├── toml_datetime v0.6.11
+    │   └── serde v1.0.228 (*)
+    └── toml_edit v0.22.27
+        ├── indexmap v2.14.0
+        │   ├── equivalent v1.0.2
+        │   └── hashbrown v0.17.1
+        ├── serde v1.0.228 (*)
+        ├── serde_spanned v0.6.9 (*)
+        ├── toml_datetime v0.6.11 (*)
+        ├── toml_write v0.1.2
+        └── winnow v0.7.15
+[dev-dependencies]
+└── tempfile v3.27.0 (*)
+
+amun-pccv v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-pccv) (*)
+
+amun-peer-identity v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-peer-identity) (*)
+
+amun-persistence v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-persistence)
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+
+amun-proof-carrying v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-proof-carrying) (*)
+
+amun-recovery v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-recovery)
+├── amun-block-store v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-block-store) (*)
+├── amun-persistence v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-persistence) (*)
+├── amun-replay-store v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-store)
+│   ├── blake3 v1.8.5 (*)
+│   ├── hex v0.4.3
+│   ├── serde v1.0.228 (*)
+│   └── serde_json v1.0.150 (*)
+├── amun-snapshot-engine-unified v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-engine-unified)
+│   ├── amun-persistence v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-persistence) (*)
+│   ├── serde v1.0.228 (*)
+│   └── serde_json v1.0.150 (*)
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-replay v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay) (*)
+
+amun-replay-consensus v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-consensus)
+├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+├── amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime) (*)
+├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+├── amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier) (*)
+├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+├── amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+└── thiserror v1.0.69 (*)
+
+amun-replay-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-engine)
+├── amun-constitutional v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional) (*)
+└── sha2 v0.10.9 (*)
+
+amun-replay-store v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-store) (*)
+
+amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier) (*)
+
+amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+
+amun-runtime-benchmarks v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-runtime-benchmarks)
+├── amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode) (*)
+├── amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime) (*)
+├── amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine) (*)
+├── amun-invariant-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-invariant-engine) (*)
+├── amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive) (*)
+├── amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier) (*)
+├── amun-resource-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-resource-core) (*)
+├── amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+└── serde_json v1.0.150 (*)
+
+amun-self-preservation v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-self-preservation)
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+├── amun-constitutional-geometry v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-geometry) (*)
+├── amun-lineage v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-lineage) (*)
+└── blake3 v1.8.5 (*)
+
+amun-snapshot-engine v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-engine) (*)
+
+amun-snapshot-engine-unified v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-engine-unified) (*)
+
+amun-state-machine v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-state-machine)
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+└── blake3 v1.8.5 (*)
+
+amun-state-stream v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-state-stream)
+├── amun-canonical-codec v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-canonical-codec) (*)
+└── blake3 v1.8.5 (*)
+
+amun-stateless-sync v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-stateless-sync) (*)
+
+amun-storage-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-storage-kernel) (*)
+
+amun-temporal-alignment v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-temporal-alignment)
+
+amun-transactions v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transactions) (*)
+
+amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof) (*)
+
+amun-verification-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-verification-kernel) (*)
+
+amun-verifier-node v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-verifier-node) (*)
+
+amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel) (*)
+
+amun-wallet-api v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-wallet-api)
+├── amun-accounts v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-accounts) (*)
+├── amun-block-store v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-block-store) (*)
+├── amun-mempool v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-mempool) (*)
+├── amun-networking v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-networking) (*)
+├── amun-transactions v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transactions) (*)
+├── axum v0.7.9 (*)
+├── blake3 v1.8.5 (*)
+├── hex v0.4.3
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+├── tokio v1.52.3 (*)
+└── tower v0.5.3 (*)
+
+amun-wallet-management v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-wallet-management)
+├── argon2 v0.5.3
+│   ├── base64ct v1.8.3
+│   ├── blake2 v0.10.6
+│   │   └── digest v0.10.7 (*)
+│   ├── cpufeatures v0.2.17
+│   └── password-hash v0.5.0
+│       ├── base64ct v1.8.3
+│       ├── rand_core v0.6.4 (*)
+│       └── subtle v2.6.1
+├── blake3 v1.8.5 (*)
+├── ed25519-dalek v2.2.0 (*)
+├── hex v0.4.3
+├── rand v0.8.6 (*)
+├── serde v1.0.228 (*)
+├── serde_json v1.0.150 (*)
+└── zeroize v1.8.2 (*)

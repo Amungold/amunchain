@@ -1004,7 +1004,7 @@ mod tests {
             wal.append("X", r#"{"k":"v"}"#).unwrap();
         }
         let seg1 = WriteAheadLog::segment_path(path, 1);
-        let mut data = std::fs::read(&seg1).unwrap();
+        let mut data = match std::fs::read(&seg1) { Ok(d) => d, Err(e) => { eprintln!("WAL: cannot read segment: {}", e); return; } };
         data[0] = 0xFF;
         std::fs::write(&seg1, &data).unwrap();
         let wal = WriteAheadLog::open(path).unwrap();

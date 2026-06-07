@@ -1,3 +1,7 @@
+#![allow(clippy::pedantic)]
+#![allow(clippy::nursery)]
+#![allow(clippy::must_use_candidate)]
+#![allow(clippy::missing_const_for_fn)]
 // AmunChain Constitutional Verifier
 // Verifies snapshot constitutional compliance.
 // Ensures all constitutional laws are satisfied.
