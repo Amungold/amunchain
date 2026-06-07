@@ -1,6 +1,6 @@
 use crate::record::FinalizedChainRecord;
 use std::fs;
-use std::io::{Read, Write};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
@@ -80,6 +80,7 @@ impl ChainStore {
     pub fn latest_height(&self) -> u64 { self.records.len().saturating_sub(1) as u64 }
     pub fn load_tip(&self) -> Option<&FinalizedChainRecord> { self.records.last() }
     pub fn len(&self) -> usize { self.records.len() }
+    pub fn is_empty(&self) -> bool { self.records.is_empty() }
 }
 
 #[cfg(test)]

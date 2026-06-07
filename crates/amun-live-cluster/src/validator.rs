@@ -48,7 +48,7 @@ impl LiveValidator {
         let store = self.store.clone();
         let peers: Vec<_> = self.config.other_peers().into_iter().cloned().collect();
         let validator_id = self.config.validator_id;
-        let total = self.config.total_validators();
+        let _total = self.config.total_validators();
         let running = self.running.clone();
 
         // Listen thread
