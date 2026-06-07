@@ -194,6 +194,7 @@ impl LiveValidator {
     pub fn current_height(&self) -> u64 { self.engine.lock().unwrap().current_height }
     pub fn history_root(&self) -> [u8; 32] { self.engine.lock().unwrap().history_root }
     pub fn store_len(&self) -> usize { self.store.lock().unwrap().len() }
+    pub fn metrics_summary(&self) -> String { self.engine.lock().unwrap().metrics.summary() }
 }
 
 #[cfg(test)]

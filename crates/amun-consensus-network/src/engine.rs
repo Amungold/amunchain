@@ -63,6 +63,7 @@ impl ConsensusRound {
             .cloned()
             .collect();
 
+        eprintln!("ROUND_DIAG: h={} votes={} approvals={} need={}", self.height, self.votes.len(), approvals.len(), total_validators * 2 / 3 + 1);
         if approvals.len() * 3 <= total_validators * 2 {
             return None; // Insufficient quorum
         }
@@ -102,11 +103,31 @@ impl ConsensusRound {
 }
 
 /// Full consensus engine managing rounds and history.
+
+#[derive(Clone, Debug)]
+pub struct ConsensusMetrics {
+    pub qcs_formed: u64,
+    pub blocks_finalized: u64,
+    pub votes_received: u64,
+}
+
+impl ConsensusMetrics {
+    pub fn new() -> Self {
+        Self { qcs_formed: 0, blocks_finalized: 0, votes_received: 0 }
+    }
+    pub fn record_qc_formed(&mut self, _h: u64) { self.qcs_formed += 1; }
+    pub fn record_block_finalized(&mut self, _h: u64) { self.blocks_finalized += 1; }
+    pub fn record_vote(&mut self) { self.votes_received += 1; }
+    pub fn summary(&self) -> String {
+        format!("qcs:{} final:{} votes:{}", self.qcs_formed, self.blocks_finalized, self.votes_received)
+    }
+}
 pub struct ConsensusEngine {
     pub validator_id: [u8; 32],
     pub total_validators: usize,
     pub current_height: u64,
     pub history_root: [u8; 32],
+    pub metrics: ConsensusMetrics,
     pub rounds: HashMap<u64, ConsensusRound>,
     finality_chain: Vec<FinalityCertificate>,
 }
@@ -118,6 +139,7 @@ impl ConsensusEngine {
             total_validators,
             current_height: 0,
             history_root: [0u8; 32],
+            metrics: ConsensusMetrics::new(),
             rounds: HashMap::new(),
             finality_chain: Vec::new(),
         }
@@ -146,12 +168,14 @@ impl ConsensusEngine {
         }
         let round = self.rounds.get_mut(&height)
             .ok_or_else(|| format!("No active round at height {}", height))?;
+        self.metrics.record_vote();
         round.add_vote(vote)
     }
 
     /// Try to advance: form QC, finalize, update history.
     pub fn try_advance(&mut self, height: u64, history_root: [u8; 32]) -> Option<FinalityCertificate> {
         let total = self.total_validators;
+        eprintln!("ADVANCE_DIAG: try_advance h={}", height);
         let round = self.rounds.get_mut(&height)?;
 
         if round.qc.is_none() {
@@ -161,6 +185,8 @@ impl ConsensusEngine {
         let cert = round.finalize(history_root)?;
         self.current_height = height;
         self.history_root = history_root;
+        self.metrics.record_qc_formed(height);
+        self.metrics.record_block_finalized(height);
         self.finality_chain.push(cert.clone());
         Some(cert)
     }
