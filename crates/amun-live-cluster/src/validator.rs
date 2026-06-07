@@ -89,6 +89,7 @@ impl LiveValidator {
         let running_consensus = running.clone();
         let h2 = thread::spawn(move || {
             while *running_consensus.lock().unwrap() {
+        println!("CONSENSUS_LOOP: validator={}", validator_id[0]);
                 let height = {
                     let eng = engine_consensus.lock().unwrap();
                     eng.current_height + 1
@@ -102,6 +103,7 @@ impl LiveValidator {
 
                 // Only the proposer creates the round
                 if is_proposer {
+                        println!("PROPOSER_DIAG: validator={} height={}", validator_id[0], height);
                     let block_hash = [height as u8; 32];
                     let mut eng = engine_consensus.lock().unwrap();
                     eng.start_round(height, validator_id);
@@ -315,6 +317,7 @@ mod tests {
         for (i, v) in validators.iter().enumerate() {
             let h = v.store.lock().unwrap().latest_height();
             assert!(h >= 1, "Validator {} store height: {}", i, h);
+        println!("Validator {} metrics: {}", i, v.metrics_summary());
         }
     }
 }
