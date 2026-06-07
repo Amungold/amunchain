@@ -136,9 +136,9 @@ impl ConsensusEngine {
     /// Process a vote for a round.
     pub fn process_vote(&mut self, vote: ConsensusVote) -> Result<(), String> {
         let height = vote.height;
-        if height > self.current_height + 1 {
+        if height > self.current_height + 5 {
             return Err(format!(
-                "Future vote height {} > current+1 {}", height, self.current_height + 1
+                "Future vote height {} > current+5 {}", height, self.current_height + 1
             ));
         }
         if !self.rounds.contains_key(&height) {

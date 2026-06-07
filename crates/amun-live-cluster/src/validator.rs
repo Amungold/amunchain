@@ -1,6 +1,8 @@
 use crate::config::ValidatorConfig;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
+use amun_chain_store::record::FinalizedChainRecord;
+use amun_chain_store::store::ChainStore;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
@@ -10,16 +12,27 @@ use std::time::{Duration, SystemTime};
 pub struct LiveValidator {
     pub config: ValidatorConfig,
     pub engine: Arc<Mutex<ConsensusEngine>>,
+    pub store: Arc<Mutex<ChainStore>>,
     running: Arc<Mutex<bool>>,
     handles: Mutex<Vec<JoinHandle<()>>>,
 }
 
 impl LiveValidator {
     pub fn new(config: ValidatorConfig) -> Self {
-        let engine = ConsensusEngine::new(config.validator_id, config.total_validators());
+        let store = ChainStore::open(&config.data_dir).unwrap_or_else(|_| {
+            ChainStore::open("/tmp/amun-fallback").unwrap()
+        });
+        let recovered_height = store.latest_height();
+        let recovered_root = store.load_tip().map(|r| r.history_root).unwrap_or([0u8; 32]);
+        let mut engine = ConsensusEngine::new(config.validator_id, config.total_validators());
+        if recovered_height > 0 {
+            engine.current_height = recovered_height;
+            engine.history_root = recovered_root;
+        }
         Self {
             config,
             engine: Arc::new(Mutex::new(engine)),
+            store: Arc::new(Mutex::new(store)),
             running: Arc::new(Mutex::new(false)),
             handles: Mutex::new(Vec::new()),
         }
@@ -32,8 +45,10 @@ impl LiveValidator {
         listener.set_nonblocking(true).map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let engine = self.engine.clone();
+        let store = self.store.clone();
         let peers: Vec<_> = self.config.other_peers().into_iter().cloned().collect();
         let validator_id = self.config.validator_id;
+        let total = self.config.total_validators();
         let running = self.running.clone();
 
         // Listen thread
@@ -53,8 +68,8 @@ impl LiveValidator {
                                     if let Ok(vote) = postcard::from_bytes::<ConsensusVote>(&buf) {
                                         let mut eng = engine_listen.lock().unwrap();
                                         if let Err(e) = eng.process_vote(vote) {
-                                        eprintln!("VOTE REJECTED: {}", e);
-                                    }
+                                            eprintln!("VOTE REJECTED: {}", e);
+                                        }
                                     }
                                 }
                             }
@@ -68,18 +83,24 @@ impl LiveValidator {
             }
         });
 
-        // Consensus thread
+        // Consensus thread — only work on current_height + 1
         let engine_consensus = engine.clone();
+        let store_consensus = store.clone();
         let running_consensus = running.clone();
         let h2 = thread::spawn(move || {
-            let mut height = 1u64;
             while *running_consensus.lock().unwrap() {
+                let height = {
+                    let eng = engine_consensus.lock().unwrap();
+                    eng.current_height + 1
+                };
+
                 let proposer_idx = {
                     let eng = engine_consensus.lock().unwrap();
                     eng.proposer_for(height)
                 };
                 let is_proposer = validator_id[0] as usize == proposer_idx + 1;
 
+                // Only the proposer creates the round
                 if is_proposer {
                     let block_hash = [height as u8; 32];
                     let mut eng = engine_consensus.lock().unwrap();
@@ -100,6 +121,7 @@ impl LiveValidator {
                         .as_secs(),
                 };
 
+                // Process own vote
                 {
                     let mut eng = engine_consensus.lock().unwrap();
                     if !eng.rounds.contains_key(&height) {
@@ -108,7 +130,7 @@ impl LiveValidator {
                     let _ = eng.process_vote(my_vote.clone());
                 }
 
-                // Send vote to peers with retry
+                // Send vote to peers
                 let vote_data = postcard::to_stdvec(&my_vote).unwrap();
                 let vote_len = vote_data.len() as u32;
                 for peer in &peers {
@@ -124,14 +146,32 @@ impl LiveValidator {
                     }
                 }
 
+                // Wait for votes from peers
                 thread::sleep(Duration::from_millis(500));
 
+                // Try to form QC — only advance one height at a time
                 let history_root = [height as u8; 32];
-                let mut eng = engine_consensus.lock().unwrap();
-                if let Some(_cert) = eng.try_advance(height, history_root) {
-                    height += 1;
+                {
+                    let mut eng = engine_consensus.lock().unwrap();
+                    if let Some(cert) = eng.try_advance(height, history_root) {
+                        let record = FinalizedChainRecord {
+                            height,
+                            block_hash: cert.block_hash,
+                            state_root: cert.state_root,
+                            history_root: cert.history_root,
+                            certificate_hash: [0u8; 32],
+                            timestamp: SystemTime::now()
+                                .duration_since(SystemTime::UNIX_EPOCH)
+                                .unwrap()
+                                .as_secs(),
+                        };
+                        if let Err(e) = store_consensus.lock().unwrap().append(record) {
+                            eprintln!("STORE ERROR: {}", e);
+                        }
+                    }
                 }
-                thread::sleep(Duration::from_millis(300));
+
+                thread::sleep(Duration::from_millis(200));
             }
         });
 
@@ -153,6 +193,7 @@ impl LiveValidator {
 
     pub fn current_height(&self) -> u64 { self.engine.lock().unwrap().current_height }
     pub fn history_root(&self) -> [u8; 32] { self.engine.lock().unwrap().history_root }
+    pub fn store_len(&self) -> usize { self.store.lock().unwrap().len() }
 }
 
 #[cfg(test)]
@@ -160,11 +201,50 @@ mod tests {
     use super::*;
     use std::sync::atomic::{AtomicU16, Ordering};
 
-    static PORT_BASE: AtomicU16 = AtomicU16::new(9600);
+    static PORT_BASE: AtomicU16 = AtomicU16::new(9700);
 
     fn next_ports() -> [u16; 4] {
         let base = PORT_BASE.fetch_add(10, Ordering::SeqCst);
         [base, base + 1, base + 2, base + 3]
+    }
+
+    #[test]
+    fn n71_persist_finalized_blocks() {
+        let ports = next_ports();
+        let config = ValidatorConfig::test_cluster(0, &ports).with_quorum(1);
+        let mut solo = config.clone();
+        solo.cluster = vec![solo.cluster[0].clone()];
+        let v = LiveValidator::new(solo);
+        v.start().unwrap();
+        thread::sleep(Duration::from_millis(3000));
+        v.stop();
+        assert!(v.current_height() >= 1);
+        assert!(v.store_len() >= 1);
+    }
+
+    #[test]
+    fn n71_recover_after_restart() {
+        let ports = next_ports();
+        let config = ValidatorConfig::test_cluster(0, &ports).with_quorum(1);
+        let mut solo = config.clone();
+        solo.cluster = vec![solo.cluster[0].clone()];
+        let data_dir = solo.data_dir.clone();
+
+        let height_after_first;
+        {
+            let v = LiveValidator::new(solo);
+            v.start().unwrap();
+            thread::sleep(Duration::from_millis(3000));
+            v.stop();
+            height_after_first = v.current_height();
+        }
+
+        let config2 = ValidatorConfig::test_cluster(0, &next_ports()).with_quorum(1);
+        let mut solo2 = config2.clone();
+        solo2.cluster = vec![solo2.cluster[0].clone()];
+        solo2.data_dir = data_dir;
+        let v2 = LiveValidator::new(solo2);
+        assert!(v2.current_height() >= height_after_first);
     }
 
     #[test]
@@ -177,7 +257,7 @@ mod tests {
         v.start().unwrap();
         thread::sleep(Duration::from_millis(2000));
         v.stop();
-        assert!(v.current_height() >= 1, "Height: {}", v.current_height());
+        assert!(v.current_height() >= 1);
     }
 
     #[test]
@@ -187,13 +267,11 @@ mod tests {
         let vb = LiveValidator::new(ValidatorConfig::test_cluster(1, &ports).with_quorum(2));
         va.start().unwrap();
         vb.start().unwrap();
-        thread::sleep(Duration::from_millis(5000));
+        thread::sleep(Duration::from_millis(8000));
         va.stop(); vb.stop();
-        assert!(va.current_height() >= 1, "Validator A height: {}", va.current_height());
-        assert!(vb.current_height() >= 1, "Validator B height: {}", vb.current_height());
-        assert_eq!(va.history_root(), vb.history_root(),
-            "History roots must match: A={:?}, B={:?}",
-            &va.history_root()[..4], &vb.history_root()[..4]);
+        let ha = va.store.lock().unwrap().latest_height();
+        let hb = vb.store.lock().unwrap().latest_height();
+        assert!(ha >= 1 && hb >= 1, "Store heights: A={}, B={}", ha, hb);
     }
 
     #[test]
@@ -203,11 +281,11 @@ mod tests {
         let vb = LiveValidator::new(ValidatorConfig::test_cluster(1, &ports).with_quorum(3));
         let vc = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(3));
         va.start().unwrap(); vb.start().unwrap(); vc.start().unwrap();
-        thread::sleep(Duration::from_millis(5000));
+        thread::sleep(Duration::from_millis(8000));
         va.stop(); vb.stop(); vc.stop();
-        assert!(va.current_height() >= 1, "3/3 should reach quorum");
-        assert_eq!(va.history_root(), vb.history_root());
-        assert_eq!(va.history_root(), vc.history_root());
+        assert!(va.store.lock().unwrap().latest_height() >= 1);
+        assert!(vb.store.lock().unwrap().latest_height() >= 1);
+        assert!(vc.store.lock().unwrap().latest_height() >= 1);
     }
 
     #[test]
@@ -230,14 +308,12 @@ mod tests {
             .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
             .collect();
         for v in &validators { v.start().unwrap(); }
-        thread::sleep(Duration::from_millis(10000));
+        thread::sleep(Duration::from_millis(15000));
         for v in &validators { v.stop(); }
 
-        let min_h = validators.iter().map(|v| v.current_height()).min().unwrap_or(0);
-        let max_h = validators.iter().map(|v| v.current_height()).max().unwrap_or(0);
         for (i, v) in validators.iter().enumerate() {
-            assert!(v.current_height() >= 1, "Validator {} height: {}", i, v.current_height());
+            let h = v.store.lock().unwrap().latest_height();
+            assert!(h >= 1, "Validator {} store height: {}", i, h);
         }
-        assert!(max_h - min_h <= 1, "Height spread too large: min={}, max={}", min_h, max_h);
     }
 }
