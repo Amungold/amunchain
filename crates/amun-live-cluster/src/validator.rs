@@ -5,6 +5,7 @@ use amun_chain_store::record::FinalizedChainRecord;
 use amun_chain_store::store::ChainStore;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
+use amun_sync::catch_up::{download_missing_records, append_missing_records};
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, SystemTime};
@@ -90,10 +91,33 @@ impl LiveValidator {
         let h2 = thread::spawn(move || {
             while *running_consensus.lock().unwrap() {
         println!("CONSENSUS_LOOP: validator={}", validator_id[0]);
-                let height = {
-                    let eng = engine_consensus.lock().unwrap();
-                    eng.current_height + 1
+                let (height, needs_sync) = {
+                    let mut eng = engine_consensus.lock().unwrap();
+                    let h = eng.current_height + 1;
+                    let sync = eng.needs_catchup;
+                    eng.needs_catchup = false;
+                    (h, sync)
                 };
+                if needs_sync {
+                    let peers_addr: Vec<std::net::SocketAddr> = peers.iter().map(|p| p.address).collect();
+                    let current_h = engine_consensus.lock().unwrap().current_height;
+                    if let Ok(records) = download_missing_records(current_h, &peers_addr) {
+                        if !records.is_empty() {
+                            let mut store_g = store_consensus.lock().unwrap();
+                            let new_h = append_missing_records(&mut store_g, current_h, records).unwrap_or(current_h);
+                            if new_h > current_h {
+                                let mut eng2 = engine_consensus.lock().unwrap();
+                                eng2.current_height = new_h;
+                                eng2.rounds.clear();
+                                if let Some(tip) = store_g.load_tip() {
+                                    eng2.history_root = tip.history_root;
+                                }
+                                eprintln!("SYNC: catchup from {} to {}", current_h, new_h);
+                            }
+                        }
+                    }
+                    continue;
+                }
 
                 let proposer_idx = {
                     let eng = engine_consensus.lock().unwrap();

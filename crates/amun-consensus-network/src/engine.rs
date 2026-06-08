@@ -104,7 +104,7 @@ impl ConsensusRound {
 
 /// Full consensus engine managing rounds and history.
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ConsensusMetrics {
     pub qcs_formed: u64,
     pub blocks_finalized: u64,
@@ -113,7 +113,7 @@ pub struct ConsensusMetrics {
 
 impl ConsensusMetrics {
     pub fn new() -> Self {
-        Self { qcs_formed: 0, blocks_finalized: 0, votes_received: 0 }
+        Self::default()
     }
     pub fn record_qc_formed(&mut self, _h: u64) { self.qcs_formed += 1; }
     pub fn record_block_finalized(&mut self, _h: u64) { self.blocks_finalized += 1; }
@@ -129,6 +129,7 @@ pub struct ConsensusEngine {
     pub history_root: [u8; 32],
     pub metrics: ConsensusMetrics,
     pub rounds: HashMap<u64, ConsensusRound>,
+    pub needs_catchup: bool,
     finality_chain: Vec<FinalityCertificate>,
 }
 
@@ -141,6 +142,7 @@ impl ConsensusEngine {
             history_root: [0u8; 32],
             metrics: ConsensusMetrics::new(),
             rounds: HashMap::new(),
+            needs_catchup: false,
             finality_chain: Vec::new(),
         }
     }
@@ -158,9 +160,11 @@ impl ConsensusEngine {
     /// Process a vote for a round.
     pub fn process_vote(&mut self, vote: ConsensusVote) -> Result<(), String> {
         let height = vote.height;
-        if height > self.current_height + 5 {
+        let future_window = std::cmp::max(50, self.current_height / 100);
+        if height > self.current_height + future_window {
+            self.needs_catchup = true;
             return Err(format!(
-                "Future vote height {} > current+5 {}", height, self.current_height + 1
+                "Future vote height {} > current+{} {}", height, future_window, self.current_height
             ));
         }
         if !self.rounds.contains_key(&height) {

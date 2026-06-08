@@ -3,7 +3,6 @@ use amun_vm_kernel::execution_context::ExecutionContext;
 use amun_bytecode::program::ConstitutionalProgram;
 use amun_bytecode::opcodes::OpCode;
 use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
-use amun_replay_consensus::replay_backed_consensus::ReplayBackedConsensus;
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
 use amun_operations::metrics::NodeMetrics;
 use amun_operations::health_check::NodeHealth;
