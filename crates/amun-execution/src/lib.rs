@@ -1,5 +1,5 @@
-use amun_transactions::{Transaction, TransactionPayload, TransactionReceipt};
 use amun_accounts::AccountStore;
+use amun_transactions::{Transaction, TransactionPayload, TransactionReceipt};
 
 /// Constitutional execution engine that processes transactions against account state.
 #[derive(Debug, Clone)]
@@ -9,7 +9,9 @@ pub struct ExecutionEngine {
 
 impl ExecutionEngine {
     pub fn new() -> Self {
-        Self { state: AccountStore::new() }
+        Self {
+            state: AccountStore::new(),
+        }
     }
 
     /// Execute a single transaction and return a receipt.
@@ -97,15 +99,22 @@ impl Default for ExecutionEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use amun_transactions::{TransferPayload, TransactionPayload};
+    use amun_transactions::{TransactionPayload, TransferPayload};
     use ed25519_dalek::SigningKey;
 
-    fn create_signed_transfer(sender_seed: u8, nonce: u64, amount: u64, to: [u8; 32]) -> Transaction {
+    fn create_signed_transfer(
+        sender_seed: u8,
+        nonce: u64,
+        amount: u64,
+        to: [u8; 32],
+    ) -> Transaction {
         let seed = [sender_seed; 32];
         let signing_key = SigningKey::from_bytes(&seed);
         let sender = signing_key.verifying_key().to_bytes();
         let mut tx = Transaction {
-            version: 1, sender, nonce,
+            version: 1,
+            sender,
+            nonce,
             payload: TransactionPayload::Transfer(TransferPayload { to, amount }),
             signature: vec![],
         };
@@ -198,8 +207,14 @@ mod tests {
         let mut engine = ExecutionEngine::new();
         let s1 = [1u8; 32];
         let s2 = [3u8; 32];
-        let a1 = { let sk = SigningKey::from_bytes(&s1); sk.verifying_key().to_bytes() };
-        let a2 = { let sk = SigningKey::from_bytes(&s2); sk.verifying_key().to_bytes() };
+        let a1 = {
+            let sk = SigningKey::from_bytes(&s1);
+            sk.verifying_key().to_bytes()
+        };
+        let a2 = {
+            let sk = SigningKey::from_bytes(&s2);
+            sk.verifying_key().to_bytes()
+        };
         engine.state.create_account(a1, 1000);
         engine.state.create_account(a2, 500);
         let tx1 = create_signed_transfer(1, 1, 200, a2);

@@ -1,14 +1,14 @@
-use amun_resource_core::{
-    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
-    ResourceRegistry, ResourceState,
-};
-use amun_vm_kernel::execution_context::ExecutionContext;
-use amun_bytecode::program::ConstitutionalProgram;
 use amun_bytecode::opcodes::OpCode;
+use amun_bytecode::program::ConstitutionalProgram;
 use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
-use amun_replay_verifier::replay_verifier::ReplayVerifier;
 use amun_proof_archive::hot_store::HotProofStore;
 use amun_proof_archive::proof_archive::ProofArchive;
+use amun_replay_verifier::replay_verifier::ReplayVerifier;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
+use amun_vm_kernel::execution_context::ExecutionContext;
 use std::time::Instant;
 
 fn make_id(seed: u64) -> ResourceId {
@@ -17,7 +17,11 @@ fn make_id(seed: u64) -> ResourceId {
     ResourceId(h)
 }
 
-struct Stats { mean: f64, ci95: f64, n: u32 }
+struct Stats {
+    mean: f64,
+    ci95: f64,
+    n: u32,
+}
 
 fn compute_stats(times: &[f64]) -> Stats {
     let n = times.len() as u32;
@@ -29,7 +33,9 @@ fn compute_stats(times: &[f64]) -> Stats {
 }
 
 fn measure_us(name: &str, warmup: u32, iterations: u32, mut f: impl FnMut()) -> Stats {
-    for _ in 0..warmup { f(); }
+    for _ in 0..warmup {
+        f();
+    }
     let mut times = Vec::with_capacity(iterations as usize);
     for _ in 0..iterations {
         let start = Instant::now();
@@ -38,7 +44,10 @@ fn measure_us(name: &str, warmup: u32, iterations: u32, mut f: impl FnMut()) -> 
         times.push(elapsed);
     }
     let s = compute_stats(&times);
-    println!("{}: {:.2} ± {:.2} µs  (95% CI, n={})", name, s.mean, s.ci95, s.n);
+    println!(
+        "{}: {:.2} ± {:.2} µs  (95% CI, n={})",
+        name, s.mean, s.ci95, s.n
+    );
     s
 }
 
@@ -46,7 +55,9 @@ fn write_csv(filename: &str, header: &[&str], rows: &[Vec<String>]) {
     let path = format!("results/{}", filename);
     let mut wtr = csv::Writer::from_path(&path).unwrap();
     wtr.write_record(header).unwrap();
-    for row in rows { wtr.write_record(row).unwrap(); }
+    for row in rows {
+        wtr.write_record(row).unwrap();
+    }
     wtr.flush().unwrap();
     println!("  -> written {}", path);
 }
@@ -61,7 +72,8 @@ fn build_registry(size: u64) -> ResourceRegistry {
             lineage: ResourceLineage::genesis(make_id(i)),
             contract_id: [1u8; 32],
             owner: [2u8; 32],
-        }).unwrap();
+        })
+        .unwrap();
     }
     reg
 }
@@ -70,21 +82,31 @@ fn build_deep_chain(depth: u64) -> (ResourceRegistry, ResourceId) {
     let mut reg = ResourceRegistry::new((depth * 2) as usize);
     let root = make_id(0);
     reg.register_genesis(ResourceMetadata {
-        resource_id: root, archetype: ResourceArchetype::Asset,
-        state: ResourceState::Active, lineage: ResourceLineage::genesis(root),
-        contract_id: [1u8; 32], owner: [2u8; 32],
-    }).unwrap();
+        resource_id: root,
+        archetype: ResourceArchetype::Asset,
+        state: ResourceState::Active,
+        lineage: ResourceLineage::genesis(root),
+        contract_id: [1u8; 32],
+        owner: [2u8; 32],
+    })
+    .unwrap();
     let mut parent = root;
     for i in 1..=depth {
         let child = make_id(i);
         let hash = ResourceRegistry::hash_resource(reg.get(&parent).unwrap());
         let version = reg.get(&parent).unwrap().lineage.version + 1;
-        reg.consume_and_derive(&parent, ResourceMetadata {
-            resource_id: child, archetype: ResourceArchetype::Asset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::single_ancestor(child, parent, hash, version),
-            contract_id: [1u8; 32], owner: [2u8; 32],
-        }).unwrap();
+        reg.consume_and_derive(
+            &parent,
+            ResourceMetadata {
+                resource_id: child,
+                archetype: ResourceArchetype::Asset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::single_ancestor(child, parent, hash, version),
+                contract_id: [1u8; 32],
+                owner: [2u8; 32],
+            },
+        )
+        .unwrap();
         parent = child;
     }
     (reg, parent)
@@ -97,28 +119,57 @@ fn workload_halt() -> ConstitutionalProgram {
 
 /// Workload B: Push10 — compute overhead.
 fn workload_push10() -> ConstitutionalProgram {
-    ConstitutionalProgram::new(1, 0, 0, vec![
-        OpCode::Push(1), OpCode::Push(2), OpCode::Push(3), OpCode::Push(4),
-        OpCode::Push(5), OpCode::Push(6), OpCode::Push(7), OpCode::Push(8),
-        OpCode::Push(9), OpCode::Push(10), OpCode::Halt,
-    ])
+    ConstitutionalProgram::new(
+        1,
+        0,
+        0,
+        vec![
+            OpCode::Push(1),
+            OpCode::Push(2),
+            OpCode::Push(3),
+            OpCode::Push(4),
+            OpCode::Push(5),
+            OpCode::Push(6),
+            OpCode::Push(7),
+            OpCode::Push(8),
+            OpCode::Push(9),
+            OpCode::Push(10),
+            OpCode::Halt,
+        ],
+    )
 }
 
 /// Workload C: Transform — single resource transformation.
 fn workload_transform() -> ConstitutionalProgram {
-    ConstitutionalProgram::new(2, 0, 0, vec![
-        OpCode::Transform { src_handle: 0, type_idx: 0 },
-        OpCode::Halt,
-    ])
+    ConstitutionalProgram::new(
+        2,
+        0,
+        0,
+        vec![
+            OpCode::Transform {
+                src_handle: 0,
+                type_idx: 0,
+            },
+            OpCode::Halt,
+        ],
+    )
 }
 
 /// Workload D: Split — split one asset into 5 children.
 fn workload_split() -> ConstitutionalProgram {
-    ConstitutionalProgram::new(2, 0, 0, vec![
-        OpCode::Push(0),
-        OpCode::Split { handle: 0, amount_count: 5 },
-        OpCode::Halt,
-    ])
+    ConstitutionalProgram::new(
+        2,
+        0,
+        0,
+        vec![
+            OpCode::Push(0),
+            OpCode::Split {
+                handle: 0,
+                amount_count: 5,
+            },
+            OpCode::Halt,
+        ],
+    )
 }
 
 // ── Experiment 1: State-Scale Invariance ────────────────────
@@ -131,17 +182,30 @@ fn exp1_state_scale() {
     for &size in &sizes {
         let mut reg = build_registry(size);
         let ctx = ExecutionContext {
-            contract_id: make_id(999), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: reg.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(999),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: reg.compute_state_root(),
+            authority: [2u8; 32],
         };
         let mut hot = HotProofStore::new(1000);
         let mut archive = ProofArchive::new();
         let result = ConstitutionalRuntime::execute(
-            &program, &ctx, &mut reg, &[], 100_000, &mut hot, &mut archive,
-        ).unwrap();
+            &program,
+            &ctx,
+            &mut reg,
+            &[],
+            100_000,
+            &mut hot,
+            &mut archive,
+        )
+        .unwrap();
         let proof = match result {
-            PipelineResult::Committed { transition_proof, .. } => transition_proof,
+            PipelineResult::Committed {
+                transition_proof, ..
+            } => transition_proof,
             _ => panic!("Expected Committed"),
         };
 
@@ -149,9 +213,17 @@ fn exp1_state_scale() {
             let mut fresh = ResourceRegistry::new((size * 2) as usize);
             ReplayVerifier::replay(&proof, &program, &mut fresh, &[]);
         });
-        rows.push(vec![size.to_string(), format!("{:.4}", stats.mean), format!("{:.4}", stats.ci95)]);
+        rows.push(vec![
+            size.to_string(),
+            format!("{:.4}", stats.mean),
+            format!("{:.4}", stats.ci95),
+        ]);
     }
-    write_csv("state_scale.csv", &["active_resources", "replay_time_us", "ci95_us"], &rows);
+    write_csv(
+        "state_scale.csv",
+        &["active_resources", "replay_time_us", "ci95_us"],
+        &rows,
+    );
 }
 
 // ── Experiment 2: Replay vs Execution (all workloads) ───────
@@ -169,9 +241,13 @@ fn exp2_replay_vs_execute() {
     for (name, program) in &workloads {
         let mut reg = build_registry(size);
         let ctx = ExecutionContext {
-            contract_id: make_id(999), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: reg.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(999),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: reg.compute_state_root(),
+            authority: [2u8; 32],
         };
 
         // Measure execution
@@ -181,22 +257,50 @@ fn exp2_replay_vs_execute() {
             let mut r = reg.clone();
             let mut h = hot.clone();
             let mut a = archive.clone();
-            match ConstitutionalRuntime::execute(program, &ctx, &mut r, &[], 100_000, &mut h, &mut a) { Ok(_) => {}, Err(e) => { println!("  {} execution failed: {}", name, e); } }
+            match ConstitutionalRuntime::execute(
+                program,
+                &ctx,
+                &mut r,
+                &[],
+                100_000,
+                &mut h,
+                &mut a,
+            ) {
+                Ok(_) => {}
+                Err(e) => {
+                    println!("  {} execution failed: {}", name, e);
+                }
+            }
         });
 
         // Get proof
         let result = ConstitutionalRuntime::execute(
-            program, &ctx, &mut reg, &[], 100_000, &mut hot, &mut archive,
+            program,
+            &ctx,
+            &mut reg,
+            &[],
+            100_000,
+            &mut hot,
+            &mut archive,
         );
         let proof = match result {
-            Ok(PipelineResult::Committed { transition_proof, .. }) => transition_proof,
-            Ok(PipelineResult::Rejected { transition_proof, .. }) => {
+            Ok(PipelineResult::Committed {
+                transition_proof, ..
+            }) => transition_proof,
+            Ok(PipelineResult::Rejected {
+                transition_proof, ..
+            }) => {
                 println!("  {} was rejected, using proof from rejection", name);
                 transition_proof
             }
             Err(e) => {
                 println!("  {} execution failed: {}", name, e);
-                rows.push(vec![name.to_string(), "ERROR".into(), "ERROR".into(), "ERROR".into()]);
+                rows.push(vec![
+                    name.to_string(),
+                    "ERROR".into(),
+                    "ERROR".into(),
+                    "ERROR".into(),
+                ]);
                 continue;
             }
         };
@@ -216,7 +320,11 @@ fn exp2_replay_vs_execute() {
             format!("{:.4}", speedup),
         ]);
     }
-    write_csv("speedup.csv", &["workload", "execution_us", "replay_us", "speedup"], &rows);
+    write_csv(
+        "speedup.csv",
+        &["workload", "execution_us", "replay_us", "speedup"],
+        &rows,
+    );
 }
 
 // ── Experiment 3: Full Pipeline ─────────────────────────────
@@ -233,24 +341,48 @@ fn exp3_full_pipeline() {
             let mut archive = ProofArchive::new();
             for i in 0..n {
                 let ctx = ExecutionContext {
-                    contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
+                    contract_id: make_id(1),
+                    caller: [1u8; 32],
+                    block_height: 1,
                     block_hash: [0u8; 32],
-                    transaction_hash: { let mut h = [0u8; 32]; h[0..8].copy_from_slice(&i.to_le_bytes()); h },
+                    transaction_hash: {
+                        let mut h = [0u8; 32];
+                        h[0..8].copy_from_slice(&i.to_le_bytes());
+                        h
+                    },
                     pre_state_root: reg.compute_state_root(),
                     authority: [2u8; 32],
                 };
                 let result = ConstitutionalRuntime::execute(
-                    &program, &ctx, &mut reg, &[], 100_000, &mut hot, &mut archive,
-                ).unwrap();
-                if let PipelineResult::Committed { transition_proof, .. } = result {
+                    &program,
+                    &ctx,
+                    &mut reg,
+                    &[],
+                    100_000,
+                    &mut hot,
+                    &mut archive,
+                )
+                .unwrap();
+                if let PipelineResult::Committed {
+                    transition_proof, ..
+                } = result
+                {
                     let mut fresh = ResourceRegistry::new(10000);
                     ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
                 }
             }
         });
-        rows.push(vec![n.to_string(), format!("{:.4}", stats.mean), format!("{:.4}", stats.ci95)]);
+        rows.push(vec![
+            n.to_string(),
+            format!("{:.4}", stats.mean),
+            format!("{:.4}", stats.ci95),
+        ]);
     }
-    write_csv("pipeline_latency.csv", &["tx_count", "latency_us", "ci95_us"], &rows);
+    write_csv(
+        "pipeline_latency.csv",
+        &["tx_count", "latency_us", "ci95_us"],
+        &rows,
+    );
 }
 
 // ── Experiment 4: Cycle Detection ───────────────────────────
@@ -266,16 +398,29 @@ fn exp4_cycle_detection() {
             let tip_hash = ResourceRegistry::hash_resource(tip_meta);
             let version = tip_meta.lineage.version + 1;
             let new_id = make_id(depth + 100);
-            let _ = reg.consume_and_derive(&tip, ResourceMetadata {
-                resource_id: new_id, archetype: ResourceArchetype::Asset,
-                state: ResourceState::Active,
-                lineage: ResourceLineage::single_ancestor(new_id, tip, tip_hash, version),
-                contract_id: [1u8; 32], owner: [2u8; 32],
-            });
+            let _ = reg.consume_and_derive(
+                &tip,
+                ResourceMetadata {
+                    resource_id: new_id,
+                    archetype: ResourceArchetype::Asset,
+                    state: ResourceState::Active,
+                    lineage: ResourceLineage::single_ancestor(new_id, tip, tip_hash, version),
+                    contract_id: [1u8; 32],
+                    owner: [2u8; 32],
+                },
+            );
         });
-        rows.push(vec![depth.to_string(), format!("{:.4}", stats.mean), format!("{:.4}", stats.ci95)]);
+        rows.push(vec![
+            depth.to_string(),
+            format!("{:.4}", stats.mean),
+            format!("{:.4}", stats.ci95),
+        ]);
     }
-    write_csv("cycle_detection.csv", &["depth", "time_us", "ci95_us"], &rows);
+    write_csv(
+        "cycle_detection.csv",
+        &["depth", "time_us", "ci95_us"],
+        &rows,
+    );
 }
 
 // ── Experiment 5: Witness Bundle Size ───────────────────────
@@ -292,25 +437,46 @@ fn exp5_witness_size() {
         for &size in &sizes {
             let mut reg = build_registry(size);
             let ctx = ExecutionContext {
-                contract_id: make_id(999), caller: [1u8; 32], block_height: 1,
-                block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-                pre_state_root: reg.compute_state_root(), authority: [2u8; 32],
+                contract_id: make_id(999),
+                caller: [1u8; 32],
+                block_height: 1,
+                block_hash: [0u8; 32],
+                transaction_hash: [0xaa; 32],
+                pre_state_root: reg.compute_state_root(),
+                authority: [2u8; 32],
             };
             let mut hot = HotProofStore::new(1000);
             let mut archive = ProofArchive::new();
             let result = ConstitutionalRuntime::execute(
-                program, &ctx, &mut reg, &[], 100_000, &mut hot, &mut archive,
-            ).unwrap();
+                program,
+                &ctx,
+                &mut reg,
+                &[],
+                100_000,
+                &mut hot,
+                &mut archive,
+            )
+            .unwrap();
             let proof = match result {
-                PipelineResult::Committed { transition_proof, .. } => transition_proof,
+                PipelineResult::Committed {
+                    transition_proof, ..
+                } => transition_proof,
                 _ => continue,
             };
             let json_size = serde_json::to_string(&proof).unwrap().len();
             println!("  witness_{}_{}: {} bytes", name, size, json_size);
-            rows.push(vec![name.to_string(), size.to_string(), json_size.to_string()]);
+            rows.push(vec![
+                name.to_string(),
+                size.to_string(),
+                json_size.to_string(),
+            ]);
         }
     }
-    write_csv("witness_size.csv", &["workload", "resources", "witness_bytes"], &rows);
+    write_csv(
+        "witness_size.csv",
+        &["workload", "resources", "witness_bytes"],
+        &rows,
+    );
 }
 
 // ── Experiment 6: Resource Law Verification ─────────────────
@@ -324,9 +490,17 @@ fn exp6_law_verification() {
             let reg = build_registry(size);
             let _root = reg.compute_state_root();
         });
-        rows.push(vec![size.to_string(), format!("{:.4}", stats.mean), format!("{:.4}", stats.ci95)]);
+        rows.push(vec![
+            size.to_string(),
+            format!("{:.4}", stats.mean),
+            format!("{:.4}", stats.ci95),
+        ]);
     }
-    write_csv("law_verification.csv", &["resources", "time_us", "ci95_us"], &rows);
+    write_csv(
+        "law_verification.csv",
+        &["resources", "time_us", "ci95_us"],
+        &rows,
+    );
 }
 
 // ── main ─────────────────────────────────────────────────────

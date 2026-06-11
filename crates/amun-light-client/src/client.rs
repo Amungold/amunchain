@@ -7,7 +7,10 @@ pub struct LightClient {
 
 impl LightClient {
     pub fn new(trusted_genesis_hash: String) -> Self {
-        Self { trusted_height: 0, trusted_hash: trusted_genesis_hash }
+        Self {
+            trusted_height: 0,
+            trusted_hash: trusted_genesis_hash,
+        }
     }
 
     pub fn bootstrap(&mut self, _height: u64) -> Result<(), String> {

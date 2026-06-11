@@ -16,7 +16,15 @@ pub struct RevocationRegistry {
 }
 
 impl RevocationRegistry {
-    pub fn new() -> Self { Self { revoked: BTreeSet::new() } }
-    pub fn revoke(&mut self, witness: &RevocationWitness) { self.revoked.insert(witness.capability_id.clone()); }
-    pub fn is_revoked(&self, capability_id: &str) -> bool { self.revoked.contains(capability_id) }
+    pub fn new() -> Self {
+        Self {
+            revoked: BTreeSet::new(),
+        }
+    }
+    pub fn revoke(&mut self, witness: &RevocationWitness) {
+        self.revoked.insert(witness.capability_id.clone());
+    }
+    pub fn is_revoked(&self, capability_id: &str) -> bool {
+        self.revoked.contains(capability_id)
+    }
 }

@@ -30,9 +30,13 @@ impl ResourceId {
         Self(bytes)
     }
 
-    pub fn as_bytes(&self) -> &[u8; 32] { &self.0 }
+    pub fn as_bytes(&self) -> &[u8; 32] {
+        &self.0
+    }
 
-    pub fn to_hex(&self) -> String { hex::encode(self.0) }
+    pub fn to_hex(&self) -> String {
+        hex::encode(self.0)
+    }
 }
 
 impl serde::Serialize for ResourceId {

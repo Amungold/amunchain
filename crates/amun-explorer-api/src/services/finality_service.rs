@@ -1,6 +1,6 @@
-use axum::Json;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::FinalityCertificateSummary;
+use axum::Json;
 
 pub struct FinalityService;
 

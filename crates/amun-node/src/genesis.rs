@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
 /// A validator defined in the genesis configuration.
@@ -113,12 +113,21 @@ mod tests {
             chain_id: "amunchain-testnet-1".into(),
             timestamp: 0,
             validators: vec![
-                GenesisValidator { peer_id: "v1".into(), public_key: "pk1".into(), voting_power: 100 },
-                GenesisValidator { peer_id: "v2".into(), public_key: "pk2".into(), voting_power: 100 },
+                GenesisValidator {
+                    peer_id: "v1".into(),
+                    public_key: "pk1".into(),
+                    voting_power: 100,
+                },
+                GenesisValidator {
+                    peer_id: "v2".into(),
+                    public_key: "pk2".into(),
+                    voting_power: 100,
+                },
             ],
-            trust_anchors: vec![
-                GenesisTrustAnchor { peer_id: "ta1".into(), public_key: "tapk1".into() },
-            ],
+            trust_anchors: vec![GenesisTrustAnchor {
+                peer_id: "ta1".into(),
+                public_key: "tapk1".into(),
+            }],
         }
     }
 

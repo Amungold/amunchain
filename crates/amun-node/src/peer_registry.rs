@@ -1,7 +1,7 @@
 #![allow(dead_code)]
-use std::collections::HashMap;
-use amun_networking::peer_identity::PeerId;
 use crate::peer_handshake::AuthenticatedPeer;
+use amun_networking::peer_identity::PeerId;
+use std::collections::HashMap;
 
 /// Registry of authenticated peers.
 #[derive(Debug, Clone, Default)]

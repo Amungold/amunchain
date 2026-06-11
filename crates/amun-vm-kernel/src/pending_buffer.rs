@@ -1,6 +1,4 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceState,
-};
+use amun_resource_core::{ResourceId, ResourceMetadata, ResourceState};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -22,9 +20,16 @@ pub struct OperationRecord {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum VMEvidence {
-    ExecutionFailure { reason: String },
-    ConstitutionalViolation { law: String, resource_ids: Vec<ResourceId> },
-    InvariantViolation { obligation_id: String },
+    ExecutionFailure {
+        reason: String,
+    },
+    ConstitutionalViolation {
+        law: String,
+        resource_ids: Vec<ResourceId>,
+    },
+    InvariantViolation {
+        obligation_id: String,
+    },
 }
 
 #[derive(Debug, Clone, Default)]
@@ -40,10 +45,9 @@ impl PendingBuffer {
     pub fn new(pre_state_resources: Vec<ResourceMetadata>) -> Self {
         let mut buffer = Self::default();
         for (i, meta) in pre_state_resources.into_iter().enumerate() {
-            buffer.resources.insert(
-                i as Handle,
-                (meta.resource_id, BufferAction::Reference),
-            );
+            buffer
+                .resources
+                .insert(i as Handle, (meta.resource_id, BufferAction::Reference));
             buffer.pre_state.insert(i as Handle, meta);
         }
         buffer.next_handle = buffer.resources.len() as Handle;
@@ -55,7 +59,9 @@ impl PendingBuffer {
         handle: Handle,
         terminal_state: ResourceState,
     ) -> Result<(), String> {
-        let entry = self.resources.get_mut(&handle)
+        let entry = self
+            .resources
+            .get_mut(&handle)
             .ok_or_else(|| format!("handle {} not found", handle))?;
         entry.1 = BufferAction::Consume { terminal_state };
         Ok(())
@@ -84,16 +90,19 @@ impl PendingBuffer {
     }
 
     pub fn get_metadata(&self, handle: Handle) -> Option<&ResourceMetadata> {
-        self.resources.get(&handle).and_then(|(_, action)| match action {
-            BufferAction::Produce { metadata } => Some(metadata),
-            BufferAction::Reference | BufferAction::Consume { .. } => {
-                self.pre_state.get(&handle)
-            }
-        })
+        self.resources
+            .get(&handle)
+            .and_then(|(_, action)| match action {
+                BufferAction::Produce { metadata } => Some(metadata),
+                BufferAction::Reference | BufferAction::Consume { .. } => {
+                    self.pre_state.get(&handle)
+                }
+            })
     }
 
     pub fn produced_resources(&self) -> Vec<&ResourceMetadata> {
-        self.resources.values()
+        self.resources
+            .values()
             .filter_map(|(_, action)| match action {
                 BufferAction::Produce { metadata } => Some(metadata),
                 _ => None,
@@ -102,7 +111,8 @@ impl PendingBuffer {
     }
 
     pub fn consumed_handles(&self) -> Vec<(Handle, ResourceId, ResourceState)> {
-        self.resources.iter()
+        self.resources
+            .iter()
             .filter_map(|(handle, (rid, action))| match action {
                 BufferAction::Consume { terminal_state } => {
                     Some((*handle, *rid, terminal_state.clone()))

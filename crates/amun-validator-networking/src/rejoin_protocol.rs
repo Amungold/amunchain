@@ -1,10 +1,15 @@
-use amun_resource_core::ResourceRegistry;
 use crate::sync_transport::SyncTransport;
+use amun_resource_core::ResourceRegistry;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RejoinResult {
-    Rejoined { height: u64, resources_imported: usize },
-    Failed { reason: String },
+    Rejoined {
+        height: u64,
+        resources_imported: usize,
+    },
+    Failed {
+        reason: String,
+    },
 }
 
 pub struct RejoinProtocol;
@@ -39,7 +44,9 @@ impl RejoinProtocol {
 
         // Export snapshot using the agreed-upon history root
         let package = SyncTransport::export_snapshot(
-            peer_registry, height, block_hash,
+            peer_registry,
+            height,
+            block_hash,
             my_trusted_history_root,
             "rejoin-protocol".into(),
         );

@@ -1,7 +1,7 @@
-use std::collections::BTreeMap;
 use crate::peer_identity::PeerId;
-use crate::validator_certificate::ValidatorCertificate;
 use crate::trust_anchor::TrustAnchorRegistry;
+use crate::validator_certificate::ValidatorCertificate;
+use std::collections::BTreeMap;
 
 /// Registry of active validators with verified certificates.
 #[derive(Debug, Clone, Default)]
@@ -29,7 +29,8 @@ impl ValidatorRegistry {
             return Err("Certificate signature invalid");
         }
 
-        self.validators.insert(certificate.validator_id, certificate);
+        self.validators
+            .insert(certificate.validator_id, certificate);
         Ok(())
     }
 

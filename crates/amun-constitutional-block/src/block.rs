@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use amun_constitutional_kernel::receipt::ExecutionReceipt;
 use amun_constitutional_commitments::SparseMerkleTree;
+use amun_constitutional_kernel::receipt::ExecutionReceipt;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ConstitutionalBlock {

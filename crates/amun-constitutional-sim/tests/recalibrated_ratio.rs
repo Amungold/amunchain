@@ -1,4 +1,4 @@
-use amun_constitutional_sim::{SimulationRunner, ExperimentalProtocol};
+use amun_constitutional_sim::{ExperimentalProtocol, SimulationRunner};
 
 #[test]
 fn test_ratio_scan_recalibrated() {
@@ -15,16 +15,19 @@ fn test_ratio_scan_recalibrated() {
         let mut e_sum = 0.0;
         let mut cr_sum = 0.0;
         let mut dl_sum = 0.0;
-        
+
         for _ in 0..runs {
             let protocol = ExperimentalProtocol {
-                num_sovereigns: n, num_steps: steps,
-                initial_recognition_density: 0.8, initial_treaty_density: 0.0,
+                num_sovereigns: n,
+                num_steps: steps,
+                initial_recognition_density: 0.8,
+                initial_treaty_density: 0.0,
                 erosion_rate: erosion,
                 formation_base_rate: formation,
                 formation_legitimacy_factor: formation * 2.0,
                 formation_reciprocity_bias: formation * 4.0,
-                treaty_failure_rate: 0.0, horizon: steps,
+                treaty_failure_rate: 0.0,
+                horizon: steps,
             };
             let results = SimulationRunner::run(&protocol);
             if let Some(last) = results.last() {
@@ -33,7 +36,7 @@ fn test_ratio_scan_recalibrated() {
                 dl_sum += last.divergence_from_start;
             }
         }
-        
+
         let e_bar = e_sum / runs as f64;
         let cr = cr_sum / runs as f64;
         let dl = dl_sum / runs as f64;

@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use blake3::Hasher;
+use serde::{Deserialize, Serialize};
 
 /// A verifiable claim about the system's constitutional properties.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -117,8 +117,7 @@ impl VerificationCertificate {
 
     /// Verify the certificate's integrity.
     pub fn verify(&self) -> bool {
-        self.certificate_id == self.compute_id()
-            && self.certificate_hash == self.compute_hash()
+        self.certificate_id == self.compute_id() && self.certificate_hash == self.compute_hash()
     }
 
     /// Count claims by status.
@@ -134,7 +133,9 @@ pub struct VerificationRegistry {
 }
 
 impl VerificationRegistry {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn register(&mut self, cert: VerificationCertificate) -> Result<(), String> {
         if !cert.verify() {
@@ -148,7 +149,9 @@ impl VerificationRegistry {
         self.certificates.iter().find(|c| c.phase == phase)
     }
 
-    pub fn count(&self) -> usize { self.certificates.len() }
+    pub fn count(&self) -> usize {
+        self.certificates.len()
+    }
 }
 
 #[cfg(test)]
@@ -184,10 +187,7 @@ mod tests {
             make_claim("C1", "N46", ClaimStatus::Proven),
             make_claim("C2", "N46", ClaimStatus::Validated),
         ];
-        let evidence = vec![
-            make_evidence("E1", "C1"),
-            make_evidence("E2", "C2"),
-        ];
+        let evidence = vec![make_evidence("E1", "C1"), make_evidence("E2", "C2")];
         let cert = VerificationCertificate::issue("N46", claims, evidence, "verifier-1", 1000);
         assert!(cert.verify());
         assert_eq!(cert.count_by_status(ClaimStatus::Proven), 1);

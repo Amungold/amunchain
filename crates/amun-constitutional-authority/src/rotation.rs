@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use amun_constitutional_signing::{ConstitutionalKeyPair, SignedArtifact};
 use crate::certificate::ConstitutionalCertificate;
+use amun_constitutional_signing::{ConstitutionalKeyPair, SignedArtifact};
 
 /// Enforces cryptographically verified key rotation.
 pub struct KeyRotationLaw;

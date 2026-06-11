@@ -1,10 +1,10 @@
+use crate::envelope::Envelope;
+use crate::transport::MockTransport;
+use amun_consensus::action::ConsensusAction;
+use amun_consensus::pacemaker::{FixedMultiplier, Pacemaker, PacemakerConfig};
+use amun_consensus::round_state_machine::RoundStateMachine;
 use amun_consensus::types::{BlockProposal, Vote};
 use amun_consensus::validator::ValidatorSet;
-use amun_consensus::round_state_machine::RoundStateMachine;
-use amun_consensus::pacemaker::{Pacemaker, PacemakerConfig, FixedMultiplier};
-use amun_consensus::action::ConsensusAction;
-use crate::transport::MockTransport;
-use crate::envelope::Envelope;
 
 /// A constitutional network node that bridges consensus engine with network transport.
 ///
@@ -45,7 +45,10 @@ impl NetworkNode {
             base_prevote_timeout_ms: 500,
             base_precommit_timeout_ms: 500,
             max_timeout_rounds: 10,
-            timeout_multiplier: FixedMultiplier { numerator: 2, denominator: 1 },
+            timeout_multiplier: FixedMultiplier {
+                numerator: 2,
+                denominator: 1,
+            },
         });
         Self {
             id,

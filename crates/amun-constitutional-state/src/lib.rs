@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use amun_constitutional_commitments::SparseMerkleTree;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 pub mod keys {
@@ -25,7 +25,10 @@ pub struct ConstitutionalStateRuntime {
 
 impl ConstitutionalStateRuntime {
     pub fn new() -> Self {
-        Self { state: BTreeMap::new(), journal: Vec::new() }
+        Self {
+            state: BTreeMap::new(),
+            journal: Vec::new(),
+        }
     }
 
     pub fn set(&mut self, key: &[u8], value: &[u8; 32]) {
@@ -54,8 +57,12 @@ impl ConstitutionalStateRuntime {
         tree.root()
     }
 
-    pub fn len(&self) -> usize { self.state.len() }
-    pub fn is_empty(&self) -> bool { self.state.is_empty() }
+    pub fn len(&self) -> usize {
+        self.state.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.state.is_empty()
+    }
 
     /// Record a transition and update state.
     pub fn apply_transition(&mut self, transition_id: &[u8; 32], transition_hash: &[u8; 32]) {
@@ -385,7 +392,8 @@ mod n3_tests {
         rt2.apply_transition(&[2u8; 32], &[0xBB; 32]);
         let c2 = rt2.create_certificate(1, [0u8; 32]);
 
-        let root_single = ConstitutionalStateRuntime::certificate_merkle_root(std::slice::from_ref(&c1));
+        let root_single =
+            ConstitutionalStateRuntime::certificate_merkle_root(std::slice::from_ref(&c1));
         let root_multi = ConstitutionalStateRuntime::certificate_merkle_root(&[c1, c2]);
         assert_ne!(root_single, root_multi);
     }
@@ -410,7 +418,9 @@ impl ConstitutionalStateRuntime {
         certificates: &[ReplayCertificate],
         cert_hash: &[u8; 32],
     ) -> Option<CertificateInclusionProof> {
-        let index = certificates.iter().position(|c| c.certificate_hash() == *cert_hash)?;
+        let index = certificates
+            .iter()
+            .position(|c| c.certificate_hash() == *cert_hash)?;
         let mut tree = SparseMerkleTree::new(b"AMUN_CERTIFICATE_MERKLE_DOMAIN");
         for (i, cert) in certificates.iter().enumerate() {
             let key = format!("{:020}", i);
@@ -475,7 +485,8 @@ mod n7_tests {
         let certs = vec![c1.clone(), c2.clone()];
         let hash = c1.certificate_hash();
 
-        let mut proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+        let mut proof =
+            ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
         // Tamper with the certificate hash
         proof.certificate_hash = [0xFF; 32];
         assert!(!proof.verify());

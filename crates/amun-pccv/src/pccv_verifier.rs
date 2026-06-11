@@ -1,10 +1,17 @@
-use amun_resource_core::{ResourceRegistry, TransformationMatrix, ResourceArchetype, ResourceState};
 use crate::enhanced_proof::EnhancedTransitionProof;
+use amun_resource_core::{
+    ResourceArchetype, ResourceRegistry, ResourceState, TransformationMatrix,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PCCVResult {
-    Verified { post_state_root: [u8; 32], evidence_count: usize },
-    Failed { reason: String },
+    Verified {
+        post_state_root: [u8; 32],
+        evidence_count: usize,
+    },
+    Failed {
+        reason: String,
+    },
 }
 
 pub struct PCCVVerifier;
@@ -35,7 +42,11 @@ impl PCCVVerifier {
         }
 
         for cid in &proof.consumed_resources {
-            if proof.produced_resources.iter().any(|m| m.resource_id == *cid) {
+            if proof
+                .produced_resources
+                .iter()
+                .any(|m| m.resource_id == *cid)
+            {
                 return PCCVResult::Failed {
                     reason: format!("R2 violation: {} consumed and produced", cid),
                 };
@@ -57,20 +68,26 @@ impl PCCVVerifier {
                 continue;
             }
             let parent_id = &meta.lineage.parent_resource_ids[0];
-            if let Some(parent_meta) = proof.witness.produced_metadata
+            if let Some(parent_meta) = proof
+                .witness
+                .produced_metadata
                 .iter()
                 .find(|m| m.resource_id == *parent_id)
             {
                 if meta.lineage.version != parent_meta.lineage.version + 1 {
                     return PCCVResult::Failed {
-                        reason: format!("R6: child v{} != parent v{} + 1",
-                            meta.lineage.version, parent_meta.lineage.version),
+                        reason: format!(
+                            "R6: child v{} != parent v{} + 1",
+                            meta.lineage.version, parent_meta.lineage.version
+                        ),
                     };
                 }
                 if !TransformationMatrix::is_legal(parent_meta.archetype, meta.archetype) {
                     return PCCVResult::Failed {
-                        reason: format!("T1: {:?} -> {:?} illegal",
-                            parent_meta.archetype, meta.archetype),
+                        reason: format!(
+                            "T1: {:?} -> {:?} illegal",
+                            parent_meta.archetype, meta.archetype
+                        ),
                     };
                 }
             }
@@ -88,19 +105,34 @@ impl PCCVVerifier {
 
         for ev in &proof.evidence {
             if ev.evidence_id() == [0u8; 32] {
-                return PCCVResult::Failed { reason: "Zero evidence ID".into() };
+                return PCCVResult::Failed {
+                    reason: "Zero evidence ID".into(),
+                };
             }
         }
 
         if Self::compute_proof_hash(proof) != proof.proof_hash {
-            return PCCVResult::Failed { reason: "Proof hash mismatch".into() };
+            return PCCVResult::Failed {
+                reason: "Proof hash mismatch".into(),
+            };
         }
 
-        let min_gas: u64 = proof.operation_log.iter().map(|op| match op.opcode.as_str() {
-            "OP_SPLIT" => 15, "OP_MERGE" => 15, "OP_TRANSFORM" => 15,
-            "OP_CONSUME" => 15, "OP_ARCHIVE" => 20, "OP_REVOKE" => 25,
-            "OP_PUSH" => 1, "OP_POP" => 1, "OP_HALT" => 0, _ => 5,
-        }).sum();
+        let min_gas: u64 = proof
+            .operation_log
+            .iter()
+            .map(|op| match op.opcode.as_str() {
+                "OP_SPLIT" => 15,
+                "OP_MERGE" => 15,
+                "OP_TRANSFORM" => 15,
+                "OP_CONSUME" => 15,
+                "OP_ARCHIVE" => 20,
+                "OP_REVOKE" => 25,
+                "OP_PUSH" => 1,
+                "OP_POP" => 1,
+                "OP_HALT" => 0,
+                _ => 5,
+            })
+            .sum();
         if proof.gas_used < min_gas {
             return PCCVResult::Failed {
                 reason: format!("Gas {} < min {}", proof.gas_used, min_gas),
@@ -123,12 +155,16 @@ impl PCCVVerifier {
         hasher.update(&proof.pre_state_root);
         hasher.update(&proof.post_state_root);
         hasher.update(&proof.gas_used.to_le_bytes());
-        for id in &proof.consumed_resources { hasher.update(id.as_bytes()); }
+        for id in &proof.consumed_resources {
+            hasher.update(id.as_bytes());
+        }
         for meta in &proof.produced_resources {
             hasher.update(meta.resource_id.as_bytes());
             hasher.update(&meta.lineage.version.to_le_bytes());
         }
-        for ev in &proof.evidence { hasher.update(&ev.evidence_id()); }
+        for ev in &proof.evidence {
+            hasher.update(&ev.evidence_id());
+        }
         let wb = serde_json::to_vec(&proof.witness).unwrap_or_default();
         hasher.update(&wb);
         let hash = hasher.finalize();

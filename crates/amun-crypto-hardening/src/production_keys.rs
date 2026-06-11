@@ -1,8 +1,8 @@
-use ed25519_dalek::{SigningKey, VerifyingKey, Signature, Signer, Verifier};
+use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use rand::rngs::OsRng;
 use rand::RngCore;
-use zeroize::{Zeroize, ZeroizeOnDrop};
 use serde::{Deserialize, Serialize};
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 #[derive(Zeroize, ZeroizeOnDrop)]
 pub struct ValidatorKeypair {
@@ -16,7 +16,10 @@ impl ValidatorKeypair {
         OsRng.fill_bytes(&mut secret);
         let signing_key = SigningKey::from_bytes(&secret);
         let public_key = signing_key.verifying_key().to_bytes();
-        Self { public_key, secret_key: signing_key.to_bytes() }
+        Self {
+            public_key,
+            secret_key: signing_key.to_bytes(),
+        }
     }
 
     pub fn sign(&self, message: &[u8]) -> [u8; 64] {

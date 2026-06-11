@@ -19,10 +19,19 @@ impl TransformationMatrix {
         matches!(
             (src, tgt),
             (ResourceArchetype::Asset, ResourceArchetype::Asset)
-                | (ResourceArchetype::Asset, ResourceArchetype::ConstitutionalAsset)
+                | (
+                    ResourceArchetype::Asset,
+                    ResourceArchetype::ConstitutionalAsset
+                )
                 | (ResourceArchetype::Evidence, ResourceArchetype::Claim)
-                | (ResourceArchetype::ConstitutionalAsset, ResourceArchetype::ConstitutionalAsset)
-                | (ResourceArchetype::ConstitutionalAsset, ResourceArchetype::Claim)
+                | (
+                    ResourceArchetype::ConstitutionalAsset,
+                    ResourceArchetype::ConstitutionalAsset
+                )
+                | (
+                    ResourceArchetype::ConstitutionalAsset,
+                    ResourceArchetype::Claim
+                )
         )
     }
 

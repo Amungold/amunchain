@@ -1,9 +1,9 @@
+pub mod certificate;
 pub mod commit_log;
 pub mod validation;
-pub mod certificate;
 
-pub use commit_log::{StateCommit, CommitLog};
-pub use validation::{ReplayResult, ReplayValidator};
 pub use certificate::{ReplayCertificate, ReplayCertificateStore};
+pub use commit_log::{CommitLog, StateCommit};
+pub use validation::{ReplayResult, ReplayValidator};
 pub mod store;
-pub use store::{ReplayStore, CertificateProvider};
+pub use store::{CertificateProvider, ReplayStore};

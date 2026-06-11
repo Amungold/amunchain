@@ -1,5 +1,8 @@
-use amun_constitutional_block::{Blockchain, finalizer::{BlockFinalizer, FinalizationContext}};
 use amun_consensus::action::{ActionLog, ConsensusAction};
+use amun_constitutional_block::{
+    finalizer::{BlockFinalizer, FinalizationContext},
+    Blockchain,
+};
 
 #[test]
 fn test_evidence_root_matches_block() {
@@ -8,9 +11,12 @@ fn test_evidence_root_matches_block() {
     log.record(ConsensusAction::None, 1, 0, "Test", [1u8; 32]);
 
     let ctx = FinalizationContext {
-        state_runtime: None, pre_state_root: [0u8; 32],
-        governance_root: "g".into(), execution_root: "e".into(),
-        timestamp: "t".into(), proposer: "p".into(),
+        state_runtime: None,
+        pre_state_root: [0u8; 32],
+        governance_root: "g".into(),
+        execution_root: "e".into(),
+        timestamp: "t".into(),
+        proposer: "p".into(),
     };
     BlockFinalizer::finalize(&mut chain, &log, ctx).unwrap();
     chain.verify_block_evidence(0, &log).unwrap();
@@ -23,9 +29,12 @@ fn test_tampered_log_fails_verification() {
     log.record(ConsensusAction::None, 1, 0, "Test", [1u8; 32]);
 
     let ctx = FinalizationContext {
-        state_runtime: None, pre_state_root: [0u8; 32],
-        governance_root: "g".into(), execution_root: "e".into(),
-        timestamp: "t".into(), proposer: "p".into(),
+        state_runtime: None,
+        pre_state_root: [0u8; 32],
+        governance_root: "g".into(),
+        execution_root: "e".into(),
+        timestamp: "t".into(),
+        proposer: "p".into(),
     };
     BlockFinalizer::finalize(&mut chain, &log, ctx).unwrap();
 
@@ -42,9 +51,12 @@ fn test_full_chain_replay_audit() {
         let mut log = ActionLog::default();
         log.record(ConsensusAction::None, 1, 0, "Round", [i; 32]);
         let ctx = FinalizationContext {
-            state_runtime: None, pre_state_root: [0u8; 32],
-            governance_root: "g".into(), execution_root: "e".into(),
-            timestamp: "t".into(), proposer: "p".into(),
+            state_runtime: None,
+            pre_state_root: [0u8; 32],
+            governance_root: "g".into(),
+            execution_root: "e".into(),
+            timestamp: "t".into(),
+            proposer: "p".into(),
         };
         BlockFinalizer::finalize(&mut chain, &log, ctx).unwrap();
         logs.push(log);

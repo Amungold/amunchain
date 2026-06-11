@@ -2,10 +2,10 @@ pub mod distribution;
 pub mod gossip;
 
 pub use distribution::{
-    CertificateMessage, InclusionProofMessage, LightClientProofBundle,
-    ProofBundleMessage, BundleBuilder,
+    BundleBuilder, CertificateMessage, InclusionProofMessage, LightClientProofBundle,
+    ProofBundleMessage,
 };
 pub use gossip::{
-    CertificateAnnouncement, CertificateInventory, CertificateSync,
-    ProofSync, BundleGossip, PeerCertificateCache,
+    BundleGossip, CertificateAnnouncement, CertificateInventory, CertificateSync,
+    PeerCertificateCache, ProofSync,
 };

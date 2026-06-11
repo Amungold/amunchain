@@ -30,12 +30,22 @@ impl ProposalManager {
         }
     }
 
-    pub fn prepare_round(&mut self, height: u64, round: u64, selector: &dyn LeaderSelector, validator_set: &ValidatorSet) {
+    pub fn prepare_round(
+        &mut self,
+        height: u64,
+        round: u64,
+        selector: &dyn LeaderSelector,
+        validator_set: &ValidatorSet,
+    ) {
         self.designated_proposer = selector.leader(height, round, validator_set);
         self.current_proposal = None;
     }
 
-    pub fn accept_proposal(&mut self, proposal: BlockProposal, proposer_id: Hash256) -> Result<(), &'static str> {
+    pub fn accept_proposal(
+        &mut self,
+        proposal: BlockProposal,
+        proposer_id: Hash256,
+    ) -> Result<(), &'static str> {
         // Verify the proposal's own proposer field matches the caller.
         if proposal.proposer != proposer_id {
             return Err("proposal proposer mismatch");

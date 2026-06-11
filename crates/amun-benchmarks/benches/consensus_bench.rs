@@ -37,10 +37,15 @@ fn bench_multi_round_10(c: &mut Criterion) {
             for height in 1..=10 {
                 let proposer = [(height as u8 % 4 + 1); 32];
                 engine.start_round(height, proposer);
-                engine.round_mut(height).unwrap().propose([height as u8; 32], [0xBB; 32]);
+                engine
+                    .round_mut(height)
+                    .unwrap()
+                    .propose([height as u8; 32], [0xBB; 32]);
 
                 for id in 1..=3 {
-                    engine.process_vote(make_vote(id, height, [height as u8; 32])).unwrap();
+                    engine
+                        .process_vote(make_vote(id, height, [height as u8; 32]))
+                        .unwrap();
                 }
                 engine.try_advance(height, [height as u8; 32]).unwrap();
             }
@@ -60,5 +65,10 @@ fn bench_vote_serialization(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_single_round, bench_multi_round_10, bench_vote_serialization);
+criterion_group!(
+    benches,
+    bench_single_round,
+    bench_multi_round_10,
+    bench_vote_serialization
+);
 criterion_main!(benches);

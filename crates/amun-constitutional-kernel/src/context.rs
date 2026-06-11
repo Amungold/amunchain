@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use serde::{Deserialize, Serialize};
 use amun_constitutional_authority::ConstitutionalCertificate;
+use serde::{Deserialize, Serialize};
 
 /// The ExecutionContext binds an operation to the constitutional authority
 /// that authorises it and the epoch in which it executes.
@@ -18,10 +18,7 @@ pub struct ExecutionContext {
 }
 
 impl ExecutionContext {
-    pub fn new(
-        authority_chain: Vec<ConstitutionalCertificate>,
-        epoch: String,
-    ) -> Self {
+    pub fn new(authority_chain: Vec<ConstitutionalCertificate>, epoch: String) -> Self {
         Self {
             authority_chain,
             epoch,

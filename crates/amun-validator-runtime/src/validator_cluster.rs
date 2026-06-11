@@ -1,5 +1,5 @@
-use amun_resource_core::ResourceId;
 use crate::validator_node::ValidatorNode;
+use amun_resource_core::ResourceId;
 
 /// Wraps a ValidatorNode with its tempdir to keep the directory alive.
 pub struct NodeInstance {
@@ -25,7 +25,10 @@ impl ValidatorCluster {
             let node = ValidatorNode::new(node_id, dir.path().to_str().unwrap())?;
             nodes.push(NodeInstance { node, _dir: dir });
         }
-        Ok(Self { nodes, block_height: 0 })
+        Ok(Self {
+            nodes,
+            block_height: 0,
+        })
     }
 
     pub fn produce_blocks(&mut self, count: u64) -> Result<(), String> {

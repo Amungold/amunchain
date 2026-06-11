@@ -1,7 +1,7 @@
-use amun_persistence::{PersistentState, FileBackend, PersistenceBackend};
-use amun_snapshot_engine_unified::{SnapshotManager};
 use amun_block_store::{BlockStore, StoredBlock};
-use amun_replay_store::{ReplayStore, ReplayRecord};
+use amun_persistence::{FileBackend, PersistenceBackend, PersistentState};
+use amun_replay_store::{ReplayRecord, ReplayStore};
+use amun_snapshot_engine_unified::SnapshotManager;
 
 /// The complete recovered state of a node after restart.
 #[derive(Debug, Clone, PartialEq)]
@@ -94,9 +94,9 @@ mod tests {
     fn n46_save_and_recover() {
         let dir = "/tmp/n46_recovery_test";
         clean_dir(dir);
-        
+
         let engine = RecoveryEngine::new(dir);
-        
+
         let state = PersistentState {
             height: 42,
             state_root: "state42".into(),
@@ -104,7 +104,7 @@ mod tests {
             block_hash: "block42".into(),
             last_commit_hash: "commit42".into(),
         };
-        
+
         let block = StoredBlock {
             height: 42,
             hash: "block42".into(),
@@ -112,7 +112,7 @@ mod tests {
             state_root: "state42".into(),
             evidence_root: "evidence42".into(),
         };
-        
+
         let record = ReplayRecord {
             height: 42,
             tx_hash: "tx42".into(),
@@ -120,16 +120,16 @@ mod tests {
             state_root_after: "state42".into(),
             commit_hash: "commit42".into(),
         };
-        
+
         engine.save_state(&state, &block, &record).unwrap();
-        
+
         let recovered = engine.recover().unwrap();
         assert_eq!(recovered.height, 42);
         assert_eq!(recovered.state_root, "state42");
         assert_eq!(recovered.evidence_root, "evidence42");
         assert_eq!(recovered.block_count, 1);
         assert_eq!(recovered.replay_count, 1);
-        
+
         clean_dir(dir);
     }
 
@@ -137,13 +137,13 @@ mod tests {
     fn n46_recover_from_genesis() {
         let dir = "/tmp/n46_genesis_test";
         clean_dir(dir);
-        
+
         let engine = RecoveryEngine::new(dir);
         let recovered = engine.recover().unwrap();
         assert_eq!(recovered.height, 0);
         assert_eq!(recovered.block_count, 0);
         assert_eq!(recovered.replay_count, 0);
-        
+
         clean_dir(dir);
     }
 
@@ -151,9 +151,9 @@ mod tests {
     fn n46_full_persistence_pipeline() {
         let dir = "/tmp/n46_pipeline_test";
         clean_dir(dir);
-        
+
         let engine = RecoveryEngine::new(dir);
-        
+
         // Simulate multiple blocks
         for i in 1..=3 {
             let state = PersistentState {
@@ -179,13 +179,13 @@ mod tests {
             };
             engine.save_state(&state, &block, &record).unwrap();
         }
-        
+
         let recovered = engine.recover().unwrap();
         assert_eq!(recovered.height, 3);
         assert_eq!(recovered.block_count, 3);
         assert_eq!(recovered.replay_count, 3);
         assert_eq!(recovered.state_root, "state3");
-        
+
         clean_dir(dir);
     }
 }

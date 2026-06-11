@@ -1,8 +1,8 @@
-use ed25519_dalek::{Verifier, VerifyingKey};
-use amun_constitution_builder::digest::ArtifactDigest;
 use crate::keys::ConstitutionalKeyPair;
 use crate::signature::ConstitutionalSignature;
-use serde::{Serialize, Deserialize};
+use amun_constitution_builder::digest::ArtifactDigest;
+use ed25519_dalek::{Verifier, VerifyingKey};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SignedArtifact<T: ArtifactDigest> {
@@ -15,16 +15,20 @@ impl<T: ArtifactDigest> SignedArtifact<T> {
         let digest = artifact.constitutional_digest();
         let sig = keypair.sign(&digest);
         let verifying_hex = keypair.verifying_key_hex();
-        Self { artifact, signature: ConstitutionalSignature::new(sig, verifying_hex) }
+        Self {
+            artifact,
+            signature: ConstitutionalSignature::new(sig, verifying_hex),
+        }
     }
 
     pub fn verify(&self) -> Result<(), String> {
         let key_bytes = hex::decode(&self.signature.verifying_key_hex)
             .map_err(|e| format!("Invalid verifying key hex: {}", e))?;
-        let arr: [u8; 32] = key_bytes.try_into()
+        let arr: [u8; 32] = key_bytes
+            .try_into()
             .map_err(|_| "Verifying key must be 32 bytes".to_string())?;
-        let verifying_key = VerifyingKey::from_bytes(&arr)
-            .map_err(|e| format!("Invalid verifying key: {}", e))?;
+        let verifying_key =
+            VerifyingKey::from_bytes(&arr).map_err(|e| format!("Invalid verifying key: {}", e))?;
 
         let digest = self.artifact.constitutional_digest();
         verifying_key

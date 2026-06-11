@@ -18,25 +18,46 @@ struct LoadResult {
 
 impl LoadResult {
     fn p50(&self) -> String {
-        if self.latencies.is_empty() { "N/A".into() }
-        else { format!("{:.2}ms", percentile(&self.latencies, 50.0)) }
+        if self.latencies.is_empty() {
+            "N/A".into()
+        } else {
+            format!("{:.2}ms", percentile(&self.latencies, 50.0))
+        }
     }
     fn p95(&self) -> String {
-        if self.latencies.is_empty() { "N/A".into() }
-        else { format!("{:.2}ms", percentile(&self.latencies, 95.0)) }
+        if self.latencies.is_empty() {
+            "N/A".into()
+        } else {
+            format!("{:.2}ms", percentile(&self.latencies, 95.0))
+        }
     }
     fn p99(&self) -> String {
-        if self.latencies.is_empty() { "N/A".into() }
-        else { format!("{:.2}ms", percentile(&self.latencies, 99.0)) }
+        if self.latencies.is_empty() {
+            "N/A".into()
+        } else {
+            format!("{:.2}ms", percentile(&self.latencies, 99.0))
+        }
     }
 
     fn min_lat_str(&self) -> String {
-        if self.latencies.is_empty() { "N/A".into() }
-        else { format!("{:.2}ms", self.latencies.iter().cloned().fold(f64::INFINITY, f64::min)) }
+        if self.latencies.is_empty() {
+            "N/A".into()
+        } else {
+            format!(
+                "{:.2}ms",
+                self.latencies.iter().cloned().fold(f64::INFINITY, f64::min)
+            )
+        }
     }
     fn max_lat_str(&self) -> String {
-        if self.latencies.is_empty() { "N/A".into() }
-        else { format!("{:.2}ms", self.latencies.iter().cloned().fold(0.0_f64, f64::max)) }
+        if self.latencies.is_empty() {
+            "N/A".into()
+        } else {
+            format!(
+                "{:.2}ms",
+                self.latencies.iter().cloned().fold(0.0_f64, f64::max)
+            )
+        }
     }
 
     fn print_report(&self) {
@@ -68,13 +89,16 @@ impl LoadResult {
             "latencies": &self.latencies,
         });
         let mut f = std::fs::File::create(path).unwrap();
-        f.write_all(serde_json::to_string_pretty(&json).unwrap().as_bytes()).unwrap();
+        f.write_all(serde_json::to_string_pretty(&json).unwrap().as_bytes())
+            .unwrap();
         println!("  Report saved: {}", path);
     }
 }
 
 fn percentile(data: &[f64], p: f64) -> f64 {
-    if data.is_empty() { return 0.0; }
+    if data.is_empty() {
+        return 0.0;
+    }
     let mut sorted: Vec<f64> = data.to_vec();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let idx = ((p / 100.0) * (sorted.len() - 1) as f64).round() as usize;
@@ -99,12 +123,18 @@ fn send_tx(addr: SocketAddr, tx: &Transaction) -> Result<f64, String> {
     let start = Instant::now();
     let mut stream = TcpStream::connect_timeout(&addr, Duration::from_secs(2))
         .map_err(|e| format!("Connect: {}", e))?;
-    stream.set_nonblocking(false).map_err(|e| format!("Nonblocking: {}", e))?;
+    stream
+        .set_nonblocking(false)
+        .map_err(|e| format!("Nonblocking: {}", e))?;
 
     let data = postcard::to_stdvec(tx).map_err(|e| format!("Encode: {}", e))?;
     let len = data.len() as u32;
-    stream.write_all(&len.to_be_bytes()).map_err(|e| format!("Write len: {}", e))?;
-    stream.write_all(&data).map_err(|e| format!("Write data: {}", e))?;
+    stream
+        .write_all(&len.to_be_bytes())
+        .map_err(|e| format!("Write len: {}", e))?;
+    stream
+        .write_all(&data)
+        .map_err(|e| format!("Write data: {}", e))?;
     stream.flush().map_err(|e| format!("Flush: {}", e))?;
 
     Ok(start.elapsed().as_secs_f64() * 1000.0)
@@ -138,13 +168,21 @@ fn run_load_test(config: LoadConfig) -> LoadResult {
     }
 
     let total_time = start.elapsed().as_secs_f64();
-    let total_time = if total_time.is_finite() && total_time > 0.0 { total_time } else { 0.001 };
+    let total_time = if total_time.is_finite() && total_time > 0.0 {
+        total_time
+    } else {
+        0.001
+    };
     let total_tx = latencies.len() as u64;
 
     LoadResult {
         total_tx,
         total_time_secs: total_time,
-        tps_average: if total_time > 0.0 { total_tx as f64 / total_time } else { 0.0 },
+        tps_average: if total_time > 0.0 {
+            total_tx as f64 / total_time
+        } else {
+            0.0
+        },
         latencies,
     }
 }
@@ -153,11 +191,13 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let tx_count: u64 = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(1000);
     let rate: u64 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
-    let ports: Vec<u16> = args.get(3)
+    let ports: Vec<u16> = args
+        .get(3)
         .map(|s| s.split(',').filter_map(|p| p.parse().ok()).collect())
         .unwrap_or_else(|| vec![10001, 10002, 10003, 10004]);
 
-    let validators: Vec<SocketAddr> = ports.iter()
+    let validators: Vec<SocketAddr> = ports
+        .iter()
         .map(|p| format!("127.0.0.1:{}", p).parse().unwrap())
         .collect();
 
@@ -165,7 +205,14 @@ fn main() {
     println!("  AmunChain Load Generator — N73-A");
     println!("═══════════════════════════════════════");
     println!("  TX Count:    {}", tx_count);
-    println!("  Rate:        {} tx/s", if rate > 0 { rate.to_string() } else { "unlimited".into() });
+    println!(
+        "  Rate:        {} tx/s",
+        if rate > 0 {
+            rate.to_string()
+        } else {
+            "unlimited".into()
+        }
+    );
     println!("  Validators:  {:?}", ports);
     println!("═══════════════════════════════════════");
 

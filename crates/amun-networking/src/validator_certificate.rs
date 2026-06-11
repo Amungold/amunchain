@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
-use crate::peer_identity::PeerId;
 use crate::crypto_identity::PeerKeyPair;
+use crate::peer_identity::PeerId;
+use serde::{Deserialize, Serialize};
 
 /// A constitutional certificate binding a validator's identity to their public key.
 ///
@@ -63,8 +63,7 @@ impl ValidatorCertificate {
 
     /// Check if the certificate is currently valid.
     pub fn is_valid_at(&self, timestamp: u64) -> bool {
-        timestamp >= self.valid_from
-            && (self.valid_until == 0 || timestamp <= self.valid_until)
+        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
     }
 }
 
@@ -160,7 +159,13 @@ mod tests {
         );
 
         let json = serde_json::to_string(&cert).unwrap();
-        let decoded: ValidatorCertificate = match serde_json::from_str(&json) { Ok(v) => v, Err(e) => { eprintln!("validator_cert: invalid certificate: {}", e); return; } };
+        let decoded: ValidatorCertificate = match serde_json::from_str(&json) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("validator_cert: invalid certificate: {}", e);
+                return;
+            }
+        };
 
         assert!(decoded.verify(&authority.verifying_key.to_bytes()));
         assert!(decoded.is_valid_at(5000));

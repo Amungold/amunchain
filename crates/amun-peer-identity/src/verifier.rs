@@ -1,5 +1,5 @@
-use ed25519_dalek::Verifier;
 use super::certificate::PeerCertificate;
+use ed25519_dalek::Verifier;
 
 pub struct IdentityVerifier;
 
@@ -9,8 +9,8 @@ impl IdentityVerifier {
             return Err("Peer does not belong to the trusted civilisation".into());
         }
 
-        let bytes = serde_json::to_vec(&cert.peer_id)
-            .map_err(|e| format!("Serialization error: {}", e))?;
+        let bytes =
+            serde_json::to_vec(&cert.peer_id).map_err(|e| format!("Serialization error: {}", e))?;
         let mut h = blake3::Hasher::new();
         h.update(b"AMUN_PEER_CERT_V1");
         h.update(&bytes);
@@ -18,7 +18,8 @@ impl IdentityVerifier {
 
         let vk_bytes = hex::decode(&cert.signature.verifying_key_hex)
             .map_err(|e| format!("Invalid key hex: {}", e))?;
-        let arr: [u8; 32] = vk_bytes.try_into()
+        let arr: [u8; 32] = vk_bytes
+            .try_into()
             .map_err(|_| "Key must be 32 bytes".to_string())?;
         let vk = ed25519_dalek::VerifyingKey::from_bytes(&arr)
             .map_err(|e| format!("Invalid verifying key: {}", e))?;

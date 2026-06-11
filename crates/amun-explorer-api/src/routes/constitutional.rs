@@ -1,10 +1,11 @@
-use axum::{extract::Path, routing::get, Router};
 use crate::services::constitutional_service::ConstitutionalService;
+use axum::{extract::Path, routing::get, Router};
 
 async fn get_dashboard() -> crate::errors::ApiResult<crate::types::ConstitutionalDashboard> {
     ConstitutionalService::get_dashboard()
 }
-async fn list_verdicts() -> crate::errors::ApiResult<Vec<crate::types::ConstitutionalVerdictSummary>> {
+async fn list_verdicts() -> crate::errors::ApiResult<Vec<crate::types::ConstitutionalVerdictSummary>>
+{
     ConstitutionalService::list_verdicts()
 }
 async fn list_obligations() -> crate::errors::ApiResult<Vec<String>> {
@@ -13,7 +14,9 @@ async fn list_obligations() -> crate::errors::ApiResult<Vec<String>> {
 async fn list_evidence() -> crate::errors::ApiResult<Vec<crate::types::EvidenceRecordSummary>> {
     ConstitutionalService::list_evidence()
 }
-async fn get_evidence(Path(id): Path<String>) -> crate::errors::ApiResult<crate::types::EvidenceRecordSummary> {
+async fn get_evidence(
+    Path(id): Path<String>,
+) -> crate::errors::ApiResult<crate::types::EvidenceRecordSummary> {
     ConstitutionalService::get_evidence(&id)
 }
 

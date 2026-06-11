@@ -14,14 +14,14 @@
 //! as specialisations of capabilities, keeping the governance
 //! model formal and replay-verifiable.
 
+pub mod amendment;
 pub mod capability;
 pub mod delegation;
 pub mod quorum;
 pub mod voting;
-pub mod amendment;
 
+pub use amendment::AmendmentLifecycle;
 pub use capability::{Capability, CapabilityCertificate};
 pub use delegation::DelegateCertificate;
 pub use quorum::QuorumPolicy;
-pub use voting::{Proposal, Ballot, Tally};
-pub use amendment::AmendmentLifecycle;
+pub use voting::{Ballot, Proposal, Tally};

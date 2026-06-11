@@ -1,7 +1,7 @@
-use ed25519_dalek::{SigningKey, VerifyingKey, Signature, Signer, Verifier};
-use rand::rngs::OsRng;
-use serde::{Serialize, Deserialize};
 use crate::peer_identity::PeerId;
+use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
+use rand::rngs::OsRng;
+use serde::{Deserialize, Serialize};
 
 /// A cryptographic key pair for a network peer.
 pub struct PeerKeyPair {
@@ -14,14 +14,20 @@ impl PeerKeyPair {
     pub fn generate() -> Self {
         let signing_key = SigningKey::generate(&mut OsRng);
         let verifying_key = signing_key.verifying_key();
-        Self { signing_key, verifying_key }
+        Self {
+            signing_key,
+            verifying_key,
+        }
     }
 
     /// Create a keypair from a 32-byte seed.
     pub fn from_seed(seed: [u8; 32]) -> Self {
         let signing_key = SigningKey::from_bytes(&seed);
         let verifying_key = signing_key.verifying_key();
-        Self { signing_key, verifying_key }
+        Self {
+            signing_key,
+            verifying_key,
+        }
     }
 
     /// Export the 32-byte seed for persistent storage.
@@ -45,7 +51,9 @@ impl PeerKeyPair {
             return false;
         }
         if let Ok(verifying_key) = VerifyingKey::from_bytes(key) {
-            let Ok(sig) = Signature::from_slice(signature) else { return false; };
+            let Ok(sig) = Signature::from_slice(signature) else {
+                return false;
+            };
             verifying_key.verify(message, &sig).is_ok()
         } else {
             false

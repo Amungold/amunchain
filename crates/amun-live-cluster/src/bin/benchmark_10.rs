@@ -7,14 +7,16 @@ fn main() {
     let base_port: u16 = 9600;
     let count: usize = 10;
     let ids: [[u8; 32]; 10] = [
-        [1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [5u8; 32],
-        [6u8; 32], [7u8; 32], [8u8; 32], [9u8; 32], [10u8; 32],
+        [1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [5u8; 32], [6u8; 32], [7u8; 32], [8u8; 32],
+        [9u8; 32], [10u8; 32],
     ];
 
     let cluster: Vec<ClusterPeer> = (0..count)
         .map(|i| ClusterPeer {
             validator_id: ids[i],
-            address: format!("127.0.0.1:{}", base_port + i as u16).parse().unwrap(),
+            address: format!("127.0.0.1:{}", base_port + i as u16)
+                .parse()
+                .unwrap(),
         })
         .collect();
 
@@ -49,7 +51,10 @@ fn main() {
         let max_h = *heights.iter().max().unwrap_or(&0);
         println!(
             "t={:3}s min={} max={} spread={}",
-            elapsed, min_h, max_h, max_h - min_h
+            elapsed,
+            min_h,
+            max_h,
+            max_h - min_h
         );
         snapshots.push((elapsed, heights));
     }
@@ -77,6 +82,9 @@ fn main() {
     println!("  Min final height:    {}", min_final);
     println!("  Max final height:    {}", max_final);
     println!("  Height spread:       {}", spread);
-    println!("  Scalability verdict: {}", if spread <= 1 { "PASS" } else { "DEGRADED" });
+    println!(
+        "  Scalability verdict: {}",
+        if spread <= 1 { "PASS" } else { "DEGRADED" }
+    );
     println!("============================================");
 }

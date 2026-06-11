@@ -18,7 +18,13 @@ impl KeyRotationCertificate {
         rotation_signature: [u8; 64],
         issued_at: u64,
     ) -> Self {
-        Self { sequence, old_public_key, new_public_key, rotation_signature, issued_at }
+        Self {
+            sequence,
+            old_public_key,
+            new_public_key,
+            rotation_signature,
+            issued_at,
+        }
     }
 
     pub fn verify(&self) -> bool {
@@ -53,7 +59,10 @@ pub struct KeyRotationChain {
 
 impl KeyRotationChain {
     pub fn new(genesis_key: [u8; 32]) -> Self {
-        Self { rotations: Vec::new(), genesis_key }
+        Self {
+            rotations: Vec::new(),
+            genesis_key,
+        }
     }
 
     pub fn add_rotation(&mut self, cert: KeyRotationCertificate) -> Result<(), String> {
@@ -62,7 +71,10 @@ impl KeyRotationChain {
         }
         let expected_seq = self.rotations.len() as u64 + 1;
         if cert.sequence != expected_seq {
-            return Err(format!("Expected sequence {}, got {}", expected_seq, cert.sequence));
+            return Err(format!(
+                "Expected sequence {}, got {}",
+                expected_seq, cert.sequence
+            ));
         }
         let current_key = self.current_key();
         if cert.old_public_key != current_key {
@@ -73,7 +85,8 @@ impl KeyRotationChain {
     }
 
     pub fn current_key(&self) -> [u8; 32] {
-        self.rotations.last()
+        self.rotations
+            .last()
             .map(|r| r.new_public_key)
             .unwrap_or(self.genesis_key)
     }
@@ -113,9 +126,7 @@ mod tests {
         message.extend_from_slice(&new_kp.public_key);
         let sig = old_kp.sign(&message);
 
-        let cert = KeyRotationCertificate::new(
-            1, old_kp.public_key, new_kp.public_key, sig, 1000,
-        );
+        let cert = KeyRotationCertificate::new(1, old_kp.public_key, new_kp.public_key, sig, 1000);
         assert!(cert.verify());
     }
 
@@ -134,7 +145,11 @@ mod tests {
             let sig = current_kp.sign(&message);
 
             let cert = KeyRotationCertificate::new(
-                i, current_kp.public_key, new_kp.public_key, sig, 1000 + i,
+                i,
+                current_kp.public_key,
+                new_kp.public_key,
+                sig,
+                1000 + i,
             );
             chain.add_rotation(cert).unwrap();
             current_kp = new_kp;

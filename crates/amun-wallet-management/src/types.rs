@@ -25,8 +25,7 @@ impl WalletSeed {
     }
 
     pub fn from_hex(hex_str: &str) -> Result<Self, String> {
-        let bytes = hex::decode(hex_str)
-            .map_err(|e| format!("invalid hex seed: {}", e))?;
+        let bytes = hex::decode(hex_str).map_err(|e| format!("invalid hex seed: {}", e))?;
         if bytes.len() != 32 {
             return Err("seed must be 32 bytes".into());
         }
@@ -38,9 +37,7 @@ impl WalletSeed {
 
 impl std::fmt::Debug for WalletSeed {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("WalletSeed")
-            .field("length", &32)
-            .finish()
+        f.debug_struct("WalletSeed").field("length", &32).finish()
     }
 }
 

@@ -1,23 +1,26 @@
-pub mod types;
 pub mod errors;
 pub mod server;
+pub mod types;
 pub mod routes {
-    pub mod chain;
     pub mod accounts;
-    pub mod finality;
+    pub mod chain;
     pub mod constitutional;
+    pub mod finality;
 }
 pub mod services {
-    pub mod chain_service;
     pub mod account_service;
-    pub mod finality_service;
+    pub mod chain_service;
     pub mod constitutional_service;
+    pub mod finality_service;
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use axum::{body::Body, http::{Request, StatusCode}};
+    use axum::{
+        body::Body,
+        http::{Request, StatusCode},
+    };
     use tower::ServiceExt;
 
     fn app() -> axum::Router {
@@ -28,40 +31,70 @@ mod tests {
     #[tokio::test]
     async fn n48_4_get_chain_head() {
         let response = app()
-            .oneshot(Request::builder().uri("/explorer/chain/head").body(Body::empty()).unwrap())
-            .await.unwrap();
+            .oneshot(
+                Request::builder()
+                    .uri("/explorer/chain/head")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[tokio::test]
     async fn n48_4_list_finality_certificates() {
         let response = app()
-            .oneshot(Request::builder().uri("/explorer/finality/certificates").body(Body::empty()).unwrap())
-            .await.unwrap();
+            .oneshot(
+                Request::builder()
+                    .uri("/explorer/finality/certificates")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[tokio::test]
     async fn n48_4_get_constitutional_dashboard() {
         let response = app()
-            .oneshot(Request::builder().uri("/explorer/constitutional/dashboard").body(Body::empty()).unwrap())
-            .await.unwrap();
+            .oneshot(
+                Request::builder()
+                    .uri("/explorer/constitutional/dashboard")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[tokio::test]
     async fn n48_4_list_verdicts() {
         let response = app()
-            .oneshot(Request::builder().uri("/explorer/constitutional/verdicts").body(Body::empty()).unwrap())
-            .await.unwrap();
+            .oneshot(
+                Request::builder()
+                    .uri("/explorer/constitutional/verdicts")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[tokio::test]
     async fn n48_4_list_evidence() {
         let response = app()
-            .oneshot(Request::builder().uri("/explorer/constitutional/evidence").body(Body::empty()).unwrap())
-            .await.unwrap();
+            .oneshot(
+                Request::builder()
+                    .uri("/explorer/constitutional/evidence")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
     }
 

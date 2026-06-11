@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use amun_networking::node::NetworkNode;
-use amun_networking::envelope::Envelope;
-use amun_consensus::validator::ValidatorSet;
 use amun_chain_checkpoint::bootstrap::BootstrapSession;
+use amun_consensus::validator::ValidatorSet;
+use amun_networking::envelope::Envelope;
+use amun_networking::node::NetworkNode;
 
 /// A multi-node constitutional network simulation.
 ///
@@ -26,10 +26,17 @@ impl Network {
         for i in 0..count {
             let id = [i as u8; 32];
             nodes.insert(i, NetworkNode::new(id));
-            validators.push(amun_consensus::validator::Validator { id, voting_power: 100 });
+            validators.push(amun_consensus::validator::Validator {
+                id,
+                voting_power: 100,
+            });
         }
         let validator_set = ValidatorSet::new(validators).unwrap();
-        Self { nodes, validator_set, time_ms: 0 }
+        Self {
+            nodes,
+            validator_set,
+            time_ms: 0,
+        }
     }
 
     fn tick(&mut self) {
@@ -78,7 +85,10 @@ impl Network {
     fn run_until_commits(&mut self, max_ticks: usize, target_commits: usize) -> bool {
         for _ in 0..max_ticks {
             self.tick();
-            let all_done = self.nodes.values().all(|n| n.committed_blocks.len() >= target_commits);
+            let all_done = self
+                .nodes
+                .values()
+                .all(|n| n.committed_blocks.len() >= target_commits);
             if all_done {
                 return true;
             }
@@ -107,7 +117,7 @@ fn n17_node_crash_and_recovery() {
 
     // Node 2 crashes — remove from both nodes and validator set
     net.nodes.remove(&2);
-    
+
     // Rebuild validator set from remaining live nodes
     let mut validators = Vec::new();
     for node in net.nodes.values() {
@@ -119,7 +129,7 @@ fn n17_node_crash_and_recovery() {
     // 3 nodes with 100 power each = 300 total, 67% = 201, need all 3
     // This is correct but tight. Test that the network makes progress.
     net.validator_set = ValidatorSet::new(validators).unwrap();
-    
+
     // The network continues with 3 nodes
     let _ = net.run_until_commits(2000, 2);
     // If it doesn't reach 2 more commits, that's expected with tight quorum
@@ -127,7 +137,10 @@ fn n17_node_crash_and_recovery() {
     assert!(net.nodes.len() == 3, "Network should have 3 live nodes");
     // At minimum, we should have at least the original commit
     let total_commits: usize = net.nodes.values().map(|n| n.committed_blocks.len()).sum();
-    assert!(total_commits >= 3, "All nodes should have at least 1 commit each");
+    assert!(
+        total_commits >= 3,
+        "All nodes should have at least 1 commit each"
+    );
 }
 
 #[test]
@@ -139,7 +152,12 @@ fn n17_node_crash_and_rejoin() {
     net.nodes.remove(&2);
     net.run_until_commits(300, 3);
 
-    let current_height = net.nodes.values().next().map(|n| n.current_height).unwrap_or(0);
+    let current_height = net
+        .nodes
+        .values()
+        .next()
+        .map(|n| n.current_height)
+        .unwrap_or(0);
     let id = [2u8; 32];
     let mut new_node = NetworkNode::new(id);
     new_node.current_height = current_height;

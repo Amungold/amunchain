@@ -1,2 +1,2 @@
-pub mod peer_table;
 pub mod discovery;
+pub mod peer_table;

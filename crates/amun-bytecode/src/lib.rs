@@ -1,10 +1,10 @@
+pub mod interpreter;
 pub mod opcodes;
 pub mod program;
-pub mod interpreter;
 
+pub use interpreter::*;
 pub use opcodes::*;
 pub use program::*;
-pub use interpreter::*;
 
 #[cfg(test)]
 mod tests {
@@ -13,7 +13,9 @@ mod tests {
     use amun_vm_kernel::execution_context::ExecutionContext;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -73,14 +75,36 @@ mod tests {
     fn w6_opcode_gas_costs() {
         assert_eq!(OpCode::Push(0).base_gas(), 1);
         assert_eq!(OpCode::Halt.base_gas(), 0);
-        assert_eq!(OpCode::Transform { src_handle: 0, type_idx: 0 }.base_gas(), 15);
-        assert_eq!(OpCode::Split { handle: 0, amount_count: 4 }.base_gas(), 10 + 20);
+        assert_eq!(
+            OpCode::Transform {
+                src_handle: 0,
+                type_idx: 0
+            }
+            .base_gas(),
+            15
+        );
+        assert_eq!(
+            OpCode::Split {
+                handle: 0,
+                amount_count: 4
+            }
+            .base_gas(),
+            10 + 20
+        );
     }
 
     #[test]
     fn w6_resource_op_classification() {
-        assert!(OpCode::Split { handle: 0, amount_count: 2 }.is_resource_op());
-        assert!(OpCode::Transform { src_handle: 0, type_idx: 0 }.is_resource_op());
+        assert!(OpCode::Split {
+            handle: 0,
+            amount_count: 2
+        }
+        .is_resource_op());
+        assert!(OpCode::Transform {
+            src_handle: 0,
+            type_idx: 0
+        }
+        .is_resource_op());
         assert!(!OpCode::Push(1).is_resource_op());
         assert!(!OpCode::Halt.is_resource_op());
     }

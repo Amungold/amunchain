@@ -1,9 +1,9 @@
-use crate::state::SimulationState;
-use crate::evolution::EvolutionOperator;
-use crate::effectiveness::EffectivenessEngine;
-use crate::observables::Observables;
 use crate::divergence::DivergenceEngine;
+use crate::effectiveness::EffectivenessEngine;
+use crate::evolution::EvolutionOperator;
+use crate::observables::Observables;
 use crate::protocol::ExperimentalProtocol;
+use crate::state::SimulationState;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -49,7 +49,11 @@ impl SimulationRunner {
                 legitimacy_variance: Observables::legitimacy_variance(&state),
                 recognition_connectivity: Observables::recognition_connectivity(&state),
                 divergence_from_start: div,
-                collapse_risk: DivergenceEngine::collapse_probability(&state, &reference, collapse_threshold),
+                collapse_risk: DivergenceEngine::collapse_probability(
+                    &state,
+                    &reference,
+                    collapse_threshold,
+                ),
             });
         }
         results

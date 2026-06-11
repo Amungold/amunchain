@@ -9,7 +9,11 @@ pub struct GasMeter {
 
 impl GasMeter {
     pub fn new(gas_limit: u64) -> Self {
-        Self { gas_limit, gas_used: 0, exhausted: false }
+        Self {
+            gas_limit,
+            gas_used: 0,
+            exhausted: false,
+        }
     }
 
     pub fn charge(&mut self, amount: u64) -> Result<u64, String> {
@@ -71,7 +75,11 @@ mod tests {
 
     #[test]
     fn w7_gas_can_afford() {
-        let meter = GasMeter { gas_limit: 100, gas_used: 80, exhausted: false };
+        let meter = GasMeter {
+            gas_limit: 100,
+            gas_used: 80,
+            exhausted: false,
+        };
         assert!(meter.can_afford(20));
         assert!(!meter.can_afford(21));
     }

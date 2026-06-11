@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::capability::CapabilityWitness;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DelegationChain {
@@ -7,7 +7,11 @@ pub struct DelegationChain {
 }
 
 impl DelegationChain {
-    pub fn new(root: CapabilityWitness) -> Self { Self { witnesses: vec![root] } }
+    pub fn new(root: CapabilityWitness) -> Self {
+        Self {
+            witnesses: vec![root],
+        }
+    }
 
     pub fn append(&mut self, witness: CapabilityWitness) -> Result<(), String> {
         let prev = self.witnesses.last().ok_or("Empty chain")?;

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
+use crate::quorum::QuorumPolicy;
+use amun_constitution_builder::canonical_bytes::CanonicalSerialize;
+use amun_constitution_builder::digest::ArtifactDigest;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use amun_constitution_builder::digest::ArtifactDigest;
-use amun_constitution_builder::canonical_bytes::CanonicalSerialize;
-use crate::quorum::QuorumPolicy;
 
 /// A proposal that is put to a constitutional vote.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

@@ -25,7 +25,7 @@ impl EvolutionOperator {
     ) {
         let mut rng = rand::thread_rng();
         let n = state.sovereigns.len();
-        
+
         // Use average effectiveness per entity (not total)
         let mut entity_avg = vec![0.0; n];
         let mut entity_count = vec![0; n];
@@ -38,7 +38,7 @@ impl EvolutionOperator {
                 entity_avg[i] /= entity_count[i] as f64;
             }
         }
-        
+
         for i in 0..n {
             for j in 0..n {
                 if i != j && !state.recognition[i][j] {
@@ -59,7 +59,7 @@ impl EvolutionOperator {
         let mut rng = rand::thread_rng();
         let n = state.sovereigns.len();
         for i in 0..n {
-            for j in (i+1)..n {
+            for j in (i + 1)..n {
                 if state.treaties[i][j] && rng.gen::<f64>() < failure_rate {
                     state.treaties[i][j] = false;
                     state.treaties[j][i] = false;
@@ -73,7 +73,9 @@ impl EvolutionOperator {
         for j in &mut state.jurisdictions {
             if rng.gen::<f64>() < shift_rate {
                 let new_region = rng.gen_range(0..10);
-                if !j.regions.contains(&new_region) { j.regions.push(new_region); }
+                if !j.regions.contains(&new_region) {
+                    j.regions.push(new_region);
+                }
             }
         }
     }
@@ -81,20 +83,30 @@ impl EvolutionOperator {
     pub fn claim_generation(state: &mut SimulationState, generation_rate: f64) {
         let mut rng = rand::thread_rng();
         let n = state.sovereigns.len();
-        if n < 2 { return; }
+        if n < 2 {
+            return;
+        }
         let actions = vec![
-            ClaimAction::Govern, ClaimAction::Trade, ClaimAction::Treaty,
-            ClaimAction::Recognize, ClaimAction::Tax, ClaimAction::Defend,
+            ClaimAction::Govern,
+            ClaimAction::Trade,
+            ClaimAction::Treaty,
+            ClaimAction::Recognize,
+            ClaimAction::Tax,
+            ClaimAction::Defend,
         ];
         if rng.gen::<f64>() < generation_rate {
             let issuer = rng.gen_range(0..n);
             let mut subject = rng.gen_range(0..n);
-            while subject == issuer { subject = rng.gen_range(0..n); }
+            while subject == issuer {
+                subject = rng.gen_range(0..n);
+            }
             let claim = crate::state::LegitimacyClaim {
-                issuer, subject,
+                issuer,
+                subject,
                 action: actions[rng.gen_range(0..actions.len())].clone(),
                 scope: state.jurisdictions[issuer].clone(),
-                epoch_start: 0, epoch_end: 10000,
+                epoch_start: 0,
+                epoch_end: 10000,
             };
             state.claims.push(claim);
             state.effectiveness.push(0.0);
@@ -116,7 +128,12 @@ impl EvolutionOperator {
     ) {
         // Use current effectiveness for formation decisions
         Self::recognition_erosion(state, erosion_rate);
-        Self::recognition_formation(state, formation_base, formation_legitimacy, formation_reciprocity);
+        Self::recognition_formation(
+            state,
+            formation_base,
+            formation_legitimacy,
+            formation_reciprocity,
+        );
         Self::treaty_evolution(state, treaty_failure_rate);
         Self::jurisdiction_evolution(state, 0.05);
         Self::claim_generation(state, 0.1);

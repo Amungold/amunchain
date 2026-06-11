@@ -1,13 +1,17 @@
-use axum::{extract::Path, routing::get, Router};
 use crate::services::chain_service::ChainService;
+use axum::{extract::Path, routing::get, Router};
 
 async fn get_head() -> crate::errors::ApiResult<crate::types::ChainHeadResponse> {
     ChainService::get_head()
 }
-async fn get_block_by_height(Path(height): Path<u64>) -> crate::errors::ApiResult<crate::types::BlockResponse> {
+async fn get_block_by_height(
+    Path(height): Path<u64>,
+) -> crate::errors::ApiResult<crate::types::BlockResponse> {
     ChainService::get_block_by_height(height)
 }
-async fn get_block_by_hash(Path(hash): Path<String>) -> crate::errors::ApiResult<crate::types::BlockResponse> {
+async fn get_block_by_hash(
+    Path(hash): Path<String>,
+) -> crate::errors::ApiResult<crate::types::BlockResponse> {
     ChainService::get_block_by_hash(&hash)
 }
 pub fn chain_routes() -> Router {

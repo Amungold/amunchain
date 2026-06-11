@@ -14,14 +14,14 @@
 //! - Replay-safe receipts: every transition leaves a verifiable proof.
 //! - Kernel sovereignty boundary: nothing may bypass constitutional checks.
 
+pub mod amendment;
 pub mod context;
 pub mod enforcer;
-pub mod state_machine;
-pub mod amendment;
 pub mod receipt;
+pub mod state_machine;
 
+pub use amendment::AmendmentActivator;
 pub use context::ExecutionContext;
 pub use enforcer::CapabilityEnforcer;
-pub use state_machine::ConstitutionalStateMachine;
-pub use amendment::AmendmentActivator;
 pub use receipt::ExecutionReceipt;
+pub use state_machine::ConstitutionalStateMachine;

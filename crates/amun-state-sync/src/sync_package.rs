@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::snapshot_certificate::StateSnapshotCertificate;
-use crate::state_chunk::{StateChunk, ChunkMerkleProof};
+use crate::state_chunk::{ChunkMerkleProof, StateChunk};
 
 /// The complete sync package sent to a bootstrapping node.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

@@ -1,6 +1,6 @@
+use crate::report::VerificationReport;
 use amun_constitutional_block::ConstitutionalBlock;
 use amun_proof_carrying::{ProofCarryingReceipt, ProofVerifier};
-use crate::report::VerificationReport;
 
 pub struct VerifierNode;
 
@@ -64,7 +64,10 @@ impl VerifierNode {
         let mut reports = Vec::new();
         for (i, block) in blocks.iter().enumerate() {
             let prev = if i > 0 { Some(&blocks[i - 1]) } else { None };
-            let receipts = receipts_per_block.get(i).map(|v| v.as_slice()).unwrap_or(&[]);
+            let receipts = receipts_per_block
+                .get(i)
+                .map(|v| v.as_slice())
+                .unwrap_or(&[]);
             reports.push(Self::verify_block(block, receipts, prev));
         }
         reports

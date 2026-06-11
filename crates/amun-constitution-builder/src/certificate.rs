@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use serde::{Deserialize, Serialize};
-use crate::emitter::CanonicalEmit;
 use crate::canonical_bytes::CanonicalSerialize;
-use crate::normalize::DeterministicNormalizer;
 use crate::digest::ArtifactDigest;
+use crate::emitter::CanonicalEmit;
+use crate::normalize::DeterministicNormalizer;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]

@@ -1,25 +1,27 @@
-pub mod validator_identity;
 pub mod network_messages;
 pub mod peer_discovery;
-pub mod sync_transport;
 pub mod rejoin_protocol;
+pub mod sync_transport;
+pub mod validator_identity;
 
-pub use validator_identity::*;
 pub use network_messages::*;
 pub use peer_discovery::*;
-pub use sync_transport::*;
 pub use rejoin_protocol::*;
+pub use sync_transport::*;
+pub use validator_identity::*;
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use amun_resource_core::{
-        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
-        ResourceRegistry, ResourceState,
+        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+        ResourceState,
     };
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     fn build_registry(count: u8) -> ResourceRegistry {
@@ -32,7 +34,8 @@ mod tests {
                 lineage: ResourceLineage::genesis(make_id(i)),
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
-            }).unwrap();
+            })
+            .unwrap();
         }
         reg
     }
@@ -64,7 +67,11 @@ mod tests {
         let history_root = [0xab; 32];
 
         let package = SyncTransport::export_snapshot(
-            &source_reg, 100, [0xcd; 32], history_root, "test".into(),
+            &source_reg,
+            100,
+            [0xcd; 32],
+            history_root,
+            "test".into(),
         );
 
         let result = SyncTransport::import_snapshot(&package, history_root);
@@ -79,9 +86,8 @@ mod tests {
         let source_reg = build_registry(10);
         let history_root = [0xab; 32];
 
-        let package = SyncTransport::export_snapshot(
-            &source_reg, 1, [0u8; 32], history_root, "test".into(),
-        );
+        let package =
+            SyncTransport::export_snapshot(&source_reg, 1, [0u8; 32], history_root, "test".into());
 
         let result = SyncTransport::import_snapshot(&package, [0x99; 32]);
         assert!(result.is_err());
@@ -96,10 +102,14 @@ mod tests {
         let block_hash = [0x20; 32];
 
         // Rejoining node trusts history_root and executes rejoin
-        let result = RejoinProtocol::rejoin(&source_reg, 42, block_hash, history_root, history_root);
+        let result =
+            RejoinProtocol::rejoin(&source_reg, 42, block_hash, history_root, history_root);
 
         match result {
-            RejoinResult::Rejoined { height, resources_imported } => {
+            RejoinResult::Rejoined {
+                height,
+                resources_imported,
+            } => {
                 assert_eq!(height, 42);
                 assert_eq!(resources_imported, 100);
             }

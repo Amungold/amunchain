@@ -23,11 +23,13 @@ impl Jurisdiction {
         }
         let set_self: HashSet<u64> = self.regions.iter().copied().collect();
         let set_other: HashSet<u64> = other.regions.iter().copied().collect();
-        
+
         let intersection_count = set_self.intersection(&set_other).count();
         let union_count = set_self.union(&set_other).count();
-        
-        if union_count == 0 { return 0.0; }
+
+        if union_count == 0 {
+            return 0.0;
+        }
         intersection_count as f64 / union_count as f64
     }
 }

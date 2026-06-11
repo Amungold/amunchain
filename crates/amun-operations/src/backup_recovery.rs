@@ -1,6 +1,6 @@
-use amun_state_sync::sync_package::ConstitutionalSyncPackage;
-use amun_state_sync::stateless_verifier::{StatelessVerifier, SyncVerificationResult};
 use amun_resource_core::ResourceRegistry;
+use amun_state_sync::stateless_verifier::{StatelessVerifier, SyncVerificationResult};
+use amun_state_sync::sync_package::ConstitutionalSyncPackage;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -24,8 +24,13 @@ impl NodeBackup {
     ) -> Self {
         let state_root = sync_package.snapshot_certificate.state_root;
         let mut backup = Self {
-            height, block_hash, state_root, history_root,
-            sync_package, created_at, backup_hash: [0u8; 32],
+            height,
+            block_hash,
+            state_root,
+            history_root,
+            sync_package,
+            created_at,
+            backup_hash: [0u8; 32],
         };
         backup.backup_hash = backup.compute_hash();
         backup
@@ -56,7 +61,8 @@ impl NodeBackup {
                 let mut registry = ResourceRegistry::new(self.sync_package.total_resources() * 2);
                 for chunk in &self.sync_package.chunks {
                     for meta in &chunk.resources {
-                        registry.register_genesis(meta.clone())
+                        registry
+                            .register_genesis(meta.clone())
                             .map_err(|e| format!("Restore error: {:?}", e))?;
                     }
                 }
@@ -71,12 +77,14 @@ impl NodeBackup {
 mod tests {
     use super::*;
     use amun_resource_core::{
-        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
-        ResourceRegistry, ResourceState,
+        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+        ResourceState,
     };
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -90,11 +98,16 @@ mod tests {
                 lineage: ResourceLineage::genesis(make_id(i)),
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
-            }).unwrap();
+            })
+            .unwrap();
         }
         let history_root = [0x10; 32];
         let package = amun_validator_networking::sync_transport::SyncTransport::export_snapshot(
-            &reg, 42, [0xab; 32], history_root, "backup-test".into(),
+            &reg,
+            42,
+            [0xab; 32],
+            history_root,
+            "backup-test".into(),
         );
         let backup = NodeBackup::new(42, [0xab; 32], history_root, package, 1000);
         assert!(backup.verify());
@@ -111,12 +124,17 @@ mod tests {
                 lineage: ResourceLineage::genesis(make_id(i)),
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
-            }).unwrap();
+            })
+            .unwrap();
         }
         let state_root = reg.compute_state_root();
         let history_root = [0x10; 32];
         let package = amun_validator_networking::sync_transport::SyncTransport::export_snapshot(
-            &reg, 42, [0xab; 32], history_root, "backup-test".into(),
+            &reg,
+            42,
+            [0xab; 32],
+            history_root,
+            "backup-test".into(),
         );
         let backup = NodeBackup::new(42, [0xab; 32], history_root, package, 1000);
         let restored = backup.restore().unwrap();

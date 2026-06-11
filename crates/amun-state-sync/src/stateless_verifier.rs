@@ -96,7 +96,9 @@ impl StatelessVerifier {
             };
         }
 
-        let total_resources: u64 = package.chunks.iter()
+        let total_resources: u64 = package
+            .chunks
+            .iter()
             .map(|c| c.resource_count() as u64)
             .sum();
         if total_resources != cert.total_resources {

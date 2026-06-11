@@ -1,5 +1,5 @@
+use crate::enhanced_proof::{LineageProof, MerkleProof, WitnessBundle};
 use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
-use crate::enhanced_proof::{MerkleProof, LineageProof, WitnessBundle};
 
 pub struct WitnessBuilder;
 
@@ -57,7 +57,9 @@ impl WitnessBuilder {
         let leaves: Vec<([u8; 32], ResourceId)> = active_ids
             .iter()
             .filter_map(|id| {
-                registry.get(id).map(|meta| (ResourceRegistry::hash_resource(meta), *id))
+                registry
+                    .get(id)
+                    .map(|meta| (ResourceRegistry::hash_resource(meta), *id))
             })
             .collect();
 
@@ -100,10 +102,7 @@ impl WitnessBuilder {
         siblings
     }
 
-    fn build_lineage_proof(
-        registry: &ResourceRegistry,
-        resource_id: &ResourceId,
-    ) -> LineageProof {
+    fn build_lineage_proof(registry: &ResourceRegistry, resource_id: &ResourceId) -> LineageProof {
         let mut chain = Vec::new();
         let mut current_id = *resource_id;
         let mut genesis_id = *resource_id;
@@ -137,7 +136,9 @@ mod tests {
     use amun_resource_core::{ResourceArchetype, ResourceLineage, ResourceMetadata, ResourceState};
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -151,7 +152,8 @@ mod tests {
             lineage: ResourceLineage::genesis(id),
             contract_id: [1u8; 32],
             owner: [2u8; 32],
-        }).unwrap();
+        })
+        .unwrap();
 
         let bundle = WitnessBuilder::build(&reg, &[id], &[]);
         assert_eq!(bundle.lineage_proofs.len(), 1);
@@ -174,27 +176,36 @@ mod tests {
             lineage: ResourceLineage::genesis(root),
             contract_id: [1u8; 32],
             owner: [2u8; 32],
-        }).unwrap();
+        })
+        .unwrap();
 
         let root_hash = ResourceRegistry::hash_resource(reg.get(&root).unwrap());
-        reg.consume_and_derive(&root, ResourceMetadata {
-            resource_id: child,
-            archetype: ResourceArchetype::Asset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::single_ancestor(child, root, root_hash, 2),
-            contract_id: [1u8; 32],
-            owner: [2u8; 32],
-        }).unwrap();
+        reg.consume_and_derive(
+            &root,
+            ResourceMetadata {
+                resource_id: child,
+                archetype: ResourceArchetype::Asset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::single_ancestor(child, root, root_hash, 2),
+                contract_id: [1u8; 32],
+                owner: [2u8; 32],
+            },
+        )
+        .unwrap();
 
         let child_hash = ResourceRegistry::hash_resource(reg.get(&child).unwrap());
-        reg.consume_and_derive(&child, ResourceMetadata {
-            resource_id: grandchild,
-            archetype: ResourceArchetype::Asset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::single_ancestor(grandchild, child, child_hash, 3),
-            contract_id: [1u8; 32],
-            owner: [2u8; 32],
-        }).unwrap();
+        reg.consume_and_derive(
+            &child,
+            ResourceMetadata {
+                resource_id: grandchild,
+                archetype: ResourceArchetype::Asset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::single_ancestor(grandchild, child, child_hash, 3),
+                contract_id: [1u8; 32],
+                owner: [2u8; 32],
+            },
+        )
+        .unwrap();
 
         let bundle = WitnessBuilder::build(&reg, &[grandchild], &[]);
         assert_eq!(bundle.lineage_proofs.len(), 1);
@@ -215,12 +226,15 @@ mod tests {
                 lineage: ResourceLineage::genesis(make_id(i)),
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
-            }).unwrap();
+            })
+            .unwrap();
         }
         let bundle = WitnessBuilder::build(&reg, &[make_id(0)], &[]);
         assert_eq!(bundle.consumed_proofs.len(), 1);
         // With 10 leaves, the Merkle proof should have at least 1 sibling
-        assert!(!bundle.consumed_proofs[0].siblings.is_empty(),
-            "Merkle proof for 10-leaf tree must have siblings");
+        assert!(
+            !bundle.consumed_proofs[0].siblings.is_empty(),
+            "Merkle proof for 10-leaf tree must have siblings"
+        );
     }
 }

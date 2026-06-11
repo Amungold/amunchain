@@ -1,8 +1,8 @@
-use std::collections::VecDeque;
-use std::io::{Read, Write, ErrorKind};
-use std::net::{TcpListener, TcpStream, SocketAddr};
 use crate::envelope::Envelope;
 use crate::transport_trait::Transport;
+use std::collections::VecDeque;
+use std::io::{ErrorKind, Read, Write};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 
 /// Real TCP network transport with length-prefixed message framing.
 ///

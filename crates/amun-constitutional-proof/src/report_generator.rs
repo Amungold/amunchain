@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult,
-};
+use crate::{ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult};
 
 /// The output of the report generator, containing both human-readable
 /// and machine-readable representations of the full constitutional state.
@@ -49,9 +47,18 @@ impl ReportGenerator {
         md.push_str(&format!("**Generated At**: {}\n\n", report.generated_at));
 
         md.push_str("## Executive Summary\n\n");
-        md.push_str(&format!("- **Total Obligations**: {}\n", report.total_obligations));
-        md.push_str(&format!("- **Total Evidence Records**: {}\n", report.total_evidence));
-        md.push_str(&format!("- **Total Verdicts**: {}\n\n", report.total_verdicts));
+        md.push_str(&format!(
+            "- **Total Obligations**: {}\n",
+            report.total_obligations
+        ));
+        md.push_str(&format!(
+            "- **Total Evidence Records**: {}\n",
+            report.total_evidence
+        ));
+        md.push_str(&format!(
+            "- **Total Verdicts**: {}\n\n",
+            report.total_verdicts
+        ));
 
         md.push_str("## Phase Verdicts\n\n");
         for verdict in &report.verdicts {
@@ -77,10 +84,7 @@ impl ReportGenerator {
                 "- **Obligations Satisfied**: {}\n",
                 verdict.obligations_satisfied
             ));
-            md.push_str(&format!(
-                "- **Failed**: {}\n\n",
-                verdict.failed_count()
-            ));
+            md.push_str(&format!("- **Failed**: {}\n\n", verdict.failed_count()));
         }
 
         md

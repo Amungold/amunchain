@@ -11,7 +11,11 @@ pub struct StateChunk {
 impl StateChunk {
     pub fn new(chunk_id: u32, resources: Vec<ResourceMetadata>) -> Self {
         let chunk_hash = Self::compute_chunk_hash(chunk_id, &resources);
-        Self { chunk_id, resources, chunk_hash }
+        Self {
+            chunk_id,
+            resources,
+            chunk_hash,
+        }
     }
 
     pub fn compute_chunk_hash(chunk_id: u32, resources: &[ResourceMetadata]) -> [u8; 32] {

@@ -1,5 +1,5 @@
-use thiserror::Error;
 use crate::ObligationId;
+use thiserror::Error;
 
 /// Errors that can occur in the Obligation Registry.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]

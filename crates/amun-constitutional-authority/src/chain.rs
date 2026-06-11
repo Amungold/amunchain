@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use amun_constitutional_signing::SignedArtifact;
 use crate::certificate::ConstitutionalCertificate;
 use crate::revocation::RevocationRegistry;
+use amun_constitutional_signing::SignedArtifact;
 
 /// A cryptographically verified chain of signed constitutional certificates.
 pub struct CertificateChain {
@@ -13,11 +13,16 @@ pub struct CertificateChain {
 
 impl CertificateChain {
     pub fn new(root: SignedArtifact<ConstitutionalCertificate>) -> Self {
-        Self { certificates: vec![root] }
+        Self {
+            certificates: vec![root],
+        }
     }
 
     /// Append a signed certificate that chains to the current tail.
-    pub fn append(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) -> Result<(), String> {
+    pub fn append(
+        &mut self,
+        cert: SignedArtifact<ConstitutionalCertificate>,
+    ) -> Result<(), String> {
         let tail = &self.certificates.last().ok_or("Empty chain")?.artifact;
         if cert.artifact.lineage_parent_hash != Some(tail.certificate_id.clone()) {
             return Err("Lineage parent mismatch".into());
@@ -54,17 +59,22 @@ impl CertificateChain {
                 if cert.issuer != cert.subject {
                     return Err("Root certificate is not self-signed".into());
                 }
-                signed.verify().map_err(|e| format!("Root signature invalid: {}", e))?;
+                signed
+                    .verify()
+                    .map_err(|e| format!("Root signature invalid: {}", e))?;
             } else {
-                let issuer_key = self.resolve_key(&cert.issuer)
-                    .ok_or_else(|| format!("Issuer certificate {} not found in chain", cert.issuer))?;
+                let issuer_key = self.resolve_key(&cert.issuer).ok_or_else(|| {
+                    format!("Issuer certificate {} not found in chain", cert.issuer)
+                })?;
                 if signed.signature.verifying_key_hex != issuer_key {
                     return Err(format!(
                         "Certificate {} not signed by issuer {}",
                         cert.certificate_id, cert.issuer
                     ));
                 }
-                signed.verify().map_err(|e| format!("Signature invalid on {}: {}", cert.certificate_id, e))?;
+                signed
+                    .verify()
+                    .map_err(|e| format!("Signature invalid on {}: {}", cert.certificate_id, e))?;
             }
 
             // 3. Epoch containment

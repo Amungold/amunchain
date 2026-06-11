@@ -7,10 +7,7 @@ pub struct SyncState {
     pub target_height: u64,
 }
 
-pub fn check_sync_status(
-    store: &ChainStore,
-    peers: &[SocketAddr],
-) -> Result<SyncState, String> {
+pub fn check_sync_status(store: &ChainStore, peers: &[SocketAddr]) -> Result<SyncState, String> {
     let local_height = store.latest_height();
 
     let peer = crate::peer_discovery::discover_peer_tip(peers);

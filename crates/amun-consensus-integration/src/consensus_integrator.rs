@@ -1,11 +1,13 @@
-use amun_resource_core::{ResourceId, ResourceRegistry};
-use amun_vm_kernel::execution_context::ExecutionContext;
 use amun_bytecode::program::ConstitutionalProgram;
 use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
 use amun_proof_archive::hot_store::HotProofStore;
 use amun_proof_archive::proof_archive::ProofArchive;
+use amun_resource_core::{ResourceId, ResourceRegistry};
+use amun_vm_kernel::execution_context::ExecutionContext;
 
-use crate::consensus_types::{ConstitutionalBlock, ConstitutionalFinalityCertificate, ConstitutionalQC};
+use crate::consensus_types::{
+    ConstitutionalBlock, ConstitutionalFinalityCertificate, ConstitutionalQC,
+};
 
 pub struct ConsensusIntegrator;
 
@@ -23,13 +25,23 @@ impl ConsensusIntegrator {
 
         for (program, ctx) in programs {
             let result = ConstitutionalRuntime::execute(
-                program, ctx, registry, &[], 100_000,
-                &mut hot, &mut archive,
-            ).map_err(|e| format!("Execution error: {}", e))?;
+                program,
+                ctx,
+                registry,
+                &[],
+                100_000,
+                &mut hot,
+                &mut archive,
+            )
+            .map_err(|e| format!("Execution error: {}", e))?;
 
             match result {
-                PipelineResult::Committed { transition_proof, .. }
-                | PipelineResult::Rejected { transition_proof, .. } => {
+                PipelineResult::Committed {
+                    transition_proof, ..
+                }
+                | PipelineResult::Rejected {
+                    transition_proof, ..
+                } => {
                     transitions.push(transition_proof);
                 }
             }
@@ -76,7 +88,10 @@ impl ConsensusIntegrator {
             qc.add_signature(sig);
         }
         if !qc.is_valid() {
-            return Err(format!("Insufficient signatures: {}/{}", qc.signer_count, quorum_size));
+            return Err(format!(
+                "Insufficient signatures: {}/{}",
+                qc.signer_count, quorum_size
+            ));
         }
         Ok(ConstitutionalFinalityCertificate::issue(block, qc))
     }
@@ -85,11 +100,13 @@ impl ConsensusIntegrator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use amun_resource_core::ResourceId;
     use amun_bytecode::opcodes::OpCode;
+    use amun_resource_core::ResourceId;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -97,13 +114,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ConsensusIntegrator::execute_block(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         assert_eq!(block.transitions.len(), 1);
         assert!(block.verify_all_proofs());
         assert_ne!(block.proof_root, [0u8; 32]);
@@ -114,13 +140,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ConsensusIntegrator::execute_block(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         let sigs: Vec<Vec<u8>> = (0..5).map(|_| vec![0u8; 64]).collect();
         let cert = ConsensusIntegrator::form_consensus(&block, 5, sigs).unwrap();
         assert!(cert.verify());
@@ -132,13 +167,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ConsensusIntegrator::execute_block(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         let sigs: Vec<Vec<u8>> = (0..2).map(|_| vec![0u8; 64]).collect();
         assert!(ConsensusIntegrator::form_consensus(&block, 5, sigs).is_err());
     }
@@ -148,13 +192,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ConsensusIntegrator::execute_block(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         let sigs: Vec<Vec<u8>> = (0..5).map(|_| vec![0u8; 64]).collect();
         let cert1 = ConsensusIntegrator::form_consensus(&block, 5, sigs.clone()).unwrap();
         let cert2 = ConsensusIntegrator::form_consensus(&block, 5, sigs).unwrap();
@@ -166,13 +219,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ConsensusIntegrator::execute_block(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         assert_eq!(block.state_root, registry.compute_state_root());
         assert_eq!(block.proof_root, block.compute_proof_root());
         assert!(!block.transitions.is_empty());

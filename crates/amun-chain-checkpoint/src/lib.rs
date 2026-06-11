@@ -1,9 +1,9 @@
-use serde::{Serialize, Deserialize};
-use std::collections::BTreeMap;
 use amun_certificate_network::distribution::LightClientProofBundle;
-pub mod inclusion;
-pub mod chain;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 pub mod bootstrap;
+pub mod chain;
+pub mod inclusion;
 
 // ============================================================
 // N12A: Checkpoint Certificate
@@ -57,7 +57,10 @@ impl CheckpointCertificate {
         if bundles.len() as u64 != expected_count {
             return Err(format!(
                 "Bundle count mismatch: expected {} for range [{}, {}] but got {}",
-                expected_count, start_height, end_height, bundles.len()
+                expected_count,
+                start_height,
+                end_height,
+                bundles.len()
             ));
         }
 
@@ -74,7 +77,9 @@ impl CheckpointCertificate {
             }
 
             // 4. Verify bundle is cryptographically valid
-            bundle.verify().map_err(|e| format!("Bundle at height {} invalid: {}", actual_height, e))?;
+            bundle
+                .verify()
+                .map_err(|e| format!("Bundle at height {} invalid: {}", actual_height, e))?;
         }
 
         let last_bundle = &bundles[bundles.len() - 1];
@@ -184,8 +189,8 @@ impl CheckpointCertificate {
     /// Returns the checkpoint hash as raw bytes (32 bytes).
     /// Necessary for Merkle tree operations that expect [u8; 32].
     pub fn checkpoint_hash_bytes(&self) -> [u8; 32] {
-        let decoded = hex::decode(&self.checkpoint_hash)
-            .expect("checkpoint hash must be valid hex");
+        let decoded =
+            hex::decode(&self.checkpoint_hash).expect("checkpoint hash must be valid hex");
         let mut out = [0u8; 32];
         out.copy_from_slice(&decoded[..32]);
         out
@@ -195,8 +200,8 @@ impl CheckpointCertificate {
 #[cfg(test)]
 mod n12a_tests {
     use super::*;
-    use amun_constitutional_state::ConstitutionalStateRuntime;
     use amun_constitutional_block::ConstitutionalBlock;
+    use amun_constitutional_state::ConstitutionalStateRuntime;
 
     /// Helper: create a valid LightClientProofBundle at a given height.
     fn create_bundle(height: u64, parent_hash: &str) -> LightClientProofBundle {
@@ -208,8 +213,16 @@ mod n12a_tests {
         let hash = cert.certificate_hash();
         let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
         let block = ConstitutionalBlock::new(
-            height, parent_hash.into(), "t".into(), "p".into(), vec![],
-            hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root,
+            height,
+            parent_hash.into(),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
         );
         LightClientProofBundle::new(block, cert, proof)
     }
@@ -328,5 +341,3 @@ mod n12a_tests {
         assert_ne!(cert1.checkpoint_hash, cert2.checkpoint_hash);
     }
 }
-
-

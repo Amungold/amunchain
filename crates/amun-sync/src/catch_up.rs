@@ -8,8 +8,8 @@ pub fn download_missing_records(
     current_height: u64,
     peers: &[SocketAddr],
 ) -> Result<Vec<FinalizedChainRecord>, String> {
-    let peer = discover_peer_tip(peers)
-        .ok_or_else(|| "No reachable peer for catch-up".to_string())?;
+    let peer =
+        discover_peer_tip(peers).ok_or_else(|| "No reachable peer for catch-up".to_string())?;
 
     if peer.tip_height <= current_height {
         return Ok(Vec::new());
@@ -47,6 +47,9 @@ pub fn append_missing_records(
     }
 
     let new_height = store.latest_height();
-    eprintln!("SYNC: appended {} blocks, new_height={}", appended, new_height);
+    eprintln!(
+        "SYNC: appended {} blocks, new_height={}",
+        appended, new_height
+    );
     Ok(new_height)
 }

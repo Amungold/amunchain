@@ -3,4 +3,4 @@
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
 pub mod smt;
-pub use smt::{SparseMerkleTree, MerkleProof, ProofType};
+pub use smt::{MerkleProof, ProofType, SparseMerkleTree};

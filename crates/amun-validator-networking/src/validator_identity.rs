@@ -11,7 +11,12 @@ pub struct ValidatorIdentity {
 
 impl ValidatorIdentity {
     pub fn new(validator_id: [u8; 32], public_key: [u8; 32], address: String, port: u16) -> Self {
-        Self { validator_id, public_key, address, port }
+        Self {
+            validator_id,
+            public_key,
+            address,
+            port,
+        }
     }
 
     /// Network fingerprint for peer discovery.

@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use std::collections::{HashSet, HashMap};
 use crate::types::Hash256;
+use serde::{Deserialize, Serialize};
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Validator {
@@ -29,7 +29,11 @@ impl ValidatorSet {
             power_index.insert(v.id, v.voting_power);
         }
         let total_power = validators.iter().map(|v| v.voting_power).sum();
-        Ok(Self { validators, total_power, power_index })
+        Ok(Self {
+            validators,
+            total_power,
+            power_index,
+        })
     }
 
     /// Rebuild the internal power index from the validators list.

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use amun_constitutional_signing::SignedArtifact;
 use crate::capability::Capability;
+use amun_constitutional_signing::SignedArtifact;
 
 pub type DelegateCertificate = SignedArtifact<Capability>;
 
@@ -16,7 +16,9 @@ pub fn verify_delegation_chain(
     }
 
     let first = &chain[0];
-    first.verify().map_err(|e| format!("First delegation invalid: {}", e))?;
+    first
+        .verify()
+        .map_err(|e| format!("First delegation invalid: {}", e))?;
     if first.signature.verifying_key_hex != root_public_key_hex {
         return Err("First delegation not signed by root authority".into());
     }

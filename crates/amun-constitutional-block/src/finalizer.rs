@@ -21,13 +21,13 @@ impl BlockFinalizer {
         action_log: &ActionLog,
         ctx: FinalizationContext,
     ) -> Result<ConstitutionalBlock, String> {
-        let parent_hash = chain.blocks.last()
+        let parent_hash = chain
+            .blocks
+            .last()
             .map(|b| b.block_hash.clone())
             .unwrap_or_else(|| "0".repeat(64));
 
-        let height = chain.blocks.last()
-            .map(|b| b.block_height + 1)
-            .unwrap_or(0);
+        let height = chain.blocks.last().map(|b| b.block_height + 1).unwrap_or(0);
 
         let evidence_root = hex::encode(action_log.evidence_root());
 

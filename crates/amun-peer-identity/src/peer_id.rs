@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 /// the identity to a specific constitutional lineage.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ConstitutionalPeerId {
-    pub peer_id: String,         // hex-encoded BLAKE3 digest
+    pub peer_id: String, // hex-encoded BLAKE3 digest
     pub public_key_hex: String,
-    pub genesis_hash: String,    // lineage anchor
+    pub genesis_hash: String, // lineage anchor
 }
 
 impl ConstitutionalPeerId {
@@ -19,6 +19,10 @@ impl ConstitutionalPeerId {
         h.update(public_key_hex.as_bytes());
         h.update(genesis_hash.as_bytes());
         let id = hex::encode(h.finalize().as_bytes());
-        Self { peer_id: id, public_key_hex, genesis_hash }
+        Self {
+            peer_id: id,
+            public_key_hex,
+            genesis_hash,
+        }
     }
 }

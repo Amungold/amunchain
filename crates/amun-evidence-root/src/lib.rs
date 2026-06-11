@@ -37,7 +37,15 @@ impl EvidenceRoot {
         hasher.update(&previous_root);
         hasher.update(&height.to_le_bytes());
         let root = hasher.finalize().into();
-        Self { root, state_root, commit_hash, replay_certificate, audit_record, previous_root, height }
+        Self {
+            root,
+            state_root,
+            commit_hash,
+            replay_certificate,
+            audit_record,
+            previous_root,
+            height,
+        }
     }
 
     /// Genesis evidence root with zeroed fields.
@@ -47,8 +55,12 @@ impl EvidenceRoot {
 
     pub fn verify(&self) -> bool {
         let recomputed = Self::compute(
-            self.state_root, self.commit_hash, self.replay_certificate,
-            self.audit_record, self.previous_root, self.height,
+            self.state_root,
+            self.commit_hash,
+            self.replay_certificate,
+            self.audit_record,
+            self.previous_root,
+            self.height,
         );
         self.root == recomputed.root
     }
@@ -61,7 +73,9 @@ pub struct EvidenceChain {
 }
 
 impl EvidenceChain {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn append(
         &mut self,
@@ -73,7 +87,12 @@ impl EvidenceChain {
     ) -> &EvidenceRoot {
         let previous = self.roots.last().map(|r| r.root).unwrap_or([0u8; 32]);
         self.roots.push(EvidenceRoot::compute(
-            state_root, commit_hash, replay_certificate, audit_record, previous, height,
+            state_root,
+            commit_hash,
+            replay_certificate,
+            audit_record,
+            previous,
+            height,
         ));
         self.roots.last().unwrap()
     }
@@ -90,8 +109,12 @@ impl EvidenceChain {
         true
     }
 
-    pub fn len(&self) -> usize { self.roots.len() }
-    pub fn is_empty(&self) -> bool { self.roots.is_empty() }
+    pub fn len(&self) -> usize {
+        self.roots.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.roots.is_empty()
+    }
 }
 
 #[cfg(test)]
@@ -107,24 +130,24 @@ mod tests {
 
     #[test]
     fn n39_evidence_root_deterministic() {
-        let r1 = EvidenceRoot::compute([1u8;32],[2u8;32],[3u8;32],[4u8;32],[0u8;32], 1);
-        let r2 = EvidenceRoot::compute([1u8;32],[2u8;32],[3u8;32],[4u8;32],[0u8;32], 1);
+        let r1 = EvidenceRoot::compute([1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [0u8; 32], 1);
+        let r2 = EvidenceRoot::compute([1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [0u8; 32], 1);
         assert_eq!(r1.root, r2.root);
     }
 
     #[test]
     fn n39_different_state_different_root() {
-        let r1 = EvidenceRoot::compute([1u8;32],[2u8;32],[3u8;32],[4u8;32],[0u8;32], 1);
-        let r2 = EvidenceRoot::compute([9u8;32],[2u8;32],[3u8;32],[4u8;32],[0u8;32], 1);
+        let r1 = EvidenceRoot::compute([1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [0u8; 32], 1);
+        let r2 = EvidenceRoot::compute([9u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [0u8; 32], 1);
         assert_ne!(r1.root, r2.root);
     }
 
     #[test]
     fn n39_evidence_chain_continuity() {
         let mut chain = EvidenceChain::new();
-        chain.append([1u8;32],[1u8;32],[1u8;32],[1u8;32], 1);
-        chain.append([2u8;32],[2u8;32],[2u8;32],[2u8;32], 2);
-        chain.append([3u8;32],[3u8;32],[3u8;32],[3u8;32], 3);
+        chain.append([1u8; 32], [1u8; 32], [1u8; 32], [1u8; 32], 1);
+        chain.append([2u8; 32], [2u8; 32], [2u8; 32], [2u8; 32], 2);
+        chain.append([3u8; 32], [3u8; 32], [3u8; 32], [3u8; 32], 3);
         assert!(chain.verify());
         assert_eq!(chain.len(), 3);
     }
@@ -132,9 +155,9 @@ mod tests {
     #[test]
     fn n39_broken_chain_detected() {
         let mut chain = EvidenceChain::new();
-        chain.append([1u8;32],[1u8;32],[1u8;32],[1u8;32], 1);
-        chain.append([2u8;32],[2u8;32],[2u8;32],[2u8;32], 2);
-        chain.append([3u8;32],[3u8;32],[3u8;32],[3u8;32], 3);
+        chain.append([1u8; 32], [1u8; 32], [1u8; 32], [1u8; 32], 1);
+        chain.append([2u8; 32], [2u8; 32], [2u8; 32], [2u8; 32], 2);
+        chain.append([3u8; 32], [3u8; 32], [3u8; 32], [3u8; 32], 3);
         chain.roots[1].state_root = [0xFF; 32];
         assert!(!chain.verify());
     }

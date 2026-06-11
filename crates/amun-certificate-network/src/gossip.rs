@@ -1,10 +1,7 @@
-use serde::{Serialize, Deserialize};
-use std::collections::{BTreeMap, HashSet};
-use amun_constitutional_state::{
-    ReplayCertificate,
-    CertificateInclusionProof,
-};
 use crate::distribution::LightClientProofBundle;
+use amun_constitutional_state::{CertificateInclusionProof, ReplayCertificate};
+use serde::{Deserialize, Serialize};
+use std::collections::{BTreeMap, HashSet};
 
 // ============================================================
 // N10A: Certificate Announcement Protocol
@@ -12,7 +9,10 @@ use crate::distribution::LightClientProofBundle;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CertificateAnnouncement {
-    Announce { certificate_hash: [u8; 32], block_height: u64 },
+    Announce {
+        certificate_hash: [u8; 32],
+        block_height: u64,
+    },
 }
 
 // ============================================================
@@ -31,8 +31,12 @@ pub enum CertificateInventory {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CertificateSync {
-    RequestBatch { hashes: Vec<[u8; 32]> },
-    BatchResponse { certificates: Vec<ReplayCertificate> },
+    RequestBatch {
+        hashes: Vec<[u8; 32]>,
+    },
+    BatchResponse {
+        certificates: Vec<ReplayCertificate>,
+    },
 }
 
 // ============================================================
@@ -52,9 +56,16 @@ pub enum ProofSync {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[allow(clippy::large_enum_variant)]
 pub enum BundleGossip {
-    AnnounceBundle { block_height: u64, certificate_hash: [u8; 32] },
-    RequestBundle { block_height: u64 },
-    BundleResponse { bundle: LightClientProofBundle },
+    AnnounceBundle {
+        block_height: u64,
+        certificate_hash: [u8; 32],
+    },
+    RequestBundle {
+        block_height: u64,
+    },
+    BundleResponse {
+        bundle: LightClientProofBundle,
+    },
 }
 
 // ============================================================
@@ -70,7 +81,9 @@ pub struct PeerCertificateCache {
 }
 
 impl PeerCertificateCache {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn store_certificate(&mut self, cert: ReplayCertificate) {
         let hash = cert.certificate_hash();
@@ -114,7 +127,8 @@ impl PeerCertificateCache {
     }
 
     pub fn missing_certificates(&self, inventory: &[[u8; 32]]) -> Vec<[u8; 32]> {
-        inventory.iter()
+        inventory
+            .iter()
             .filter(|h| !self.has_certificate(h))
             .copied()
             .collect()
@@ -124,9 +138,15 @@ impl PeerCertificateCache {
         self.certificates.keys().copied().collect()
     }
 
-    pub fn certificate_count(&self) -> usize { self.certificates.len() }
-    pub fn proof_count(&self) -> usize { self.proofs.len() }
-    pub fn bundle_count(&self) -> usize { self.bundles.len() }
+    pub fn certificate_count(&self) -> usize {
+        self.certificates.len()
+    }
+    pub fn proof_count(&self) -> usize {
+        self.proofs.len()
+    }
+    pub fn bundle_count(&self) -> usize {
+        self.bundles.len()
+    }
 }
 
 // ============================================================
@@ -136,10 +156,14 @@ impl PeerCertificateCache {
 #[cfg(test)]
 mod n10_tests {
     use super::*;
-    use amun_constitutional_state::ConstitutionalStateRuntime;
     use amun_constitutional_block::ConstitutionalBlock;
+    use amun_constitutional_state::ConstitutionalStateRuntime;
 
-    fn create_test_data() -> (ReplayCertificate, CertificateInclusionProof, LightClientProofBundle) {
+    fn create_test_data() -> (
+        ReplayCertificate,
+        CertificateInclusionProof,
+        LightClientProofBundle,
+    ) {
         let mut rt = ConstitutionalStateRuntime::new();
         rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
         let cert = rt.create_certificate(1, [0u8; 32]);
@@ -147,7 +171,18 @@ mod n10_tests {
         let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
         let hash = cert.certificate_hash();
         let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
-        let block = ConstitutionalBlock::new(0, "0".repeat(64), "t".into(), "p".into(), vec![], hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root);
+        let block = ConstitutionalBlock::new(
+            0,
+            "0".repeat(64),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
+        );
         let bundle = LightClientProofBundle::new(block, cert.clone(), proof.clone());
         (cert, proof, bundle)
     }
@@ -156,9 +191,15 @@ mod n10_tests {
     fn n10a_certificate_announcement() {
         let (cert, _, _) = create_test_data();
         let hash = cert.certificate_hash();
-        let msg = CertificateAnnouncement::Announce { certificate_hash: hash, block_height: 1 };
+        let msg = CertificateAnnouncement::Announce {
+            certificate_hash: hash,
+            block_height: 1,
+        };
         match msg {
-            CertificateAnnouncement::Announce { certificate_hash, block_height } => {
+            CertificateAnnouncement::Announce {
+                certificate_hash,
+                block_height,
+            } => {
                 assert_eq!(certificate_hash, hash);
                 assert_eq!(block_height, 1);
             }
@@ -169,7 +210,9 @@ mod n10_tests {
     fn n10b_inventory_exchange() {
         let (cert, _, _) = create_test_data();
         let hash = cert.certificate_hash();
-        let inv = CertificateInventory::Inventory { certificate_hashes: vec![hash] };
+        let inv = CertificateInventory::Inventory {
+            certificate_hashes: vec![hash],
+        };
         match inv {
             CertificateInventory::Inventory { certificate_hashes } => {
                 assert!(certificate_hashes.contains(&hash));
@@ -182,7 +225,9 @@ mod n10_tests {
     fn n10c_certificate_sync() {
         let (cert, _, _) = create_test_data();
         let hash = cert.certificate_hash();
-        let resp = CertificateSync::BatchResponse { certificates: vec![cert.clone()] };
+        let resp = CertificateSync::BatchResponse {
+            certificates: vec![cert.clone()],
+        };
         match resp {
             CertificateSync::BatchResponse { certificates } => {
                 assert_eq!(certificates[0].certificate_hash(), hash);
@@ -194,7 +239,9 @@ mod n10_tests {
     #[test]
     fn n10d_proof_sync() {
         let (_, proof, _) = create_test_data();
-        let resp = ProofSync::ProofResponse { proof: proof.clone() };
+        let resp = ProofSync::ProofResponse {
+            proof: proof.clone(),
+        };
         match resp {
             ProofSync::ProofResponse { proof: p } => assert!(p.verify()),
             _ => unreachable!(),
@@ -204,7 +251,9 @@ mod n10_tests {
     #[test]
     fn n10e_bundle_gossip() {
         let (_, _, bundle) = create_test_data();
-        let resp = BundleGossip::BundleResponse { bundle: bundle.clone() };
+        let resp = BundleGossip::BundleResponse {
+            bundle: bundle.clone(),
+        };
         match resp {
             BundleGossip::BundleResponse { bundle: b } => assert!(b.verify().is_ok()),
             _ => unreachable!(),
@@ -264,17 +313,28 @@ mod n10_tests {
         let (cert, proof, bundle) = create_test_data();
         let hash = cert.certificate_hash();
 
-        let _announce = CertificateAnnouncement::Announce { certificate_hash: hash, block_height: 0 };
-        let cert_resp = CertificateSync::BatchResponse { certificates: vec![cert.clone()] };
-        let proof_resp = ProofSync::ProofResponse { proof: proof.clone() };
-        let bundle_resp = BundleGossip::BundleResponse { bundle: bundle.clone() };
+        let _announce = CertificateAnnouncement::Announce {
+            certificate_hash: hash,
+            block_height: 0,
+        };
+        let cert_resp = CertificateSync::BatchResponse {
+            certificates: vec![cert.clone()],
+        };
+        let proof_resp = ProofSync::ProofResponse {
+            proof: proof.clone(),
+        };
+        let bundle_resp = BundleGossip::BundleResponse {
+            bundle: bundle.clone(),
+        };
 
         let mut cache = PeerCertificateCache::new();
         cache.mark_announced(hash);
 
         match cert_resp {
             CertificateSync::BatchResponse { certificates } => {
-                for c in &certificates { cache.store_certificate(c.clone()); }
+                for c in &certificates {
+                    cache.store_certificate(c.clone());
+                }
             }
             _ => unreachable!(),
         }
@@ -298,11 +358,23 @@ mod n10_tests {
 
     #[test]
     fn n10_serialize_announcement() {
-        let msg = CertificateAnnouncement::Announce { certificate_hash: [1u8; 32], block_height: 7 };
+        let msg = CertificateAnnouncement::Announce {
+            certificate_hash: [1u8; 32],
+            block_height: 7,
+        };
         let json = serde_json::to_string(&msg).unwrap();
-        let decoded: CertificateAnnouncement = match serde_json::from_str(&json) { Ok(v) => v, Err(e) => { eprintln!("gossip: invalid announcement: {}", e); return; } };
+        let decoded: CertificateAnnouncement = match serde_json::from_str(&json) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("gossip: invalid announcement: {}", e);
+                return;
+            }
+        };
         match decoded {
-            CertificateAnnouncement::Announce { certificate_hash, block_height } => {
+            CertificateAnnouncement::Announce {
+                certificate_hash,
+                block_height,
+            } => {
                 assert_eq!(certificate_hash, [1u8; 32]);
                 assert_eq!(block_height, 7);
             }

@@ -1,5 +1,5 @@
-use amun_resource_core::{ResourceMetadata, ResourceRegistry};
 use amun_operations::backup_recovery::NodeBackup;
+use amun_resource_core::{ResourceMetadata, ResourceRegistry};
 use amun_validator_networking::sync_transport::SyncTransport;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -32,10 +32,9 @@ impl PersistentValidatorStore {
 
     fn load_from_backup(path: &Path) -> Result<Self, String> {
         let backup_file = path.join("backup.json");
-        let json = fs::read_to_string(&backup_file)
-            .map_err(|e| format!("Read error: {}", e))?;
-        let backup: NodeBackup = serde_json::from_str(&json)
-            .map_err(|e| format!("Deserialization error: {}", e))?;
+        let json = fs::read_to_string(&backup_file).map_err(|e| format!("Read error: {}", e))?;
+        let backup: NodeBackup =
+            serde_json::from_str(&json).map_err(|e| format!("Deserialization error: {}", e))?;
         if !backup.verify() {
             return Err("Backup verification failed".into());
         }
@@ -51,12 +50,18 @@ impl PersistentValidatorStore {
 
     pub fn save(&self) -> Result<(), String> {
         let package = SyncTransport::export_snapshot(
-            &self.registry, self.current_height, self.current_block_hash,
-            self.history_root, "persistent-store".into(),
+            &self.registry,
+            self.current_height,
+            self.current_block_hash,
+            self.history_root,
+            "persistent-store".into(),
         );
         let backup = NodeBackup::new(
-            self.current_height, self.current_block_hash,
-            self.history_root, package, 0,
+            self.current_height,
+            self.current_block_hash,
+            self.history_root,
+            package,
+            0,
         );
         let json = serde_json::to_string_pretty(&backup)
             .map_err(|e| format!("Serialization error: {}", e))?;
@@ -72,10 +77,9 @@ impl PersistentValidatorStore {
         if !backup_file.exists() {
             return Err("No backup file found".into());
         }
-        let json = fs::read_to_string(&backup_file)
-            .map_err(|e| format!("Read error: {}", e))?;
-        let backup: NodeBackup = serde_json::from_str(&json)
-            .map_err(|e| format!("Deserialization error: {}", e))?;
+        let json = fs::read_to_string(&backup_file).map_err(|e| format!("Read error: {}", e))?;
+        let backup: NodeBackup =
+            serde_json::from_str(&json).map_err(|e| format!("Deserialization error: {}", e))?;
         if !backup.verify() {
             return Err("Backup verification failed — file may be corrupted".into());
         }
@@ -88,11 +92,15 @@ impl PersistentValidatorStore {
     }
 
     pub fn advance(
-        &mut self, height: u64, block_hash: [u8; 32],
-        history_root: [u8; 32], new_resources: Vec<ResourceMetadata>,
+        &mut self,
+        height: u64,
+        block_hash: [u8; 32],
+        history_root: [u8; 32],
+        new_resources: Vec<ResourceMetadata>,
     ) -> Result<(), String> {
         for meta in new_resources {
-            self.registry.register_genesis(meta)
+            self.registry
+                .register_genesis(meta)
                 .map_err(|e| format!("Register error: {:?}", e))?;
         }
         self.current_height = height;
@@ -101,10 +109,18 @@ impl PersistentValidatorStore {
         Ok(())
     }
 
-    pub fn registry(&self) -> &ResourceRegistry { &self.registry }
-    pub fn registry_mut(&mut self) -> &mut ResourceRegistry { &mut self.registry }
-    pub fn current_height(&self) -> u64 { self.current_height }
-    pub fn state_root(&self) -> [u8; 32] { self.registry.compute_state_root() }
+    pub fn registry(&self) -> &ResourceRegistry {
+        &self.registry
+    }
+    pub fn registry_mut(&mut self) -> &mut ResourceRegistry {
+        &mut self.registry
+    }
+    pub fn current_height(&self) -> u64 {
+        self.current_height
+    }
+    pub fn state_root(&self) -> [u8; 32] {
+        self.registry.compute_state_root()
+    }
 }
 
 #[cfg(test)]
@@ -115,7 +131,9 @@ mod tests {
     };
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -131,14 +149,17 @@ mod tests {
         let dir_str = dir.path().to_str().unwrap();
         let mut store = PersistentValidatorStore::open(dir_str).unwrap();
         for i in 0..10u8 {
-            store.registry_mut().register_genesis(ResourceMetadata {
-                resource_id: make_id(i),
-                archetype: ResourceArchetype::Asset,
-                state: ResourceState::Active,
-                lineage: ResourceLineage::genesis(make_id(i)),
-                contract_id: [1u8; 32],
-                owner: [2u8; 32],
-            }).unwrap();
+            store
+                .registry_mut()
+                .register_genesis(ResourceMetadata {
+                    resource_id: make_id(i),
+                    archetype: ResourceArchetype::Asset,
+                    state: ResourceState::Active,
+                    lineage: ResourceLineage::genesis(make_id(i)),
+                    contract_id: [1u8; 32],
+                    owner: [2u8; 32],
+                })
+                .unwrap();
         }
         let root_before = store.state_root();
         store.advance(42, [0xab; 32], [0x10; 32], vec![]).unwrap();
@@ -156,14 +177,17 @@ mod tests {
         let dir_str = dir.path().to_str().unwrap();
         let mut store = PersistentValidatorStore::open(dir_str).unwrap();
         for i in 0..50u8 {
-            store.registry_mut().register_genesis(ResourceMetadata {
-                resource_id: make_id(i),
-                archetype: ResourceArchetype::Asset,
-                state: ResourceState::Active,
-                lineage: ResourceLineage::genesis(make_id(i)),
-                contract_id: [1u8; 32],
-                owner: [2u8; 32],
-            }).unwrap();
+            store
+                .registry_mut()
+                .register_genesis(ResourceMetadata {
+                    resource_id: make_id(i),
+                    archetype: ResourceArchetype::Asset,
+                    state: ResourceState::Active,
+                    lineage: ResourceLineage::genesis(make_id(i)),
+                    contract_id: [1u8; 32],
+                    owner: [2u8; 32],
+                })
+                .unwrap();
         }
         let state_root = store.state_root();
         store.advance(100, [0xcd; 32], [0x10; 32], vec![]).unwrap();
@@ -201,6 +225,9 @@ mod tests {
         let backup_file = dir.path().join("backup.json");
         fs::write(&backup_file, "corrupted-garbage-data").unwrap();
         let result = PersistentValidatorStore::open(dir_str);
-        assert!(result.is_err(), "Corrupted backup file should be rejected on open");
+        assert!(
+            result.is_err(),
+            "Corrupted backup file should be rejected on open"
+        );
     }
 }

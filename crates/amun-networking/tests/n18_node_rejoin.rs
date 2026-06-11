@@ -1,5 +1,5 @@
-use amun_networking::node::{NetworkNode, NodeLifecycle};
 use amun_chain_checkpoint::bootstrap::BootstrapSession;
+use amun_networking::node::{NetworkNode, NodeLifecycle};
 
 // ============================================================
 // N18.2 — Lifecycle Invariants

@@ -11,14 +11,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("═══════════════════════════════════════════");
     println!();
 
-    let data_dir = std::env::var("AMUN_DATA_DIR")
-        .unwrap_or_else(|_| "./data".to_string());
+    let data_dir = std::env::var("AMUN_DATA_DIR").unwrap_or_else(|_| "./data".to_string());
     let data_dir = PathBuf::from(&data_dir);
 
     // Phase 1: Load real system data
     println!("[1/6] Loading AmunChain operational data...");
     let phase_certificates = load_phase_certificates(&data_dir)?;
-    
+
     if phase_certificates.is_empty() {
         println!();
         println!("WARNING: No verification certificates found.");
@@ -37,7 +36,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("   Loaded {} phase certificates", phase_certificates.len());
     for (phase, cert) in &phase_certificates {
-        println!("   - {} : {} ({} claims)", phase, cert.certificate_id, cert.claims.len());
+        println!(
+            "   - {} : {} ({} claims)",
+            phase,
+            cert.certificate_id,
+            cert.claims.len()
+        );
     }
 
     // Phase 2: Run constitutional pipeline
@@ -113,7 +117,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for gate in &cert.gates {
         let status = if gate.passed { "PASS" } else { "FAIL" };
         let kind = if gate.is_hard_gate { "HARD" } else { "COND" };
-        println!("    [{}] [{}] {} — {}", status, kind, gate.gate_id, gate.details);
+        println!(
+            "    [{}] [{}] {} — {}",
+            status, kind, gate.gate_id, gate.details
+        );
     }
     println!();
     println!("  Overall: {:?}", cert.verdict);

@@ -1,17 +1,15 @@
-use amun_resource_core::{
-    ResourceMetadata, ResourceRegistry,
-};
-use amun_vm_kernel::execution_context::ExecutionContext;
-use amun_vm_kernel::vm_kernel::{CommitResult, VMKernel};
-use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
-use amun_transition_proof::transition_proof::TransitionProof;
-use amun_transition_proof::proof_builder::ProofBuilder;
 use amun_bytecode::interpreter::{Interpreter, InterpreterResult};
 use amun_bytecode::program::ConstitutionalProgram;
+use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use amun_invariant_engine::invariant_engine::InvariantEngine;
 use amun_invariant_engine::invariant_types::InvariantDeclaration;
 use amun_proof_archive::hot_store::HotProofStore;
 use amun_proof_archive::proof_archive::ProofArchive;
+use amun_resource_core::{ResourceMetadata, ResourceRegistry};
+use amun_transition_proof::proof_builder::ProofBuilder;
+use amun_transition_proof::transition_proof::TransitionProof;
+use amun_vm_kernel::execution_context::ExecutionContext;
+use amun_vm_kernel::vm_kernel::{CommitResult, VMKernel};
 
 /// Result of executing a contract through the full constitutional pipeline.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -76,9 +74,17 @@ impl ConstitutionalRuntime {
             };
             archive.archive_evidence(evidence.clone());
             let proof = TransitionProof::new(
-                ctx.transaction_hash, ctx.contract_id, ctx.block_height,
-                ctx.block_hash, pre_state_root, pre_state_root,
-                vec![], vec![], vec![], vec![evidence.clone()], gas_used,
+                ctx.transaction_hash,
+                ctx.contract_id,
+                ctx.block_height,
+                ctx.block_hash,
+                pre_state_root,
+                pre_state_root,
+                vec![],
+                vec![],
+                vec![],
+                vec![evidence.clone()],
+                gas_used,
             );
             hot_store.store(proof.clone(), ctx.block_height);
             return Ok(PipelineResult::Rejected {
@@ -96,9 +102,17 @@ impl ConstitutionalRuntime {
                 archive.archive_evidence(ev.clone());
             }
             let proof = TransitionProof::new(
-                ctx.transaction_hash, ctx.contract_id, ctx.block_height,
-                ctx.block_hash, pre_state_root, pre_state_root,
-                vec![], vec![], vec![], evidence.clone(), gas_used,
+                ctx.transaction_hash,
+                ctx.contract_id,
+                ctx.block_height,
+                ctx.block_hash,
+                pre_state_root,
+                pre_state_root,
+                vec![],
+                vec![],
+                vec![],
+                evidence.clone(),
+                gas_used,
             );
             hot_store.store(proof.clone(), ctx.block_height);
             return Ok(PipelineResult::Rejected {
@@ -108,11 +122,13 @@ impl ConstitutionalRuntime {
         }
 
         // Phase 4: Atomic Commit
-        let commit_result = VMKernel::commit(&buffer, registry)
-            .map_err(|e| format!("Commit error: {:?}", e))?;
+        let commit_result =
+            VMKernel::commit(&buffer, registry).map_err(|e| format!("Commit error: {:?}", e))?;
 
         let post_state_root = match &commit_result {
-            CommitResult::Committed { post_state_root, .. } => *post_state_root,
+            CommitResult::Committed {
+                post_state_root, ..
+            } => *post_state_root,
             _ => pre_state_root,
         };
 
@@ -157,7 +173,10 @@ impl ConstitutionalRuntime {
             gas_used,
         );
         let pccv_result = amun_pccv::pccv_verifier::PCCVVerifier::verify(&enhanced_proof, registry);
-        let pccv_verified = matches!(pccv_result, amun_pccv::pccv_verifier::PCCVResult::Verified { .. });
+        let pccv_verified = matches!(
+            pccv_result,
+            amun_pccv::pccv_verifier::PCCVResult::Verified { .. }
+        );
 
         if !pccv_verified {
             // PCCV failed — this is a constitutional violation
@@ -174,9 +193,17 @@ impl ConstitutionalRuntime {
             };
             archive.archive_evidence(evidence.clone());
             let proof = TransitionProof::new(
-                ctx.transaction_hash, ctx.contract_id, ctx.block_height,
-                ctx.block_hash, pre_state_root, pre_state_root,
-                vec![], vec![], vec![], vec![evidence.clone()], gas_used,
+                ctx.transaction_hash,
+                ctx.contract_id,
+                ctx.block_height,
+                ctx.block_hash,
+                pre_state_root,
+                pre_state_root,
+                vec![],
+                vec![],
+                vec![],
+                vec![evidence.clone()],
+                gas_used,
             );
             hot_store.store(proof.clone(), ctx.block_height);
             return Ok(PipelineResult::Rejected {
@@ -198,12 +225,14 @@ impl ConstitutionalRuntime {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use amun_resource_core::{ResourceMetadata, ResourceState, ResourceLineage, ResourceArchetype};
-    use amun_resource_core::ResourceId;
     use amun_bytecode::opcodes::OpCode;
+    use amun_resource_core::ResourceId;
+    use amun_resource_core::{ResourceArchetype, ResourceLineage, ResourceMetadata, ResourceState};
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -212,10 +241,7 @@ mod tests {
         let mut hot_store = HotProofStore::new(100);
         let mut archive = ProofArchive::new();
 
-        let program = ConstitutionalProgram::new(1, 0, 0, vec![
-            OpCode::Push(42),
-            OpCode::Halt,
-        ]);
+        let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Push(42), OpCode::Halt]);
 
         let ctx = ExecutionContext {
             contract_id: make_id(1),
@@ -228,8 +254,13 @@ mod tests {
         };
 
         let result = ConstitutionalRuntime::execute(
-            &program, &ctx, &mut registry, &[], 10000,
-            &mut hot_store, &mut archive,
+            &program,
+            &ctx,
+            &mut registry,
+            &[],
+            10000,
+            &mut hot_store,
+            &mut archive,
         );
 
         assert!(result.is_ok());
@@ -265,8 +296,13 @@ mod tests {
         };
 
         let result = ConstitutionalRuntime::execute(
-            &program, &ctx, &mut registry, &[], 10000,
-            &mut hot_store, &mut archive,
+            &program,
+            &ctx,
+            &mut registry,
+            &[],
+            10000,
+            &mut hot_store,
+            &mut archive,
         );
 
         assert!(result.is_ok());
@@ -277,20 +313,21 @@ mod tests {
 
     #[test]
     fn n50_pccv_rejection_preserves_state() {
-        
         let mut registry = ResourceRegistry::new(1000);
         let mut hot_store = HotProofStore::new(100);
         let mut archive = ProofArchive::new();
 
         let id = make_id(1);
-        registry.register_genesis(ResourceMetadata {
-            resource_id: id,
-            archetype: ResourceArchetype::Asset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::genesis(id),
-            contract_id: [1u8; 32],
-            owner: [2u8; 32],
-        }).unwrap();
+        registry
+            .register_genesis(ResourceMetadata {
+                resource_id: id,
+                archetype: ResourceArchetype::Asset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::genesis(id),
+                contract_id: [1u8; 32],
+                owner: [2u8; 32],
+            })
+            .unwrap();
 
         let root_before = registry.compute_state_root();
         let total_before = registry.total();
@@ -307,13 +344,24 @@ mod tests {
         };
 
         let _result = ConstitutionalRuntime::execute(
-            &program, &ctx, &mut registry, &[], 10000,
-            &mut hot_store, &mut archive,
+            &program,
+            &ctx,
+            &mut registry,
+            &[],
+            10000,
+            &mut hot_store,
+            &mut archive,
         );
 
-        assert_eq!(root_before, registry.compute_state_root(),
-            "State root must not change");
-        assert_eq!(total_before, registry.total(),
-            "Resource count must not change");
+        assert_eq!(
+            root_before,
+            registry.compute_state_root(),
+            "State root must not change"
+        );
+        assert_eq!(
+            total_before,
+            registry.total(),
+            "Resource count must not change"
+        );
     }
 }

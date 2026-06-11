@@ -1,6 +1,6 @@
 use amun_resource_core::{
-    ResourceArchetype, ResourceId, ResourceLineage,
-    ResourceMetadata, ResourceRegistry, ResourceState,
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
 };
 use std::time::Instant;
 
@@ -28,18 +28,24 @@ fn stress_001_10k_genesis_resources() {
     let start = Instant::now();
     for i in 0..count {
         let id = make_id(i as u64);
-        reg.register_genesis(make_genesis(id, ResourceArchetype::Asset)).unwrap();
+        reg.register_genesis(make_genesis(id, ResourceArchetype::Asset))
+            .unwrap();
     }
     let elapsed = start.elapsed();
     assert_eq!(reg.total(), count as usize);
-    println!("10k genesis: {:?} ({:.0} ops/sec)", elapsed, count as f64 / elapsed.as_secs_f64());
+    println!(
+        "10k genesis: {:?} ({:.0} ops/sec)",
+        elapsed,
+        count as f64 / elapsed.as_secs_f64()
+    );
 }
 
 #[test]
 fn stress_002_deep_lineage_chain() {
     let mut reg = ResourceRegistry::new(10_000);
     let root_id = make_id(0);
-    reg.register_genesis(make_genesis(root_id, ResourceArchetype::Asset)).unwrap();
+    reg.register_genesis(make_genesis(root_id, ResourceArchetype::Asset))
+        .unwrap();
 
     let depth = 2000;
     let start = Instant::now();
@@ -48,7 +54,10 @@ fn stress_002_deep_lineage_chain() {
         let child_id = make_id(i as u64);
         let (parent_hash, version) = {
             let parent = reg.get(&parent_id).unwrap();
-            (ResourceRegistry::hash_resource(parent), parent.lineage.version + 1)
+            (
+                ResourceRegistry::hash_resource(parent),
+                parent.lineage.version + 1,
+            )
         };
         let child = ResourceMetadata {
             resource_id: child_id,
@@ -63,7 +72,12 @@ fn stress_002_deep_lineage_chain() {
     }
     let elapsed = start.elapsed();
     assert_eq!(reg.lineage_depth(&parent_id), depth as usize);
-    println!("{} deep lineage: {:?} ({:.0} derivations/sec)", depth, elapsed, depth as f64 / elapsed.as_secs_f64());
+    println!(
+        "{} deep lineage: {:?} ({:.0} derivations/sec)",
+        depth,
+        elapsed,
+        depth as f64 / elapsed.as_secs_f64()
+    );
 }
 
 #[test]
@@ -79,7 +93,8 @@ fn stress_003_wide_fanout() {
     // Phase 1: genesis
     for i in 0..count {
         let id = make_id(i as u64);
-        reg.register_genesis(make_genesis(id, ResourceArchetype::Asset)).unwrap();
+        reg.register_genesis(make_genesis(id, ResourceArchetype::Asset))
+            .unwrap();
     }
 
     // Phase 2: one derivation from each root
@@ -88,7 +103,10 @@ fn stress_003_wide_fanout() {
         let child_id = make_id(10000 + i as u64);
         let (parent_hash, version) = {
             let parent = reg.get(&parent_id).unwrap();
-            (ResourceRegistry::hash_resource(parent), parent.lineage.version + 1)
+            (
+                ResourceRegistry::hash_resource(parent),
+                parent.lineage.version + 1,
+            )
         };
         let child = ResourceMetadata {
             resource_id: child_id,
@@ -104,7 +122,10 @@ fn stress_003_wide_fanout() {
     let elapsed = start.elapsed();
     assert_eq!(reg.total(), count * 2);
     assert_eq!(reg.total_active(), count); // all roots consumed, only children active
-    println!("Wide fanout ({} genesis + {} derivations): {:?}", count, count, elapsed);
+    println!(
+        "Wide fanout ({} genesis + {} derivations): {:?}",
+        count, count, elapsed
+    );
 }
 
 #[test]
@@ -113,7 +134,8 @@ fn stress_004_state_root_10k() {
     let count = 10_000;
     for i in 0..count {
         let id = make_id(i as u64);
-        reg.register_genesis(make_genesis(id, ResourceArchetype::Asset)).unwrap();
+        reg.register_genesis(make_genesis(id, ResourceArchetype::Asset))
+            .unwrap();
     }
     let start = Instant::now();
     let root = reg.compute_state_root();
@@ -128,7 +150,8 @@ fn stress_005_lookup_under_load() {
     let count = 50_000;
     for i in 0..count {
         let id = make_id(i as u64);
-        reg.register_genesis(make_genesis(id, ResourceArchetype::Asset)).unwrap();
+        reg.register_genesis(make_genesis(id, ResourceArchetype::Asset))
+            .unwrap();
     }
     let start = Instant::now();
     let mut found = 0;
@@ -139,14 +162,19 @@ fn stress_005_lookup_under_load() {
     }
     let elapsed = start.elapsed();
     assert_eq!(found, count as usize);
-    println!("Lookup 50k resources: {:?} ({:.0} lookups/sec)", elapsed, count as f64 / elapsed.as_secs_f64());
+    println!(
+        "Lookup 50k resources: {:?} ({:.0} lookups/sec)",
+        elapsed,
+        count as f64 / elapsed.as_secs_f64()
+    );
 }
 
 #[test]
 fn stress_006_parent_verification_under_load() {
     let mut reg = ResourceRegistry::new(200_000);
     let root_id = make_id(0);
-    reg.register_genesis(make_genesis(root_id, ResourceArchetype::Asset)).unwrap();
+    reg.register_genesis(make_genesis(root_id, ResourceArchetype::Asset))
+        .unwrap();
 
     let chain_length = 1000;
     let mut parent_id = root_id;
@@ -154,7 +182,10 @@ fn stress_006_parent_verification_under_load() {
         let child_id = make_id(i as u64);
         let (parent_hash, version) = {
             let parent = reg.get(&parent_id).unwrap();
-            (ResourceRegistry::hash_resource(parent), parent.lineage.version + 1)
+            (
+                ResourceRegistry::hash_resource(parent),
+                parent.lineage.version + 1,
+            )
         };
         let child = ResourceMetadata {
             resource_id: child_id,
@@ -191,14 +222,18 @@ fn stress_007_cycle_detection_at_depth() {
     let mut reg = ResourceRegistry::new(200_000);
     let depth = 5000;
     let root_id = make_id(0);
-    reg.register_genesis(make_genesis(root_id, ResourceArchetype::Asset)).unwrap();
+    reg.register_genesis(make_genesis(root_id, ResourceArchetype::Asset))
+        .unwrap();
 
     let mut parent_id = root_id;
     for i in 1..=depth {
         let child_id = make_id(i as u64);
         let (parent_hash, version) = {
             let parent = reg.get(&parent_id).unwrap();
-            (ResourceRegistry::hash_resource(parent), parent.lineage.version + 1)
+            (
+                ResourceRegistry::hash_resource(parent),
+                parent.lineage.version + 1,
+            )
         };
         let child = ResourceMetadata {
             resource_id: child_id,
@@ -215,7 +250,10 @@ fn stress_007_cycle_detection_at_depth() {
     let start = Instant::now();
     let (tip_hash, version) = {
         let tip = reg.get(&parent_id).unwrap();
-        (ResourceRegistry::hash_resource(tip), tip.lineage.version + 1)
+        (
+            ResourceRegistry::hash_resource(tip),
+            tip.lineage.version + 1,
+        )
     };
     let new_child = ResourceMetadata {
         resource_id: make_id(99999),

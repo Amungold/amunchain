@@ -10,7 +10,11 @@ pub struct HotProofStore {
 
 impl HotProofStore {
     pub fn new(retention_blocks: u64) -> Self {
-        Self { proofs: HashMap::new(), stored_at: HashMap::new(), retention_blocks }
+        Self {
+            proofs: HashMap::new(),
+            stored_at: HashMap::new(),
+            retention_blocks,
+        }
     }
 
     pub fn store(&mut self, proof: TransitionProof, block_height: u64) {
@@ -23,11 +27,14 @@ impl HotProofStore {
         self.proofs.get(proof_hash)
     }
 
-    pub fn total(&self) -> usize { self.proofs.len() }
+    pub fn total(&self) -> usize {
+        self.proofs.len()
+    }
 
     pub fn prune(&mut self, current_block: u64) -> usize {
         let cutoff = current_block.saturating_sub(self.retention_blocks);
-        let to_remove: Vec<[u8; 32]> = self.stored_at
+        let to_remove: Vec<[u8; 32]> = self
+            .stored_at
             .iter()
             .filter(|(_, &stored)| stored < cutoff)
             .map(|(hash, _)| *hash)
@@ -51,14 +58,24 @@ mod tests {
     use amun_resource_core::ResourceId;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     fn make_proof(tx_hash: [u8; 32]) -> TransitionProof {
         TransitionProof::new(
-            tx_hash, make_id(1), 1, [0u8; 32],
-            [0x01; 32], [0x02; 32],
-            vec![], vec![], vec![], vec![], 1000,
+            tx_hash,
+            make_id(1),
+            1,
+            [0u8; 32],
+            [0x01; 32],
+            [0x02; 32],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            1000,
         )
     }
 

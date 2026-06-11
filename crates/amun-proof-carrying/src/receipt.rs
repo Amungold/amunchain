@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use serde::{Deserialize, Serialize};
-use amun_constitutional_kernel::receipt::ExecutionReceipt;
 use amun_constitutional_commitments::MerkleProof;
+use amun_constitutional_kernel::receipt::ExecutionReceipt;
+use serde::{Deserialize, Serialize};
 
 /// A proof-carrying receipt binds an execution receipt with the Merkle
 /// proofs that attest its inclusion in the constitutional state,

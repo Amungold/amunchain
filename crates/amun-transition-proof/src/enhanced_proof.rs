@@ -1,6 +1,6 @@
+use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
 use amun_vm_kernel::pending_buffer::OperationRecord;
-use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -67,7 +67,9 @@ impl WitnessBundle {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.consumed_proofs.is_empty() && self.lineage_proofs.is_empty() && self.produced_metadata.is_empty()
+        self.consumed_proofs.is_empty()
+            && self.lineage_proofs.is_empty()
+            && self.produced_metadata.is_empty()
     }
 }
 

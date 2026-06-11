@@ -14,15 +14,13 @@ impl EvidenceEngine {
         transaction_hash: [u8; 32],
     ) -> ConstitutionalEvidence {
         match vm_evidence {
-            VMEvidence::ExecutionFailure { reason } => {
-                ConstitutionalEvidence::ExecutionFailure {
-                    reason: reason.clone(),
-                    contract_id,
-                    block_height,
-                    transaction_hash,
-                    gas_consumed: 0,
-                }
-            }
+            VMEvidence::ExecutionFailure { reason } => ConstitutionalEvidence::ExecutionFailure {
+                reason: reason.clone(),
+                contract_id,
+                block_height,
+                transaction_hash,
+                gas_consumed: 0,
+            },
             VMEvidence::ConstitutionalViolation { law, resource_ids } => {
                 ConstitutionalEvidence::ConstitutionalViolation {
                     law: law.clone(),
@@ -44,10 +42,7 @@ impl EvidenceEngine {
         }
     }
 
-    pub fn archive(
-        evidence: ConstitutionalEvidence,
-        archive: &mut VMEvidenceArchive,
-    ) -> [u8; 32] {
+    pub fn archive(evidence: ConstitutionalEvidence, archive: &mut VMEvidenceArchive) -> [u8; 32] {
         archive.insert(evidence)
     }
 }
@@ -72,7 +67,11 @@ mod tests {
         let tx_hash = [0xaa; 32];
         let evidence = EvidenceEngine::convert(&vm_ev, contract_id, 42, tx_hash);
         match evidence {
-            ConstitutionalEvidence::ExecutionFailure { reason, block_height, .. } => {
+            ConstitutionalEvidence::ExecutionFailure {
+                reason,
+                block_height,
+                ..
+            } => {
                 assert_eq!(reason, "out of gas");
                 assert_eq!(block_height, 42);
             }
@@ -88,7 +87,9 @@ mod tests {
         };
         let evidence = EvidenceEngine::convert(&vm_ev, make_id(3), 10, [0xbb; 32]);
         match evidence {
-            ConstitutionalEvidence::ConstitutionalViolation { law, resource_ids, .. } => {
+            ConstitutionalEvidence::ConstitutionalViolation {
+                law, resource_ids, ..
+            } => {
                 assert_eq!(law, "R1");
                 assert_eq!(resource_ids.len(), 2);
             }
@@ -116,12 +117,18 @@ mod tests {
     #[test]
     fn w4_evidence_id_deterministic() {
         let e1 = ConstitutionalEvidence::ExecutionFailure {
-            reason: "test".into(), contract_id: make_id(1),
-            block_height: 1, transaction_hash: [0xdd; 32], gas_consumed: 0,
+            reason: "test".into(),
+            contract_id: make_id(1),
+            block_height: 1,
+            transaction_hash: [0xdd; 32],
+            gas_consumed: 0,
         };
         let e2 = ConstitutionalEvidence::ExecutionFailure {
-            reason: "test".into(), contract_id: make_id(1),
-            block_height: 1, transaction_hash: [0xdd; 32], gas_consumed: 0,
+            reason: "test".into(),
+            contract_id: make_id(1),
+            block_height: 1,
+            transaction_hash: [0xdd; 32],
+            gas_consumed: 0,
         };
         assert_eq!(e1.evidence_id(), e2.evidence_id());
     }
@@ -130,17 +137,25 @@ mod tests {
     fn w4_violation_and_failure_categories() {
         let mut archive = VMEvidenceArchive::new();
         archive.insert(ConstitutionalEvidence::ExecutionFailure {
-            reason: "oog".into(), contract_id: make_id(1),
-            block_height: 1, transaction_hash: [0x11; 32], gas_consumed: 0,
+            reason: "oog".into(),
+            contract_id: make_id(1),
+            block_height: 1,
+            transaction_hash: [0x11; 32],
+            gas_consumed: 0,
         });
         archive.insert(ConstitutionalEvidence::ConstitutionalViolation {
-            law: "R1".into(), resource_ids: vec![],
-            contract_id: make_id(1), block_height: 1, transaction_hash: [0x22; 32],
+            law: "R1".into(),
+            resource_ids: vec![],
+            contract_id: make_id(1),
+            block_height: 1,
+            transaction_hash: [0x22; 32],
         });
         archive.insert(ConstitutionalEvidence::InvariantViolation {
             obligation_id: "SAFETY-001".into(),
-            contract_id: make_id(1), block_height: 1,
-            transaction_hash: [0x33; 32], state_root: [0u8; 32],
+            contract_id: make_id(1),
+            block_height: 1,
+            transaction_hash: [0x33; 32],
+            state_root: [0u8; 32],
         });
         assert_eq!(archive.total(), 3);
         assert_eq!(archive.failures().len(), 1);

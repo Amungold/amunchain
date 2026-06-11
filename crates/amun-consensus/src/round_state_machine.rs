@@ -1,9 +1,9 @@
-use crate::state::{ConsensusState, ConsensusStep};
+use crate::action::{ActionLog, ConsensusAction};
 use crate::pacemaker::Pacemaker;
-use crate::vote_collector::VoteCollector;
+use crate::state::{ConsensusState, ConsensusStep};
+use crate::types::{BlockProposal, QuorumCertificate, Vote, VoteType};
 use crate::validator::ValidatorSet;
-use crate::types::{BlockProposal, Vote, VoteType, QuorumCertificate};
-use crate::action::{ConsensusAction, ActionLog};
+use crate::vote_collector::VoteCollector;
 
 pub struct RoundStateMachine {
     pub local_validator_id: [u8; 32],
@@ -45,7 +45,9 @@ impl RoundStateMachine {
     }
 
     pub fn propose(&mut self, block_hash: [u8; 32], proposer_id: [u8; 32]) {
-        if self.state.step != ConsensusStep::Propose { return; }
+        if self.state.step != ConsensusStep::Propose {
+            return;
+        }
         self.emit(ConsensusAction::BroadcastProposal(BlockProposal {
             height: self.state.height,
             block_hash,
@@ -60,32 +62,47 @@ impl RoundStateMachine {
             self.state.see_valid(block_hash);
             self.state.advance_step();
             self.emit(ConsensusAction::BroadcastPrevote(Vote {
-                height: self.state.height, block_hash,
-                voter: self.local_validator_id, round: self.state.round,
-                vote_type: VoteType::Prevote, timestamp: 0,
+                height: self.state.height,
+                block_hash,
+                voter: self.local_validator_id,
+                round: self.state.round,
+                vote_type: VoteType::Prevote,
+                timestamp: 0,
             }));
         }
     }
 
-    pub fn process_vote(&mut self, vote: Vote, validator_set: &ValidatorSet) -> Option<QuorumCertificate> {
-        if vote.height != self.state.height || vote.round != self.state.round { return None; }
+    pub fn process_vote(
+        &mut self,
+        vote: Vote,
+        validator_set: &ValidatorSet,
+    ) -> Option<QuorumCertificate> {
+        if vote.height != self.state.height || vote.round != self.state.round {
+            return None;
+        }
         let expected = match self.state.step {
             ConsensusStep::Prevote => VoteType::Prevote,
             ConsensusStep::Precommit => VoteType::Precommit,
             _ => return None,
         };
-        if vote.vote_type != expected { return None; }
+        if vote.vote_type != expected {
+            return None;
+        }
         let qc = self.vote_collector.add_vote(vote, validator_set);
         if qc.is_some() {
             match self.state.step {
                 ConsensusStep::Prevote => {
-                    if let Some(ref qc) = qc { self.state.see_valid(qc.block_hash); }
+                    if let Some(ref qc) = qc {
+                        self.state.see_valid(qc.block_hash);
+                    }
                     self.state.advance_step();
                     self.emit(ConsensusAction::BroadcastPrecommit(Vote {
                         height: self.state.height,
                         block_hash: qc.as_ref().map(|q| q.block_hash).unwrap_or([0u8; 32]),
-                        voter: self.local_validator_id, round: self.state.round,
-                        vote_type: VoteType::Precommit, timestamp: 0,
+                        voter: self.local_validator_id,
+                        round: self.state.round,
+                        vote_type: VoteType::Precommit,
+                        timestamp: 0,
                     }));
                 }
                 ConsensusStep::Precommit => {
@@ -113,11 +130,18 @@ impl RoundStateMachine {
     pub fn advance_round(&mut self) -> Result<(), &'static str> {
         let from = self.state.round;
         self.state.advance_round()?;
-        self.emit(ConsensusAction::AdvanceRound { from, to: self.state.round });
+        self.emit(ConsensusAction::AdvanceRound {
+            from,
+            to: self.state.round,
+        });
         self.vote_collector.reset();
         Ok(())
     }
 
-    pub fn current_timeout_ms(&self) -> Option<u64> { self.pacemaker.timeout_ms(self.state.round, self.state.step) }
-    pub fn is_committed(&self) -> bool { self.pending_commit_qc.is_some() && self.state.step == ConsensusStep::Commit }
+    pub fn current_timeout_ms(&self) -> Option<u64> {
+        self.pacemaker.timeout_ms(self.state.round, self.state.step)
+    }
+    pub fn is_committed(&self) -> bool {
+        self.pending_commit_qc.is_some() && self.state.step == ConsensusStep::Commit
+    }
 }

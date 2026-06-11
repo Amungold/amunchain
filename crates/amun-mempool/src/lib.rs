@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use amun_transactions::Transaction;
+use std::collections::HashMap;
 
 /// A constitutional mempool that holds pending transactions before block inclusion.
 #[derive(Debug, Clone, Default)]
@@ -60,8 +60,13 @@ mod tests {
         let signing_key = SigningKey::from_bytes(&seed);
         let sender = signing_key.verifying_key().to_bytes();
         let mut tx = Transaction {
-            version: 1, sender, nonce,
-            payload: TransactionPayload::Transfer(TransferPayload { to: [2u8; 32], amount }),
+            version: 1,
+            sender,
+            nonce,
+            payload: TransactionPayload::Transfer(TransferPayload {
+                to: [2u8; 32],
+                amount,
+            }),
             signature: vec![],
         };
         tx.sign(&signing_key);

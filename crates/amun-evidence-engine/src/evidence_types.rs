@@ -35,11 +35,18 @@ impl ConstitutionalEvidence {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"AMUN_EVIDENCE_V1");
         match self {
-            Self::ExecutionFailure { transaction_hash, .. } => {
+            Self::ExecutionFailure {
+                transaction_hash, ..
+            } => {
                 hasher.update(b"EXEC_FAILURE");
                 hasher.update(transaction_hash);
             }
-            Self::ConstitutionalViolation { law, resource_ids, transaction_hash, .. } => {
+            Self::ConstitutionalViolation {
+                law,
+                resource_ids,
+                transaction_hash,
+                ..
+            } => {
                 hasher.update(b"CONST_VIOLATION");
                 hasher.update(law.as_bytes());
                 hasher.update(transaction_hash);
@@ -47,7 +54,11 @@ impl ConstitutionalEvidence {
                     hasher.update(id.as_bytes());
                 }
             }
-            Self::InvariantViolation { obligation_id, transaction_hash, .. } => {
+            Self::InvariantViolation {
+                obligation_id,
+                transaction_hash,
+                ..
+            } => {
                 hasher.update(b"INVARIANT_VIOLATION");
                 hasher.update(obligation_id.as_bytes());
                 hasher.update(transaction_hash);
@@ -68,6 +79,9 @@ impl ConstitutionalEvidence {
     }
 
     pub fn causes_revert(&self) -> bool {
-        matches!(self, Self::ExecutionFailure { .. } | Self::ConstitutionalViolation { .. })
+        matches!(
+            self,
+            Self::ExecutionFailure { .. } | Self::ConstitutionalViolation { .. }
+        )
     }
 }

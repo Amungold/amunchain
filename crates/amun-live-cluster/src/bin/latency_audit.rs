@@ -6,11 +6,7 @@ use std::time::Duration;
 fn main() {
     let ports = [9700, 9701, 9702, 9703];
     let validators: Vec<LiveValidator> = (0..4)
-        .map(|i| {
-            LiveValidator::new(
-                ValidatorConfig::test_cluster(i, &ports).with_quorum(4),
-            )
-        })
+        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
         .collect();
 
     for v in &validators {
@@ -44,7 +40,9 @@ fn main() {
                     let gap2 = t3 - t2;
                     println!(
                         "  Block intervals: {}ms, {}ms (avg {:.0}ms)",
-                        gap1, gap2, (gap1 + gap2) as f64 / 2.0
+                        gap1,
+                        gap2,
+                        (gap1 + gap2) as f64 / 2.0
                     );
                     println!(
                         "  Approx TPS from timestamps: {:.2}",

@@ -5,12 +5,12 @@
 //! a network endpoint — it is a lineage-bound constitutional entity
 //! whose identity is cryptographically provable.
 
-pub mod peer_id;
 pub mod certificate;
+pub mod peer_id;
 pub mod registry;
 pub mod verifier;
 
-pub use peer_id::ConstitutionalPeerId;
 pub use certificate::PeerCertificate;
+pub use peer_id::ConstitutionalPeerId;
 pub use registry::PeerRegistry;
 pub use verifier::IdentityVerifier;

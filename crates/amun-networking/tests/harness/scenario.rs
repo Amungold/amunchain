@@ -1,10 +1,10 @@
 // Allow dead code in test harness — these are used by v2 scenarios
 #![allow(dead_code)]
-use amun_consensus::action::ConsensusAction;
-use amun_networking::envelope::Envelope;
-use super::SimulationNodeCore;
 use super::event_scheduler::EventScheduler;
 use super::message_delivery::MessageDeliveryEngine;
+use super::SimulationNodeCore;
+use amun_consensus::action::ConsensusAction;
+use amun_networking::envelope::Envelope;
 use std::collections::HashMap;
 
 pub trait ConsensusScenario {
@@ -63,7 +63,10 @@ impl ScenarioRunner {
     }
 
     pub fn run(&mut self, _scenario: &dyn ConsensusScenario) -> ScenarioResult {
-        ScenarioResult { success: true, commits: 0 }
+        ScenarioResult {
+            success: true,
+            commits: 0,
+        }
     }
 }
 

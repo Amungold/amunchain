@@ -1,9 +1,8 @@
 use crate::message::{
-    NetworkMessage, StateSyncRequest as NetSyncRequest,
-    StateSyncResponse as NetSyncResponse,
+    NetworkMessage, StateSyncRequest as NetSyncRequest, StateSyncResponse as NetSyncResponse,
 };
 use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream, SocketAddr};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::thread;
 /// Listens on `addr`, and for each connection, reads a StateSyncRequest,
 /// generates a StateSyncResponse, and sends it back.
@@ -24,9 +23,9 @@ impl SyncServer {
     where
         F: Fn(&NetSyncRequest) -> NetSyncResponse + Send + Sync + 'static,
     {
-        let listener = TcpListener::bind(self.addr)
-            .map_err(|e| format!("Bind error: {}", e))?;
-        listener.set_nonblocking(false)
+        let listener = TcpListener::bind(self.addr).map_err(|e| format!("Bind error: {}", e))?;
+        listener
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let handler = std::sync::Arc::new(handler);
@@ -66,28 +65,30 @@ impl SyncServer {
 
     fn read_message(stream: &mut TcpStream) -> Result<NetworkMessage, String> {
         let mut len_buf = [0u8; 4];
-        stream.read_exact(&mut len_buf)
+        stream
+            .read_exact(&mut len_buf)
             .map_err(|e| format!("Read len error: {}", e))?;
         let len = u32::from_be_bytes(len_buf) as usize;
         if len > 16 * 1024 * 1024 {
             return Err("Frame too large".into());
         }
         let mut data = vec![0u8; len];
-        stream.read_exact(&mut data)
+        stream
+            .read_exact(&mut data)
             .map_err(|e| format!("Read data error: {}", e))?;
-        NetworkMessage::decode(&data)
-            .map_err(|e| format!("Decode error: {}", e))
+        NetworkMessage::decode(&data).map_err(|e| format!("Decode error: {}", e))
     }
 
     fn send_message(stream: &mut TcpStream, msg: &NetworkMessage) -> Result<(), String> {
         let data = msg.encode().map_err(|e| format!("Encode error: {}", e))?;
         let len = data.len() as u32;
-        stream.write_all(&len.to_be_bytes())
+        stream
+            .write_all(&len.to_be_bytes())
             .map_err(|e| format!("Write len error: {}", e))?;
-        stream.write_all(&data)
+        stream
+            .write_all(&data)
             .map_err(|e| format!("Write data error: {}", e))?;
-        stream.flush()
-            .map_err(|e| format!("Flush error: {}", e))?;
+        stream.flush().map_err(|e| format!("Flush error: {}", e))?;
         Ok(())
     }
 }
@@ -101,36 +102,39 @@ impl SyncClient {
         server_addr: SocketAddr,
         request: &NetSyncRequest,
     ) -> Result<NetSyncResponse, String> {
-        let mut stream = TcpStream::connect(server_addr)
-            .map_err(|e| format!("Connect error: {}", e))?;
-        stream.set_nonblocking(false)
+        let mut stream =
+            TcpStream::connect(server_addr).map_err(|e| format!("Connect error: {}", e))?;
+        stream
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         // Send request
         let msg = NetworkMessage::StateSyncRequest(request.clone());
         let data = msg.encode().map_err(|e| format!("Encode error: {}", e))?;
         let len = data.len() as u32;
-        stream.write_all(&len.to_be_bytes())
+        stream
+            .write_all(&len.to_be_bytes())
             .map_err(|e| format!("Write error: {}", e))?;
-        stream.write_all(&data)
+        stream
+            .write_all(&data)
             .map_err(|e| format!("Write error: {}", e))?;
-        stream.flush()
-            .map_err(|e| format!("Flush error: {}", e))?;
+        stream.flush().map_err(|e| format!("Flush error: {}", e))?;
 
         // Read response
         let mut len_buf = [0u8; 4];
-        stream.read_exact(&mut len_buf)
+        stream
+            .read_exact(&mut len_buf)
             .map_err(|e| format!("Read len error: {}", e))?;
         let resp_len = u32::from_be_bytes(len_buf) as usize;
         if resp_len > 16 * 1024 * 1024 {
             return Err("Response too large".into());
         }
         let mut data = vec![0u8; resp_len];
-        stream.read_exact(&mut data)
+        stream
+            .read_exact(&mut data)
             .map_err(|e| format!("Read data error: {}", e))?;
 
-        let msg = NetworkMessage::decode(&data)
-            .map_err(|e| format!("Decode error: {}", e))?;
+        let msg = NetworkMessage::decode(&data).map_err(|e| format!("Decode error: {}", e))?;
 
         match msg {
             NetworkMessage::StateSyncResponse(resp) => Ok(resp),
@@ -141,9 +145,9 @@ impl SyncClient {
 
 #[cfg(test)]
 mod tests {
-    use crate::message::{FullSnapshotData, DeltaSyncData};
-        use std::time::Duration;
     use super::*;
+    use crate::message::{DeltaSyncData, FullSnapshotData};
+    use std::time::Duration;
 
     /// N67 — Full network state sync: Node B serves a snapshot, Node A requests and receives it.
     #[test]
@@ -158,18 +162,20 @@ mod tests {
         let _server_thread = thread::spawn(move || {
             let server = SyncServer::new(server_addr);
             server_ready_clone.store(true, std::sync::atomic::Ordering::SeqCst);
-            server.serve(|_req| {
-                // Return a full snapshot response
-                NetSyncResponse::FullSnapshot(FullSnapshotData {
-                    height: 100,
-                    block_hash: [0xAA; 32],
-                    state_root: [0xBB; 32],
-                    history_root: [0xCC; 32],
-                    chunks: vec![b"chunk_data_1".to_vec(), b"chunk_data_2".to_vec()],
-                    chunk_root: [0xDD; 32],
-                    total_resources: 500,
+            server
+                .serve(|_req| {
+                    // Return a full snapshot response
+                    NetSyncResponse::FullSnapshot(FullSnapshotData {
+                        height: 100,
+                        block_hash: [0xAA; 32],
+                        state_root: [0xBB; 32],
+                        history_root: [0xCC; 32],
+                        chunks: vec![b"chunk_data_1".to_vec(), b"chunk_data_2".to_vec()],
+                        chunk_root: [0xDD; 32],
+                        total_resources: 500,
+                    })
                 })
-            }).ok();
+                .ok();
         });
 
         // Wait for server to be ready
@@ -207,21 +213,23 @@ mod tests {
 
         let _server_thread = thread::spawn(move || {
             let server = SyncServer::new(addr);
-            server.serve(|req| {
-                if req.current_height >= 100 {
-                    NetSyncResponse::AlreadySynced
-                } else {
-                    NetSyncResponse::FullSnapshot(FullSnapshotData {
-                        height: 100,
-                        block_hash: [0xAA; 32],
-                        state_root: [0xBB; 32],
-                        history_root: [0xCC; 32],
-                        chunks: vec![],
-                        chunk_root: [0xDD; 32],
-                        total_resources: 0,
-                    })
-                }
-            }).ok();
+            server
+                .serve(|req| {
+                    if req.current_height >= 100 {
+                        NetSyncResponse::AlreadySynced
+                    } else {
+                        NetSyncResponse::FullSnapshot(FullSnapshotData {
+                            height: 100,
+                            block_hash: [0xAA; 32],
+                            state_root: [0xBB; 32],
+                            history_root: [0xCC; 32],
+                            chunks: vec![],
+                            chunk_root: [0xDD; 32],
+                            total_resources: 0,
+                        })
+                    }
+                })
+                .ok();
         });
 
         thread::sleep(Duration::from_millis(100));
@@ -248,28 +256,30 @@ mod tests {
 
         let _server_thread = thread::spawn(move || {
             let server = SyncServer::new(addr);
-            server.serve(|req| {
-                let diff = 100 - req.current_height;
-                if diff <= 10 {
-                    NetSyncResponse::DeltaSync(DeltaSyncData {
-                        start_height: req.current_height + 1,
-                        end_height: 100,
-                        blocks: (req.current_height + 1..=100)
-                            .map(|h| vec![h as u8; 32])
-                            .collect(),
-                    })
-                } else {
-                    NetSyncResponse::FullSnapshot(FullSnapshotData {
-                        height: 100,
-                        block_hash: [0xAA; 32],
-                        state_root: [0xBB; 32],
-                        history_root: [0xCC; 32],
-                        chunks: vec![],
-                        chunk_root: [0xDD; 32],
-                        total_resources: 0,
-                    })
-                }
-            }).ok();
+            server
+                .serve(|req| {
+                    let diff = 100 - req.current_height;
+                    if diff <= 10 {
+                        NetSyncResponse::DeltaSync(DeltaSyncData {
+                            start_height: req.current_height + 1,
+                            end_height: 100,
+                            blocks: (req.current_height + 1..=100)
+                                .map(|h| vec![h as u8; 32])
+                                .collect(),
+                        })
+                    } else {
+                        NetSyncResponse::FullSnapshot(FullSnapshotData {
+                            height: 100,
+                            block_hash: [0xAA; 32],
+                            state_root: [0xBB; 32],
+                            history_root: [0xCC; 32],
+                            chunks: vec![],
+                            chunk_root: [0xDD; 32],
+                            total_resources: 0,
+                        })
+                    }
+                })
+                .ok();
         });
 
         thread::sleep(Duration::from_millis(100));
@@ -300,9 +310,7 @@ mod tests {
 
         let _server_thread = thread::spawn(move || {
             let server = SyncServer::new(addr);
-            server.serve(|_req| {
-                NetSyncResponse::AlreadySynced
-            }).ok();
+            server.serve(|_req| NetSyncResponse::AlreadySynced).ok();
         });
 
         thread::sleep(Duration::from_millis(100));

@@ -1,17 +1,19 @@
-use amun_constitutional_signing::ConstitutionalKeyPair;
 use amun_constitutional_authority::ConstitutionalCertificate;
+use amun_constitutional_governance::amendment::AmendmentLifecycle;
 use amun_constitutional_governance::capability::Capability;
 use amun_constitutional_governance::quorum::QuorumPolicy;
-use amun_constitutional_governance::voting::{Proposal, Ballot, Tally};
-use amun_constitutional_governance::amendment::AmendmentLifecycle;
+use amun_constitutional_governance::voting::{Ballot, Proposal, Tally};
 use amun_constitutional_kernel::{
-    ExecutionContext,
-    ConstitutionalStateMachine,
-    AmendmentActivator,
+    AmendmentActivator, ConstitutionalStateMachine, ExecutionContext,
 };
+use amun_constitutional_signing::ConstitutionalKeyPair;
 use std::collections::BTreeMap;
 
-fn build_test_context() -> (ExecutionContext, Vec<Capability>, Vec<ConstitutionalCertificate>) {
+fn build_test_context() -> (
+    ExecutionContext,
+    Vec<Capability>,
+    Vec<ConstitutionalCertificate>,
+) {
     let key = ConstitutionalKeyPair::generate();
     let root_cert = ConstitutionalCertificate::new_root(
         key.verifying_key_hex(),
@@ -40,10 +42,7 @@ fn build_test_context() -> (ExecutionContext, Vec<Capability>, Vec<Constitutiona
         ),
     ];
 
-    let ctx = ExecutionContext::new(
-        vec![root_cert],
-        "2026-06-01T00:00:00Z".into(),
-    );
+    let ctx = ExecutionContext::new(vec![root_cert], "2026-06-01T00:00:00Z".into());
 
     (ctx, capabilities, vec![])
 }
@@ -53,19 +52,29 @@ fn test_state_machine_determinism() {
     let (ctx, capabilities, _) = build_test_context();
     let mut machine = ConstitutionalStateMachine::new();
 
-    let updates: BTreeMap<String, String> = [
-        ("key_a".into(), "value_a".into()),
-    ].into();
+    let updates: BTreeMap<String, String> = [("key_a".into(), "value_a".into())].into();
 
-    let (v1, receipt1) = machine.transition(
-        &ctx, &capabilities, "set_parameter", "constitutional", updates.clone(),
-    ).expect("transition should succeed");
+    let (v1, receipt1) = machine
+        .transition(
+            &ctx,
+            &capabilities,
+            "set_parameter",
+            "constitutional",
+            updates.clone(),
+        )
+        .expect("transition should succeed");
 
     // Replay must produce identical result
     let mut machine2 = ConstitutionalStateMachine::new();
-    let (v2, receipt2) = machine2.transition(
-        &ctx, &capabilities, "set_parameter", "constitutional", updates,
-    ).expect("transition should succeed");
+    let (v2, receipt2) = machine2
+        .transition(
+            &ctx,
+            &capabilities,
+            "set_parameter",
+            "constitutional",
+            updates,
+        )
+        .expect("transition should succeed");
 
     assert_eq!(v1, v2);
     assert_eq!(receipt1, receipt2);
@@ -81,7 +90,11 @@ fn test_unauthorised_action_rejected() {
     let updates: BTreeMap<String, String> = [].into();
 
     let result = machine.transition(
-        &ctx, &empty_caps, "set_parameter", "constitutional", updates,
+        &ctx,
+        &empty_caps,
+        "set_parameter",
+        "constitutional",
+        updates,
     );
     assert!(result.is_err());
 }
@@ -92,8 +105,10 @@ fn test_amendment_activation() {
     let mut machine = ConstitutionalStateMachine::new();
 
     let mut amendment = AmendmentLifecycle::new(
-        "Title".into(), "desc".into(),
-        "2026-01-01T00:00:00Z".into(), "2030-01-01T00:00:00Z".into(),
+        "Title".into(),
+        "desc".into(),
+        "2026-01-01T00:00:00Z".into(),
+        "2030-01-01T00:00:00Z".into(),
     );
     amendment.propose();
     amendment.approve();
@@ -105,12 +120,15 @@ fn test_amendment_activation() {
         passed: true,
     };
 
-    let version = AmendmentActivator::activate(
-        &mut machine, &ctx, &capabilities, &mut amendment, &tally,
-    ).expect("activation should succeed");
+    let version =
+        AmendmentActivator::activate(&mut machine, &ctx, &capabilities, &mut amendment, &tally)
+            .expect("activation should succeed");
 
     assert!(version > 0);
-    assert!(machine.state.fields.contains_key(&format!("amendment.{}", amendment.proposal.proposal_id)));
+    assert!(machine
+        .state
+        .fields
+        .contains_key(&format!("amendment.{}", amendment.proposal.proposal_id)));
 }
 
 #[test]
@@ -179,9 +197,17 @@ fn test_proposal_ballot_integration() {
     };
 
     let version = AmendmentActivator::activate(
-        &mut machine, &ctx, &capabilities, &mut amendment, &activation_tally,
-    ).expect("activation should succeed");
+        &mut machine,
+        &ctx,
+        &capabilities,
+        &mut amendment,
+        &activation_tally,
+    )
+    .expect("activation should succeed");
 
     assert!(version > 0);
-    assert!(machine.state.fields.contains_key(&format!("amendment.{}", amendment.proposal.proposal_id)));
+    assert!(machine
+        .state
+        .fields
+        .contains_key(&format!("amendment.{}", amendment.proposal.proposal_id)));
 }

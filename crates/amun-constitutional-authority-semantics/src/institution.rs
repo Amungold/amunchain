@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use amun_peer_identity::ConstitutionalPeerId;
 use crate::capability::AuthorityCapability;
+use amun_peer_identity::ConstitutionalPeerId;
+use serde::{Deserialize, Serialize};
 
 /// An institutional actor is a peer that possesses a set of
 /// constitutional capabilities, making it an institution within

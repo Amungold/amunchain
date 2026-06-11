@@ -1,6 +1,6 @@
 #![allow(clippy::too_many_arguments)]
-use serde::{Deserialize, Serialize};
 use blake3::Hasher;
+use serde::{Deserialize, Serialize};
 
 use crate::{ObligationResult, ObligationResultStatus, VerdictResult};
 

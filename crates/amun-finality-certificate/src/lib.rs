@@ -33,11 +33,14 @@ impl ConstitutionalFinalityCertificate {
     ) -> Self {
         let mut cert = Self {
             finality_id: [0u8; 32],
-            height, block_hash, evidence_root,
+            height,
+            block_hash,
+            evidence_root,
             replay_certificate_head: replay_head,
             audit_record_head: audit_head,
             quorum_certificate_hash: qc_hash,
-            previous_finality, timestamp,
+            previous_finality,
+            timestamp,
         };
         cert.finality_id = cert.compute_id();
         cert
@@ -72,7 +75,9 @@ pub struct FinalityChain {
 }
 
 impl FinalityChain {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn append(&mut self, cert: ConstitutionalFinalityCertificate) -> Result<(), &'static str> {
         if !cert.verify() {
@@ -88,8 +93,12 @@ impl FinalityChain {
         Ok(())
     }
 
-    pub fn is_empty(&self) -> bool { self.certificates.is_empty() }
-    pub fn len(&self) -> usize { self.certificates.len() }
+    pub fn is_empty(&self) -> bool {
+        self.certificates.is_empty()
+    }
+    pub fn len(&self) -> usize {
+        self.certificates.len()
+    }
     pub fn latest(&self) -> Option<&ConstitutionalFinalityCertificate> {
         self.latest_id.and_then(|id| self.certificates.get(&id))
     }
@@ -101,8 +110,14 @@ mod tests {
 
     fn issue_cert(h: u64) -> ConstitutionalFinalityCertificate {
         ConstitutionalFinalityCertificate::issue(
-            h, [h as u8; 32], [h as u8; 32], [h as u8; 32],
-            [h as u8; 32], [h as u8; 32], [0u8; 32], h * 1000,
+            h,
+            [h as u8; 32],
+            [h as u8; 32],
+            [h as u8; 32],
+            [h as u8; 32],
+            [h as u8; 32],
+            [0u8; 32],
+            h * 1000,
         )
     }
 
@@ -138,12 +153,12 @@ mod tests {
     fn n41_finality_chain_continuity() {
         let mut chain = FinalityChain::new();
         let c1 = ConstitutionalFinalityCertificate::issue(
-            1,[1u8;32],[1u8;32],[1u8;32],[1u8;32],[1u8;32],[0u8;32],1000,
+            1, [1u8; 32], [1u8; 32], [1u8; 32], [1u8; 32], [1u8; 32], [0u8; 32], 1000,
         );
         chain.append(c1).unwrap();
         let prev = chain.latest().unwrap().finality_id;
         let c2 = ConstitutionalFinalityCertificate::issue(
-            2,[2u8;32],[2u8;32],[2u8;32],[2u8;32],[2u8;32],prev,2000,
+            2, [2u8; 32], [2u8; 32], [2u8; 32], [2u8; 32], [2u8; 32], prev, 2000,
         );
         assert!(chain.append(c2).is_ok());
         assert_eq!(chain.len(), 2);

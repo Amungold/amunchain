@@ -1,6 +1,6 @@
+use crate::{ObligationNamespace, RegistryError};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
-use crate::{ObligationNamespace, RegistryError};
 
 /// A unique constitutional identifier for a proof obligation.
 ///
@@ -14,7 +14,10 @@ pub struct ObligationId {
 
 impl ObligationId {
     pub fn new(namespace: ObligationNamespace, sequence: u32) -> Self {
-        Self { namespace, sequence }
+        Self {
+            namespace,
+            sequence,
+        }
     }
 
     pub fn namespace(&self) -> ObligationNamespace {
@@ -57,6 +60,9 @@ impl FromStr for ObligationId {
         let sequence: u32 = parts[1]
             .parse()
             .map_err(|_| RegistryError::InvalidObligationIdFormat(s.to_string()))?;
-        Ok(Self { namespace, sequence })
+        Ok(Self {
+            namespace,
+            sequence,
+        })
     }
 }

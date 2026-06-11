@@ -7,10 +7,10 @@
 
 pub mod capability;
 pub mod delegation;
-pub mod revocation;
 pub mod institution;
+pub mod revocation;
 
 pub use capability::{AuthorityCapability, CapabilityWitness};
 pub use delegation::{DelegationChain, DelegationProof};
-pub use revocation::{RevocationWitness, RevocationRegistry};
 pub use institution::{InstitutionalActor, InstitutionalWitness};
+pub use revocation::{RevocationRegistry, RevocationWitness};

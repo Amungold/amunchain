@@ -1,10 +1,14 @@
-use axum::{extract::Path, routing::get, Router};
 use crate::services::account_service::AccountService;
+use axum::{extract::Path, routing::get, Router};
 
-async fn get_account(Path(address): Path<String>) -> crate::errors::ApiResult<crate::types::AccountSummary> {
+async fn get_account(
+    Path(address): Path<String>,
+) -> crate::errors::ApiResult<crate::types::AccountSummary> {
     AccountService::get_account(&address)
 }
-async fn get_transactions(Path(address): Path<String>) -> crate::errors::ApiResult<Vec<crate::types::TransactionSummary>> {
+async fn get_transactions(
+    Path(address): Path<String>,
+) -> crate::errors::ApiResult<Vec<crate::types::TransactionSummary>> {
     AccountService::get_transactions(&address)
 }
 

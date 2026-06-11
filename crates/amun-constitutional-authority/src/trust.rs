@@ -19,7 +19,11 @@ impl TrustAnchor {
         genesis_hash: String,
         scope: String,
     ) -> Self {
-        Self { signed_cert, genesis_hash, frozen_scope: scope }
+        Self {
+            signed_cert,
+            genesis_hash,
+            frozen_scope: scope,
+        }
     }
 
     pub fn is_self_signed(&self) -> bool {

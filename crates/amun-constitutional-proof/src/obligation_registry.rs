@@ -42,9 +42,9 @@ impl ObligationRegistry {
             self.graph.add_edge(obligation.id.clone(), dep.clone());
         }
 
-        self.graph.all_dependencies_exist().map_err(|_| {
-            RegistryError::CircularDependency(obligation.id.clone())
-        })?;
+        self.graph
+            .all_dependencies_exist()
+            .map_err(|_| RegistryError::CircularDependency(obligation.id.clone()))?;
 
         let kinds = self.collect_kinds();
         self.graph.validate_derived_terminate_in_primary(&kinds)?;

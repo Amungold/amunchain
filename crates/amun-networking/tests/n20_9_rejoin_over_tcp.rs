@@ -1,13 +1,13 @@
+use amun_certificate_network::distribution::LightClientProofBundle;
+use amun_chain_checkpoint::{
+    bootstrap::BootstrapSession,
+    inclusion::{checkpoint_merkle_root, prove_checkpoint_inclusion, CheckpointBundle},
+    CheckpointCertificate,
+};
+use amun_constitutional_block::ConstitutionalBlock;
+use amun_constitutional_state::ConstitutionalStateRuntime;
 use amun_networking::node::{NetworkNode, NodeLifecycle};
 use amun_networking::sync_protocol::{SyncRequest, SyncResponse};
-use amun_chain_checkpoint::{
-    CheckpointCertificate,
-    inclusion::{checkpoint_merkle_root, prove_checkpoint_inclusion, CheckpointBundle},
-    bootstrap::BootstrapSession,
-};
-use amun_constitutional_state::ConstitutionalStateRuntime;
-use amun_constitutional_block::ConstitutionalBlock;
-use amun_certificate_network::distribution::LightClientProofBundle;
 
 fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
     let mut rt = ConstitutionalStateRuntime::new();
@@ -18,13 +18,9 @@ fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
         rt.apply_transition(&[height as u8; 32], &[0xAA; 32]);
         let cert = rt.create_certificate(height, [0u8; 32]);
         let certs = vec![cert.clone()];
-        let merkle_root = hex::encode(
-            ConstitutionalStateRuntime::certificate_merkle_root(&certs)
-        );
+        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
         let hash = cert.certificate_hash();
-        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(
-            &certs, &hash
-        ).unwrap();
+        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
 
         let parent_hash = if height == start {
             &parent
@@ -33,8 +29,16 @@ fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
         };
 
         let block = ConstitutionalBlock::new(
-            height, parent_hash.into(), "t".into(), "p".into(), vec![],
-            hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root,
+            height,
+            parent_hash.into(),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
         );
 
         bundles.push(LightClientProofBundle::new(block, cert, proof));
@@ -127,7 +131,8 @@ fn n20_9_rejoin_rejects_outdated_checkpoint() {
     let cp_old = build_checkpoint(0, 9);
     let checkpoints_old = vec![cp_old.clone()];
     let root_old = checkpoint_merkle_root(&checkpoints_old);
-    let proof_old = prove_checkpoint_inclusion(&checkpoints_old, &cp_old.checkpoint_hash_bytes()).unwrap();
+    let proof_old =
+        prove_checkpoint_inclusion(&checkpoints_old, &cp_old.checkpoint_hash_bytes()).unwrap();
     let bundle_old = CheckpointBundle::new(cp_old, proof_old);
 
     let mut node = NetworkNode::new_bootstrapping([8u8; 32]);
@@ -136,7 +141,8 @@ fn n20_9_rejoin_rejects_outdated_checkpoint() {
     let cp_new = build_checkpoint(50, 99);
     let checkpoints_new = vec![cp_new.clone()];
     let root_new = checkpoint_merkle_root(&checkpoints_new);
-    let proof_new = prove_checkpoint_inclusion(&checkpoints_new, &cp_new.checkpoint_hash_bytes()).unwrap();
+    let proof_new =
+        prove_checkpoint_inclusion(&checkpoints_new, &cp_new.checkpoint_hash_bytes()).unwrap();
     let bundle_new = CheckpointBundle::new(cp_new, proof_new);
 
     let mut session = BootstrapSession::new(root_new);

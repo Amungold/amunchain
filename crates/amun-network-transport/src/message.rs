@@ -1,5 +1,5 @@
 use amun_resource_core::ResourceId;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Unified network message envelope for all AmunChain protocol messages.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -98,14 +98,12 @@ pub struct Pong {
 impl NetworkMessage {
     /// Canonical encoding of the message for wire transmission.
     pub fn encode(&self) -> Result<Vec<u8>, String> {
-        postcard::to_stdvec(self)
-            .map_err(|e| format!("Encode error: {}", e))
+        postcard::to_stdvec(self).map_err(|e| format!("Encode error: {}", e))
     }
 
     /// Decode a message from wire bytes.
     pub fn decode(data: &[u8]) -> Result<Self, String> {
-        postcard::from_bytes(data)
-            .map_err(|e| format!("Decode error: {}", e))
+        postcard::from_bytes(data).map_err(|e| format!("Decode error: {}", e))
     }
 }
 
@@ -189,7 +187,7 @@ mod tests {
         });
         let encoded = msg.encode().unwrap();
         // Truncate the last byte
-        let result = NetworkMessage::decode(&encoded[..encoded.len()-1]);
+        let result = NetworkMessage::decode(&encoded[..encoded.len() - 1]);
         assert!(result.is_err());
     }
 }

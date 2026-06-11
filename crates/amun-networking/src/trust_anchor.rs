@@ -1,5 +1,5 @@
-use std::collections::BTreeMap;
 use crate::peer_identity::PeerId;
+use std::collections::BTreeMap;
 
 /// A registry of trusted constitutional authorities.
 ///

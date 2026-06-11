@@ -1,5 +1,5 @@
-use axum::Router;
 use crate::routes::{accounts, chain, network, transactions};
+use axum::Router;
 
 pub fn build_app() -> Router {
     Router::new()

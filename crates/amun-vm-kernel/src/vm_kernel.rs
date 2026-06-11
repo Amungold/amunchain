@@ -1,7 +1,4 @@
-use amun_resource_core::{
-    ResourceMetadata, ResourceRegistry,
-    TransformationMatrix, RegistryError,
-};
+use amun_resource_core::{RegistryError, ResourceMetadata, ResourceRegistry, TransformationMatrix};
 
 use crate::execution_context::ExecutionContext;
 use crate::pending_buffer::{PendingBuffer, VMEvidence};
@@ -30,10 +27,7 @@ impl VMKernel {
         PendingBuffer::new(pre_state)
     }
 
-    pub fn verify(
-        buffer: &mut PendingBuffer,
-        registry: &ResourceRegistry,
-    ) -> bool {
+    pub fn verify(buffer: &mut PendingBuffer, registry: &ResourceRegistry) -> bool {
         let produced: Vec<ResourceMetadata> = buffer
             .produced_resources()
             .iter()
@@ -80,8 +74,7 @@ impl VMKernel {
                         all_passed = false;
                         continue;
                     }
-                    let actual_hash =
-                        amun_resource_core::ResourceRegistry::hash_resource(parent);
+                    let actual_hash = amun_resource_core::ResourceRegistry::hash_resource(parent);
                     if meta.lineage.parent_hashes.len() == 1
                         && meta.lineage.parent_hashes[0] != actual_hash
                     {

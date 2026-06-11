@@ -1,17 +1,25 @@
-use axum::{extract::Path, routing::get, routing::post, Json, Router};
 use crate::services::transaction_service::TransactionService;
 use crate::types::{BuildTransactionRequest, SubmitTransactionRequest};
+use axum::{extract::Path, routing::get, routing::post, Json, Router};
 
-async fn build_transaction(Json(req): Json<BuildTransactionRequest>) -> crate::errors::ApiResult<crate::types::BuildTransactionResponse> {
+async fn build_transaction(
+    Json(req): Json<BuildTransactionRequest>,
+) -> crate::errors::ApiResult<crate::types::BuildTransactionResponse> {
     TransactionService::build_transaction(req)
 }
-async fn submit_transaction(Json(req): Json<SubmitTransactionRequest>) -> crate::errors::ApiResult<crate::types::SubmitTransactionResponse> {
+async fn submit_transaction(
+    Json(req): Json<SubmitTransactionRequest>,
+) -> crate::errors::ApiResult<crate::types::SubmitTransactionResponse> {
     TransactionService::submit_transaction(req)
 }
-async fn get_transaction_by_hash(Path(hash): Path<String>) -> crate::errors::ApiResult<crate::types::TransactionStatusResponse> {
+async fn get_transaction_by_hash(
+    Path(hash): Path<String>,
+) -> crate::errors::ApiResult<crate::types::TransactionStatusResponse> {
     TransactionService::get_transaction(&hash)
 }
-async fn get_transaction_status(Path(hash): Path<String>) -> crate::errors::ApiResult<crate::types::TransactionStatusResponse> {
+async fn get_transaction_status(
+    Path(hash): Path<String>,
+) -> crate::errors::ApiResult<crate::types::TransactionStatusResponse> {
     TransactionService::get_transaction_status(&hash)
 }
 pub fn transaction_routes() -> Router {

@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 
-
 use crate::evidence_types::ConstitutionalEvidence;
 
 /// A lightweight evidence archive for the VM kernel.

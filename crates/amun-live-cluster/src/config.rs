@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -20,9 +20,7 @@ pub struct ClusterPeer {
 impl ValidatorConfig {
     pub fn localhost_cluster(validator_index: usize) -> Self {
         let base_port = 9000;
-        let ids: [[u8; 32]; 4] = [
-            [1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32],
-        ];
+        let ids: [[u8; 32]; 4] = [[1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32]];
         let cluster: Vec<ClusterPeer> = (0..4)
             .map(|i| ClusterPeer {
                 validator_id: ids[i],
@@ -39,9 +37,7 @@ impl ValidatorConfig {
     }
 
     pub fn test_cluster(validator_index: usize, ports: &[u16; 4]) -> Self {
-        let ids: [[u8; 32]; 4] = [
-            [1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32],
-        ];
+        let ids: [[u8; 32]; 4] = [[1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32]];
         let cluster: Vec<ClusterPeer> = (0..4)
             .map(|i| ClusterPeer {
                 validator_id: ids[i],
@@ -64,7 +60,10 @@ impl ValidatorConfig {
     }
 
     pub fn other_peers(&self) -> Vec<&ClusterPeer> {
-        self.cluster.iter().filter(|p| p.validator_id != self.validator_id).collect()
+        self.cluster
+            .iter()
+            .filter(|p| p.validator_id != self.validator_id)
+            .collect()
     }
 
     pub fn total_validators(&self) -> usize {

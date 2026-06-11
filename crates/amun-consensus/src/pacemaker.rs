@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::state::ConsensusStep;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct FixedMultiplier {
@@ -9,7 +9,10 @@ pub struct FixedMultiplier {
 
 impl FixedMultiplier {
     pub const fn new(numerator: u64, denominator: u64) -> Self {
-        Self { numerator, denominator }
+        Self {
+            numerator,
+            denominator,
+        }
     }
 
     /// Apply the multiplier to a value using checked arithmetic.

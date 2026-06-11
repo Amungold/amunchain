@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
 /// Unique identifier for a peer in the network.
@@ -19,7 +19,11 @@ pub struct PeerIdentity {
 
 impl PeerIdentity {
     pub fn new(node_id: NodeId, public_key: PublicKeyBytes, address: SocketAddr) -> Self {
-        Self { node_id, public_key, address }
+        Self {
+            node_id,
+            public_key,
+            address,
+        }
     }
 }
 

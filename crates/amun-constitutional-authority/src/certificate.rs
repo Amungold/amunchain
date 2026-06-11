@@ -2,11 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
+use amun_constitution_builder::{canonical_bytes::CanonicalSerialize, digest::ArtifactDigest};
 use serde::{Deserialize, Serialize};
-use amun_constitution_builder::{
-    canonical_bytes::CanonicalSerialize,
-    digest::ArtifactDigest,
-};
 
 /// A constitutional certificate whose identity is derived from a
 /// stable subset of its fields (everything except `certificate_id`,
@@ -17,9 +14,9 @@ use amun_constitution_builder::{
 #[serde(rename_all = "snake_case")]
 pub struct ConstitutionalCertificate {
     pub schema_version: u32,
-    pub certificate_id: String,          // hex BLAKE3 of identity bytes
-    pub issuer: String,                  // certificate_id of the issuer
-    pub subject: String,                 // certificate_id of the subject
+    pub certificate_id: String, // hex BLAKE3 of identity bytes
+    pub issuer: String,         // certificate_id of the issuer
+    pub subject: String,        // certificate_id of the subject
     pub subject_verifying_key_hex: String,
     pub lineage_parent_hash: Option<String>,
     pub epoch_start: String,
@@ -70,9 +67,9 @@ impl ConstitutionalCertificate {
 
     /// Create a child certificate issued by a parent.
     pub fn new_child(
-        issuer_id: String,               // parent certificate_id
+        issuer_id: String, // parent certificate_id
         subject_public_key_hex: String,
-        lineage_parent: String,          // same as issuer_id
+        lineage_parent: String, // same as issuer_id
         epoch_start: String,
         epoch_end: String,
         scope: String,

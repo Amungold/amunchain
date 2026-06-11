@@ -8,10 +8,19 @@ use thiserror::Error;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ResourceState {
     Active,
-    Consumed { derived_children: Vec<ResourceId> },
-    Archived { archive_height: u64 },
-    Revoked { reason: String },
-    TransferredOut { target_contract: [u8; 32], proof_id: [u8; 32] },
+    Consumed {
+        derived_children: Vec<ResourceId>,
+    },
+    Archived {
+        archive_height: u64,
+    },
+    Revoked {
+        reason: String,
+    },
+    TransferredOut {
+        target_contract: [u8; 32],
+        proof_id: [u8; 32],
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -41,7 +50,10 @@ pub enum RegistryError {
     #[error("parent hash mismatch for resource {0}")]
     ParentHashMismatch(ResourceId),
     #[error("illegal transformation: {src:?} -> {tgt:?}")]
-    IllegalTransformation { src: ResourceArchetype, tgt: ResourceArchetype },
+    IllegalTransformation {
+        src: ResourceArchetype,
+        tgt: ResourceArchetype,
+    },
     #[error("circular dependency detected")]
     CircularDependency,
     #[error("derived child count mismatch")]
@@ -76,7 +88,10 @@ impl ResourceRegistry {
     }
 
     pub fn total_active(&self) -> usize {
-        self.resources.values().filter(|m| matches!(m.state, ResourceState::Active)).count()
+        self.resources
+            .values()
+            .filter(|m| matches!(m.state, ResourceState::Active))
+            .count()
     }
 
     pub fn total(&self) -> usize {
@@ -86,7 +101,8 @@ impl ResourceRegistry {
     /// Returns all active resource IDs, sorted.
     /// This is the entry point needed by WitnessBuilder for Merkle proof construction.
     pub fn active_ids(&self) -> Vec<ResourceId> {
-        let mut ids: Vec<ResourceId> = self.resources
+        let mut ids: Vec<ResourceId> = self
+            .resources
             .iter()
             .filter(|(_, m)| matches!(m.state, ResourceState::Active))
             .map(|(id, _)| *id)
@@ -97,7 +113,8 @@ impl ResourceRegistry {
 
     /// Returns all active resource metadata, sorted by ID.
     pub fn active_resources(&self) -> Vec<&ResourceMetadata> {
-        let mut active: Vec<&ResourceMetadata> = self.resources
+        let mut active: Vec<&ResourceMetadata> = self
+            .resources
             .values()
             .filter(|m| matches!(m.state, ResourceState::Active))
             .collect();
@@ -116,7 +133,10 @@ impl ResourceRegistry {
             });
         }
         if meta.lineage.version != 1 {
-            return Err(RegistryError::VersionMismatch { expected: 1, actual: meta.lineage.version });
+            return Err(RegistryError::VersionMismatch {
+                expected: 1,
+                actual: meta.lineage.version,
+            });
         }
         self.ancestor_cache.insert(meta.resource_id, HashSet::new());
         self.resources.insert(meta.resource_id, meta);
@@ -131,7 +151,10 @@ impl ResourceRegistry {
         if self.resources.contains_key(&child_meta.resource_id) {
             return Err(RegistryError::DuplicateId(child_meta.resource_id));
         }
-        let parent = self.resources.get(parent_id).ok_or(RegistryError::NotFound(*parent_id))?;
+        let parent = self
+            .resources
+            .get(parent_id)
+            .ok_or(RegistryError::NotFound(*parent_id))?;
         if !matches!(parent.state, ResourceState::Active) {
             return Err(RegistryError::NotActive(*parent_id));
         }
@@ -166,16 +189,19 @@ impl ResourceRegistry {
             return Err(RegistryError::CircularDependency);
         }
         let child_id = child_meta.resource_id;
-        let mut child_ancestors = self.ancestor_cache
+        let mut child_ancestors = self
+            .ancestor_cache
             .get(parent_id)
             .cloned()
             .unwrap_or_default();
         child_ancestors.insert(*parent_id);
         self.ancestor_cache.insert(child_id, child_ancestors);
-        self.resources.get_mut(parent_id).expect("registry: parent must exist after contains_key check").state =
-            ResourceState::Consumed {
-                derived_children: vec![child_id],
-            };
+        self.resources
+            .get_mut(parent_id)
+            .expect("registry: parent must exist after contains_key check")
+            .state = ResourceState::Consumed {
+            derived_children: vec![child_id],
+        };
         self.resources.insert(child_id, child_meta);
         Ok(child_id)
     }
@@ -190,10 +216,7 @@ impl ResourceRegistry {
         }
 
         // Build leaf hashes
-        let mut leaves: Vec<[u8; 32]> = active
-            .iter()
-            .map(|m| Self::hash_resource(m))
-            .collect();
+        let mut leaves: Vec<[u8; 32]> = active.iter().map(|m| Self::hash_resource(m)).collect();
 
         // Build Merkle tree bottom-up
         while leaves.len() > 1 {
@@ -288,8 +311,11 @@ mod tests {
     fn w1_reject_duplicate_genesis() {
         let mut reg = ResourceRegistry::new(1000);
         let id = make_id(1);
-        reg.register_genesis(make_meta(id, ResourceArchetype::Asset)).unwrap();
-        assert!(reg.register_genesis(make_meta(id, ResourceArchetype::Asset)).is_err());
+        reg.register_genesis(make_meta(id, ResourceArchetype::Asset))
+            .unwrap();
+        assert!(reg
+            .register_genesis(make_meta(id, ResourceArchetype::Asset))
+            .is_err());
     }
 
     #[test]
@@ -325,7 +351,8 @@ mod tests {
         let mut reg = ResourceRegistry::new(1000);
         let parent_id = make_id(1);
         let child_id = make_id(2);
-        reg.register_genesis(make_meta(parent_id, ResourceArchetype::Evidence)).unwrap();
+        reg.register_genesis(make_meta(parent_id, ResourceArchetype::Evidence))
+            .unwrap();
         let parent_hash = ResourceRegistry::hash_resource(reg.get(&parent_id).unwrap());
         let child_meta = ResourceMetadata {
             resource_id: child_id,
@@ -343,7 +370,8 @@ mod tests {
         let mut reg = ResourceRegistry::new(1000);
         let a = make_id(1);
         let b = make_id(2);
-        reg.register_genesis(make_meta(a, ResourceArchetype::Asset)).unwrap();
+        reg.register_genesis(make_meta(a, ResourceArchetype::Asset))
+            .unwrap();
         let hash_a = ResourceRegistry::hash_resource(reg.get(&a).unwrap());
         let child_b = ResourceMetadata {
             resource_id: b,
@@ -370,7 +398,8 @@ mod tests {
     fn w1_lineage_depth() {
         let mut reg = ResourceRegistry::new(1000);
         let root = make_id(1);
-        reg.register_genesis(make_meta(root, ResourceArchetype::Asset)).unwrap();
+        reg.register_genesis(make_meta(root, ResourceArchetype::Asset))
+            .unwrap();
         let mut current_parent = root;
         for i in 2u64..=10 {
             let child = make_id(i as u8);
@@ -393,7 +422,8 @@ mod tests {
     fn w21a_active_ids_returns_sorted() {
         let mut reg = ResourceRegistry::new(1000);
         for i in 0..10u8 {
-            reg.register_genesis(make_meta(make_id(i), ResourceArchetype::Asset)).unwrap();
+            reg.register_genesis(make_meta(make_id(i), ResourceArchetype::Asset))
+                .unwrap();
         }
         let ids = reg.active_ids();
         assert_eq!(ids.len(), 10);
@@ -423,8 +453,12 @@ mod tests {
     #[test]
     fn w21a_merkle_root_not_zero_for_nonempty() {
         let mut reg = ResourceRegistry::new(1000);
-        reg.register_genesis(make_meta(make_id(1), ResourceArchetype::Asset)).unwrap();
+        reg.register_genesis(make_meta(make_id(1), ResourceArchetype::Asset))
+            .unwrap();
         let root = reg.compute_state_root();
-        assert_ne!(root, [0u8; 32], "Merkle root must be non-zero for non-empty state");
+        assert_ne!(
+            root, [0u8; 32],
+            "Merkle root must be non-zero for non-empty state"
+        );
     }
 }

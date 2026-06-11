@@ -1,7 +1,7 @@
-use crate::messages::{Transaction, GossipMessage};
+use crate::messages::{GossipMessage, Transaction};
 use std::collections::{HashMap, VecDeque};
 use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream, SocketAddr};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -57,7 +57,9 @@ impl Mempool {
     pub fn len(&self) -> usize {
         self.transactions.len()
     }
-    pub fn is_empty(&self) -> bool { self.transactions.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.transactions.is_empty()
+    }
 }
 
 pub struct GossipServer {
@@ -71,9 +73,10 @@ impl GossipServer {
     }
 
     pub fn serve(&self) -> Result<(), String> {
-        let listener = TcpListener::bind(self.addr)
-            .map_err(|e| format!("Gossip bind error: {}", e))?;
-        listener.set_nonblocking(false)
+        let listener =
+            TcpListener::bind(self.addr).map_err(|e| format!("Gossip bind error: {}", e))?;
+        listener
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let mempool = self.mempool.clone();
@@ -121,37 +124,62 @@ impl GossipServer {
 pub struct GossipClient;
 
 impl GossipClient {
-    pub fn announce(peer_addr: SocketAddr, tx_hash: [u8; 32], sender_id: [u8; 32]) -> Result<(), String> {
-        let mut stream = TcpStream::connect(peer_addr)
-            .map_err(|e| format!("Gossip connect error: {}", e))?;
-        stream.set_nonblocking(false)
+    pub fn announce(
+        peer_addr: SocketAddr,
+        tx_hash: [u8; 32],
+        sender_id: [u8; 32],
+    ) -> Result<(), String> {
+        let mut stream =
+            TcpStream::connect(peer_addr).map_err(|e| format!("Gossip connect error: {}", e))?;
+        stream
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
         let msg = GossipMessage::TransactionAnnounce { tx_hash, sender_id };
         let data = postcard::to_stdvec(&msg).map_err(|e| format!("Encode error: {}", e))?;
         let len = data.len() as u32;
-        stream.write_all(&len.to_be_bytes()).map_err(|e| format!("Write error: {}", e))?;
-        stream.write_all(&data).map_err(|e| format!("Write error: {}", e))?;
+        stream
+            .write_all(&len.to_be_bytes())
+            .map_err(|e| format!("Write error: {}", e))?;
+        stream
+            .write_all(&data)
+            .map_err(|e| format!("Write error: {}", e))?;
         stream.flush().map_err(|e| format!("Flush error: {}", e))?;
         Ok(())
     }
 
-    pub fn request_tx(peer_addr: SocketAddr, tx_hash: [u8; 32], requester_id: [u8; 32]) -> Result<Transaction, String> {
-        let mut stream = TcpStream::connect(peer_addr)
-            .map_err(|e| format!("Request connect error: {}", e))?;
-        stream.set_nonblocking(false)
+    pub fn request_tx(
+        peer_addr: SocketAddr,
+        tx_hash: [u8; 32],
+        requester_id: [u8; 32],
+    ) -> Result<Transaction, String> {
+        let mut stream =
+            TcpStream::connect(peer_addr).map_err(|e| format!("Request connect error: {}", e))?;
+        stream
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
-        let msg = GossipMessage::TransactionRequest { tx_hash, requester_id };
+        let msg = GossipMessage::TransactionRequest {
+            tx_hash,
+            requester_id,
+        };
         let data = postcard::to_stdvec(&msg).map_err(|e| format!("Encode error: {}", e))?;
         let len = data.len() as u32;
-        stream.write_all(&len.to_be_bytes()).map_err(|e| format!("Write error: {}", e))?;
-        stream.write_all(&data).map_err(|e| format!("Write error: {}", e))?;
+        stream
+            .write_all(&len.to_be_bytes())
+            .map_err(|e| format!("Write error: {}", e))?;
+        stream
+            .write_all(&data)
+            .map_err(|e| format!("Write error: {}", e))?;
         stream.flush().map_err(|e| format!("Flush error: {}", e))?;
 
         let mut len_buf = [0u8; 4];
-        stream.read_exact(&mut len_buf).map_err(|e| format!("Read len error: {}", e))?;
+        stream
+            .read_exact(&mut len_buf)
+            .map_err(|e| format!("Read len error: {}", e))?;
         let resp_len = u32::from_be_bytes(len_buf) as usize;
         let mut buf = vec![0u8; resp_len];
-        stream.read_exact(&mut buf).map_err(|e| format!("Read data error: {}", e))?;
+        stream
+            .read_exact(&mut buf)
+            .map_err(|e| format!("Read data error: {}", e))?;
 
         match postcard::from_bytes::<GossipMessage>(&buf)
             .map_err(|e| format!("Decode error: {}", e))?
@@ -170,9 +198,9 @@ impl GossipClient {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
     use super::*;
     use crate::messages::Transaction;
+    use std::time::Duration;
 
     fn make_tx(sender: u8, nonce: u64) -> Transaction {
         let mut tx = Transaction {

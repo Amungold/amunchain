@@ -1,12 +1,10 @@
 #![allow(clippy::too_many_arguments)]
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceRegistry,
-};
+use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
 use amun_vm_kernel::pending_buffer::PendingBuffer;
 
-use crate::enhanced_proof::{EnhancedTransitionProof};
+use crate::enhanced_proof::EnhancedTransitionProof;
+use crate::pccv_verifier::{PCCVResult, PCCVVerifier};
 use crate::witness_builder::WitnessBuilder;
-use crate::pccv_verifier::{PCCVVerifier, PCCVResult};
 
 pub struct TransitionProofEngine;
 
@@ -41,7 +39,10 @@ impl TransitionProofEngine {
             .iter()
             .map(|ev| {
                 amun_evidence_engine::evidence_engine::EvidenceEngine::convert(
-                    ev, contract_id, block_height, transaction_hash,
+                    ev,
+                    contract_id,
+                    block_height,
+                    transaction_hash,
                 )
             })
             .collect();
@@ -80,8 +81,15 @@ impl TransitionProofEngine {
         gas_used: u64,
     ) -> (EnhancedTransitionProof, PCCVResult) {
         let proof = Self::build_proof(
-            buffer, registry, contract_id, block_height, block_hash,
-            transaction_hash, pre_state_root, post_state_root, gas_used,
+            buffer,
+            registry,
+            contract_id,
+            block_height,
+            block_hash,
+            transaction_hash,
+            pre_state_root,
+            post_state_root,
+            gas_used,
         );
         let result = PCCVVerifier::verify(&proof, registry);
         (proof, result)
@@ -90,19 +98,21 @@ impl TransitionProofEngine {
 
 #[cfg(test)]
 mod tests {
-    use amun_resource_core::{
-        ResourceId, ResourceMetadata, ResourceRegistry,
-        ResourceState, ResourceLineage, ResourceArchetype,
-    };
     use crate::enhanced_proof::EnhancedTransitionProof;
     use crate::enhanced_proof::WitnessBundle;
-    use crate::TransitionProofEngine;
-    use crate::PCCVVerifier;
     use crate::PCCVResult;
+    use crate::PCCVVerifier;
+    use crate::TransitionProofEngine;
+    use amun_resource_core::{
+        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+        ResourceState,
+    };
     use amun_vm_kernel::pending_buffer::PendingBuffer;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -132,13 +142,25 @@ mod tests {
             owner: [2u8; 32],
         };
         buffer.register_production(child_meta.clone());
-        buffer.register_consumption(0, ResourceState::Consumed {
-            derived_children: vec![child_id],
-        }).unwrap();
+        buffer
+            .register_consumption(
+                0,
+                ResourceState::Consumed {
+                    derived_children: vec![child_id],
+                },
+            )
+            .unwrap();
         buffer.record_operation("OP_TRANSFORM", vec![0], vec![1]);
         let proof = TransitionProofEngine::build_proof(
-            &buffer, &reg, make_id(99), 1, [0u8; 32],
-            [0xaa; 32], pre_root, pre_root, 15,
+            &buffer,
+            &reg,
+            make_id(99),
+            1,
+            [0u8; 32],
+            [0xaa; 32],
+            pre_root,
+            pre_root,
+            15,
         );
         let result = PCCVVerifier::verify(&proof, &reg);
         assert!(matches!(result, PCCVResult::Verified { .. }));
@@ -170,9 +192,14 @@ mod tests {
             contract_id: [1u8; 32],
             owner: [2u8; 32],
         });
-        buffer.register_consumption(0, ResourceState::Consumed {
-            derived_children: vec![child_id],
-        }).unwrap();
+        buffer
+            .register_consumption(
+                0,
+                ResourceState::Consumed {
+                    derived_children: vec![child_id],
+                },
+            )
+            .unwrap();
         buffer.record_operation("OP_TRANSFORM", vec![0], vec![1]);
         let consumed_resources = vec![ev];
         let produced_resources = vec![ResourceMetadata {
@@ -219,16 +246,31 @@ mod tests {
             lineage: ResourceLineage::genesis(parent),
             contract_id: [1u8; 32],
             owner: [2u8; 32],
-        }).unwrap();
+        })
+        .unwrap();
         let pre_root = reg.compute_state_root();
         let buffer = PendingBuffer::new(vec![]);
         let proof1 = TransitionProofEngine::build_proof(
-            &buffer, &reg, make_id(99), 1, [0u8; 32],
-            [0xcc; 32], pre_root, pre_root, 0,
+            &buffer,
+            &reg,
+            make_id(99),
+            1,
+            [0u8; 32],
+            [0xcc; 32],
+            pre_root,
+            pre_root,
+            0,
         );
         let proof2 = TransitionProofEngine::build_proof(
-            &buffer, &reg, make_id(99), 1, [0u8; 32],
-            [0xcc; 32], pre_root, pre_root, 0,
+            &buffer,
+            &reg,
+            make_id(99),
+            1,
+            [0u8; 32],
+            [0xcc; 32],
+            pre_root,
+            pre_root,
+            0,
         );
         assert_eq!(proof1.proof_hash, proof2.proof_hash);
     }

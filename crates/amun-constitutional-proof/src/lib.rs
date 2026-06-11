@@ -1,56 +1,56 @@
-mod obligation_namespace;
+mod article_i_certificate;
+mod article_iii_certificate;
+mod certification;
+mod constitutional_verdict;
+mod dependency_graph;
+mod evidence_archive;
+mod evidence_lineage;
+mod evidence_record;
+mod evidence_status;
+mod evidence_type;
+mod failure_reason;
 mod obligation_id;
 mod obligation_kind;
+mod obligation_namespace;
+mod obligation_registry;
+mod obligation_result;
+mod obligation_result_status;
 mod obligation_severity;
 mod obligation_status;
-mod registry_error;
 mod proof_obligation;
-mod dependency_graph;
-mod obligation_registry;
-mod article_i_certificate;
-mod obligation_result_status;
-mod failure_reason;
-mod obligation_result;
-mod verdict_result;
-mod constitutional_verdict;
-mod verdict_evaluator;
-mod evidence_type;
-mod evidence_status;
-mod evidence_lineage;
-mod reproducibility;
-mod evidence_record;
-mod evidence_archive;
-mod article_iii_certificate;
-mod report_generator;
 mod publication_package;
-mod certification;
+mod registry_error;
+mod report_generator;
+mod reproducibility;
+mod verdict_evaluator;
+mod verdict_result;
 
-pub use obligation_namespace::*;
+pub use article_i_certificate::*;
+pub use article_iii_certificate::*;
+pub use certification::*;
+pub use constitutional_verdict::*;
+pub use dependency_graph::*;
+pub use evidence_archive::*;
+pub use evidence_lineage::*;
+pub use evidence_record::*;
+pub use evidence_status::*;
+pub use evidence_type::*;
+pub use failure_reason::*;
 pub use obligation_id::*;
 pub use obligation_kind::*;
+pub use obligation_namespace::*;
+pub use obligation_registry::*;
+pub use obligation_result::*;
+pub use obligation_result_status::*;
 pub use obligation_severity::*;
 pub use obligation_status::*;
-pub use registry_error::*;
 pub use proof_obligation::*;
-pub use dependency_graph::*;
-pub use obligation_registry::*;
-pub use article_i_certificate::*;
-pub use obligation_result_status::*;
-pub use failure_reason::*;
-pub use obligation_result::*;
-pub use verdict_result::*;
-pub use constitutional_verdict::*;
-pub use verdict_evaluator::*;
-pub use evidence_type::*;
-pub use evidence_status::*;
-pub use evidence_lineage::*;
-pub use reproducibility::*;
-pub use evidence_record::*;
-pub use evidence_archive::*;
-pub use article_iii_certificate::*;
-pub use report_generator::*;
 pub use publication_package::*;
-pub use certification::*;
+pub use registry_error::*;
+pub use report_generator::*;
+pub use reproducibility::*;
+pub use verdict_evaluator::*;
+pub use verdict_result::*;
 
 #[cfg(test)]
 mod tests {
@@ -372,7 +372,10 @@ mod tests {
         )
         .with_dependency(missing_dep.clone());
         let result = reg.register(obl);
-        assert!(matches!(result, Err(RegistryError::MissingDependency(_, _))));
+        assert!(matches!(
+            result,
+            Err(RegistryError::MissingDependency(_, _))
+        ));
     }
 
     #[test]
@@ -380,26 +383,24 @@ mod tests {
         let mut reg = ObligationRegistry::new();
         let id1 = make_id(ObligationNamespace::Safety, 1);
         let id2 = make_id(ObligationNamespace::Safety, 2);
-        reg.register(
-            ProofObligation::new(
-                id1,
-                ObligationKind::Primary,
-                "desc",
-                "formal",
-                ObligationSeverity::Critical,
-                "N42",
-            )
-        ).unwrap();
-        reg.register(
-            ProofObligation::new(
-                id2,
-                ObligationKind::Primary,
-                "desc",
-                "formal",
-                ObligationSeverity::Minor,
-                "N46",
-            )
-        ).unwrap();
+        reg.register(ProofObligation::new(
+            id1,
+            ObligationKind::Primary,
+            "desc",
+            "formal",
+            ObligationSeverity::Critical,
+            "N42",
+        ))
+        .unwrap();
+        reg.register(ProofObligation::new(
+            id2,
+            ObligationKind::Primary,
+            "desc",
+            "formal",
+            ObligationSeverity::Minor,
+            "N46",
+        ))
+        .unwrap();
         assert_eq!(reg.by_severity(ObligationSeverity::Critical).len(), 1);
         assert_eq!(reg.by_severity(ObligationSeverity::Minor).len(), 1);
         assert_eq!(reg.by_severity(ObligationSeverity::Major).len(), 0);
@@ -408,26 +409,24 @@ mod tests {
     #[test]
     fn n47_1_s3_query_by_phase() {
         let mut reg = ObligationRegistry::new();
-        reg.register(
-            ProofObligation::new(
-                make_id(ObligationNamespace::Finality, 1),
-                ObligationKind::Primary,
-                "desc",
-                "formal",
-                ObligationSeverity::Critical,
-                "N41",
-            )
-        ).unwrap();
-        reg.register(
-            ProofObligation::new(
-                make_id(ObligationNamespace::Finality, 2),
-                ObligationKind::Primary,
-                "desc",
-                "formal",
-                ObligationSeverity::Critical,
-                "N45",
-            )
-        ).unwrap();
+        reg.register(ProofObligation::new(
+            make_id(ObligationNamespace::Finality, 1),
+            ObligationKind::Primary,
+            "desc",
+            "formal",
+            ObligationSeverity::Critical,
+            "N41",
+        ))
+        .unwrap();
+        reg.register(ProofObligation::new(
+            make_id(ObligationNamespace::Finality, 2),
+            ObligationKind::Primary,
+            "desc",
+            "formal",
+            ObligationSeverity::Critical,
+            "N45",
+        ))
+        .unwrap();
         assert_eq!(reg.by_phase("N41").len(), 1);
         assert_eq!(reg.by_phase("N45").len(), 1);
         assert_eq!(reg.by_phase("N99").len(), 0);
@@ -440,16 +439,15 @@ mod tests {
         let mut reg = ObligationRegistry::new();
         for i in 1..=22 {
             let id = ObligationId::new(ObligationNamespace::Safety, i);
-            reg.register(
-                ProofObligation::new(
-                    id,
-                    ObligationKind::Primary,
-                    format!("Obligation {}", i),
-                    format!("formal {}", i),
-                    ObligationSeverity::Critical,
-                    "N42",
-                )
-            ).unwrap();
+            reg.register(ProofObligation::new(
+                id,
+                ObligationKind::Primary,
+                format!("Obligation {}", i),
+                format!("formal {}", i),
+                ObligationSeverity::Critical,
+                "N42",
+            ))
+            .unwrap();
         }
         reg.freeze().unwrap();
         let cert = ArticleICertificate::issue(&reg, 1000);
@@ -468,16 +466,15 @@ mod tests {
         let mut reg = ObligationRegistry::new();
         for i in 1..=22 {
             let id = ObligationId::new(ObligationNamespace::Safety, i);
-            reg.register(
-                ProofObligation::new(
-                    id,
-                    ObligationKind::Primary,
-                    format!("Obligation {}", i),
-                    format!("formal {}", i),
-                    ObligationSeverity::Critical,
-                    "N42",
-                )
-            ).unwrap();
+            reg.register(ProofObligation::new(
+                id,
+                ObligationKind::Primary,
+                format!("Obligation {}", i),
+                format!("formal {}", i),
+                ObligationSeverity::Critical,
+                "N42",
+            ))
+            .unwrap();
         }
         assert!(ArticleICertificate::issue(&reg, 1000).is_none());
     }
@@ -487,16 +484,15 @@ mod tests {
         let mut reg = ObligationRegistry::new();
         for i in 1..=21 {
             let id = ObligationId::new(ObligationNamespace::Safety, i);
-            reg.register(
-                ProofObligation::new(
-                    id,
-                    ObligationKind::Primary,
-                    format!("Obligation {}", i),
-                    format!("formal {}", i),
-                    ObligationSeverity::Critical,
-                    "N42",
-                )
-            ).unwrap();
+            reg.register(ProofObligation::new(
+                id,
+                ObligationKind::Primary,
+                format!("Obligation {}", i),
+                format!("formal {}", i),
+                ObligationSeverity::Critical,
+                "N42",
+            ))
+            .unwrap();
         }
         reg.freeze().unwrap();
         assert!(ArticleICertificate::issue(&reg, 1000).is_none());
@@ -652,12 +648,24 @@ mod tests {
             vec!["EV-CL1".into()],
         )];
         let v1 = ConstitutionalVerdict::new(
-            "V-HASH".into(), "S-HASH".into(), "hash_test".into(), "N43".into(),
-            results.clone(), VerdictResult::Pass, 4000, "hash_verifier".into(),
+            "V-HASH".into(),
+            "S-HASH".into(),
+            "hash_test".into(),
+            "N43".into(),
+            results.clone(),
+            VerdictResult::Pass,
+            4000,
+            "hash_verifier".into(),
         );
         let v2 = ConstitutionalVerdict::new(
-            "V-HASH".into(), "S-HASH".into(), "hash_test".into(), "N43".into(),
-            results, VerdictResult::Pass, 4000, "hash_verifier".into(),
+            "V-HASH".into(),
+            "S-HASH".into(),
+            "hash_test".into(),
+            "N43".into(),
+            results,
+            VerdictResult::Pass,
+            4000,
+            "hash_verifier".into(),
         );
         assert_eq!(v1.verdict_hash, v2.verdict_hash);
     }
@@ -676,8 +684,13 @@ mod tests {
             ),
         ];
         let verdict = ConstitutionalVerdict::new(
-            "V-SER".into(), "S-SER".into(), "ser_test".into(), "N44".into(),
-            results, VerdictResult::Fail(vec!["bad signature".into()]), 5000,
+            "V-SER".into(),
+            "S-SER".into(),
+            "ser_test".into(),
+            "N44".into(),
+            results,
+            VerdictResult::Fail(vec!["bad signature".into()]),
+            5000,
             "ser_verifier".into(),
         );
         let json = serde_json::to_string_pretty(&verdict).unwrap();
@@ -689,85 +702,186 @@ mod tests {
     // --- N47.2-S2: VerdictEvaluator tests ---
 
     fn make_obl(id: ObligationId, severity: ObligationSeverity) -> ProofObligation {
-        ProofObligation::new(id, ObligationKind::Primary, "desc", "formal", severity, "N42")
+        ProofObligation::new(
+            id,
+            ObligationKind::Primary,
+            "desc",
+            "formal",
+            severity,
+            "N42",
+        )
     }
 
     #[test]
     fn n47_2_s2_fail_on_critical() {
-        let obl = make_obl(ObligationId::new(ObligationNamespace::Safety, 1), ObligationSeverity::Critical);
-        let results = vec![ObligationResult::failed(obl.id.clone(), FailureReason::new("CRIT", "critical failure"), vec![])];
+        let obl = make_obl(
+            ObligationId::new(ObligationNamespace::Safety, 1),
+            ObligationSeverity::Critical,
+        );
+        let results = vec![ObligationResult::failed(
+            obl.id.clone(),
+            FailureReason::new("CRIT", "critical failure"),
+            vec![],
+        )];
         let verdict = VerdictEvaluator::evaluate(
-            "V-FAIL-CRIT".into(), "S-FAIL".into(), "test".into(), "N44".into(),
-            &[obl], results, 6000, "eval".into(),
+            "V-FAIL-CRIT".into(),
+            "S-FAIL".into(),
+            "test".into(),
+            "N44".into(),
+            &[obl],
+            results,
+            6000,
+            "eval".into(),
         );
         assert!(matches!(verdict.overall_result, VerdictResult::Fail(_)));
     }
 
     #[test]
     fn n47_2_s2_fail_on_two_major() {
-        let obl1 = make_obl(ObligationId::new(ObligationNamespace::Replay, 1), ObligationSeverity::Major);
-        let obl2 = make_obl(ObligationId::new(ObligationNamespace::Replay, 2), ObligationSeverity::Major);
+        let obl1 = make_obl(
+            ObligationId::new(ObligationNamespace::Replay, 1),
+            ObligationSeverity::Major,
+        );
+        let obl2 = make_obl(
+            ObligationId::new(ObligationNamespace::Replay, 2),
+            ObligationSeverity::Major,
+        );
         let obligations = vec![obl1.clone(), obl2.clone()];
         let results = vec![
             ObligationResult::failed(obl1.id, FailureReason::new("M1", "m1"), vec![]),
             ObligationResult::failed(obl2.id, FailureReason::new("M2", "m2"), vec![]),
         ];
         let verdict = VerdictEvaluator::evaluate(
-            "V-FAIL-2MAJ".into(), "S-2MAJ".into(), "test".into(), "N43".into(),
-            &obligations, results, 7000, "eval".into(),
+            "V-FAIL-2MAJ".into(),
+            "S-2MAJ".into(),
+            "test".into(),
+            "N43".into(),
+            &obligations,
+            results,
+            7000,
+            "eval".into(),
         );
         assert!(matches!(verdict.overall_result, VerdictResult::Fail(_)));
     }
 
     #[test]
     fn n47_2_s2_conditional_pass_on_one_major() {
-        let obl = make_obl(ObligationId::new(ObligationNamespace::Evidence, 1), ObligationSeverity::Major);
-        let results = vec![ObligationResult::failed(obl.id.clone(), FailureReason::new("M1", "single major"), vec![])];
-        let verdict = VerdictEvaluator::evaluate(
-            "V-COND".into(), "S-COND".into(), "test".into(), "N42".into(),
-            &[obl], results, 8000, "eval".into(),
+        let obl = make_obl(
+            ObligationId::new(ObligationNamespace::Evidence, 1),
+            ObligationSeverity::Major,
         );
-        assert!(matches!(verdict.overall_result, VerdictResult::ConditionalPass(_)));
+        let results = vec![ObligationResult::failed(
+            obl.id.clone(),
+            FailureReason::new("M1", "single major"),
+            vec![],
+        )];
+        let verdict = VerdictEvaluator::evaluate(
+            "V-COND".into(),
+            "S-COND".into(),
+            "test".into(),
+            "N42".into(),
+            &[obl],
+            results,
+            8000,
+            "eval".into(),
+        );
+        assert!(matches!(
+            verdict.overall_result,
+            VerdictResult::ConditionalPass(_)
+        ));
     }
 
     #[test]
     fn n47_2_s2_pass_with_minor_failures() {
-        let obl = make_obl(ObligationId::new(ObligationNamespace::Performance, 1), ObligationSeverity::Minor);
-        let results = vec![ObligationResult::failed(obl.id.clone(), FailureReason::new("MIN", "minor issue"), vec![])];
-        let verdict = VerdictEvaluator::evaluate(
-            "V-PASS-MIN".into(), "S-MIN".into(), "test".into(), "N46".into(),
-            &[obl], results, 9000, "eval".into(),
+        let obl = make_obl(
+            ObligationId::new(ObligationNamespace::Performance, 1),
+            ObligationSeverity::Minor,
         );
-        assert!(matches!(verdict.overall_result, VerdictResult::ConditionalPass(_)));
+        let results = vec![ObligationResult::failed(
+            obl.id.clone(),
+            FailureReason::new("MIN", "minor issue"),
+            vec![],
+        )];
+        let verdict = VerdictEvaluator::evaluate(
+            "V-PASS-MIN".into(),
+            "S-MIN".into(),
+            "test".into(),
+            "N46".into(),
+            &[obl],
+            results,
+            9000,
+            "eval".into(),
+        );
+        assert!(matches!(
+            verdict.overall_result,
+            VerdictResult::ConditionalPass(_)
+        ));
     }
 
     #[test]
     fn n47_2_s2_pass_with_advisory_failures() {
-        let obl = make_obl(ObligationId::new(ObligationNamespace::Performance, 2), ObligationSeverity::Advisory);
-        let results = vec![ObligationResult::failed(obl.id.clone(), FailureReason::new("ADV", "advisory note"), vec![])];
-        let verdict = VerdictEvaluator::evaluate(
-            "V-PASS-ADV".into(), "S-ADV".into(), "test".into(), "N46".into(),
-            &[obl], results, 10000, "eval".into(),
+        let obl = make_obl(
+            ObligationId::new(ObligationNamespace::Performance, 2),
+            ObligationSeverity::Advisory,
         );
-        assert!(matches!(verdict.overall_result, VerdictResult::ConditionalPass(_)));
+        let results = vec![ObligationResult::failed(
+            obl.id.clone(),
+            FailureReason::new("ADV", "advisory note"),
+            vec![],
+        )];
+        let verdict = VerdictEvaluator::evaluate(
+            "V-PASS-ADV".into(),
+            "S-ADV".into(),
+            "test".into(),
+            "N46".into(),
+            &[obl],
+            results,
+            10000,
+            "eval".into(),
+        );
+        assert!(matches!(
+            verdict.overall_result,
+            VerdictResult::ConditionalPass(_)
+        ));
     }
 
     #[test]
     fn n47_2_s2_pass_all_satisfied() {
-        let obl = make_obl(ObligationId::new(ObligationNamespace::Finality, 1), ObligationSeverity::Critical);
-        let results = vec![ObligationResult::satisfied(obl.id.clone(), vec!["EV-OK".into()])];
+        let obl = make_obl(
+            ObligationId::new(ObligationNamespace::Finality, 1),
+            ObligationSeverity::Critical,
+        );
+        let results = vec![ObligationResult::satisfied(
+            obl.id.clone(),
+            vec!["EV-OK".into()],
+        )];
         let verdict = VerdictEvaluator::evaluate(
-            "V-PASS-ALL".into(), "S-ALL".into(), "test".into(), "N41".into(),
-            &[obl], results, 11000, "eval".into(),
+            "V-PASS-ALL".into(),
+            "S-ALL".into(),
+            "test".into(),
+            "N41".into(),
+            &[obl],
+            results,
+            11000,
+            "eval".into(),
         );
         assert_eq!(verdict.overall_result, VerdictResult::Pass);
     }
 
     #[test]
     fn n47_2_s2_count_obligations_correctly() {
-        let obl1 = make_obl(ObligationId::new(ObligationNamespace::Safety, 1), ObligationSeverity::Critical);
-        let obl2 = make_obl(ObligationId::new(ObligationNamespace::Safety, 2), ObligationSeverity::Critical);
-        let obl3 = make_obl(ObligationId::new(ObligationNamespace::Safety, 3), ObligationSeverity::Major);
+        let obl1 = make_obl(
+            ObligationId::new(ObligationNamespace::Safety, 1),
+            ObligationSeverity::Critical,
+        );
+        let obl2 = make_obl(
+            ObligationId::new(ObligationNamespace::Safety, 2),
+            ObligationSeverity::Critical,
+        );
+        let obl3 = make_obl(
+            ObligationId::new(ObligationNamespace::Safety, 3),
+            ObligationSeverity::Major,
+        );
         let obligations = vec![obl1.clone(), obl2.clone(), obl3.clone()];
         let results = vec![
             ObligationResult::satisfied(obl1.id, vec!["EV1".into()]),
@@ -775,8 +889,14 @@ mod tests {
             ObligationResult::failed(obl3.id, FailureReason::new("M", "maj"), vec![]),
         ];
         let verdict = VerdictEvaluator::evaluate(
-            "V-COUNT".into(), "S-COUNT".into(), "test".into(), "N45".into(),
-            &obligations, results, 12000, "eval".into(),
+            "V-COUNT".into(),
+            "S-COUNT".into(),
+            "test".into(),
+            "N45".into(),
+            &obligations,
+            results,
+            12000,
+            "eval".into(),
         );
         assert_eq!(verdict.obligations_checked, 3);
         assert_eq!(verdict.obligations_satisfied, 2);
@@ -785,24 +905,42 @@ mod tests {
 
     #[test]
     fn n47_2_s2_waived_advisory_does_not_fail() {
-        let obl = make_obl(ObligationId::new(ObligationNamespace::Performance, 3), ObligationSeverity::Advisory);
+        let obl = make_obl(
+            ObligationId::new(ObligationNamespace::Performance, 3),
+            ObligationSeverity::Advisory,
+        );
         let mut result = ObligationResult::satisfied(obl.id.clone(), vec!["EV-W".into()]);
         result.status = ObligationResultStatus::Waived;
         let verdict = VerdictEvaluator::evaluate(
-            "V-WAIVED".into(), "S-WAIVED".into(), "test".into(), "N46".into(),
-            &[obl], vec![result], 13000, "eval".into(),
+            "V-WAIVED".into(),
+            "S-WAIVED".into(),
+            "test".into(),
+            "N46".into(),
+            &[obl],
+            vec![result],
+            13000,
+            "eval".into(),
         );
         assert!(!matches!(verdict.overall_result, VerdictResult::Fail(_)));
     }
 
     #[test]
     fn n47_2_s2_not_applicable_does_not_fail() {
-        let obl = make_obl(ObligationId::new(ObligationNamespace::Cluster, 4), ObligationSeverity::Critical);
+        let obl = make_obl(
+            ObligationId::new(ObligationNamespace::Cluster, 4),
+            ObligationSeverity::Critical,
+        );
         let mut result = ObligationResult::satisfied(obl.id.clone(), vec!["EV-NA".into()]);
         result.status = ObligationResultStatus::NotApplicable;
         let verdict = VerdictEvaluator::evaluate(
-            "V-NA".into(), "S-NA".into(), "test".into(), "N43".into(),
-            &[obl], vec![result], 14000, "eval".into(),
+            "V-NA".into(),
+            "S-NA".into(),
+            "test".into(),
+            "N43".into(),
+            &[obl],
+            vec![result],
+            14000,
+            "eval".into(),
         );
         assert!(!matches!(verdict.overall_result, VerdictResult::Fail(_)));
     }
@@ -887,8 +1025,16 @@ mod tests {
             vec![id],
         )
         .with_status(EvidenceStatus::Archived)
-        .with_reproducibility(Reproducibility::new("cmd".into(), "env".into(), "out".into()))
-        .with_lineage(EvidenceLineage::new("parent".into(), "derived".into(), "parent-hash".into()));
+        .with_reproducibility(Reproducibility::new(
+            "cmd".into(),
+            "env".into(),
+            "out".into(),
+        ))
+        .with_lineage(EvidenceLineage::new(
+            "parent".into(),
+            "derived".into(),
+            "parent-hash".into(),
+        ));
         let json = serde_json::to_string_pretty(&ev).unwrap();
         let parsed: EvidenceRecord = serde_json::from_str(&json).unwrap();
         assert_eq!(ev, parsed);
@@ -896,7 +1042,12 @@ mod tests {
 
     // --- N47.3-S1: EvidenceArchive tests ---
 
-    fn make_evidence(id: &str, phase: &str, ev_type: EvidenceType, obl_id: ObligationId) -> EvidenceRecord {
+    fn make_evidence(
+        id: &str,
+        phase: &str,
+        ev_type: EvidenceType,
+        obl_id: ObligationId,
+    ) -> EvidenceRecord {
         EvidenceRecord::new(
             id.into(),
             ev_type,
@@ -936,17 +1087,30 @@ mod tests {
         archive.insert(ev).unwrap();
 
         archive.verify("EV-LIFECYCLE").unwrap();
-        assert_eq!(archive.get("EV-LIFECYCLE").unwrap().status, EvidenceStatus::Verified);
+        assert_eq!(
+            archive.get("EV-LIFECYCLE").unwrap().status,
+            EvidenceStatus::Verified
+        );
 
         archive.archive("EV-LIFECYCLE").unwrap();
-        assert_eq!(archive.get("EV-LIFECYCLE").unwrap().status, EvidenceStatus::Archived);
+        assert_eq!(
+            archive.get("EV-LIFECYCLE").unwrap().status,
+            EvidenceStatus::Archived
+        );
     }
 
     #[test]
     fn n47_3_s1_cannot_archive_unverified() {
         let mut archive = EvidenceArchive::new();
         let obl = ObligationId::new(ObligationNamespace::Evidence, 1);
-        archive.insert(make_evidence("EV-UNV", "N42", EvidenceType::ReplayEvidence, obl)).unwrap();
+        archive
+            .insert(make_evidence(
+                "EV-UNV",
+                "N42",
+                EvidenceType::ReplayEvidence,
+                obl,
+            ))
+            .unwrap();
         assert!(archive.archive("EV-UNV").is_err());
     }
 
@@ -954,9 +1118,19 @@ mod tests {
     fn n47_3_s1_reject_is_permanent() {
         let mut archive = EvidenceArchive::new();
         let obl = ObligationId::new(ObligationNamespace::Cluster, 1);
-        archive.insert(make_evidence("EV-REJ", "N43", EvidenceType::SimulationEvidence, obl)).unwrap();
+        archive
+            .insert(make_evidence(
+                "EV-REJ",
+                "N43",
+                EvidenceType::SimulationEvidence,
+                obl,
+            ))
+            .unwrap();
         archive.reject("EV-REJ").unwrap();
-        assert_eq!(archive.get("EV-REJ").unwrap().status, EvidenceStatus::Rejected);
+        assert_eq!(
+            archive.get("EV-REJ").unwrap().status,
+            EvidenceStatus::Rejected
+        );
         assert!(archive.verify("EV-REJ").is_err());
         assert!(archive.archive("EV-REJ").is_err());
         assert_eq!(archive.total_count(), 1);
@@ -1036,9 +1210,30 @@ mod tests {
         let obl1 = ObligationId::new(ObligationNamespace::Safety, 1);
         let obl2 = ObligationId::new(ObligationNamespace::Safety, 2);
 
-        archive.insert(make_evidence("EV-A", "N41", EvidenceType::AuditEvidence, obl1.clone())).unwrap();
-        archive.insert(make_evidence("EV-B", "N42", EvidenceType::ReplayEvidence, obl1.clone())).unwrap();
-        archive.insert(make_evidence("EV-C", "N43", EvidenceType::SimulationEvidence, obl2.clone())).unwrap();
+        archive
+            .insert(make_evidence(
+                "EV-A",
+                "N41",
+                EvidenceType::AuditEvidence,
+                obl1.clone(),
+            ))
+            .unwrap();
+        archive
+            .insert(make_evidence(
+                "EV-B",
+                "N42",
+                EvidenceType::ReplayEvidence,
+                obl1.clone(),
+            ))
+            .unwrap();
+        archive
+            .insert(make_evidence(
+                "EV-C",
+                "N43",
+                EvidenceType::SimulationEvidence,
+                obl2.clone(),
+            ))
+            .unwrap();
 
         assert_eq!(archive.by_obligation(&obl1).len(), 2);
         assert_eq!(archive.by_obligation(&obl2).len(), 1);
@@ -1049,9 +1244,30 @@ mod tests {
         let mut archive = EvidenceArchive::new();
         let obl = ObligationId::new(ObligationNamespace::Finality, 1);
 
-        archive.insert(make_evidence("EV-P1", "N41", EvidenceType::ConsensusEvidence, obl.clone())).unwrap();
-        archive.insert(make_evidence("EV-P2", "N41", EvidenceType::CertificateEvidence, obl.clone())).unwrap();
-        archive.insert(make_evidence("EV-P3", "N42", EvidenceType::ReplayEvidence, obl)).unwrap();
+        archive
+            .insert(make_evidence(
+                "EV-P1",
+                "N41",
+                EvidenceType::ConsensusEvidence,
+                obl.clone(),
+            ))
+            .unwrap();
+        archive
+            .insert(make_evidence(
+                "EV-P2",
+                "N41",
+                EvidenceType::CertificateEvidence,
+                obl.clone(),
+            ))
+            .unwrap();
+        archive
+            .insert(make_evidence(
+                "EV-P3",
+                "N42",
+                EvidenceType::ReplayEvidence,
+                obl,
+            ))
+            .unwrap();
 
         assert_eq!(archive.by_phase("N41").len(), 2);
         assert_eq!(archive.by_phase("N42").len(), 1);
@@ -1062,15 +1278,18 @@ mod tests {
     fn n47_3_s1_admissibility_rules() {
         let obl = ObligationId::new(ObligationNamespace::Replay, 1);
 
-        let mut collected = make_evidence("EV-ADM-1", "N42", EvidenceType::ReplayEvidence, obl.clone());
+        let mut collected =
+            make_evidence("EV-ADM-1", "N42", EvidenceType::ReplayEvidence, obl.clone());
         collected.status = EvidenceStatus::Collected;
         assert!(!EvidenceArchive::is_admissible(&collected));
 
-        let mut verified = make_evidence("EV-ADM-2", "N42", EvidenceType::ReplayEvidence, obl.clone());
+        let mut verified =
+            make_evidence("EV-ADM-2", "N42", EvidenceType::ReplayEvidence, obl.clone());
         verified.status = EvidenceStatus::Verified;
         assert!(EvidenceArchive::is_admissible(&verified));
 
-        let mut archived = make_evidence("EV-ADM-3", "N42", EvidenceType::ReplayEvidence, obl.clone());
+        let mut archived =
+            make_evidence("EV-ADM-3", "N42", EvidenceType::ReplayEvidence, obl.clone());
         archived.status = EvidenceStatus::Archived;
         assert!(EvidenceArchive::is_admissible(&archived));
 
@@ -1085,8 +1304,8 @@ mod tests {
     fn n47_3_cert_issue() {
         let mut archive = EvidenceArchive::new();
         let obl = ObligationId::new(ObligationNamespace::Finality, 1);
-        archive.insert(
-            EvidenceRecord::new(
+        archive
+            .insert(EvidenceRecord::new(
                 "EV-CERT".into(),
                 EvidenceType::ConsensusEvidence,
                 "source".into(),
@@ -1094,8 +1313,8 @@ mod tests {
                 "hash".into(),
                 "N41".into(),
                 vec![obl],
-            )
-        ).unwrap();
+            ))
+            .unwrap();
         let cert = ArticleIIICertificate::issue(&archive, 1000);
         assert!(cert.is_some());
         assert_eq!(cert.unwrap().evidence_records, 1);
@@ -1119,20 +1338,26 @@ mod tests {
             "formal",
             ObligationSeverity::Critical,
             "N41",
-        )).unwrap();
+        ))
+        .unwrap();
         reg.freeze().unwrap();
 
         let mut archive = EvidenceArchive::new();
         let obl = ObligationId::new(ObligationNamespace::Safety, 1);
-        archive.insert(EvidenceRecord::new(
-            "EV-RPT".into(),
-            EvidenceType::AuditEvidence,
-            "test".into(),
-            1000,
-            "hash".into(),
-            "N41".into(),
-            vec![obl],
-        ).with_status(EvidenceStatus::Archived)).unwrap();
+        archive
+            .insert(
+                EvidenceRecord::new(
+                    "EV-RPT".into(),
+                    EvidenceType::AuditEvidence,
+                    "test".into(),
+                    1000,
+                    "hash".into(),
+                    "N41".into(),
+                    vec![obl],
+                )
+                .with_status(EvidenceStatus::Archived),
+            )
+            .unwrap();
 
         let verdict = ConstitutionalVerdict::new(
             "V-RPT".into(),
@@ -1148,12 +1373,7 @@ mod tests {
             "test".into(),
         );
 
-        let report = ReportGenerator::generate_report(
-            &reg,
-            &archive,
-            vec![verdict],
-            5000,
-        );
+        let report = ReportGenerator::generate_report(&reg, &archive, vec![verdict], 5000);
 
         assert_eq!(report.total_obligations, 1);
         assert_eq!(report.total_evidence, 1);
@@ -1183,20 +1403,26 @@ mod tests {
             "formal",
             ObligationSeverity::Critical,
             "N41",
-        )).unwrap();
+        ))
+        .unwrap();
         reg.freeze().unwrap();
 
         let mut archive = EvidenceArchive::new();
         let obl = ObligationId::new(ObligationNamespace::Safety, 1);
-        archive.insert(EvidenceRecord::new(
-            "EV-PKG".into(),
-            EvidenceType::AuditEvidence,
-            "test".into(),
-            1000,
-            "hash".into(),
-            "N41".into(),
-            vec![obl],
-        ).with_status(EvidenceStatus::Archived)).unwrap();
+        archive
+            .insert(
+                EvidenceRecord::new(
+                    "EV-PKG".into(),
+                    EvidenceType::AuditEvidence,
+                    "test".into(),
+                    1000,
+                    "hash".into(),
+                    "N41".into(),
+                    vec![obl],
+                )
+                .with_status(EvidenceStatus::Archived),
+            )
+            .unwrap();
 
         let verdict = ConstitutionalVerdict::new(
             "V-PKG".into(),
@@ -1212,19 +1438,9 @@ mod tests {
             "test".into(),
         );
 
-        let report = ReportGenerator::generate_report(
-            &reg,
-            &archive,
-            vec![verdict.clone()],
-            6000,
-        );
+        let report = ReportGenerator::generate_report(&reg, &archive, vec![verdict.clone()], 6000);
 
-        let mut pkg = PublicationPackage::new(
-            "N47-PKG-001".into(),
-            report,
-            vec![verdict],
-            6000,
-        );
+        let mut pkg = PublicationPackage::new("N47-PKG-001".into(), report, vec![verdict], 6000);
 
         assert!(pkg.verify());
         assert!(!pkg.frozen);
@@ -1252,7 +1468,8 @@ mod tests {
             "formal",
             ObligationSeverity::Critical,
             "N42",
-        )).unwrap();
+        ))
+        .unwrap();
         reg.freeze().unwrap();
 
         let archive = EvidenceArchive::new();
@@ -1267,19 +1484,9 @@ mod tests {
             "test".into(),
         );
 
-        let report = ReportGenerator::generate_report(
-            &reg,
-            &archive,
-            vec![verdict.clone()],
-            7000,
-        );
+        let report = ReportGenerator::generate_report(&reg, &archive, vec![verdict.clone()], 7000);
 
-        let pkg = PublicationPackage::new(
-            "N47-PKG-VERIFY".into(),
-            report,
-            vec![verdict],
-            7000,
-        );
+        let pkg = PublicationPackage::new("N47-PKG-VERIFY".into(), report, vec![verdict], 7000);
 
         assert!(pkg.verify());
         assert_eq!(pkg.manifest.artifact_count, 2); // 1 report + 1 verdict
@@ -1298,53 +1505,89 @@ mod tests {
                 format!("formal {}", i),
                 ObligationSeverity::Critical,
                 "N42",
-            )).unwrap();
+            ))
+            .unwrap();
         }
         reg.freeze().unwrap();
 
         let mut archive = EvidenceArchive::new();
         for i in 1..=30 {
-            archive.insert(EvidenceRecord::new(
-                format!("EV-CERT-{}", i),
-                EvidenceType::AuditEvidence,
-                "test".into(),
-                1000,
-                format!("hash-{}", i),
-                "N42".into(),
-                vec![ObligationId::new(ObligationNamespace::Safety, 1)],
-            ).with_status(EvidenceStatus::Archived)).unwrap();
+            archive
+                .insert(
+                    EvidenceRecord::new(
+                        format!("EV-CERT-{}", i),
+                        EvidenceType::AuditEvidence,
+                        "test".into(),
+                        1000,
+                        format!("hash-{}", i),
+                        "N42".into(),
+                        vec![ObligationId::new(ObligationNamespace::Safety, 1)],
+                    )
+                    .with_status(EvidenceStatus::Archived),
+                )
+                .unwrap();
         }
 
         let verdicts = vec![
             ConstitutionalVerdict::new(
-                "V-N41".into(), "S-N41".into(), "test".into(), "N41".into(),
+                "V-N41".into(),
+                "S-N41".into(),
+                "test".into(),
+                "N41".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N42".into(), "S-N42".into(), "test".into(), "N42".into(),
+                "V-N42".into(),
+                "S-N42".into(),
+                "test".into(),
+                "N42".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N43".into(), "S-N43".into(), "test".into(), "N43".into(),
+                "V-N43".into(),
+                "S-N43".into(),
+                "test".into(),
+                "N43".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N44".into(), "S-N44".into(), "test".into(), "N44".into(),
+                "V-N44".into(),
+                "S-N44".into(),
+                "test".into(),
+                "N44".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N45".into(), "S-N45".into(), "test".into(), "N45".into(),
+                "V-N45".into(),
+                "S-N45".into(),
+                "test".into(),
+                "N45".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N46".into(), "S-N46".into(), "test".into(), "N46".into(),
+                "V-N46".into(),
+                "S-N46".into(),
+                "test".into(),
+                "N46".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
         ];
 
@@ -1373,41 +1616,72 @@ mod tests {
                 format!("formal {}", i),
                 ObligationSeverity::Critical,
                 "N42",
-            )).unwrap();
+            ))
+            .unwrap();
         }
         reg.freeze().unwrap();
 
         let archive = EvidenceArchive::new();
         let verdicts = vec![
             ConstitutionalVerdict::new(
-                "V-N41".into(), "S-N41".into(), "test".into(), "N41".into(),
+                "V-N41".into(),
+                "S-N41".into(),
+                "test".into(),
+                "N41".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N42".into(), "S-N42".into(), "test".into(), "N42".into(),
+                "V-N42".into(),
+                "S-N42".into(),
+                "test".into(),
+                "N42".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N43".into(), "S-N43".into(), "test".into(), "N43".into(),
+                "V-N43".into(),
+                "S-N43".into(),
+                "test".into(),
+                "N43".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N44".into(), "S-N44".into(), "test".into(), "N44".into(),
+                "V-N44".into(),
+                "S-N44".into(),
+                "test".into(),
+                "N44".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N45".into(), "S-N45".into(), "test".into(), "N45".into(),
+                "V-N45".into(),
+                "S-N45".into(),
+                "test".into(),
+                "N45".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
             ConstitutionalVerdict::new(
-                "V-N46".into(), "S-N46".into(), "test".into(), "N46".into(),
+                "V-N46".into(),
+                "S-N46".into(),
+                "test".into(),
+                "N46".into(),
                 vec![],
-                VerdictResult::Pass, 1000, "test".into(),
+                VerdictResult::Pass,
+                1000,
+                "test".into(),
             ),
         ];
 
@@ -1436,19 +1710,23 @@ mod tests {
                 format!("formal {}", i),
                 ObligationSeverity::Critical,
                 "N42",
-            )).unwrap();
+            ))
+            .unwrap();
         }
         reg.freeze().unwrap();
 
         let archive = EvidenceArchive::new();
         // Only N41, missing N42-N46
-        let verdicts = vec![
-            ConstitutionalVerdict::new(
-                "V-N41".into(), "S-N41".into(), "test".into(), "N41".into(),
-                vec![],
-                VerdictResult::Pass, 1000, "test".into(),
-            ),
-        ];
+        let verdicts = vec![ConstitutionalVerdict::new(
+            "V-N41".into(),
+            "S-N41".into(),
+            "test".into(),
+            "N41".into(),
+            vec![],
+            VerdictResult::Pass,
+            1000,
+            "test".into(),
+        )];
 
         let cert = CertificationEvaluator::evaluate(
             &reg,

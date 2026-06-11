@@ -19,12 +19,27 @@ pub struct ConsensusMetrics {
 }
 
 impl ConsensusMetrics {
-    pub fn new() -> Self { Self::default() }
-    pub fn record_vote_accepted(&mut self) { self.votes_accepted += 1; }
-    pub fn record_duplicate_vote(&mut self) { self.duplicate_votes += 1; self.votes_rejected += 1; }
-    pub fn record_future_height_vote(&mut self) { self.future_height_votes += 1; self.votes_rejected += 1; }
-    pub fn record_round_started(&mut self) { self.rounds_started += 1; }
-    pub fn record_proposal(&mut self) { self.proposals_made += 1; self.last_proposed_at = Some(Instant::now()); }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn record_vote_accepted(&mut self) {
+        self.votes_accepted += 1;
+    }
+    pub fn record_duplicate_vote(&mut self) {
+        self.duplicate_votes += 1;
+        self.votes_rejected += 1;
+    }
+    pub fn record_future_height_vote(&mut self) {
+        self.future_height_votes += 1;
+        self.votes_rejected += 1;
+    }
+    pub fn record_round_started(&mut self) {
+        self.rounds_started += 1;
+    }
+    pub fn record_proposal(&mut self) {
+        self.proposals_made += 1;
+        self.last_proposed_at = Some(Instant::now());
+    }
     pub fn record_qc_formed(&mut self, _height: u64) {
         self.qcs_formed += 1;
         self.last_qc_at = Some(Instant::now());
@@ -49,7 +64,11 @@ impl ConsensusMetrics {
         let last = self.finality_timestamps[self.finality_timestamps.len() - 1].1;
         let elapsed = last.duration_since(first).as_secs_f64();
         let count = self.finality_timestamps.len() as f64;
-        let avg_interval = if count > 1.0 { elapsed / (count - 1.0) } else { elapsed };
+        let avg_interval = if count > 1.0 {
+            elapsed / (count - 1.0)
+        } else {
+            elapsed
+        };
         FinalityStats {
             blocks_finalized: self.blocks_finalized,
             elapsed_secs: elapsed,

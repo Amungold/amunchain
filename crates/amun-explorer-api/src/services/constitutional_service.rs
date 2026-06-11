@@ -1,6 +1,6 @@
-use axum::Json;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::{ConstitutionalDashboard, ConstitutionalVerdictSummary, EvidenceRecordSummary};
+use axum::Json;
 
 pub struct ConstitutionalService;
 
@@ -11,8 +11,12 @@ impl ConstitutionalService {
             total_verdicts: 6,
             total_evidence: 12,
             phases_verified: vec![
-                "N41".into(), "N42".into(), "N43".into(),
-                "N44".into(), "N45".into(), "N46".into(),
+                "N41".into(),
+                "N42".into(),
+                "N43".into(),
+                "N44".into(),
+                "N45".into(),
+                "N46".into(),
             ],
             overall_status: "PASS".into(),
         }))
@@ -41,8 +45,12 @@ impl ConstitutionalService {
 
     pub fn list_obligations() -> ApiResult<Vec<String>> {
         Ok(Json(vec![
-            "SAFETY-001".into(), "SAFETY-002".into(), "REPLAY-001".into(),
-            "EVIDENCE-001".into(), "FINALITY-001".into(), "CLUSTER-001".into(),
+            "SAFETY-001".into(),
+            "SAFETY-002".into(),
+            "REPLAY-001".into(),
+            "EVIDENCE-001".into(),
+            "FINALITY-001".into(),
+            "CLUSTER-001".into(),
         ]))
     }
 

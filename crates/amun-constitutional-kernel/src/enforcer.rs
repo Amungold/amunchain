@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use amun_constitutional_governance::capability::Capability;
 use crate::context::ExecutionContext;
+use amun_constitutional_governance::capability::Capability;
 
 /// The CapabilityEnforcer validates that an operation is authorised by
 /// a valid capability present in the execution context's authority chain.

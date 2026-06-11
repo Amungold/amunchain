@@ -4,9 +4,9 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn create_test_registry(size: u64) -> ResourceRegistry {
     let mut reg = ResourceRegistry::new(size as usize * 2);
-    use amun_resource_core::{ResourceMetadata, ResourceId, ResourceState};
     use amun_resource_core::resource_lineage::ResourceLineage;
     use amun_resource_core::transformation_matrix::ResourceArchetype;
+    use amun_resource_core::{ResourceId, ResourceMetadata, ResourceState};
 
     for i in 0..size {
         let id = {
@@ -21,7 +21,8 @@ fn create_test_registry(size: u64) -> ResourceRegistry {
             lineage: ResourceLineage::genesis(id),
             contract_id: [0u8; 32],
             owner: [1u8; 32],
-        }).unwrap();
+        })
+        .unwrap();
     }
     reg
 }
@@ -30,9 +31,7 @@ fn bench_snapshot_create_1k(c: &mut Criterion) {
     let reg = create_test_registry(1000);
     c.bench_function("snapshot_create_1k_resources", |b| {
         b.iter(|| {
-            let snap = SyncProtocol::create_snapshot(
-                &reg, 1, [0xAA; 32], [0xBB; 32],
-            );
+            let snap = SyncProtocol::create_snapshot(&reg, 1, [0xAA; 32], [0xBB; 32]);
             black_box(snap.total_resources);
         })
     });
@@ -54,13 +53,16 @@ fn bench_snapshot_create_10k(c: &mut Criterion) {
     let reg = create_test_registry(10000);
     c.bench_function("snapshot_create_10k_resources", |b| {
         b.iter(|| {
-            let snap = SyncProtocol::create_snapshot(
-                &reg, 1, [0xAA; 32], [0xBB; 32],
-            );
+            let snap = SyncProtocol::create_snapshot(&reg, 1, [0xAA; 32], [0xBB; 32]);
             black_box(snap.total_resources);
         })
     });
 }
 
-criterion_group!(benches, bench_snapshot_create_1k, bench_snapshot_import_1k, bench_snapshot_create_10k);
+criterion_group!(
+    benches,
+    bench_snapshot_create_1k,
+    bench_snapshot_import_1k,
+    bench_snapshot_create_10k
+);
 criterion_main!(benches);

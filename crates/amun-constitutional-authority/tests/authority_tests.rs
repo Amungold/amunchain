@@ -1,9 +1,8 @@
 use amun_constitution_builder::digest::ArtifactDigest;
-use amun_constitutional_signing::{ConstitutionalKeyPair, SignedArtifact};
 use amun_constitutional_authority::{
-    ConstitutionalCertificate, CertificateChain, RevocationRegistry,
-    KeyRotationLaw, TrustAnchor,
+    CertificateChain, ConstitutionalCertificate, KeyRotationLaw, RevocationRegistry, TrustAnchor,
 };
+use amun_constitutional_signing::{ConstitutionalKeyPair, SignedArtifact};
 
 fn build_root(key: &ConstitutionalKeyPair) -> ConstitutionalCertificate {
     ConstitutionalCertificate::new_root(
@@ -15,7 +14,10 @@ fn build_root(key: &ConstitutionalKeyPair) -> ConstitutionalCertificate {
     )
 }
 
-fn build_child(parent: &ConstitutionalCertificate, key: &ConstitutionalKeyPair) -> ConstitutionalCertificate {
+fn build_child(
+    parent: &ConstitutionalCertificate,
+    key: &ConstitutionalKeyPair,
+) -> ConstitutionalCertificate {
     ConstitutionalCertificate::new_child(
         parent.certificate_id.clone(),
         key.verifying_key_hex(),
@@ -44,7 +46,9 @@ fn valid_chain_passes_validation() {
     let child = build_child(&root, &child_key);
 
     let mut chain = CertificateChain::new(SignedArtifact::sign(root, &root_key));
-    chain.append(SignedArtifact::sign(child, &root_key)).unwrap();
+    chain
+        .append(SignedArtifact::sign(child, &root_key))
+        .unwrap();
     assert!(chain.validate(&RevocationRegistry::new()).is_ok());
 }
 
@@ -70,7 +74,9 @@ fn broken_lineage_rejected() {
     child.lineage_parent_hash = Some("deadbeef".into());
 
     let mut chain = CertificateChain::new(SignedArtifact::sign(root, &root_key));
-    assert!(chain.append(SignedArtifact::sign(child, &root_key)).is_err());
+    assert!(chain
+        .append(SignedArtifact::sign(child, &root_key))
+        .is_err());
 }
 
 #[test]
@@ -94,9 +100,13 @@ fn rotation_with_proof_accepted() {
     let old = ConstitutionalKeyPair::generate();
     let new = ConstitutionalKeyPair::generate();
     let cert = ConstitutionalCertificate::new_child(
-        "parent".into(), new.verifying_key_hex(), "parent".into(),
-        "2026-07-01T00:00:00Z".into(), "2035-12-31T23:59:59Z".into(),
-        "RotatedScope".into(), "2026-05-28T13:00:00Z".into(),
+        "parent".into(),
+        new.verifying_key_hex(),
+        "parent".into(),
+        "2026-07-01T00:00:00Z".into(),
+        "2035-12-31T23:59:59Z".into(),
+        "RotatedScope".into(),
+        "2026-05-28T13:00:00Z".into(),
     );
     let signed = SignedArtifact::sign(cert, &old);
     assert!(KeyRotationLaw::validate_rotation(&old.verifying_key_hex(), &signed, &old).is_ok());

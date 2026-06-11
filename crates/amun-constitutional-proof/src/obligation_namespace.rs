@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::RegistryError;
+use serde::{Deserialize, Serialize};
 
 /// The constitutional domains defined in Article I of the N47 constitution.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]

@@ -2,11 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
+use amun_constitution_builder::{canonical_bytes::CanonicalSerialize, digest::ArtifactDigest};
 use serde::{Deserialize, Serialize};
-use amun_constitution_builder::{
-    canonical_bytes::CanonicalSerialize,
-    digest::ArtifactDigest,
-};
 
 /// An execution receipt proves that a state transition occurred under
 /// constitutional authority.

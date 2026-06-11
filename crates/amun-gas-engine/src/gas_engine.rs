@@ -1,6 +1,6 @@
-use amun_resource_core::ResourceId;
-use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use crate::gas_meter::GasMeter;
+use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+use amun_resource_core::ResourceId;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum GasEngineResult {
@@ -32,9 +32,20 @@ impl GasEngine {
                         transaction_hash,
                         gas_consumed: meter.gas_used,
                     };
-                    (GasEngineResult::OutOfGas { gas_used: meter.gas_used, gas_limit }, Some(ev))
+                    (
+                        GasEngineResult::OutOfGas {
+                            gas_used: meter.gas_used,
+                            gas_limit,
+                        },
+                        Some(ev),
+                    )
                 } else {
-                    (GasEngineResult::Success { gas_used: meter.gas_used }, None)
+                    (
+                        GasEngineResult::Success {
+                            gas_used: meter.gas_used,
+                        },
+                        None,
+                    )
                 }
             }
             Err(reason) => {
@@ -45,7 +56,13 @@ impl GasEngine {
                     transaction_hash,
                     gas_consumed: meter.gas_used,
                 };
-                (GasEngineResult::OutOfGas { gas_used: meter.gas_used, gas_limit }, Some(ev))
+                (
+                    GasEngineResult::OutOfGas {
+                        gas_used: meter.gas_used,
+                        gas_limit,
+                    },
+                    Some(ev),
+                )
             }
         }
     }
@@ -61,26 +78,38 @@ mod tests {
     use amun_resource_core::ResourceId;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
     fn w7_execute_within_gas() {
-        let (result, evidence) = GasEngine::execute_with_gas(
-            1000, make_id(1), 1, [0xaa; 32],
-            |meter| { meter.charge(100)?; meter.charge(200)?; Ok(()) },
-        );
+        let (result, evidence) =
+            GasEngine::execute_with_gas(1000, make_id(1), 1, [0xaa; 32], |meter| {
+                meter.charge(100)?;
+                meter.charge(200)?;
+                Ok(())
+            });
         assert!(matches!(result, GasEngineResult::Success { gas_used: 300 }));
         assert!(evidence.is_none());
     }
 
     #[test]
     fn w7_execute_out_of_gas_produces_evidence() {
-        let (result, evidence) = GasEngine::execute_with_gas(
-            100, make_id(2), 42, [0xbb; 32],
-            |meter| { meter.charge(80)?; meter.charge(30)?; Ok(()) },
-        );
-        assert!(matches!(result, GasEngineResult::OutOfGas { gas_used: 100, gas_limit: 100 }));
+        let (result, evidence) =
+            GasEngine::execute_with_gas(100, make_id(2), 42, [0xbb; 32], |meter| {
+                meter.charge(80)?;
+                meter.charge(30)?;
+                Ok(())
+            });
+        assert!(matches!(
+            result,
+            GasEngineResult::OutOfGas {
+                gas_used: 100,
+                gas_limit: 100
+            }
+        ));
         assert!(evidence.is_some());
     }
 
@@ -92,20 +121,25 @@ mod tests {
 
     #[test]
     fn w7_no_evidence_on_success() {
-        let (result, evidence) = GasEngine::execute_with_gas(
-            500, make_id(3), 10, [0xcc; 32],
-            |meter| { meter.charge(50)?; Ok(()) },
-        );
+        let (result, evidence) =
+            GasEngine::execute_with_gas(500, make_id(3), 10, [0xcc; 32], |meter| {
+                meter.charge(50)?;
+                Ok(())
+            });
         assert!(matches!(result, GasEngineResult::Success { .. }));
         assert!(evidence.is_none());
     }
 
     #[test]
     fn w7_gas_accounting_deterministic() {
-        let run = || GasEngine::execute_with_gas(
-            200, make_id(4), 1, [0xdd; 32],
-            |meter| { meter.charge(30)?; meter.charge(40)?; meter.charge(50)?; Ok(()) },
-        );
+        let run = || {
+            GasEngine::execute_with_gas(200, make_id(4), 1, [0xdd; 32], |meter| {
+                meter.charge(30)?;
+                meter.charge(40)?;
+                meter.charge(50)?;
+                Ok(())
+            })
+        };
         let (r1, _) = run();
         let (r2, _) = run();
         assert_eq!(r1, r2);

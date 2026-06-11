@@ -2,13 +2,11 @@
 // Phase N9: Certificate Distribution Layer
 // ============================================================
 
-use serde::{Serialize, Deserialize};
-use amun_constitutional_state::{
-    ReplayCertificate,
-    CertificateInclusionProof,
-    ConstitutionalStateRuntime,
-};
 use amun_constitutional_block::ConstitutionalBlock;
+use amun_constitutional_state::{
+    CertificateInclusionProof, ConstitutionalStateRuntime, ReplayCertificate,
+};
+use serde::{Deserialize, Serialize};
 
 // ============================================================
 // N9A: Certificate Request/Response Protocol
@@ -24,7 +22,9 @@ impl CertificateMessage {
     pub fn certificate_hash(&self) -> Option<[u8; 32]> {
         match self {
             CertificateMessage::RequestCertificate { certificate_hash } => Some(*certificate_hash),
-            CertificateMessage::CertificateResponse { certificate } => Some(certificate.certificate_hash()),
+            CertificateMessage::CertificateResponse { certificate } => {
+                Some(certificate.certificate_hash())
+            }
         }
     }
 }
@@ -51,16 +51,32 @@ pub struct LightClientProofBundle {
 }
 
 impl LightClientProofBundle {
-    pub fn new(block_header: ConstitutionalBlock, certificate: ReplayCertificate, inclusion_proof: CertificateInclusionProof) -> Self {
-        Self { block_header, certificate, inclusion_proof }
+    pub fn new(
+        block_header: ConstitutionalBlock,
+        certificate: ReplayCertificate,
+        inclusion_proof: CertificateInclusionProof,
+    ) -> Self {
+        Self {
+            block_header,
+            certificate,
+            inclusion_proof,
+        }
     }
 
     pub fn verify(&self) -> Result<(), String> {
-        amun_constitutional_block::verify_light_client_proof(&self.block_header, &self.certificate, &self.inclusion_proof)
+        amun_constitutional_block::verify_light_client_proof(
+            &self.block_header,
+            &self.certificate,
+            &self.inclusion_proof,
+        )
     }
 
-    pub fn block_height(&self) -> u64 { self.block_header.block_height }
-    pub fn certificate_hash(&self) -> [u8; 32] { self.certificate.certificate_hash() }
+    pub fn block_height(&self) -> u64 {
+        self.block_header.block_height
+    }
+    pub fn certificate_hash(&self) -> [u8; 32] {
+        self.certificate.certificate_hash()
+    }
 }
 
 // ============================================================
@@ -83,12 +99,21 @@ pub enum ProofBundleMessage {
 pub struct BundleBuilder;
 
 impl BundleBuilder {
-    pub fn build_from_runtime(block: ConstitutionalBlock, rt: &ConstitutionalStateRuntime, pre_state_root: [u8; 32]) -> Option<LightClientProofBundle> {
+    pub fn build_from_runtime(
+        block: ConstitutionalBlock,
+        rt: &ConstitutionalStateRuntime,
+        pre_state_root: [u8; 32],
+    ) -> Option<LightClientProofBundle> {
         let cert = rt.create_certificate(block.block_height, pre_state_root);
         let certs = vec![cert.clone()];
         let hash = cert.certificate_hash();
-        let inclusion_proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash)?;
-        Some(LightClientProofBundle { block_header: block, certificate: cert, inclusion_proof })
+        let inclusion_proof =
+            ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash)?;
+        Some(LightClientProofBundle {
+            block_header: block,
+            certificate: cert,
+            inclusion_proof,
+        })
     }
 }
 
@@ -107,8 +132,20 @@ mod n9_tests {
         let certs = vec![cert.clone()];
         let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
         let hash = cert.certificate_hash();
-        let inclusion_proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
-        let block = ConstitutionalBlock::new(0, "0".repeat(64), "t".into(), "p".into(), vec![], hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root);
+        let inclusion_proof =
+            ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+        let block = ConstitutionalBlock::new(
+            0,
+            "0".repeat(64),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
+        );
         LightClientProofBundle::new(block, cert, inclusion_proof)
     }
 
@@ -116,9 +153,13 @@ mod n9_tests {
     fn n9a_certificate_request_response() {
         let bundle = create_test_bundle();
         let cert_hash = bundle.certificate_hash();
-        let response = CertificateMessage::CertificateResponse { certificate: bundle.certificate.clone() };
+        let response = CertificateMessage::CertificateResponse {
+            certificate: bundle.certificate.clone(),
+        };
         match response {
-            CertificateMessage::CertificateResponse { certificate } => assert_eq!(certificate.certificate_hash(), cert_hash),
+            CertificateMessage::CertificateResponse { certificate } => {
+                assert_eq!(certificate.certificate_hash(), cert_hash)
+            }
             _ => unreachable!(),
         }
     }
@@ -126,7 +167,9 @@ mod n9_tests {
     #[test]
     fn n9b_inclusion_proof_request_response() {
         let bundle = create_test_bundle();
-        let response = InclusionProofMessage::InclusionProofResponse { proof: bundle.inclusion_proof.clone() };
+        let response = InclusionProofMessage::InclusionProofResponse {
+            proof: bundle.inclusion_proof.clone(),
+        };
         match response {
             InclusionProofMessage::InclusionProofResponse { proof } => assert!(proof.verify()),
             _ => unreachable!(),
@@ -137,7 +180,10 @@ mod n9_tests {
     fn n9c_light_client_bundle_creation() {
         let bundle = create_test_bundle();
         assert_eq!(bundle.block_height(), 0);
-        assert_eq!(bundle.certificate_hash(), bundle.inclusion_proof.certificate_hash);
+        assert_eq!(
+            bundle.certificate_hash(),
+            bundle.inclusion_proof.certificate_hash
+        );
     }
 
     #[test]
@@ -157,7 +203,9 @@ mod n9_tests {
     fn n9d_bundle_response() {
         let bundle = create_test_bundle();
         let height = bundle.block_height();
-        let response = ProofBundleMessage::BundleResponse { bundle: bundle.clone() };
+        let response = ProofBundleMessage::BundleResponse {
+            bundle: bundle.clone(),
+        };
         match response {
             ProofBundleMessage::BundleResponse { bundle: received } => {
                 assert!(received.verify().is_ok());
@@ -169,7 +217,9 @@ mod n9_tests {
 
     #[test]
     fn n9d_bundle_not_found() {
-        let response = ProofBundleMessage::BundleNotFound { reason: "Not found".into() };
+        let response = ProofBundleMessage::BundleNotFound {
+            reason: "Not found".into(),
+        };
         match response {
             ProofBundleMessage::BundleNotFound { reason } => assert!(!reason.is_empty()),
             _ => unreachable!(),
@@ -181,8 +231,21 @@ mod n9_tests {
         let mut rt = ConstitutionalStateRuntime::new();
         rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
         let cert = rt.create_certificate(1, [0u8; 32]);
-        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(std::slice::from_ref(&cert)));
-        let block = ConstitutionalBlock::new(1, "parent_hash".into(), "t".into(), "p".into(), vec![], hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root);
+        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+            std::slice::from_ref(&cert),
+        ));
+        let block = ConstitutionalBlock::new(
+            1,
+            "parent_hash".into(),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
+        );
         let bundle = BundleBuilder::build_from_runtime(block, &rt, [0u8; 32]).unwrap();
         assert!(bundle.verify().is_ok());
         assert_eq!(bundle.block_height(), 1);
@@ -191,11 +254,21 @@ mod n9_tests {
     #[test]
     fn n9_serialize_certificate_message() {
         let bundle = create_test_bundle();
-        let request = CertificateMessage::RequestCertificate { certificate_hash: bundle.certificate_hash() };
+        let request = CertificateMessage::RequestCertificate {
+            certificate_hash: bundle.certificate_hash(),
+        };
         let json = serde_json::to_string(&request).unwrap();
-        let deserialized: CertificateMessage = match serde_json::from_str(&json) { Ok(v) => v, Err(e) => { eprintln!("distribution: invalid certificate message: {}", e); return; } };
+        let deserialized: CertificateMessage = match serde_json::from_str(&json) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("distribution: invalid certificate message: {}", e);
+                return;
+            }
+        };
         match deserialized {
-            CertificateMessage::RequestCertificate { certificate_hash } => assert_eq!(certificate_hash, bundle.certificate_hash()),
+            CertificateMessage::RequestCertificate { certificate_hash } => {
+                assert_eq!(certificate_hash, bundle.certificate_hash())
+            }
             _ => unreachable!(),
         }
     }
@@ -204,7 +277,13 @@ mod n9_tests {
     fn n9_serialize_bundle() {
         let bundle = create_test_bundle();
         let json = serde_json::to_string(&bundle).unwrap();
-        let deserialized: LightClientProofBundle = match serde_json::from_str(&json) { Ok(v) => v, Err(e) => { eprintln!("distribution: invalid proof bundle: {}", e); return; } };
+        let deserialized: LightClientProofBundle = match serde_json::from_str(&json) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("distribution: invalid proof bundle: {}", e);
+                return;
+            }
+        };
         assert!(deserialized.verify().is_ok());
         assert_eq!(deserialized.block_height(), bundle.block_height());
         assert_eq!(deserialized.certificate_hash(), bundle.certificate_hash());

@@ -1,7 +1,7 @@
 use crate::record::FinalizedChainRecord;
 use crate::store::ChainStore;
 use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream, SocketAddr};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -15,10 +15,14 @@ impl SyncServer {
         Self { store, addr }
     }
 
-    pub fn serve(&self) -> Result<(), String> {
-        let listener = TcpListener::bind(self.addr)
-            .map_err(|e| format!("Sync bind error: {}", e))?;
-        listener.set_nonblocking(false)
+    pub fn serve(&self) -> Result<SocketAddr, String> {
+        let listener =
+            TcpListener::bind(self.addr).map_err(|e| format!("Sync bind error: {}", e))?;
+        let actual_addr = listener
+            .local_addr()
+            .map_err(|e| format!("local_addr error: {}", e))?;
+        listener
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let store = self.store.clone();
@@ -41,7 +45,8 @@ impl SyncServer {
                     }
                     drop(store);
 
-                    let encoded: Vec<u8> = records.iter()
+                    let encoded: Vec<u8> = records
+                        .iter()
                         .flat_map(|r| {
                             let data = r.encode();
                             let len = data.len() as u32;
@@ -58,7 +63,7 @@ impl SyncServer {
                 }
             }
         });
-        Ok(())
+        Ok(actual_addr)
     }
 }
 
@@ -70,33 +75,44 @@ impl SyncClient {
         start_height: u64,
         end_height: u64,
     ) -> Result<Vec<FinalizedChainRecord>, String> {
-        let mut stream = TcpStream::connect(peer_addr)
-            .map_err(|e| format!("Sync connect error: {}", e))?;
-        stream.set_nonblocking(false)
+        let mut stream =
+            TcpStream::connect(peer_addr).map_err(|e| format!("Sync connect error: {}", e))?;
+        stream
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let mut req = Vec::new();
         req.extend_from_slice(&start_height.to_le_bytes());
         req.extend_from_slice(&end_height.to_le_bytes());
-        stream.write_all(&req).map_err(|e| format!("Sync write error: {}", e))?;
-        stream.flush().map_err(|e| format!("Sync flush error: {}", e))?;
+        stream
+            .write_all(&req)
+            .map_err(|e| format!("Sync write error: {}", e))?;
+        stream
+            .flush()
+            .map_err(|e| format!("Sync flush error: {}", e))?;
 
         let mut size_buf = [0u8; 4];
-        stream.read_exact(&mut size_buf).map_err(|e| format!("Sync read size error: {}", e))?;
+        stream
+            .read_exact(&mut size_buf)
+            .map_err(|e| format!("Sync read size error: {}", e))?;
         let total = u32::from_le_bytes(size_buf) as usize;
         if total > 16 * 1024 * 1024 {
             return Err("Response too large".into());
         }
 
         let mut data = vec![0u8; total];
-        stream.read_exact(&mut data).map_err(|e| format!("Sync read data error: {}", e))?;
+        stream
+            .read_exact(&mut data)
+            .map_err(|e| format!("Sync read data error: {}", e))?;
 
         let mut records = Vec::new();
         let mut offset = 0;
         while offset + 4 <= data.len() {
             let len = u32::from_le_bytes(data[offset..offset + 4].try_into().unwrap()) as usize;
             offset += 4;
-            if offset + len > data.len() { break; }
+            if offset + len > data.len() {
+                break;
+            }
             let record = FinalizedChainRecord::decode(&data[offset..offset + len])?;
             records.push(record);
             offset += len;
@@ -121,7 +137,9 @@ impl SyncClient {
 
         let missing = Self::download_range(peer_addr, start_height, peer_tip)?;
         for record in &missing {
-            local_store.append(record.clone()).map_err(|e| format!("Append error: {}", e))?;
+            local_store
+                .append(record.clone())
+                .map_err(|e| format!("Append error: {}", e))?;
         }
         Ok(local_store.latest_height())
     }
@@ -135,33 +153,41 @@ mod tests {
 
     fn make_record(h: u64) -> FinalizedChainRecord {
         FinalizedChainRecord {
-            height: h, block_hash: [h as u8; 32],
-            state_root: [0xBB; 32], history_root: [h as u8; 32],
-            certificate_hash: [0xDD; 32], timestamp: h * 1000,
+            height: h,
+            block_hash: [h as u8; 32],
+            state_root: [0xBB; 32],
+            history_root: [h as u8; 32],
+            certificate_hash: [0xDD; 32],
+            timestamp: h * 1000,
         }
     }
 
-    fn setup_server(port: u16, count: u64) -> (Arc<Mutex<ChainStore>>, SocketAddr) {
+    fn setup_server(count: u64) -> (Arc<Mutex<ChainStore>>, SocketAddr) {
         let dir = tempfile::tempdir().unwrap();
         let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
-        for h in 0..count { store.append(make_record(h)).unwrap(); }
+        for h in 0..count {
+            store.append(make_record(h)).unwrap();
+        }
         let store = Arc::new(Mutex::new(store));
-        let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
-        SyncServer::new(store.clone(), addr).serve().unwrap();
+        let server = SyncServer {
+            store: store.clone(),
+            addr: "127.0.0.1:0".parse().unwrap(),
+        };
+        let actual_addr = server.serve().unwrap();
         thread::sleep(Duration::from_millis(100));
-        (store, addr)
+        (store, actual_addr)
     }
 
     #[test]
     fn n72_sync_download_range() {
-        let (_, addr) = setup_server(9901, 5);
+        let (_, addr) = setup_server(5);
         let records = SyncClient::download_range(addr, 0, 4).unwrap();
         assert_eq!(records.len(), 5);
     }
 
     #[test]
     fn n72_sync_catch_up() {
-        let (_, addr) = setup_server(9902, 10);
+        let (_, addr) = setup_server(10);
         let dir = tempfile::tempdir().unwrap();
         let mut local = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
         let h = SyncClient::catch_up(addr, &mut local).unwrap();
@@ -171,10 +197,12 @@ mod tests {
 
     #[test]
     fn n72_sync_partial_catch_up() {
-        let (_, addr) = setup_server(9903, 20);
+        let (_, addr) = setup_server(20);
         let dir = tempfile::tempdir().unwrap();
         let mut local = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
-        for h in 0..5 { local.append(make_record(h)).unwrap(); }
+        for h in 0..5 {
+            local.append(make_record(h)).unwrap();
+        }
         let h = SyncClient::catch_up(addr, &mut local).unwrap();
         assert_eq!(h, 19);
         assert_eq!(local.len(), 20);
@@ -182,10 +210,12 @@ mod tests {
 
     #[test]
     fn n72_sync_already_synced() {
-        let (_, addr) = setup_server(9904, 5);
+        let (_, addr) = setup_server(5);
         let dir = tempfile::tempdir().unwrap();
         let mut local = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
-        for h in 0..5 { local.append(make_record(h)).unwrap(); }
+        for h in 0..5 {
+            local.append(make_record(h)).unwrap();
+        }
         let h = SyncClient::catch_up(addr, &mut local).unwrap();
         assert_eq!(h, 4);
     }

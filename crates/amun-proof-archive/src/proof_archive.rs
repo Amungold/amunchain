@@ -1,7 +1,7 @@
-use amun_transition_proof::transition_proof::TransitionProof;
-use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
-use std::collections::HashMap;
 use crate::hot_store::HotProofStore;
+use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+use amun_transition_proof::transition_proof::TransitionProof;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default)]
 pub struct ProofArchive {
@@ -10,7 +10,9 @@ pub struct ProofArchive {
 }
 
 impl ProofArchive {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn archive_permanent(&mut self, proof: TransitionProof) {
         self.permanent.insert(proof.proof_hash, proof);
@@ -24,8 +26,12 @@ impl ProofArchive {
         self.permanent.get(proof_hash)
     }
 
-    pub fn total_permanent(&self) -> usize { self.permanent.len() }
-    pub fn total_evidence(&self) -> usize { self.evidence.len() }
+    pub fn total_permanent(&self) -> usize {
+        self.permanent.len()
+    }
+    pub fn total_evidence(&self) -> usize {
+        self.evidence.len()
+    }
 
     pub fn archive_from_hot(
         &mut self,
@@ -47,14 +53,24 @@ mod tests {
     use amun_resource_core::ResourceId;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     fn make_proof(tx_hash: [u8; 32]) -> TransitionProof {
         TransitionProof::new(
-            tx_hash, make_id(1), 1, [0u8; 32],
-            [0x01; 32], [0x02; 32],
-            vec![], vec![], vec![], vec![], 1000,
+            tx_hash,
+            make_id(1),
+            1,
+            [0u8; 32],
+            [0x01; 32],
+            [0x02; 32],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            1000,
         )
     }
 

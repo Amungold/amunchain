@@ -63,8 +63,8 @@ fn collect_files_with_extensions(
     if !dir.exists() {
         return Ok(());
     }
-    let entries = fs::read_dir(dir)
-        .map_err(|e| format!("Failed to read dir {}: {}", dir.display(), e))?;
+    let entries =
+        fs::read_dir(dir).map_err(|e| format!("Failed to read dir {}: {}", dir.display(), e))?;
 
     for entry in entries {
         let entry = entry.map_err(|e| format!("Entry error: {}", e))?;

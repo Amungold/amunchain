@@ -12,10 +12,16 @@ pub struct TransactionService;
 impl TransactionService {
     pub fn build_transaction(req: BuildTransactionRequest) -> ApiResult<BuildTransactionResponse> {
         if req.sender.is_empty() || req.recipient.is_empty() {
-            return Err(ApiError::new("INVALID_REQUEST", "Sender or recipient is empty"));
+            return Err(ApiError::new(
+                "INVALID_REQUEST",
+                "Sender or recipient is empty",
+            ));
         }
         if req.amount == 0 {
-            return Err(ApiError::new("INVALID_REQUEST", "Amount must be greater than zero"));
+            return Err(ApiError::new(
+                "INVALID_REQUEST",
+                "Amount must be greater than zero",
+            ));
         }
 
         let mut hasher = Hasher::new();
@@ -38,7 +44,10 @@ impl TransactionService {
         req: SubmitTransactionRequest,
     ) -> ApiResult<SubmitTransactionResponse> {
         if req.transaction_bytes.is_empty() || req.signature.is_empty() {
-            return Err(ApiError::new("INVALID_REQUEST", "Missing transaction bytes or signature"));
+            return Err(ApiError::new(
+                "INVALID_REQUEST",
+                "Missing transaction bytes or signature",
+            ));
         }
 
         let mut hasher = Hasher::new();
@@ -51,7 +60,10 @@ impl TransactionService {
 
     pub fn get_transaction(hash: &str) -> ApiResult<TransactionStatusResponse> {
         if hash.is_empty() {
-            return Err(ApiError::new("INVALID_REQUEST", "Transaction hash is empty"));
+            return Err(ApiError::new(
+                "INVALID_REQUEST",
+                "Transaction hash is empty",
+            ));
         }
 
         Ok(Json(TransactionStatusResponse {

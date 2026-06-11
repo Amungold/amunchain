@@ -25,7 +25,12 @@ impl AntiReplayGuard {
         }
         if self.seen_hashes.len() >= self.max_capacity {
             // Evict oldest entries (simplified: clear half)
-            let to_remove: Vec<[u8; 32]> = self.seen_hashes.iter().take(self.max_capacity / 2).cloned().collect();
+            let to_remove: Vec<[u8; 32]> = self
+                .seen_hashes
+                .iter()
+                .take(self.max_capacity / 2)
+                .cloned()
+                .collect();
             for h in to_remove {
                 self.seen_hashes.remove(&h);
             }

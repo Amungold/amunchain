@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    EvidenceLineage, EvidenceStatus, EvidenceType, ObligationId, Reproducibility,
-};
+use crate::{EvidenceLineage, EvidenceStatus, EvidenceType, ObligationId, Reproducibility};
 
 /// A single piece of constitutional evidence.
 ///

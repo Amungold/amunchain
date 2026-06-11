@@ -84,7 +84,9 @@ pub struct ReplayCertificateStore {
 }
 
 impl ReplayCertificateStore {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn store(&mut self, cert: ReplayCertificate) -> Result<(), &'static str> {
         if !cert.verify() {
@@ -104,21 +106,34 @@ impl ReplayCertificateStore {
         Ok(())
     }
 
-    pub fn is_empty(&self) -> bool { self.certificates.is_empty() }
-    pub fn len(&self) -> usize { self.certificates.len() }
+    pub fn is_empty(&self) -> bool {
+        self.certificates.is_empty()
+    }
+    pub fn len(&self) -> usize {
+        self.certificates.len()
+    }
     pub fn latest(&self) -> Option<&ReplayCertificate> {
-        self.latest_id.as_ref().and_then(|id| self.certificates.get(id))
+        self.latest_id
+            .as_ref()
+            .and_then(|id| self.certificates.get(id))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::validation::{ReplayResult, ReplayValidator};
     use crate::commit_log::StateCommit;
+    use crate::validation::{ReplayResult, ReplayValidator};
 
     fn make_commit(h: u64, prev: [u8; 32], new: [u8; 32]) -> StateCommit {
-        StateCommit { height: h, block_hash: [h as u8; 32], previous_root: prev, new_root: new, tx_count: 1, timestamp: h * 1000 }
+        StateCommit {
+            height: h,
+            block_hash: [h as u8; 32],
+            previous_root: prev,
+            new_root: new,
+            tx_count: 1,
+            timestamp: h * 1000,
+        }
     }
 
     fn valid_result() -> ReplayResult {
@@ -178,12 +193,18 @@ mod tests {
     #[test]
     fn n37_certificate_chain_verification() {
         let mut store = ReplayCertificateStore::new();
-        store.store(ReplayCertificate::genesis([0xAA; 32], 1000)).unwrap();
+        store
+            .store(ReplayCertificate::genesis([0xAA; 32], 1000))
+            .unwrap();
         let r = valid_result();
         let id1 = store.latest().unwrap().certificate_id;
-        store.store(ReplayCertificate::issue(&r, 3, id1, [0xAA; 32], 2000).unwrap()).unwrap();
+        store
+            .store(ReplayCertificate::issue(&r, 3, id1, [0xAA; 32], 2000).unwrap())
+            .unwrap();
         let id2 = store.latest().unwrap().certificate_id;
-        store.store(ReplayCertificate::issue(&r, 6, id2, [0xAA; 32], 3000).unwrap()).unwrap();
+        store
+            .store(ReplayCertificate::issue(&r, 6, id2, [0xAA; 32], 3000).unwrap())
+            .unwrap();
         assert_eq!(store.len(), 3);
         for _ in 0..3 {
             let c = store.latest().unwrap();

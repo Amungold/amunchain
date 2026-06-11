@@ -1,4 +1,4 @@
-use crate::commit_log::{StateCommit, CommitLog};
+use crate::commit_log::{CommitLog, StateCommit};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReplayResult {
@@ -10,11 +10,21 @@ pub struct ReplayResult {
 
 impl ReplayResult {
     pub fn success(expected: [u8; 32], count: usize) -> Self {
-        Self { expected_root: expected, replayed_root: expected, valid: true, commits_checked: count }
+        Self {
+            expected_root: expected,
+            replayed_root: expected,
+            valid: true,
+            commits_checked: count,
+        }
     }
 
     pub fn failure(expected: [u8; 32], actual: [u8; 32], count: usize) -> Self {
-        Self { expected_root: expected, replayed_root: actual, valid: false, commits_checked: count }
+        Self {
+            expected_root: expected,
+            replayed_root: actual,
+            valid: false,
+            commits_checked: count,
+        }
     }
 }
 
@@ -32,7 +42,9 @@ impl ReplayValidator {
                 return ReplayResult::failure(prev.new_root, curr.previous_root, i);
             }
         }
-        let last = commits.last().expect("validation: invariant violated — non-empty after check");
+        let last = commits
+            .last()
+            .expect("validation: invariant violated — non-empty after check");
         ReplayResult::success(last.new_root, commits.len())
     }
 

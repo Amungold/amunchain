@@ -17,15 +17,31 @@ pub struct NodeMetrics {
 }
 
 impl NodeMetrics {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
-    pub fn record_block_produced(&mut self) { self.blocks_produced += 1; }
-    pub fn record_block_imported(&mut self) { self.blocks_imported += 1; }
-    pub fn record_transaction(&mut self) { self.transactions_processed += 1; }
-    pub fn record_proof_generated(&mut self) { self.proofs_generated += 1; }
-    pub fn record_proof_verified(&mut self) { self.proofs_verified += 1; }
-    pub fn record_replay(&mut self) { self.replays_performed += 1; }
-    pub fn record_state_sync(&mut self) { self.state_syncs_completed += 1; }
+    pub fn record_block_produced(&mut self) {
+        self.blocks_produced += 1;
+    }
+    pub fn record_block_imported(&mut self) {
+        self.blocks_imported += 1;
+    }
+    pub fn record_transaction(&mut self) {
+        self.transactions_processed += 1;
+    }
+    pub fn record_proof_generated(&mut self) {
+        self.proofs_generated += 1;
+    }
+    pub fn record_proof_verified(&mut self) {
+        self.proofs_verified += 1;
+    }
+    pub fn record_replay(&mut self) {
+        self.replays_performed += 1;
+    }
+    pub fn record_state_sync(&mut self) {
+        self.state_syncs_completed += 1;
+    }
 
     /// Return a summary of all metrics as key-value pairs.
     pub fn summary(&self) -> Vec<(&str, u64)> {

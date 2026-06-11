@@ -2,7 +2,7 @@ use crate::message::NetworkMessage;
 use crate::peer::{NodeId, PeerIdentity};
 use std::collections::HashMap;
 use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream, SocketAddr};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -25,7 +25,9 @@ impl std::fmt::Display for TransportError {
             TransportError::ReceiveFailed(s) => write!(f, "Receive failed: {}", s),
             TransportError::EncodeFailed(s) => write!(f, "Encode failed: {}", s),
             TransportError::DecodeFailed(s) => write!(f, "Decode failed: {}", s),
-            TransportError::PeerNotFound(id) => write!(f, "Peer not found: {:?}", id.0[..4].to_vec()),
+            TransportError::PeerNotFound(id) => {
+                write!(f, "Peer not found: {:?}", id.0[..4].to_vec())
+            }
         }
     }
 }
@@ -40,31 +42,37 @@ impl PeerConnection {
     fn send(&mut self, message: &NetworkMessage) -> Result<(), TransportError> {
         let data = message.encode().map_err(TransportError::EncodeFailed)?;
         let len = data.len() as u32;
-        self.stream.write_all(&len.to_be_bytes())
+        self.stream
+            .write_all(&len.to_be_bytes())
             .map_err(|e| TransportError::SendFailed(e.to_string()))?;
-        self.stream.write_all(&data)
+        self.stream
+            .write_all(&data)
             .map_err(|e| TransportError::SendFailed(e.to_string()))?;
-        self.stream.flush()
+        self.stream
+            .flush()
             .map_err(|e| TransportError::SendFailed(e.to_string()))?;
         Ok(())
     }
 
     fn receive(&mut self) -> Result<NetworkMessage, TransportError> {
         let mut len_buf = [0u8; 4];
-        self.stream.read_exact(&mut len_buf)
+        self.stream
+            .read_exact(&mut len_buf)
             .map_err(|e| TransportError::ReceiveFailed(e.to_string()))?;
         let len = u32::from_be_bytes(len_buf) as usize;
-        
+
         if len > 16 * 1024 * 1024 {
-            return Err(TransportError::ReceiveFailed(
-                format!("Frame too large: {} bytes", len)
-            ));
+            return Err(TransportError::ReceiveFailed(format!(
+                "Frame too large: {} bytes",
+                len
+            )));
         }
-        
+
         let mut data = vec![0u8; len];
-        self.stream.read_exact(&mut data)
+        self.stream
+            .read_exact(&mut data)
             .map_err(|e| TransportError::ReceiveFailed(e.to_string()))?;
-        
+
         NetworkMessage::decode(&data).map_err(TransportError::DecodeFailed)
     }
 }
@@ -90,15 +98,19 @@ impl TcpTransport {
     }
 
     pub fn add_peer(&self, peer: PeerIdentity) {
-        self.peers.lock().unwrap().insert(peer.node_id.clone(), peer);
+        self.peers
+            .lock()
+            .unwrap()
+            .insert(peer.node_id.clone(), peer);
     }
 
     pub fn start_listen(&self) -> Result<(), TransportError> {
         let listener = TcpListener::bind(self.bind_address)
             .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
-        listener.set_nonblocking(true)
+        listener
+            .set_nonblocking(true)
             .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
-        
+
         let connections = self.connections.clone();
         let inbox = self.inbox.clone();
 
@@ -128,15 +140,18 @@ impl TcpTransport {
     pub fn connect(&self, peer_id: &NodeId) -> Result<(), TransportError> {
         let peer = {
             let peers = self.peers.lock().unwrap();
-            peers.get(peer_id).cloned()
+            peers
+                .get(peer_id)
+                .cloned()
                 .ok_or_else(|| TransportError::PeerNotFound(peer_id.clone()))?
         };
-        
+
         let stream = TcpStream::connect(peer.address)
             .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
-        stream.set_nonblocking(false)
+        stream
+            .set_nonblocking(false)
             .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
-        
+
         let conn = PeerConnection {
             stream,
             peer_id: peer.node_id.clone(),
@@ -147,7 +162,8 @@ impl TcpTransport {
 
     pub fn send(&self, peer_id: &NodeId, message: &NetworkMessage) -> Result<(), TransportError> {
         let mut connections = self.connections.lock().unwrap();
-        let conn = connections.get_mut(peer_id)
+        let conn = connections
+            .get_mut(peer_id)
             .ok_or_else(|| TransportError::PeerNotFound(peer_id.clone()))?;
         conn.send(message)
     }
@@ -268,7 +284,7 @@ mod integration_tests {
             let len = u32::from_be_bytes(len_buf) as usize;
             let mut data = vec![0u8; len];
             stream.read_exact(&mut data).unwrap();
-            
+
             let msg: NetworkMessage = NetworkMessage::decode(&data).unwrap();
             match msg {
                 NetworkMessage::Ping(ping) => {
@@ -428,7 +444,7 @@ mod integration_tests {
 
         let b_thread = thread::spawn(move || {
             let (mut stream, _addr) = listener.accept().unwrap();
-            
+
             // Receive Ping
             let mut len_buf = [0u8; 4];
             stream.read_exact(&mut len_buf).unwrap();

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use serde::{Deserialize, Serialize};
-use crate::emitter::CanonicalEmit;
 use crate::canonical_bytes::CanonicalSerialize;
-use crate::normalize::DeterministicNormalizer;
 use crate::digest::ArtifactDigest;
+use crate::emitter::CanonicalEmit;
+use crate::normalize::DeterministicNormalizer;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
@@ -31,11 +31,7 @@ impl ArtifactDigest for ConstitutionalManifest {
 }
 
 impl ConstitutionalManifest {
-    pub fn new(
-        genesis_hash: String,
-        specification_hash: String,
-        timestamp: String,
-    ) -> Self {
+    pub fn new(genesis_hash: String, specification_hash: String, timestamp: String) -> Self {
         Self {
             schema_version: 1,
             civilization: "AmunChain".into(),
@@ -64,8 +60,14 @@ impl CanonicalEmit for ConstitutionalManifest {
         lines.push(format!("| Schema Version | {} |", self.schema_version));
         lines.push(format!("| Civilization Name | {} |", self.civilization));
         lines.push(format!("| Genesis Hash | {} |", self.genesis_hash));
-        lines.push(format!("| Specification Hash | {} |", self.specification_hash));
-        lines.push(format!("| Constitution Version | {} |", self.constitution_version));
+        lines.push(format!(
+            "| Specification Hash | {} |",
+            self.specification_hash
+        ));
+        lines.push(format!(
+            "| Constitution Version | {} |",
+            self.constitution_version
+        ));
         lines.push(format!("| Codec Version | {} |", self.codec_version));
         lines.push(format!("| Proof Version | {} |", self.proof_version));
         lines.push(format!("| Hash Algorithm | {} |", self.hash_algorithm));

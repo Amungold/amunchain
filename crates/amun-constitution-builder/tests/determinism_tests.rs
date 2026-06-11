@@ -17,16 +17,22 @@ fn test_manifest_determinism() {
 fn test_federation_determinism() {
     let ts = "2026-05-28T00:00:00Z".to_string();
     let f1 = FederationArtifact::new(
-        "AmunChain".into(), "OtherChain".into(),
-        "gen_a".into(), "gen_b".into(),
-        "spec_a".into(), "spec_b".into(),
+        "AmunChain".into(),
+        "OtherChain".into(),
+        "gen_a".into(),
+        "gen_b".into(),
+        "spec_a".into(),
+        "spec_b".into(),
         vec!["treaty-1".into()],
         ts.clone(),
     );
     let f2 = FederationArtifact::new(
-        "AmunChain".into(), "OtherChain".into(),
-        "gen_a".into(), "gen_b".into(),
-        "spec_a".into(), "spec_b".into(),
+        "AmunChain".into(),
+        "OtherChain".into(),
+        "gen_a".into(),
+        "gen_b".into(),
+        "spec_a".into(),
+        "spec_b".into(),
         vec!["treaty-1".into()],
         ts,
     );

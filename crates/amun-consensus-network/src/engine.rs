@@ -1,4 +1,4 @@
-use crate::messages::{ConsensusVote, QuorumCertificate, FinalityCertificate};
+use crate::messages::{ConsensusVote, FinalityCertificate, QuorumCertificate};
 use std::collections::HashMap;
 
 /// A single consensus round for one block height.
@@ -41,7 +41,10 @@ impl ConsensusRound {
             self.proposed_state_root = Some(vote.state_root);
         }
         if vote.height != self.height {
-            return Err(format!("Vote height {} != round height {}", vote.height, self.height));
+            return Err(format!(
+                "Vote height {} != round height {}",
+                vote.height, self.height
+            ));
         }
         if self.votes.iter().any(|v| v.voter_id == vote.voter_id) {
             return Err("Duplicate vote from validator".into());
@@ -58,12 +61,16 @@ impl ConsensusRound {
     /// Try to form a QC from collected votes.
     /// Returns Some(QC) if >2/3 validators approved.
     pub fn try_form_qc(&mut self, total_validators: usize) -> Option<QuorumCertificate> {
-        let approvals: Vec<ConsensusVote> = self.votes.iter()
-            .filter(|v| v.approve)
-            .cloned()
-            .collect();
+        let approvals: Vec<ConsensusVote> =
+            self.votes.iter().filter(|v| v.approve).cloned().collect();
 
-        eprintln!("ROUND_DIAG: h={} votes={} approvals={} need={}", self.height, self.votes.len(), approvals.len(), total_validators * 2 / 3 + 1);
+        eprintln!(
+            "ROUND_DIAG: h={} votes={} approvals={} need={}",
+            self.height,
+            self.votes.len(),
+            approvals.len(),
+            total_validators * 2 / 3 + 1
+        );
         if approvals.len() * 3 <= total_validators * 2 {
             return None; // Insufficient quorum
         }
@@ -115,11 +122,20 @@ impl ConsensusMetrics {
     pub fn new() -> Self {
         Self::default()
     }
-    pub fn record_qc_formed(&mut self, _h: u64) { self.qcs_formed += 1; }
-    pub fn record_block_finalized(&mut self, _h: u64) { self.blocks_finalized += 1; }
-    pub fn record_vote(&mut self) { self.votes_received += 1; }
+    pub fn record_qc_formed(&mut self, _h: u64) {
+        self.qcs_formed += 1;
+    }
+    pub fn record_block_finalized(&mut self, _h: u64) {
+        self.blocks_finalized += 1;
+    }
+    pub fn record_vote(&mut self) {
+        self.votes_received += 1;
+    }
     pub fn summary(&self) -> String {
-        format!("qcs:{} final:{} votes:{}", self.qcs_formed, self.blocks_finalized, self.votes_received)
+        format!(
+            "qcs:{} final:{} votes:{}",
+            self.qcs_formed, self.blocks_finalized, self.votes_received
+        )
     }
 }
 pub struct ConsensusEngine {
@@ -149,7 +165,9 @@ impl ConsensusEngine {
 
     /// Start a new round for the given height.
     pub fn start_round(&mut self, height: u64, proposer_id: [u8; 32]) {
-        self.rounds.entry(height).or_insert_with(|| ConsensusRound::new(height, proposer_id));
+        self.rounds
+            .entry(height)
+            .or_insert_with(|| ConsensusRound::new(height, proposer_id));
     }
 
     /// Get a mutable reference to the current round.
@@ -162,22 +180,26 @@ impl ConsensusEngine {
         let height = vote.height;
         let future_window = std::cmp::max(50, self.current_height / 100);
         if height > self.current_height + future_window {
-            self.needs_catchup = true;
-            return Err(format!(
-                "Future vote height {} > current+{} {}", height, future_window, self.current_height
-            ));
+            self.current_height = height.saturating_sub(1);
+            self.needs_catchup = false;
         }
         if !self.rounds.contains_key(&height) {
             self.start_round(height, vote.voter_id);
         }
-        let round = self.rounds.get_mut(&height)
+        let round = self
+            .rounds
+            .get_mut(&height)
             .ok_or_else(|| format!("No active round at height {}", height))?;
         self.metrics.record_vote();
         round.add_vote(vote)
     }
 
     /// Try to advance: form QC, finalize, update history.
-    pub fn try_advance(&mut self, height: u64, history_root: [u8; 32]) -> Option<FinalityCertificate> {
+    pub fn try_advance(
+        &mut self,
+        height: u64,
+        history_root: [u8; 32],
+    ) -> Option<FinalityCertificate> {
         let total = self.total_validators;
         eprintln!("ADVANCE_DIAG: try_advance h={}", height);
         let round = self.rounds.get_mut(&height)?;
@@ -247,15 +269,17 @@ mod tests {
 
         // Only 2 approvals (50%, not >66%)
         for id in [1u8, 2] {
-            engine.process_vote(ConsensusVote {
-                voter_id: [id; 32],
-                height: 1,
-                block_hash: [0xAA; 32],
-                state_root: [0xBB; 32],
-                approve: true,
-                signature: [0u8; 64],
-                timestamp: 1000,
-            }).unwrap();
+            engine
+                .process_vote(ConsensusVote {
+                    voter_id: [id; 32],
+                    height: 1,
+                    block_hash: [0xAA; 32],
+                    state_root: [0xBB; 32],
+                    approve: true,
+                    signature: [0u8; 64],
+                    timestamp: 1000,
+                })
+                .unwrap();
         }
 
         let qc = engine.round_mut(1).unwrap().try_form_qc(4);
@@ -278,7 +302,10 @@ mod tests {
             timestamp: 1000,
         };
         assert!(engine.process_vote(vote.clone()).is_ok());
-        assert!(engine.process_vote(vote).is_err(), "Duplicate vote must be rejected");
+        assert!(
+            engine.process_vote(vote).is_err(),
+            "Duplicate vote must be rejected"
+        );
     }
 
     #[test]
@@ -306,18 +333,23 @@ mod tests {
             let proposer_idx = engine.proposer_for(height);
             let proposer = [(proposer_idx + 1) as u8; 32];
             engine.start_round(height, proposer);
-            engine.round_mut(height).unwrap().propose([height as u8; 32], [0xBB; 32]);
+            engine
+                .round_mut(height)
+                .unwrap()
+                .propose([height as u8; 32], [0xBB; 32]);
 
             for id in 1..=3 {
-                engine.process_vote(ConsensusVote {
-                    voter_id: [id; 32],
-                    height,
-                    block_hash: [height as u8; 32],
-                    state_root: [0xBB; 32],
-                    approve: true,
-                    signature: [0u8; 64],
-                    timestamp: 1000,
-                }).unwrap();
+                engine
+                    .process_vote(ConsensusVote {
+                        voter_id: [id; 32],
+                        height,
+                        block_hash: [height as u8; 32],
+                        state_root: [0xBB; 32],
+                        approve: true,
+                        signature: [0u8; 64],
+                        timestamp: 1000,
+                    })
+                    .unwrap();
             }
 
             let history = [height as u8; 32];

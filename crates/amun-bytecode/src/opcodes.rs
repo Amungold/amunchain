@@ -4,12 +4,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OpCode {
     // Resource operations
-    Split   { handle: u32, amount_count: u32 },
-    Merge   { handle_count: u32 },
+    Split { handle: u32, amount_count: u32 },
+    Merge { handle_count: u32 },
     Transform { src_handle: u32, type_idx: u32 },
     Consume { src_handle: u32, type_idx: u32 },
     Archive { handle: u32 },
-    Revoke  { handle: u32, reason_ptr: u32 },
+    Revoke { handle: u32, reason_ptr: u32 },
     // Constitutional operations
     CheckInvariant { invariant_idx: u32 },
     EmitClaim { obligation_id_ptr: u32 },

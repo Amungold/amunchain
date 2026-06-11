@@ -1,5 +1,5 @@
-use amun_resource_core::ResourceId;
 use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+use amun_resource_core::ResourceId;
 
 use crate::invariant_types::{InvariantDeclaration, InvariantResult, InvariantSeverity};
 
@@ -47,12 +47,17 @@ impl InvariantEngine {
 
     /// Count results by severity.
     pub fn count_by_severity(results: &[InvariantResult], severity: InvariantSeverity) -> usize {
-        results.iter().filter(|r| r.severity == severity && !r.passed).count()
+        results
+            .iter()
+            .filter(|r| r.severity == severity && !r.passed)
+            .count()
     }
 
     /// Returns true if any Critical invariant failed.
     pub fn has_critical_failure(results: &[InvariantResult]) -> bool {
-        results.iter().any(|r| r.severity == InvariantSeverity::Critical && !r.passed)
+        results
+            .iter()
+            .any(|r| r.severity == InvariantSeverity::Critical && !r.passed)
     }
 
     /// Returns true if all invariants passed.
@@ -64,11 +69,13 @@ impl InvariantEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use amun_resource_core::ResourceId;
     use crate::invariant_types::{InvariantDeclaration, InvariantScope};
+    use amun_resource_core::ResourceId;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     fn sample_invariants() -> Vec<InvariantDeclaration> {
@@ -99,7 +106,10 @@ mod tests {
         let invs = sample_invariants();
         let (results, evidence) = InvariantEngine::evaluate(
             &invs,
-            make_id(1), 1, [0xaa; 32], [0x01; 32],
+            make_id(1),
+            1,
+            [0xaa; 32],
+            [0x01; 32],
             |_| true, // all pass
         );
         assert!(InvariantEngine::all_passed(&results));
@@ -112,7 +122,10 @@ mod tests {
         let invs = sample_invariants();
         let (results, evidence) = InvariantEngine::evaluate(
             &invs,
-            make_id(2), 42, [0xbb; 32], [0x02; 32],
+            make_id(2),
+            42,
+            [0xbb; 32],
+            [0x02; 32],
             |inv| inv.obligation_id != "SAFETY-001", // SAFETY-001 fails
         );
         assert!(!InvariantEngine::all_passed(&results));
@@ -131,7 +144,10 @@ mod tests {
         let invs = sample_invariants();
         let (results, evidence) = InvariantEngine::evaluate(
             &invs,
-            make_id(3), 10, [0xcc; 32], [0x03; 32],
+            make_id(3),
+            10,
+            [0xcc; 32],
+            [0x03; 32],
             |inv| inv.obligation_id != "PERF-001", // PERF-001 fails (Minor)
         );
         assert!(!InvariantEngine::all_passed(&results));
@@ -144,11 +160,20 @@ mod tests {
         let invs = sample_invariants();
         let (results, _) = InvariantEngine::evaluate(
             &invs,
-            make_id(4), 5, [0xdd; 32], [0x04; 32],
+            make_id(4),
+            5,
+            [0xdd; 32],
+            [0x04; 32],
             |inv| inv.obligation_id == "PERF-001", // only PERF-001 passes
         );
-        assert_eq!(InvariantEngine::count_by_severity(&results, InvariantSeverity::Critical), 2);
-        assert_eq!(InvariantEngine::count_by_severity(&results, InvariantSeverity::Minor), 0);
+        assert_eq!(
+            InvariantEngine::count_by_severity(&results, InvariantSeverity::Critical),
+            2
+        );
+        assert_eq!(
+            InvariantEngine::count_by_severity(&results, InvariantSeverity::Minor),
+            0
+        );
     }
 
     #[test]
@@ -157,7 +182,10 @@ mod tests {
         let state_root = [0xab; 32];
         let (_, evidence) = InvariantEngine::evaluate(
             &invs,
-            make_id(5), 99, [0xee; 32], state_root,
+            make_id(5),
+            99,
+            [0xee; 32],
+            state_root,
             |_| false, // all fail
         );
         assert_eq!(evidence.len(), 3);

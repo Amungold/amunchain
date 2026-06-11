@@ -1,5 +1,5 @@
-use std::collections::BTreeMap;
 use blake3::Hasher;
+use std::collections::BTreeMap;
 
 /// A constitutional account holding balance and nonce.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

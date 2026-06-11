@@ -67,9 +67,10 @@ impl DependencyGraph {
             if let Some(cycle_node) = self.find_cycle() {
                 return Err(RegistryError::CircularDependency(cycle_node));
             }
-            return Err(RegistryError::CircularDependency(
-                ObligationId::new(crate::ObligationNamespace::Safety, 0),
-            ));
+            return Err(RegistryError::CircularDependency(ObligationId::new(
+                crate::ObligationNamespace::Safety,
+                0,
+            )));
         }
 
         Ok(sorted)
@@ -80,10 +81,11 @@ impl DependencyGraph {
         kinds: &HashMap<ObligationId, crate::ObligationKind>,
     ) -> Result<(), RegistryError> {
         for node in &self.nodes {
-            let kind = kinds.get(node).copied().unwrap_or(crate::ObligationKind::Primary);
-            if kind == crate::ObligationKind::Derived
-                && !self.has_primary_ancestor(node, kinds)
-            {
+            let kind = kinds
+                .get(node)
+                .copied()
+                .unwrap_or(crate::ObligationKind::Primary);
+            if kind == crate::ObligationKind::Derived && !self.has_primary_ancestor(node, kinds) {
                 return Err(RegistryError::DerivedNotTerminatingInPrimary(node.clone()));
             }
         }
@@ -155,7 +157,10 @@ impl DependencyGraph {
             if !visited.insert(current.clone()) {
                 continue;
             }
-            let kind = kinds.get(&current).copied().unwrap_or(crate::ObligationKind::Primary);
+            let kind = kinds
+                .get(&current)
+                .copied()
+                .unwrap_or(crate::ObligationKind::Primary);
             if kind == crate::ObligationKind::Primary {
                 return true;
             }

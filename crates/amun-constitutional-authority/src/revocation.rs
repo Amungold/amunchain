@@ -16,7 +16,9 @@ pub struct RevocationRegistry {
 
 impl RevocationRegistry {
     pub fn new() -> Self {
-        Self { revoked: BTreeSet::new() }
+        Self {
+            revoked: BTreeSet::new(),
+        }
     }
 
     pub fn revoke(&mut self, certificate_id: String) {

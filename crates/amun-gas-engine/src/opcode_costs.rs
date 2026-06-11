@@ -45,8 +45,14 @@ mod tests {
 
     #[test]
     fn w7_split_cost_proportional() {
-        let split_2 = OpCode::Split { handle: 0, amount_count: 2 };
-        let split_10 = OpCode::Split { handle: 0, amount_count: 10 };
+        let split_2 = OpCode::Split {
+            handle: 0,
+            amount_count: 2,
+        };
+        let split_10 = OpCode::Split {
+            handle: 0,
+            amount_count: 10,
+        };
         let cost_2 = OpCodeCosts::cost(&split_2);
         let cost_10 = OpCodeCosts::cost(&split_10);
         assert!(cost_10 > cost_2);
@@ -70,7 +76,10 @@ mod tests {
         let ops = vec![
             OpCode::Push(1),
             OpCode::Push(2),
-            OpCode::Transform { src_handle: 0, type_idx: 0 },
+            OpCode::Transform {
+                src_handle: 0,
+                type_idx: 0,
+            },
             OpCode::Halt,
         ];
         let total = OpCodeCosts::estimate(&ops);

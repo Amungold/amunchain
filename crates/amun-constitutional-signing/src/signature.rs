@@ -59,7 +59,9 @@ impl<'de> serde::Deserialize<'de> for ConstitutionalSignature {
         }
         let h = Helper::deserialize(d)?;
         let bytes = hex::decode(&h.sig).map_err(serde::de::Error::custom)?;
-        let arr: [u8; 64] = bytes.try_into().map_err(|_| serde::de::Error::custom("sig must be 64 bytes"))?;
+        let arr: [u8; 64] = bytes
+            .try_into()
+            .map_err(|_| serde::de::Error::custom("sig must be 64 bytes"))?;
         let sig = Signature::from_bytes(&arr);
         Ok(Self {
             sig,

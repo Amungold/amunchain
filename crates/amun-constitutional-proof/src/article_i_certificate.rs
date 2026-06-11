@@ -1,4 +1,4 @@
-use crate::{ObligationRegistry, ObligationKind, ObligationSeverity};
+use crate::{ObligationKind, ObligationRegistry, ObligationSeverity};
 use std::collections::HashMap;
 
 /// Certificate confirming that Article I of the N47 constitution is fully

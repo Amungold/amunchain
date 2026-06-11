@@ -6,11 +6,7 @@ use std::time::{Duration, Instant};
 fn main() {
     let ports = [9900, 9901, 9902, 9903];
     let validators: Vec<LiveValidator> = (0..4)
-        .map(|i| {
-            LiveValidator::new(
-                ValidatorConfig::test_cluster(i, &ports).with_quorum(4),
-            )
-        })
+        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
         .collect();
 
     for v in &validators {
@@ -21,11 +17,25 @@ fn main() {
     let duration = 3600;
     let interval = 60;
     let mut prev_max: u64 = 0;
+    let crash_time = Duration::from_secs(120);
+    let restart_time = Duration::from_secs(150);
+    let mut crashed = false;
+    let mut restarted = false;
 
     println!("=== N84 SOAK TEST: {} minutes ===", duration / 60);
 
     for _min in 1..=(duration / interval) {
         thread::sleep(Duration::from_secs(interval));
+        if !crashed && start.elapsed() >= crash_time {
+            validators[3].stop();
+            println!("=== CRASH: Validator 3 stopped ===");
+            crashed = true;
+        }
+        if crashed && !restarted && start.elapsed() >= restart_time {
+            validators[3].start().unwrap();
+            println!("=== RECOVERY: Validator 3 restarted ===");
+            restarted = true;
+        }
         let elapsed = start.elapsed().as_secs();
         let heights: Vec<u64> = validators
             .iter()
@@ -40,11 +50,20 @@ fn main() {
 
         println!(
             "t={:4}min  min={}  max={}  spread={}  blocks={}  tps={:.1}",
-            elapsed / 60, min_h, max_h, spread, blocks, tps
+            elapsed / 60,
+            min_h,
+            max_h,
+            spread,
+            blocks,
+            tps
         );
 
         if spread > 2 {
-            eprintln!("WARN: spread={} exceeds threshold at t={}min", spread, elapsed / 60);
+            eprintln!(
+                "WARN: spread={} exceeds threshold at t={}min",
+                spread,
+                elapsed / 60
+            );
         }
         if blocks == 0 {
             eprintln!("STALL: no blocks produced in last {}s", interval);
@@ -71,7 +90,13 @@ fn main() {
     println!("  Total blocks:   {}", total_blocks);
     println!("  Final heights:  {:?}", final_h);
     println!("  Spread:         {}", spread);
-    println!("  Avg TPS:        {:.2}", total_blocks as f64 / (total_time * 60.0));
-    println!("  Verdict:        {}", if spread <= 2 { "PASS" } else { "DEGRADED" });
+    println!(
+        "  Avg TPS:        {:.2}",
+        total_blocks as f64 / (total_time * 60.0)
+    );
+    println!(
+        "  Verdict:        {}",
+        if spread <= 2 { "PASS" } else { "DEGRADED" }
+    );
     println!("============================================");
 }

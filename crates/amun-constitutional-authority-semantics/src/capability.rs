@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use amun_constitution_builder::digest::ArtifactDigest;
 use amun_constitution_builder::canonical_bytes::CanonicalSerialize;
+use amun_constitution_builder::digest::ArtifactDigest;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct AuthorityCapability {

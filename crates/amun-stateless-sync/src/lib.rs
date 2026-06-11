@@ -1,11 +1,8 @@
-use serde::{Serialize, Deserialize};
-use std::collections::BTreeMap;
-use amun_constitutional_state::{
-    ReplayCertificate,
-    CertificateInclusionProof,
-};
-use amun_constitutional_block::ConstitutionalBlock;
 use amun_certificate_network::distribution::LightClientProofBundle;
+use amun_constitutional_block::ConstitutionalBlock;
+use amun_constitutional_state::{CertificateInclusionProof, ReplayCertificate};
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 // ============================================================
 // N11A: Header-First Sync Protocol
@@ -24,8 +21,12 @@ pub enum HeaderSyncMessage {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CertificateSyncMessage {
-    RequestCertificatesForHeight { height: u64 },
-    CertificateBatch { certificates: Vec<ReplayCertificate> },
+    RequestCertificatesForHeight {
+        height: u64,
+    },
+    CertificateBatch {
+        certificates: Vec<ReplayCertificate>,
+    },
 }
 
 // ============================================================
@@ -65,7 +66,9 @@ impl StatelessNode {
     pub fn import_header(&mut self, header: ConstitutionalBlock) {
         let h = header.block_height;
         self.headers.insert(h, header);
-        if h > self.tip_height { self.tip_height = h; }
+        if h > self.tip_height {
+            self.tip_height = h;
+        }
     }
 
     pub fn import_certificate(&mut self, cert: ReplayCertificate) {
@@ -82,12 +85,18 @@ impl StatelessNode {
     }
 
     pub fn verify_height(&self, height: u64) -> Result<(), String> {
-        let header = self.headers.get(&height)
+        let header = self
+            .headers
+            .get(&height)
             .ok_or_else(|| format!("Missing header at height {}", height))?;
-        let bundle = self.bundles.get(&height)
+        let bundle = self
+            .bundles
+            .get(&height)
             .ok_or_else(|| format!("Missing bundle at height {}", height))?;
         let cert_hash = bundle.certificate.certificate_hash();
-        let proof = self.inclusion_proofs.get(&cert_hash)
+        let proof = self
+            .inclusion_proofs
+            .get(&cert_hash)
             .ok_or("Missing inclusion proof for certificate")?;
         amun_constitutional_block::verify_light_client_proof(header, &bundle.certificate, proof)
     }
@@ -99,9 +108,15 @@ impl StatelessNode {
         Ok(())
     }
 
-    pub fn has_header(&self, height: u64) -> bool { self.headers.contains_key(&height) }
-    pub fn tip_height(&self) -> u64 { self.tip_height }
-    pub fn header_count(&self) -> usize { self.headers.len() }
+    pub fn has_header(&self, height: u64) -> bool {
+        self.headers.contains_key(&height)
+    }
+    pub fn tip_height(&self) -> u64 {
+        self.tip_height
+    }
+    pub fn header_count(&self) -> usize {
+        self.headers.len()
+    }
 }
 
 impl Default for StatelessNode {
@@ -156,8 +171,16 @@ mod n11_tests {
         let hash = cert.certificate_hash();
         let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
         let block = ConstitutionalBlock::new(
-            height, parent_hash.into(), "t".into(), "p".into(), vec![],
-            hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root,
+            height,
+            parent_hash.into(),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
         );
         LightClientProofBundle::new(block, cert, proof)
     }
@@ -165,7 +188,9 @@ mod n11_tests {
     #[test]
     fn n11a_header_sync() {
         let bundle = create_bundle(0, &"0".repeat(64));
-        let msg = HeaderSyncMessage::HeaderBatch { headers: vec![bundle.block_header.clone()] };
+        let msg = HeaderSyncMessage::HeaderBatch {
+            headers: vec![bundle.block_header.clone()],
+        };
         match msg {
             HeaderSyncMessage::HeaderBatch { headers } => assert_eq!(headers[0].block_height, 0),
             _ => unreachable!(),
@@ -175,9 +200,13 @@ mod n11_tests {
     #[test]
     fn n11b_certificate_sync() {
         let bundle = create_bundle(0, &"0".repeat(64));
-        let msg = CertificateSyncMessage::CertificateBatch { certificates: vec![bundle.certificate.clone()] };
+        let msg = CertificateSyncMessage::CertificateBatch {
+            certificates: vec![bundle.certificate.clone()],
+        };
         match msg {
-            CertificateSyncMessage::CertificateBatch { certificates } => assert!(!certificates.is_empty()),
+            CertificateSyncMessage::CertificateBatch { certificates } => {
+                assert!(!certificates.is_empty())
+            }
             _ => unreachable!(),
         }
     }
@@ -185,7 +214,9 @@ mod n11_tests {
     #[test]
     fn n11c_proof_bundle_sync() {
         let bundle = create_bundle(0, &"0".repeat(64));
-        let msg = ProofBundleSyncMessage::BundleResponse { bundle: bundle.clone() };
+        let msg = ProofBundleSyncMessage::BundleResponse {
+            bundle: bundle.clone(),
+        };
         match msg {
             ProofBundleSyncMessage::BundleResponse { bundle: b } => assert!(b.verify().is_ok()),
             _ => unreachable!(),

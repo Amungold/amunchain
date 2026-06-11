@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -37,7 +37,12 @@ impl PeerTable {
     }
 
     /// Add or update a peer.
-    pub fn upsert(&mut self, node_id: [u8; 32], address: SocketAddr, chain_height: u64) -> Result<(), String> {
+    pub fn upsert(
+        &mut self,
+        node_id: [u8; 32],
+        address: SocketAddr,
+        chain_height: u64,
+    ) -> Result<(), String> {
         if self.peers.len() >= self.max_peers && !self.peers.contains_key(&node_id) {
             return Err("Peer table full".into());
         }
@@ -47,7 +52,8 @@ impl PeerTable {
             .unwrap()
             .as_secs();
 
-        self.peers.entry(node_id)
+        self.peers
+            .entry(node_id)
             .and_modify(|p| {
                 p.address = address;
                 p.last_seen = now;
@@ -86,14 +92,16 @@ impl PeerTable {
 
     /// Get active peers.
     pub fn active_peers(&self) -> Vec<&PeerRecord> {
-        self.peers.values()
+        self.peers
+            .values()
             .filter(|p| p.status == PeerStatus::Active)
             .collect()
     }
 
     /// Get all peer addresses (for exchange).
     pub fn peer_addresses(&self) -> Vec<(SocketAddr, u64)> {
-        self.active_peers().iter()
+        self.active_peers()
+            .iter()
             .map(|p| (p.address, p.chain_height))
             .collect()
     }
@@ -128,7 +136,9 @@ mod tests {
     fn n73_add_and_lookup_peer() {
         let mut table = PeerTable::new(10);
         let id = make_id(1);
-        table.upsert(id, "127.0.0.1:9001".parse().unwrap(), 100).unwrap();
+        table
+            .upsert(id, "127.0.0.1:9001".parse().unwrap(), 100)
+            .unwrap();
         assert_eq!(table.active_count(), 1);
         assert!(table.get(&id).is_some());
     }
@@ -137,8 +147,12 @@ mod tests {
     fn n73_duplicate_peer_updated() {
         let mut table = PeerTable::new(10);
         let id = make_id(1);
-        table.upsert(id, "127.0.0.1:9001".parse().unwrap(), 100).unwrap();
-        table.upsert(id, "127.0.0.1:9002".parse().unwrap(), 200).unwrap();
+        table
+            .upsert(id, "127.0.0.1:9001".parse().unwrap(), 100)
+            .unwrap();
+        table
+            .upsert(id, "127.0.0.1:9002".parse().unwrap(), 200)
+            .unwrap();
         assert_eq!(table.active_count(), 1);
         assert_eq!(table.get(&id).unwrap().chain_height, 200);
     }
@@ -147,7 +161,9 @@ mod tests {
     fn n73_remove_peer() {
         let mut table = PeerTable::new(10);
         let id = make_id(1);
-        table.upsert(id, "127.0.0.1:9001".parse().unwrap(), 100).unwrap();
+        table
+            .upsert(id, "127.0.0.1:9001".parse().unwrap(), 100)
+            .unwrap();
         table.remove(&id);
         assert_eq!(table.active_count(), 0);
     }
@@ -155,8 +171,12 @@ mod tests {
     #[test]
     fn n73_max_peers_enforced() {
         let mut table = PeerTable::new(2);
-        table.upsert(make_id(1), "127.0.0.1:9001".parse().unwrap(), 100).unwrap();
-        table.upsert(make_id(2), "127.0.0.1:9002".parse().unwrap(), 100).unwrap();
+        table
+            .upsert(make_id(1), "127.0.0.1:9001".parse().unwrap(), 100)
+            .unwrap();
+        table
+            .upsert(make_id(2), "127.0.0.1:9002".parse().unwrap(), 100)
+            .unwrap();
         let result = table.upsert(make_id(3), "127.0.0.1:9003".parse().unwrap(), 100);
         assert!(result.is_err());
     }
@@ -165,7 +185,9 @@ mod tests {
     fn n73_peer_expiry() {
         let mut table = PeerTable::new(10);
         let id = make_id(1);
-        table.upsert(id, "127.0.0.1:9001".parse().unwrap(), 100).unwrap();
+        table
+            .upsert(id, "127.0.0.1:9001".parse().unwrap(), 100)
+            .unwrap();
         // Set last_seen far in the past
         table.peers.get_mut(&id).unwrap().last_seen = 0;
         table.expire_stale(60);

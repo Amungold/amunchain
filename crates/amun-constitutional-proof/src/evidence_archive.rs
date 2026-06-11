@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::{EvidenceRecord, EvidenceStatus, ObligationId, EvidenceType};
+use crate::{EvidenceRecord, EvidenceStatus, EvidenceType, ObligationId};
 
 /// The constitutional evidence archive.
 ///
@@ -59,10 +59,7 @@ impl EvidenceArchive {
 
     /// Return all records belonging to a given phase.
     pub fn by_phase(&self, phase: &str) -> Vec<&EvidenceRecord> {
-        self.records
-            .values()
-            .filter(|r| r.phase == phase)
-            .collect()
+        self.records.values().filter(|r| r.phase == phase).collect()
     }
 
     /// Return all records of a specific evidence type.

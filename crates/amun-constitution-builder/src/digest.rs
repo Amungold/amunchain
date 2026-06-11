@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use blake3::Hasher;
 use crate::canonical_bytes::CanonicalSerialize;
+use blake3::Hasher;
 
 pub trait ArtifactDigest: CanonicalSerialize {
     /// Domain separator for constitutional hashing (prevents cross-artifact collisions).

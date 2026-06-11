@@ -9,11 +9,7 @@ use std::time::{Duration, Instant};
 fn main() {
     let ports = [9400, 9401, 9402, 9403];
     let validators: Vec<LiveValidator> = (0..4)
-        .map(|i| {
-            LiveValidator::new(
-                ValidatorConfig::test_cluster(i, &ports).with_quorum(4),
-            )
-        })
+        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
         .collect();
 
     for v in &validators {
@@ -26,7 +22,10 @@ fn main() {
     for _ in 0..15 {
         thread::sleep(Duration::from_secs(1));
         let t = start.elapsed().as_secs();
-        let h: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+        let h: Vec<u64> = validators
+            .iter()
+            .map(|v| v.store.lock().unwrap().latest_height())
+            .collect();
         println!("t={:3}s heights={:?}", t, h);
     }
 
@@ -72,10 +71,9 @@ fn main() {
             let data = postcard::to_stdvec(vote).unwrap();
             for port in &ports {
                 let addr = format!("127.0.0.1:{}", port);
-                if let Ok(mut stream) = TcpStream::connect_timeout(
-                    &addr.parse().unwrap(),
-                    Duration::from_millis(200),
-                ) {
+                if let Ok(mut stream) =
+                    TcpStream::connect_timeout(&addr.parse().unwrap(), Duration::from_millis(200))
+                {
                     let msg_type = [0x00u8];
                     let len = (data.len() as u32).to_be_bytes();
                     let _ = stream.write_all(&msg_type);
@@ -93,7 +91,10 @@ fn main() {
     for _ in 0..10 {
         thread::sleep(Duration::from_secs(1));
         let t = start.elapsed().as_secs();
-        let h: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+        let h: Vec<u64> = validators
+            .iter()
+            .map(|v| v.store.lock().unwrap().latest_height())
+            .collect();
         println!("t={:3}s heights={:?}", t, h);
     }
 
@@ -102,7 +103,10 @@ fn main() {
     }
 
     let h_after = validators[0].store.lock().unwrap().latest_height();
-    let final_h: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+    let final_h: Vec<u64> = validators
+        .iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     let spread = final_h.iter().max().unwrap_or(&0) - final_h.iter().min().unwrap_or(&0);
     let made_progress = h_after > h_before;
     let all_alive = spread <= 2;
@@ -116,6 +120,13 @@ fn main() {
     println!("  All validators alive:   {}", all_alive);
     println!("  Final heights:          {:?}", final_h);
     println!("  Height spread:          {}", spread);
-    println!("  Byzantine verdict:      {}", if made_progress && all_alive { "PASS" } else { "PARTIAL" });
+    println!(
+        "  Byzantine verdict:      {}",
+        if made_progress && all_alive {
+            "PASS"
+        } else {
+            "PARTIAL"
+        }
+    );
     println!("============================================");
 }

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
-use amun_constitutional_governance::capability::Capability;
 use crate::context::ExecutionContext;
 use crate::receipt::ExecutionReceipt;
+use amun_constitutional_governance::capability::Capability;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 /// A minimal deterministic constitutional state.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

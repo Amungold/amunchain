@@ -36,9 +36,13 @@ impl NodeHealth {
 
     /// Returns a summary status string.
     pub fn status(&self) -> &str {
-        if !self.is_synced { "syncing" }
-        else if self.peer_count == 0 { "isolated" }
-        else { "healthy" }
+        if !self.is_synced {
+            "syncing"
+        } else if self.peer_count == 0 {
+            "isolated"
+        } else {
+            "healthy"
+        }
     }
 }
 

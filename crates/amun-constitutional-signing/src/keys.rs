@@ -1,6 +1,6 @@
-use ed25519_dalek::{SigningKey, VerifyingKey, Signature};
-use rand::RngCore;
+use ed25519_dalek::{Signature, SigningKey, VerifyingKey};
 use rand::rngs::OsRng;
+use rand::RngCore;
 
 pub struct ConstitutionalKeyPair {
     signing_key: SigningKey,
@@ -13,7 +13,10 @@ impl ConstitutionalKeyPair {
         OsRng.fill_bytes(&mut secret_bytes);
         let signing_key = SigningKey::from_bytes(&secret_bytes);
         let verifying_key = signing_key.verifying_key();
-        Self { signing_key, verifying_key }
+        Self {
+            signing_key,
+            verifying_key,
+        }
     }
 
     pub fn verifying_key_hex(&self) -> String {

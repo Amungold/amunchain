@@ -114,7 +114,9 @@ impl<'a> CanonicalReader<'a> {
             return Err(CanonicalError::UnexpectedEnd);
         }
         let slice = &self.buffer[self.position..self.position + 8];
-        let bytes: [u8; 8] = slice.try_into().expect("canonical: fixed-size conversion failed");
+        let bytes: [u8; 8] = slice
+            .try_into()
+            .expect("canonical: fixed-size conversion failed");
         self.position += 8;
         Ok(u64::from_be_bytes(bytes))
     }
@@ -124,7 +126,9 @@ impl<'a> CanonicalReader<'a> {
             return Err(CanonicalError::UnexpectedEnd);
         }
         let slice = &self.buffer[self.position..self.position + 32];
-        let hash: ConstitutionalHash = slice.try_into().expect("canonical: fixed-size conversion failed");
+        let hash: ConstitutionalHash = slice
+            .try_into()
+            .expect("canonical: fixed-size conversion failed");
         self.position += 32;
         Ok(hash)
     }

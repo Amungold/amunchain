@@ -1,8 +1,10 @@
 // Allow dead code in test harness — these are used by v2 scenarios
 #![allow(dead_code)]
-use amun_consensus::{types::BlockProposal, validator::Validator, round_state_machine::RoundStateMachine};
-use amun_networking::transport::MockTransport;
+use amun_consensus::{
+    round_state_machine::RoundStateMachine, types::BlockProposal, validator::Validator,
+};
 use amun_constitutional_block::Blockchain;
+use amun_networking::transport::MockTransport;
 use std::collections::HashSet;
 use std::fmt;
 

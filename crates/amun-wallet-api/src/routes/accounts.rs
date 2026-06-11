@@ -1,13 +1,19 @@
-use axum::{extract::Path, routing::get, Router};
 use crate::services::account_service::AccountService;
+use axum::{extract::Path, routing::get, Router};
 
-async fn get_balance(Path(address): Path<String>) -> crate::errors::ApiResult<crate::types::AccountResponse> {
+async fn get_balance(
+    Path(address): Path<String>,
+) -> crate::errors::ApiResult<crate::types::AccountResponse> {
     AccountService::get_balance(&address)
 }
-async fn get_nonce(Path(address): Path<String>) -> crate::errors::ApiResult<crate::types::AccountResponse> {
+async fn get_nonce(
+    Path(address): Path<String>,
+) -> crate::errors::ApiResult<crate::types::AccountResponse> {
     AccountService::get_nonce(&address)
 }
-async fn get_account(Path(address): Path<String>) -> crate::errors::ApiResult<crate::types::AccountResponse> {
+async fn get_account(
+    Path(address): Path<String>,
+) -> crate::errors::ApiResult<crate::types::AccountResponse> {
     AccountService::get_account(&address)
 }
 pub fn account_routes() -> Router {

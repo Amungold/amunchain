@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use rand::Rng;
 use crate::types::{ClaimAction, Jurisdiction};
+use rand::Rng;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SimulationState {
@@ -47,7 +47,7 @@ impl SimulationState {
 
         let mut treaties = vec![vec![false; num_sovereigns]; num_sovereigns];
         for i in 0..num_sovereigns {
-            for j in (i+1)..num_sovereigns {
+            for j in (i + 1)..num_sovereigns {
                 if rng.gen::<f64>() < treaty_density {
                     treaties[i][j] = true;
                     treaties[j][i] = true;
@@ -66,14 +66,20 @@ impl SimulationState {
             .collect();
 
         let actions = vec![
-            ClaimAction::Govern, ClaimAction::Trade, ClaimAction::Treaty,
-            ClaimAction::Recognize, ClaimAction::Tax, ClaimAction::Defend,
+            ClaimAction::Govern,
+            ClaimAction::Trade,
+            ClaimAction::Treaty,
+            ClaimAction::Recognize,
+            ClaimAction::Tax,
+            ClaimAction::Defend,
         ];
 
         let claims: Vec<LegitimacyClaim> = (0..num_sovereigns)
             .map(|i| {
                 let mut subject = (i + 1) % num_sovereigns;
-                if num_sovereigns == 1 { subject = 0; }
+                if num_sovereigns == 1 {
+                    subject = 0;
+                }
                 LegitimacyClaim {
                     issuer: i,
                     subject,
@@ -87,6 +93,13 @@ impl SimulationState {
 
         let effectiveness = vec![0.0; claims.len()];
 
-        Self { sovereigns, recognition, treaties, jurisdictions, claims, effectiveness }
+        Self {
+            sovereigns,
+            recognition,
+            treaties,
+            jurisdictions,
+            claims,
+            effectiveness,
+        }
     }
 }

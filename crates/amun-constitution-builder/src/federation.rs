@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use serde::{Deserialize, Serialize};
-use crate::emitter::CanonicalEmit;
 use crate::canonical_bytes::CanonicalSerialize;
-use crate::normalize::DeterministicNormalizer;
 use crate::digest::ArtifactDigest;
+use crate::emitter::CanonicalEmit;
+use crate::normalize::DeterministicNormalizer;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
@@ -77,8 +77,14 @@ impl CanonicalEmit for FederationArtifact {
         lines.push(format!("Civilization B: {}", self.civilization_b));
         lines.push(format!("Genesis Hash A: {}", self.genesis_hash_a));
         lines.push(format!("Genesis Hash B: {}", self.genesis_hash_b));
-        lines.push(format!("Specification Hash A: {}", self.specification_hash_a));
-        lines.push(format!("Specification Hash B: {}", self.specification_hash_b));
+        lines.push(format!(
+            "Specification Hash A: {}",
+            self.specification_hash_a
+        ));
+        lines.push(format!(
+            "Specification Hash B: {}",
+            self.specification_hash_b
+        ));
         lines.push(format!("Compatibility Level: {}", self.compatibility_level));
         lines.push(format!("Replay Boundary: {}", self.replay_boundary));
         lines.push(format!("Timestamp: {}", self.timestamp));

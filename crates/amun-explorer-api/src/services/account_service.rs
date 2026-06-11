@@ -1,6 +1,6 @@
-use axum::Json;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::AccountSummary;
+use axum::Json;
 
 pub struct AccountService;
 

@@ -1,12 +1,12 @@
-use amun_resource_core::ResourceRegistry;
-use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
-use amun_vm_kernel::execution_context::ExecutionContext;
 use amun_bytecode::program::ConstitutionalProgram;
+use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
 use amun_invariant_engine::invariant_types::InvariantDeclaration;
+use amun_pccv::pccv_verifier::{PCCVResult, PCCVVerifier};
+use amun_pccv::transition_proof_engine::TransitionProofEngine as PCCVEngine;
 use amun_proof_archive::hot_store::HotProofStore;
 use amun_proof_archive::proof_archive::ProofArchive;
-use amun_pccv::pccv_verifier::{PCCVVerifier, PCCVResult};
-use amun_pccv::transition_proof_engine::TransitionProofEngine as PCCVEngine;
+use amun_resource_core::ResourceRegistry;
+use amun_vm_kernel::execution_context::ExecutionContext;
 
 pub struct DualVerifier;
 
@@ -22,12 +22,22 @@ impl DualVerifier {
         let pre_root = registry.compute_state_root();
 
         let result = ConstitutionalRuntime::execute(
-            program, ctx, registry, invariants, 100_000,
-            &mut hot_store, &mut archive,
-        ).map_err(|e| format!("Execution error: {}", e))?;
+            program,
+            ctx,
+            registry,
+            invariants,
+            100_000,
+            &mut hot_store,
+            &mut archive,
+        )
+        .map_err(|e| format!("Execution error: {}", e))?;
 
         match result {
-            PipelineResult::Committed { post_state_root, transition_proof, pccv_verified } => {
+            PipelineResult::Committed {
+                post_state_root,
+                transition_proof,
+                pccv_verified,
+            } => {
                 // Build enhanced proof for PCCV
                 let enhanced_proof = PCCVEngine::build_proof(
                     &amun_vm_kernel::pending_buffer::PendingBuffer::new(vec![]),

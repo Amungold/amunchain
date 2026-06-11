@@ -7,11 +7,7 @@ use rand::RngCore;
 use crate::types::{Keystore, WalletKeypair};
 
 /// Encrypt a keypair with a password and save to a keystore file.
-pub fn save_keystore(
-    keypair: &WalletKeypair,
-    password: &str,
-    path: &str,
-) -> Result<(), String> {
+pub fn save_keystore(keypair: &WalletKeypair, password: &str, path: &str) -> Result<(), String> {
     let mut salt = [0u8; 32];
     OsRng.fill_bytes(&mut salt);
 
@@ -36,8 +32,7 @@ pub fn save_keystore(
 
     let json = serde_json::to_string_pretty(&keystore)
         .map_err(|e| format!("serialization error: {}", e))?;
-    fs::write(path, json)
-        .map_err(|e| format!("write error: {}", e))?;
+    fs::write(path, json).map_err(|e| format!("write error: {}", e))?;
 
     Ok(())
 }
@@ -45,17 +40,18 @@ pub fn save_keystore(
 /// Load a keystore file, decrypt with password, and return the keypair.
 /// Returns an error if the password is incorrect (detected via verification hash).
 pub fn load_keystore(path: &str, password: &str) -> Result<WalletKeypair, String> {
-    let json = fs::read_to_string(path)
-        .map_err(|e| format!("read error: {}", e))?;
-    let keystore: Keystore = serde_json::from_str(&json)
-        .map_err(|e| format!("invalid keystore format: {}", e))?;
+    let json = fs::read_to_string(path).map_err(|e| format!("read error: {}", e))?;
+    let keystore: Keystore =
+        serde_json::from_str(&json).map_err(|e| format!("invalid keystore format: {}", e))?;
 
     if keystore.version != 1 {
-        return Err(format!("unsupported keystore version: {}", keystore.version));
+        return Err(format!(
+            "unsupported keystore version: {}",
+            keystore.version
+        ));
     }
 
-    let salt = hex::decode(&keystore.salt)
-        .map_err(|e| format!("invalid salt: {}", e))?;
+    let salt = hex::decode(&keystore.salt).map_err(|e| format!("invalid salt: {}", e))?;
     let encrypted = hex::decode(&keystore.encrypted_private_key)
         .map_err(|e| format!("invalid encrypted key: {}", e))?;
 
@@ -75,8 +71,8 @@ pub fn load_keystore(path: &str, password: &str) -> Result<WalletKeypair, String
         secret_key[i] = encrypted[i] ^ derived_key[i];
     }
 
-    let public_key = hex::decode(&keystore.public_key)
-        .map_err(|e| format!("invalid public key: {}", e))?;
+    let public_key =
+        hex::decode(&keystore.public_key).map_err(|e| format!("invalid public key: {}", e))?;
 
     let mut pub_bytes = [0u8; 32];
     pub_bytes.copy_from_slice(&public_key);

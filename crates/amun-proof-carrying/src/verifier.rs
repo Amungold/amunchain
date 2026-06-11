@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use amun_constitutional_commitments::SparseMerkleTree;
 use crate::receipt::ProofCarryingReceipt;
+use amun_constitutional_commitments::SparseMerkleTree;
 
 /// Verifies proof-carrying receipts without access to the full chain state.
 pub struct ProofVerifier;
@@ -15,7 +15,8 @@ impl ProofVerifier {
         // Verify state proof
         let state_root_bytes = hex::decode(&receipt.state_root)
             .map_err(|e| format!("Invalid state root hex: {}", e))?;
-        let state_root: [u8; 32] = state_root_bytes.try_into()
+        let state_root: [u8; 32] = state_root_bytes
+            .try_into()
             .map_err(|_| "State root must be 32 bytes".to_string())?;
 
         let state_tree = SparseMerkleTree::new(b"AMUN_STATE_DOMAIN");
@@ -27,7 +28,8 @@ impl ProofVerifier {
         if let Some(ref gov_proof) = receipt.governance_proof {
             let gov_root_bytes = hex::decode(&receipt.governance_root)
                 .map_err(|e| format!("Invalid governance root hex: {}", e))?;
-            let gov_root: [u8; 32] = gov_root_bytes.try_into()
+            let gov_root: [u8; 32] = gov_root_bytes
+                .try_into()
                 .map_err(|_| "Governance root must be 32 bytes".to_string())?;
 
             let gov_tree = SparseMerkleTree::new(b"AMUN_GOVERNANCE_DOMAIN");
@@ -40,7 +42,8 @@ impl ProofVerifier {
         if let Some(ref exec_proof) = receipt.execution_proof {
             let exec_root_bytes = hex::decode(&receipt.execution_root)
                 .map_err(|e| format!("Invalid execution root hex: {}", e))?;
-            let exec_root: [u8; 32] = exec_root_bytes.try_into()
+            let exec_root: [u8; 32] = exec_root_bytes
+                .try_into()
                 .map_err(|_| "Execution root must be 32 bytes".to_string())?;
 
             let exec_tree = SparseMerkleTree::new(b"AMUN_EXECUTION_DOMAIN");

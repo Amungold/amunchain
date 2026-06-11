@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::certificate_chain::CertificateChain;
+use serde::{Deserialize, Serialize};
 
 /// A cryptographic commitment to the entire constitutional history.
 /// Enables verification of the complete chain state from a single root.
@@ -17,15 +17,18 @@ pub struct ConstitutionalHistoryRoot {
 impl ConstitutionalHistoryRoot {
     /// Compute the history root from a certificate chain.
     pub fn from_chain(chain: &CertificateChain) -> Self {
-        let total_transactions: usize = chain.certificates.iter()
-            .map(|c| c.transitions.len())
-            .sum();
+        let total_transactions: usize =
+            chain.certificates.iter().map(|c| c.transitions.len()).sum();
 
-        let total_evidence: usize = chain.certificates.iter()
-            .map(|c| c.transitions.iter()
-                .map(|t| t.evidence.len())
-                .sum::<usize>()
-            )
+        let total_evidence: usize = chain
+            .certificates
+            .iter()
+            .map(|c| {
+                c.transitions
+                    .iter()
+                    .map(|t| t.evidence.len())
+                    .sum::<usize>()
+            })
             .sum();
 
         let genesis_block = chain.genesis().block_height;
@@ -85,27 +88,52 @@ impl ConstitutionalHistoryRoot {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use amun_transition_proof::transition_proof::TransitionProof;
-    use amun_resource_core::ResourceId;
     use crate::block_validator::BlockValidationResult;
-    use crate::finality_certificate::ConstitutionalFinalityCertificate;
     use crate::certificate_chain::CertificateChain;
+    use crate::finality_certificate::ConstitutionalFinalityCertificate;
+    use amun_resource_core::ResourceId;
+    use amun_transition_proof::transition_proof::TransitionProof;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
-    fn make_cert(height: u64, state_root: [u8; 32], qc_hash: [u8; 32], prev_hash: [u8; 32]) -> ConstitutionalFinalityCertificate {
+    fn make_cert(
+        height: u64,
+        state_root: [u8; 32],
+        qc_hash: [u8; 32],
+        prev_hash: [u8; 32],
+    ) -> ConstitutionalFinalityCertificate {
         let block_result = BlockValidationResult {
-            total_transactions: 1, committed: 1, rejected: 0,
-            pccv_verified: 1, pccv_failed: 0, block_valid: true, state_root,
+            total_transactions: 1,
+            committed: 1,
+            rejected: 0,
+            pccv_verified: 1,
+            pccv_failed: 0,
+            block_valid: true,
+            state_root,
         };
         let transitions = vec![TransitionProof::new(
-            [0xaa; 32], make_id(1), height, [0u8; 32],
-            [0u8; 32], state_root, vec![], vec![], vec![], vec![], 0,
+            [0xaa; 32],
+            make_id(1),
+            height,
+            [0u8; 32],
+            [0u8; 32],
+            state_root,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            0,
         )];
         let mut cert = ConstitutionalFinalityCertificate::issue(
-            &block_result, transitions, qc_hash, height, [0xbb; 32],
+            &block_result,
+            transitions,
+            qc_hash,
+            height,
+            [0xbb; 32],
         );
         cert.previous_certificate_hash = prev_hash;
         cert.certificate_hash = cert.compute_hash();

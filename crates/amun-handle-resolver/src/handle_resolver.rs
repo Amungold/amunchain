@@ -1,6 +1,6 @@
+use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use amun_resource_core::{ResourceId, ResourceState};
 use amun_vm_kernel::pending_buffer::{Handle, PendingBuffer};
-use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use std::collections::HashSet;
 
 /// Resolves handles to ResourceIds and validates reachability.
@@ -43,10 +43,7 @@ impl HandleResolver {
             .map(|m| m.resource_id)
             .collect();
 
-        let consumed_ids: HashSet<ResourceId> = consumed
-            .iter()
-            .map(|(_, rid, _)| *rid)
-            .collect();
+        let consumed_ids: HashSet<ResourceId> = consumed.iter().map(|(_, rid, _)| *rid).collect();
 
         let mut leaks = Vec::new();
         for meta in &produced {
@@ -131,7 +128,9 @@ mod tests {
     use amun_vm_kernel::pending_buffer::PendingBuffer;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     fn make_meta(id: ResourceId) -> ResourceMetadata {
@@ -150,9 +149,8 @@ mod tests {
         let mut buffer = PendingBuffer::new(vec![]);
         let meta = make_meta(make_id(1));
         buffer.register_production(meta);
-        let (no_leaks, evidence) = HandleResolver::detect_leaks(
-            &buffer, make_id(99), 1, [0xaa; 32],
-        );
+        let (no_leaks, evidence) =
+            HandleResolver::detect_leaks(&buffer, make_id(99), 1, [0xaa; 32]);
         assert!(no_leaks);
         assert!(evidence.is_empty());
     }
@@ -164,9 +162,8 @@ mod tests {
         buffer.record_operation("OP_TRANSFORM", vec![0], vec![1]);
         // Op 2: consumes handle 1 (produced by op 1), produces handles 2,3
         buffer.record_operation("OP_SPLIT", vec![1], vec![2, 3]);
-        let (safe, violations) = HandleResolver::validate_handle_safety(
-            &buffer, make_id(99), 1, [0xcc; 32],
-        );
+        let (safe, violations) =
+            HandleResolver::validate_handle_safety(&buffer, make_id(99), 1, [0xcc; 32]);
         assert!(safe, "Expected safe, got violations: {:?}", violations);
         assert!(violations.is_empty());
     }
@@ -178,9 +175,8 @@ mod tests {
         buffer.record_operation("OP_TRANSFORM", vec![0], vec![1]);
         // Op 2: tries to consume handle 0 again — already consumed
         buffer.record_operation("OP_TRANSFORM", vec![0], vec![2]);
-        let (safe, violations) = HandleResolver::validate_handle_safety(
-            &buffer, make_id(99), 1, [0xdd; 32],
-        );
+        let (safe, violations) =
+            HandleResolver::validate_handle_safety(&buffer, make_id(99), 1, [0xdd; 32]);
         assert!(!safe, "Expected violation, but got safe");
         assert_eq!(violations.len(), 1);
         match &violations[0] {
@@ -194,9 +190,7 @@ mod tests {
     #[test]
     fn w9_empty_buffer_no_violations() {
         let buffer = PendingBuffer::new(vec![]);
-        let (no_leaks, _) = HandleResolver::detect_leaks(
-            &buffer, make_id(99), 1, [0xbb; 32],
-        );
+        let (no_leaks, _) = HandleResolver::detect_leaks(&buffer, make_id(99), 1, [0xbb; 32]);
         assert!(no_leaks);
     }
 }

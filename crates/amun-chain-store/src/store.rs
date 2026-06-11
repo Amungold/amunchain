@@ -38,27 +38,44 @@ impl ChainStore {
         if chain_file.exists() && index_file.exists() {
             Self::load(&data_dir, &chain_file, &index_file)
         } else {
-            Ok(Self { data_dir, records: BTreeMap::new(), highest: 0 })
+            Ok(Self {
+                data_dir,
+                records: BTreeMap::new(),
+                highest: 0,
+            })
         }
     }
 
     fn load(data_dir: &Path, chain_file: &Path, index_file: &Path) -> Result<Self, StoreError> {
         let index_bytes = fs::read(index_file).map_err(|e| StoreError::IoError(e.to_string()))?;
-        let offsets: Vec<u64> = index_bytes.chunks_exact(8).map(|b| u64::from_le_bytes(b.try_into().unwrap())).collect();
+        let offsets: Vec<u64> = index_bytes
+            .chunks_exact(8)
+            .map(|b| u64::from_le_bytes(b.try_into().unwrap()))
+            .collect();
         let chain_bytes = fs::read(chain_file).map_err(|e| StoreError::IoError(e.to_string()))?;
         let mut records = BTreeMap::new();
         let mut highest = 0u64;
         for &offset in &offsets {
             let start = offset as usize;
-            if start + 4 > chain_bytes.len() { return Err(StoreError::Corrupted("Truncated".into())); }
-            let len = u32::from_le_bytes(chain_bytes[start..start+4].try_into().unwrap()) as usize;
+            if start + 4 > chain_bytes.len() {
+                return Err(StoreError::Corrupted("Truncated".into()));
+            }
+            let len =
+                u32::from_le_bytes(chain_bytes[start..start + 4].try_into().unwrap()) as usize;
             let end = start + 4 + len;
-            if end > chain_bytes.len() { return Err(StoreError::Corrupted("Truncated data".into())); }
-            let record = FinalizedChainRecord::decode(&chain_bytes[start+4..end]).map_err(StoreError::DecodeError)?;
+            if end > chain_bytes.len() {
+                return Err(StoreError::Corrupted("Truncated data".into()));
+            }
+            let record = FinalizedChainRecord::decode(&chain_bytes[start + 4..end])
+                .map_err(StoreError::DecodeError)?;
             highest = highest.max(record.height);
             records.insert(record.height, record);
         }
-        Ok(Self { data_dir: data_dir.to_path_buf(), records, highest })
+        Ok(Self {
+            data_dir: data_dir.to_path_buf(),
+            records,
+            highest,
+        })
     }
 
     pub fn append(&mut self, record: FinalizedChainRecord) -> Result<(), StoreError> {
@@ -69,34 +86,69 @@ impl ChainStore {
         let len = data.len() as u32;
         let chain_file = self.data_dir.join("chain.dat");
         let index_file = self.data_dir.join("chain.index");
-        let offset = if chain_file.exists() { fs::metadata(&chain_file).map_err(|e| StoreError::IoError(e.to_string()))?.len() } else { 0 };
-        let mut f = fs::OpenOptions::new().create(true).append(true).open(&chain_file).map_err(|e| StoreError::IoError(e.to_string()))?;
-        f.write_all(&len.to_le_bytes()).map_err(|e| StoreError::IoError(e.to_string()))?;
-        f.write_all(&data).map_err(|e| StoreError::IoError(e.to_string()))?;
+        let offset = if chain_file.exists() {
+            fs::metadata(&chain_file)
+                .map_err(|e| StoreError::IoError(e.to_string()))?
+                .len()
+        } else {
+            0
+        };
+        let mut f = fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&chain_file)
+            .map_err(|e| StoreError::IoError(e.to_string()))?;
+        f.write_all(&len.to_le_bytes())
+            .map_err(|e| StoreError::IoError(e.to_string()))?;
+        f.write_all(&data)
+            .map_err(|e| StoreError::IoError(e.to_string()))?;
         f.flush().map_err(|e| StoreError::IoError(e.to_string()))?;
-        let mut idx = fs::OpenOptions::new().create(true).append(true).open(&index_file).map_err(|e| StoreError::IoError(e.to_string()))?;
-        idx.write_all(&offset.to_le_bytes()).map_err(|e| StoreError::IoError(e.to_string()))?;
-        idx.flush().map_err(|e| StoreError::IoError(e.to_string()))?;
+        let mut idx = fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&index_file)
+            .map_err(|e| StoreError::IoError(e.to_string()))?;
+        idx.write_all(&offset.to_le_bytes())
+            .map_err(|e| StoreError::IoError(e.to_string()))?;
+        idx.flush()
+            .map_err(|e| StoreError::IoError(e.to_string()))?;
         self.highest = self.highest.max(record.height);
         self.records.insert(record.height, record);
         Ok(())
     }
 
-    pub fn load_height(&self, height: u64) -> Option<&FinalizedChainRecord> { self.records.get(&height) }
+    pub fn load_height(&self, height: u64) -> Option<&FinalizedChainRecord> {
+        self.records.get(&height)
+    }
     pub fn load_height_range(&self, start: u64, end: u64) -> Vec<&FinalizedChainRecord> {
         self.records.range(start..=end).map(|(_, r)| r).collect()
     }
-    pub fn latest_height(&self) -> u64 { self.highest }
-    pub fn load_tip(&self) -> Option<&FinalizedChainRecord> { self.records.get(&self.highest) }
-    pub fn len(&self) -> usize { self.records.len() }
-    pub fn is_empty(&self) -> bool { self.records.is_empty() }
+    pub fn latest_height(&self) -> u64 {
+        self.highest
+    }
+    pub fn load_tip(&self) -> Option<&FinalizedChainRecord> {
+        self.records.get(&self.highest)
+    }
+    pub fn len(&self) -> usize {
+        self.records.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.records.is_empty()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     fn make_record(h: u64) -> FinalizedChainRecord {
-        FinalizedChainRecord { height: h, block_hash: [h as u8; 32], state_root: [0xBB; 32], history_root: [0xCC; 32], certificate_hash: [0xDD; 32], timestamp: h * 1000 }
+        FinalizedChainRecord {
+            height: h,
+            block_hash: [h as u8; 32],
+            state_root: [0xBB; 32],
+            history_root: [0xCC; 32],
+            certificate_hash: [0xDD; 32],
+            timestamp: h * 1000,
+        }
     }
 
     #[test]
@@ -113,7 +165,11 @@ mod tests {
     fn n70_recover_after_restart() {
         let dir = tempfile::tempdir().unwrap();
         let dir_str = dir.path().to_str().unwrap();
-        { let mut s = ChainStore::open(dir_str).unwrap(); s.append(make_record(0)).unwrap(); s.append(make_record(1)).unwrap(); }
+        {
+            let mut s = ChainStore::open(dir_str).unwrap();
+            s.append(make_record(0)).unwrap();
+            s.append(make_record(1)).unwrap();
+        }
         let s = ChainStore::open(dir_str).unwrap();
         assert_eq!(s.len(), 2);
         assert_eq!(s.latest_height(), 1);

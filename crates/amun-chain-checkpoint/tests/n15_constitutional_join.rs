@@ -1,16 +1,12 @@
-use amun_chain_checkpoint::{
-    CheckpointCertificate, CheckpointStore,
-    inclusion::{
-        checkpoint_merkle_root,
-        prove_checkpoint_inclusion,
-        CheckpointBundle,
-    },
-    chain::RecursiveCheckpointProof,
-    bootstrap::BootstrapSession,
-};
-use amun_constitutional_state::ConstitutionalStateRuntime;
-use amun_constitutional_block::ConstitutionalBlock;
 use amun_certificate_network::distribution::LightClientProofBundle;
+use amun_chain_checkpoint::{
+    bootstrap::BootstrapSession,
+    chain::RecursiveCheckpointProof,
+    inclusion::{checkpoint_merkle_root, prove_checkpoint_inclusion, CheckpointBundle},
+    CheckpointCertificate, CheckpointStore,
+};
+use amun_constitutional_block::ConstitutionalBlock;
+use amun_constitutional_state::ConstitutionalStateRuntime;
 
 #[test]
 fn n15_node_b_full_bootstrap_from_node_a_checkpoints() {
@@ -22,13 +18,9 @@ fn n15_node_b_full_bootstrap_from_node_a_checkpoints() {
         rt_a.apply_transition(&[height as u8; 32], &[0xAA; 32]);
         let cert = rt_a.create_certificate(height, [0u8; 32]);
         let certs = vec![cert.clone()];
-        let merkle_root = hex::encode(
-            ConstitutionalStateRuntime::certificate_merkle_root(&certs)
-        );
+        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
         let hash = cert.certificate_hash();
-        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(
-            &certs, &hash
-        ).unwrap();
+        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
 
         let parent_hash = if height == 0 {
             &parent
@@ -60,12 +52,8 @@ fn n15_node_b_full_bootstrap_from_node_a_checkpoints() {
     let checkpoints = vec![cp1.clone(), cp2.clone()];
     let checkpoint_root = checkpoint_merkle_root(&checkpoints);
 
-    let proof1 = prove_checkpoint_inclusion(
-        &checkpoints, &cp1.checkpoint_hash_bytes()
-    ).unwrap();
-    let proof2 = prove_checkpoint_inclusion(
-        &checkpoints, &cp2.checkpoint_hash_bytes()
-    ).unwrap();
+    let proof1 = prove_checkpoint_inclusion(&checkpoints, &cp1.checkpoint_hash_bytes()).unwrap();
+    let proof2 = prove_checkpoint_inclusion(&checkpoints, &cp2.checkpoint_hash_bytes()).unwrap();
 
     let checkpoint_bundles = vec![
         CheckpointBundle::new(cp1, proof1),
@@ -107,13 +95,9 @@ fn n15_bootstrap_preserves_chain_continuity() {
         rt.apply_transition(&[height as u8; 32], &[0xBB; 32]);
         let cert = rt.create_certificate(height, [0u8; 32]);
         let certs = vec![cert.clone()];
-        let merkle_root = hex::encode(
-            ConstitutionalStateRuntime::certificate_merkle_root(&certs)
-        );
+        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
         let hash = cert.certificate_hash();
-        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(
-            &certs, &hash
-        ).unwrap();
+        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
 
         let parent_hash = if height == 0 {
             &parent
@@ -140,9 +124,7 @@ fn n15_bootstrap_preserves_chain_continuity() {
     let cp = CheckpointCertificate::create(0, 4, &bundles).unwrap();
     let checkpoints = vec![cp.clone()];
     let root = checkpoint_merkle_root(&checkpoints);
-    let proof = prove_checkpoint_inclusion(
-        &checkpoints, &cp.checkpoint_hash_bytes()
-    ).unwrap();
+    let proof = prove_checkpoint_inclusion(&checkpoints, &cp.checkpoint_hash_bytes()).unwrap();
     let bundle = CheckpointBundle::new(cp, proof);
 
     let mut session = BootstrapSession::new(root);

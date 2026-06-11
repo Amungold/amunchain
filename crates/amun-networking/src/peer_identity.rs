@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
 /// A unique peer identifier. Derived from the validator public key.
@@ -21,6 +21,10 @@ pub struct PeerIdentity {
 
 impl PeerIdentity {
     pub fn new(peer_id: PeerId, public_key: [u8; 32], address: SocketAddr) -> Self {
-        Self { peer_id, public_key, address }
+        Self {
+            peer_id,
+            public_key,
+            address,
+        }
     }
 }

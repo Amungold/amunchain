@@ -54,5 +54,10 @@ fn bench_record_serialization(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_append_100_records, bench_read_100_records, bench_record_serialization);
+criterion_group!(
+    benches,
+    bench_append_100_records,
+    bench_read_100_records,
+    bench_record_serialization
+);
 criterion_main!(benches);

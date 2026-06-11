@@ -9,7 +9,9 @@ pub struct ReplayStore {
 
 impl ReplayStore {
     pub fn new() -> Self {
-        Self { certificates: BTreeMap::new() }
+        Self {
+            certificates: BTreeMap::new(),
+        }
     }
 
     /// Insert a certificate. Key is certificate.certificate_hash().
@@ -99,4 +101,3 @@ mod tests {
         assert_eq!(store.len(), 2);
     }
 }
-

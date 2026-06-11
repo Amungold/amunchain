@@ -1,8 +1,8 @@
-pub mod types;
 pub mod keygen;
-pub mod seed;
 pub mod keystore;
+pub mod seed;
 pub mod signer;
+pub mod types;
 
 #[cfg(test)]
 mod tests {

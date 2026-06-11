@@ -1,7 +1,7 @@
-use crate::messages::{ConsensusVote, FinalityCertificate};
 use crate::engine::ConsensusEngine;
+use crate::messages::{ConsensusVote, FinalityCertificate};
 use std::io::{Read, Write};
-use std::net::{TcpStream, SocketAddr};
+use std::net::{SocketAddr, TcpStream};
 use std::sync::{Arc, Mutex};
 
 /// Networked consensus: validators communicate via TCP to propose, vote, and finalize.
@@ -13,13 +13,12 @@ pub struct NetworkConsensus {
 }
 
 impl NetworkConsensus {
-    pub fn new(
-        validator_id: [u8; 32],
-        address: SocketAddr,
-        total_validators: usize,
-    ) -> Self {
+    pub fn new(validator_id: [u8; 32], address: SocketAddr, total_validators: usize) -> Self {
         Self {
-            engine: Arc::new(Mutex::new(ConsensusEngine::new(validator_id, total_validators))),
+            engine: Arc::new(Mutex::new(ConsensusEngine::new(
+                validator_id,
+                total_validators,
+            ))),
             validator_id,
             address,
             peers: Vec::new(),
@@ -52,7 +51,10 @@ impl NetworkConsensus {
         if is_proposer {
             let mut engine = self.engine.lock().unwrap();
             engine.start_round(height, self.validator_id);
-            engine.round_mut(height).unwrap().propose(block_hash, state_root);
+            engine
+                .round_mut(height)
+                .unwrap()
+                .propose(block_hash, state_root);
         }
 
         // Phase 2: Collect votes (broadcast + listen)
@@ -107,7 +109,8 @@ impl NetworkConsensus {
 
         // Phase 3: Form QC and finalize
         let mut engine = self.engine.lock().unwrap();
-        engine.try_advance(height, history_root)
+        engine
+            .try_advance(height, history_root)
             .ok_or_else(|| "Failed to form QC".into())
     }
 }
@@ -130,15 +133,17 @@ mod tests {
         engine.start_round(1, [1u8; 32]);
         engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
 
-        engine.process_vote(ConsensusVote {
-            voter_id: [1u8; 32],
-            height: 1,
-            block_hash: [0xAA; 32],
-            state_root: [0xBB; 32],
-            approve: true,
-            signature: [0u8; 64],
-            timestamp: 1000,
-        }).unwrap();
+        engine
+            .process_vote(ConsensusVote {
+                voter_id: [1u8; 32],
+                height: 1,
+                block_hash: [0xAA; 32],
+                state_root: [0xBB; 32],
+                approve: true,
+                signature: [0u8; 64],
+                timestamp: 1000,
+            })
+            .unwrap();
 
         let cert = engine.try_advance(1, [0xCC; 32]).unwrap();
         assert_eq!(cert.height, 1);

@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use amun_chain_checkpoint::CheckpointCertificate;
+use serde::{Deserialize, Serialize};
 
 /// Request from a bootstrapping node to learn the current chain state.
 #[derive(Debug, Clone, Serialize, Deserialize)]

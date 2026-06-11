@@ -6,7 +6,9 @@ impl DivergenceEngine {
     /// D_R: Recognition divergence
     pub fn recognition_divergence(s1: &SimulationState, s2: &SimulationState) -> f64 {
         let n = s1.sovereigns.len().min(s2.sovereigns.len());
-        if n == 0 { return 0.0; }
+        if n == 0 {
+            return 0.0;
+        }
         let mut diff = 0;
         for i in 0..n {
             for j in 0..n {
@@ -21,26 +23,37 @@ impl DivergenceEngine {
     /// D_T: Treaty divergence
     pub fn treaty_divergence(s1: &SimulationState, s2: &SimulationState) -> f64 {
         let n = s1.sovereigns.len().min(s2.sovereigns.len());
-        if n == 0 { return 0.0; }
+        if n == 0 {
+            return 0.0;
+        }
         let mut diff = 0;
         let mut total = 0;
         for i in 0..n {
-            for j in (i+1)..n {
-                if s1.treaties[i][j] != s2.treaties[i][j] { diff += 1; }
+            for j in (i + 1)..n {
+                if s1.treaties[i][j] != s2.treaties[i][j] {
+                    diff += 1;
+                }
                 total += 1;
             }
         }
-        if total == 0 { return 0.0; }
+        if total == 0 {
+            return 0.0;
+        }
         diff as f64 / total as f64
     }
 
     /// D_E: Effectiveness divergence
     pub fn effectiveness_divergence(s1: &SimulationState, s2: &SimulationState) -> f64 {
         let n = s1.effectiveness.len().min(s2.effectiveness.len());
-        if n == 0 { return 0.0; }
-        s1.effectiveness.iter().zip(s2.effectiveness.iter())
+        if n == 0 {
+            return 0.0;
+        }
+        s1.effectiveness
+            .iter()
+            .zip(s2.effectiveness.iter())
             .map(|(e1, e2)| (e1 - e2).abs())
-            .sum::<f64>() / n as f64
+            .sum::<f64>()
+            / n as f64
     }
 
     /// D_L = α·D_R + β·D_T + γ·D_J + δ·D_E
@@ -62,7 +75,11 @@ impl DivergenceEngine {
     }
 
     /// Collapse probability estimate
-    pub fn collapse_probability(current: &SimulationState, reference: &SimulationState, threshold: f64) -> f64 {
+    pub fn collapse_probability(
+        current: &SimulationState,
+        reference: &SimulationState,
+        threshold: f64,
+    ) -> f64 {
         let d = Self::compute(current, reference);
         (d / threshold).min(1.0)
     }

@@ -1,7 +1,7 @@
 use crate::peer_table::PeerTable;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream, SocketAddr};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -9,11 +9,18 @@ use std::thread;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum DiscoveryMessage {
     /// Request peer list from a known peer.
-    PeerRequest { requester_id: [u8; 32], requester_addr: SocketAddr },
+    PeerRequest {
+        requester_id: [u8; 32],
+        requester_addr: SocketAddr,
+    },
     /// Response with known peers.
     PeerResponse { peers: Vec<(SocketAddr, u64)> },
     /// Announce self to the network.
-    PeerAnnounce { node_id: [u8; 32], address: SocketAddr, chain_height: u64 },
+    PeerAnnounce {
+        node_id: [u8; 32],
+        address: SocketAddr,
+        chain_height: u64,
+    },
 }
 
 /// Discovery server: listens for discovery messages.
@@ -25,13 +32,18 @@ pub struct DiscoveryServer {
 
 impl DiscoveryServer {
     pub fn new(table: Arc<Mutex<PeerTable>>, addr: SocketAddr, own_id: [u8; 32]) -> Self {
-        Self { table, addr, own_id }
+        Self {
+            table,
+            addr,
+            own_id,
+        }
     }
 
     pub fn serve(&self) -> Result<(), String> {
-        let listener = TcpListener::bind(self.addr)
-            .map_err(|e| format!("Discovery bind error: {}", e))?;
-        listener.set_nonblocking(false)
+        let listener =
+            TcpListener::bind(self.addr).map_err(|e| format!("Discovery bind error: {}", e))?;
+        listener
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let table = self.table.clone();
@@ -47,7 +59,10 @@ impl DiscoveryServer {
                         if stream.read_exact(&mut buf).is_ok() {
                             if let Ok(msg) = postcard::from_bytes::<DiscoveryMessage>(&buf) {
                                 match msg {
-                                    DiscoveryMessage::PeerRequest { requester_id, requester_addr } => {
+                                    DiscoveryMessage::PeerRequest {
+                                        requester_id,
+                                        requester_addr,
+                                    } => {
                                         // Don't add self
                                         if requester_id != own_id {
                                             let mut table = table.lock().unwrap();
@@ -72,7 +87,11 @@ impl DiscoveryServer {
                                             }
                                         }
                                     }
-                                    DiscoveryMessage::PeerAnnounce { node_id, address, chain_height } => {
+                                    DiscoveryMessage::PeerAnnounce {
+                                        node_id,
+                                        address,
+                                        chain_height,
+                                    } => {
                                         if node_id != own_id {
                                             let mut table = table.lock().unwrap();
                                             let _ = table.upsert(node_id, address, chain_height);
@@ -99,9 +118,10 @@ impl DiscoveryClient {
         requester_id: [u8; 32],
         requester_addr: SocketAddr,
     ) -> Result<Vec<(SocketAddr, u64)>, String> {
-        let mut stream = TcpStream::connect(peer_addr)
-            .map_err(|e| format!("Discovery connect error: {}", e))?;
-        stream.set_nonblocking(false)
+        let mut stream =
+            TcpStream::connect(peer_addr).map_err(|e| format!("Discovery connect error: {}", e))?;
+        stream
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let req = DiscoveryMessage::PeerRequest {
@@ -110,18 +130,26 @@ impl DiscoveryClient {
         };
         let data = postcard::to_stdvec(&req).map_err(|e| format!("Encode error: {}", e))?;
         let len = data.len() as u32;
-        stream.write_all(&len.to_be_bytes()).map_err(|e| format!("Write error: {}", e))?;
-        stream.write_all(&data).map_err(|e| format!("Write error: {}", e))?;
+        stream
+            .write_all(&len.to_be_bytes())
+            .map_err(|e| format!("Write error: {}", e))?;
+        stream
+            .write_all(&data)
+            .map_err(|e| format!("Write error: {}", e))?;
         stream.flush().map_err(|e| format!("Flush error: {}", e))?;
 
         let mut len_buf = [0u8; 4];
-        stream.read_exact(&mut len_buf).map_err(|e| format!("Read len error: {}", e))?;
+        stream
+            .read_exact(&mut len_buf)
+            .map_err(|e| format!("Read len error: {}", e))?;
         let resp_len = u32::from_be_bytes(len_buf) as usize;
         if resp_len > 1024 * 1024 {
             return Err("Response too large".into());
         }
         let mut buf = vec![0u8; resp_len];
-        stream.read_exact(&mut buf).map_err(|e| format!("Read data error: {}", e))?;
+        stream
+            .read_exact(&mut buf)
+            .map_err(|e| format!("Read data error: {}", e))?;
 
         match postcard::from_bytes::<DiscoveryMessage>(&buf)
             .map_err(|e| format!("Decode error: {}", e))?
@@ -138,9 +166,10 @@ impl DiscoveryClient {
         address: SocketAddr,
         chain_height: u64,
     ) -> Result<(), String> {
-        let mut stream = TcpStream::connect(peer_addr)
-            .map_err(|e| format!("Announce connect error: {}", e))?;
-        stream.set_nonblocking(false)
+        let mut stream =
+            TcpStream::connect(peer_addr).map_err(|e| format!("Announce connect error: {}", e))?;
+        stream
+            .set_nonblocking(false)
             .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let msg = DiscoveryMessage::PeerAnnounce {
@@ -150,8 +179,12 @@ impl DiscoveryClient {
         };
         let data = postcard::to_stdvec(&msg).map_err(|e| format!("Encode error: {}", e))?;
         let len = data.len() as u32;
-        stream.write_all(&len.to_be_bytes()).map_err(|e| format!("Write error: {}", e))?;
-        stream.write_all(&data).map_err(|e| format!("Write error: {}", e))?;
+        stream
+            .write_all(&len.to_be_bytes())
+            .map_err(|e| format!("Write error: {}", e))?;
+        stream
+            .write_all(&data)
+            .map_err(|e| format!("Write error: {}", e))?;
         stream.flush().map_err(|e| format!("Flush error: {}", e))?;
         Ok(())
     }
@@ -168,17 +201,16 @@ fn addr_to_id(addr: &SocketAddr) -> [u8; 32] {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
     use super::*;
     use crate::peer_table::PeerTable;
+    use std::time::Duration;
 
-    fn setup_discovery_server(
-        port: u16,
-        own_id: [u8; 32],
-    ) -> (Arc<Mutex<PeerTable>>, SocketAddr) {
+    fn setup_discovery_server(port: u16, own_id: [u8; 32]) -> (Arc<Mutex<PeerTable>>, SocketAddr) {
         let table = Arc::new(Mutex::new(PeerTable::new(10)));
         let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
-        DiscoveryServer::new(table.clone(), addr, own_id).serve().unwrap();
+        DiscoveryServer::new(table.clone(), addr, own_id)
+            .serve()
+            .unwrap();
         thread::sleep(Duration::from_millis(100));
         (table, addr)
     }
@@ -195,7 +227,11 @@ mod tests {
         let (table, addr) = setup_discovery_server(10001, own_id);
 
         // Pre-populate server's table with a known peer
-        table.lock().unwrap().upsert(make_id(2), "127.0.0.1:10002".parse().unwrap(), 100).unwrap();
+        table
+            .lock()
+            .unwrap()
+            .upsert(make_id(2), "127.0.0.1:10002".parse().unwrap(), 100)
+            .unwrap();
 
         // Client requests peers
         let requester_id = make_id(3);
@@ -227,15 +263,21 @@ mod tests {
         // Server A knows B
         let id_a = make_id(1);
         let (table_a, addr_a) = setup_discovery_server(10006, id_a);
-        table_a.lock().unwrap().upsert(make_id(2), "127.0.0.1:10007".parse().unwrap(), 100).unwrap();
+        table_a
+            .lock()
+            .unwrap()
+            .upsert(make_id(2), "127.0.0.1:10007".parse().unwrap(), 100)
+            .unwrap();
 
         // Client C requests from A, gets B
         let id_c = make_id(3);
         let addr_c: SocketAddr = "127.0.0.1:10008".parse().unwrap();
         let peers = DiscoveryClient::request_peers(addr_a, id_c, addr_c).unwrap();
 
-        assert!(peers.iter().any(|(addr, _)| addr.port() == 10007),
-            "Should discover peer B from server A");
+        assert!(
+            peers.iter().any(|(addr, _)| addr.port() == 10007),
+            "Should discover peer B from server A"
+        );
     }
 
     #[test]

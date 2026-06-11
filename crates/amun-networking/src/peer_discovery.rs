@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
-use std::collections::BTreeMap;
-use crate::peer_identity::{PeerId, PeerIdentity};
 use crate::crypto_identity::{PeerKeyPair, SignedMessage};
+use crate::peer_identity::{PeerId, PeerIdentity};
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 /// Announcement message broadcast by a peer to declare its presence.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -95,22 +95,16 @@ mod tests {
     #[test]
     fn n20_7_peer_announcement_sign_and_verify() {
         let keypair = PeerKeyPair::generate();
-        let (announcement, signed) = PeerAnnouncement::sign(
-            &keypair,
-            "127.0.0.1:7001".into(),
-            1000,
-        );
+        let (announcement, signed) =
+            PeerAnnouncement::sign(&keypair, "127.0.0.1:7001".into(), 1000);
         assert!(PeerAnnouncement::verify(&announcement, &signed));
     }
 
     #[test]
     fn n20_7_tampered_announcement_rejected() {
         let keypair = PeerKeyPair::generate();
-        let (announcement, mut signed) = PeerAnnouncement::sign(
-            &keypair,
-            "127.0.0.1:7001".into(),
-            1000,
-        );
+        let (announcement, mut signed) =
+            PeerAnnouncement::sign(&keypair, "127.0.0.1:7001".into(), 1000);
         // Tamper with the signed payload
         signed.payload = b"tampered data".to_vec();
         assert!(!PeerAnnouncement::verify(&announcement, &signed));
@@ -120,7 +114,11 @@ mod tests {
     fn n20_7_peer_registry_register_and_lookup() {
         let keypair = PeerKeyPair::generate();
         let peer_id = keypair.peer_id();
-        let identity = PeerIdentity::new(peer_id, keypair.verifying_key.to_bytes(), "127.0.0.1:7001".parse().unwrap());
+        let identity = PeerIdentity::new(
+            peer_id,
+            keypair.verifying_key.to_bytes(),
+            "127.0.0.1:7001".parse().unwrap(),
+        );
 
         let mut registry = PeerRegistry::new();
         registry.register(identity, 1000);
@@ -172,8 +170,16 @@ mod tests {
         let kp1 = PeerKeyPair::generate();
         let kp2 = PeerKeyPair::generate();
 
-        let id1 = PeerIdentity::new(kp1.peer_id(), kp1.verifying_key.to_bytes(), "127.0.0.1:7001".parse().unwrap());
-        let id2 = PeerIdentity::new(kp2.peer_id(), kp2.verifying_key.to_bytes(), "127.0.0.1:7002".parse().unwrap());
+        let id1 = PeerIdentity::new(
+            kp1.peer_id(),
+            kp1.verifying_key.to_bytes(),
+            "127.0.0.1:7001".parse().unwrap(),
+        );
+        let id2 = PeerIdentity::new(
+            kp2.peer_id(),
+            kp2.verifying_key.to_bytes(),
+            "127.0.0.1:7002".parse().unwrap(),
+        );
 
         let mut registry = PeerRegistry::new();
         registry.register(id1, 1000);

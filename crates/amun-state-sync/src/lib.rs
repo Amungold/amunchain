@@ -1,23 +1,25 @@
 pub mod snapshot_certificate;
 pub mod state_chunk;
-pub mod sync_package;
 pub mod stateless_verifier;
+pub mod sync_package;
 
 pub use snapshot_certificate::*;
 pub use state_chunk::*;
-pub use sync_package::*;
 pub use stateless_verifier::*;
+pub use sync_package::*;
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use amun_resource_core::{
-        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
-        ResourceRegistry, ResourceState,
+        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+        ResourceState,
     };
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     fn make_meta(id: ResourceId) -> ResourceMetadata {
@@ -34,8 +36,15 @@ mod tests {
     #[test]
     fn n56_snapshot_certificate_verify() {
         let cert = StateSnapshotCertificate::new(
-            100, [0xab; 32], [0x01; 32], [0x02; 32], [0x03; 32],
-            4, 1000, 5000, "test-verifier".into(),
+            100,
+            [0xab; 32],
+            [0x01; 32],
+            [0x02; 32],
+            [0x03; 32],
+            4,
+            1000,
+            5000,
+            "test-verifier".into(),
         );
         assert!(cert.verify());
     }
@@ -43,8 +52,15 @@ mod tests {
     #[test]
     fn n56_snapshot_certificate_detects_tampering() {
         let mut cert = StateSnapshotCertificate::new(
-            100, [0xab; 32], [0x01; 32], [0x02; 32], [0x03; 32],
-            4, 1000, 5000, "test-verifier".into(),
+            100,
+            [0xab; 32],
+            [0x01; 32],
+            [0x02; 32],
+            [0x03; 32],
+            4,
+            1000,
+            5000,
+            "test-verifier".into(),
         );
         cert.height = 999;
         assert!(!cert.verify());
@@ -67,9 +83,9 @@ mod tests {
 
     #[test]
     fn n56_chunk_merkle_tree_proofs() {
-        let chunks: Vec<StateChunk> = (0..8).map(|i| {
-            StateChunk::new(i, vec![make_meta(make_id(i as u8))])
-        }).collect();
+        let chunks: Vec<StateChunk> = (0..8)
+            .map(|i| StateChunk::new(i, vec![make_meta(make_id(i as u8))]))
+            .collect();
         let (root, proofs) = build_chunk_merkle_tree(&chunks);
         assert_ne!(root, [0u8; 32]);
         assert_eq!(proofs.len(), 8);
@@ -92,15 +108,26 @@ mod tests {
 
         // Chunk the state
         let chunk_size = 5;
-        let chunks: Vec<StateChunk> = active.chunks(chunk_size).enumerate().map(|(i, batch)| {
-            StateChunk::new(i as u32, batch.iter().map(|m| (*m).clone()).collect())
-        }).collect();
+        let chunks: Vec<StateChunk> = active
+            .chunks(chunk_size)
+            .enumerate()
+            .map(|(i, batch)| {
+                StateChunk::new(i as u32, batch.iter().map(|m| (*m).clone()).collect())
+            })
+            .collect();
         let (chunk_root, chunk_proofs) = build_chunk_merkle_tree(&chunks);
 
         // Create snapshot certificate
         let cert = StateSnapshotCertificate::new(
-            42, [0xbb; 32], state_root, history_root, chunk_root,
-            chunks.len() as u32, active.len() as u64, 6000, "amun-state-sync".into(),
+            42,
+            [0xbb; 32],
+            state_root,
+            history_root,
+            chunk_root,
+            chunks.len() as u32,
+            active.len() as u64,
+            6000,
+            "amun-state-sync".into(),
         );
 
         // Create sync package
@@ -110,7 +137,10 @@ mod tests {
         // Stateless verification
         let result = StatelessVerifier::verify(&pkg, history_root);
         match result {
-            SyncVerificationResult::Verified { state_root: verified_root, resources_imported } => {
+            SyncVerificationResult::Verified {
+                state_root: verified_root,
+                resources_imported,
+            } => {
                 assert_eq!(verified_root, state_root);
                 assert_eq!(resources_imported, 20);
             }
@@ -123,7 +153,15 @@ mod tests {
     #[test]
     fn n56_reject_wrong_history_root() {
         let cert = StateSnapshotCertificate::new(
-            1, [0u8; 32], [0u8; 32], [0x02; 32], [0u8; 32], 0, 0, 0, "v".into(),
+            1,
+            [0u8; 32],
+            [0u8; 32],
+            [0x02; 32],
+            [0u8; 32],
+            0,
+            0,
+            0,
+            "v".into(),
         );
         let pkg = ConstitutionalSyncPackage::new(cert, vec![], vec![]);
         let result = StatelessVerifier::verify(&pkg, [0x99; 32]);
@@ -137,11 +175,21 @@ mod tests {
         let state_root = reg.compute_state_root();
         let history_root = [0x10; 32];
         let active = reg.active_resources();
-        let chunks = vec![StateChunk::new(0, active.iter().map(|m| (*m).clone()).collect())];
+        let chunks = vec![StateChunk::new(
+            0,
+            active.iter().map(|m| (*m).clone()).collect(),
+        )];
         let (chunk_root, chunk_proofs) = build_chunk_merkle_tree(&chunks);
         let cert = StateSnapshotCertificate::new(
-            1, [0u8; 32], state_root, history_root, chunk_root,
-            1, 1, 0, "v".into(),
+            1,
+            [0u8; 32],
+            state_root,
+            history_root,
+            chunk_root,
+            1,
+            1,
+            0,
+            "v".into(),
         );
 
         // Tamper with a chunk
@@ -163,13 +211,24 @@ mod tests {
         let state_root = reg.compute_state_root();
         let history_root = [0x10; 32];
         let active = reg.active_resources();
-        let chunks: Vec<StateChunk> = active.chunks(5).enumerate().map(|(i, batch)| {
-            StateChunk::new(i as u32, batch.iter().map(|m| (*m).clone()).collect())
-        }).collect();
+        let chunks: Vec<StateChunk> = active
+            .chunks(5)
+            .enumerate()
+            .map(|(i, batch)| {
+                StateChunk::new(i as u32, batch.iter().map(|m| (*m).clone()).collect())
+            })
+            .collect();
         let (chunk_root, chunk_proofs) = build_chunk_merkle_tree(&chunks);
         let cert = StateSnapshotCertificate::new(
-            1, [0u8; 32], state_root, history_root, chunk_root,
-            2, 10, 0, "v".into(),
+            1,
+            [0u8; 32],
+            state_root,
+            history_root,
+            chunk_root,
+            2,
+            10,
+            0,
+            "v".into(),
         );
 
         // Remove one chunk

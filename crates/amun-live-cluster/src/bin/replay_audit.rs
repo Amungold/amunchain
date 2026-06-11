@@ -1,4 +1,3 @@
-
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
 use std::thread;
@@ -7,11 +6,7 @@ use std::time::Duration;
 fn main() {
     let ports = [9500, 9501, 9502, 9503];
     let validators: Vec<LiveValidator> = (0..4)
-        .map(|i| {
-            LiveValidator::new(
-                ValidatorConfig::test_cluster(i, &ports).with_quorum(4),
-            )
-        })
+        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
         .collect();
 
     for v in &validators {
@@ -80,7 +75,10 @@ fn main() {
     println!("  All state roots match: {}", all_match);
     println!("  All evidence match:    {}", all_match);
     println!("  Determinism verified:  {}", all_match);
-    println!("  Verdict:               {}", if all_match { "PASS" } else { "FAIL" });
+    println!(
+        "  Verdict:               {}",
+        if all_match { "PASS" } else { "FAIL" }
+    );
     println!("============================================");
 
     if !all_match {

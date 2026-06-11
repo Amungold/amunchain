@@ -1,11 +1,11 @@
+use amun_bytecode::opcodes::OpCode;
+use amun_bytecode::program::ConstitutionalProgram;
+use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
+use amun_operations::health_check::NodeHealth;
+use amun_operations::metrics::NodeMetrics;
+use amun_persistent_node::persistent_store::PersistentValidatorStore;
 use amun_resource_core::ResourceId;
 use amun_vm_kernel::execution_context::ExecutionContext;
-use amun_bytecode::program::ConstitutionalProgram;
-use amun_bytecode::opcodes::OpCode;
-use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
-use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_operations::metrics::NodeMetrics;
-use amun_operations::health_check::NodeHealth;
 
 pub struct ValidatorNode {
     pub node_id: ResourceId,
@@ -22,7 +22,12 @@ impl ValidatorNode {
             h[0..8].copy_from_slice(&node_id.0[0..8]);
             h
         });
-        Ok(Self { node_id, store, metrics: NodeMetrics::new(), health })
+        Ok(Self {
+            node_id,
+            store,
+            metrics: NodeMetrics::new(),
+            health,
+        })
     }
 
     pub fn propose_block(&mut self, height: u64) -> Result<(), String> {
@@ -45,9 +50,15 @@ impl ValidatorNode {
         let mut archive = amun_proof_archive::proof_archive::ProofArchive::new();
 
         let result = ConstitutionalRuntime::execute(
-            &program, &ctx, self.store.registry_mut(), &[], 100_000,
-            &mut hot, &mut archive,
-        ).map_err(|e| format!("Execution error: {}", e))?;
+            &program,
+            &ctx,
+            self.store.registry_mut(),
+            &[],
+            100_000,
+            &mut hot,
+            &mut archive,
+        )
+        .map_err(|e| format!("Execution error: {}", e))?;
 
         match result {
             PipelineResult::Committed { .. } => {

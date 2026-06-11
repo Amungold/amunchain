@@ -1,6 +1,6 @@
+use super::certificate::PeerCertificate;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use super::certificate::PeerCertificate;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PeerRegistry {
@@ -9,7 +9,9 @@ pub struct PeerRegistry {
 
 impl PeerRegistry {
     pub fn new() -> Self {
-        Self { peers: BTreeMap::new() }
+        Self {
+            peers: BTreeMap::new(),
+        }
     }
 
     pub fn register(&mut self, cert: PeerCertificate) {
@@ -20,7 +22,9 @@ impl PeerRegistry {
         self.peers.contains_key(peer_id)
     }
 
-    pub fn is_empty(&self) -> bool { self.peers.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.peers.is_empty()
+    }
 
     pub fn len(&self) -> usize {
         self.peers.len()

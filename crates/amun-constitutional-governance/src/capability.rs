@@ -2,11 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
+use amun_constitution_builder::{canonical_bytes::CanonicalSerialize, digest::ArtifactDigest};
 use serde::{Deserialize, Serialize};
-use amun_constitution_builder::{
-    canonical_bytes::CanonicalSerialize,
-    digest::ArtifactDigest,
-};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
@@ -15,7 +12,7 @@ pub struct Capability {
     pub capability_id: String,
     pub action: String,
     pub scope: String,
-    pub subject_verifying_key_hex: String,   // who holds this capability
+    pub subject_verifying_key_hex: String, // who holds this capability
     pub epoch_start: String,
     pub epoch_end: String,
     pub parameters: serde_json::Value,

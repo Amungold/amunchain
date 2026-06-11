@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::validator_identity::ValidatorIdentity;
+use std::collections::HashMap;
 
 /// Tracks known peers in the network.
 #[derive(Debug, Clone, Default)]

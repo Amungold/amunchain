@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
-use amun_resource_core::ResourceId;
 use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+use amun_resource_core::ResourceId;
 
 use crate::transfer_proof::CrossContractTransferProof;
 
@@ -54,14 +54,21 @@ mod tests {
     use amun_resource_core::ResourceId;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
     fn w11_register_and_consume_proof() {
         let mut registry = TransferProofRegistry::new();
         let proof = CrossContractTransferProof::new(
-            make_id(1), [1u8; 32], [2u8; 32], 42, [0xaa; 32], [0xbb; 32],
+            make_id(1),
+            [1u8; 32],
+            [2u8; 32],
+            42,
+            [0xaa; 32],
+            [0xbb; 32],
         );
         assert!(registry.consume(&proof, make_id(99), 1, [0xcc; 32]).is_ok());
         assert_eq!(registry.total_consumed(), 1);
@@ -72,9 +79,16 @@ mod tests {
     fn w11_reject_double_consumption() {
         let mut registry = TransferProofRegistry::new();
         let proof = CrossContractTransferProof::new(
-            make_id(1), [1u8; 32], [2u8; 32], 42, [0xaa; 32], [0xbb; 32],
+            make_id(1),
+            [1u8; 32],
+            [2u8; 32],
+            42,
+            [0xaa; 32],
+            [0xbb; 32],
         );
-        registry.consume(&proof, make_id(99), 1, [0xcc; 32]).unwrap();
+        registry
+            .consume(&proof, make_id(99), 1, [0xcc; 32])
+            .unwrap();
         let result = registry.consume(&proof, make_id(99), 2, [0xdd; 32]);
         assert!(result.is_err());
     }
@@ -83,10 +97,19 @@ mod tests {
     fn w11_double_consumption_produces_x1_evidence() {
         let mut registry = TransferProofRegistry::new();
         let proof = CrossContractTransferProof::new(
-            make_id(1), [1u8; 32], [2u8; 32], 42, [0xaa; 32], [0xbb; 32],
+            make_id(1),
+            [1u8; 32],
+            [2u8; 32],
+            42,
+            [0xaa; 32],
+            [0xbb; 32],
         );
-        registry.consume(&proof, make_id(99), 1, [0xcc; 32]).unwrap();
-        let err = registry.consume(&proof, make_id(99), 2, [0xdd; 32]).unwrap_err();
+        registry
+            .consume(&proof, make_id(99), 1, [0xcc; 32])
+            .unwrap();
+        let err = registry
+            .consume(&proof, make_id(99), 2, [0xdd; 32])
+            .unwrap_err();
         match *err {
             ConstitutionalEvidence::ConstitutionalViolation { law, .. } => {
                 assert_eq!(law, "X1");
@@ -98,10 +121,20 @@ mod tests {
     #[test]
     fn w11_proof_id_deterministic() {
         let p1 = CrossContractTransferProof::new(
-            make_id(1), [1u8; 32], [2u8; 32], 42, [0xaa; 32], [0xbb; 32],
+            make_id(1),
+            [1u8; 32],
+            [2u8; 32],
+            42,
+            [0xaa; 32],
+            [0xbb; 32],
         );
         let p2 = CrossContractTransferProof::new(
-            make_id(1), [1u8; 32], [2u8; 32], 42, [0xaa; 32], [0xbb; 32],
+            make_id(1),
+            [1u8; 32],
+            [2u8; 32],
+            42,
+            [0xaa; 32],
+            [0xbb; 32],
         );
         assert_eq!(p1.proof_id, p2.proof_id);
     }

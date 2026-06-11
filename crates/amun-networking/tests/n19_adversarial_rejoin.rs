@@ -1,12 +1,12 @@
-use amun_networking::node::NetworkNode;
-use amun_chain_checkpoint::{
-    CheckpointCertificate,
-    inclusion::{checkpoint_merkle_root, prove_checkpoint_inclusion, CheckpointBundle},
-    bootstrap::BootstrapSession,
-};
-use amun_constitutional_state::ConstitutionalStateRuntime;
-use amun_constitutional_block::ConstitutionalBlock;
 use amun_certificate_network::distribution::LightClientProofBundle;
+use amun_chain_checkpoint::{
+    bootstrap::BootstrapSession,
+    inclusion::{checkpoint_merkle_root, prove_checkpoint_inclusion, CheckpointBundle},
+    CheckpointCertificate,
+};
+use amun_constitutional_block::ConstitutionalBlock;
+use amun_constitutional_state::ConstitutionalStateRuntime;
+use amun_networking::node::NetworkNode;
 
 fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
     let mut rt = ConstitutionalStateRuntime::new();
@@ -17,13 +17,9 @@ fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
         rt.apply_transition(&[height as u8; 32], &[0xAA; 32]);
         let cert = rt.create_certificate(height, [0u8; 32]);
         let certs = vec![cert.clone()];
-        let merkle_root = hex::encode(
-            ConstitutionalStateRuntime::certificate_merkle_root(&certs)
-        );
+        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
         let hash = cert.certificate_hash();
-        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(
-            &certs, &hash
-        ).unwrap();
+        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
 
         let parent_hash = if height == start {
             &parent
@@ -32,8 +28,16 @@ fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
         };
 
         let block = ConstitutionalBlock::new(
-            height, parent_hash.into(), "t".into(), "p".into(), vec![],
-            hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root,
+            height,
+            parent_hash.into(),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
         );
 
         bundles.push(LightClientProofBundle::new(block, cert, proof));
@@ -130,7 +134,8 @@ fn n19_mixed_checkpoint_stream_rejected() {
     let proof1 = prove_checkpoint_inclusion(&checkpoints, &cp1.checkpoint_hash_bytes()).unwrap();
 
     // Tamper with the second bundle
-    let mut proof2 = prove_checkpoint_inclusion(&checkpoints, &cp2.checkpoint_hash_bytes()).unwrap();
+    let mut proof2 =
+        prove_checkpoint_inclusion(&checkpoints, &cp2.checkpoint_hash_bytes()).unwrap();
     proof2.root = [0xAA; 32];
 
     let bundles = vec![
@@ -156,7 +161,9 @@ fn n19_byzantine_rejoin_source_rejected() {
 
     // Honest bootstrap works
     let mut honest_session = BootstrapSession::new(root);
-    assert!(honest_session.ingest_bundles(std::slice::from_ref(&bundle)).is_ok());
+    assert!(honest_session
+        .ingest_bundles(std::slice::from_ref(&bundle))
+        .is_ok());
 
     // Byzantine source provides wrong root
     let byzantine_root = [0x13; 32];

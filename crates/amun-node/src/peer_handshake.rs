@@ -1,8 +1,8 @@
 #![allow(dead_code)]
-use serde::{Serialize, Deserialize};
 use amun_networking::crypto_identity::PeerKeyPair;
-use amun_networking::validator_certificate::ValidatorCertificate;
 use amun_networking::peer_identity::PeerId;
+use amun_networking::validator_certificate::ValidatorCertificate;
+use serde::{Deserialize, Serialize};
 
 /// Handshake message sent when two nodes establish a connection.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -101,13 +101,7 @@ mod tests {
             0,
             0,
         );
-        let handshake = HandshakeMessage::new(
-            &keypair,
-            &cert,
-            genesis_hash,
-            "test-node",
-            4001,
-        );
+        let handshake = HandshakeMessage::new(&keypair, &cert, genesis_hash, "test-node", 4001);
         (handshake, genesis_hash)
     }
 

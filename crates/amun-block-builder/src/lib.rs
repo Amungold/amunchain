@@ -1,7 +1,7 @@
-use amun_transactions::{Transaction, TransactionReceipt};
 use amun_accounts::AccountStore;
 use amun_execution::ExecutionEngine;
 use amun_mempool::Mempool;
+use amun_transactions::{Transaction, TransactionReceipt};
 use blake3::Hasher;
 
 /// A constitutional block containing transactions and their execution results.
@@ -40,7 +40,9 @@ pub struct BlockBuilder {
 
 impl BlockBuilder {
     pub fn new() -> Self {
-        Self { engine: ExecutionEngine::new() }
+        Self {
+            engine: ExecutionEngine::new(),
+        }
     }
 
     /// Build a block from the mempool, executing all transactions.
@@ -91,7 +93,9 @@ mod tests {
         let sk = SigningKey::from_bytes(&s);
         let sender = sk.verifying_key().to_bytes();
         let mut tx = Transaction {
-            version: 1, sender, nonce,
+            version: 1,
+            sender,
+            nonce,
             payload: TransactionPayload::Transfer(TransferPayload { to, amount }),
             signature: vec![],
         };
@@ -105,12 +109,22 @@ mod tests {
         let mut mempool = Mempool::new();
         let s1 = [1u8; 32];
         let s2 = [3u8; 32];
-        let a1 = { let sk = SigningKey::from_bytes(&s1); sk.verifying_key().to_bytes() };
-        let a2 = { let sk = SigningKey::from_bytes(&s2); sk.verifying_key().to_bytes() };
+        let a1 = {
+            let sk = SigningKey::from_bytes(&s1);
+            sk.verifying_key().to_bytes()
+        };
+        let a2 = {
+            let sk = SigningKey::from_bytes(&s2);
+            sk.verifying_key().to_bytes()
+        };
         builder.engine.state.create_account(a1, 1000);
         builder.engine.state.create_account(a2, 500);
-        mempool.add_transaction(create_signed_transfer(1, 1, 200, a2)).unwrap();
-        mempool.add_transaction(create_signed_transfer(3, 1, 100, a1)).unwrap();
+        mempool
+            .add_transaction(create_signed_transfer(1, 1, 200, a2))
+            .unwrap();
+        mempool
+            .add_transaction(create_signed_transfer(3, 1, 100, a1))
+            .unwrap();
         let block = builder.build_block(1, [0u8; 32], &mut mempool, 10, [0u8; 32], 1000);
         assert_eq!(block.height, 1);
         assert_eq!(block.transactions.len(), 2);
@@ -128,7 +142,9 @@ mod tests {
         let sk = SigningKey::from_bytes(&[1u8; 32]);
         let a1 = sk.verifying_key().to_bytes();
         builder.engine.state.create_account(a1, 1000);
-        mempool.add_transaction(create_signed_transfer(1, 1, 100, [2u8; 32])).unwrap();
+        mempool
+            .add_transaction(create_signed_transfer(1, 1, 100, [2u8; 32]))
+            .unwrap();
         let block = builder.build_block(1, [0u8; 32], &mut mempool, 10, [0u8; 32], 1000);
         let h1 = block.block_hash();
         let h2 = block.block_hash();
@@ -139,7 +155,10 @@ mod tests {
     fn n27_different_state_different_block_hash() {
         let mut b1 = BlockBuilder::new();
         let mut b2 = BlockBuilder::new();
-        let a = { let sk = SigningKey::from_bytes(&[1u8; 32]); sk.verifying_key().to_bytes() };
+        let a = {
+            let sk = SigningKey::from_bytes(&[1u8; 32]);
+            sk.verifying_key().to_bytes()
+        };
         b1.engine.state.create_account(a, 1000);
         b2.engine.state.create_account(a, 999);
         let block1 = b1.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);

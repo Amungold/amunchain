@@ -1,13 +1,15 @@
+use amun_pccv::pccv_verifier::PCCVResult;
+use amun_pccv::transition_proof_engine::TransitionProofEngine;
 use amun_resource_core::{
-    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
-    ResourceRegistry, ResourceState,
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
 };
 use amun_vm_kernel::pending_buffer::PendingBuffer;
-use amun_pccv::transition_proof_engine::TransitionProofEngine;
-use amun_pccv::pccv_verifier::PCCVResult;
 
 fn make_id(seed: u8) -> ResourceId {
-    let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+    let mut h = [0u8; 32];
+    h[0] = seed;
+    ResourceId(h)
 }
 
 #[test]
@@ -47,24 +49,48 @@ fn n49c_replay_produces_identical_proof() {
     let mut buffer2 = PendingBuffer::new(pre_state);
 
     buffer1.register_production(child_meta.clone());
-    buffer1.register_consumption(0, ResourceState::Consumed {
-        derived_children: vec![child_id],
-    }).unwrap();
+    buffer1
+        .register_consumption(
+            0,
+            ResourceState::Consumed {
+                derived_children: vec![child_id],
+            },
+        )
+        .unwrap();
     buffer1.record_operation("OP_TRANSFORM", vec![0], vec![1]);
 
     buffer2.register_production(child_meta);
-    buffer2.register_consumption(0, ResourceState::Consumed {
-        derived_children: vec![child_id],
-    }).unwrap();
+    buffer2
+        .register_consumption(
+            0,
+            ResourceState::Consumed {
+                derived_children: vec![child_id],
+            },
+        )
+        .unwrap();
     buffer2.record_operation("OP_TRANSFORM", vec![0], vec![1]);
 
     let proof1 = TransitionProofEngine::build_proof(
-        &buffer1, &reg1, make_id(99), 1, [0u8; 32],
-        [0xaa; 32], pre_root1, pre_root1, 15,
+        &buffer1,
+        &reg1,
+        make_id(99),
+        1,
+        [0u8; 32],
+        [0xaa; 32],
+        pre_root1,
+        pre_root1,
+        15,
     );
     let proof2 = TransitionProofEngine::build_proof(
-        &buffer2, &reg2, make_id(99), 1, [0u8; 32],
-        [0xaa; 32], pre_root2, pre_root2, 15,
+        &buffer2,
+        &reg2,
+        make_id(99),
+        1,
+        [0u8; 32],
+        [0xaa; 32],
+        pre_root2,
+        pre_root2,
+        15,
     );
 
     assert_eq!(proof1.proof_hash, proof2.proof_hash);
@@ -103,17 +129,31 @@ fn n49c_replay_consistent_across_iterations() {
         contract_id: [1u8; 32],
         owner: [2u8; 32],
     });
-    buffer.register_consumption(0, ResourceState::Consumed {
-        derived_children: vec![child_id],
-    }).unwrap();
+    buffer
+        .register_consumption(
+            0,
+            ResourceState::Consumed {
+                derived_children: vec![child_id],
+            },
+        )
+        .unwrap();
     buffer.record_operation("OP_TRANSFORM", vec![0], vec![1]);
 
-    let proofs: Vec<_> = (0..5).map(|_| {
-        TransitionProofEngine::build_proof(
-            &buffer, &reg, make_id(99), 1, [0u8; 32],
-            [0xaa; 32], pre_root, pre_root, 15,
-        )
-    }).collect();
+    let proofs: Vec<_> = (0..5)
+        .map(|_| {
+            TransitionProofEngine::build_proof(
+                &buffer,
+                &reg,
+                make_id(99),
+                1,
+                [0u8; 32],
+                [0xaa; 32],
+                pre_root,
+                pre_root,
+                15,
+            )
+        })
+        .collect();
 
     for i in 1..proofs.len() {
         assert_eq!(proofs[0].proof_hash, proofs[i].proof_hash);

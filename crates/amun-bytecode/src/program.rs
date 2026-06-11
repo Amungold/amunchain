@@ -63,6 +63,9 @@ impl ConstitutionalProgram {
     }
 
     pub fn constitutional_ops(&self) -> Vec<&OpCode> {
-        self.code.iter().filter(|op| op.is_constitutional_op()).collect()
+        self.code
+            .iter()
+            .filter(|op| op.is_constitutional_op())
+            .collect()
     }
 }

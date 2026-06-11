@@ -2,10 +2,10 @@ pub mod block;
 pub mod chain;
 pub mod finalizer;
 
-pub use block::{ConstitutionalBlock, BlockBuilder};
+pub use block::{BlockBuilder, ConstitutionalBlock};
 pub use chain::Blockchain;
 
-use amun_constitutional_state::{ReplayCertificate, ConstitutionalStateRuntime};
+use amun_constitutional_state::{ConstitutionalStateRuntime, ReplayCertificate};
 
 /// Verify that a block's state provenance is cryptographically valid.
 ///
@@ -19,9 +19,9 @@ pub fn verify_block_provenance(
     cert: &ReplayCertificate,
 ) -> Result<(), String> {
     // 1. Verify certificate merkle root matches block commitment
-    let computed_root = hex::encode(
-        ConstitutionalStateRuntime::certificate_merkle_root(std::slice::from_ref(cert))
-    );
+    let computed_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+        std::slice::from_ref(cert),
+    ));
     if block.replay_certificate_root != computed_root {
         return Err(format!(
             "Certificate root mismatch: block={} computed={}",
@@ -62,7 +62,9 @@ pub fn verify_full_replay(
 
     // Step 2: Verify journal ↔ state proof (single source of truth)
     if !cert.verify(records) {
-        return Err("Full replay verification failed: journal does not produce the claimed state".into());
+        return Err(
+            "Full replay verification failed: journal does not produce the claimed state".into(),
+        );
     }
 
     Ok(())

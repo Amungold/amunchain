@@ -1,12 +1,12 @@
 #![allow(clippy::type_complexity)]
-use amun_resource_core::{ResourceId, ResourceRegistry};
-use amun_vm_kernel::execution_context::ExecutionContext;
 use amun_bytecode::program::ConstitutionalProgram;
 use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
-use amun_replay_verifier::replay_verifier::{ReplayVerifier, ReplayResult};
 use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use amun_proof_archive::hot_store::HotProofStore;
 use amun_proof_archive::proof_archive::ProofArchive;
+use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+use amun_resource_core::{ResourceId, ResourceRegistry};
+use amun_vm_kernel::execution_context::ExecutionContext;
 use serde::{Deserialize, Serialize};
 
 /// A fully verified block with execution, proof, replay, and evidence roots.
@@ -36,9 +36,12 @@ impl EvidenceVerifiedBlock {
     }
 
     pub fn compute_block_hash(
-        block_height: u64, parent_hash: &[u8; 32],
-        state_root: &[u8; 32], proof_root: &[u8; 32],
-        replay_root: &[u8; 32], evidence_root: &[u8; 32],
+        block_height: u64,
+        parent_hash: &[u8; 32],
+        state_root: &[u8; 32],
+        proof_root: &[u8; 32],
+        replay_root: &[u8; 32],
+        evidence_root: &[u8; 32],
     ) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
         hasher.update(b"AMUN_EVIDENCE_BLOCK_V1");
@@ -126,7 +129,13 @@ impl ConstitutionalFinalityCertificate {
 
     /// The certificate binds five independent roots into one cryptographic commitment.
     pub fn bound_roots(&self) -> (&[u8; 32], &[u8; 32], &[u8; 32], &[u8; 32], &[u8; 32]) {
-        (&self.state_root, &self.proof_root, &self.replay_root, &self.evidence_root, &self.qc.block_hash)
+        (
+            &self.state_root,
+            &self.proof_root,
+            &self.replay_root,
+            &self.evidence_root,
+            &self.qc.block_hash,
+        )
     }
 }
 
@@ -150,13 +159,23 @@ impl EvidenceBackedConsensus {
 
         for (program, ctx) in programs {
             let result = ConstitutionalRuntime::execute(
-                program, ctx, registry, &[], 100_000,
-                &mut hot, &mut archive,
-            ).map_err(|e| format!("Execution error: {}", e))?;
+                program,
+                ctx,
+                registry,
+                &[],
+                100_000,
+                &mut hot,
+                &mut archive,
+            )
+            .map_err(|e| format!("Execution error: {}", e))?;
 
             let proof = match result {
-                PipelineResult::Committed { transition_proof, .. }
-                | PipelineResult::Rejected { transition_proof, .. } => transition_proof,
+                PipelineResult::Committed {
+                    transition_proof, ..
+                }
+                | PipelineResult::Rejected {
+                    transition_proof, ..
+                } => transition_proof,
             };
 
             proof_hashes.push(proof.proof_hash);
@@ -165,8 +184,14 @@ impl EvidenceBackedConsensus {
             let replay = ReplayVerifier::replay(&proof, program, &mut fresh_reg, &[]);
 
             let verified = matches!(replay, ReplayResult::Match { .. });
-            replay_hashes.push(if verified { proof.proof_hash } else { [0u8; 32] });
-            if !verified { all_verified = false; }
+            replay_hashes.push(if verified {
+                proof.proof_hash
+            } else {
+                [0u8; 32]
+            });
+            if !verified {
+                all_verified = false;
+            }
 
             // Collect evidence from the proof
             for ev in &proof.evidence {
@@ -179,13 +204,23 @@ impl EvidenceBackedConsensus {
         let replay_root = Self::hash_list(b"AMUN_REPLAY_ROOT_V1", &replay_hashes);
         let evidence_root = EvidenceVerifiedBlock::compute_evidence_root(&all_evidence);
         let block_hash = EvidenceVerifiedBlock::compute_block_hash(
-            block_height, &parent_hash, &state_root, &proof_root, &replay_root, &evidence_root,
+            block_height,
+            &parent_hash,
+            &state_root,
+            &proof_root,
+            &replay_root,
+            &evidence_root,
         );
 
         Ok(EvidenceVerifiedBlock {
-            block_height, block_hash, state_root,
-            proof_root, replay_root, evidence_root,
-            evidence: all_evidence, all_verified,
+            block_height,
+            block_hash,
+            state_root,
+            proof_root,
+            replay_root,
+            evidence_root,
+            evidence: all_evidence,
+            all_verified,
         })
     }
 
@@ -213,7 +248,10 @@ impl EvidenceBackedConsensus {
             qc.signer_count = qc.signatures.len();
         }
         if !qc.is_valid() {
-            return Err(format!("Insufficient quorum: {}/{}", qc.signer_count, quorum_size));
+            return Err(format!(
+                "Insufficient quorum: {}/{}",
+                qc.signer_count, quorum_size
+            ));
         }
         Ok(ConstitutionalFinalityCertificate::issue(block, qc))
     }
@@ -234,11 +272,13 @@ impl EvidenceBackedConsensus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use amun_resource_core::ResourceId;
     use amun_bytecode::opcodes::OpCode;
+    use amun_resource_core::ResourceId;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -246,13 +286,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = EvidenceBackedConsensus::execute_and_verify(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         let sigs: Vec<Vec<u8>> = (0..5).map(|_| vec![0u8; 64]).collect();
         let cert = EvidenceBackedConsensus::form_consensus(&block, 5, sigs).unwrap();
         assert!(cert.verify());
@@ -264,13 +313,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = EvidenceBackedConsensus::execute_and_verify(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         let sigs: Vec<Vec<u8>> = (0..5).map(|_| vec![0u8; 64]).collect();
         let cert = EvidenceBackedConsensus::form_consensus(&block, 5, sigs).unwrap();
         let (sr, pr, rr, er, qh) = cert.bound_roots();
@@ -286,13 +344,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = EvidenceBackedConsensus::execute_and_verify(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         let sigs: Vec<Vec<u8>> = (0..5).map(|_| vec![0u8; 64]).collect();
         let c1 = EvidenceBackedConsensus::form_consensus(&block, 5, sigs.clone()).unwrap();
         let c2 = EvidenceBackedConsensus::form_consensus(&block, 5, sigs).unwrap();

@@ -12,12 +12,13 @@ pub fn discover_peer_tip(peers: &[SocketAddr]) -> Option<PeerInfo> {
     let mut best: Option<PeerInfo> = None;
 
     for addr in peers {
-        let stream = std::net::TcpStream::connect_timeout(
-            addr,
-            std::time::Duration::from_millis(500),
-        );
+        eprintln!("DISCOVERY trying {}", addr);
+        let stream =
+            std::net::TcpStream::connect_timeout(addr, std::time::Duration::from_millis(500));
         if let Ok(mut stream) = stream {
+            eprintln!("DISCOVERY connected {}", addr);
             if let Ok((tip_height, tip_hash)) = send_tip_request(&mut stream) {
+                eprintln!("DISCOVERY tip {} height={}", addr, tip_height);
                 match &best {
                     None => {
                         best = Some(PeerInfo {

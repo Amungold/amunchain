@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
 use blake3::Hasher;
-use ed25519_dalek::{VerifyingKey, SigningKey, Signer, Verifier, Signature};
+use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TransactionPayload {
@@ -82,11 +82,18 @@ mod tests {
     use rand::rngs::OsRng;
 
     fn create_signed_transfer() -> Transaction {
-        let mut seed = [0u8; 32]; rand::RngCore::fill_bytes(&mut OsRng, &mut seed); let signing_key = SigningKey::from_bytes(&seed);
+        let mut seed = [0u8; 32];
+        rand::RngCore::fill_bytes(&mut OsRng, &mut seed);
+        let signing_key = SigningKey::from_bytes(&seed);
         let sender = signing_key.verifying_key().to_bytes();
         let mut tx = Transaction {
-            version: 1, sender, nonce: 0,
-            payload: TransactionPayload::Transfer(TransferPayload { to: [2u8; 32], amount: 100 }),
+            version: 1,
+            sender,
+            nonce: 0,
+            payload: TransactionPayload::Transfer(TransferPayload {
+                to: [2u8; 32],
+                amount: 100,
+            }),
             signature: vec![],
         };
         tx.sign(&signing_key);
@@ -94,36 +101,68 @@ mod tests {
     }
 
     #[test]
-    fn n23_tx_hash_deterministic() { let tx = create_signed_transfer(); assert_eq!(tx.tx_hash(), tx.tx_hash()); }
+    fn n23_tx_hash_deterministic() {
+        let tx = create_signed_transfer();
+        assert_eq!(tx.tx_hash(), tx.tx_hash());
+    }
     #[test]
     fn n23_different_nonce_different_hash() {
-        let mut seed = [0u8; 32]; rand::RngCore::fill_bytes(&mut OsRng, &mut seed); let sk = SigningKey::from_bytes(&seed);
+        let mut seed = [0u8; 32];
+        rand::RngCore::fill_bytes(&mut OsRng, &mut seed);
+        let sk = SigningKey::from_bytes(&seed);
         let s = sk.verifying_key().to_bytes();
-        let mut t1 = Transaction { version:1, sender:s, nonce:0, payload:TransactionPayload::Transfer(TransferPayload{to:[2u8;32],amount:100}), signature:vec![] };
+        let mut t1 = Transaction {
+            version: 1,
+            sender: s,
+            nonce: 0,
+            payload: TransactionPayload::Transfer(TransferPayload {
+                to: [2u8; 32],
+                amount: 100,
+            }),
+            signature: vec![],
+        };
         t1.sign(&sk);
-        let mut t2 = Transaction { version:1, sender:s, nonce:1, payload:TransactionPayload::Transfer(TransferPayload{to:[2u8;32],amount:100}), signature:vec![] };
+        let mut t2 = Transaction {
+            version: 1,
+            sender: s,
+            nonce: 1,
+            payload: TransactionPayload::Transfer(TransferPayload {
+                to: [2u8; 32],
+                amount: 100,
+            }),
+            signature: vec![],
+        };
         t2.sign(&sk);
         assert_ne!(t1.tx_hash(), t2.tx_hash());
     }
     #[test]
-    fn n23_sign_and_verify() { let tx = create_signed_transfer(); assert!(tx.verify()); }
+    fn n23_sign_and_verify() {
+        let tx = create_signed_transfer();
+        assert!(tx.verify());
+    }
     #[test]
     fn n23_tampered_rejected() {
         let mut tx = create_signed_transfer();
-        let TransactionPayload::Transfer(ref mut t) = tx.payload; t.amount = 999;
+        let TransactionPayload::Transfer(ref mut t) = tx.payload;
+        t.amount = 999;
         assert!(!tx.verify());
     }
     #[test]
     fn n23_wrong_signer_rejected() {
         let tx = create_signed_transfer();
-        let mut seed = [0u8; 32]; rand::RngCore::fill_bytes(&mut OsRng, &mut seed); let impostor = SigningKey::from_bytes(&seed);
+        let mut seed = [0u8; 32];
+        rand::RngCore::fill_bytes(&mut OsRng, &mut seed);
+        let impostor = SigningKey::from_bytes(&seed);
         let mut fake = tx.clone();
         fake.sender = impostor.verifying_key().to_bytes();
         assert!(!fake.verify());
     }
     #[test]
     fn n23_transfer_roundtrip() {
-        let t = TransferPayload { to: [2u8; 32], amount: 100 };
+        let t = TransferPayload {
+            to: [2u8; 32],
+            amount: 100,
+        };
         let j = serde_json::to_string(&t).unwrap();
         let d: TransferPayload = serde_json::from_str(&j).unwrap();
         assert_eq!(d.amount, 100);
@@ -131,7 +170,14 @@ mod tests {
     #[test]
     fn n23_receipt_error_code() {
         let tx = create_signed_transfer();
-        let r = TransactionReceipt { tx_hash: tx.tx_hash(), success: false, error_code: Some(1), sender: tx.sender, nonce: tx.nonce, gas_used: 0 };
+        let r = TransactionReceipt {
+            tx_hash: tx.tx_hash(),
+            success: false,
+            error_code: Some(1),
+            sender: tx.sender,
+            nonce: tx.nonce,
+            gas_used: 0,
+        };
         assert!(!r.success);
         assert_eq!(r.error_code, Some(1));
     }

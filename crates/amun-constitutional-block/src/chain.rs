@@ -58,8 +58,14 @@ impl Blockchain {
 
 impl Blockchain {
     /// Verify that a block's evidence_root matches the given ActionLog.
-    pub fn verify_block_evidence(&self, height: u64, log: &amun_consensus::action::ActionLog) -> Result<(), String> {
-        let block = self.blocks.get(height as usize)
+    pub fn verify_block_evidence(
+        &self,
+        height: u64,
+        log: &amun_consensus::action::ActionLog,
+    ) -> Result<(), String> {
+        let block = self
+            .blocks
+            .get(height as usize)
             .ok_or_else(|| format!("Block not found at height {}", height))?;
         let computed = hex::encode(log.evidence_root());
         if block.evidence_root != computed {
@@ -72,9 +78,16 @@ impl Blockchain {
     }
 
     /// Full chain evidence audit — verify every block against its ActionLog.
-    pub fn verify_chain_evidence(&self, logs: &[amun_consensus::action::ActionLog]) -> Result<(), String> {
+    pub fn verify_chain_evidence(
+        &self,
+        logs: &[amun_consensus::action::ActionLog],
+    ) -> Result<(), String> {
         if logs.len() != self.blocks.len() {
-            return Err(format!("Log count {} != block count {}", logs.len(), self.blocks.len()));
+            return Err(format!(
+                "Log count {} != block count {}",
+                logs.len(),
+                self.blocks.len()
+            ));
         }
         for (i, log) in logs.iter().enumerate() {
             self.verify_block_evidence(i as u64, log)?;

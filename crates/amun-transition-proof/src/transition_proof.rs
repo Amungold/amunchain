@@ -1,7 +1,7 @@
 #![allow(clippy::too_many_arguments)]
+use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use amun_resource_core::{ResourceId, ResourceMetadata};
 use amun_vm_kernel::pending_buffer::OperationRecord;
-use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
 use serde::{Deserialize, Serialize};
 
 /// A cryptographic proof that a specific contract execution occurred

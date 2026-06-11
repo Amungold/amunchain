@@ -1,5 +1,8 @@
-use amun_constitutional_block::{Blockchain, finalizer::{BlockFinalizer, FinalizationContext}};
 use amun_consensus::action::{ActionLog, ConsensusAction};
+use amun_constitutional_block::{
+    finalizer::{BlockFinalizer, FinalizationContext},
+    Blockchain,
+};
 use amun_constitutional_state::ConstitutionalStateRuntime;
 
 #[test]
@@ -38,14 +41,20 @@ fn test_state_root_changes_block_hash() {
     state2.apply_transition(&[1u8; 32], &[0xBB; 32]);
 
     let ctx1 = FinalizationContext {
-        state_runtime: Some(state1), pre_state_root: [0u8; 32],
-        governance_root: "g".into(), execution_root: "e".into(),
-        timestamp: "t".into(), proposer: "p".into(),
+        state_runtime: Some(state1),
+        pre_state_root: [0u8; 32],
+        governance_root: "g".into(),
+        execution_root: "e".into(),
+        timestamp: "t".into(),
+        proposer: "p".into(),
     };
     let ctx2 = FinalizationContext {
-        state_runtime: Some(state2), pre_state_root: [0u8; 32],
-        governance_root: "g".into(), execution_root: "e".into(),
-        timestamp: "t".into(), proposer: "p".into(),
+        state_runtime: Some(state2),
+        pre_state_root: [0u8; 32],
+        governance_root: "g".into(),
+        execution_root: "e".into(),
+        timestamp: "t".into(),
+        proposer: "p".into(),
     };
 
     let b1 = BlockFinalizer::finalize(&mut chain1, &log, ctx1).unwrap();

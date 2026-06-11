@@ -1,6 +1,6 @@
 use crate::inclusion::{verify_checkpoint_sequence, CheckpointBundle};
-use amun_stateless_sync::StatelessNode;
 use amun_constitutional_state::ConstitutionalStateRuntime;
+use amun_stateless_sync::StatelessNode;
 
 pub struct BootstrapSession {
     trusted_checkpoint_root: [u8; 32],
@@ -15,17 +15,11 @@ impl BootstrapSession {
         }
     }
 
-    pub fn ingest_bundles(
-        &mut self,
-        bundles: &[CheckpointBundle],
-    ) -> Result<(), String> {
+    pub fn ingest_bundles(&mut self, bundles: &[CheckpointBundle]) -> Result<(), String> {
         verify_checkpoint_sequence(bundles, &self.trusted_checkpoint_root)
     }
 
-    pub fn verify_complete_chain(
-        &self,
-        expected_state_root: &str,
-    ) -> Result<(), String> {
+    pub fn verify_complete_chain(&self, expected_state_root: &str) -> Result<(), String> {
         self.node.verify_chain()?;
         let rt = ConstitutionalStateRuntime::new();
         let current = hex::encode(rt.state_root());
@@ -46,11 +40,11 @@ impl BootstrapSession {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::inclusion::{prove_checkpoint_inclusion, checkpoint_merkle_root};
+    use crate::inclusion::{checkpoint_merkle_root, prove_checkpoint_inclusion};
     use crate::CheckpointCertificate;
-    use amun_constitutional_state::ConstitutionalStateRuntime;
-    use amun_constitutional_block::ConstitutionalBlock;
     use amun_certificate_network::distribution::LightClientProofBundle;
+    use amun_constitutional_block::ConstitutionalBlock;
+    use amun_constitutional_state::ConstitutionalStateRuntime;
 
     fn create_bundle(height: u64, parent_hash: &str) -> LightClientProofBundle {
         let mut rt = ConstitutionalStateRuntime::new();
@@ -61,8 +55,16 @@ mod tests {
         let hash = cert.certificate_hash();
         let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
         let block = ConstitutionalBlock::new(
-            height, parent_hash.into(), "t".into(), "p".into(), vec![],
-            hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root,
+            height,
+            parent_hash.into(),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
         );
         LightClientProofBundle::new(block, cert, proof)
     }
@@ -71,7 +73,11 @@ mod tests {
         let mut bundles: Vec<LightClientProofBundle> = Vec::new();
         let parent = "0".repeat(64);
         for h in start..=end {
-            let parent_hash = if h == start { &parent } else { &bundles.last().unwrap().block_header.block_hash };
+            let parent_hash = if h == start {
+                &parent
+            } else {
+                &bundles.last().unwrap().block_header.block_hash
+            };
             bundles.push(create_bundle(h, parent_hash));
         }
         CheckpointCertificate::create(start, end, &bundles).unwrap()

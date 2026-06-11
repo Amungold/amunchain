@@ -35,7 +35,9 @@ pub struct AuditTrail {
 }
 
 impl AuditTrail {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn record(
         &mut self,
@@ -46,10 +48,19 @@ impl AuditTrail {
         replay_certificate: [u8; 32],
         timestamp: u64,
     ) {
-        let previous = self.records.last().map(|r| r.record_hash()).unwrap_or([0u8; 32]);
+        let previous = self
+            .records
+            .last()
+            .map(|r| r.record_hash())
+            .unwrap_or([0u8; 32]);
         self.records.push(AuditRecord {
-            height, block_hash, state_root, commit_hash, replay_certificate,
-            previous_audit_record: previous, timestamp,
+            height,
+            block_hash,
+            state_root,
+            commit_hash,
+            replay_certificate,
+            previous_audit_record: previous,
+            timestamp,
         });
     }
 
@@ -62,8 +73,12 @@ impl AuditTrail {
         true
     }
 
-    pub fn len(&self) -> usize { self.records.len() }
-    pub fn is_empty(&self) -> bool { self.records.is_empty() }
+    pub fn len(&self) -> usize {
+        self.records.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.records.is_empty()
+    }
 }
 
 #[cfg(test)]
@@ -112,6 +127,9 @@ mod tests {
         let mut trail = AuditTrail::new();
         trail.record(1, [1u8; 32], [10u8; 32], [11u8; 32], [12u8; 32], 1000);
         trail.record(2, [2u8; 32], [20u8; 32], [21u8; 32], [22u8; 32], 2000);
-        assert_ne!(trail.records[0].record_hash(), trail.records[1].record_hash());
+        assert_ne!(
+            trail.records[0].record_hash(),
+            trail.records[1].record_hash()
+        );
     }
 }

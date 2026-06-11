@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::{ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GateResult {
@@ -97,8 +97,7 @@ impl CertificationEvaluator {
             .iter()
             .flat_map(|v| &v.results)
             .filter(|r| {
-                r.status == crate::ObligationResultStatus::Failed
-                    && r.failure_reason.is_some()
+                r.status == crate::ObligationResultStatus::Failed && r.failure_reason.is_some()
             })
             .count();
         GateResult {
@@ -114,9 +113,7 @@ impl CertificationEvaluator {
         let major_failures: usize = verdicts
             .iter()
             .flat_map(|v| &v.results)
-            .filter(|r| {
-                r.status == crate::ObligationResultStatus::Failed
-            })
+            .filter(|r| r.status == crate::ObligationResultStatus::Failed)
             .count();
         GateResult {
             gate_id: "GATE-C3".into(),

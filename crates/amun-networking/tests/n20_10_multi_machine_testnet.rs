@@ -2,20 +2,20 @@ use std::net::{SocketAddr, TcpListener};
 use std::str::FromStr;
 use std::time::Duration;
 
+use amun_certificate_network::distribution::LightClientProofBundle;
+use amun_chain_checkpoint::{
+    bootstrap::BootstrapSession,
+    inclusion::{checkpoint_merkle_root, prove_checkpoint_inclusion, CheckpointBundle},
+    CheckpointCertificate,
+};
+use amun_constitutional_block::ConstitutionalBlock;
+use amun_constitutional_state::ConstitutionalStateRuntime;
+use amun_networking::crypto_identity::PeerKeyPair;
 use amun_networking::node::{NetworkNode, NodeLifecycle};
-use amun_networking::tcp_transport::TcpTransport;
 use amun_networking::peer_identity::PeerIdentity;
 use amun_networking::sync_protocol::{SyncRequest, SyncResponse};
-use amun_networking::crypto_identity::PeerKeyPair;
+use amun_networking::tcp_transport::TcpTransport;
 use amun_networking::transport_trait::Transport;
-use amun_chain_checkpoint::{
-    CheckpointCertificate,
-    inclusion::{checkpoint_merkle_root, prove_checkpoint_inclusion, CheckpointBundle},
-    bootstrap::BootstrapSession,
-};
-use amun_constitutional_state::ConstitutionalStateRuntime;
-use amun_constitutional_block::ConstitutionalBlock;
-use amun_certificate_network::distribution::LightClientProofBundle;
 
 // ============================================================
 // Helper: find an available port on localhost
@@ -91,13 +91,9 @@ fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
         rt.apply_transition(&[height as u8; 32], &[0xAA; 32]);
         let cert = rt.create_certificate(height, [0u8; 32]);
         let certs = vec![cert.clone()];
-        let merkle_root = hex::encode(
-            ConstitutionalStateRuntime::certificate_merkle_root(&certs)
-        );
+        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
         let hash = cert.certificate_hash();
-        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(
-            &certs, &hash
-        ).unwrap();
+        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
 
         let parent_hash = if height == start {
             &parent
@@ -106,8 +102,16 @@ fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
         };
 
         let block = ConstitutionalBlock::new(
-            height, parent_hash.into(), "t".into(), "p".into(), vec![],
-            hex::encode(rt.state_root()), "g".into(), "e".into(), "ev".into(), merkle_root,
+            height,
+            parent_hash.into(),
+            "t".into(),
+            "p".into(),
+            vec![],
+            hex::encode(rt.state_root()),
+            "g".into(),
+            "e".into(),
+            "ev".into(),
+            merkle_root,
         );
 
         bundles.push(LightClientProofBundle::new(block, cert, proof));

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use crate::voting::Proposal;
 use crate::quorum::QuorumPolicy;
+use crate::voting::Proposal;
 
 /// The amendment lifecycle is a simple state machine for constitutional changes.
 pub enum AmendmentState {

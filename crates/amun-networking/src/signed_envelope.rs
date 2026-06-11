@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
-use crate::peer_identity::PeerId;
-use crate::envelope::Envelope;
 use crate::crypto_identity::{PeerKeyPair, SignedMessage};
+use crate::envelope::Envelope;
+use crate::peer_identity::PeerId;
+use serde::{Deserialize, Serialize};
 
 /// A cryptographically signed network message.
 /// Wraps a SignedMessage for transmission.
@@ -26,11 +26,7 @@ impl SignedEnvelope {
 
     /// Verify the envelope signature.
     pub fn verify(&self) -> bool {
-        PeerKeyPair::verify(
-            &self.sender_peer_id.0,
-            &self.payload,
-            &self.signature,
-        )
+        PeerKeyPair::verify(&self.sender_peer_id.0, &self.payload, &self.signature)
     }
 }
 
@@ -43,15 +39,18 @@ pub struct DirectedMessage {
 
 impl DirectedMessage {
     pub fn new(to: PeerId, signed_envelope: SignedEnvelope) -> Self {
-        Self { to, signed_envelope }
+        Self {
+            to,
+            signed_envelope,
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::envelope::Envelope;
     use crate::crypto_identity::PeerKeyPair;
+    use crate::envelope::Envelope;
 
     #[test]
     fn n20_6_signed_envelope_verification() {

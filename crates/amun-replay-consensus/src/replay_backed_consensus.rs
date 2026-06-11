@@ -1,15 +1,14 @@
-use amun_resource_core::{ResourceId, ResourceRegistry};
-use amun_vm_kernel::execution_context::ExecutionContext;
 use amun_bytecode::program::ConstitutionalProgram;
 use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
-use amun_transition_proof::transition_proof::TransitionProof;
-use amun_replay_verifier::replay_verifier::{ReplayVerifier, ReplayResult};
 use amun_proof_archive::hot_store::HotProofStore;
 use amun_proof_archive::proof_archive::ProofArchive;
+use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+use amun_resource_core::{ResourceId, ResourceRegistry};
+use amun_transition_proof::transition_proof::TransitionProof;
+use amun_vm_kernel::execution_context::ExecutionContext;
 
 use crate::replay_backed_types::{
-    ReplayBackedFinalityCertificate, ReplayBackedQC,
-    ReplayVerificationRecord, ReplayVerifiedBlock,
+    ReplayBackedFinalityCertificate, ReplayBackedQC, ReplayVerificationRecord, ReplayVerifiedBlock,
 };
 
 /// Replay-Backed Consensus Engine.
@@ -33,13 +32,23 @@ impl ReplayBackedConsensus {
 
         for (program, ctx) in programs {
             let result = ConstitutionalRuntime::execute(
-                program, ctx, registry, &[], 100_000,
-                &mut hot, &mut archive,
-            ).map_err(|e| format!("Execution error: {}", e))?;
+                program,
+                ctx,
+                registry,
+                &[],
+                100_000,
+                &mut hot,
+                &mut archive,
+            )
+            .map_err(|e| format!("Execution error: {}", e))?;
 
             let proof = match result {
-                PipelineResult::Committed { transition_proof, .. }
-                | PipelineResult::Rejected { transition_proof, .. } => transition_proof,
+                PipelineResult::Committed {
+                    transition_proof, ..
+                }
+                | PipelineResult::Rejected {
+                    transition_proof, ..
+                } => transition_proof,
             };
 
             // Replay verification
@@ -47,7 +56,10 @@ impl ReplayBackedConsensus {
             let replay = ReplayVerifier::replay(&proof, program, &mut fresh_reg, &[]);
 
             let record = match replay {
-                ReplayResult::Match { state_root, proof_hash } => ReplayVerificationRecord {
+                ReplayResult::Match {
+                    state_root,
+                    proof_hash,
+                } => ReplayVerificationRecord {
                     proof_hash: proof.proof_hash,
                     state_root_match: state_root == proof.post_state_root,
                     proof_hash_match: proof_hash == proof.proof_hash,
@@ -116,7 +128,10 @@ impl ReplayBackedConsensus {
         }
 
         if !qc.is_valid() {
-            return Err(format!("Insufficient quorum: {}/{}", qc.signer_count, quorum_size));
+            return Err(format!(
+                "Insufficient quorum: {}/{}",
+                qc.signer_count, quorum_size
+            ));
         }
 
         Ok(ReplayBackedFinalityCertificate::issue(block, qc))
@@ -138,11 +153,13 @@ impl ReplayBackedConsensus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use amun_resource_core::ResourceId;
     use amun_bytecode::opcodes::OpCode;
+    use amun_resource_core::ResourceId;
 
     fn make_id(seed: u8) -> ResourceId {
-        let mut h = [0u8; 32]; h[0] = seed; ResourceId(h)
+        let mut h = [0u8; 32];
+        h[0] = seed;
+        ResourceId(h)
     }
 
     #[test]
@@ -150,13 +167,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ReplayBackedConsensus::execute_and_replay(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         assert!(block.all_verified);
         assert_eq!(block.replay_verifications.len(), 1);
         assert!(block.replay_verifications[0].is_verified());
@@ -167,13 +193,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ReplayBackedConsensus::execute_and_replay(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         let sigs: Vec<Vec<u8>> = (0..5).map(|_| vec![0u8; 64]).collect();
         let cert = ReplayBackedConsensus::form_consensus(&block, 5, sigs).unwrap();
         assert!(cert.verify());
@@ -184,13 +219,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let mut block = ReplayBackedConsensus::execute_and_replay(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         // Tamper with a verification record
         block.replay_verifications[0].replay_success = false;
         block.all_verified = false;
@@ -203,13 +247,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ReplayBackedConsensus::execute_and_replay(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         let sigs: Vec<Vec<u8>> = (0..5).map(|_| vec![0u8; 64]).collect();
         let cert1 = ReplayBackedConsensus::form_consensus(&block, 5, sigs.clone()).unwrap();
         let cert2 = ReplayBackedConsensus::form_consensus(&block, 5, sigs).unwrap();
@@ -221,13 +274,22 @@ mod tests {
         let mut registry = ResourceRegistry::new(10000);
         let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
         let ctx = ExecutionContext {
-            contract_id: make_id(1), caller: [1u8; 32], block_height: 1,
-            block_hash: [0u8; 32], transaction_hash: [0xaa; 32],
-            pre_state_root: registry.compute_state_root(), authority: [2u8; 32],
+            contract_id: make_id(1),
+            caller: [1u8; 32],
+            block_height: 1,
+            block_hash: [0u8; 32],
+            transaction_hash: [0xaa; 32],
+            pre_state_root: registry.compute_state_root(),
+            authority: [2u8; 32],
         };
         let block = ReplayBackedConsensus::execute_and_replay(
-            &[(program, ctx)], &mut registry, 1, [0u8; 32], make_id(99),
-        ).unwrap();
+            &[(program, ctx)],
+            &mut registry,
+            1,
+            [0u8; 32],
+            make_id(99),
+        )
+        .unwrap();
         assert_eq!(block.replay_root, block.compute_replay_root());
         assert_ne!(block.replay_root, [0u8; 32]);
     }

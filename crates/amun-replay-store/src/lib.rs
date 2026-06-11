@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
+use blake3::Hasher;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
-use blake3::Hasher;
 
 /// A single replay record capturing a state transition.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -34,15 +34,16 @@ pub struct ReplayStore {
 
 impl ReplayStore {
     pub fn new(path: &str) -> Self {
-        Self { path: path.to_string() }
+        Self {
+            path: path.to_string(),
+        }
     }
 
     /// Append a replay record to the journal.
     pub fn append(&self, record: &ReplayRecord) -> Result<(), String> {
         let mut records = self.load_all().unwrap_or_default();
         records.push(record.clone());
-        let json = serde_json::to_string_pretty(&records)
-            .map_err(|e| e.to_string())?;
+        let json = serde_json::to_string_pretty(&records).map_err(|e| e.to_string())?;
         if let Some(parent) = Path::new(&self.path).parent() {
             fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         }
@@ -54,8 +55,7 @@ impl ReplayStore {
         if !Path::new(&self.path).exists() {
             return Ok(Vec::new());
         }
-        let json = fs::read_to_string(&self.path)
-            .map_err(|e| e.to_string())?;
+        let json = fs::read_to_string(&self.path).map_err(|e| e.to_string())?;
         serde_json::from_str(&json).map_err(|e| e.to_string())
     }
 

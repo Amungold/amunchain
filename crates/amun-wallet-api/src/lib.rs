@@ -1,17 +1,17 @@
-pub mod types;
 pub mod errors;
 pub mod server;
+pub mod types;
 pub mod routes {
     pub mod accounts;
-    pub mod transactions;
     pub mod chain;
     pub mod network;
+    pub mod transactions;
 }
 pub mod services {
     pub mod account_service;
-    pub mod transaction_service;
     pub mod chain_service;
     pub mod network_service;
+    pub mod transaction_service;
 }
 
 #[cfg(test)]
@@ -28,7 +28,12 @@ mod tests {
     async fn n48_3_get_network_info() {
         let app = server::build_app();
         let response = app
-            .oneshot(Request::builder().uri("/network/info").body(Body::empty()).unwrap())
+            .oneshot(
+                Request::builder()
+                    .uri("/network/info")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
@@ -38,7 +43,12 @@ mod tests {
     async fn n48_3_get_chain_head() {
         let app = server::build_app();
         let response = app
-            .oneshot(Request::builder().uri("/chain/head").body(Body::empty()).unwrap())
+            .oneshot(
+                Request::builder()
+                    .uri("/chain/head")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
@@ -50,9 +60,12 @@ mod tests {
         let body = json!({"transaction_type":"transfer","sender":"0xaaa","recipient":"0xbbb","amount":1000,"nonce":1});
         let response = app
             .oneshot(
-                Request::builder().uri("/transactions/build").method("POST")
+                Request::builder()
+                    .uri("/transactions/build")
+                    .method("POST")
                     .header("content-type", "application/json")
-                    .body(Body::from(serde_json::to_vec(&body).unwrap())).unwrap()
+                    .body(Body::from(serde_json::to_vec(&body).unwrap()))
+                    .unwrap(),
             )
             .await
             .unwrap();
@@ -62,12 +75,16 @@ mod tests {
     #[tokio::test]
     async fn n48_3_build_transaction_invalid() {
         let app = server::build_app();
-        let body = json!({"transaction_type":"transfer","sender":"","recipient":"","amount":0,"nonce":0});
+        let body =
+            json!({"transaction_type":"transfer","sender":"","recipient":"","amount":0,"nonce":0});
         let response = app
             .oneshot(
-                Request::builder().uri("/transactions/build").method("POST")
+                Request::builder()
+                    .uri("/transactions/build")
+                    .method("POST")
                     .header("content-type", "application/json")
-                    .body(Body::from(serde_json::to_vec(&body).unwrap())).unwrap()
+                    .body(Body::from(serde_json::to_vec(&body).unwrap()))
+                    .unwrap(),
             )
             .await
             .unwrap();
@@ -85,7 +102,8 @@ mod tests {
 
     #[test]
     fn n48_3_service_get_transaction() {
-        let result = services::transaction_service::TransactionService::get_transaction("0xdeadbeef");
+        let result =
+            services::transaction_service::TransactionService::get_transaction("0xdeadbeef");
         assert!(result.is_ok());
         let tx = result.unwrap();
         assert_eq!(tx.hash, "0xdeadbeef");

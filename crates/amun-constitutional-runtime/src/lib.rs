@@ -1,10 +1,10 @@
-pub mod runtime_pipeline;
 pub mod block_validator;
-pub mod finality_certificate;
 pub mod certificate_chain;
+pub mod finality_certificate;
 pub mod history_root;
-pub use runtime_pipeline::*;
+pub mod runtime_pipeline;
 pub use block_validator::*;
-pub use finality_certificate::*;
 pub use certificate_chain::*;
+pub use finality_certificate::*;
 pub use history_root::*;
+pub use runtime_pipeline::*;

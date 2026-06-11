@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
 
-use amun_constitutional_governance::amendment::AmendmentLifecycle;
-use amun_constitutional_governance::voting::Tally;
-use std::collections::BTreeMap;
-use crate::state_machine::ConstitutionalStateMachine;
 use crate::context::ExecutionContext;
 use crate::enforcer::CapabilityEnforcer;
+use crate::state_machine::ConstitutionalStateMachine;
+use amun_constitutional_governance::amendment::AmendmentLifecycle;
 use amun_constitutional_governance::capability::Capability;
+use amun_constitutional_governance::voting::Tally;
+use std::collections::BTreeMap;
 
 /// Activates an approved amendment by applying its state transition.
 pub struct AmendmentActivator;

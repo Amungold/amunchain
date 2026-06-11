@@ -45,9 +45,18 @@ impl CommitLog {
         tx_count: usize,
         timestamp: u64,
     ) -> &StateCommit {
-        let commit = StateCommit { height, block_hash, previous_root, new_root, tx_count, timestamp };
+        let commit = StateCommit {
+            height,
+            block_hash,
+            previous_root,
+            new_root,
+            tx_count,
+            timestamp,
+        };
         self.commits.push(commit);
-        self.commits.last().expect("commit_log: invariant violated — empty after push")
+        self.commits
+            .last()
+            .expect("commit_log: invariant violated — empty after push")
     }
 
     /// Get the latest state root.
@@ -56,7 +65,9 @@ impl CommitLog {
     }
 
     /// Number of commits.
-    pub fn is_empty(&self) -> bool { self.commits.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.commits.is_empty()
+    }
     pub fn len(&self) -> usize {
         self.commits.len()
     }
@@ -106,7 +117,9 @@ mod tests {
     #[test]
     fn n34_different_commits_different_hash() {
         let mut log = CommitLog::new();
-        let c1 = log.record(1, [1u8; 32], [0u8; 32], [10u8; 32], 1, 1000).clone();
+        let c1 = log
+            .record(1, [1u8; 32], [0u8; 32], [10u8; 32], 1, 1000)
+            .clone();
         let c2 = log.record(2, [2u8; 32], [10u8; 32], [20u8; 32], 2, 2000);
         assert_ne!(c1.commit_hash(), c2.commit_hash());
     }
