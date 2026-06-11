@@ -67,3 +67,55 @@ pub fn create_snapshot(
 
     Ok(manifest)
 }
+
+/// Verify the integrity of a snapshot directory.
+/// Returns the manifest if valid, or an error string.
+pub fn verify_snapshot(snapshot_dir: &Path) -> Result<SnapshotManifest, String> {
+    let manifest_path = snapshot_dir.join("manifest.json");
+    let state_path = snapshot_dir.join("state.bin");
+
+    // 1. Files must exist
+    if !manifest_path.exists() {
+        return Err("manifest.json not found".into());
+    }
+    if !state_path.exists() {
+        return Err("state.bin not found".into());
+    }
+
+    // 2. Read and parse manifest
+    let json = std::fs::read_to_string(&manifest_path).map_err(|e| e.to_string())?;
+    let manifest: SnapshotManifest = serde_json::from_str(&json).map_err(|e| e.to_string())?;
+
+    // 3. Recompute hash from the fields (excluding snapshot_hash itself)
+    let pre_hash = postcard::to_stdvec(&(
+        manifest.snapshot_height,
+        manifest.state_root,
+        manifest.history_root,
+        manifest.validator_set_hash,
+    ))
+    .map_err(|e| e.to_string())?;
+    let expected_hash = blake3::hash(&pre_hash);
+
+    if manifest.snapshot_hash != *expected_hash.as_bytes() {
+        return Err(format!(
+            "Hash mismatch: stored={} computed={}",
+            hex::encode(manifest.snapshot_hash),
+            hex::encode(expected_hash.as_bytes())
+        ));
+    }
+
+    // 4. Quick check that state.bin contains the same height
+    let state_bytes = std::fs::read(&state_path).map_err(|e| e.to_string())?;
+    if state_bytes.len() < 8 {
+        return Err("state.bin too short".into());
+    }
+    let height = u64::from_le_bytes(state_bytes[0..8].try_into().unwrap());
+    if height != manifest.snapshot_height {
+        return Err(format!(
+            "Height mismatch: state={} manifest={}",
+            height, manifest.snapshot_height
+        ));
+    }
+
+    Ok(manifest)
+}
