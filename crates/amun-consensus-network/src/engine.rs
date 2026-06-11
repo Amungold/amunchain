@@ -180,8 +180,10 @@ impl ConsensusEngine {
         let height = vote.height;
         let future_window = std::cmp::max(50, self.current_height / 100);
         if height > self.current_height + future_window {
-            self.current_height = height.saturating_sub(1);
-            self.needs_catchup = false;
+            self.needs_catchup = true;
+            return Err(format!(
+                "Future vote height {} > current+{} {}", height, future_window, self.current_height
+            ));
         }
         if !self.rounds.contains_key(&height) {
             self.start_round(height, vote.voter_id);

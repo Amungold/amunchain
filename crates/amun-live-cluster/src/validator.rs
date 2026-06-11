@@ -4,6 +4,7 @@ use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
+use amun_sync::protocol::handle_incoming_with_store;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
@@ -79,6 +80,45 @@ impl LiveValidator {
 
     pub fn start(&self) -> Result<(), String> {
         *self.running.lock().unwrap() = true;
+
+        // Fast‑forward before consensus starts so a recovered node
+        // joins at the current network height immediately.
+        {
+            let recovered_height = self.store.lock().unwrap().latest_height();
+            let mut eng = self.engine.lock().unwrap();
+            if recovered_height > 0 {
+                eng.metrics.qcs_formed = recovered_height;
+                eng.metrics.blocks_finalized = recovered_height;
+            }
+            for _retry in 0..5 {
+                for peer in self.config.other_peers() {
+                    if let Ok(mut stream) = std::net::TcpStream::connect_timeout(
+                        &peer.address, std::time::Duration::from_secs(3))
+                    {
+                        let _ = stream.set_read_timeout(Some(std::time::Duration::from_secs(3)));
+                        let req = b"HEIGHT"; let rl = (req.len() as u32).to_be_bytes();
+                        let _ = stream.write_all(&rl); let _ = stream.write_all(req); let _ = stream.flush();
+                        let mut lb = [0u8;4];
+                        if stream.read_exact(&mut lb).is_ok() && u32::from_be_bytes(lb) == 8 {
+                            let mut d = [0u8;8];
+                            if stream.read_exact(&mut d).is_ok() {
+                                let ph = u64::from_le_bytes(d);
+                                if ph > eng.current_height {
+                                    eprintln!("FAST-FORWARD: {} -> {}", eng.current_height, ph);
+                                    eng.current_height = ph;
+                                    eng.metrics.qcs_formed = ph;
+                                    eng.metrics.blocks_finalized = ph;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if eng.current_height > recovered_height { break; }
+                std::thread::sleep(std::time::Duration::from_millis(500));
+            }
+        }
+
         let listener = TcpListener::bind(self.config.listen_addr)
             .map_err(|e| format!("Bind error on {}: {}", self.config.listen_addr, e))?;
         listener
@@ -264,8 +304,34 @@ impl LiveValidator {
             }
         });
 
+        // Embedded sync server for block‑range requests
+        let sync_addr = std::net::SocketAddr::new(
+            self.config.listen_addr.ip(),
+            self.config.listen_addr.port() + 10000,
+        );
+        let sync_listener = TcpListener::bind(sync_addr)
+            .map_err(|e| format!("Sync bind error on {}: {}", sync_addr, e))?;
+        sync_listener.set_nonblocking(true)
+            .map_err(|e| format!("Sync nonblocking error: {}", e))?;
+        let sync_store = self.store.clone();
+        let sync_running = running.clone();
+        let h_sync = thread::spawn(move || {
+            while *sync_running.lock().unwrap() {
+                match sync_listener.accept() {
+                    Ok((stream, _)) => {
+                        let store_guard = sync_store.lock().unwrap();
+                        handle_incoming_with_store(stream, &store_guard, |_data| {});
+                    }
+                    Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                        thread::sleep(Duration::from_millis(10));
+                    }
+                    Err(_) => break,
+                }
+            }
+        });
         self.handles.lock().unwrap().push(h1);
         self.handles.lock().unwrap().push(h2);
+        self.handles.lock().unwrap().push(h_sync);
         Ok(())
     }
 
