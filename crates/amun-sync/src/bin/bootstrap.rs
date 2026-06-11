@@ -1,62 +1,90 @@
-use amun_chain_store::snapshot::{restore_snapshot, verify_snapshot};
+use amun_chain_store::snapshot::{create_snapshot, restore_snapshot, verify_snapshot};
 use amun_chain_store::store::ChainStore;
-use std::io::{Read, Write};
-use std::net::{SocketAddr, TcpStream};
+use amun_sync::catch_up::{download_missing_records, append_missing_records};
+use std::net::SocketAddr;
 use std::path::Path;
-use std::time::Duration;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 4 {
-        eprintln!("Usage: bootstrap <store_dir> <peer_addr> <snapshot_dir>");
+        eprintln!("Usage: bootstrap <source_data_dir> <target_data_dir> <sync_peer_addr>");
+        eprintln!("  source_data_dir: path to a running validator's store (for creating snapshot)");
+        eprintln!("  target_data_dir: path where the new node will be restored");
+        eprintln!("  sync_peer_addr:  address of the embedded sync endpoint (port+10000)");
         std::process::exit(1);
     }
-    let store_dir = Path::new(&args[1]);
-    let peer: SocketAddr = args[2].parse().expect("Invalid peer address");
-    let snapshot_dir = Path::new(&args[3]);
+    let source_dir = Path::new(&args[1]);
+    let target_dir = Path::new(&args[2]);
+    let sync_peer: SocketAddr = args[3].parse().expect("Invalid sync peer address");
 
-    // 1. Download snapshot manifest from peer
-    eprintln!("BOOTSTRAP: downloading snapshot from {}", peer);
-    let mut stream = TcpStream::connect_timeout(&peer, Duration::from_secs(5))
-        .expect("Failed to connect to peer");
-    stream.set_read_timeout(Some(Duration::from_secs(30))).ok();
-    stream.set_write_timeout(Some(Duration::from_secs(10))).ok();
+    // Phase 1: Snapshot
+    let snap_dir = source_dir.join("snapshot_bootstrap");
+    let source_store = ChainStore::open(source_dir.to_str().unwrap()).expect("Failed to open source store");
+    eprintln!("Creating snapshot from {} at height {}...", source_dir.display(), source_store.latest_height());
+    let manifest = create_snapshot(&source_store, &snap_dir).expect("Failed to create snapshot");
+    eprintln!("Snapshot created: height={}, hash={}", manifest.snapshot_height, hex::encode(manifest.snapshot_hash));
 
-    let request = b"SNAPSHOT";
-    let req_len = (request.len() as u32).to_be_bytes();
-    stream.write_all(&req_len).expect("write len");
-    stream.write_all(request).expect("write request");
-    stream.flush().expect("flush");
+    // Phase 2: Verify
+    eprintln!("Verifying snapshot...");
+    verify_snapshot(&snap_dir).expect("Snapshot verification failed");
+    eprintln!("Snapshot verified.");
 
-    // Read manifest length
-    let mut len_buf = [0u8; 4];
-    stream.read_exact(&mut len_buf).expect("read len");
-    let manifest_len = u32::from_be_bytes(len_buf) as usize;
-    if manifest_len == 0 {
-        eprintln!("BOOTSTRAP: peer has no snapshot available");
-        std::process::exit(1);
+    // Phase 3: Restore
+    eprintln!("Restoring snapshot to {}...", target_dir.display());
+    let restored_manifest = restore_snapshot(&snap_dir, target_dir).expect("Failed to restore snapshot");
+    eprintln!("Restored to height {}", restored_manifest.snapshot_height);
+
+    // Phase 4: Historical gap-fill (1..snapshot_height)
+    eprintln!("Filling historical gaps...");
+    let mut target_store = ChainStore::open(target_dir.to_str().unwrap()).expect("Failed to open target store");
+    let peers = vec![sync_peer];
+    
+    // Fill from height 1 to snapshot_height
+    let mut current_gap_start = 1u64;
+    while current_gap_start <= manifest.snapshot_height {
+        match download_missing_records(current_gap_start - 1, &peers) {
+            Ok(records) => {
+                if records.is_empty() { break; }
+                eprintln!("Gap-fill: downloaded {} records from height {}", records.len(), records.first().unwrap().height);
+                let new_h = append_missing_records(&mut target_store, current_gap_start - 1, records)
+                    .unwrap_or(current_gap_start - 1);
+                current_gap_start = new_h + 1;
+                eprintln!("Gap-fill: store height now {}", new_h);
+            }
+            Err(e) => {
+                eprintln!("Gap-fill: download failed at height {}: {}", current_gap_start, e);
+                break;
+            }
+        }
     }
 
-    // Read manifest
-    let mut manifest_data = vec![0u8; manifest_len];
-    stream.read_exact(&mut manifest_data).expect("read manifest");
+    // Phase 5: Delta sync – catch up any blocks produced since snapshot
+    eprintln!("Syncing recent blocks...");
+    let local_height = target_store.latest_height();
+    match download_missing_records(local_height, &peers) {
+        Ok(records) => {
+            eprintln!("Delta sync: downloaded {} records", records.len());
+            if !records.is_empty() {
+                let new_h = append_missing_records(&mut target_store, local_height, records)
+                    .unwrap_or(local_height);
+                eprintln!("Delta sync: store height now {}", new_h);
+            }
+        }
+        Err(e) => {
+            eprintln!("Delta sync failed: {}", e);
+        }
+    }
 
-    // Write manifest to snapshot_dir
-    std::fs::create_dir_all(snapshot_dir).expect("create snapshot dir");
-    std::fs::write(snapshot_dir.join("manifest.json"), &manifest_data).expect("write manifest");
-
-    eprintln!("BOOTSTRAP: snapshot manifest downloaded ({} bytes)", manifest_len);
-
-    // 2. Verify snapshot
-    let manifest = verify_snapshot(snapshot_dir).expect("snapshot verification failed");
-    eprintln!("BOOTSTRAP: snapshot verified at height {}", manifest.snapshot_height);
-
-    // 3. Restore store
-    restore_snapshot(snapshot_dir, store_dir).expect("restore failed");
-    eprintln!("BOOTSTRAP: store restored from snapshot");
-
-    // 4. Verify restored store
-    let store = ChainStore::open(store_dir.to_str().unwrap()).expect("open restored store");
-    eprintln!("BOOTSTRAP: store tip height = {}", store.latest_height());
-    eprintln!("BOOTSTRAP: complete — node is ready to join consensus");
+    // Phase 6: Verify final state
+    let final_height = target_store.latest_height();
+    
+    // Count missing records
+    let mut missing = 0u64;
+    for h in 1..=final_height {
+        if target_store.load_height(h).is_none() {
+            missing += 1;
+        }
+    }
+    eprintln!("Bootstrap complete: final_height={} store_records={} missing={}",
+        final_height, target_store.len(), missing);
 }
