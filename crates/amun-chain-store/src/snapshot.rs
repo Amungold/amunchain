@@ -15,10 +15,7 @@ pub struct SnapshotManifest {
 
 /// Create a snapshot of the current chain state at the latest finalized height.
 /// Writes manifest.json and a binary state dump into `output_dir`.
-pub fn create_snapshot(
-    store: &ChainStore,
-    output_dir: &Path,
-) -> Result<SnapshotManifest, String> {
+pub fn create_snapshot(store: &ChainStore, output_dir: &Path) -> Result<SnapshotManifest, String> {
     let tip = store
         .load_tip()
         .ok_or_else(|| "Empty store – cannot snapshot".to_string())?;
@@ -116,6 +113,35 @@ pub fn verify_snapshot(snapshot_dir: &Path) -> Result<SnapshotManifest, String> 
             height, manifest.snapshot_height
         ));
     }
+
+    Ok(manifest)
+}
+
+/// Restore a chain store from a verified snapshot.
+/// Creates a new store at `store_dir` and populates it with the tip record.
+pub fn restore_snapshot(snapshot_dir: &Path, store_dir: &Path) -> Result<SnapshotManifest, String> {
+    // Verify first
+    let manifest = verify_snapshot(snapshot_dir)?;
+
+    // Read state.bin
+    let state_path = snapshot_dir.join("state.bin");
+    let state_bytes = std::fs::read(&state_path).map_err(|e| e.to_string())?;
+    let state_root: [u8; 32] = state_bytes[8..40].try_into().map_err(|e| format!("{:?}", e))?;
+
+    // Build the tip record
+    let record = crate::record::FinalizedChainRecord {
+        height: manifest.snapshot_height,
+        block_hash: [manifest.snapshot_height as u8; 32],
+        state_root,
+        history_root: manifest.history_root,
+        certificate_hash: [0u8; 32],
+        timestamp: 0,
+    };
+
+    // Create/open store
+    let mut store = crate::store::ChainStore::open(store_dir.to_str().unwrap())
+        .map_err(|e| format!("open store: {}", e))?;
+    store.append(record).map_err(|e| format!("append record: {}", e))?;
 
     Ok(manifest)
 }

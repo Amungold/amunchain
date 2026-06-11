@@ -27,7 +27,10 @@ fn main() {
 
     // Test 1: verify valid snapshot
     let manifest = verify_snapshot(&snapshot_dir).unwrap();
-    println!("Test 1 PASS: valid snapshot verified, height={}", manifest.snapshot_height);
+    println!(
+        "Test 1 PASS: valid snapshot verified, height={}",
+        manifest.snapshot_height
+    );
 
     // Test 2: corrupt manifest and expect failure
     std::fs::write(snapshot_dir.join("manifest.json"), "garbage").unwrap();
@@ -42,7 +45,7 @@ fn main() {
     std::fs::write(snapshot_dir.join("state.bin"), state).unwrap();
     // Recreate a valid manifest for this test
     create_snapshot(&store, &snapshot_dir).unwrap(); // re-create valid manifest
-    // Now corrupt the state.bin height
+                                                     // Now corrupt the state.bin height
     let mut state2 = std::fs::read(snapshot_dir.join("state.bin")).unwrap();
     state2[0] ^= 0xFF;
     std::fs::write(snapshot_dir.join("state.bin"), state2).unwrap();
