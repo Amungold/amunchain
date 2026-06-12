@@ -1,255 +1,139 @@
-# AmunChain
+AmunChain
 
-A constitutional blockchain written in Rust.
+Constitutional blockchain infrastructure for sovereign digital systems.
 
-The system is designed around one core idea:
-
-The rules governing the chain are themselves part of the chain identity.
-
-If the constitutional rules change,
-the civilization identity changes.
+Deterministic • Auditable • Replayable • Security-First
 
 ---
 
-## Philosophy
+Overview
 
-AmunChain is not a general-purpose blockchain.
+AmunChain is an open-source blockchain infrastructure platform built in Rust and designed around constitutional governance, deterministic execution, cryptographic verifiability, and long-term sustainability.
 
-It is a constitutional computational system where:
-
-- determinism is mandatory
-- replayability is mandatory
-- constitutional validity is mandatory
-- serialization is frozen
-- domain separation is frozen
-- state interpretation is frozen
-
-Every node must independently verify reality.
+Unlike conventional blockchains, AmunChain treats constitutional rules as a first-class component of network identity. Every node independently verifies state transitions, protocol rules, and system integrity through reproducible execution and auditability guarantees.
 
 ---
 
-## Current Status
+Foundation Status
 
-| Property | Value |
-|---|---|
-| Phase | 92 |
-| Crates | 32 |
-| Audit Layers | 16 |
-| Tests | 258 passing |
-| Rust | 1.85+ |
+N100 Foundation Complete
+
+The constitutional foundation, storage layer, replay engine, networking stack, audit framework, synchronization mechanisms, and recovery infrastructure have been implemented and validated.
+
+Current focus is ecosystem expansion and higher-level protocol development.
 
 ---
 
-## Repository Layout
+Core Principles
 
-| Path | Purpose |
-|---|---|
-| crates/ | Constitutional crates |
-| docs/ | Technical documentation |
-| constitution/ | Constitutional specifications |
-| tools/ | Verification scripts |
-| fixtures/ | Replay and snapshot fixtures |
-| audit_reports/ | Audit outputs |
-
----
-
-## Quick Start
-
-```bash
-cargo build --workspace
-cargo test --workspace
-cargo deny check licenses
-cargo udeps --workspace
-```
-
----
-
-## Core Principles
-
-### Determinism
+Determinism
 
 The same input must always produce the same output.
 
-No hidden entropy is allowed.
-
-### Replayability
+Replayability
 
 Every state transition must be independently reproducible.
 
-### Verifiability
+Verifiability
 
 Every result must be cryptographically provable.
 
-### Constitutional Authority
+Security First
 
-The constitution defines the authority of the civilization.
+Security is prioritized over performance shortcuts.
 
-The runtime is a servant of the constitution.
+Long-Term Sustainability
 
----
+Architectural decisions prioritize durability and maintainability over short-term optimization.
 
-## Major Components
+Digital Sovereignty
 
-### amun-constitutional
-
-The constitutional core.
-
-Contains:
-
-- schema registry
-- domain registry
-- constitutional codec
-- replay certificates
-- specification hashing
-- freeze witnesses
-- constitutional invariants
-
-### amun-storage-kernel
-
-Persistent SMT storage engine.
-
-Contains:
-
-- sparse merkle trees
-- WAL persistence
-- snapshots
-- crash recovery
-
-### amun-replay-engine
-
-Deterministic replay infrastructure.
-
-Contains:
-
-- replay equivalence
-- divergence detection
-- transcript validation
-- witness envelopes
-
-### amun-networking
-
-Constitutional peer-to-peer networking.
-
-Contains:
-
-- sovereignty checks
-- quarantine logic
-- manifest verification
-- peer synchronization
+The network is designed to support independent digital infrastructure without centralized control.
 
 ---
 
-## Constitutional Identity
+Architecture
 
-Civilization identity is derived from:
+Constitutional Layer
 
-- frozen constants
-- registry fingerprints
-- constitutional invariants
-- replay semantics
-- physics manifests
-- specification hashes
+Defines protocol identity, governance rules, invariants, registries, and protocol semantics.
 
-Changing constitutional semantics produces a different civilization.
+Storage Layer
 
----
+Persistent state management using cryptographic data structures, snapshots, and recovery mechanisms.
 
-## Audit Layers
+Replay Layer
 
-AmunChain uses a layered constitutional audit system.
+Deterministic execution validation and state reproduction.
 
-The audit stack validates:
+Networking Layer
 
-- physics
-- geometry
-- replay
-- byzantine resistance
-- mutation resistance
-- crash recovery
-- differential consistency
-- fuzzing safety
+Peer synchronization, protocol verification, and distributed communication.
 
-See:
+Audit Framework
 
-docs/AUDIT_LAYERS.md
+Multi-layer validation covering correctness, consistency, safety, and fault tolerance.
 
 ---
 
-## Build Requirements
+Ecosystem
 
-Recommended environment:
+AmunChain
 
-- Linux x86_64
-- Rust 1.85+
-- clang
-- lld
+Core blockchain infrastructure.
 
-Recommended build:
+NTR
 
-```bash
+Native token of the AmunChain ecosystem.
+
+---
+
+Technology Stack
+
+- Rust
+- Cryptographic Proof Systems
+- Merkle Trees
+- Peer-to-Peer Networking
+- Snapshot & Recovery Infrastructure
+- Deterministic State Execution
+- Audit & Verification Frameworks
+
+---
+
+Build
+
 cargo build --workspace --locked
-```
+cargo test --workspace
 
 ---
 
-## Governance
+Documentation
 
-Constitutional amendments are explicit civilization transitions.
+Documentation can be found in:
 
-Amendments must define:
-
-- lineage
-- activation semantics
-- migration semantics
-- replay compatibility
+- docs/
+- constitution/
+- audit_reports/
 
 ---
 
-## Security Model
+License
 
-The system assumes hostile environments.
+Dual Licensed:
 
-The runtime must reject:
-
-- malformed proofs
-- corrupted manifests
-- replay divergence
-- invalid snapshots
-- constitutional drift
+- MIT License
+- Apache License 2.0
 
 ---
 
-## Documentation
+Website
 
-| File | Purpose |
-|---|---|
-| docs/CRATE_ARCHITECTURE.md | Crate taxonomy |
-| docs/DEVELOPER_GUIDE.md | Developer workflow |
-| docs/AUDIT_LAYERS.md | Audit layer definitions |
-| docs/CONSTITUTIONAL_MODEL.md | Constitutional ontology |
-| docs/REPLAY_MODEL.md | Replay semantics |
-| docs/SECURITY_MODEL.md | Security doctrine |
+https://amungold.com
 
 ---
 
-## Vision
+Organization
 
-AmunChain aims to become:
+Developed and maintained by Amungold Global.
 
-A constitutional substrate for deterministic civilizations.
-
----
-
-## License
-
-The source code is licensed under the **GNU Affero General Public License v3.0 or later** (AGPL-3.0-or-later).
-
-Constitutional artifacts (genesis, lineage, witnesses, identity) are sovereign and protected under the **Constitutional Sovereignty Addendum**.
-
-See:
-- [LICENSE](LICENSE) — AGPLv3
-- [CONSTITUTIONAL_SOVEREIGNTY.md](CONSTITUTIONAL_SOVEREIGNTY.md) — Sovereignty terms
-- [TRADEMARKS.md](TRADEMARKS.md) — Trademark registry
-- [genesis/FOUNDING_IDENTITY.md](genesis/FOUNDING_IDENTITY.md) — Founding declaration
-
-Copyright (c) 2026 **Amungold Global**. All trademark rights and sovereign identity rights reserved.
+Building sovereign digital infrastructure for the next generation of constitutional systems.
