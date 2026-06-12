@@ -16,6 +16,53 @@ pub struct ConsensusVote {
     pub timestamp: u64,
 }
 
+/// A signed vote — the vote payload plus a cryptographic signature.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct SignedVote {
+    pub vote: ConsensusVote,
+    #[serde(with = "serde_bytes")]
+    pub signature: [u8; 64],
+}
+
+/// An equivocation proof: evidence that a validator voted for two different blocks
+/// at the same height and round.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct EquivocationProof {
+    pub validator_id: [u8; 32],
+    pub height: u64,
+    pub round: u64,
+    pub vote_a: SignedVote,
+    pub vote_b: SignedVote,
+    pub detected_at_height: u64,
+}
+
+impl EquivocationProof {
+    /// Verify the proof without any external state.
+    pub fn verify_standalone(&self) -> Result<(), String> {
+        let a = &self.vote_a.vote;
+        let b = &self.vote_b.vote;
+        if a.voter_id != self.validator_id || b.voter_id != self.validator_id {
+            return Err("Validator ID mismatch".into());
+        }
+        if a.height != self.height || b.height != self.height {
+            return Err("Height mismatch".into());
+        }
+        if a.timestamp != self.round || b.timestamp != self.round {
+            return Err("Round mismatch".into());
+        }
+        if a.block_hash == b.block_hash {
+            return Err("Same block hash – not equivocation".into());
+        }
+        if self.vote_a.signature == [0u8; 64] || self.vote_b.signature == [0u8; 64] {
+            return Err("Missing signature".into());
+        }
+        if self.vote_a.signature == self.vote_b.signature {
+            return Err("Identical signatures – likely duplicate".into());
+        }
+        Ok(())
+    }
+}
+
 /// A quorum certificate: proof that >2/3 validators approved.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct QuorumCertificate {
@@ -74,6 +121,99 @@ mod tests {
             signature: [0u8; 64],
             timestamp: 1000,
         }
+    }
+
+    fn make_signed_vote(voter: u8, height: u64, block_hash: [u8; 32], round: u64) -> SignedVote {
+        let mut vote = make_vote(voter, height, block_hash, true);
+        vote.timestamp = round;
+        SignedVote {
+            vote,
+            signature: [1u8; 64],
+        }
+    }
+
+    #[test]
+    fn n101_2_valid_equivocation_proof_accepted() {
+        let mut vote_a = make_signed_vote(1, 10, [0xAA; 32], 1);
+        let mut vote_b = make_signed_vote(1, 10, [0xBB; 32], 1);
+        vote_a.signature = [1u8; 64];
+        vote_b.signature = [2u8; 64]; // different signature for different vote
+        let proof = EquivocationProof {
+            validator_id: [1u8; 32],
+            height: 10,
+            round: 1,
+            vote_a,
+            vote_b,
+            detected_at_height: 11,
+        };
+        assert!(proof.verify_standalone().is_ok());
+    }
+
+    #[test]
+    fn n101_2_different_validators_rejected() {
+        let proof = EquivocationProof {
+            validator_id: [1u8; 32],
+            height: 10,
+            round: 1,
+            vote_a: make_signed_vote(1, 10, [0xAA; 32], 1),
+            vote_b: make_signed_vote(2, 10, [0xBB; 32], 1),
+            detected_at_height: 11,
+        };
+        assert!(proof.verify_standalone().is_err());
+    }
+
+    #[test]
+    fn n101_2_different_heights_rejected() {
+        let proof = EquivocationProof {
+            validator_id: [1u8; 32],
+            height: 10,
+            round: 1,
+            vote_a: make_signed_vote(1, 10, [0xAA; 32], 1),
+            vote_b: make_signed_vote(1, 11, [0xBB; 32], 1),
+            detected_at_height: 11,
+        };
+        assert!(proof.verify_standalone().is_err());
+    }
+
+    #[test]
+    fn n101_2_same_block_hash_rejected() {
+        let proof = EquivocationProof {
+            validator_id: [1u8; 32],
+            height: 10,
+            round: 1,
+            vote_a: make_signed_vote(1, 10, [0xAA; 32], 1),
+            vote_b: make_signed_vote(1, 10, [0xAA; 32], 1),
+            detected_at_height: 11,
+        };
+        assert!(proof.verify_standalone().is_err());
+    }
+
+    #[test]
+    fn n101_2_missing_signature_rejected() {
+        let mut bad = make_signed_vote(1, 10, [0xBB; 32], 1);
+        bad.signature = [0u8; 64];
+        let proof = EquivocationProof {
+            validator_id: [1u8; 32],
+            height: 10,
+            round: 1,
+            vote_a: make_signed_vote(1, 10, [0xAA; 32], 1),
+            vote_b: bad,
+            detected_at_height: 11,
+        };
+        assert!(proof.verify_standalone().is_err());
+    }
+
+    #[test]
+    fn n101_2_different_rounds_rejected() {
+        let proof = EquivocationProof {
+            validator_id: [1u8; 32],
+            height: 10,
+            round: 1,
+            vote_a: make_signed_vote(1, 10, [0xAA; 32], 1),
+            vote_b: make_signed_vote(1, 10, [0xBB; 32], 2),
+            detected_at_height: 11,
+        };
+        assert!(proof.verify_standalone().is_err());
     }
 
     #[test]

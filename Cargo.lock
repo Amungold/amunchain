@@ -250,9 +250,12 @@ dependencies = [
 name = "amun-consensus-network"
 version = "0.1.0"
 dependencies = [
+ "blake3",
  "postcard",
  "serde",
  "serde_bytes",
+ "serde_json",
+ "tempfile",
 ]
 
 [[package]]
@@ -1168,6 +1171,7 @@ name = "amun-sync"
 version = "0.1.0"
 dependencies = [
  "amun-chain-store",
+ "amun-consensus-network",
  "amun-network-transport",
  "blake3",
  "hex",
