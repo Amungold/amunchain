@@ -1,4 +1,5 @@
 use crate::messages::{ConsensusVote, FinalityCertificate, QuorumCertificate};
+use crate::validator_status::ValidatorStatusRegistry;
 use std::collections::HashMap;
 
 /// A single consensus round for one block height.
@@ -12,6 +13,7 @@ pub struct ConsensusRound {
     pub qc: Option<QuorumCertificate>,
     pub finality: Option<FinalityCertificate>,
     pub complete: bool,
+    pub double_vote_evidence: Vec<DoubleVoteEvidence>,
 }
 
 impl ConsensusRound {
@@ -25,6 +27,7 @@ impl ConsensusRound {
             qc: None,
             finality: None,
             complete: false,
+            double_vote_evidence: Vec::new(),
         }
     }
 
@@ -46,7 +49,18 @@ impl ConsensusRound {
                 vote.height, self.height
             ));
         }
-        if self.votes.iter().any(|v| v.voter_id == vote.voter_id) {
+        // Check for equivocation: same validator, same height, different block_hash
+        if let Some(existing) = self.votes.iter().find(|v| v.voter_id == vote.voter_id) {
+            if existing.block_hash != vote.block_hash {
+                let evidence = DoubleVoteEvidence {
+                    validator_id: vote.voter_id,
+                    height: self.height,
+                    vote_a: existing.clone(),
+                    vote_b: vote.clone(),
+                };
+                self.double_vote_evidence.push(evidence);
+                return Err("Equivocation detected: double vote for different blocks".into());
+            }
             return Err("Duplicate vote from validator".into());
         }
         if let Some(hash) = self.proposed_block_hash {
@@ -138,6 +152,25 @@ impl ConsensusMetrics {
         )
     }
 }
+
+/// State machine for node lifecycle
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NodeState {
+    Bootstrapping,
+    CatchingUp,
+    JoiningConsensus,
+    Active,
+}
+
+/// Evidence of equivocation — same validator voted for two different blocks at the same height.
+#[derive(Debug, Clone)]
+pub struct DoubleVoteEvidence {
+    pub validator_id: [u8; 32],
+    pub height: u64,
+    pub vote_a: crate::messages::ConsensusVote,
+    pub vote_b: crate::messages::ConsensusVote,
+}
+
 pub struct ConsensusEngine {
     pub validator_id: [u8; 32],
     pub total_validators: usize,
@@ -146,6 +179,8 @@ pub struct ConsensusEngine {
     pub metrics: ConsensusMetrics,
     pub rounds: HashMap<u64, ConsensusRound>,
     pub needs_catchup: bool,
+    pub node_state: NodeState,
+    pub validator_status: Option<std::sync::Arc<std::sync::Mutex<ValidatorStatusRegistry>>>,
     finality_chain: Vec<FinalityCertificate>,
 }
 
@@ -159,6 +194,8 @@ impl ConsensusEngine {
             metrics: ConsensusMetrics::new(),
             rounds: HashMap::new(),
             needs_catchup: false,
+            node_state: NodeState::Active,
+            validator_status: None,
             finality_chain: Vec::new(),
         }
     }
@@ -182,7 +219,8 @@ impl ConsensusEngine {
         if height > self.current_height + future_window {
             self.needs_catchup = true;
             return Err(format!(
-                "Future vote height {} > current+{} {}", height, future_window, self.current_height
+                "Future vote height {} > current+{} {}",
+                height, future_window, self.current_height
             ));
         }
         if !self.rounds.contains_key(&height) {
@@ -219,13 +257,32 @@ impl ConsensusEngine {
         Some(cert)
     }
 
-    /// Get the proposer for a given height (round-robin).
+    /// Get the proposer for a given height (round-robin), skipping suspended validators.
     pub fn proposer_for(&self, height: u64) -> usize {
-        ((height - 1) as usize) % self.total_validators
+        let base = ((height - 1) as usize) % self.total_validators;
+        let mut idx = base;
+        for _ in 0..self.total_validators {
+            let validator_id = [(idx + 1) as u8; 32];
+            if !self.is_suspended(&validator_id) {
+                return idx;
+            }
+            idx = (idx + 1) % self.total_validators;
+        }
+        base
     }
 
     pub fn is_finalized(&self, height: u64) -> bool {
         self.rounds.get(&height).is_some_and(|r| r.complete)
+    }
+
+    // N101.6: Check if a validator is currently suspended
+    fn is_suspended(&self, validator_id: &[u8; 32]) -> bool {
+        if let Some(ref registry) = self.validator_status {
+            let reg = registry.lock().unwrap();
+            reg.is_suspended(validator_id, self.current_height)
+        } else {
+            false
+        }
     }
 }
 

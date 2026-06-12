@@ -23,11 +23,17 @@ fn main() {
 
 fn handle_client(mut stream: TcpStream, snapshot_dir: &Path) {
     let mut len_buf = [0u8; 4];
-    if stream.read_exact(&mut len_buf).is_err() { return; }
+    if stream.read_exact(&mut len_buf).is_err() {
+        return;
+    }
     let len = u32::from_be_bytes(len_buf) as usize;
-    if len > 1024 { return; }
+    if len > 1024 {
+        return;
+    }
     let mut buf = vec![0u8; len];
-    if stream.read_exact(&mut buf).is_err() { return; }
+    if stream.read_exact(&mut buf).is_err() {
+        return;
+    }
 
     if buf == b"MANIFEST" {
         let manifest_path = snapshot_dir.join("manifest.json");

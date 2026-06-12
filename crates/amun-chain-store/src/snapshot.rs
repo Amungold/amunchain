@@ -126,7 +126,9 @@ pub fn restore_snapshot(snapshot_dir: &Path, store_dir: &Path) -> Result<Snapsho
     // Read state.bin
     let state_path = snapshot_dir.join("state.bin");
     let state_bytes = std::fs::read(&state_path).map_err(|e| e.to_string())?;
-    let state_root: [u8; 32] = state_bytes[8..40].try_into().map_err(|e| format!("{:?}", e))?;
+    let state_root: [u8; 32] = state_bytes[8..40]
+        .try_into()
+        .map_err(|e| format!("{:?}", e))?;
 
     // Build the tip record
     let record = crate::record::FinalizedChainRecord {
@@ -141,7 +143,9 @@ pub fn restore_snapshot(snapshot_dir: &Path, store_dir: &Path) -> Result<Snapsho
     // Create/open store
     let mut store = crate::store::ChainStore::open(store_dir.to_str().unwrap())
         .map_err(|e| format!("open store: {}", e))?;
-    store.append(record).map_err(|e| format!("append record: {}", e))?;
+    store
+        .append(record)
+        .map_err(|e| format!("append record: {}", e))?;
 
     Ok(manifest)
 }
