@@ -1,15 +1,17 @@
 [package]
 name = "amun-rpc"
-version = "3.0.0"
-license = "MIT OR Apache-2.0"
+version = "0.1.0"
 edition = "2021"
-description = "AmunChain JSON-RPC with auth and rate limiting"
+description = "Live RPC server for AmunChain validators"
 
 [dependencies]
-amun-host = { path = "../amun-host" }
-amun-crypto = { path = "../amun-crypto" }
+amun-chain-store = { path = "../amun-chain-store" }
+amun-consensus-network = { path = "../amun-consensus-network" }
+axum = { version = "0.7", features = ["json"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-blake3 = { version = "1.5", default-features = false }
-subtle = "2"
-heapless = "0.8"
+hex = "0.4"
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors"] }
+

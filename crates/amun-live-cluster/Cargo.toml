@@ -9,9 +9,11 @@ license = "MIT OR Apache-2.0"
 amun-consensus-network = { path = "../amun-consensus-network" }
 amun-chain-store = { path = "../amun-chain-store" }
 amun-sync = { path = "../amun-sync" }
+amun-rpc = { path = "../amun-rpc" }
 amun-network-transport = { path = "../amun-network-transport" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+tokio = { version = "1", features = ["full"] }
 postcard = { version = "1", features = ["use-std"] }
 tempfile = "3"
 hex = "0.4.3"
@@ -19,3 +21,11 @@ hex = "0.4.3"
 [[bin]]
 name = "validator"
 path = "src/bin/validator.rs"
+
+[[bin]]
+name = "e2e_test"
+path = "src/bin/e2e_test.rs"
+
+[[bin]]
+name = "rpc_server"
+path = "src/bin/rpc_server.rs"
