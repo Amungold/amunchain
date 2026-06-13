@@ -168,6 +168,7 @@ pub struct DoubleVoteEvidence {
 pub struct ConsensusEngine {
     pub validator_id: [u8; 32],
     pub total_validators: usize,
+    pub validator_ids: Vec<[u8; 32]>,
     pub current_height: u64,
     pub history_root: [u8; 32],
     pub metrics: ConsensusMetrics,
@@ -184,6 +185,7 @@ impl ConsensusEngine {
         Self {
             validator_id,
             total_validators,
+            validator_ids: Vec::new(),
             current_height: 0,
             history_root: [0u8; 32],
             metrics: ConsensusMetrics::new(),
@@ -269,18 +271,37 @@ impl ConsensusEngine {
         result
     }
 
+    /// Count validators that are NOT suspended.
+    pub fn active_validator_count(&self) -> usize {
+        if self.validator_ids.is_empty() {
+            // Fallback: use sequential IDs
+            let mut active = 0;
+            for i in 0..self.total_validators {
+                let id = [(i + 1) as u8; 32];
+                if !self.is_suspended(&id) {
+                    active += 1;
+                }
+            }
+            return active;
+        }
+        self.validator_ids
+            .iter()
+            .filter(|id| !self.is_suspended(id))
+            .count()
+    }
+
     /// Try to advance: form QC, finalize, update history.
     pub fn try_advance(
         &mut self,
         height: u64,
         history_root: [u8; 32],
     ) -> Option<FinalityCertificate> {
-        let total = self.total_validators;
-        eprintln!("ADVANCE_DIAG: try_advance h={}", height);
+        let active = self.active_validator_count();
+        eprintln!("ADVANCE_DIAG: try_advance h={} active={}/{}", height, active, self.total_validators);
         let round = self.rounds.get_mut(&height)?;
 
         if round.qc.is_none() {
-            round.try_form_qc(total)?;
+            round.try_form_qc(active)?;
         }
 
         let cert = round.finalize(history_root)?;

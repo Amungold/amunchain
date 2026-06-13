@@ -67,6 +67,6 @@ impl ValidatorConfig {
     }
 
     pub fn total_validators(&self) -> usize {
-        self.quorum_size.unwrap_or(self.cluster.len())
+        self.cluster.len()
     }
 }
