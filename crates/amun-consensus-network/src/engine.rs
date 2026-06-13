@@ -236,6 +236,7 @@ impl ConsensusEngine {
             .rounds
             .get_mut(&height)
             .ok_or_else(|| format!("No active round at height {}", height))?;
+        eprintln!("PROCESS_VOTE: validator={:?} height={} hash={:?}", &vote.voter_id[..4], vote.height, &vote.block_hash[..4]);
         self.metrics.record_vote();
         round.add_vote(vote)
     }

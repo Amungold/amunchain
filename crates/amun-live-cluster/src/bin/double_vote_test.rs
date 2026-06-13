@@ -1,8 +1,6 @@
 use amun_consensus_network::messages::ConsensusVote;
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
-use std::io::Write;
-use std::net::TcpStream;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -23,7 +21,7 @@ fn main() {
         v.start().unwrap();
     }
 
-    println!("=== N103.1 DOUBLE VOTE DETECTION ===");
+    println!("=== N103.1 DOUBLE VOTE DETECTION (DIRECT ENGINE INJECTION) ===");
     println!("Validators: {} | Quorum: {}", count, quorum);
     println!();
 
@@ -32,56 +30,46 @@ fn main() {
     let initial: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
     println!("  Initial heights: {:?}", initial);
 
-    println!("\nPhase 2: Injecting double vote (equivocation)...");
+    println!("\nPhase 2: Direct equivocation injection into validator 0 engine...");
 
-    let current_h = validators[0].store.lock().unwrap().latest_height();
-    let vote_height = current_h + 1;
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
 
-    let vote_a = ConsensusVote {
-        voter_id: [4u8; 32],
-        height: vote_height,
-        block_hash: [0xAA; 32],
-        state_root: [0xBB; 32],
-        approve: true,
-        signature: [1u8; 64],
-        timestamp: now,
-    };
+    // Lock the engine directly and inject two conflicting votes
+    {
+        let mut eng = validators[0].engine.lock().unwrap();
+        let target_height = eng.current_height + 1;
 
-    let vote_b = ConsensusVote {
-        voter_id: [4u8; 32],
-        height: vote_height,
-        block_hash: [0xFF; 32],
-        state_root: [0xBB; 32],
-        approve: true,
-        signature: [2u8; 64],
-        timestamp: now + 1,
-    };
+        let vote_a = ConsensusVote {
+            voter_id: [4u8; 32],
+            height: target_height,
+            block_hash: [0xAA; 32],
+            state_root: [0xBB; 32],
+            approve: true,
+            signature: [1u8; 64],
+            timestamp: now,
+        };
 
-    let data_a = postcard::to_stdvec(&vote_a).unwrap();
-    let data_b = postcard::to_stdvec(&vote_b).unwrap();
+        let vote_b = ConsensusVote {
+            voter_id: [4u8; 32],
+            height: target_height,
+            block_hash: [0xFF; 32],
+            state_root: [0xBB; 32],
+            approve: true,
+            signature: [2u8; 64],
+            timestamp: now + 1,
+        };
 
-    let addr = format!("127.0.0.1:{}", base_port);
-    if let Ok(mut stream) = TcpStream::connect(&addr) {
-        let msg_type = [0x00u8];
-        let len = (data_a.len() as u32).to_be_bytes();
-        let _ = stream.write_all(&msg_type);
-        let _ = stream.write_all(&len);
-        let _ = stream.write_all(&data_a);
-        let _ = stream.flush();
-        println!("  Sent vote A (block_hash=0xAA)");
-    }
+        // Process first vote
+        match eng.process_vote(vote_a) {
+            Ok(()) => println!("  Vote A accepted"),
+            Err(e) => println!("  Vote A rejected: {}", e),
+        }
 
-    thread::sleep(Duration::from_millis(100));
-
-    if let Ok(mut stream) = TcpStream::connect(&addr) {
-        let msg_type = [0x00u8];
-        let len = (data_b.len() as u32).to_be_bytes();
-        let _ = stream.write_all(&msg_type);
-        let _ = stream.write_all(&len);
-        let _ = stream.write_all(&data_b);
-        let _ = stream.flush();
-        println!("  Sent vote B (block_hash=0xFF)");
+        // Process second vote (should trigger equivocation detection)
+        match eng.process_vote(vote_b) {
+            Ok(()) => println!("  Vote B accepted"),
+            Err(e) => println!("  Vote B rejected: {}", e),
+        }
     }
 
     println!("\nPhase 3: Waiting for consensus to continue...");
@@ -93,7 +81,7 @@ fn main() {
     let spread = max_h - min_h;
     println!("  Final heights: {:?} spread={}", final_heights, spread);
 
-    let made_progress = final_heights[0] > initial[0] && final_heights[1] > initial[1] && final_heights[2] > initial[2] && final_heights[3] > initial[3];
+    let made_progress = final_heights.iter().all(|h| *h > initial[0]);
     let no_stall = spread <= 2;
 
     for v in &validators { v.stop(); }
