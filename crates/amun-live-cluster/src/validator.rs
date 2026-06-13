@@ -100,6 +100,28 @@ impl LiveValidator {
                 }
             }
         }
+        // Retry until caught up within 2 blocks of network tip
+        for retry in 0..10 {
+            std::thread::sleep(std::time::Duration::from_secs(3));
+            let current = self.store.lock().unwrap().latest_height();
+            let peers: Vec<std::net::SocketAddr> = self.config.other_peers()
+                .iter().map(|p| p.address).collect();
+            if let Ok(records) = download_missing_records(current, &peers) {
+                if records.is_empty() { break; }
+                let new_h = {
+                    let mut s = self.store.lock().unwrap();
+                    append_missing_records(&mut s, current, records).unwrap_or(current)
+                };
+                let mut eng = self.engine.lock().unwrap();
+                if new_h > eng.current_height {
+                    eng.current_height = new_h;
+                    eng.rounds.clear();
+                    eprintln!("REJOIN retry {}: {} -> {}", retry, current, new_h);
+                } else {
+                    break;
+                }
+            }
+        }
     }
 
     pub fn start(&self) -> Result<(), String> {
