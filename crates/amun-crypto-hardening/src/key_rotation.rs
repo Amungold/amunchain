@@ -139,6 +139,7 @@ mod tests {
         for i in 1..=3 {
             let new_kp = ValidatorKeypair::generate();
             let mut message = Vec::new();
+            #[allow(clippy::unnecessary_cast)]
             message.extend_from_slice(&(i as u64).to_le_bytes());
             message.extend_from_slice(&current_kp.public_key);
             message.extend_from_slice(&new_kp.public_key);

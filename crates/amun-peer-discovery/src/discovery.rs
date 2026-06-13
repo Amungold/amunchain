@@ -238,7 +238,7 @@ mod tests {
         let requester_addr: SocketAddr = "127.0.0.1:10003".parse().unwrap();
         let peers = DiscoveryClient::request_peers(addr, requester_id, requester_addr).unwrap();
 
-        assert!(peers.len() >= 1, "Should discover at least 1 peer");
+        assert!(!peers.is_empty(), "Should discover at least 1 peer");
         // The requester should also be added to the server's table
         assert!(table.lock().unwrap().get(&requester_id).is_some());
     }

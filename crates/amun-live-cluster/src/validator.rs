@@ -78,6 +78,30 @@ impl LiveValidator {
         }
     }
 
+
+    fn perform_rejoin(&self) {
+        let local = self.store.lock().unwrap().latest_height();
+        let peers: Vec<std::net::SocketAddr> = self.config.other_peers()
+            .iter().map(|p| p.address).collect();
+        if let Ok(records) = download_missing_records(local, &peers) {
+            if !records.is_empty() {
+                let new_h = {
+                    let mut s = self.store.lock().unwrap();
+                    append_missing_records(&mut s, local, records).unwrap_or(local)
+                };
+                let mut eng = self.engine.lock().unwrap();
+                if new_h > eng.current_height {
+                    eng.current_height = new_h;
+                    eng.rounds.clear();
+                    if let Some(t) = self.store.lock().unwrap().load_tip() {
+                        eng.history_root = t.history_root;
+                    }
+                    eprintln!("REJOIN: {} -> {}", local, new_h);
+                }
+            }
+        }
+    }
+
     pub fn start(&self) -> Result<(), String> {
         *self.running.lock().unwrap() = true;
 
@@ -133,6 +157,7 @@ impl LiveValidator {
         let running = self.running.clone();
 
         // Listen thread
+        let store_sync = self.store.clone();
         let engine_listen = engine.clone();
         let running_listen = running.clone();
         let h1 = thread::spawn(move || {
@@ -140,6 +165,18 @@ impl LiveValidator {
                 match listener.accept() {
                     Ok((mut stream, _)) => {
                         let _ = stream.set_nonblocking(false);
+                        // Peek first byte to detect sync protocol messages (types 0x01-0x04)
+                        let mut peek_buf = [0u8; 1];
+                        if stream.peek(&mut peek_buf).is_ok() && peek_buf[0] >= 0x01 && peek_buf[0] <= 0x04 {
+                            let st = store_sync.lock().unwrap();
+                            amun_sync::protocol::handle_incoming_with_store(stream, &st, |data| {
+                                if let Ok(vote) = postcard::from_bytes::<ConsensusVote>(data) {
+                                    // votes arrive via 0x00, not via this path
+                                    let _ = vote;
+                                }
+                            });
+                            continue;
+                        }
                         let mut len_buf = [0u8; 4];
                         if stream.read_exact(&mut len_buf).is_ok() {
                             let len = u32::from_be_bytes(len_buf) as usize;
@@ -330,6 +367,7 @@ impl LiveValidator {
             }
         });
         self.handles.lock().unwrap().push(h1);
+        self.perform_rejoin();
         self.handles.lock().unwrap().push(h2);
         self.handles.lock().unwrap().push(h_sync);
         Ok(())

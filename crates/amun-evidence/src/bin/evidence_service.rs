@@ -35,7 +35,7 @@ fn main() {
                 for entry in entries.flatten() {
                     let path = entry.path();
                     eprintln!("WATCHER: found file {:?}", path);
-                    if path.extension().map_or(false, |e| e == "json") {
+                    if path.extension().is_some_and(|e| e == "json") {
                         let filename = path.to_string_lossy().to_string();
                         if !seen.contains(&filename) {
                             seen.push(filename.clone());
@@ -81,8 +81,7 @@ fn main() {
                     let mut buf = vec![0u8; len];
                     if stream.read_exact(&mut buf).is_ok() {
                         if let Ok(msg) = String::from_utf8(buf) {
-                            if msg.starts_with("PROOF:") {
-                                let proof_data = &msg[6..];
+                            if let Some(proof_data) = msg.strip_prefix("PROOF:") {
                                 let hash = blake3::hash(proof_data.as_bytes());
                                 let filename = format!("gossip_{}.json", hash.to_hex());
                                 let dest = evidence_dir.join(&filename);
