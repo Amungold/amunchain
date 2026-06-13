@@ -215,6 +215,12 @@ impl ConsensusEngine {
     /// Process a vote for a round.
     pub fn process_vote(&mut self, vote: ConsensusVote) -> Result<(), String> {
         let height = vote.height;
+        if height <= self.current_height {
+            return Err(format!(
+                "Stale vote height {} <= current {}",
+                height, self.current_height
+            ));
+        }
         let future_window = std::cmp::max(50, self.current_height / 100);
         if height > self.current_height + future_window {
             self.needs_catchup = true;
@@ -254,6 +260,8 @@ impl ConsensusEngine {
         self.metrics.record_qc_formed(height);
         self.metrics.record_block_finalized(height);
         self.finality_chain.push(cert.clone());
+        let keep_from = height.saturating_sub(64);
+        self.rounds.retain(|h, _| *h >= keep_from);
         Some(cert)
     }
 
