@@ -47,9 +47,6 @@ impl EquivocationProof {
         if a.height != self.height || b.height != self.height {
             return Err("Height mismatch".into());
         }
-        if a.timestamp != self.round || b.timestamp != self.round {
-            return Err("Round mismatch".into());
-        }
         if a.block_hash == b.block_hash {
             return Err("Same block hash – not equivocation".into());
         }

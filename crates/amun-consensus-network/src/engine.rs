@@ -1,4 +1,5 @@
-use crate::messages::{ConsensusVote, FinalityCertificate, QuorumCertificate};
+use crate::messages::{ConsensusVote, FinalityCertificate, QuorumCertificate, EquivocationProof, SignedVote};
+use crate::misbehavior::MisbehaviorRegistry;
 use crate::validator_status::ValidatorStatusRegistry;
 use std::collections::HashMap;
 
@@ -52,13 +53,6 @@ impl ConsensusRound {
         // Check for equivocation: same validator, same height, different block_hash
         if let Some(existing) = self.votes.iter().find(|v| v.voter_id == vote.voter_id) {
             if existing.block_hash != vote.block_hash {
-                let evidence = DoubleVoteEvidence {
-                    validator_id: vote.voter_id,
-                    height: self.height,
-                    vote_a: existing.clone(),
-                    vote_b: vote.clone(),
-                };
-                self.double_vote_evidence.push(evidence);
                 return Err("Equivocation detected: double vote for different blocks".into());
             }
             return Err("Duplicate vote from validator".into());
@@ -181,6 +175,7 @@ pub struct ConsensusEngine {
     pub needs_catchup: bool,
     pub node_state: NodeState,
     pub validator_status: Option<std::sync::Arc<std::sync::Mutex<ValidatorStatusRegistry>>>,
+    pub misbehavior_registry: MisbehaviorRegistry,
     finality_chain: Vec<FinalityCertificate>,
 }
 
@@ -196,6 +191,7 @@ impl ConsensusEngine {
             needs_catchup: false,
             node_state: NodeState::Active,
             validator_status: None,
+            misbehavior_registry: MisbehaviorRegistry::new(),
             finality_chain: Vec::new(),
         }
     }
@@ -238,7 +234,26 @@ impl ConsensusEngine {
             .ok_or_else(|| format!("No active round at height {}", height))?;
         eprintln!("PROCESS_VOTE: validator={:?} height={} hash={:?}", &vote.voter_id[..4], vote.height, &vote.block_hash[..4]);
         self.metrics.record_vote();
-        round.add_vote(vote)
+        let result = round.add_vote(vote.clone());
+        if let Err(ref e) = &result {
+            if e.contains("Equivocation detected") {
+                let existing = round.votes.iter().find(|v| v.voter_id == vote.voter_id).unwrap();
+                let signed_a = SignedVote { vote: existing.clone(), signature: existing.signature };
+                let signed_b = SignedVote { vote: vote.clone(), signature: vote.signature };
+                let proof = EquivocationProof {
+                    validator_id: vote.voter_id,
+                    height: vote.height,
+                    round: round.height,
+                    vote_a: signed_a,
+                    vote_b: signed_b,
+                    detected_at_height: self.current_height,
+                };
+                if let Ok(hash) = self.misbehavior_registry.add_proof(proof) {
+                    eprintln!("EVIDENCE_RECORDED: proof_hash={:?} validator={:?}", &hash[..4], &vote.voter_id[..4]);
+                }
+            }
+        }
+        result
     }
 
     /// Try to advance: form QC, finalize, update history.
