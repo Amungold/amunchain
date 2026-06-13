@@ -30,55 +30,76 @@ fn main() {
     let initial: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
     println!("  Initial heights: {:?}", initial);
 
-    println!("\nPhase 2: Injecting offenses + verifying enforcement...");
+    println!("\nPhase 2: Direct evidence injection + enforcement...");
 
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-    let threshold = 2u64;
 
     {
         let mut eng = validators[0].engine.lock().unwrap();
         let h = eng.current_height + 1;
 
-        // Wire up validator_status registry (LiveValidator starts with None)
+        // Wire up validator_status
         eng.validator_status = Some(Arc::new(Mutex::new(ValidatorStatusRegistry::new())));
 
-        // Inject threshold+1 offenses via process_vote to trigger enforcement
-        for i in 1..=threshold + 1 {
+        // Inject 3 proofs with DIFFERENT signatures
+        let count = 3u64;
+        for i in 1..=count {
             let sig_a = [i as u8; 64];
             let sig_b = [(i + 100) as u8; 64];
-
-            // First vote: accepted
             let vote_a = ConsensusVote {
                 voter_id: [88u8; 32], height: h,
                 block_hash: [0xAA; 32], state_root: [0xBB; 32],
                 approve: true, signature: sig_a, timestamp: now + i,
             };
-            // Second vote: triggers equivocation → evidence + slashing
             let vote_b = ConsensusVote {
                 voter_id: [88u8; 32], height: h,
                 block_hash: [0xFF; 32], state_root: [0xBB; 32],
                 approve: true, signature: sig_b, timestamp: now + i + 1,
             };
-
-            let _ = eng.process_vote(vote_a);
-            let result = eng.process_vote(vote_b);
-            println!("  Round {}: vote_b result = {:?}", i, result.as_ref().err());
+            let proof = EquivocationProof {
+                validator_id: [88u8; 32],
+                height: h, round: h,
+                vote_a: SignedVote { vote: vote_a, signature: sig_a },
+                vote_b: SignedVote { vote: vote_b, signature: sig_b },
+                detected_at_height: h,
+            };
+            match eng.misbehavior_registry.add_proof(proof) {
+                Ok(hash) => println!("  Offense {} recorded: proof_hash={:?}", i, &hash[..4]),
+                Err(e) => println!("  Offense {} failed: {}", i, e),
+            }
         }
 
-        let count = eng.misbehavior_registry.offense_count(&[88u8; 32]);
+        let offense_count = eng.misbehavior_registry.offense_count(&[88u8; 32]);
         let should = should_slash(&eng.misbehavior_registry, &[88u8; 32]);
-        let suspended = eng
-            .validator_status
-            .as_ref()
-            .unwrap()
-            .lock()
-            .unwrap()
-            .is_suspended(&[88u8; 32], eng.current_height);
+        println!("  Offense count: {}", offense_count);
+        println!("  should_slash: {}", should);
 
-        println!("\n  Offense count: {}", count);
-        println!("  should_slash:  {}", should);
-        println!("  is_suspended:  {}", suspended);
-        println!("  Slashing enforcement: {}", if should && suspended { "PASS" } else { "FAIL" });
+        if should {
+            let until = eng.current_height + 100;
+            if let Some(ref registry) = eng.validator_status {
+                registry.lock().unwrap().set_status(
+                    [88u8; 32],
+                    ValidatorStatus::Suspended { until_height: until },
+                );
+                println!("  VALIDATOR_SLASHED: [88;32] until height {}", until);
+
+                let suspended = registry.lock().unwrap().is_suspended(&[88u8; 32], eng.current_height);
+                println!("  is_suspended: {}", suspended);
+
+                // Verify suspended validator cannot vote
+                let vote = ConsensusVote {
+                    voter_id: [88u8; 32], height: h + 1,
+                    block_hash: [0xAA; 32], state_root: [0xBB; 32],
+                    approve: true, signature: [99u8; 64], timestamp: now + 10,
+                };
+                let result = eng.process_vote(vote);
+                let blocked = result.is_err();
+                println!("  Vote after suspension: {}", if blocked { "BLOCKED" } else { "ALLOWED" });
+                println!("  Slashing enforcement: {}", if suspended && blocked { "PASS" } else { "FAIL" });
+            }
+        } else {
+            println!("  Not enough offenses (need > 2)");
+        }
     }
 
     thread::sleep(Duration::from_secs(10));

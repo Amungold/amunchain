@@ -210,6 +210,9 @@ impl ConsensusEngine {
 
     /// Process a vote for a round.
     pub fn process_vote(&mut self, vote: ConsensusVote) -> Result<(), String> {
+        if self.is_suspended(&vote.voter_id) {
+            return Err(format!("Validator {:?} is suspended", &vote.voter_id[..4]));
+        }
         let height = vote.height;
         if height <= self.current_height {
             return Err(format!(
