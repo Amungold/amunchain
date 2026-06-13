@@ -1,6 +1,9 @@
 use amun_consensus_network::messages::{ConsensusVote, EquivocationProof, SignedVote};
+use amun_consensus_network::slashing::should_slash;
+use amun_consensus_network::validator_status::{ValidatorStatus, ValidatorStatusRegistry};
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -19,7 +22,7 @@ fn main() {
 
     for v in &validators { v.start().unwrap(); }
 
-    println!("=== N103.2 EVIDENCE PIPELINE TEST ===");
+    println!("=== N103.3 AUTOMATIC SLASHING TEST ===");
     println!();
 
     println!("Phase 1: Warmup (30s)...");
@@ -27,43 +30,55 @@ fn main() {
     let initial: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
     println!("  Initial heights: {:?}", initial);
 
-    println!("\nPhase 2: Evidence pipeline...");
+    println!("\nPhase 2: Injecting offenses + verifying enforcement...");
+
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+    let threshold = 2u64;
 
     {
         let mut eng = validators[0].engine.lock().unwrap();
         let h = eng.current_height + 1;
 
-        let vote_a = ConsensusVote {
-            voter_id: [88u8; 32], height: h,
-            block_hash: [0xAA; 32], state_root: [0xBB; 32],
-            approve: true, signature: [1u8; 64], timestamp: now,
-        };
-        let vote_b = ConsensusVote {
-            voter_id: [88u8; 32], height: h,
-            block_hash: [0xFF; 32], state_root: [0xBB; 32],
-            approve: true, signature: [2u8; 64], timestamp: now + 1,
-        };
+        // Wire up validator_status registry (LiveValidator starts with None)
+        eng.validator_status = Some(Arc::new(Mutex::new(ValidatorStatusRegistry::new())));
 
-        let proof = EquivocationProof {
-            validator_id: [88u8; 32],
-            height: h,
-            round: h,
-            vote_a: SignedVote { vote: vote_a, signature: [1u8; 64] },
-            vote_b: SignedVote { vote: vote_b, signature: [2u8; 64] },
-            detected_at_height: h,
-        };
+        // Inject threshold+1 offenses via process_vote to trigger enforcement
+        for i in 1..=threshold + 1 {
+            let sig_a = [i as u8; 64];
+            let sig_b = [(i + 100) as u8; 64];
 
-        let pre = eng.misbehavior_registry.all_proofs().len();
-        match eng.misbehavior_registry.add_proof(proof) {
-            Ok(hash) => {
-                let post = eng.misbehavior_registry.all_proofs().len();
-                println!("  Evidence recorded: hash={:?}", &hash[..8]);
-                println!("  Registry: {} -> {}", pre, post);
-                println!("  Evidence pipeline: PASS");
-            }
-            Err(e) => println!("  Evidence recording failed: {}", e),
+            // First vote: accepted
+            let vote_a = ConsensusVote {
+                voter_id: [88u8; 32], height: h,
+                block_hash: [0xAA; 32], state_root: [0xBB; 32],
+                approve: true, signature: sig_a, timestamp: now + i,
+            };
+            // Second vote: triggers equivocation → evidence + slashing
+            let vote_b = ConsensusVote {
+                voter_id: [88u8; 32], height: h,
+                block_hash: [0xFF; 32], state_root: [0xBB; 32],
+                approve: true, signature: sig_b, timestamp: now + i + 1,
+            };
+
+            let _ = eng.process_vote(vote_a);
+            let result = eng.process_vote(vote_b);
+            println!("  Round {}: vote_b result = {:?}", i, result.as_ref().err());
         }
+
+        let count = eng.misbehavior_registry.offense_count(&[88u8; 32]);
+        let should = should_slash(&eng.misbehavior_registry, &[88u8; 32]);
+        let suspended = eng
+            .validator_status
+            .as_ref()
+            .unwrap()
+            .lock()
+            .unwrap()
+            .is_suspended(&[88u8; 32], eng.current_height);
+
+        println!("\n  Offense count: {}", count);
+        println!("  should_slash:  {}", should);
+        println!("  is_suspended:  {}", suspended);
+        println!("  Slashing enforcement: {}", if should && suspended { "PASS" } else { "FAIL" });
     }
 
     thread::sleep(Duration::from_secs(10));

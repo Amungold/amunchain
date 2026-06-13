@@ -50,7 +50,7 @@ impl ConsensusRound {
                 vote.height, self.height
             ));
         }
-        // Check for equivocation: same validator, same height, different block_hash
+        // Check for equivocation FIRST (before checking proposed_block_hash)
         if let Some(existing) = self.votes.iter().find(|v| v.voter_id == vote.voter_id) {
             if existing.block_hash != vote.block_hash {
                 return Err("Equivocation detected: double vote for different blocks".into());
@@ -250,6 +250,16 @@ impl ConsensusEngine {
                 };
                 if let Ok(hash) = self.misbehavior_registry.add_proof(proof) {
                     eprintln!("EVIDENCE_RECORDED: proof_hash={:?} validator={:?}", &hash[..4], &vote.voter_id[..4]);
+                    if crate::slashing::should_slash(&self.misbehavior_registry, &vote.voter_id) {
+                        if let Some(ref registry) = self.validator_status {
+                            let until = self.current_height + 100;
+                            registry.lock().unwrap().set_status(
+                                vote.voter_id,
+                                crate::validator_status::ValidatorStatus::Suspended { until_height: until },
+                            );
+                            eprintln!("VALIDATOR_SLASHED: validator={:?} until={}", &vote.voter_id[..4], until);
+                        }
+                    }
                 }
             }
         }
