@@ -144,7 +144,7 @@ fn n17_node_crash_and_recovery() {
 }
 
 #[test]
-#[ignore = "Requires bootstrap/rejoin protocol (N18)"]
+
 fn n17_node_crash_and_rejoin() {
     let mut net = Network::new(4);
     net.run_until_commits(500, 1);

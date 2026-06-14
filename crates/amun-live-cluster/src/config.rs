@@ -7,7 +7,6 @@ pub struct ValidatorConfig {
     pub listen_addr: SocketAddr,
     pub cluster: Vec<ClusterPeer>,
     pub data_dir: String,
-    /// Override total validators for quorum (defaults to cluster.len()).
     pub quorum_size: Option<usize>,
 }
 
@@ -53,7 +52,6 @@ impl ValidatorConfig {
         }
     }
 
-    /// Override the quorum size (total validators to count for >2/3).
     pub fn with_quorum(mut self, n: usize) -> Self {
         self.quorum_size = Some(n);
         self
@@ -64,6 +62,11 @@ impl ValidatorConfig {
             .iter()
             .filter(|p| p.validator_id != self.validator_id)
             .collect()
+    }
+
+    // **NEW: Returns ALL peer addresses (including self) for forced static connections**
+    pub fn all_peer_addresses(&self) -> Vec<SocketAddr> {
+        self.cluster.iter().map(|p| p.address).collect()
     }
 
     pub fn total_validators(&self) -> usize {

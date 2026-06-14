@@ -76,7 +76,6 @@ version = "0.1.0"
 dependencies = [
  "amun-accounts",
  "amun-consensus",
- "amun-execution",
  "amun-mempool",
  "amun-transactions",
  "blake3",
@@ -600,17 +599,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "amun-execution"
-version = "0.1.0"
-dependencies = [
- "amun-accounts",
- "amun-transactions",
- "ed25519-dalek",
- "rand 0.8.6",
- "serde",
-]
-
-[[package]]
 name = "amun-experimental-framework"
 version = "0.1.0"
 dependencies = [
@@ -828,6 +816,7 @@ dependencies = [
  "amun-consensus",
  "amun-constitutional-block",
  "amun-constitutional-state",
+ "amun-persistent-node",
  "ed25519-dalek",
  "hex",
  "rand 0.8.6",
@@ -839,11 +828,21 @@ dependencies = [
 name = "amun-node"
 version = "0.1.0"
 dependencies = [
+ "amun-bytecode",
  "amun-chain-checkpoint",
  "amun-consensus",
  "amun-constitutional-block",
+ "amun-constitutional-runtime",
  "amun-constitutional-state",
  "amun-networking",
+ "amun-persistence",
+ "amun-persistent-node",
+ "amun-proof-archive",
+ "amun-resource-core",
+ "amun-snapshot-engine-unified",
+ "amun-validator-networking",
+ "amun-validator-runtime",
+ "amun-vm-kernel",
  "blake3",
  "hex",
  "serde",
