@@ -181,6 +181,8 @@ pub struct ConsensusEngine {
     pub validator_status: Option<std::sync::Arc<std::sync::Mutex<ValidatorStatusRegistry>>>,
     pub misbehavior_registry: MisbehaviorRegistry,
     pub validator_keys: ValidatorKeyRegistry,
+    pub validator_powers: HashMap<[u8; 32], u64>,
+    pub total_voting_power: u64,
     finality_chain: Vec<FinalityCertificate>,
 }
 
@@ -199,6 +201,8 @@ impl ConsensusEngine {
             validator_status: None,
             misbehavior_registry: MisbehaviorRegistry::new(),
             validator_keys: ValidatorKeyRegistry::new(),
+            validator_powers: HashMap::new(),
+            total_voting_power: 0,
             finality_chain: Vec::new(),
         }
     }
