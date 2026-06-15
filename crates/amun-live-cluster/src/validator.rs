@@ -5,6 +5,9 @@ use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
 use amun_validator_identity::derive_validator_id;
+// use amun_networking::crypto_identity::PeerKeyPair;
+// use amun_networking::trust_anchor::TrustAnchorRegistry;
+// use amun_networking::validator_certificate::ValidatorCertificate;
 use amun_validator_identity::vote_signing_payload;
 use ed25519_dalek::{Signer, SigningKey};
 use rand::rngs::OsRng;
@@ -44,18 +47,54 @@ impl LiveValidator {
         let my_true_id = derive_validator_id(&pk);
         // Use the cryptographic ID everywhere instead of the config's dummy ID
         let validator_id = my_true_id;
-        // Register self and all cluster peers with derived cryptographic IDs
-        engine.register_validator(validator_id, pk);
-        engine.validator_id = validator_id; // Use cryptographic ID as engine's own identity
+        // N105.5: Register validators using certificates verified by genesis trust anchors
+        // Hardcoded genesis authority for test clusters (replace with real genesis key in production)
+        let genesis_authority_seed: [u8; 32] = [0x42; 32];
+        let genesis_authority_kp = amun_networking::crypto_identity::PeerKeyPair::from_seed(genesis_authority_seed);
+
+        // Create self certificate and verify it
+        let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
+        let self_cert = amun_networking::validator_certificate::ValidatorCertificate::issue(
+            my_peer_id,
+            pk,
+            &genesis_authority_kp,
+            0, // valid from height 0
+            0, // no expiry for test
+        );
+        if !self_cert.verify(&genesis_authority_kp.verifying_key.to_bytes()) {
+            panic!("Self certificate verification failed");
+        }
+        engine.register_validator_identity(
+            self_cert.validator_id.0,
+            validator_id,
+            pk,
+        );
+        engine.validator_id = validator_id;
+
+        // Register peers: generate certificates using the same authority and their public keys
         for peer in &config.cluster {
-            // Use a deterministic seed per validator (NOT the validator_id itself) for test clusters
-            // In production, keys come from certificates.
+            // Use deterministic seed to derive peer key (TEMPORARY — replace with real certificate files)
             let mut seed = [0u8; 32];
             seed[0] = peer.validator_id[0];
-            let peer_sk = SigningKey::from_bytes(&seed);
+            let peer_sk = ed25519_dalek::SigningKey::from_bytes(&seed);
             let peer_pk = peer_sk.verifying_key().to_bytes();
-            let peer_id = derive_validator_id(&peer_pk);
-            engine.register_validator(peer_id, peer_pk);
+            let peer_peer_id = amun_networking::peer_identity::PeerId::from_bytes(peer_pk);
+            let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
+            let peer_cert = amun_networking::validator_certificate::ValidatorCertificate::issue(
+                peer_peer_id,
+                peer_pk,
+                &genesis_authority_kp,
+                0,
+                0,
+            );
+            if !peer_cert.verify(&genesis_authority_kp.verifying_key.to_bytes()) {
+                panic!("Peer certificate verification failed");
+            }
+            engine.register_validator_identity(
+                peer_cert.validator_id.0,
+                peer_id,
+                peer_pk,
+            );
         }
         Self {
             config,
