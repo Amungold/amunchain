@@ -220,10 +220,13 @@ impl ConsensusEngine {
         peer_id: [u8; 32],
         validator_id: [u8; 32],
         public_key: [u8; 32],
+        voting_power: u64,
     ) {
         self.validator_ids.push(validator_id);
         self.validator_keys
             .register_identity(peer_id, validator_id, public_key);
+        self.validator_powers.insert(validator_id, voting_power);
+        self.total_voting_power += voting_power;
     }
 
     pub fn start_round(&mut self, height: u64, proposer_id: [u8; 32]) {

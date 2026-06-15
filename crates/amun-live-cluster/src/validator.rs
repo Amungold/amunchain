@@ -65,6 +65,7 @@ impl LiveValidator {
             self_cert.validator_id.0,
             validator_id,
             pk,
+            100,
         );
         engine.validator_id = validator_id;
 
@@ -88,6 +89,7 @@ impl LiveValidator {
                 peer_cert.validator_id.0,
                 peer_id,
                 peer_pk,
+                100,
             );
         }
         Self {
