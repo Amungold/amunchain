@@ -94,29 +94,12 @@ fn main() {
     );
 
     let cert_path = config_dir.join("validator.crt");
-    let (cert, dev_anchor) = crate::certificate_loader::load_validator_certificate(
+    let cert = crate::certificate_loader::load_validator_certificate(
         cert_path.to_str().unwrap(),
-        &keypair,
         &genesis,
     )
     .expect("Failed to load validator certificate");
-
-    if let Some(ref anchor) = dev_anchor {
-        println!("Development mode: using self-signed certificate");
-        let anchor_pubkey: [u8; 32] = hex::decode(&anchor.public_key)
-            .expect("Invalid anchor public key hex")
-            .try_into()
-            .expect("Invalid anchor public key length");
-        if cert.verify(&anchor_pubkey) {
-            println!("Certificate: self-signed (dev mode)");
-        } else {
-            panic!("Self-signed certificate verification failed");
-        }
-    } else {
-        crate::certificate_loader::verify_certificate_against_genesis(&cert, &genesis)
-            .expect("Certificate verification failed");
-        println!("Certificate: verified by genesis trust anchor");
-    }
+    println!("Certificate: verified by genesis trust anchor");
 
     let mut node = NetworkNode::new(peer_id.0);
     node.keypair = Some(keypair);

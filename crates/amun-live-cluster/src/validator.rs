@@ -75,10 +75,10 @@ impl LiveValidator {
             let cert_path = peer.certificate_path.as_ref()
                 .expect("Peer certificate_path not set");
             let cert_json = std::fs::read_to_string(cert_path)
-                .expect(&format!("Failed to read certificate {}", cert_path));
+                .unwrap_or_else(|_| panic!("Failed to read certificate {}", cert_path));
             let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
                 serde_json::from_str(&cert_json)
-                .expect(&format!("Invalid certificate JSON in {}", cert_path));
+                .unwrap_or_else(|_| panic!("Invalid certificate JSON in {}", cert_path));
             if !peer_cert.verify(&authority_kp.verifying_key.to_bytes()) {
                 panic!("Peer certificate verification failed for {}", cert_path);
             }

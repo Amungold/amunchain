@@ -80,7 +80,7 @@ impl ValidatorConfig {
     }
 }
 
-fn set_cert_paths(cluster: &mut Vec<ClusterPeer>) {
+fn set_cert_paths(cluster: &mut [ClusterPeer]) {
     let cert_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("testdata")
         .join("certs");

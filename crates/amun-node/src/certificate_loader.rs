@@ -1,6 +1,5 @@
-use crate::genesis::{Genesis, GenesisTrustAnchor};
-use amun_networking::crypto_identity::PeerKeyPair;
-use amun_networking::peer_identity::PeerId;
+use crate::genesis::Genesis;
+// removed unused import
 use amun_networking::validator_certificate::ValidatorCertificate;
 use std::fs;
 use std::path::Path;
@@ -9,57 +8,19 @@ use std::path::Path;
 /// Returns the certificate and optionally a development trust anchor (for self-signed certs).
 pub fn load_validator_certificate(
     cert_file: &str,
-    keypair: &PeerKeyPair,
     genesis: &Genesis,
-) -> Result<(ValidatorCertificate, Option<GenesisTrustAnchor>), String> {
+) -> Result<ValidatorCertificate, String> {
     let path = Path::new(cert_file);
-    if path.exists() {
-        let cert_json =
-            fs::read_to_string(path).map_err(|e| format!("Cannot read certificate: {}", e))?;
-        let cert: ValidatorCertificate = serde_json::from_str(&cert_json)
-            .map_err(|e| format!("Invalid certificate JSON: {}", e))?;
-        println!("Loaded existing certificate from {}", cert_file);
-        Ok((cert, None))
-    } else {
-        // For development: create a self-signed certificate from the first trust anchor
-        let anchor = genesis
-            .trust_anchors
-            .first()
-            .ok_or("No trust anchors in genesis")?;
-        let _issuer_id = PeerId::from_bytes(
-            hex::decode(&anchor.peer_id)
-                .map_err(|e| format!("Invalid anchor peer ID: {}", e))?
-                .try_into()
-                .map_err(|_| "Invalid anchor peer ID length")?,
-        );
-        let validator_id = keypair.peer_id();
-        // Self-signed: the validator is its own issuer
-        let cert = ValidatorCertificate::issue(
-            validator_id,
-            keypair.verifying_key.to_bytes(),
-            keypair, // signs as the authority
-            0,
-            0,
-        );
-        // Store the validator's public key as a development trust anchor
-        let dev_anchor = GenesisTrustAnchor {
-            peer_id: hex::encode(keypair.verifying_key.to_bytes()),
-            public_key: hex::encode(keypair.verifying_key.to_bytes()),
-        };
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent)
-                .map_err(|e| format!("Cannot create cert directory: {}", e))?;
-        }
-        let cert_json = serde_json::to_string_pretty(&cert)
-            .map_err(|e| format!("Cannot serialize certificate: {}", e))?;
-        fs::write(path, &cert_json).map_err(|e| format!("Cannot write certificate: {}", e))?;
-        println!(
-            "Generated self-signed certificate and saved to {}",
-            cert_file
-        );
-        println!("NOTE: In production, use a certificate signed by a constitutional authority.");
-        Ok((cert, Some(dev_anchor)))
+    if !path.exists() {
+        return Err(format!("Validator certificate not found: {}", cert_file));
     }
+    let cert_json =
+        fs::read_to_string(path).map_err(|e| format!("Cannot read certificate: {}", e))?;
+    let cert: ValidatorCertificate = serde_json::from_str(&cert_json)
+        .map_err(|e| format!("Invalid certificate JSON: {}", e))?;
+    println!("Loaded existing certificate from {}", cert_file);
+    verify_certificate_against_genesis(&cert, genesis)?;
+    Ok(cert)
 }
 
 /// Verify a validator certificate against the genesis trust anchors.
@@ -86,7 +47,8 @@ pub fn verify_certificate_against_genesis(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::genesis::{GenesisTrustAnchor, GenesisValidator};
+    use crate::genesis::{Genesis, GenesisTrustAnchor, GenesisValidator};
+    use amun_networking::crypto_identity::PeerKeyPair;
     use tempfile::tempdir;
 
     fn test_genesis() -> Genesis {
@@ -94,38 +56,81 @@ mod tests {
             chain_id: "test".into(),
             timestamp: 0,
             validators: vec![GenesisValidator {
-                peer_id: "aa".repeat(32),
-                public_key: "bb".repeat(32),
+                peer_id: "aa".repeat(64),
+                public_key: "bb".repeat(64),
                 voting_power: 100,
             }],
             trust_anchors: vec![GenesisTrustAnchor {
-                peer_id: "cc".repeat(32),
-                public_key: "dd".repeat(32),
+                peer_id: "cc".repeat(64),
+                public_key: "dd".repeat(64),
             }],
         }
     }
 
     #[test]
-    fn n22_4_load_or_create_certificate() {
+    fn n106_0_missing_certificate_rejected() {
         let dir = tempdir().unwrap();
-        let cert_path = dir.path().join("validator.crt");
-        let keypair = PeerKeyPair::generate();
+        let cert_path = dir.path().join("nonexistent.crt");
         let genesis = test_genesis();
-        let cert =
-            load_validator_certificate(cert_path.to_str().unwrap(), &keypair, &genesis).unwrap();
-        assert_eq!(cert.0.validator_id, keypair.peer_id());
+        let result = load_validator_certificate(
+            cert_path.to_str().unwrap(),
+            &genesis,
+        );
+        assert!(result.is_err());
     }
 
     #[test]
-    fn n22_4_certificate_persists_across_loads() {
+    fn n106_0_certificate_verified_against_genesis() {
         let dir = tempdir().unwrap();
-        let cert_path = dir.path().join("validator.crt");
-        let keypair = PeerKeyPair::generate();
-        let genesis = test_genesis();
-        let cert1 =
-            load_validator_certificate(cert_path.to_str().unwrap(), &keypair, &genesis).unwrap();
-        let cert2 =
-            load_validator_certificate(cert_path.to_str().unwrap(), &keypair, &genesis).unwrap();
-        assert_eq!(cert1.0.validator_id, cert2.0.validator_id);
+        let cert_path = dir.path().join("valid.crt");
+        let authority = PeerKeyPair::generate();
+        let validator = PeerKeyPair::generate();
+        let cert = ValidatorCertificate::issue(
+            validator.peer_id(),
+            validator.verifying_key.to_bytes(),
+            &authority,
+            0, 0,
+        );
+        std::fs::write(&cert_path, serde_json::to_string_pretty(&cert).unwrap()).unwrap();
+        let authority_pk_hex = hex::encode(authority.verifying_key.to_bytes());
+        let genesis = Genesis {
+            chain_id: "test".into(),
+            timestamp: 0,
+            validators: vec![],
+            trust_anchors: vec![GenesisTrustAnchor {
+                peer_id: "aa".repeat(64),
+                public_key: authority_pk_hex,
+            }],
+        };
+        let loaded = load_validator_certificate(cert_path.to_str().unwrap(), &genesis).unwrap();
+        assert_eq!(loaded.validator_id, validator.peer_id());
+    }
+
+    #[test]
+    fn n106_0_tampered_certificate_rejected() {
+        let dir = tempdir().unwrap();
+        let cert_path = dir.path().join("tampered.crt");
+        let authority = PeerKeyPair::generate();
+        let validator = PeerKeyPair::generate();
+        let mut cert = ValidatorCertificate::issue(
+            validator.peer_id(),
+            validator.verifying_key.to_bytes(),
+            &authority,
+            0, 0,
+        );
+        cert.public_key = [0u8; 32];
+        std::fs::write(&cert_path, serde_json::to_string_pretty(&cert).unwrap()).unwrap();
+        let authority_pk_hex = hex::encode(authority.verifying_key.to_bytes());
+        let genesis = Genesis {
+            chain_id: "test".into(),
+            timestamp: 0,
+            validators: vec![],
+            trust_anchors: vec![GenesisTrustAnchor {
+                peer_id: "bb".repeat(64),
+                public_key: authority_pk_hex,
+            }],
+        };
+        let result = load_validator_certificate(cert_path.to_str().unwrap(), &genesis);
+        assert!(result.is_err());
     }
 }
