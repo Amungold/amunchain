@@ -1,4 +1,5 @@
 use crate::config::ValidatorConfig;
+use crate::config::load_genesis_authority;
 use amun_chain_store::record::FinalizedChainRecord;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
@@ -6,6 +7,8 @@ use amun_consensus_network::messages::ConsensusVote;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
 use amun_validator_identity::derive_validator_id;
 use amun_validator_identity::vote_signing_payload;
+use amun_authority_registry::AuthorityRegistry;
+use amun_authority_registry::ConstitutionalAuthority;
 use ed25519_dalek::{Signer, SigningKey};
 use rand::rngs::OsRng;
 use std::io::{Read, Write};
@@ -46,31 +49,34 @@ impl LiveValidator {
         let validator_id = my_true_id;
         // N105.5: Register validators using certificates verified by genesis trust anchors
         // Hardcoded genesis authority for test clusters (replace with real genesis key in production)
-        let genesis_authority_seed: [u8; 32] = [0x42; 32];
-        let genesis_authority_kp =
-            amun_networking::crypto_identity::PeerKeyPair::from_seed(genesis_authority_seed);
+        // N107.3: Build authority registry from genesis authority
+        let genesis = load_genesis_authority(concat!(env!("CARGO_MANIFEST_DIR"), "/genesis/genesis_authority.json"));
+        let authority = ConstitutionalAuthority::new(
+            genesis.authority_public_key,
+            genesis.authority_version,
+            0,
+        );
+        let registry = AuthorityRegistry::from_genesis(authority);
+        let active_authority = registry.active().expect("No active authority");
+        let authority_pubkey = active_authority.authority_public_key;
 
         // Create self certificate and verify it
         let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
+        let genesis_authority_kp = amun_networking::crypto_identity::PeerKeyPair::from_seed([0x42; 32]);
         let self_cert = amun_networking::validator_certificate::ValidatorCertificate::issue(
             my_peer_id,
             pk,
             &genesis_authority_kp,
-            0, // valid from height 0
-            0, // no expiry for test
+            0,
+            0,
         );
-        println!("GENESIS_PK={:?}", genesis_authority_kp.verifying_key.to_bytes());
-        println!("CONFIG_PK={:?}", config.authority_public_key);
-
-        if !self_cert.verify(&config.authority_public_key) {
+        if !self_cert.verify(&authority_pubkey) {
             panic!("Self certificate verification failed");
         }
         engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
         engine.validator_id = validator_id;
 
         // N105.5D: Load peer certificates from disk (mandatory)
-        let authority_seed: [u8; 32] = [0x42; 32];
-        let _authority_kp = amun_networking::crypto_identity::PeerKeyPair::from_seed(authority_seed);
         for peer in &config.cluster {
             let cert_path = peer
                 .certificate_path
@@ -81,7 +87,7 @@ impl LiveValidator {
             let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
                 serde_json::from_str(&cert_json)
                     .unwrap_or_else(|_| panic!("Invalid certificate JSON in {}", cert_path));
-            if !peer_cert.verify(&config.authority_public_key) {
+            if !peer_cert.verify(&authority_pubkey) {
                 panic!("Peer certificate verification failed for {}", cert_path);
             }
             let peer_pk = peer_cert.public_key;
