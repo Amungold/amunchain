@@ -68,50 +68,27 @@ impl LiveValidator {
         );
         engine.validator_id = validator_id;
 
-        // N105.5C: Load peer certificates from disk, fall back to seed if missing
+        // N105.5D: Load peer certificates from disk (mandatory)
         let authority_seed: [u8; 32] = [0x42; 32];
         let authority_kp = amun_networking::crypto_identity::PeerKeyPair::from_seed(authority_seed);
         for peer in &config.cluster {
-            if let Some(cert_path) = &peer.certificate_path {
-                let cert_json = std::fs::read_to_string(cert_path)
-                    .expect(&format!("Failed to read certificate {}", cert_path));
-                let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
-                    serde_json::from_str(&cert_json)
-                    .expect(&format!("Invalid certificate JSON in {}", cert_path));
-                if !peer_cert.verify(&authority_kp.verifying_key.to_bytes()) {
-                    panic!("Peer certificate verification failed for {}", cert_path);
-                }
-                let peer_pk = peer_cert.public_key;
-                let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
-                engine.register_validator_identity(
-                    peer_cert.validator_id.0,
-                    peer_id,
-                    peer_pk,
-                );
-            } else {
-                // Legacy fallback (will be removed in N105.5D)
-                eprintln!("WARNING: no certificate for peer {:?}, using seed derivation", &peer.validator_id[..4]);
-                let mut seed = [0u8; 32];
-                seed[0] = peer.validator_id[0];
-                let peer_sk = ed25519_dalek::SigningKey::from_bytes(&seed);
-                let peer_pk = peer_sk.verifying_key().to_bytes();
-                let peer_peer_id = amun_networking::peer_identity::PeerId::from_bytes(peer_pk);
-                let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
-                let peer_cert = amun_networking::validator_certificate::ValidatorCertificate::issue(
-                    peer_peer_id,
-                    peer_pk,
-                    &authority_kp,
-                    0, 0,
-                );
-                if !peer_cert.verify(&authority_kp.verifying_key.to_bytes()) {
-                    panic!("Peer certificate verification failed");
-                }
-                engine.register_validator_identity(
-                    peer_cert.validator_id.0,
-                    peer_id,
-                    peer_pk,
-                );
+            let cert_path = peer.certificate_path.as_ref()
+                .expect("Peer certificate_path not set");
+            let cert_json = std::fs::read_to_string(cert_path)
+                .expect(&format!("Failed to read certificate {}", cert_path));
+            let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
+                serde_json::from_str(&cert_json)
+                .expect(&format!("Invalid certificate JSON in {}", cert_path));
+            if !peer_cert.verify(&authority_kp.verifying_key.to_bytes()) {
+                panic!("Peer certificate verification failed for {}", cert_path);
             }
+            let peer_pk = peer_cert.public_key;
+            let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
+            engine.register_validator_identity(
+                peer_cert.validator_id.0,
+                peer_id,
+                peer_pk,
+            );
         }
         Self {
             config,

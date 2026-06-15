@@ -14,7 +14,7 @@ fn main() {
     let cluster: Vec<ClusterPeer> = (0..count)
         .map(|i| ClusterPeer {
             validator_id: ids[i],
-                certificate_path: None,
+            certificate_path: None,
             address: format!("127.0.0.1:{}", base_port + i as u16)
                 .parse()
                 .unwrap(),

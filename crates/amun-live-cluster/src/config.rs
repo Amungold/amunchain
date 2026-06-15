@@ -82,9 +82,10 @@ impl ValidatorConfig {
 
 fn set_cert_paths(cluster: &mut Vec<ClusterPeer>) {
     let cert_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("testdata").join("certs");
+        .join("testdata")
+        .join("certs");
     for (i, peer) in cluster.iter_mut().enumerate() {
-        let path = cert_dir.join(format!("validator_{}.crt", i+1));
+        let path = cert_dir.join(format!("validator_{}.crt", i + 1));
         peer.certificate_path = Some(path.to_str().unwrap().to_string());
     }
 }
