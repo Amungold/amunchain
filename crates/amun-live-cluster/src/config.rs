@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
+pub fn default_authority_public_key() -> [u8; 32] {
+    amun_networking::crypto_identity::PeerKeyPair::from_seed([0x42; 32])
+        .verifying_key
+        .to_bytes()
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ValidatorConfig {
@@ -8,6 +13,8 @@ pub struct ValidatorConfig {
     pub cluster: Vec<ClusterPeer>,
     pub data_dir: String,
     pub quorum_size: Option<usize>,
+    #[serde(default = "default_authority_public_key")]
+    pub authority_public_key: [u8; 32],
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -35,6 +42,7 @@ impl ValidatorConfig {
             listen_addr: cluster[validator_index].address,
             cluster,
             data_dir: format!("/tmp/amun-validator-{}", validator_index),
+            authority_public_key: default_authority_public_key(),
             quorum_size: None,
         }
     }
@@ -54,6 +62,7 @@ impl ValidatorConfig {
             listen_addr: cluster[validator_index].address,
             cluster,
             data_dir: format!("/tmp/amun-test-validator-{}", validator_index),
+            authority_public_key: default_authority_public_key(),
             quorum_size: None,
         }
     }

@@ -59,7 +59,7 @@ impl LiveValidator {
             0, // valid from height 0
             0, // no expiry for test
         );
-        if !self_cert.verify(&genesis_authority_kp.verifying_key.to_bytes()) {
+        if !self_cert.verify(&config.authority_public_key) {
             panic!("Self certificate verification failed");
         }
         engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
@@ -67,7 +67,7 @@ impl LiveValidator {
 
         // N105.5D: Load peer certificates from disk (mandatory)
         let authority_seed: [u8; 32] = [0x42; 32];
-        let authority_kp = amun_networking::crypto_identity::PeerKeyPair::from_seed(authority_seed);
+        let _authority_kp = amun_networking::crypto_identity::PeerKeyPair::from_seed(authority_seed);
         for peer in &config.cluster {
             let cert_path = peer
                 .certificate_path
@@ -78,7 +78,7 @@ impl LiveValidator {
             let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
                 serde_json::from_str(&cert_json)
                     .unwrap_or_else(|_| panic!("Invalid certificate JSON in {}", cert_path));
-            if !peer_cert.verify(&authority_kp.verifying_key.to_bytes()) {
+            if !peer_cert.verify(&config.authority_public_key) {
                 panic!("Peer certificate verification failed for {}", cert_path);
             }
             let peer_pk = peer_cert.public_key;
