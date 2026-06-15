@@ -2,7 +2,9 @@ use amun_bytecode::opcodes::OpCode;
 use amun_bytecode::program::ConstitutionalProgram;
 use amun_constitutional_runtime::runtime_pipeline::ConstitutionalRuntime;
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_resource_core::{ResourceId, ResourceArchetype, ResourceState, ResourceLineage, ResourceMetadata};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+};
 use amun_vm_kernel::execution_context::ExecutionContext;
 use std::env;
 
@@ -22,7 +24,11 @@ fn main() {
         let mut store = PersistentValidatorStore::open(&dir).expect("Failed to open store");
 
         let mut prev_root = store.state_root();
-        println!("Validator {} | Height 0 root: {}", v, hex::encode(prev_root));
+        println!(
+            "Validator {} | Height 0 root: {}",
+            v,
+            hex::encode(prev_root)
+        );
 
         for h in 1..=block_count {
             // Identical resource across all validators
@@ -35,7 +41,10 @@ fn main() {
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
             };
-            store.registry_mut().register_genesis(meta).expect("Failed to register resource");
+            store
+                .registry_mut()
+                .register_genesis(meta)
+                .expect("Failed to register resource");
 
             let program = ConstitutionalProgram::new(
                 2,
@@ -90,7 +99,9 @@ fn main() {
                     if current_root == prev_root {
                         eprintln!(
                             "FAIL: Validator {} state root did not change at height {} (prev: {})",
-                            v, h, hex::encode(prev_root)
+                            v,
+                            h,
+                            hex::encode(prev_root)
                         );
                         std::process::exit(1);
                     }
@@ -112,7 +123,11 @@ fn main() {
     let all_match = final_roots.iter().all(|r| *r == first);
     if all_match {
         println!("\nPASS: Constitutional multi-block state evolution is deterministic");
-        println!("Final root after {} blocks: {}", block_count, hex::encode(first));
+        println!(
+            "Final root after {} blocks: {}",
+            block_count,
+            hex::encode(first)
+        );
     } else {
         println!("\nFAIL: Validators diverged");
         for (i, r) in final_roots.iter().enumerate() {

@@ -1,12 +1,14 @@
-use amun_networking::node::NetworkNode;
-use amun_consensus::validator::{ValidatorSet, Validator};
+use amun_consensus::validator::{Validator, ValidatorSet};
 use amun_networking::envelope::Envelope;
+use amun_networking::node::NetworkNode;
+use amun_persistence::PersistentState;
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_resource_core::{ResourceId, ResourceArchetype, ResourceState, ResourceLineage, ResourceMetadata};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+};
+use amun_snapshot_engine_unified::SnapshotManager;
 use amun_validator_networking::rejoin_protocol::{RejoinProtocol, RejoinResult};
 use amun_validator_networking::sync_transport::SyncTransport;
-use amun_snapshot_engine_unified::SnapshotManager;
-use amun_persistence::PersistentState;
 use std::collections::HashMap;
 
 fn main() {
@@ -24,7 +26,10 @@ fn main() {
 
     for i in 0..validator_count {
         nodes.insert(i, NetworkNode::new([i as u8; 32]));
-        validators.push(Validator { id: [i as u8; 32], voting_power: 100 });
+        validators.push(Validator {
+            id: [i as u8; 32],
+            voting_power: 100,
+        });
     }
 
     let validator_set = ValidatorSet::new(validators).unwrap();
@@ -32,23 +37,36 @@ fn main() {
     let run_consensus = |nodes: &mut HashMap<usize, NetworkNode>,
                          stores: &mut HashMap<usize, PersistentValidatorStore>,
                          validator_set: &ValidatorSet,
-                         target_commits: usize, max_ticks: usize|
+                         target_commits: usize,
+                         max_ticks: usize|
      -> bool {
         let mut time_ms = 0u64;
         let node_ids: Vec<usize> = nodes.keys().copied().collect();
-        while nodes.values().map(|n| n.committed_blocks.len()).min().unwrap_or(0) < target_commits {
-            if time_ms as usize > max_ticks * 100 { return false; }
+        while nodes
+            .values()
+            .map(|n| n.committed_blocks.len())
+            .min()
+            .unwrap_or(0)
+            < target_commits
+        {
+            if time_ms as usize > max_ticks * 100 {
+                return false;
+            }
             time_ms += 100;
             for &i in &node_ids {
                 if let Some(node) = nodes.get_mut(&i) {
-                    if i == 0 && time_ms % 500 == 0 { node.propose(); }
+                    if i == 0 && time_ms.is_multiple_of(500) {
+                        node.propose();
+                    }
                     node.flush_outgoing();
                 }
             }
             let mut all_messages: Vec<(usize, Envelope)> = Vec::new();
             for &i in &node_ids {
                 if let Some(node) = nodes.get_mut(&i) {
-                    for env in node.drain_outbox() { all_messages.push((i, env)); }
+                    for env in node.drain_outbox() {
+                        all_messages.push((i, env));
+                    }
                 }
             }
             for (_sender_id, msg) in &all_messages {
@@ -69,12 +87,20 @@ fn main() {
                             let h = node.committed_blocks.len() as u64;
                             let rid = ResourceId([h as u8; 32]);
                             let meta = ResourceMetadata {
-                                resource_id: rid, archetype: ResourceArchetype::Asset,
-                                state: ResourceState::Active, lineage: ResourceLineage::genesis(rid),
-                                contract_id: [1u8; 32], owner: [2u8; 32],
+                                resource_id: rid,
+                                archetype: ResourceArchetype::Asset,
+                                state: ResourceState::Active,
+                                lineage: ResourceLineage::genesis(rid),
+                                contract_id: [1u8; 32],
+                                owner: [2u8; 32],
                             };
-                            store.registry_mut().register_genesis(meta).expect("Failed to register");
-                            store.advance(h, [0u8; 32], [0x10; 32], vec![]).expect("Failed to advance");
+                            store
+                                .registry_mut()
+                                .register_genesis(meta)
+                                .expect("Failed to register");
+                            store
+                                .advance(h, [0u8; 32], [0x10; 32], vec![])
+                                .expect("Failed to advance");
                         }
                     }
                 }
@@ -85,8 +111,14 @@ fn main() {
 
     // Phase 1: Run to height 5, create snapshots
     println!("Phase 1: Running network to height 5...");
-    assert!(run_consensus(&mut nodes, &mut stores, &validator_set, 5, 2000));
-    
+    assert!(run_consensus(
+        &mut nodes,
+        &mut stores,
+        &validator_set,
+        5,
+        2000
+    ));
+
     for i in 0..validator_count {
         let snapshot_path = format!("/tmp/amun_checkpoint_test/snapshot_v{}.json", i);
         let manager = SnapshotManager::new(&snapshot_path);
@@ -104,10 +136,14 @@ fn main() {
 
     // Phase 2: Crash 2 validators
     println!("Phase 2: Crashing validators 2 and 4...");
-    nodes.remove(&2); nodes.remove(&4);
+    nodes.remove(&2);
+    nodes.remove(&4);
     let mut live_validators = Vec::new();
     for &i in &[0, 1, 3, 5, 6] {
-        live_validators.push(Validator { id: [i as u8; 32], voting_power: 100 });
+        live_validators.push(Validator {
+            id: [i as u8; 32],
+            voting_power: 100,
+        });
     }
     let live_set = ValidatorSet::new(live_validators).unwrap();
 
@@ -121,23 +157,35 @@ fn main() {
         let snapshot_path = format!("/tmp/amun_checkpoint_test/snapshot_v{}.json", v);
         let manager = SnapshotManager::new(&snapshot_path);
         let _snapshot = manager.load().expect("Failed to load snapshot");
-        
+
         let peer_registry = stores[&0].registry().clone();
-        let result = RejoinProtocol::rejoin(
-            &peer_registry, 10, [10u8; 32], [0x10; 32], [0x10; 32],
-        );
+        let result = RejoinProtocol::rejoin(&peer_registry, 10, [10u8; 32], [0x10; 32], [0x10; 32]);
         match result {
-            RejoinResult::Rejoined { height, resources_imported } => {
+            RejoinResult::Rejoined {
+                height,
+                resources_imported,
+            } => {
                 let package = SyncTransport::export_snapshot(
-                    &peer_registry, height, [10u8; 32], [0x10; 32], "rejoin".into(),
+                    &peer_registry,
+                    height,
+                    [10u8; 32],
+                    [0x10; 32],
+                    "rejoin".into(),
                 );
                 let imported = SyncTransport::import_snapshot(&package, [0x10; 32]).unwrap();
                 let store = stores.get_mut(&v).unwrap();
                 *store.registry_mut() = imported;
-                store.advance(height, [0u8; 32], [0x10; 32], vec![]).unwrap();
+                store
+                    .advance(height, [0u8; 32], [0x10; 32], vec![])
+                    .unwrap();
                 let root = store.state_root();
-                println!("Validator {} recovered: height={}, resources={}, root={}",
-                         v, height, resources_imported, hex::encode(root));
+                println!(
+                    "Validator {} recovered: height={}, resources={}, root={}",
+                    v,
+                    height,
+                    resources_imported,
+                    hex::encode(root)
+                );
             }
             RejoinResult::Failed { reason } => {
                 println!("Validator {} rejoin failed: {}", v, reason);
@@ -149,12 +197,12 @@ fn main() {
     let all_roots: Vec<_> = (0..7).map(|i| stores[&i].state_root()).collect();
     let first = all_roots[0];
     let all_match = all_roots.iter().all(|r| *r == first);
-    
+
     println!("\nAll validator roots:");
     for (i, r) in all_roots.iter().enumerate() {
         println!("  Validator {}: {}", i, hex::encode(*r));
     }
-    
+
     if all_match {
         println!("\nPASS: Checkpoint-based recovery and rejoin successful");
         println!("Final root: {}", hex::encode(first));

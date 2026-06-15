@@ -26,7 +26,9 @@ pub struct ChainService;
 
 impl ChainService {
     pub fn get_head() -> ApiResult<BlockSummary> {
-        let head = provider().get_head().map_err(|e| ApiError::new("RPC_ERROR", &e.to_string()))?;
+        let head = provider()
+            .get_head()
+            .map_err(|e| ApiError::new("RPC_ERROR", &e.to_string()))?;
         Ok(Json(BlockSummary {
             height: head.height,
             hash: head.block_hash,
@@ -40,7 +42,9 @@ impl ChainService {
     }
 
     pub fn get_block_by_height(height: u64) -> ApiResult<BlockSummary> {
-        let block = provider().get_block(height).map_err(|e| ApiError::new("RPC_ERROR", &e.to_string()))?;
+        let block = provider()
+            .get_block(height)
+            .map_err(|e| ApiError::new("RPC_ERROR", &e.to_string()))?;
         Ok(Json(BlockSummary {
             height: block.height,
             hash: block.block_hash,
@@ -64,7 +68,9 @@ impl ChainService {
         if hash.is_empty() {
             return Err(ApiError::not_found("Transaction", hash));
         }
-        let head = provider().get_head().map_err(|e| ApiError::new("RPC_ERROR", &e.to_string()))?;
+        let head = provider()
+            .get_head()
+            .map_err(|e| ApiError::new("RPC_ERROR", &e.to_string()))?;
         Ok(Json(TransactionSummary {
             hash: hash.to_string(),
             block_height: head.height,

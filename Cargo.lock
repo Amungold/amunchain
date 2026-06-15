@@ -76,6 +76,7 @@ version = "0.1.0"
 dependencies = [
  "amun-accounts",
  "amun-consensus",
+ "amun-execution",
  "amun-mempool",
  "amun-transactions",
  "blake3",
@@ -249,8 +250,11 @@ dependencies = [
 name = "amun-consensus-network"
 version = "0.1.0"
 dependencies = [
+ "amun-validator-identity",
  "blake3",
+ "ed25519-dalek",
  "postcard",
+ "rand 0.8.6",
  "serde",
  "serde_bytes",
  "serde_json",
@@ -599,6 +603,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-execution"
+version = "0.1.0"
+dependencies = [
+ "amun-accounts",
+ "amun-transactions",
+ "ed25519-dalek",
+ "rand 0.8.6",
+ "serde",
+]
+
+[[package]]
 name = "amun-experimental-framework"
 version = "0.1.0"
 dependencies = [
@@ -753,8 +768,11 @@ dependencies = [
  "amun-network-transport",
  "amun-rpc",
  "amun-sync",
+ "amun-validator-identity",
+ "ed25519-dalek",
  "hex",
  "postcard",
+ "rand 0.8.6",
  "serde",
  "serde_json",
  "tempfile",
@@ -1257,6 +1275,16 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "amun-validator-identity"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "ed25519-dalek",
+ "rand 0.8.6",
+ "serde",
 ]
 
 [[package]]

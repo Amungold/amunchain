@@ -1,5 +1,7 @@
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_resource_core::{ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+};
 use std::env;
 
 fn main() {
@@ -17,7 +19,11 @@ fn main() {
         let mut store = PersistentValidatorStore::open(&dir).expect("Failed to open store");
 
         let root_initial = store.state_root();
-        println!("Validator {} initial root: {}", i, hex::encode(root_initial));
+        println!(
+            "Validator {} initial root: {}",
+            i,
+            hex::encode(root_initial)
+        );
 
         // Use identical resource IDs for all validators to test determinism
         for j in 0..3 {
@@ -30,7 +36,10 @@ fn main() {
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
             };
-            store.registry_mut().register_genesis(meta).expect("Failed to register");
+            store
+                .registry_mut()
+                .register_genesis(meta)
+                .expect("Failed to register");
         }
 
         let root_final = store.state_root();
@@ -51,9 +60,15 @@ fn main() {
         println!("Final root:   {}", hex::encode(first_final));
     } else {
         println!("\nFAIL: Determinism violation detected");
-        if !all_initial_match { println!("  - Initial roots differ"); }
-        if !all_final_match { println!("  - Final roots differ"); }
-        if !state_changed { println!("  - State did not evolve"); }
+        if !all_initial_match {
+            println!("  - Initial roots differ");
+        }
+        if !all_final_match {
+            println!("  - Final roots differ");
+        }
+        if !state_changed {
+            println!("  - State did not evolve");
+        }
         std::process::exit(1);
     }
 }

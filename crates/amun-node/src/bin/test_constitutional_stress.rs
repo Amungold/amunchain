@@ -2,7 +2,9 @@ use amun_bytecode::opcodes::OpCode;
 use amun_bytecode::program::ConstitutionalProgram;
 use amun_constitutional_runtime::runtime_pipeline::ConstitutionalRuntime;
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_resource_core::{ResourceId, ResourceArchetype, ResourceState, ResourceLineage, ResourceMetadata};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+};
 use amun_vm_kernel::execution_context::ExecutionContext;
 use std::env;
 
@@ -22,7 +24,11 @@ fn main() {
         let mut store = PersistentValidatorStore::open(&dir).expect("Failed to open store");
 
         let mut prev_root = store.state_root();
-        println!("Validator {} | Height 0 root: {}", v, hex::encode(prev_root));
+        println!(
+            "Validator {} | Height 0 root: {}",
+            v,
+            hex::encode(prev_root)
+        );
 
         for h in 1..=block_count {
             let resource_id = ResourceId([h as u8; 32]);
@@ -34,7 +40,10 @@ fn main() {
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
             };
-            store.registry_mut().register_genesis(meta).expect("Failed to register");
+            store
+                .registry_mut()
+                .register_genesis(meta)
+                .expect("Failed to register");
 
             let program = ConstitutionalProgram::new(
                 2,
@@ -42,7 +51,10 @@ fn main() {
                 0,
                 vec![
                     OpCode::Push(0),
-                    OpCode::Split { handle: 0, amount_count: 3 },
+                    OpCode::Split {
+                        handle: 0,
+                        amount_count: 3,
+                    },
                     OpCode::Halt,
                 ],
             );
@@ -61,27 +73,46 @@ fn main() {
             let mut archive = amun_proof_archive::proof_archive::ProofArchive::new();
 
             let result = ConstitutionalRuntime::execute(
-                &program, &ctx, store.registry_mut(), &[], 100_000, &mut hot, &mut archive,
+                &program,
+                &ctx,
+                store.registry_mut(),
+                &[],
+                100_000,
+                &mut hot,
+                &mut archive,
             );
 
             match result {
                 Ok(_) => {
-                    store.advance(h, [0u8; 32], [0x10; 32], vec![]).expect("Failed to advance");
+                    store
+                        .advance(h, [0u8; 32], [0x10; 32], vec![])
+                        .expect("Failed to advance");
                     let current_root = store.state_root();
-                    
+
                     // Print only every 10th block to reduce output
                     if h % 10 == 0 || h == block_count {
-                        println!("Validator {} | Height {} root: {}", v, h, hex::encode(current_root));
+                        println!(
+                            "Validator {} | Height {} root: {}",
+                            v,
+                            h,
+                            hex::encode(current_root)
+                        );
                     }
 
                     if current_root == prev_root {
-                        eprintln!("FAIL: Validator {} state root did not change at height {}", v, h);
+                        eprintln!(
+                            "FAIL: Validator {} state root did not change at height {}",
+                            v, h
+                        );
                         std::process::exit(1);
                     }
                     prev_root = current_root;
                 }
                 Err(e) => {
-                    eprintln!("FAIL: Validator {} execution error at height {}: {}", v, h, e);
+                    eprintln!(
+                        "FAIL: Validator {} execution error at height {}: {}",
+                        v, h, e
+                    );
                     std::process::exit(1);
                 }
             }
@@ -92,7 +123,10 @@ fn main() {
     let first = final_roots[0];
     let all_match = final_roots.iter().all(|r| *r == first);
     if all_match {
-        println!("\nPASS: Constitutional stress test passed ({} blocks)", block_count);
+        println!(
+            "\nPASS: Constitutional stress test passed ({} blocks)",
+            block_count
+        );
         println!("Final root: {}", hex::encode(first));
     } else {
         println!("\nFAIL: Validators diverged during stress test");

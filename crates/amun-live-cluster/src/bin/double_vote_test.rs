@@ -20,19 +20,27 @@ fn main() {
         .map(LiveValidator::new)
         .collect();
 
-    for v in &validators { v.start().unwrap(); }
+    for v in &validators {
+        v.start().unwrap();
+    }
 
     println!("=== N103.3 AUTOMATIC SLASHING TEST ===");
     println!();
 
     println!("Phase 1: Warmup (30s)...");
     thread::sleep(Duration::from_secs(30));
-    let initial: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+    let initial: Vec<u64> = validators
+        .iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     println!("  Initial heights: {:?}", initial);
 
     println!("\nPhase 2: Direct evidence injection + enforcement...");
 
-    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
 
     {
         let mut eng = validators[0].engine.lock().unwrap();
@@ -47,20 +55,35 @@ fn main() {
             let sig_a = [i as u8; 64];
             let sig_b = [(i + 100) as u8; 64];
             let vote_a = ConsensusVote {
-                voter_id: [88u8; 32], height: h,
-                block_hash: [0xAA; 32], state_root: [0xBB; 32],
-                approve: true, signature: sig_a, timestamp: now + i,
+                voter_id: [88u8; 32],
+                height: h,
+                block_hash: [0xAA; 32],
+                state_root: [0xBB; 32],
+                approve: true,
+                signature: sig_a,
+                timestamp: now + i,
             };
             let vote_b = ConsensusVote {
-                voter_id: [88u8; 32], height: h,
-                block_hash: [0xFF; 32], state_root: [0xBB; 32],
-                approve: true, signature: sig_b, timestamp: now + i + 1,
+                voter_id: [88u8; 32],
+                height: h,
+                block_hash: [0xFF; 32],
+                state_root: [0xBB; 32],
+                approve: true,
+                signature: sig_b,
+                timestamp: now + i + 1,
             };
             let proof = EquivocationProof {
                 validator_id: [88u8; 32],
-                height: h, round: h,
-                vote_a: SignedVote { vote: vote_a, signature: sig_a },
-                vote_b: SignedVote { vote: vote_b, signature: sig_b },
+                height: h,
+                round: h,
+                vote_a: SignedVote {
+                    vote: vote_a,
+                    signature: sig_a,
+                },
+                vote_b: SignedVote {
+                    vote: vote_b,
+                    signature: sig_b,
+                },
                 detected_at_height: h,
             };
             match eng.misbehavior_registry.add_proof(proof) {
@@ -79,23 +102,38 @@ fn main() {
             if let Some(ref registry) = eng.validator_status {
                 registry.lock().unwrap().set_status(
                     [88u8; 32],
-                    ValidatorStatus::Suspended { until_height: until },
+                    ValidatorStatus::Suspended {
+                        until_height: until,
+                    },
                 );
                 println!("  VALIDATOR_SLASHED: [88;32] until height {}", until);
 
-                let suspended = registry.lock().unwrap().is_suspended(&[88u8; 32], eng.current_height);
+                let suspended = registry
+                    .lock()
+                    .unwrap()
+                    .is_suspended(&[88u8; 32], eng.current_height);
                 println!("  is_suspended: {}", suspended);
 
                 // Verify suspended validator cannot vote
                 let vote = ConsensusVote {
-                    voter_id: [88u8; 32], height: h + 1,
-                    block_hash: [0xAA; 32], state_root: [0xBB; 32],
-                    approve: true, signature: [99u8; 64], timestamp: now + 10,
+                    voter_id: [88u8; 32],
+                    height: h + 1,
+                    block_hash: [0xAA; 32],
+                    state_root: [0xBB; 32],
+                    approve: true,
+                    signature: [99u8; 64],
+                    timestamp: now + 10,
                 };
                 let result = eng.process_vote(vote);
                 let blocked = result.is_err();
-                println!("  Vote after suspension: {}", if blocked { "BLOCKED" } else { "ALLOWED" });
-                println!("  Slashing enforcement: {}", if suspended && blocked { "PASS" } else { "FAIL" });
+                println!(
+                    "  Vote after suspension: {}",
+                    if blocked { "BLOCKED" } else { "ALLOWED" }
+                );
+                println!(
+                    "  Slashing enforcement: {}",
+                    if suspended && blocked { "PASS" } else { "FAIL" }
+                );
             }
         } else {
             println!("  Not enough offenses (need > 2)");
@@ -103,14 +141,26 @@ fn main() {
     }
 
     thread::sleep(Duration::from_secs(10));
-    let final_heights: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+    let final_heights: Vec<u64> = validators
+        .iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     let max_h = *final_heights.iter().max().unwrap_or(&0);
     let min_h = *final_heights.iter().min().unwrap_or(&0);
 
-    for v in &validators { v.stop(); }
+    for v in &validators {
+        v.stop();
+    }
 
     println!("\n============================================");
-    println!("  Final heights: {:?} spread={}", final_heights, max_h - min_h);
-    println!("  Network: {}", if max_h - min_h <= 2 { "PASS" } else { "FAIL" });
+    println!(
+        "  Final heights: {:?} spread={}",
+        final_heights,
+        max_h - min_h
+    );
+    println!(
+        "  Network: {}",
+        if max_h - min_h <= 2 { "PASS" } else { "FAIL" }
+    );
     println!("============================================");
 }

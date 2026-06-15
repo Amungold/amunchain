@@ -1,6 +1,9 @@
-use crate::messages::{ConsensusVote, FinalityCertificate, QuorumCertificate, EquivocationProof, SignedVote};
+use crate::messages::{
+    ConsensusVote, EquivocationProof, FinalityCertificate, QuorumCertificate, SignedVote,
+};
 use crate::misbehavior::MisbehaviorRegistry;
 use crate::validator_status::ValidatorStatusRegistry;
+use amun_validator_identity::ValidatorKeyRegistry;
 use std::collections::HashMap;
 
 /// A single consensus round for one block height.
@@ -177,6 +180,7 @@ pub struct ConsensusEngine {
     pub node_state: NodeState,
     pub validator_status: Option<std::sync::Arc<std::sync::Mutex<ValidatorStatusRegistry>>>,
     pub misbehavior_registry: MisbehaviorRegistry,
+    pub validator_keys: ValidatorKeyRegistry,
     finality_chain: Vec<FinalityCertificate>,
 }
 
@@ -194,11 +198,30 @@ impl ConsensusEngine {
             node_state: NodeState::Active,
             validator_status: None,
             misbehavior_registry: MisbehaviorRegistry::new(),
+            validator_keys: ValidatorKeyRegistry::new(),
             finality_chain: Vec::new(),
         }
     }
 
     /// Start a new round for the given height.
+    /// Register a validator with its derived id and public key.
+    pub fn register_validator(&mut self, validator_id: [u8; 32], public_key: [u8; 32]) {
+        self.validator_ids.push(validator_id);
+        self.validator_keys.insert(validator_id, public_key);
+    }
+
+    /// Register a validator with both PeerId and ValidatorId (unified identity).
+    pub fn register_validator_identity(
+        &mut self,
+        peer_id: [u8; 32],
+        validator_id: [u8; 32],
+        public_key: [u8; 32],
+    ) {
+        self.validator_ids.push(validator_id);
+        self.validator_keys
+            .register_identity(peer_id, validator_id, public_key);
+    }
+
     pub fn start_round(&mut self, height: u64, proposer_id: [u8; 32]) {
         self.rounds
             .entry(height)
@@ -214,6 +237,27 @@ impl ConsensusEngine {
     pub fn process_vote(&mut self, vote: ConsensusVote) -> Result<(), String> {
         if self.is_suspended(&vote.voter_id) {
             return Err(format!("Validator {:?} is suspended", &vote.voter_id[..4]));
+        }
+        // N105.3: Verify signature if registry populated
+        if !self.validator_keys.is_empty() {
+            let pk = self
+                .validator_keys
+                .get(&vote.voter_id)
+                .ok_or_else(|| format!("Unknown validator {:?}", &vote.voter_id[..4]))?;
+            let payload = amun_validator_identity::vote_signing_payload(
+                &vote.voter_id,
+                vote.height,
+                &vote.block_hash,
+                &vote.state_root,
+                vote.approve,
+                vote.timestamp,
+            );
+            if !amun_validator_identity::verify_ed25519(pk, &payload, &vote.signature) {
+                return Err(format!(
+                    "Invalid vote signature from {:?}",
+                    &vote.voter_id[..4]
+                ));
+            }
         }
         let height = vote.height;
         if height <= self.current_height {
@@ -237,14 +281,29 @@ impl ConsensusEngine {
             .rounds
             .get_mut(&height)
             .ok_or_else(|| format!("No active round at height {}", height))?;
-        eprintln!("PROCESS_VOTE: validator={:?} height={} hash={:?}", &vote.voter_id[..4], vote.height, &vote.block_hash[..4]);
+        eprintln!(
+            "PROCESS_VOTE: validator={:?} height={} hash={:?}",
+            &vote.voter_id[..4],
+            vote.height,
+            &vote.block_hash[..4]
+        );
         self.metrics.record_vote();
         let result = round.add_vote(vote.clone());
         if let Err(ref e) = &result {
             if e.contains("Equivocation detected") {
-                let existing = round.votes.iter().find(|v| v.voter_id == vote.voter_id).unwrap();
-                let signed_a = SignedVote { vote: existing.clone(), signature: existing.signature };
-                let signed_b = SignedVote { vote: vote.clone(), signature: vote.signature };
+                let existing = round
+                    .votes
+                    .iter()
+                    .find(|v| v.voter_id == vote.voter_id)
+                    .unwrap();
+                let signed_a = SignedVote {
+                    vote: existing.clone(),
+                    signature: existing.signature,
+                };
+                let signed_b = SignedVote {
+                    vote: vote.clone(),
+                    signature: vote.signature,
+                };
                 let proof = EquivocationProof {
                     validator_id: vote.voter_id,
                     height: vote.height,
@@ -254,15 +313,25 @@ impl ConsensusEngine {
                     detected_at_height: self.current_height,
                 };
                 if let Ok(hash) = self.misbehavior_registry.add_proof(proof) {
-                    eprintln!("EVIDENCE_RECORDED: proof_hash={:?} validator={:?}", &hash[..4], &vote.voter_id[..4]);
+                    eprintln!(
+                        "EVIDENCE_RECORDED: proof_hash={:?} validator={:?}",
+                        &hash[..4],
+                        &vote.voter_id[..4]
+                    );
                     if crate::slashing::should_slash(&self.misbehavior_registry, &vote.voter_id) {
                         if let Some(ref registry) = self.validator_status {
                             let until = self.current_height + 100;
                             registry.lock().unwrap().set_status(
                                 vote.voter_id,
-                                crate::validator_status::ValidatorStatus::Suspended { until_height: until },
+                                crate::validator_status::ValidatorStatus::Suspended {
+                                    until_height: until,
+                                },
                             );
-                            eprintln!("VALIDATOR_SLASHED: validator={:?} until={}", &vote.voter_id[..4], until);
+                            eprintln!(
+                                "VALIDATOR_SLASHED: validator={:?} until={}",
+                                &vote.voter_id[..4],
+                                until
+                            );
                         }
                     }
                 }
@@ -297,7 +366,10 @@ impl ConsensusEngine {
         history_root: [u8; 32],
     ) -> Option<FinalityCertificate> {
         let active = self.active_validator_count();
-        eprintln!("ADVANCE_DIAG: try_advance h={} active={}/{}", height, active, self.total_validators);
+        eprintln!(
+            "ADVANCE_DIAG: try_advance h={} active={}/{}",
+            height, active, self.total_validators
+        );
         let round = self.rounds.get_mut(&height)?;
 
         if round.qc.is_none() {
@@ -477,5 +549,54 @@ mod tests {
 
         assert_eq!(engine.current_height, 3);
         assert_eq!(engine.history_root, [3u8; 32]);
+    }
+
+    // N105.3 test: signature enforced when registry populated
+    #[test]
+    fn n105_signature_required_when_registry_populated() {
+        use ed25519_dalek::{Signer, SigningKey};
+        use rand::rngs::OsRng;
+        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+
+        // Generate a keypair, derive validator id
+        let sk = SigningKey::generate(&mut OsRng);
+        let pk = sk.verifying_key().to_bytes();
+        let vid = amun_validator_identity::derive_validator_id(&pk);
+        // Register this validator
+        engine.register_validator(vid, pk);
+        engine.start_round(1, vid);
+
+        // Create a validly signed vote
+        let payload_ok = amun_validator_identity::vote_signing_payload(
+            &vid,
+            1,
+            &[0xAA; 32],
+            &[0xBB; 32],
+            true,
+            1000,
+        );
+        let sig_ok = sk.sign(&payload_ok).to_bytes();
+        let vote_ok = ConsensusVote {
+            voter_id: vid,
+            height: 1,
+            block_hash: [0xAA; 32],
+            state_root: [0xBB; 32],
+            approve: true,
+            signature: sig_ok,
+            timestamp: 1000,
+        };
+        assert!(engine.process_vote(vote_ok).is_ok());
+
+        // Unsigned vote (all zeros signature) must be rejected
+        let vote_bad = ConsensusVote {
+            voter_id: vid,
+            height: 1,
+            block_hash: [0xAA; 32],
+            state_root: [0xBB; 32],
+            approve: true,
+            signature: [0u8; 64],
+            timestamp: 1000,
+        };
+        assert!(engine.process_vote(vote_bad).is_err());
     }
 }

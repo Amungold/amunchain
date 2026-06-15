@@ -45,7 +45,9 @@ fn main() {
             );
             match result {
                 Ok(_) => {
-                    store.advance(h, [0u8; 32], [0x10; 32], vec![]).expect("Failed to advance");
+                    store
+                        .advance(h, [0u8; 32], [0x10; 32], vec![])
+                        .expect("Failed to advance");
                 }
                 Err(e) => {
                     eprintln!("FAIL: Execution error at height {}: {}", h, e);

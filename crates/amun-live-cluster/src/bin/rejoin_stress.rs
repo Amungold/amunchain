@@ -1,6 +1,6 @@
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
-use amun_sync::catch_up::{download_missing_records, append_missing_records};
+use amun_sync::catch_up::{append_missing_records, download_missing_records};
 use std::net::SocketAddr;
 use std::thread;
 use std::time::Duration;
@@ -9,7 +9,7 @@ fn sync_to_tip(v: &LiveValidator, peer_addr: SocketAddr) {
     let peers = vec![peer_addr];
     let local_h = v.store.lock().unwrap().latest_height();
     eprintln!("  sync_to_tip: local_h={}, peer={}", local_h, peer_addr);
-    
+
     match download_missing_records(local_h, &peers) {
         Ok(records) => {
             eprintln!("  sync_to_tip: downloaded {} records", records.len());
@@ -43,13 +43,19 @@ fn main() {
 
     let mut validators: Vec<LiveValidator> = (0..4)
         .map(|i| {
-            let mut config = ValidatorConfig::test_cluster(i, &[base_port, base_port+1, base_port+2, base_port+3]).with_quorum(4);
+            let mut config = ValidatorConfig::test_cluster(
+                i,
+                &[base_port, base_port + 1, base_port + 2, base_port + 3],
+            )
+            .with_quorum(4);
             config.data_dir = data_dirs[i].clone();
             LiveValidator::new(config)
         })
         .collect();
 
-    for v in &validators { v.start().unwrap(); }
+    for v in &validators {
+        v.start().unwrap();
+    }
     println!("=== N100.4 REJOIN STRESS (FIXED FINAL) ===");
     println!("Cycles: {} | Interval: {}s", cycles, crash_interval);
     thread::sleep(Duration::from_secs(crash_interval));
@@ -57,7 +63,9 @@ fn main() {
     for cycle in 1..=cycles {
         let target = (cycle % 4) as usize;
         let peer_idx = (target + 1) % 4;
-        let peer_addr: SocketAddr = format!("127.0.0.1:{}", base_port + peer_idx as u16).parse().unwrap();
+        let peer_addr: SocketAddr = format!("127.0.0.1:{}", base_port + peer_idx as u16)
+            .parse()
+            .unwrap();
 
         println!("Cycle {}/{} | Killing validator {}", cycle, cycles, target);
         let pre_height = validators[target].store.lock().unwrap().latest_height();
@@ -65,7 +73,11 @@ fn main() {
         thread::sleep(Duration::from_secs(10));
 
         println!("  Restarting validator {}...", target);
-        let mut config = ValidatorConfig::test_cluster(target, &[base_port, base_port+1, base_port+2, base_port+3]).with_quorum(4);
+        let mut config = ValidatorConfig::test_cluster(
+            target,
+            &[base_port, base_port + 1, base_port + 2, base_port + 3],
+        )
+        .with_quorum(4);
         config.data_dir = data_dirs[target].clone();
         let new_v = LiveValidator::new(config);
         new_v.start().unwrap();
@@ -80,30 +92,53 @@ fn main() {
             thread::sleep(Duration::from_secs(t));
             let h = validators[target].store.lock().unwrap().latest_height();
             eprintln!("  t+{}s: height={}", t, h);
-            if h > pre_height + 3 { break; }
+            if h > pre_height + 3 {
+                break;
+            }
         }
 
-        let heights: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+        let heights: Vec<u64> = validators
+            .iter()
+            .map(|v| v.store.lock().unwrap().latest_height())
+            .collect();
         let min_h = *heights.iter().min().unwrap_or(&0);
         let max_h = *heights.iter().max().unwrap_or(&0);
         let spread = max_h - min_h;
         let post_height = heights[target];
-        
+
         if spread <= 5 && post_height > pre_height {
             passed += 1;
-            println!("  Result: PASS | pre_h={} post_h={} spread={}", pre_height, post_height, spread);
+            println!(
+                "  Result: PASS | pre_h={} post_h={} spread={}",
+                pre_height, post_height, spread
+            );
         } else {
             failed += 1;
-            println!("  Result: FAIL | pre_h={} post_h={} spread={}", pre_height, post_height, spread);
+            println!(
+                "  Result: FAIL | pre_h={} post_h={} spread={}",
+                pre_height, post_height, spread
+            );
         }
     }
 
-    for v in &validators { v.stop(); }
-    let final_h: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+    for v in &validators {
+        v.stop();
+    }
+    let final_h: Vec<u64> = validators
+        .iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     let final_spread = final_h.iter().max().unwrap_or(&0) - final_h.iter().min().unwrap_or(&0);
     println!("\n============================================");
     println!("  Passed: {}  Failed: {}", passed, failed);
     println!("  Final spread: {}", final_spread);
-    println!("  Verdict: {}", if failed == 0 && final_spread <= 5 { "PASS" } else { "PARTIAL" });
+    println!(
+        "  Verdict: {}",
+        if failed == 0 && final_spread <= 5 {
+            "PASS"
+        } else {
+            "PARTIAL"
+        }
+    );
     println!("============================================");
 }

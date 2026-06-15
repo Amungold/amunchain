@@ -295,3 +295,68 @@ mod tests {
         assert!(decoded.verify());
     }
 }
+
+/// N104.1: A block proposal sent by the designated proposer to all validators.
+/// Contains only transaction hashes for propagation, not execution.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct BlockProposal {
+    pub height: u64,
+    pub parent_hash: [u8; 32],
+    pub tx_hashes: Vec<[u8; 32]>,
+    pub proposer_id: [u8; 32],
+    pub timestamp: u64,
+}
+
+#[cfg(test)]
+mod n104_1_tests {
+    use super::*;
+
+    #[test]
+    fn n104_1_block_proposal_roundtrip() {
+        let proposal = BlockProposal {
+            height: 42,
+            parent_hash: [0xAA; 32],
+            tx_hashes: vec![[0x01; 32], [0x02; 32]],
+            proposer_id: [0xBB; 32],
+            timestamp: 1700000000,
+        };
+        let encoded = postcard::to_stdvec(&proposal).unwrap();
+        let decoded: BlockProposal = postcard::from_bytes(&encoded).unwrap();
+        assert_eq!(decoded, proposal);
+    }
+
+    #[test]
+    fn n104_1_deterministic_hash() {
+        let proposal = BlockProposal {
+            height: 1,
+            parent_hash: [0xCC; 32],
+            tx_hashes: vec![],
+            proposer_id: [0xDD; 32],
+            timestamp: 0,
+        };
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(b"N104_BLOCK_PROPOSAL_V1");
+        hasher.update(&proposal.height.to_le_bytes());
+        hasher.update(&proposal.parent_hash);
+        for txh in &proposal.tx_hashes {
+            hasher.update(txh);
+        }
+        hasher.update(&proposal.proposer_id);
+        hasher.update(&proposal.timestamp.to_le_bytes());
+        let h1 = hasher.finalize();
+
+        // Second round gives same hash
+        let mut hasher2 = blake3::Hasher::new();
+        hasher2.update(b"N104_BLOCK_PROPOSAL_V1");
+        hasher2.update(&proposal.height.to_le_bytes());
+        hasher2.update(&proposal.parent_hash);
+        for txh in &proposal.tx_hashes {
+            hasher2.update(txh);
+        }
+        hasher2.update(&proposal.proposer_id);
+        hasher2.update(&proposal.timestamp.to_le_bytes());
+        let h2 = hasher2.finalize();
+
+        assert_eq!(h1, h2);
+    }
+}

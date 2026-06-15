@@ -22,8 +22,10 @@ fn main() {
     for h in 1..=HEIGHTS {
         let mut height_mutations = Vec::new();
         for j in 0..h {
-            let id = ResourceId([h as u8, j as u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            let id = ResourceId([
+                h as u8, j as u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+            ]);
             let meta = ResourceMetadata {
                 resource_id: id,
                 archetype: ResourceArchetype::Asset,
@@ -32,10 +34,15 @@ fn main() {
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
             };
-            ref_store.registry_mut().register_genesis(meta.clone()).expect("Failed to register");
+            ref_store
+                .registry_mut()
+                .register_genesis(meta.clone())
+                .expect("Failed to register");
             height_mutations.push(meta);
         }
-        ref_store.advance(h, [0u8; 32], [0x10; 32], vec![]).expect("Failed to advance");
+        ref_store
+            .advance(h, [0u8; 32], [0x10; 32], vec![])
+            .expect("Failed to advance");
         mutations_log.push(height_mutations);
     }
     let ref_root = ref_store.state_root();
@@ -47,13 +54,19 @@ fn main() {
     for v in 0..4 {
         let replay_dir = format!("{}/replay{}", prefix, v);
         std::fs::create_dir_all(&replay_dir).expect("Failed to create dir");
-        let mut replay_store = PersistentValidatorStore::open(&replay_dir).expect("Failed to open store");
+        let mut replay_store =
+            PersistentValidatorStore::open(&replay_dir).expect("Failed to open store");
 
         for (h, height_mutations) in mutations_log.iter().enumerate() {
             for meta in height_mutations {
-                replay_store.registry_mut().register_genesis(meta.clone()).expect("Failed to register");
+                replay_store
+                    .registry_mut()
+                    .register_genesis(meta.clone())
+                    .expect("Failed to register");
             }
-            replay_store.advance((h + 1) as u64, [0u8; 32], [0x10; 32], vec![]).expect("Failed to advance");
+            replay_store
+                .advance((h + 1) as u64, [0u8; 32], [0x10; 32], vec![])
+                .expect("Failed to advance");
         }
         let replay_root = replay_store.state_root();
         println!("Replay {} root: {}", v, hex::encode(replay_root));
@@ -68,7 +81,12 @@ fn main() {
     } else {
         println!("\nFAIL: Replay determinism violation");
         for (i, r) in replay_roots.iter().enumerate() {
-            println!("Replay {} root: {} (match: {})", i, hex::encode(*r), *r == ref_root);
+            println!(
+                "Replay {} root: {} (match: {})",
+                i,
+                hex::encode(*r),
+                *r == ref_root
+            );
         }
         std::process::exit(1);
     }

@@ -1,11 +1,15 @@
 use crate::config::ValidatorConfig;
-use amun_consensus_network::engine::ConsensusEngine;
-use amun_consensus_network::messages::ConsensusVote;
 use amun_chain_store::record::FinalizedChainRecord;
 use amun_chain_store::store::ChainStore;
+use amun_consensus_network::engine::ConsensusEngine;
+use amun_consensus_network::messages::ConsensusVote;
+use amun_sync::catch_up::{append_missing_records, download_missing_records};
+use amun_validator_identity::derive_validator_id;
+use amun_validator_identity::vote_signing_payload;
+use ed25519_dalek::{Signer, SigningKey};
+use rand::rngs::OsRng;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
-use amun_sync::catch_up::{download_missing_records, append_missing_records};
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant, SystemTime};
@@ -16,19 +20,42 @@ pub struct LiveValidator {
     pub store: Arc<Mutex<ChainStore>>,
     running: Arc<Mutex<bool>>,
     handles: Mutex<Vec<JoinHandle<()>>>,
+    signing_key: SigningKey,
+    pub validator_id: [u8; 32],
 }
 
 impl LiveValidator {
     pub fn new(config: ValidatorConfig) -> Self {
-        let store = ChainStore::open(&config.data_dir).unwrap_or_else(|_| {
-            ChainStore::open("/tmp/amun-fallback").unwrap()
-        });
+        let store = ChainStore::open(&config.data_dir)
+            .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").unwrap());
         let recovered_height = store.latest_height();
-        let recovered_root = store.load_tip().map(|r| r.history_root).unwrap_or([0u8; 32]);
+        let recovered_root = store
+            .load_tip()
+            .map(|r| r.history_root)
+            .unwrap_or([0u8; 32]);
         let mut engine = ConsensusEngine::new(config.validator_id, config.total_validators());
         if recovered_height > 0 {
             engine.current_height = recovered_height;
             engine.history_root = recovered_root;
+        }
+        // N105.4A: Generate real signing key (random, not derived from validator_id)
+        let signing_key = SigningKey::generate(&mut OsRng);
+        let pk = signing_key.verifying_key().to_bytes();
+        let my_true_id = derive_validator_id(&pk);
+        // Use the cryptographic ID everywhere instead of the config's dummy ID
+        let validator_id = my_true_id;
+        // Register self and all cluster peers with derived cryptographic IDs
+        engine.register_validator(validator_id, pk);
+        engine.validator_id = validator_id; // Use cryptographic ID as engine's own identity
+        for peer in &config.cluster {
+            // Use a deterministic seed per validator (NOT the validator_id itself) for test clusters
+            // In production, keys come from certificates.
+            let mut seed = [0u8; 32];
+            seed[0] = peer.validator_id[0];
+            let peer_sk = SigningKey::from_bytes(&seed);
+            let peer_pk = peer_sk.verifying_key().to_bytes();
+            let peer_id = derive_validator_id(&peer_pk);
+            engine.register_validator(peer_id, peer_pk);
         }
         Self {
             config,
@@ -36,6 +63,8 @@ impl LiveValidator {
             store: Arc::new(Mutex::new(store)),
             running: Arc::new(Mutex::new(false)),
             handles: Mutex::new(Vec::new()),
+            signing_key: signing_key.clone(),
+            validator_id: my_true_id,
         }
     }
 
@@ -43,14 +72,17 @@ impl LiveValidator {
         *self.running.lock().unwrap() = true;
         let listener = TcpListener::bind(self.config.listen_addr)
             .map_err(|e| format!("Bind error on {}: {}", self.config.listen_addr, e))?;
-        listener.set_nonblocking(true).map_err(|e| format!("Set nonblocking error: {}", e))?;
+        listener
+            .set_nonblocking(true)
+            .map_err(|e| format!("Set nonblocking error: {}", e))?;
 
         let engine = self.engine.clone();
         let store = self.store.clone();
         let peers: Vec<_> = self.config.other_peers().into_iter().cloned().collect();
-        let validator_id = self.config.validator_id;
         let _total = self.config.total_validators();
         let running = self.running.clone();
+        let signing_key_clone = self.signing_key.clone();
+        let validator_id = self.validator_id;
 
         // Listen thread
         let engine_listen = engine.clone();
@@ -85,7 +117,7 @@ impl LiveValidator {
                         eprintln!("LISTENER ERROR: {:?}", e);
                         thread::sleep(Duration::from_millis(10));
                         continue;
-                    },
+                    }
                 }
             }
         });
@@ -95,6 +127,7 @@ impl LiveValidator {
         let store_consensus = store.clone();
         let running_consensus = running.clone();
         let h2 = thread::spawn(move || {
+            let signing_key = signing_key_clone;
             while *running_consensus.lock().unwrap() {
                 let (height, needs_sync) = {
                     let mut eng = engine_consensus.lock().unwrap();
@@ -104,12 +137,14 @@ impl LiveValidator {
                     (h, sync)
                 };
                 if needs_sync {
-                    let peers_addr: Vec<std::net::SocketAddr> = peers.iter().map(|p| p.address).collect();
+                    let peers_addr: Vec<std::net::SocketAddr> =
+                        peers.iter().map(|p| p.address).collect();
                     let current_h = engine_consensus.lock().unwrap().current_height;
                     if let Ok(records) = download_missing_records(current_h, &peers_addr) {
                         if !records.is_empty() {
                             let mut store_g = store_consensus.lock().unwrap();
-                            let new_h = append_missing_records(&mut store_g, current_h, records).unwrap_or(current_h);
+                            let new_h = append_missing_records(&mut store_g, current_h, records)
+                                .unwrap_or(current_h);
                             if new_h > current_h {
                                 let mut eng2 = engine_consensus.lock().unwrap();
                                 eng2.current_height = new_h;
@@ -141,14 +176,27 @@ impl LiveValidator {
                 }
 
                 let block_hash = [height as u8; 32];
+                let timestamp = SystemTime::now()
+                    .duration_since(SystemTime::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs();
+                let payload = vote_signing_payload(
+                    &validator_id,
+                    height,
+                    &block_hash,
+                    &[0xBB; 32],
+                    true,
+                    timestamp,
+                );
+                let sig = signing_key.sign(&payload).to_bytes();
                 let my_vote = ConsensusVote {
-                    voter_id: validator_id, height, block_hash,
-                    state_root: [0xBB; 32], approve: true,
-                    signature: [0u8; 64],
-                    timestamp: SystemTime::now()
-                        .duration_since(SystemTime::UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs(),
+                    voter_id: validator_id,
+                    height,
+                    block_hash,
+                    state_root: [0xBB; 32],
+                    approve: true,
+                    signature: sig,
+                    timestamp,
                 };
 
                 // Process own vote — with fallback proposal if proposer is silent
@@ -250,10 +298,18 @@ impl LiveValidator {
         }
     }
 
-    pub fn current_height(&self) -> u64 { self.engine.lock().unwrap().current_height }
-    pub fn history_root(&self) -> [u8; 32] { self.engine.lock().unwrap().history_root }
-    pub fn store_len(&self) -> usize { self.store.lock().unwrap().len() }
-    pub fn metrics_summary(&self) -> String { self.engine.lock().unwrap().metrics.summary() }
+    pub fn current_height(&self) -> u64 {
+        self.engine.lock().unwrap().current_height
+    }
+    pub fn history_root(&self) -> [u8; 32] {
+        self.engine.lock().unwrap().history_root
+    }
+    pub fn store_len(&self) -> usize {
+        self.store.lock().unwrap().len()
+    }
+    pub fn metrics_summary(&self) -> String {
+        self.engine.lock().unwrap().metrics.summary()
+    }
 }
 
 #[cfg(test)]
@@ -328,7 +384,8 @@ mod tests {
         va.start().unwrap();
         vb.start().unwrap();
         thread::sleep(Duration::from_millis(8000));
-        va.stop(); vb.stop();
+        va.stop();
+        vb.stop();
         let ha = va.store.lock().unwrap().latest_height();
         let hb = vb.store.lock().unwrap().latest_height();
         assert!(ha >= 1 && hb >= 1, "Store heights: A={}, B={}", ha, hb);
@@ -340,9 +397,13 @@ mod tests {
         let va = LiveValidator::new(ValidatorConfig::test_cluster(0, &ports).with_quorum(3));
         let vb = LiveValidator::new(ValidatorConfig::test_cluster(1, &ports).with_quorum(3));
         let vc = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(3));
-        va.start().unwrap(); vb.start().unwrap(); vc.start().unwrap();
+        va.start().unwrap();
+        vb.start().unwrap();
+        vc.start().unwrap();
         thread::sleep(Duration::from_millis(8000));
-        va.stop(); vb.stop(); vc.stop();
+        va.stop();
+        vb.stop();
+        vc.stop();
         assert!(va.store.lock().unwrap().latest_height() >= 1);
         assert!(vb.store.lock().unwrap().latest_height() >= 1);
         assert!(vc.store.lock().unwrap().latest_height() >= 1);
@@ -367,14 +428,18 @@ mod tests {
         let validators: Vec<LiveValidator> = (0..4)
             .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
             .collect();
-        for v in &validators { v.start().unwrap(); }
+        for v in &validators {
+            v.start().unwrap();
+        }
         thread::sleep(Duration::from_millis(15000));
-        for v in &validators { v.stop(); }
+        for v in &validators {
+            v.stop();
+        }
 
         for (i, v) in validators.iter().enumerate() {
             let h = v.store.lock().unwrap().latest_height();
             assert!(h >= 1, "Validator {} store height: {}", i, h);
-        println!("Validator {} metrics: {}", i, v.metrics_summary());
+            println!("Validator {} metrics: {}", i, v.metrics_summary());
         }
     }
 }

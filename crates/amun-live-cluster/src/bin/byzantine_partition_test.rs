@@ -28,7 +28,10 @@ fn main() {
     // Phase 1: warmup (30s)
     println!("Phase 1: Warmup...");
     thread::sleep(Duration::from_secs(30));
-    let initial: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+    let initial: Vec<u64> = validators
+        .iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     println!("  Initial heights: {:?}", initial);
 
     // Phase 2: partition — stop V2 and V3, leave V0 and V1 (2 < quorum=3)
@@ -44,7 +47,14 @@ fn main() {
     // With only 2/4 validators, quorum=3 cannot be met.
     // The chain should NOT advance (safety preserved).
     let stalled = v0_h <= initial[0] + 2 && v1_h <= initial[1] + 2;
-    println!("  Chain stalled: {}", if stalled { "PASS (safety preserved)" } else { "FAIL (advanced without quorum)" });
+    println!(
+        "  Chain stalled: {}",
+        if stalled {
+            "PASS (safety preserved)"
+        } else {
+            "FAIL (advanced without quorum)"
+        }
+    );
 
     // Phase 3: heal partition — restart V2 and V3
     println!("\nPhase 3: Healing partition...");
@@ -58,7 +68,10 @@ fn main() {
 
     thread::sleep(Duration::from_secs(60));
 
-    let final_heights: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+    let final_heights: Vec<u64> = validators
+        .iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     let min_h = *final_heights.iter().min().unwrap_or(&0);
     let max_h = *final_heights.iter().max().unwrap_or(&0);
     let spread = max_h - min_h;
@@ -66,14 +79,29 @@ fn main() {
 
     let recovered = spread <= 2 && final_heights.iter().all(|h| *h > initial[0]);
 
-    for v in &validators { v.stop(); }
+    for v in &validators {
+        v.stop();
+    }
 
     println!("\n============================================");
     println!("  N102.9 BYZANTINE PARTITION RESULTS");
     println!("============================================");
-    println!("  Safety (no advance): {}", if stalled { "PASS" } else { "FAIL" });
-    println!("  Recovery (rejoin):  {}", if recovered { "PASS" } else { "FAIL" });
+    println!(
+        "  Safety (no advance): {}",
+        if stalled { "PASS" } else { "FAIL" }
+    );
+    println!(
+        "  Recovery (rejoin):  {}",
+        if recovered { "PASS" } else { "FAIL" }
+    );
     println!("  Final spread:       {}", spread);
-    println!("  Verdict:            {}", if stalled && recovered { "PASS" } else { "PARTIAL" });
+    println!(
+        "  Verdict:            {}",
+        if stalled && recovered {
+            "PASS"
+        } else {
+            "PARTIAL"
+        }
+    );
     println!("============================================");
 }

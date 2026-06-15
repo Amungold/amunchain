@@ -1,6 +1,6 @@
+use amun_persistent_node::persistent_store::PersistentValidatorStore;
 use std::env;
 use std::path::Path;
-use amun_persistent_node::persistent_store::PersistentValidatorStore;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -9,8 +9,8 @@ fn main() {
         std::process::exit(1);
     }
     let path = Path::new(&args[1]);
-    let store = PersistentValidatorStore::open(path.to_str().unwrap())
-        .expect("Failed to open store");
+    let store =
+        PersistentValidatorStore::open(path.to_str().unwrap()).expect("Failed to open store");
     let root = store.state_root();
     println!("{}", hex::encode(root));
 }

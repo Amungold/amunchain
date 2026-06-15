@@ -2,7 +2,9 @@ use amun_bytecode::opcodes::OpCode;
 use amun_bytecode::program::ConstitutionalProgram;
 use amun_constitutional_runtime::runtime_pipeline::ConstitutionalRuntime;
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_resource_core::{ResourceId, ResourceArchetype, ResourceState, ResourceLineage, ResourceMetadata};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+};
 use amun_vm_kernel::execution_context::ExecutionContext;
 use std::env;
 
@@ -31,11 +33,23 @@ fn main() {
             contract_id: [1u8; 32],
             owner: [2u8; 32],
         };
-        ref_store.registry_mut().register_genesis(meta).expect("Failed to register");
+        ref_store
+            .registry_mut()
+            .register_genesis(meta)
+            .expect("Failed to register");
 
         let program = ConstitutionalProgram::new(
-            2, 0, 0,
-            vec![OpCode::Push(0), OpCode::Split { handle: 0, amount_count: 3 }, OpCode::Halt],
+            2,
+            0,
+            0,
+            vec![
+                OpCode::Push(0),
+                OpCode::Split {
+                    handle: 0,
+                    amount_count: 3,
+                },
+                OpCode::Halt,
+            ],
         );
         let ctx = ExecutionContext {
             contract_id: ResourceId([0u8; 32]),
@@ -48,14 +62,28 @@ fn main() {
         };
         let mut hot = amun_proof_archive::hot_store::HotProofStore::new(1000);
         let mut archive = amun_proof_archive::proof_archive::ProofArchive::new();
-        ConstitutionalRuntime::execute(&program, &ctx, ref_store.registry_mut(), &[], 100_000, &mut hot, &mut archive)
-            .expect("Execution failed");
-        ref_store.advance(h, [0u8; 32], [0x10; 32], vec![]).expect("Advance failed");
+        ConstitutionalRuntime::execute(
+            &program,
+            &ctx,
+            ref_store.registry_mut(),
+            &[],
+            100_000,
+            &mut hot,
+            &mut archive,
+        )
+        .expect("Execution failed");
+        ref_store
+            .advance(h, [0u8; 32], [0x10; 32], vec![])
+            .expect("Advance failed");
 
         mutation_log.push((resource_id, program));
     }
     let ref_root = ref_store.state_root();
-    println!("Reference root after {} blocks: {}", block_count, hex::encode(ref_root));
+    println!(
+        "Reference root after {} blocks: {}",
+        block_count,
+        hex::encode(ref_root)
+    );
     drop(ref_store);
 
     // Phase 2: Replay on 4 independent stores from scratch
@@ -63,7 +91,8 @@ fn main() {
     for v in 0..4 {
         let replay_dir = format!("{}/replay{}", prefix, v);
         std::fs::create_dir_all(&replay_dir).expect("Failed to create dir");
-        let mut replay_store = PersistentValidatorStore::open(&replay_dir).expect("Failed to open store");
+        let mut replay_store =
+            PersistentValidatorStore::open(&replay_dir).expect("Failed to open store");
 
         for (h, (resource_id, program)) in mutation_log.iter().enumerate() {
             let height = (h + 1) as u64;
@@ -75,7 +104,10 @@ fn main() {
                 contract_id: [1u8; 32],
                 owner: [2u8; 32],
             };
-            replay_store.registry_mut().register_genesis(meta).expect("Failed to register");
+            replay_store
+                .registry_mut()
+                .register_genesis(meta)
+                .expect("Failed to register");
 
             let ctx = ExecutionContext {
                 contract_id: ResourceId([v as u8; 32]),
@@ -88,9 +120,19 @@ fn main() {
             };
             let mut hot = amun_proof_archive::hot_store::HotProofStore::new(1000);
             let mut archive = amun_proof_archive::proof_archive::ProofArchive::new();
-            ConstitutionalRuntime::execute(&program, &ctx, replay_store.registry_mut(), &[], 100_000, &mut hot, &mut archive)
-                .expect("Replay execution failed");
-            replay_store.advance(height, [0u8; 32], [0x10; 32], vec![]).expect("Replay advance failed");
+            ConstitutionalRuntime::execute(
+                program,
+                &ctx,
+                replay_store.registry_mut(),
+                &[],
+                100_000,
+                &mut hot,
+                &mut archive,
+            )
+            .expect("Replay execution failed");
+            replay_store
+                .advance(height, [0u8; 32], [0x10; 32], vec![])
+                .expect("Replay advance failed");
         }
         let replay_root = replay_store.state_root();
         println!("Replay {} final root: {}", v, hex::encode(replay_root));
@@ -105,7 +147,12 @@ fn main() {
     } else {
         println!("\nFAIL: Replay divergence detected");
         for (i, r) in replay_roots.iter().enumerate() {
-            println!("Replay {} root: {} (match: {})", i, hex::encode(*r), *r == ref_root);
+            println!(
+                "Replay {} root: {} (match: {})",
+                i,
+                hex::encode(*r),
+                *r == ref_root
+            );
         }
         std::process::exit(1);
     }

@@ -21,13 +21,19 @@ fn main() {
         let mut node = ValidatorNode::new(node_id, &dir).expect("Failed to create node");
 
         let mut prev_root = node.store.state_root();
-        println!("Validator {} | Height 0 root: {}", v, hex::encode(prev_root));
+        println!(
+            "Validator {} | Height 0 root: {}",
+            v,
+            hex::encode(prev_root)
+        );
 
         for h in 1..=BLOCKS {
             // Add resources directly to the registry before proposing
             for j in 0..h {
-                let id = ResourceId([h as u8, j as u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                let id = ResourceId([
+                    h as u8, j as u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                ]);
                 let meta = ResourceMetadata {
                     resource_id: id,
                     archetype: ResourceArchetype::Asset,
@@ -36,11 +42,19 @@ fn main() {
                     contract_id: [1u8; 32],
                     owner: [2u8; 32],
                 };
-                node.store.registry_mut().register_genesis(meta).expect("Failed to register");
+                node.store
+                    .registry_mut()
+                    .register_genesis(meta)
+                    .expect("Failed to register");
             }
             node.propose_block(h).expect("Failed to propose block");
             let current_root = node.store.state_root();
-            println!("Validator {} | Height {} root: {}", v, h, hex::encode(current_root));
+            println!(
+                "Validator {} | Height {} root: {}",
+                v,
+                h,
+                hex::encode(current_root)
+            );
 
             if current_root == prev_root {
                 println!("FAIL: State root did not evolve at height {}", h);

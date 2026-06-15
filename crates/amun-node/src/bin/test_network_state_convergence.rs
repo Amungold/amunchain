@@ -1,43 +1,51 @@
-use amun_networking::node::NetworkNode;
-use amun_consensus::validator::{ValidatorSet, Validator};
+use amun_consensus::validator::{Validator, ValidatorSet};
 use amun_networking::envelope::Envelope;
+use amun_networking::node::NetworkNode;
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_resource_core::{ResourceId, ResourceArchetype, ResourceState, ResourceLineage, ResourceMetadata};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+};
 use std::collections::HashMap;
 
 fn main() {
     let mut nodes: HashMap<usize, NetworkNode> = HashMap::new();
     let mut stores: HashMap<usize, PersistentValidatorStore> = HashMap::new();
     let mut validators = Vec::new();
-    
+
     // Create 4 nodes with their own state stores
     for i in 0..4 {
         let id = [i as u8; 32];
         nodes.insert(i, NetworkNode::new(id));
-        
+
         let dir = format!("/tmp/amun_state_test/validator{}", i);
         std::fs::create_dir_all(&dir).expect("Failed to create dir");
         let store = PersistentValidatorStore::open(&dir).expect("Failed to open store");
         stores.insert(i, store);
-        
+
         validators.push(Validator {
             id,
             voting_power: 100,
         });
     }
-    
+
     let validator_set = ValidatorSet::new(validators).unwrap();
     let mut time_ms = 0u64;
     let node_ids: Vec<usize> = nodes.keys().copied().collect();
 
     // Run until we have 3 commits
-    while nodes.values().map(|n| n.committed_blocks.len()).min().unwrap_or(0) < 3 {
+    while nodes
+        .values()
+        .map(|n| n.committed_blocks.len())
+        .min()
+        .unwrap_or(0)
+        < 3
+    {
         time_ms += 100;
 
         // Leader proposes
         for &i in &node_ids {
             if let Some(node) = nodes.get_mut(&i) {
-                if i == 0 && time_ms % 500 == 0 {
+                if i == 0 && time_ms.is_multiple_of(500) {
                     node.propose();
                 }
                 node.flush_outgoing();
@@ -70,7 +78,7 @@ fn main() {
             if let Some(node) = nodes.get_mut(&i) {
                 let prev_commits = node.committed_blocks.len();
                 node.process_incoming(&validator_set);
-                
+
                 // If a new block was committed, update the state store
                 if node.committed_blocks.len() > prev_commits {
                     if let Some(store) = stores.get_mut(&i) {
@@ -85,8 +93,13 @@ fn main() {
                             contract_id: [1u8; 32],
                             owner: [2u8; 32],
                         };
-                        store.registry_mut().register_genesis(meta).expect("Failed to register");
-                        store.advance(height, [0u8; 32], [0x10; 32], vec![]).expect("Failed to advance");
+                        store
+                            .registry_mut()
+                            .register_genesis(meta)
+                            .expect("Failed to register");
+                        store
+                            .advance(height, [0u8; 32], [0x10; 32], vec![])
+                            .expect("Failed to advance");
                     }
                 }
             }

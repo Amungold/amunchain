@@ -20,7 +20,9 @@ async fn main() {
     // Wait for RPC to be ready
     let rpc = RpcClient::new("127.0.0.1", 9070);
     for _ in 0..30 {
-        if rpc.get_status().is_ok() { break; }
+        if rpc.get_status().is_ok() {
+            break;
+        }
         tokio::time::sleep(Duration::from_millis(500)).await;
     }
 
@@ -28,7 +30,9 @@ async fn main() {
     println!("Waiting for blocks in store...");
     for _ in 0..60 {
         if let Ok(h) = rpc.get_head() {
-            if h.height >= 3 { break; }
+            if h.height >= 3 {
+                break;
+            }
         }
         tokio::time::sleep(Duration::from_millis(500)).await;
     }
@@ -45,7 +49,11 @@ async fn main() {
     println!("[PASS] /block/{}: ok", head.height);
 
     let range = rpc.get_block_range(1, head.height).expect("/blocks range");
-    println!("[PASS] /blocks/1/{}: {} blocks", head.height, range.blocks.len());
+    println!(
+        "[PASS] /blocks/1/{}: {} blocks",
+        head.height,
+        range.blocks.len()
+    );
 
     let metrics = rpc.get_metrics().expect("/metrics");
     println!("[PASS] /metrics: height={}", metrics.height);

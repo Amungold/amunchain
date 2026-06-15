@@ -29,8 +29,10 @@ fn main() {
         for h in 1..=HEIGHTS {
             // Add h resources at this height, all deterministic
             for j in 0..h {
-                let id = ResourceId([h as u8, j as u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                let id = ResourceId([
+                    h as u8, j as u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                ]);
                 let meta = ResourceMetadata {
                     resource_id: id,
                     archetype: ResourceArchetype::Asset,
@@ -55,7 +57,9 @@ fn main() {
             if h > 0 && current_root == prev_root {
                 println!(
                     "FAIL: Validator {} height {} root did not change from height {}",
-                    v, h, h - 1
+                    v,
+                    h,
+                    h - 1
                 );
                 std::process::exit(1);
             }
@@ -69,7 +73,11 @@ fn main() {
     let all_match = final_roots.iter().all(|r| *r == first);
     if all_match {
         println!("\nPASS: Multi-height state evolution is deterministic");
-        println!("Final root after {} heights: {}", HEIGHTS, hex::encode(first));
+        println!(
+            "Final root after {} heights: {}",
+            HEIGHTS,
+            hex::encode(first)
+        );
     } else {
         println!("\nFAIL: Final roots diverge");
         for (i, r) in final_roots.iter().enumerate() {

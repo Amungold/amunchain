@@ -38,7 +38,7 @@ pub fn download_missing_records(
                 }
             }
         }
-        
+
         eprintln!(
             "SYNC: no suitable peer found (attempt {}/{}), retrying in 2s...",
             attempt + 1,

@@ -29,16 +29,27 @@ fn main() {
     println!("Phase 1: Consensus convergence...");
     for _ in 0..60 {
         thread::sleep(Duration::from_secs(1));
-        let heights: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+        let heights: Vec<u64> = validators
+            .iter()
+            .map(|v| v.store.lock().unwrap().latest_height())
+            .collect();
         let min_h = *heights.iter().min().unwrap_or(&0);
         let max_h = *heights.iter().max().unwrap_or(&0);
         if heights.iter().all(|h| *h > 0) && max_h - min_h <= 1 {
-            println!("  Converged at t={}s: heights={:?} spread={}", start.elapsed().as_secs(), heights, max_h - min_h);
+            println!(
+                "  Converged at t={}s: heights={:?} spread={}",
+                start.elapsed().as_secs(),
+                heights,
+                max_h - min_h
+            );
             break;
         }
     }
 
-    let pre_kill_heights: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+    let pre_kill_heights: Vec<u64> = validators
+        .iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     println!("  Pre-kill heights: {:?}", pre_kill_heights);
 
     // Phase 2: kill validator 2, verify quorum continues (30s)
@@ -46,12 +57,25 @@ fn main() {
     validators[2].stop();
     thread::sleep(Duration::from_secs(30));
 
-    let after_kill: Vec<u64> = validators.iter().enumerate().map(|(i, v)| {
-        if i == 2 { 0 } else { v.store.lock().unwrap().latest_height() }
-    }).collect();
+    let after_kill: Vec<u64> = validators
+        .iter()
+        .enumerate()
+        .map(|(i, v)| {
+            if i == 2 {
+                0
+            } else {
+                v.store.lock().unwrap().latest_height()
+            }
+        })
+        .collect();
     println!("  After kill heights: {:?}", after_kill);
-    let progress = after_kill[0] > pre_kill_heights[0] && after_kill[1] > pre_kill_heights[1] && after_kill[3] > pre_kill_heights[3];
-    println!("  Progress made: {}", if progress { "PASS" } else { "FAIL" });
+    let progress = after_kill[0] > pre_kill_heights[0]
+        && after_kill[1] > pre_kill_heights[1]
+        && after_kill[3] > pre_kill_heights[3];
+    println!(
+        "  Progress made: {}",
+        if progress { "PASS" } else { "FAIL" }
+    );
 
     // Phase 3: restart validator 2, verify catch-up (60s)
     println!("\nPhase 3: Restarting validator 2...");
@@ -63,13 +87,21 @@ fn main() {
 
     thread::sleep(Duration::from_secs(60));
 
-    let final_heights: Vec<u64> = validators.iter().map(|v| v.store.lock().unwrap().latest_height()).collect();
+    let final_heights: Vec<u64> = validators
+        .iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     let final_min = *final_heights.iter().min().unwrap_or(&0);
     let final_max = *final_heights.iter().max().unwrap_or(&0);
     let final_spread = final_max - final_min;
-    println!("  Final heights: {:?} spread={}", final_heights, final_spread);
+    println!(
+        "  Final heights: {:?} spread={}",
+        final_heights, final_spread
+    );
 
-    for v in &validators { v.stop(); }
+    for v in &validators {
+        v.stop();
+    }
 
     let recovered = final_spread <= 2 && final_heights[2] > 0;
 
@@ -77,8 +109,18 @@ fn main() {
     println!("  N102.7 MULTI-VALIDATOR TEST RESULTS");
     println!("============================================");
     println!("  Consensus:    {}", if progress { "PASS" } else { "FAIL" });
-    println!("  Crash-rejoin: {}", if recovered { "PASS" } else { "FAIL" });
+    println!(
+        "  Crash-rejoin: {}",
+        if recovered { "PASS" } else { "FAIL" }
+    );
     println!("  Final spread: {}", final_spread);
-    println!("  Verdict:      {}", if progress && recovered { "PASS" } else { "PARTIAL" });
+    println!(
+        "  Verdict:      {}",
+        if progress && recovered {
+            "PASS"
+        } else {
+            "PARTIAL"
+        }
+    );
     println!("============================================");
 }

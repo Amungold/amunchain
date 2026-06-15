@@ -25,7 +25,10 @@ fn main() {
     let first = roots[0];
     let all_match = roots.iter().all(|r| *r == first);
     if all_match {
-        println!("PASS: All validators have state_root = {}", hex::encode(first));
+        println!(
+            "PASS: All validators have state_root = {}",
+            hex::encode(first)
+        );
     } else {
         println!("FAIL: Mismatch detected");
         std::process::exit(1);

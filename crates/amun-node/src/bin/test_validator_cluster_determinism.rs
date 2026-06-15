@@ -31,13 +31,10 @@ fn main() {
     // Verify all validators have identical state roots at each height
     let first_validator = &all_roots[0];
     for (h_idx, (height, expected_root)) in first_validator.iter().enumerate() {
-        for v in 1..4 {
+        for (v, _item) in all_roots.iter().enumerate().take(4).skip(1) {
             let (_, validator_root) = all_roots[v][h_idx];
             if validator_root != *expected_root {
-                println!(
-                    "FAIL: Validator {} height {} root diverges",
-                    v, height
-                );
+                println!("FAIL: Validator {} height {} root diverges", v, height);
                 std::process::exit(1);
             }
         }
@@ -45,5 +42,9 @@ fn main() {
 
     let final_root = first_validator.last().unwrap().1;
     println!("\nPASS: Validator cluster determinism verified");
-    println!("Final root after {} blocks: {}", BLOCKS, hex::encode(final_root));
+    println!(
+        "Final root after {} blocks: {}",
+        BLOCKS,
+        hex::encode(final_root)
+    );
 }

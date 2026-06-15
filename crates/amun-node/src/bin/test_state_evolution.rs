@@ -1,5 +1,7 @@
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_resource_core::{ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+};
 use std::env;
 use std::path::Path;
 
@@ -10,8 +12,8 @@ fn main() {
         std::process::exit(1);
     }
     let path = Path::new(&args[1]);
-    let mut store = PersistentValidatorStore::open(path.to_str().unwrap())
-        .expect("Failed to open store");
+    let mut store =
+        PersistentValidatorStore::open(path.to_str().unwrap()).expect("Failed to open store");
 
     // 1. Get initial state root (should be zero)
     let root_before = store.state_root();
@@ -28,12 +30,18 @@ fn main() {
             contract_id: [1u8; 32],
             owner: [2u8; 32],
         };
-        store.registry_mut().register_genesis(meta).expect("Failed to register");
+        store
+            .registry_mut()
+            .register_genesis(meta)
+            .expect("Failed to register");
     }
 
     // 3. Get state root after adding resources
     let root_after = store.state_root();
-    println!("State Root (after 3 resources): {}", hex::encode(root_after));
+    println!(
+        "State Root (after 3 resources): {}",
+        hex::encode(root_after)
+    );
 
     // 4. Verify the root changed
     if root_before == root_after {

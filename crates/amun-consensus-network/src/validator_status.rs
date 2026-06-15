@@ -25,13 +25,9 @@ impl Default for ValidatorStatusRegistry {
     }
 }
 
-impl ValidatorStatusRegistry {
-}
-
-
+impl ValidatorStatusRegistry {}
 
 impl ValidatorStatusRegistry {
-
     pub fn set_status(&mut self, validator_id: [u8; 32], status: ValidatorStatus) {
         self.statuses.insert(validator_id, status);
     }

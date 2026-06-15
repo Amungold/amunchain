@@ -17,7 +17,11 @@ fn main() {
     let data_dir = PathBuf::from(&args[2]);
     let peers: Vec<String> = args[3..].to_vec();
 
-    eprintln!("EvidenceService starting on port {} with {} peers", listen_port, peers.len());
+    eprintln!(
+        "EvidenceService starting on port {} with {} peers",
+        listen_port,
+        peers.len()
+    );
 
     let evidence_dir = data_dir.join("evidence");
     fs::create_dir_all(&evidence_dir).expect("Failed to create evidence dir");

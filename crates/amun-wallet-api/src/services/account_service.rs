@@ -1,7 +1,7 @@
-use axum::Json;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::AccountResponse;
 use amun_rpc::provider::ChainDataProvider;
+use axum::Json;
 use std::sync::Arc;
 
 static PROVIDER: std::sync::OnceLock<Arc<dyn ChainDataProvider>> = std::sync::OnceLock::new();

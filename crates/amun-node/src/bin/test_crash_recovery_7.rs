@@ -1,8 +1,10 @@
-use amun_networking::node::NetworkNode;
-use amun_consensus::validator::{ValidatorSet, Validator};
+use amun_consensus::validator::{Validator, ValidatorSet};
 use amun_networking::envelope::Envelope;
+use amun_networking::node::NetworkNode;
 use amun_persistent_node::persistent_store::PersistentValidatorStore;
-use amun_resource_core::{ResourceId, ResourceArchetype, ResourceState, ResourceLineage, ResourceMetadata};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+};
 use std::collections::HashMap;
 
 fn main() {
@@ -18,7 +20,10 @@ fn main() {
         std::fs::create_dir_all(&dir).expect("Failed to create dir");
         let store = PersistentValidatorStore::open(&dir).expect("Failed to open store");
         stores.insert(i, store);
-        validators.push(Validator { id, voting_power: 100 });
+        validators.push(Validator {
+            id,
+            voting_power: 100,
+        });
     }
 
     let validator_set = ValidatorSet::new(validators).unwrap();
@@ -31,19 +36,31 @@ fn main() {
      -> bool {
         let mut time_ms = 0u64;
         let node_ids: Vec<usize> = nodes.keys().copied().collect();
-        while nodes.values().map(|n| n.committed_blocks.len()).min().unwrap_or(0) < target_commits {
-            if time_ms as usize > max_ticks * 100 { return false; }
+        while nodes
+            .values()
+            .map(|n| n.committed_blocks.len())
+            .min()
+            .unwrap_or(0)
+            < target_commits
+        {
+            if time_ms as usize > max_ticks * 100 {
+                return false;
+            }
             time_ms += 100;
             for &i in &node_ids {
                 if let Some(node) = nodes.get_mut(&i) {
-                    if i == 0 && time_ms % 500 == 0 { node.propose(); }
+                    if i == 0 && time_ms.is_multiple_of(500) {
+                        node.propose();
+                    }
                     node.flush_outgoing();
                 }
             }
             let mut all_messages: Vec<(usize, Envelope)> = Vec::new();
             for &i in &node_ids {
                 if let Some(node) = nodes.get_mut(&i) {
-                    for env in node.drain_outbox() { all_messages.push((i, env)); }
+                    for env in node.drain_outbox() {
+                        all_messages.push((i, env));
+                    }
                 }
             }
             for (_sender_id, msg) in &all_messages {
@@ -71,8 +88,13 @@ fn main() {
                                 contract_id: [1u8; 32],
                                 owner: [2u8; 32],
                             };
-                            store.registry_mut().register_genesis(meta).expect("Failed to register");
-                            store.advance(h, [0u8; 32], [0x10; 32], vec![]).expect("Failed to advance");
+                            store
+                                .registry_mut()
+                                .register_genesis(meta)
+                                .expect("Failed to register");
+                            store
+                                .advance(h, [0u8; 32], [0x10; 32], vec![])
+                                .expect("Failed to advance");
                         }
                     }
                 }
@@ -83,7 +105,13 @@ fn main() {
 
     // Phase 1: Run with 7 validators to 5 commits
     println!("Phase 1: Running 7-validator network to 5 commits...");
-    assert!(run_consensus(&mut nodes, &mut stores, &validator_set, 5, 2000));
+    assert!(run_consensus(
+        &mut nodes,
+        &mut stores,
+        &validator_set,
+        5,
+        2000
+    ));
     let pre_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
     println!("Pre-crash: {} validators converged", pre_roots.len());
 
@@ -98,14 +126,17 @@ fn main() {
     // Build new validator set with 5 nodes
     let mut live_validators = Vec::new();
     for &i in &[0, 1, 3, 5, 6] {
-        live_validators.push(Validator { id: [i as u8; 32], voting_power: 100 });
+        live_validators.push(Validator {
+            id: [i as u8; 32],
+            voting_power: 100,
+        });
     }
     let live_set = ValidatorSet::new(live_validators).unwrap();
 
     // Phase 3: Continue with 5 validators
     println!("Phase 3: Continuing with 5 validators...");
     let ok = run_consensus(&mut nodes, &mut stores, &live_set, 10, 3000);
-    
+
     if ok {
         let final_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
         let first = final_roots[0];
@@ -125,7 +156,10 @@ fn main() {
             let first = final_roots[0];
             let all_match = final_roots.iter().all(|r| *r == first);
             if all_match {
-                println!("State roots match across all {} survivors", final_roots.len());
+                println!(
+                    "State roots match across all {} survivors",
+                    final_roots.len()
+                );
                 println!("Final root: {}", hex::encode(first));
             }
         }
