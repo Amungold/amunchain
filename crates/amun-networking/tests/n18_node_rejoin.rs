@@ -56,7 +56,6 @@ fn n18_bootstrapping_node_stores_trusted_root() {
 // ============================================================
 
 #[test]
-#[ignore = "Requires full sync protocol implementation"]
 fn n18_full_rejoin_after_crash() {
     // Scenario:
     // 1. 4-node network commits block 1

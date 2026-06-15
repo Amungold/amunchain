@@ -71,19 +71,39 @@ impl ConsensusRound {
 
     /// Try to form a QC from collected votes.
     /// Returns Some(QC) if >2/3 validators approved.
-    pub fn try_form_qc(&mut self, total_validators: usize) -> Option<QuorumCertificate> {
+    pub fn try_form_qc(
+        &mut self,
+        total_validators: usize,
+        validator_powers: &HashMap<[u8; 32], u64>,
+        total_voting_power: u64,
+    ) -> Option<QuorumCertificate> {
         let approvals: Vec<ConsensusVote> =
             self.votes.iter().filter(|v| v.approve).cloned().collect();
+        let approval_count = approvals.len() as u64;
+
+        let (approval_power, quorum_met) = if total_voting_power > 0 {
+            // Weighted voting: sum the power of each approving validator
+            let power = approvals
+                .iter()
+                .map(|v| validator_powers.get(&v.voter_id).copied().unwrap_or(0))
+                .sum();
+            (power, power * 3 > total_voting_power * 2)
+        } else {
+            // Legacy fallback: count votes when powers are not set
+            (approval_count, approval_count * 3 > total_validators as u64 * 2)
+        };
 
         eprintln!(
-            "ROUND_DIAG: h={} votes={} approvals={} need={}",
+            "ROUND_DIAG: h={} votes={} approvals={} power={}/{}",
             self.height,
             self.votes.len(),
             approvals.len(),
-            total_validators * 2 / 3 + 1
+            approval_power,
+            if total_voting_power > 0 { total_voting_power } else { total_validators as u64 }
         );
-        if approvals.len() * 3 <= total_validators * 2 {
-            return None; // Insufficient quorum
+
+        if !quorum_met {
+            return None;
         }
 
         let qc = QuorumCertificate {
@@ -91,8 +111,8 @@ impl ConsensusRound {
             block_hash: self.proposed_block_hash?,
             state_root: self.proposed_state_root?,
             votes: approvals,
-            quorum_size: total_validators * 2 / 3 + 1,
-            total_validators,
+            approval_power,
+            total_voting_power: if total_voting_power > 0 { total_voting_power } else { total_validators as u64 },
         };
 
         if !qc.verify() {
@@ -380,8 +400,7 @@ impl ConsensusEngine {
         let round = self.rounds.get_mut(&height)?;
 
         if round.qc.is_none() {
-            round.try_form_qc(active)?;
-        }
+            round.try_form_qc(active, &self.validator_powers, self.total_voting_power)?;        }
 
         let cert = round.finalize(history_root)?;
         self.current_height = height;
@@ -478,7 +497,7 @@ mod tests {
                 .unwrap();
         }
 
-        let qc = engine.round_mut(1).unwrap().try_form_qc(4);
+        let qc = engine.round_mut(1).unwrap().try_form_qc(4, &HashMap::new(), 0);
         assert!(qc.is_none(), "Should not form QC with only 2/4 votes");
     }
 

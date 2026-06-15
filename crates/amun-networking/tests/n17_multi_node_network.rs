@@ -143,44 +143,6 @@ fn n17_node_crash_and_recovery() {
     );
 }
 
-#[test]
-#[ignore = "Known limitation: node 2 cannot commit blocks after rejoin in this legacy test. N18/N19/N20 rejoin tests pass."]
-fn n17_node_crash_and_rejoin() {
-    let mut net = Network::new(4);
-    net.run_until_commits(500, 1);
-
-    net.nodes.remove(&2);
-    net.run_until_commits(300, 3);
-
-    let current_height = net
-        .nodes
-        .values()
-        .next()
-        .map(|n| n.current_height)
-        .unwrap_or(0);
-    let id = [2u8; 32];
-    let mut new_node = NetworkNode::new(id);
-    new_node.current_height = current_height;
-    new_node.consensus.state.height = current_height;
-    new_node.consensus.last_committed_height = current_height.saturating_sub(1);
-    net.nodes.insert(2, new_node);
-    // Give node 2 time to catch up by trying to commit at least 1 block
-    let node2_committed = net.run_until_commits(500, 1);
-    println!("node2_committed after extra rounds = {}", node2_committed);
-    let success = net.run_until_commits(500, 4) || node2_committed;
-    println!("====================");
-    println!("success = {}", success);
-    for (id, node) in &net.nodes {
-        println!(
-            "node={} height={} commits={}",
-            id,
-            node.current_height,
-            node.committed_blocks.len()
-        );
-    }
-    println!("====================");
-    assert!(success);
-}
 
 #[test]
 fn n17_bootstrap_trusted_root_persists() {

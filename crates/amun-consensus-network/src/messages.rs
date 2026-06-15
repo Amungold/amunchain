@@ -69,14 +69,13 @@ pub struct QuorumCertificate {
     #[serde(with = "serde_bytes")]
     pub state_root: [u8; 32],
     pub votes: Vec<ConsensusVote>,
-    pub quorum_size: usize,
-    pub total_validators: usize,
+    pub approval_power: u64,
+    pub total_voting_power: u64,
 }
 
 impl QuorumCertificate {
     pub fn verify_quorum(&self) -> bool {
-        let approvals = self.votes.iter().filter(|v| v.approve).count();
-        approvals * 3 > self.total_validators * 2
+        self.approval_power * 3 > self.total_voting_power * 2
     }
 
     pub fn verify_consistency(&self) -> bool {
@@ -226,8 +225,8 @@ mod tests {
                 make_vote(3, 1, hash, true),
                 make_vote(4, 1, hash, false),
             ],
-            quorum_size: 3,
-            total_validators: 4,
+            approval_power: 3,
+            total_voting_power: 4,
         };
         assert!(qc.verify());
     }
@@ -245,8 +244,8 @@ mod tests {
                 make_vote(3, 1, hash, false),
                 make_vote(4, 1, hash, true),
             ],
-            quorum_size: 2,
-            total_validators: 4,
+            approval_power: 2,
+            total_voting_power: 4,
         };
         assert!(!qc.verify_quorum());
     }
@@ -263,8 +262,8 @@ mod tests {
                 make_vote(3, 1, [0xAA; 32], true),
                 make_vote(4, 1, [0xAA; 32], true),
             ],
-            quorum_size: 4,
-            total_validators: 4,
+            approval_power: 4,
+            total_voting_power: 4,
         };
         assert!(!qc.verify_consistency());
     }
@@ -287,8 +286,8 @@ mod tests {
             block_hash: hash,
             state_root: [0xBB; 32],
             votes: vec![make_vote(1, 1, hash, true)],
-            quorum_size: 1,
-            total_validators: 1,
+            approval_power: 1,
+            total_voting_power: 1,
         };
         let encoded = postcard::to_stdvec(&qc).unwrap();
         let decoded: QuorumCertificate = postcard::from_bytes(&encoded).unwrap();

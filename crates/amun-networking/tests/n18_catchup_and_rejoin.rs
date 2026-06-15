@@ -86,7 +86,6 @@ fn n18_sync_response_serialization_roundtrip() {
 // ============================================================
 
 #[test]
-#[ignore = "Requires network-integrated bootstrap"]
 fn n18_full_rejoin_matches_network_state() {
     // 4 nodes commit 10 blocks
     // Node 2 crashes
