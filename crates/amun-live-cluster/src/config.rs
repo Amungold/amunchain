@@ -1,10 +1,20 @@
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
-pub fn default_authority_public_key() -> [u8; 32] {
-    amun_networking::crypto_identity::PeerKeyPair::from_seed([0x42; 32])
-        .verifying_key
-        .to_bytes()
+/// A constitutional authority loaded from genesis configuration.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GenesisAuthority {
+    pub authority_public_key: [u8; 32],
+    pub authority_version: u64,
 }
+
+/// Load genesis authority from a JSON file.
+/// The file must exist; there is no fallback.
+pub fn load_genesis_authority(path: &str) -> GenesisAuthority {
+    let json = std::fs::read_to_string(path)
+        .expect("Genesis authority file missing");
+    serde_json::from_str(&json).expect("Invalid genesis authority JSON")
+}
+
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ValidatorConfig {
@@ -13,7 +23,6 @@ pub struct ValidatorConfig {
     pub cluster: Vec<ClusterPeer>,
     pub data_dir: String,
     pub quorum_size: Option<usize>,
-    #[serde(default = "default_authority_public_key")]
     pub authority_public_key: [u8; 32],
 }
 
@@ -42,7 +51,7 @@ impl ValidatorConfig {
             listen_addr: cluster[validator_index].address,
             cluster,
             data_dir: format!("/tmp/amun-validator-{}", validator_index),
-            authority_public_key: default_authority_public_key(),
+            authority_public_key: load_genesis_authority(concat!(env!("CARGO_MANIFEST_DIR"), "/genesis/genesis_authority.json")).authority_public_key,
             quorum_size: None,
         }
     }
@@ -62,7 +71,7 @@ impl ValidatorConfig {
             listen_addr: cluster[validator_index].address,
             cluster,
             data_dir: format!("/tmp/amun-test-validator-{}", validator_index),
-            authority_public_key: default_authority_public_key(),
+            authority_public_key: load_genesis_authority(concat!(env!("CARGO_MANIFEST_DIR"), "/genesis/genesis_authority.json")).authority_public_key,
             quorum_size: None,
         }
     }

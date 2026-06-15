@@ -29,7 +29,7 @@ fn main() {
                 cluster: cluster.clone(),
                 data_dir: format!("/tmp/amun-bench10-{}", i),
                 quorum_size: Some(count),
-                authority_public_key: amun_live_cluster::config::default_authority_public_key(),
+                authority_public_key: amun_live_cluster::config::load_genesis_authority(concat!(env!("CARGO_MANIFEST_DIR"), "/genesis/genesis_authority.json")).authority_public_key,
             };
             LiveValidator::new(config)
         })

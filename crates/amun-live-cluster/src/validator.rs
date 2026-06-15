@@ -59,6 +59,9 @@ impl LiveValidator {
             0, // valid from height 0
             0, // no expiry for test
         );
+        println!("GENESIS_PK={:?}", genesis_authority_kp.verifying_key.to_bytes());
+        println!("CONFIG_PK={:?}", config.authority_public_key);
+
         if !self_cert.verify(&config.authority_public_key) {
             panic!("Self certificate verification failed");
         }
