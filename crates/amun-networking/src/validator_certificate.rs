@@ -14,6 +14,8 @@ pub struct ValidatorCertificate {
     /// The authority that issued this certificate.
     pub issuer: PeerId,
     /// When this certificate becomes valid.
+    pub authority_id: [u8; 32],
+    pub authority_version: u64,
     pub valid_from: u64,
     /// When this certificate expires (0 = never).
     pub valid_until: u64,
@@ -33,6 +35,8 @@ impl ValidatorCertificate {
         let mut cert = Self {
             validator_id,
             public_key,
+            authority_id: [0u8; 32],
+            authority_version: 0,
             issuer: issuer_keypair.peer_id(),
             valid_from,
             valid_until,
@@ -49,6 +53,8 @@ impl ValidatorCertificate {
         let mut data = Vec::new();
         data.extend_from_slice(&self.validator_id.0);
         data.extend_from_slice(&self.public_key);
+        data.extend_from_slice(&self.authority_version.to_le_bytes());
+        data.extend_from_slice(&self.authority_id);
         data.extend_from_slice(&self.issuer.0);
         data.extend_from_slice(&self.valid_from.to_le_bytes());
         data.extend_from_slice(&self.valid_until.to_le_bytes());
@@ -64,6 +70,31 @@ impl ValidatorCertificate {
     /// Check if the certificate is currently valid.
     pub fn is_valid_at(&self, timestamp: u64) -> bool {
         timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+    }
+
+    /// Create a new certificate with explicit authority version and id.
+    pub fn issue_v2(
+        validator_id: PeerId,
+        public_key: [u8; 32],
+        authority_version: u64,
+        authority_id: [u8; 32],
+        issuer_keypair: &PeerKeyPair,
+        valid_from: u64,
+        valid_until: u64,
+    ) -> Self {
+        let mut cert = Self {
+            validator_id,
+            public_key,
+            authority_version,
+            authority_id,
+            issuer: issuer_keypair.peer_id(),
+            valid_from,
+            valid_until,
+            authority_signature: Vec::new(),
+        };
+        let payload = cert.serialize_for_signing();
+        cert.authority_signature = issuer_keypair.sign(&payload);
+        cert
     }
 }
 
