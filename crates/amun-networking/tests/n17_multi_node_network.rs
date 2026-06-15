@@ -143,7 +143,6 @@ fn n17_node_crash_and_recovery() {
     );
 }
 
-
 #[test]
 fn n17_bootstrap_trusted_root_persists() {
     let root = [0xAB; 32];

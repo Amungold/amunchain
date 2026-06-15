@@ -90,7 +90,10 @@ impl ConsensusRound {
             (power, power * 3 > total_voting_power * 2)
         } else {
             // Legacy fallback: count votes when powers are not set
-            (approval_count, approval_count * 3 > total_validators as u64 * 2)
+            (
+                approval_count,
+                approval_count * 3 > total_validators as u64 * 2,
+            )
         };
 
         eprintln!(
@@ -99,7 +102,11 @@ impl ConsensusRound {
             self.votes.len(),
             approvals.len(),
             approval_power,
-            if total_voting_power > 0 { total_voting_power } else { total_validators as u64 }
+            if total_voting_power > 0 {
+                total_voting_power
+            } else {
+                total_validators as u64
+            }
         );
 
         if !quorum_met {
@@ -112,7 +119,11 @@ impl ConsensusRound {
             state_root: self.proposed_state_root?,
             votes: approvals,
             approval_power,
-            total_voting_power: if total_voting_power > 0 { total_voting_power } else { total_validators as u64 },
+            total_voting_power: if total_voting_power > 0 {
+                total_voting_power
+            } else {
+                total_validators as u64
+            },
         };
 
         if !qc.verify() {
@@ -400,7 +411,8 @@ impl ConsensusEngine {
         let round = self.rounds.get_mut(&height)?;
 
         if round.qc.is_none() {
-            round.try_form_qc(active, &self.validator_powers, self.total_voting_power)?;        }
+            round.try_form_qc(active, &self.validator_powers, self.total_voting_power)?;
+        }
 
         let cert = round.finalize(history_root)?;
         self.current_height = height;
@@ -497,7 +509,10 @@ mod tests {
                 .unwrap();
         }
 
-        let qc = engine.round_mut(1).unwrap().try_form_qc(4, &HashMap::new(), 0);
+        let qc = engine
+            .round_mut(1)
+            .unwrap()
+            .try_form_qc(4, &HashMap::new(), 0);
         assert!(qc.is_none(), "Should not form QC with only 2/4 votes");
     }
 

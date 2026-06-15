@@ -16,8 +16,8 @@ pub fn load_validator_certificate(
     }
     let cert_json =
         fs::read_to_string(path).map_err(|e| format!("Cannot read certificate: {}", e))?;
-    let cert: ValidatorCertificate = serde_json::from_str(&cert_json)
-        .map_err(|e| format!("Invalid certificate JSON: {}", e))?;
+    let cert: ValidatorCertificate =
+        serde_json::from_str(&cert_json).map_err(|e| format!("Invalid certificate JSON: {}", e))?;
     println!("Loaded existing certificate from {}", cert_file);
     verify_certificate_against_genesis(&cert, genesis)?;
     verify_validator_membership(&cert, genesis)?;
@@ -83,7 +83,11 @@ mod tests {
     use amun_networking::crypto_identity::PeerKeyPair;
     use tempfile::tempdir;
 
-    fn make_genesis(validator_peer_id_hex: &str, validator_pk_hex: &str, trust_anchor_pk_hex: &str) -> Genesis {
+    fn make_genesis(
+        validator_peer_id_hex: &str,
+        validator_pk_hex: &str,
+        trust_anchor_pk_hex: &str,
+    ) -> Genesis {
         Genesis {
             chain_id: "test".into(),
             timestamp: 0,
@@ -103,7 +107,11 @@ mod tests {
     fn n106_0_missing_certificate_rejected() {
         let dir = tempdir().unwrap();
         let cert_path = dir.path().join("nonexistent.crt");
-        let genesis = make_genesis("aa".repeat(64).as_str(), "bb".repeat(64).as_str(), "dd".repeat(64).as_str());
+        let genesis = make_genesis(
+            "aa".repeat(64).as_str(),
+            "bb".repeat(64).as_str(),
+            "dd".repeat(64).as_str(),
+        );
         let result = load_validator_certificate(cert_path.to_str().unwrap(), &genesis);
         assert!(result.is_err());
     }
@@ -115,12 +123,7 @@ mod tests {
         let authority = PeerKeyPair::generate();
         let validator = PeerKeyPair::generate();
         let validator_pk = validator.verifying_key.to_bytes();
-        let cert = ValidatorCertificate::issue(
-            validator.peer_id(),
-            validator_pk,
-            &authority,
-            0, 0,
-        );
+        let cert = ValidatorCertificate::issue(validator.peer_id(), validator_pk, &authority, 0, 0);
         std::fs::write(&cert_path, serde_json::to_string_pretty(&cert).unwrap()).unwrap();
         let authority_pk_hex = hex::encode(authority.verifying_key.to_bytes());
         let validator_id_hex = hex::encode(validator.peer_id().0);
@@ -141,7 +144,8 @@ mod tests {
             validator.peer_id(),
             validator.verifying_key.to_bytes(),
             &authority,
-            0, 0,
+            0,
+            0,
         );
         std::fs::write(&cert_path, serde_json::to_string_pretty(&cert).unwrap()).unwrap();
         let authority_pk_hex = hex::encode(authority.verifying_key.to_bytes());
@@ -162,7 +166,8 @@ mod tests {
             validator.peer_id(),
             validator.verifying_key.to_bytes(),
             &authority,
-            0, 0,
+            0,
+            0,
         );
         cert.public_key = [0u8; 32];
         std::fs::write(&cert_path, serde_json::to_string_pretty(&cert).unwrap()).unwrap();
@@ -185,12 +190,17 @@ mod tests {
             unknown_validator.peer_id(),
             unknown_validator.verifying_key.to_bytes(),
             &authority,
-            0, 0,
+            0,
+            0,
         );
         std::fs::write(&cert_path, serde_json::to_string_pretty(&cert).unwrap()).unwrap();
         let authority_pk_hex = hex::encode(authority.verifying_key.to_bytes());
         // Genesis contains a different validator
-        let genesis = make_genesis("dd".repeat(64).as_str(), "ee".repeat(64).as_str(), &authority_pk_hex);
+        let genesis = make_genesis(
+            "dd".repeat(64).as_str(),
+            "ee".repeat(64).as_str(),
+            &authority_pk_hex,
+        );
         let result = load_validator_certificate(cert_path.to_str().unwrap(), &genesis);
         assert!(result.is_err());
     }

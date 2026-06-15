@@ -12,6 +12,17 @@ pub fn derive_validator_id(public_key: &[u8; 32]) -> ValidatorId {
     out
 }
 
+/// Derive a PeerId (network identifier) from the public key and genesis hash.
+/// This mirrors the derivation in amun-networking.
+pub fn derive_peer_id(public_key: &[u8; 32], genesis_hash: &[u8; 32]) -> [u8; 32] {
+    let mut h = blake3::Hasher::new();
+    h.update(b"AMUN_PEER_ID_V1");
+    h.update(public_key);
+    h.update(genesis_hash);
+    let mut out = [0u8; 32];
+    out.copy_from_slice(h.finalize().as_bytes());
+    out
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -25,16 +36,4 @@ mod tests {
         // not equal to raw public key
         assert_ne!(id1, pk);
     }
-}
-
-/// Derive a PeerId (network identifier) from the public key and genesis hash.
-/// This mirrors the derivation in amun-networking.
-pub fn derive_peer_id(public_key: &[u8; 32], genesis_hash: &[u8; 32]) -> [u8; 32] {
-    let mut h = blake3::Hasher::new();
-    h.update(b"AMUN_PEER_ID_V1");
-    h.update(public_key);
-    h.update(genesis_hash);
-    let mut out = [0u8; 32];
-    out.copy_from_slice(h.finalize().as_bytes());
-    out
 }

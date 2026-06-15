@@ -73,7 +73,7 @@ fn test_factor_isolation_recalibrated() {
         last_c
     );
 
-    // Group A should have the highest legitimacy.
+    // Group A and B should exceed Group C.
     assert!(
         last_a > last_b,
         "Full treaty density should exceed moderate: A={:.4} vs B={:.4}",
