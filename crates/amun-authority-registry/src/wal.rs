@@ -47,6 +47,11 @@ impl GovernanceWal {
         state.finalize_block(total_validators, registry)?;
         Ok(state)
     }
+
+    /// Return all WAL entries with block_height greater than the given height.
+    pub fn entries_since(&self, height: u64) -> Vec<&GovernanceWalRecord> {
+        self.entries.iter().filter(|e| e.block_height >= height).collect()
+    }
 }
 
 #[cfg(test)]

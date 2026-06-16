@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 /// A validator's vote on a governance proposal.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -13,7 +13,7 @@ pub enum GovernanceVote {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProposalVotes {
     pub proposal_id: [u8; 32],
-    votes: HashMap<[u8; 32], GovernanceVote>,
+    votes: BTreeMap<[u8; 32], GovernanceVote>,
 }
 
 /// Result of a vote tally.
@@ -28,7 +28,7 @@ impl ProposalVotes {
     pub fn new(proposal_id: [u8; 32]) -> Self {
         Self {
             proposal_id,
-            votes: HashMap::new(),
+            votes: BTreeMap::new(),
         }
     }
 

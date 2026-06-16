@@ -19,8 +19,8 @@ pub enum GovernanceTransaction {
 /// The governance state that lives in the chain state.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct GovernanceState {
-    pub proposals: std::collections::HashMap<[u8; 32], GovernanceProposal>,
-    pub votes: std::collections::HashMap<[u8; 32], crate::voting::ProposalVotes>,
+    pub proposals: std::collections::BTreeMap<[u8; 32], GovernanceProposal>,
+    pub votes: std::collections::BTreeMap<[u8; 32], crate::voting::ProposalVotes>,
     pub journal: crate::executor::ExecutionJournal,
 }
 

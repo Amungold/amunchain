@@ -3,7 +3,7 @@ use crate::governance::{GovernanceAction, GovernanceProposal};
 use crate::registry::{AuthorityRegistry, AuthorityTransition};
 use crate::voting::ProposalVotes;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
 /// Errors that can occur during governance execution.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -17,7 +17,7 @@ pub enum GovernanceError {
 /// Tracks which proposals have been executed to prevent replay.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ExecutionJournal {
-    executed: HashSet<[u8; 32]>,
+    executed: BTreeSet<[u8; 32]>,
 }
 
 impl ExecutionJournal {

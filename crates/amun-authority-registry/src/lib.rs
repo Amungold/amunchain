@@ -8,3 +8,4 @@ pub mod voting;
 pub mod executor;
 pub mod transaction;
 pub mod wal;
+pub mod recovery;
