@@ -6,7 +6,7 @@ use crate::authority::ConstitutionalAuthority;
 pub struct AuthorityRegistry {
     authorities: BTreeMap<u64, ConstitutionalAuthority>,
     active_version: u64,
-    transition: Option<AuthorityTransition>,
+    pub transition: Option<AuthorityTransition>,
 }
 
 /// Describes a scheduled transition from one authority version to another.
