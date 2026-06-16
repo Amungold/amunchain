@@ -22,7 +22,7 @@ pub enum GovernanceAction {
 }
 
 /// A governance proposal submitted by a validator.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GovernanceProposal {
     pub proposal_id: [u8; 32],
     pub proposer: [u8; 32],        // ValidatorId

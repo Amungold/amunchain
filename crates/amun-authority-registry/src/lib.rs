@@ -6,3 +6,4 @@ pub use registry::AuthorityRegistry;
 pub mod governance;
 pub mod voting;
 pub mod executor;
+pub mod transaction;
