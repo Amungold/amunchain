@@ -75,6 +75,16 @@ impl GovernanceState {
         }
         Ok(executed)
     }
+
+    /// Serialize the governance state to a byte vector for persistence.
+    pub fn snapshot(&self) -> Vec<u8> {
+        postcard::to_stdvec(&self).expect("GovernanceState serialization must not fail")
+    }
+
+    /// Restore governance state from a previously saved snapshot.
+    pub fn restore(bytes: &[u8]) -> Result<Self, String> {
+        postcard::from_bytes(bytes).map_err(|e| format!("GovernanceState deserialization failed: {}", e))
+    }
 }
 
 #[cfg(test)]
@@ -138,5 +148,73 @@ mod tests {
         let executed = state.finalize_block(4, &mut registry).unwrap();
         assert_eq!(executed.len(), 1);
         assert!(registry.by_version(2).is_some());
+    }
+
+    #[test]
+    fn n107_8a_snapshot_roundtrip() {
+        let mut state = GovernanceState::new();
+        let action = GovernanceAction::AddAuthority {
+            authority_public_key: [3u8; 32],
+            authority_version: 3,
+        };
+        let proposal = GovernanceProposal::new([0xAA; 32], action, 100);
+        state.apply_transaction(&GovernanceTransaction::SubmitProposal(proposal.clone()));
+        state.apply_transaction(&GovernanceTransaction::CastVote {
+            proposal_id: proposal.proposal_id,
+            validator_id: [1u8; 32],
+            vote: GovernanceVote::Approve,
+        });
+
+        let bytes = state.snapshot();
+        let restored = GovernanceState::restore(&bytes).unwrap();
+        assert!(restored.proposals.contains_key(&proposal.proposal_id));
+        assert_eq!(restored.votes.get(&proposal.proposal_id).unwrap().total_votes(), 1);
+    }
+
+    #[test]
+    fn n107_8a_empty_snapshot() {
+        let state = GovernanceState::new();
+        let bytes = state.snapshot();
+        let restored = GovernanceState::restore(&bytes).unwrap();
+        assert!(restored.proposals.is_empty());
+    }
+
+    #[test]
+    fn n107_8a_multiple_proposals() {
+        let mut state = GovernanceState::new();
+        for i in 0..3u8 {
+            let action = GovernanceAction::RetireAuthority { authority_version: i as u64 };
+            let proposal = GovernanceProposal::new([i; 32], action, 100 + i as u64);
+            state.apply_transaction(&GovernanceTransaction::SubmitProposal(proposal));
+        }
+        let bytes = state.snapshot();
+        let restored = GovernanceState::restore(&bytes).unwrap();
+        assert_eq!(restored.proposals.len(), 3);
+    }
+
+    #[test]
+    fn n107_8a_executed_proposals_survive_snapshot() {
+        let mut state = GovernanceState::new();
+        let mut registry = crate::registry::AuthorityRegistry::new();
+        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+
+        let action = GovernanceAction::AddAuthority {
+            authority_public_key: [2u8; 32],
+            authority_version: 2,
+        };
+        let proposal = GovernanceProposal::new([0xAA; 32], action, 100);
+        state.apply_transaction(&GovernanceTransaction::SubmitProposal(proposal.clone()));
+        for id in 1..=3u8 {
+            state.apply_transaction(&GovernanceTransaction::CastVote {
+                proposal_id: proposal.proposal_id,
+                validator_id: [id; 32],
+                vote: GovernanceVote::Approve,
+            });
+        }
+        state.finalize_block(4, &mut registry).unwrap();
+
+        let bytes = state.snapshot();
+        let restored = GovernanceState::restore(&bytes).unwrap();
+        assert!(restored.journal.is_executed(&proposal.proposal_id));
     }
 }
