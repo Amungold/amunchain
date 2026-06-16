@@ -6,6 +6,7 @@ use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
 use amun_mempool::Mempool;
 use amun_block_builder::BlockBuilder;
+use amun_authority_registry::transaction::GovernanceState;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
 use amun_validator_identity::derive_validator_id;
 use amun_validator_identity::vote_signing_payload;
@@ -28,6 +29,8 @@ pub struct LiveValidator {
     pub validator_id: [u8; 32],
     pub mempool: Arc<Mutex<Mempool>>,
     pub builder: Arc<Mutex<BlockBuilder>>,
+    pub governance: Arc<Mutex<GovernanceState>>,
+    pub authority_registry: Arc<Mutex<AuthorityRegistry>>,
 }
 
 impl LiveValidator {
@@ -113,6 +116,8 @@ impl LiveValidator {
             validator_id: my_true_id,
             mempool: Arc::new(Mutex::new(Mempool::new())),
             builder: Arc::new(Mutex::new(BlockBuilder::new())),
+            governance: Arc::new(Mutex::new(GovernanceState::new())),
+            authority_registry: Arc::new(Mutex::new(registry)),
         }
     }
 
@@ -176,6 +181,8 @@ impl LiveValidator {
         let store_consensus = store.clone();
         let mempool_consensus = self.mempool.clone();
         let builder_consensus = self.builder.clone();
+        let governance_consensus = self.governance.clone();
+        let authority_registry_consensus = self.authority_registry.clone();
         let running_consensus = running.clone();
         let h2 = thread::spawn(move || {
             let signing_key = signing_key_clone;
@@ -336,6 +343,11 @@ impl LiveValidator {
                     eng.try_advance(height, history_root)
                 };
                 if let Some(cert) = cert {
+                    // Execute any approved governance proposals
+                    let mut gov = governance_consensus.lock().unwrap();
+                    let mut reg = authority_registry_consensus.lock().unwrap();
+                    let _ = gov.finalize_block(4, &mut reg);
+                    
                     let record = FinalizedChainRecord {
                         height,
                         block_hash: cert.block_hash,
@@ -393,7 +405,84 @@ mod tests {
 
     static PORT_BASE: AtomicU16 = AtomicU16::new(9700);
 
-    fn next_ports() -> [u16; 4] {
+    
+    #[test]
+    fn n108_1_governance_updates_live_authority_registry() {
+        use amun_authority_registry::governance::{GovernanceAction, GovernanceProposal};
+        use amun_authority_registry::transaction::GovernanceTransaction;
+        use amun_authority_registry::voting::GovernanceVote;
+
+        let ports = next_ports();
+        let config = ValidatorConfig::test_cluster(0, &ports).with_quorum(3);
+        let v = LiveValidator::new(config);
+        v.start().unwrap();
+
+        // Verify initial state: only authority v1 exists
+        {
+            let reg = v.authority_registry.lock().unwrap();
+            assert!(reg.by_version(1).is_some(), "v1 should exist from genesis");
+            assert!(reg.by_version(2).is_none(), "v2 should not exist yet");
+        }
+
+        // Create a governance proposal to add authority v2
+        let proposal = GovernanceProposal::new(
+            [0xAA; 32],
+            GovernanceAction::AddAuthority {
+                authority_public_key: [2u8; 32],
+                authority_version: 2,
+            },
+            100,
+        );
+
+        // Submit the proposal to governance state
+        {
+            let mut gov = v.governance.lock().unwrap();
+            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(proposal.clone()));
+        }
+
+        // Cast 3 approving votes (quorum for 4 validators)
+        for id in 1..=3u8 {
+            let mut gov = v.governance.lock().unwrap();
+            gov.apply_transaction(&GovernanceTransaction::CastVote {
+                proposal_id: proposal.proposal_id,
+                validator_id: [id; 32],
+                vote: GovernanceVote::Approve,
+            });
+        }
+
+        // Execute governance finalization (simulates what happens at block finalization)
+        {
+            let mut gov = v.governance.lock().unwrap();
+            let mut reg = v.authority_registry.lock().unwrap();
+            let executed = gov.finalize_block(4, &mut reg).unwrap();
+            assert_eq!(executed.len(), 1, "Proposal should be executed");
+        }
+
+        // Verify the registry was updated
+        {
+            let reg = v.authority_registry.lock().unwrap();
+            assert!(reg.by_version(1).is_some(), "v1 should still exist");
+            assert!(reg.by_version(2).is_some(), "v2 should now be registered");
+        }
+
+        // Verify the journal recorded the execution
+        {
+            let gov = v.governance.lock().unwrap();
+            assert!(gov.journal.is_executed(&proposal.proposal_id), "Journal should record execution");
+        }
+
+        // Verify idempotency: second finalization should not re-execute
+        {
+            let mut gov = v.governance.lock().unwrap();
+            let mut reg = v.authority_registry.lock().unwrap();
+            let executed = gov.finalize_block(4, &mut reg).unwrap();
+            assert!(executed.is_empty(), "Second finalization should produce no new executions");
+        }
+
+        v.stop();
+    }
+
+fn next_ports() -> [u16; 4] {
         let base = PORT_BASE.fetch_add(10, Ordering::SeqCst);
         [base, base + 1, base + 2, base + 3]
     }
