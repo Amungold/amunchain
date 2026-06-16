@@ -109,9 +109,24 @@ impl ConsensusRound {
             }
         );
 
+        eprintln!(
+            "QC_CHECK: approvals={} power={} total={} quorum={}",
+            approvals.len(),
+            approval_power,
+            total_voting_power,
+            quorum_met
+        );
+
         if !quorum_met {
             return None;
         }
+
+        eprintln!(
+            "QC_FORMED: h={} approvals={} power={}",
+            self.height,
+            approvals.len(),
+            approval_power
+        );
 
         let qc = QuorumCertificate {
             height: self.height,
@@ -299,6 +314,12 @@ impl ConsensusEngine {
         }
         let height = vote.height;
         if height <= self.current_height {
+            eprintln!(
+                "STALE_VOTE: vote_h={} current_h={} validator={:?}",
+                height,
+                self.current_height,
+                &vote.voter_id[..4]
+            );
             return Err(format!(
                 "Stale vote height {} <= current {}",
                 height, self.current_height

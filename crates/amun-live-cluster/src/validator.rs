@@ -131,6 +131,7 @@ impl LiveValidator {
         let running = self.running.clone();
         let signing_key_clone = self.signing_key.clone();
         let validator_id = self.validator_id;
+        let my_index = self.config.validator_id[0];
 
         // Listen thread
         let engine_listen = engine.clone();
@@ -213,30 +214,48 @@ impl LiveValidator {
                     let eng = engine_consensus.lock().unwrap();
                     eng.proposer_for(height)
                 };
-                let is_proposer = validator_id[0] as usize == proposer_idx + 1;
-
+                let is_proposer = my_index as usize == proposer_idx + 1;
                 let timestamp = SystemTime::now()
                     .duration_since(SystemTime::UNIX_EPOCH)
                     .unwrap()
                     .as_secs();
 
                 // Proposer builds a real block from mempool transactions
-                let (block_hash, state_root) = if is_proposer {
+                let already_proposed = {
+                    let eng = engine_consensus.lock().unwrap();
+                    eng.rounds.get(&height).and_then(|r| r.proposed_block_hash).is_some()
+                };
+                let (block_hash, state_root) = if is_proposer && !already_proposed {
                     let mut mp = mempool_consensus.lock().unwrap();
                     let mut bld = builder_consensus.lock().unwrap();
                     let parent = engine_consensus.lock().unwrap().history_root;
                     let block = bld.build_block(height, parent, &mut mp, 1000, validator_id, timestamp);
                     let hash = block.block_hash();
                     let root = block.state_root;
-                    let mut eng = engine_consensus.lock().unwrap();
-                    eng.start_round(height, validator_id);
+                    let mut eng = engine_consensus.lock().unwrap();                    eng.start_round(height, validator_id);
                     if let Some(round) = eng.round_mut(height) {
                         round.propose(hash, root);
                     }
                     (hash, root)
+                } else if is_proposer && already_proposed {
+                    let eng = engine_consensus.lock().unwrap();
+                    let round = eng.rounds.get(&height);
+                    let hash = round.and_then(|r| r.proposed_block_hash).unwrap_or([height as u8; 32]);
+                    let root = round.and_then(|r| r.proposed_state_root).unwrap_or([0xBB; 32]);
+                    (hash, root)
                 } else {
-                    // Non-proposers use a placeholder; they learn the real hash from the proposal
-                    ([height as u8; 32], [0xBB; 32])
+                    // Non-proposers: wait for proposer's vote to arrive, then use that hash
+                    thread::sleep(Duration::from_millis(200));
+                    let eng = engine_consensus.lock().unwrap();
+                    if let Some(round) = eng.rounds.get(&height) {
+                        if let (Some(h), Some(r)) = (round.proposed_block_hash, round.proposed_state_root) {
+                            (h, r)
+                        } else {
+                            ([height as u8; 32], [0xBB; 32])
+                        }
+                    } else {
+                        ([height as u8; 32], [0xBB; 32])
+                    }
                 };
 
                 let payload = vote_signing_payload(
@@ -263,10 +282,6 @@ impl LiveValidator {
                     let mut eng = engine_consensus.lock().unwrap();
                     if !eng.rounds.contains_key(&height) {
                         eng.start_round(height, [(proposer_idx + 1) as u8; 32]);
-                        // Fallback: if proposer didn't propose, first validator to arrive proposes
-                        if let Some(round) = eng.round_mut(height) {
-                            round.propose(block_hash, state_root);
-                        }
                     }
                     let _ = eng.process_vote(my_vote.clone());
                 }
