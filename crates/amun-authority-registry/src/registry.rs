@@ -6,6 +6,16 @@ use crate::authority::ConstitutionalAuthority;
 pub struct AuthorityRegistry {
     authorities: BTreeMap<u64, ConstitutionalAuthority>,
     active_version: u64,
+    transition: Option<AuthorityTransition>,
+}
+
+/// Describes a scheduled transition from one authority version to another.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthorityTransition {
+    pub from_version: u64,
+    pub to_version: u64,
+    pub activation_height: u64,
+    pub grace_period_blocks: u64,
 }
 
 impl AuthorityRegistry {
@@ -44,7 +54,7 @@ impl AuthorityRegistry {
     }
 
     pub fn is_revoked(&self, version: u64) -> bool {
-        self.authorities.get(&version).map_or(false, |a| a.revoked)
+        self.authorities.get(&version).is_some_and(|a| a.revoked)
     }
 
     /// Activate a new authority, making it the active one.
@@ -59,6 +69,63 @@ impl AuthorityRegistry {
         if let Some(auth) = self.authorities.get_mut(&authority_version) {
             auth.revoked = true;
         }
+    }
+
+    /// Schedule a transition to a new authority version.
+    pub fn schedule_transition(&mut self, transition: AuthorityTransition) {
+        self.transition = Some(transition);
+    }
+
+    /// Return the authority (or authorities) valid at a given block height.
+    pub fn valid_authorities_at(&self, height: u64) -> Vec<&ConstitutionalAuthority> {
+        let mut result = Vec::new();
+        if let Some(ref t) = self.transition {
+            if height < t.activation_height {
+                // Pre-activation: only the old authority is valid
+                if let Some(a) = self.by_version(t.from_version) {
+                    result.push(a);
+                }
+            } else if height < t.activation_height + t.grace_period_blocks {
+                // Grace period: both authorities are valid
+                if let Some(a) = self.by_version(t.from_version) {
+                    result.push(a);
+                }
+                if let Some(a) = self.by_version(t.to_version) {
+                    result.push(a);
+                }
+            } else {
+                // Post-grace: only the new authority is valid
+                if let Some(a) = self.by_version(t.to_version) {
+                    result.push(a);
+                }
+            }
+        } else {
+            // No transition scheduled: return the active authority
+            if let Some(a) = self.active() {
+                result.push(a);
+            }
+        }
+        result
+    }
+
+    /// Check if an authority can issue new certificates at a given height.
+    pub fn can_issue_at(&self, authority_version: u64, height: u64) -> bool {
+        if self.is_revoked(authority_version) {
+            return false;
+        }
+        if let Some(ref t) = self.transition {
+            // After activation, the old authority cannot issue new certs
+            if authority_version == t.from_version && height >= t.activation_height {
+                return false;
+            }
+        }
+        // The active authority can always issue (if not revoked)
+        if let Some(active) = self.active() {
+            if active.authority_version == authority_version {
+                return true;
+            }
+        }
+        false
     }
 }
 
@@ -152,6 +219,95 @@ mod tests {
         reg.register(a1);
         reg.retire(1);
         assert!(reg.is_revoked(1));
+        assert!(reg.by_version(1).is_some());
+    }
+
+    #[test]
+    fn n107_6_schedule_transition() {
+        let mut reg = AuthorityRegistry::new();
+        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+        reg.register(a1);
+        reg.register(a2);
+        let t = AuthorityTransition {
+            from_version: 1,
+            to_version: 2,
+            activation_height: 100,
+            grace_period_blocks: 50,
+        };
+        reg.schedule_transition(t);
+        assert!(reg.transition.is_some());
+    }
+
+    #[test]
+    fn n107_6_pre_activation() {
+        let mut reg = AuthorityRegistry::new();
+        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+        reg.register(a1);
+        reg.register(a2);
+        reg.schedule_transition(AuthorityTransition {
+            from_version: 1, to_version: 2,
+            activation_height: 100, grace_period_blocks: 50,
+        });
+        let valid = reg.valid_authorities_at(50);
+        assert_eq!(valid.len(), 1);
+        assert_eq!(valid[0].authority_version, 1);
+    }
+
+    #[test]
+    fn n107_6_dual_validation_window() {
+        let mut reg = AuthorityRegistry::new();
+        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+        reg.register(a1);
+        reg.register(a2);
+        reg.schedule_transition(AuthorityTransition {
+            from_version: 1, to_version: 2,
+            activation_height: 100, grace_period_blocks: 50,
+        });
+        let valid = reg.valid_authorities_at(120);
+        assert_eq!(valid.len(), 2);
+    }
+
+    #[test]
+    fn n107_6_post_grace_period() {
+        let mut reg = AuthorityRegistry::new();
+        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+        reg.register(a1);
+        reg.register(a2);
+        reg.schedule_transition(AuthorityTransition {
+            from_version: 1, to_version: 2,
+            activation_height: 100, grace_period_blocks: 50,
+        });
+        let valid = reg.valid_authorities_at(200);
+        assert_eq!(valid.len(), 1);
+        assert_eq!(valid[0].authority_version, 2);
+    }
+
+    #[test]
+    fn n107_6_old_authority_cannot_issue_after_activation() {
+        let mut reg = AuthorityRegistry::new();
+        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+        reg.register(a1);
+        reg.register(a2);
+        reg.schedule_transition(AuthorityTransition {
+            from_version: 1, to_version: 2,
+            activation_height: 100, grace_period_blocks: 50,
+        });
+        assert!(!reg.can_issue_at(1, 150));
+        assert!(reg.can_issue_at(2, 150));
+    }
+
+    #[test]
+    fn n107_6_historical_certificates_survive() {
+        let mut reg = AuthorityRegistry::new();
+        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+        reg.register(a1);
+        reg.retire(1);
+        // Retired authority can still be looked up for verification
         assert!(reg.by_version(1).is_some());
     }
 }
