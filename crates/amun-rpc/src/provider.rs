@@ -8,6 +8,7 @@ pub trait ChainDataProvider: Send + Sync {
     fn get_block(&self, height: u64) -> Result<BlockResponse, String>;
     fn get_block_range(&self, from: u64, to: u64) -> Result<RangeResponse, String>;
     fn get_metrics(&self) -> Result<MetricsResponse, String>;
+    fn submit_transaction(&self, tx_json: &str) -> Result<String, String>;
 }
 
 pub struct LiveRpcProvider {
@@ -37,6 +38,9 @@ impl ChainDataProvider for LiveRpcProvider {
     }
     fn get_metrics(&self) -> Result<MetricsResponse, String> {
         self.client.get_metrics()
+    }
+    fn submit_transaction(&self, tx_json: &str) -> Result<String, String> {
+        self.client.submit_transaction(tx_json)
     }
 }
 
@@ -72,6 +76,9 @@ impl ChainDataProvider for MockProvider {
     }
     fn get_block_range(&self, _from: u64, _to: u64) -> Result<RangeResponse, String> {
         Ok(RangeResponse { blocks: vec![] })
+    }
+    fn submit_transaction(&self, _tx_json: &str) -> Result<String, String> {
+        Ok("mock_hash".to_string())
     }
     fn get_metrics(&self) -> Result<MetricsResponse, String> {
         Ok(MetricsResponse {

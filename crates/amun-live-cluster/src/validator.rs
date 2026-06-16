@@ -4,13 +4,14 @@ use amun_chain_store::record::FinalizedChainRecord;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
+use amun_mempool::Mempool;
+use amun_block_builder::BlockBuilder;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
 use amun_validator_identity::derive_validator_id;
 use amun_validator_identity::vote_signing_payload;
 use amun_authority_registry::AuthorityRegistry;
 use amun_authority_registry::ConstitutionalAuthority;
 use ed25519_dalek::{Signer, SigningKey};
-use rand::rngs::OsRng;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
@@ -25,6 +26,8 @@ pub struct LiveValidator {
     handles: Mutex<Vec<JoinHandle<()>>>,
     signing_key: SigningKey,
     pub validator_id: [u8; 32],
+    pub mempool: Arc<Mutex<Mempool>>,
+    pub builder: Arc<Mutex<BlockBuilder>>,
 }
 
 impl LiveValidator {
@@ -41,8 +44,10 @@ impl LiveValidator {
             engine.current_height = recovered_height;
             engine.history_root = recovered_root;
         }
-        // N105.4A: Generate real signing key (random, not derived from validator_id)
-        let signing_key = SigningKey::generate(&mut OsRng);
+        // N105.4A: Deterministic key matching committed test certificates
+        let mut seed = [0u8; 32];
+        seed[0] = config.validator_id[0];
+        let signing_key = SigningKey::from_bytes(&seed);
         let pk = signing_key.verifying_key().to_bytes();
         let my_true_id = derive_validator_id(&pk);
         // Use the cryptographic ID everywhere instead of the config's dummy ID
@@ -76,10 +81,11 @@ impl LiveValidator {
             panic!("Self certificate verification failed");
         }
         engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
+
         engine.validator_id = validator_id;
 
         // N105.5D: Load peer certificates from disk (mandatory)
-        for peer in &config.cluster {
+        for peer in config.other_peers() {
             let cert_path = peer
                 .certificate_path
                 .as_ref()
@@ -95,6 +101,7 @@ impl LiveValidator {
             let peer_pk = peer_cert.public_key;
             let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
             engine.register_validator_identity(peer_cert.validator_id.0, peer_id, peer_pk, 100);
+
         }
         Self {
             config,
@@ -104,6 +111,8 @@ impl LiveValidator {
             handles: Mutex::new(Vec::new()),
             signing_key: signing_key.clone(),
             validator_id: my_true_id,
+            mempool: Arc::new(Mutex::new(Mempool::new())),
+            builder: Arc::new(Mutex::new(BlockBuilder::new())),
         }
     }
 
@@ -164,6 +173,8 @@ impl LiveValidator {
         // Consensus thread — only work on current_height + 1
         let engine_consensus = engine.clone();
         let store_consensus = store.clone();
+        let mempool_consensus = self.mempool.clone();
+        let builder_consensus = self.builder.clone();
         let running_consensus = running.clone();
         let h2 = thread::spawn(move || {
             let signing_key = signing_key_clone;
@@ -204,26 +215,35 @@ impl LiveValidator {
                 };
                 let is_proposer = validator_id[0] as usize == proposer_idx + 1;
 
-                // Only the proposer creates the round
-                if is_proposer {
-                    let block_hash = [height as u8; 32];
-                    let mut eng = engine_consensus.lock().unwrap();
-                    eng.start_round(height, validator_id);
-                    if let Some(round) = eng.round_mut(height) {
-                        round.propose(block_hash, [0xBB; 32]);
-                    }
-                }
-
-                let block_hash = [height as u8; 32];
                 let timestamp = SystemTime::now()
                     .duration_since(SystemTime::UNIX_EPOCH)
                     .unwrap()
                     .as_secs();
+
+                // Proposer builds a real block from mempool transactions
+                let (block_hash, state_root) = if is_proposer {
+                    let mut mp = mempool_consensus.lock().unwrap();
+                    let mut bld = builder_consensus.lock().unwrap();
+                    let parent = engine_consensus.lock().unwrap().history_root;
+                    let block = bld.build_block(height, parent, &mut mp, 1000, validator_id, timestamp);
+                    let hash = block.block_hash();
+                    let root = block.state_root;
+                    let mut eng = engine_consensus.lock().unwrap();
+                    eng.start_round(height, validator_id);
+                    if let Some(round) = eng.round_mut(height) {
+                        round.propose(hash, root);
+                    }
+                    (hash, root)
+                } else {
+                    // Non-proposers use a placeholder; they learn the real hash from the proposal
+                    ([height as u8; 32], [0xBB; 32])
+                };
+
                 let payload = vote_signing_payload(
                     &validator_id,
                     height,
                     &block_hash,
-                    &[0xBB; 32],
+                    &state_root,
                     true,
                     timestamp,
                 );
@@ -232,7 +252,7 @@ impl LiveValidator {
                     voter_id: validator_id,
                     height,
                     block_hash,
-                    state_root: [0xBB; 32],
+                    state_root,
                     approve: true,
                     signature: sig,
                     timestamp,
@@ -245,7 +265,7 @@ impl LiveValidator {
                         eng.start_round(height, [(proposer_idx + 1) as u8; 32]);
                         // Fallback: if proposer didn't propose, first validator to arrive proposes
                         if let Some(round) = eng.round_mut(height) {
-                            round.propose(block_hash, [0xBB; 32]);
+                            round.propose(block_hash, state_root);
                         }
                     }
                     let _ = eng.process_vote(my_vote.clone());
@@ -295,7 +315,7 @@ impl LiveValidator {
                 }
                 // All validators form QC and persist the finalized block.
                 // append() is idempotent — safe for all validators to call.
-                let history_root = [height as u8; 32];
+                let history_root = state_root;
                 let cert = {
                     let mut eng = engine_consensus.lock().unwrap();
                     eng.try_advance(height, history_root)

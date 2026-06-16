@@ -99,6 +99,34 @@ impl RpcClient {
         self.get_json(&format!("blocks/{}/{}", from, to))
     }
 
+    
+    pub fn submit_transaction(&self, tx_json: &str) -> Result<String, String> {
+        let mut stream = TcpStream::connect(format!("{}:{}", self.host, self.port))
+            .map_err(|e| format!("Connect error: {}", e))?;
+
+        let body = tx_json.to_string();
+        let request = format!(
+            "POST /tx/submit HTTP/1.0
+Host: {}:{}
+Content-Type: application/json
+Content-Length: {}
+Connection: close
+
+{}",
+            self.host, self.port, body.len(), body
+        );
+        stream.write_all(request.as_bytes()).map_err(|e| format!("Write error: {}", e))?;
+
+        let mut response = String::new();
+        stream.read_to_string(&mut response).map_err(|e| format!("Read error: {}", e))?;
+
+        let body = response.split("
+
+").nth(1).ok_or("No body")?;
+        let parsed: serde_json::Value = serde_json::from_str(body).map_err(|e| format!("Parse error: {}", e))?;
+        parsed["hash"].as_str().map(|h| h.to_string()).ok_or("Missing hash".to_string())
+    }
+
     pub fn get_metrics(&self) -> Result<MetricsResponse, String> {
         self.get_json("metrics")
     }

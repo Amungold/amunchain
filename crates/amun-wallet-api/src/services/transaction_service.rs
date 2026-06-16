@@ -1,5 +1,4 @@
 use axum::Json;
-use blake3::Hasher;
 
 use crate::errors::{ApiError, ApiResult};
 use crate::types::{
@@ -12,31 +11,36 @@ pub struct TransactionService;
 impl TransactionService {
     pub fn build_transaction(req: BuildTransactionRequest) -> ApiResult<BuildTransactionResponse> {
         if req.sender.is_empty() || req.recipient.is_empty() {
-            return Err(ApiError::new(
-                "INVALID_REQUEST",
-                "Sender or recipient is empty",
-            ));
+            return Err(ApiError::new("INVALID_REQUEST", "Sender or recipient is empty"));
         }
         if req.amount == 0 {
-            return Err(ApiError::new(
-                "INVALID_REQUEST",
-                "Amount must be greater than zero",
-            ));
+            return Err(ApiError::new("INVALID_REQUEST", "Amount must be greater than zero"));
         }
 
-        let mut hasher = Hasher::new();
-        hasher.update(req.sender.as_bytes());
-        hasher.update(req.recipient.as_bytes());
-        hasher.update(&req.amount.to_le_bytes());
-        hasher.update(&req.nonce.to_le_bytes());
-        let tx_hash = hex::encode(hasher.finalize().as_bytes());
+        use amun_transactions::{Transaction, TransactionPayload, TransferPayload};
+        let sender: [u8; 32] = hex::decode(&req.sender)
+            .map_err(|_| ApiError::new("INVALID_REQUEST", "Invalid sender hex"))?
+            .try_into()
+            .map_err(|_| ApiError::new("INVALID_REQUEST", "Sender must be 32 bytes"))?;
+        let recipient: [u8; 32] = hex::decode(&req.recipient)
+            .map_err(|_| ApiError::new("INVALID_REQUEST", "Invalid recipient hex"))?
+            .try_into()
+            .map_err(|_| ApiError::new("INVALID_REQUEST", "Recipient must be 32 bytes"))?;
 
-        let tx_bytes = serde_json::to_vec(&req).unwrap_or_default();
-        let tx_bytes_encoded = hex::encode(&tx_bytes);
+        let tx = Transaction {
+            version: 1,
+            sender,
+            nonce: req.nonce,
+            payload: TransactionPayload::Transfer(TransferPayload { to: recipient, amount: req.amount }),
+            signature: vec![],
+        };
+
+        let tx_hash = tx.tx_hash();
+        let tx_bytes = serde_json::to_vec(&tx).unwrap_or_default();
 
         Ok(Json(BuildTransactionResponse {
-            transaction_bytes: tx_bytes_encoded,
-            transaction_hash: tx_hash,
+            transaction_bytes: hex::encode(&tx_bytes),
+            transaction_hash: hex::encode(tx_hash),
         }))
     }
 
@@ -44,16 +48,31 @@ impl TransactionService {
         req: SubmitTransactionRequest,
     ) -> ApiResult<SubmitTransactionResponse> {
         if req.transaction_bytes.is_empty() || req.signature.is_empty() {
-            return Err(ApiError::new(
-                "INVALID_REQUEST",
-                "Missing transaction bytes or signature",
-            ));
+            return Err(ApiError::new("INVALID_REQUEST", "Missing transaction bytes or signature"));
         }
 
-        let mut hasher = Hasher::new();
-        hasher.update(req.transaction_bytes.as_bytes());
-        hasher.update(req.signature.as_bytes());
-        let hash = hex::encode(hasher.finalize().as_bytes());
+        let tx_bytes = hex::decode(&req.transaction_bytes)
+            .map_err(|_| ApiError::new("INVALID_REQUEST", "Invalid hex in transaction_bytes"))?;
+        let mut tx: amun_transactions::Transaction = serde_json::from_slice(&tx_bytes)
+            .map_err(|_| ApiError::new("INVALID_REQUEST", "Invalid transaction format"))?;
+
+        let sig: Vec<u8> = hex::decode(&req.signature)
+            .map_err(|_| ApiError::new("INVALID_REQUEST", "Invalid hex in signature"))?;
+        tx.signature = sig;
+
+        if !tx.verify() {
+            return Err(ApiError::new("INVALID_REQUEST", "Invalid transaction signature"));
+        }
+
+        let tx_json = serde_json::json!({
+            "transaction_bytes": req.transaction_bytes,
+            "signature": req.signature,
+            "public_key": req.public_key,
+        }).to_string();
+
+        let hash = crate::services::account_service::provider()
+            .submit_transaction(&tx_json)
+            .map_err(|e| ApiError::new("RPC_ERROR", &e))?;
 
         Ok(Json(SubmitTransactionResponse { hash }))
     }

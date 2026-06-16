@@ -10,7 +10,7 @@ pub fn set_provider(p: Arc<dyn ChainDataProvider>) {
     let _ = PROVIDER.set(p);
 }
 
-fn provider() -> Arc<dyn ChainDataProvider> {
+pub fn provider() -> Arc<dyn ChainDataProvider> {
     #[cfg(test)]
     {
         use amun_rpc::provider::MockProvider;

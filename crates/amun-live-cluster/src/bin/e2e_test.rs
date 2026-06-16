@@ -14,6 +14,7 @@ async fn main() {
     let state = AppState {
         store: validator.store.clone(),
         engine: validator.engine.clone(),
+        mempool: validator.mempool.clone(),
     };
     tokio::spawn(async move { serve(state, 9070).await });
 
