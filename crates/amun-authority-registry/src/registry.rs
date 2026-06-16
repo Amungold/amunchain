@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use crate::authority::ConstitutionalAuthority;
+use amun_networking::validator_certificate::ValidatorCertificate;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AuthorityRegistry {
@@ -110,6 +111,43 @@ impl AuthorityRegistry {
     }
 
     /// Check if an authority can issue new certificates at a given height.
+
+    /// Verify a certificate against the authority registry at a given block height.
+    /// Follows the Authority Sunset Model: the authority must be currently valid
+    /// at the verification height, not just at issuance time.
+    pub fn verify_certificate_at(
+        &self,
+        cert: &ValidatorCertificate,
+        height: u64,
+    ) -> bool {
+        // 1. Authority version must exist
+        let authority = match self.by_version(cert.authority_version) {
+            Some(a) => a,
+            None => return false,
+        };
+
+        // 2. Authority ID must match (skip for legacy certs with zero ID)
+        if cert.authority_id != [0u8; 32] && authority.authority_id != cert.authority_id {
+            return false;
+        }
+
+        // 3. Authority must not be revoked at this height
+        if let Some(revoked_height) = authority.revoked_at_height {
+            if height >= revoked_height {
+                return false;
+            }
+        }
+
+        // 4. Authority must be valid at this height (transition/grace window check)
+        let valid = self.valid_authorities_at(height);
+        if !valid.iter().any(|a| a.authority_version == cert.authority_version) {
+            return false;
+        }
+
+        // 5. Cryptographic signature must verify
+        cert.verify(&authority.authority_public_key)
+    }
+
     pub fn can_issue_at(&self, authority_version: u64, height: u64) -> bool {
         if self.is_revoked(authority_version) {
             return false;
@@ -257,6 +295,134 @@ mod tests {
     }
 
     #[test]
+
+    #[test]
+    fn n108_3b_accept_v1_before_grace_end() {
+        use amun_networking::crypto_identity::PeerKeyPair;
+        use amun_networking::peer_identity::PeerId;
+        use amun_networking::validator_certificate::ValidatorCertificate;
+
+        let mut reg = AuthorityRegistry::new();
+        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+        let v1_pk = v1_kp.verifying_key.to_bytes();
+        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+        let v1_id = v1.authority_id;
+        reg.register(v1);
+
+        let v2_kp = PeerKeyPair::from_seed([0x43; 32]);
+        let v2_pk = v2_kp.verifying_key.to_bytes();
+        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+        reg.register(v2);
+
+        reg.schedule_transition(AuthorityTransition {
+            from_version: 1, to_version: 2,
+            activation_height: 500, grace_period_blocks: 100,
+        });
+
+        // Certificate issued by v1, verified during grace window (height 550)
+        let cert = ValidatorCertificate::issue_v2(
+            PeerId::from_bytes([1u8; 32]),
+            [1u8; 32],
+            1,
+            v1_id,
+            &v1_kp,
+            0, 0,
+        );
+        assert!(reg.verify_certificate_at(&cert, 550), "v1 cert should be valid during grace window");
+    }
+
+    #[test]
+    fn n108_3b_reject_v1_after_grace_end() {
+        use amun_networking::crypto_identity::PeerKeyPair;
+        use amun_networking::peer_identity::PeerId;
+        use amun_networking::validator_certificate::ValidatorCertificate;
+
+        let mut reg = AuthorityRegistry::new();
+        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+        let v1_pk = v1_kp.verifying_key.to_bytes();
+        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+        let v1_id = v1.authority_id;
+        reg.register(v1);
+
+        let v2_kp = PeerKeyPair::from_seed([0x43; 32]);
+        let v2_pk = v2_kp.verifying_key.to_bytes();
+        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+        reg.register(v2);
+
+        reg.schedule_transition(AuthorityTransition {
+            from_version: 1, to_version: 2,
+            activation_height: 500, grace_period_blocks: 100,
+        });
+
+        let cert = ValidatorCertificate::issue_v2(
+            PeerId::from_bytes([1u8; 32]),
+            [1u8; 32],
+            1,
+            v1_id,
+            &v1_kp,
+            0, 0,
+        );
+        assert!(!reg.verify_certificate_at(&cert, 650), "v1 cert should be rejected after grace window");
+    }
+
+    #[test]
+    fn n108_3b_accept_v2_after_activation() {
+        use amun_networking::crypto_identity::PeerKeyPair;
+        use amun_networking::peer_identity::PeerId;
+        use amun_networking::validator_certificate::ValidatorCertificate;
+
+        let mut reg = AuthorityRegistry::new();
+        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+        let v1 = ConstitutionalAuthority::new(v1_kp.verifying_key.to_bytes(), 1, 0);
+        reg.register(v1);
+
+        let v2_kp = PeerKeyPair::from_seed([0x43; 32]);
+        let v2_pk = v2_kp.verifying_key.to_bytes();
+        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+        let v2_id = v2.authority_id;
+        reg.register(v2);
+
+        reg.schedule_transition(AuthorityTransition {
+            from_version: 1, to_version: 2,
+            activation_height: 500, grace_period_blocks: 100,
+        });
+
+        let cert = ValidatorCertificate::issue_v2(
+            PeerId::from_bytes([2u8; 32]),
+            [2u8; 32],
+            2,
+            v2_id,
+            &v2_kp,
+            0, 0,
+        );
+        assert!(reg.verify_certificate_at(&cert, 650), "v2 cert should be accepted after activation");
+    }
+
+    #[test]
+    fn n108_3b_reject_revoked_authority() {
+        use amun_networking::crypto_identity::PeerKeyPair;
+        use amun_networking::peer_identity::PeerId;
+        use amun_networking::validator_certificate::ValidatorCertificate;
+
+        let mut reg = AuthorityRegistry::new();
+        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+        let v1_pk = v1_kp.verifying_key.to_bytes();
+        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+        let v1_id = v1.authority_id;
+        reg.register(v1);
+        reg.retire(1, 500);
+
+        let cert = ValidatorCertificate::issue_v2(
+            PeerId::from_bytes([1u8; 32]),
+            [1u8; 32],
+            1,
+            v1_id,
+            &v1_kp,
+            0, 0,
+        );
+        assert!(!reg.verify_certificate_at(&cert, 600), "revoked authority cert should be rejected");
+    }
+
     fn n107_6_dual_validation_window() {
         let mut reg = AuthorityRegistry::new();
         let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);

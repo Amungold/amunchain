@@ -66,7 +66,6 @@ impl LiveValidator {
         );
         let registry = AuthorityRegistry::from_genesis(authority);
         let active_authority = registry.active().expect("No active authority");
-        let authority_pubkey = active_authority.authority_public_key;
 
         // Create self certificate and verify it
         let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
@@ -80,7 +79,7 @@ impl LiveValidator {
             0,
             0,
         );
-        if !self_cert.verify(&registry.by_version(self_cert.authority_version).map(|a| a.authority_public_key).unwrap_or(authority_pubkey)) {
+        if !registry.verify_certificate_at(&self_cert, 0) {
             panic!("Self certificate verification failed");
         }
         engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
@@ -98,7 +97,7 @@ impl LiveValidator {
             let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
                 serde_json::from_str(&cert_json)
                     .unwrap_or_else(|_| panic!("Invalid certificate JSON in {}", cert_path));
-            if !peer_cert.verify(&registry.by_version(peer_cert.authority_version).map(|a| a.authority_public_key).unwrap_or(authority_pubkey)) {
+            if !registry.verify_certificate_at(&peer_cert, 0) {
                 panic!("Peer certificate verification failed for {}", cert_path);
             }
             let peer_pk = peer_cert.public_key;
