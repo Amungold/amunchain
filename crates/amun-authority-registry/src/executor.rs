@@ -101,7 +101,7 @@ pub fn execute_governance(
                     format!("authority_version {} does not exist", authority_version)
                 ));
             }
-            registry.retire(*authority_version);
+            registry.retire(*authority_version, proposal.created_height);
         }
     }
 

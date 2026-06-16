@@ -65,9 +65,10 @@ impl AuthorityRegistry {
     }
 
     /// Retire an authority so it can no longer issue new certificates.
-    pub fn retire(&mut self, authority_version: u64) {
+    pub fn retire(&mut self, authority_version: u64, height: u64) {
         if let Some(auth) = self.authorities.get_mut(&authority_version) {
             auth.revoked = true;
+            auth.revoked_at_height = Some(height);
         }
     }
 
@@ -182,7 +183,7 @@ mod tests {
         let mut reg = AuthorityRegistry::new();
         let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
         reg.register(a1);
-        reg.retire(1);
+        reg.retire(1, 1000);
         assert!(reg.is_revoked(1));
         assert!(reg.by_version(1).is_some());
     }
@@ -217,7 +218,7 @@ mod tests {
         let mut reg = AuthorityRegistry::new();
         let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
         reg.register(a1);
-        reg.retire(1);
+        reg.retire(1, 1000);
         assert!(reg.is_revoked(1));
         assert!(reg.by_version(1).is_some());
     }
@@ -306,7 +307,7 @@ mod tests {
         let mut reg = AuthorityRegistry::new();
         let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
         reg.register(a1);
-        reg.retire(1);
+        reg.retire(1, 1000);
         // Retired authority can still be looked up for verification
         assert!(reg.by_version(1).is_some());
     }

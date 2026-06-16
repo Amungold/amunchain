@@ -7,6 +7,7 @@ pub struct ConstitutionalAuthority {
     pub authority_version: u64,
     pub activated_at_height: u64,
     pub revoked: bool,
+    pub revoked_at_height: Option<u64>,
 }
 
 impl ConstitutionalAuthority {
@@ -21,6 +22,7 @@ impl ConstitutionalAuthority {
             authority_version: version,
             activated_at_height,
             revoked: false,
+            revoked_at_height: None,
         }
     }
 }
