@@ -11,6 +11,7 @@ fn make_vote(voter: u8, height: u64, block_hash: [u8; 32]) -> ConsensusVote {
         approve: true,
         signature: [0u8; 64],
         timestamp: 1000,
+        commitment: None,
     }
 }
 
