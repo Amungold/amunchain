@@ -35,10 +35,10 @@ impl GovernanceRecoveryEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::authority::ConstitutionalAuthority;
     use crate::governance::{GovernanceAction, GovernanceProposal};
     use crate::transaction::GovernanceTransaction;
     use crate::voting::GovernanceVote;
-    use crate::authority::ConstitutionalAuthority;
 
     fn build_base_snapshot() -> (Vec<u8>, u64, [u8; 32]) {
         let mut state = GovernanceState::new();
@@ -58,21 +58,26 @@ mod tests {
 
         // Append new transactions to the WAL after the snapshot
         let mut wal = GovernanceWal::new();
-        let action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let proposal = GovernanceProposal::new([0xBB; 32], action, 150);
         wal.append(150, GovernanceTransaction::SubmitProposal(proposal.clone()));
-        wal.append(150, GovernanceTransaction::CastVote {
-            proposal_id: proposal.proposal_id,
-            validator_id: [1u8; 32],
-            vote: GovernanceVote::Approve,
-        });
+        wal.append(
+            150,
+            GovernanceTransaction::CastVote {
+                proposal_id: proposal.proposal_id,
+                validator_id: [1u8; 32],
+                vote: GovernanceVote::Approve,
+            },
+        );
 
         let mut registry = crate::registry::AuthorityRegistry::new();
         registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
 
-        let recovered = GovernanceRecoveryEngine::recover(
-            &snapshot, snap_height, &wal, 4, &mut registry,
-        ).unwrap();
+        let recovered =
+            GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+                .unwrap();
 
         // The new proposal should be present
         assert!(recovered.proposals.contains_key(&proposal.proposal_id));
@@ -90,12 +95,17 @@ mod tests {
             authority_public_key: [9u8; 32],
             authority_version: 9,
         };
-        wal.append(50, GovernanceTransaction::SubmitProposal(
-            GovernanceProposal::new([0x99; 32], old_action, 50)
-        ));
+        wal.append(
+            50,
+            GovernanceTransaction::SubmitProposal(GovernanceProposal::new(
+                [0x99; 32], old_action, 50,
+            )),
+        );
 
         // This entry is AFTER the snapshot height and should be replayed
-        let new_action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let new_action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let new_proposal = GovernanceProposal::new([0xCC; 32], new_action, 200);
         let new_proposal_id = new_proposal.proposal_id;
         wal.append(200, GovernanceTransaction::SubmitProposal(new_proposal));
@@ -103,14 +113,20 @@ mod tests {
         let mut registry = crate::registry::AuthorityRegistry::new();
         registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
 
-        let recovered = GovernanceRecoveryEngine::recover(
-            &snapshot, snap_height, &wal, 4, &mut registry,
-        ).unwrap();
+        let recovered =
+            GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+                .unwrap();
 
         // Only the entry after snapshot should be present (plus the snapshot's entry)
         assert_eq!(recovered.proposals.len(), 2);
-        assert!(recovered.proposals.contains_key(&snap_id), "Snapshot proposal missing");
-        assert!(recovered.proposals.contains_key(&new_proposal_id), "WAL proposal missing");
+        assert!(
+            recovered.proposals.contains_key(&snap_id),
+            "Snapshot proposal missing"
+        );
+        assert!(
+            recovered.proposals.contains_key(&new_proposal_id),
+            "WAL proposal missing"
+        );
         assert!(!recovered.proposals.contains_key(&[0x99; 32])); // before snapshot, ignored
     }
 
@@ -126,19 +142,22 @@ mod tests {
         let proposal = GovernanceProposal::new([0xDD; 32], action, 150);
         wal.append(150, GovernanceTransaction::SubmitProposal(proposal.clone()));
         for id in 1..=3u8 {
-            wal.append(150, GovernanceTransaction::CastVote {
-                proposal_id: proposal.proposal_id,
-                validator_id: [id; 32],
-                vote: GovernanceVote::Approve,
-            });
+            wal.append(
+                150,
+                GovernanceTransaction::CastVote {
+                    proposal_id: proposal.proposal_id,
+                    validator_id: [id; 32],
+                    vote: GovernanceVote::Approve,
+                },
+            );
         }
 
         let mut registry = crate::registry::AuthorityRegistry::new();
         registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
 
-        let recovered = GovernanceRecoveryEngine::recover(
-            &snapshot, snap_height, &wal, 4, &mut registry,
-        ).unwrap();
+        let recovered =
+            GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+                .unwrap();
 
         // The executed proposal should be in the journal
         assert!(recovered.journal.is_executed(&proposal.proposal_id));
@@ -151,26 +170,34 @@ mod tests {
         let (snapshot, snap_height, _snap_id) = build_base_snapshot();
 
         let mut wal = GovernanceWal::new();
-        let action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let proposal = GovernanceProposal::new([0xEE; 32], action, 150);
         wal.append(150, GovernanceTransaction::SubmitProposal(proposal.clone()));
-        wal.append(150, GovernanceTransaction::CastVote {
-            proposal_id: proposal.proposal_id,
-            validator_id: [1u8; 32],
-            vote: GovernanceVote::Approve,
-        });
-        wal.append(150, GovernanceTransaction::CastVote {
-            proposal_id: proposal.proposal_id,
-            validator_id: [2u8; 32],
-            vote: GovernanceVote::Reject,
-        });
+        wal.append(
+            150,
+            GovernanceTransaction::CastVote {
+                proposal_id: proposal.proposal_id,
+                validator_id: [1u8; 32],
+                vote: GovernanceVote::Approve,
+            },
+        );
+        wal.append(
+            150,
+            GovernanceTransaction::CastVote {
+                proposal_id: proposal.proposal_id,
+                validator_id: [2u8; 32],
+                vote: GovernanceVote::Reject,
+            },
+        );
 
         let mut registry = crate::registry::AuthorityRegistry::new();
         registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
 
-        let recovered = GovernanceRecoveryEngine::recover(
-            &snapshot, snap_height, &wal, 4, &mut registry,
-        ).unwrap();
+        let recovered =
+            GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+                .unwrap();
 
         let votes = recovered.votes.get(&proposal.proposal_id).unwrap();
         assert_eq!(votes.total_votes(), 2);
@@ -192,19 +219,22 @@ mod tests {
             let proposal = GovernanceProposal::new([0xFF; 32], action, 200);
             wal.append(200, GovernanceTransaction::SubmitProposal(proposal.clone()));
             for id in 1..=3u8 {
-                wal.append(200, GovernanceTransaction::CastVote {
-                    proposal_id: proposal.proposal_id,
-                    validator_id: [id; 32],
-                    vote: GovernanceVote::Approve,
-                });
+                wal.append(
+                    200,
+                    GovernanceTransaction::CastVote {
+                        proposal_id: proposal.proposal_id,
+                        validator_id: [id; 32],
+                        vote: GovernanceVote::Approve,
+                    },
+                );
             }
 
             let mut registry = crate::registry::AuthorityRegistry::new();
             registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
 
-            let recovered = GovernanceRecoveryEngine::recover(
-                &snapshot, snap_height, &wal, 4, &mut registry,
-            ).unwrap();
+            let recovered =
+                GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+                    .unwrap();
             recovered.snapshot()
         };
 

@@ -8,6 +8,8 @@ pub enum NetworkMessage {
     BlockAnnounce(BlockAnnounce),
     /// A finality certificate for a block.
     CertificateAnnounce(CertificateAnnounce),
+    /// N110.3: Slashing certificate announcement
+    SlashingCertificateAnnounce(SlashingCertificateAnnounce),
     /// State sync request (snapshot or delta).
     StateSyncRequest(StateSyncRequest),
     /// State sync response (snapshot or delta).
@@ -40,6 +42,17 @@ pub struct CertificateAnnounce {
     pub timestamp: u64,
 }
 
+/// N110.3: Slashing certificate announcement for network propagation.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SlashingCertificateAnnounce {
+    pub validator_id: [u8; 32],
+    pub certificate_hash: [u8; 32],
+    pub amount_slashed: u64,
+    pub remaining_stake: u64,
+    pub offense_count: u32,
+    pub timestamp: u64,
+}
+
 /// Request for state sync from a peer.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StateSyncRequest {
@@ -63,7 +76,6 @@ pub struct FullSnapshotData {
     pub block_hash: [u8; 32],
     pub state_root: [u8; 32],
     pub history_root: [u8; 32],
-    /// Serialized chunk data (canonical encoding).
     pub chunks: Vec<Vec<u8>>,
     pub chunk_root: [u8; 32],
     pub total_resources: u64,
@@ -73,7 +85,6 @@ pub struct FullSnapshotData {
 pub struct DeltaSyncData {
     pub start_height: u64,
     pub end_height: u64,
-    /// Serialized delta blocks.
     pub blocks: Vec<Vec<u8>>,
 }
 
@@ -173,7 +184,6 @@ mod tests {
 
     #[test]
     fn n66_reject_malformed_frame() {
-        // Garbage bytes should not decode
         let result = NetworkMessage::decode(&[0xFF; 10]);
         assert!(result.is_err());
     }
@@ -186,8 +196,30 @@ mod tests {
             timestamp: 0,
         });
         let encoded = msg.encode().unwrap();
-        // Truncate the last byte
         let result = NetworkMessage::decode(&encoded[..encoded.len() - 1]);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn n110_3b_roundtrip_slashing_certificate() {
+        let msg = NetworkMessage::SlashingCertificateAnnounce(SlashingCertificateAnnounce {
+            validator_id: [0x42; 32],
+            certificate_hash: [0xAA; 32],
+            amount_slashed: 15000,
+            remaining_stake: 85000,
+            offense_count: 3,
+            timestamp: 3000,
+        });
+        let encoded = msg.encode().unwrap();
+        let decoded = NetworkMessage::decode(&encoded).unwrap();
+        match decoded {
+            NetworkMessage::SlashingCertificateAnnounce(c) => {
+                assert_eq!(c.validator_id, [0x42; 32]);
+                assert_eq!(c.amount_slashed, 15000);
+                assert_eq!(c.remaining_stake, 85000);
+                assert_eq!(c.offense_count, 3);
+            }
+            _ => panic!("Wrong variant"),
+        }
     }
 }

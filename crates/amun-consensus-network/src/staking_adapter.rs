@@ -1,0 +1,346 @@
+// ============================================================================
+// N110.1 — Staking Adapter
+// ============================================================================
+// Bridges N109 MisbehaviorRegistry → Economic Slashing.
+//
+// Design decisions:
+//   - Self-contained: does NOT depend on amun-staking (which is no_std)
+//   - Uses a trait for testability and future integration with amun-staking
+//   - Translates MisbehaviorScore → offense_count → penalty_bps → amount
+//
+// In N110.2, the real amun-staking::ValidatorRegistry will be plugged in
+// via amun-sdk-layer. For now, a test implementation proves the pipeline.
+// ============================================================================
+
+use crate::misbehavior_registry::{MisbehaviorRegistry, ValidatorAction, ValidatorStatus};
+
+/// N110.1: Result of executing a slash on a validator's stake
+#[derive(Debug, Clone, PartialEq)]
+pub struct SlashResult {
+    pub validator_id: [u8; 32],
+    pub amount_slashed: u64,
+    pub remaining_stake: u64,
+    pub penalty_bps: u64,
+    pub offense_count: u32,
+    pub is_active: bool,
+}
+
+/// N110.1: Trait for executing slashing on real stake.
+/// In production, this will be implemented by amun-staking::ValidatorRegistry.
+/// In tests, a simulated implementation verifies the pipeline.
+pub trait SlashingExecutor {
+    fn get_stake(&self, validator_id: &[u8; 32]) -> u64;
+    fn slash(&mut self, validator_id: &[u8; 32], amount: u64) -> Result<u64, String>;
+    fn deactivate(&mut self, validator_id: &[u8; 32]);
+}
+
+/// N110.1: Adapter that connects MisbehaviorRegistry to SlashingExecutor.
+pub struct StakingAdapter<E: SlashingExecutor> {
+    pub registry: MisbehaviorRegistry,
+    pub executor: E,
+    pub base_penalty_bps: u64,
+}
+
+impl<E: SlashingExecutor> StakingAdapter<E> {
+    pub fn new(registry: MisbehaviorRegistry, executor: E) -> Self {
+        Self {
+            registry,
+            executor,
+            base_penalty_bps: 500, // 5% base penalty
+        }
+    }
+
+    /// N110.1: Check if a validator is slashable and execute the slash.
+    ///
+    /// Returns SlashResult if slashing was executed, None if validator
+    /// hasn't crossed the slashing threshold.
+    pub fn try_slash(&mut self, validator_id: &[u8; 32]) -> Option<SlashResult> {
+        // Check if validator crossed slashing threshold
+        match self.registry.check_thresholds(validator_id) {
+            Some(ValidatorAction::Slash) => {
+                // Validator is slashable — execute
+                Some(self.execute_slash(validator_id))
+            }
+            _ => None,
+        }
+    }
+
+    /// N110.1: Execute the slash unconditionally.
+    fn execute_slash(&mut self, validator_id: &[u8; 32]) -> SlashResult {
+        let score = self.registry.get_score(validator_id);
+        let status = self.registry.get_status(validator_id);
+        let current_stake = self.executor.get_stake(validator_id);
+
+        // Translate MisbehaviorScore → offense_count
+        // Each 10 points ≈ 1 offense for penalty calculation
+        let offense_count = ((score / 10) as u32).clamp(1, 10);
+
+        // Calculate penalty in basis points
+        let penalty_bps = (self.base_penalty_bps * offense_count as u64).min(10000);
+
+        // Calculate amount to slash
+        let amount = current_stake
+            .saturating_mul(penalty_bps)
+            .saturating_div(10000);
+
+        // Execute the slash on real stake
+        let _ = self.executor.slash(validator_id, amount);
+
+        // Deactivate if status is SlashEligible and this isn't first slash
+        if status == ValidatorStatus::SlashEligible && offense_count >= 3 {
+            self.executor.deactivate(validator_id);
+        }
+
+        let remaining = self.executor.get_stake(validator_id);
+
+        SlashResult {
+            validator_id: *validator_id,
+            amount_slashed: amount,
+            remaining_stake: remaining,
+            penalty_bps,
+            offense_count,
+            is_active: status != ValidatorStatus::SlashEligible || offense_count < 3,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::evidence_store::EvidenceType;
+    use crate::misbehavior_registry::{MisbehaviorRegistry, MisbehaviorThresholds};
+    use std::collections::HashMap;
+
+    /// N110.1: Simulated staking implementation for testing
+    struct SimulatedStaking {
+        stakes: HashMap<[u8; 32], u64>,
+    }
+
+    impl SimulatedStaking {
+        fn new() -> Self {
+            Self {
+                stakes: HashMap::new(),
+            }
+        }
+
+        fn set_stake(&mut self, validator_id: [u8; 32], amount: u64) {
+            self.stakes.insert(validator_id, amount);
+        }
+    }
+
+    impl SlashingExecutor for SimulatedStaking {
+        fn get_stake(&self, validator_id: &[u8; 32]) -> u64 {
+            *self.stakes.get(validator_id).unwrap_or(&0)
+        }
+
+        fn slash(&mut self, validator_id: &[u8; 32], amount: u64) -> Result<u64, String> {
+            if let Some(stake) = self.stakes.get_mut(validator_id) {
+                *stake = stake.saturating_sub(amount);
+                Ok(amount)
+            } else {
+                Err("Validator not found".into())
+            }
+        }
+
+        fn deactivate(&mut self, _validator_id: &[u8; 32]) {
+            // In real implementation, sets validator.is_active = false
+        }
+    }
+
+    /// N110.1 GATEKEEPER: Slashing reduces real validator stake
+    #[test]
+    fn n110_1_slashing_reduces_real_validator_stake() {
+        let mut staking = SimulatedStaking::new();
+        let validator_id = [0x42; 32];
+        staking.set_stake(validator_id, 100_000); // 100k initial stake
+
+        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        let mut adapter = StakingAdapter::new(registry, staking);
+
+        // Accumulate misbehavior until slashing threshold
+        // 3 DoubleVotes (weight 10 each) = score 30 → Slashing
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xA1; 32],
+            &EvidenceType::DoubleVote,
+            1,
+        );
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xA2; 32],
+            &EvidenceType::DoubleVote,
+            2,
+        );
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xA3; 32],
+            &EvidenceType::DoubleVote,
+            3,
+        );
+
+        assert_eq!(adapter.registry.get_score(&validator_id), 30);
+        assert_eq!(
+            adapter.registry.get_status(&validator_id),
+            ValidatorStatus::SlashEligible
+        );
+
+        // Execute slash
+        let result = adapter.try_slash(&validator_id);
+        assert!(
+            result.is_some(),
+            "N110.1 FAIL: should execute slash when threshold crossed"
+        );
+
+        let slash_result = result.unwrap();
+        assert_eq!(slash_result.validator_id, validator_id);
+        assert!(
+            slash_result.amount_slashed > 0,
+            "N110.1 FAIL: slash amount must be positive"
+        );
+        assert!(
+            slash_result.remaining_stake < 100_000,
+            "N110.1 FAIL: remaining stake ({}) must be less than initial (100000)",
+            slash_result.remaining_stake
+        );
+        assert_eq!(
+            slash_result.remaining_stake,
+            100_000 - slash_result.amount_slashed,
+            "N110.1 FAIL: stake accounting mismatch"
+        );
+
+        eprintln!("N110.1 GATEKEEPER PASSED: initial=100000, slashed={}, remaining={}, penalty={}bps, offenses={}",
+            slash_result.amount_slashed,
+            slash_result.remaining_stake,
+            slash_result.penalty_bps,
+            slash_result.offense_count,
+        );
+    }
+
+    /// N110.1: Validator below threshold is not slashed
+    #[test]
+    fn n110_1_validator_below_threshold_not_slashed() {
+        let mut staking = SimulatedStaking::new();
+        let validator_id = [0xAA; 32];
+        staking.set_stake(validator_id, 50_000);
+
+        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        let mut adapter = StakingAdapter::new(registry, staking);
+
+        // Only one offense — score=10, below slashing threshold (30)
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xB1; 32],
+            &EvidenceType::DoubleVote,
+            1,
+        );
+
+        let result = adapter.try_slash(&validator_id);
+        assert!(
+            result.is_none(),
+            "N110.1 FAIL: should not slash validator below threshold"
+        );
+        assert_eq!(
+            adapter.executor.get_stake(&validator_id),
+            50_000,
+            "N110.1 FAIL: stake should not change when not slashed"
+        );
+    }
+
+    /// N110.1: Multiple slashes accumulate correctly
+    #[test]
+    fn n110_1_multiple_slashes_accumulate() {
+        let mut staking = SimulatedStaking::new();
+        let validator_id = [0xCC; 32];
+        staking.set_stake(validator_id, 200_000);
+
+        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        let mut adapter = StakingAdapter::new(registry, staking);
+
+        // First set of offenses → first slash
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xD1; 32],
+            &EvidenceType::DoubleVote,
+            1,
+        );
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xD2; 32],
+            &EvidenceType::DoubleVote,
+            2,
+        );
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xD3; 32],
+            &EvidenceType::DoubleVote,
+            3,
+        );
+
+        let result1 = adapter.try_slash(&validator_id).unwrap();
+        assert!(result1.amount_slashed > 0);
+
+        // More offenses → score increases → should be slashable again
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xD4; 32],
+            &EvidenceType::DoubleVote,
+            4,
+        );
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xD5; 32],
+            &EvidenceType::DoubleVote,
+            5,
+        );
+        adapter.registry.record_misbehavior(
+            &validator_id,
+            &[0xD6; 32],
+            &EvidenceType::DoubleVote,
+            6,
+        );
+
+        let result2 = adapter.try_slash(&validator_id).unwrap();
+        assert!(result2.amount_slashed > 0);
+        assert!(
+            result2.offense_count > result1.offense_count,
+            "Second slash should have higher offense_count"
+        );
+        assert!(
+            result2.remaining_stake < result1.remaining_stake,
+            "Stake should decrease further on second slash"
+        );
+    }
+
+    /// N110.1: Different validators have independent slashing
+    #[test]
+    fn n110_1_different_validators_independent() {
+        let mut staking = SimulatedStaking::new();
+        staking.set_stake([1u8; 32], 100_000);
+        staking.set_stake([2u8; 32], 100_000);
+
+        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        let mut adapter = StakingAdapter::new(registry, staking);
+
+        // Validator 1: commit offenses
+        adapter
+            .registry
+            .record_misbehavior(&[1u8; 32], &[0xE1; 32], &EvidenceType::DoubleVote, 1);
+        adapter
+            .registry
+            .record_misbehavior(&[1u8; 32], &[0xE2; 32], &EvidenceType::DoubleVote, 2);
+        adapter
+            .registry
+            .record_misbehavior(&[1u8; 32], &[0xE3; 32], &EvidenceType::DoubleVote, 3);
+
+        // Validator 1 should be slashed
+        let r1 = adapter.try_slash(&[1u8; 32]);
+        assert!(r1.is_some());
+
+        // Validator 2 should NOT be slashed (no offenses)
+        let r2 = adapter.try_slash(&[2u8; 32]);
+        assert!(r2.is_none());
+
+        // Validator 2's stake should be intact
+        assert_eq!(adapter.executor.get_stake(&[2u8; 32]), 100_000);
+    }
+}

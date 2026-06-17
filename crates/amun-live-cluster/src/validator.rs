@@ -1,17 +1,18 @@
-use crate::config::ValidatorConfig;
 use crate::config::load_genesis_authority;
+use crate::config::ValidatorConfig;
+use amun_authority_registry::transaction::GovernanceState;
+use amun_authority_registry::AuthorityRegistry;
+use amun_authority_registry::ConstitutionalAuthority;
+use amun_block_builder::BlockBuilder;
 use amun_chain_store::record::FinalizedChainRecord;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
+use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
 use amun_mempool::Mempool;
-use amun_block_builder::BlockBuilder;
-use amun_authority_registry::transaction::GovernanceState;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
 use amun_validator_identity::derive_validator_id;
 use amun_validator_identity::vote_signing_payload;
-use amun_authority_registry::AuthorityRegistry;
-use amun_authority_registry::ConstitutionalAuthority;
 use ed25519_dalek::{Signer, SigningKey};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
@@ -31,6 +32,11 @@ pub struct LiveValidator {
     pub builder: Arc<Mutex<BlockBuilder>>,
     pub governance: Arc<Mutex<GovernanceState>>,
     pub authority_registry: Arc<Mutex<AuthorityRegistry>>,
+    /// N110.4: Certificate gossip for slashing certificate propagation
+    pub certificate_gossip: Arc<Mutex<amun_consensus_network::CertificateGossip>>,
+    /// N110.4c: Staking adapter for applying slashes after finality
+    pub staking_adapter: Arc<Mutex<StakingAdapter<RealStakingExecutor>>>,
+    pub applied_slashing_certificates: Arc<Mutex<std::collections::HashSet<[u8; 32]>>>,
 }
 
 impl LiveValidator {
@@ -58,7 +64,10 @@ impl LiveValidator {
         // N105.5: Register validators using certificates verified by genesis trust anchors
         // Hardcoded genesis authority for test clusters (replace with real genesis key in production)
         // N107.3: Build authority registry from genesis authority
-        let genesis = load_genesis_authority(concat!(env!("CARGO_MANIFEST_DIR"), "/genesis/genesis_authority.json"));
+        let genesis = load_genesis_authority(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/genesis/genesis_authority.json"
+        ));
         let authority = ConstitutionalAuthority::new(
             genesis.authority_public_key,
             genesis.authority_version,
@@ -69,7 +78,8 @@ impl LiveValidator {
 
         // Create self certificate and verify it
         let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
-        let genesis_authority_kp = amun_networking::crypto_identity::PeerKeyPair::from_seed([0x42; 32]);
+        let genesis_authority_kp =
+            amun_networking::crypto_identity::PeerKeyPair::from_seed([0x42; 32]);
         let self_cert = amun_networking::validator_certificate::ValidatorCertificate::issue_v2(
             my_peer_id,
             pk,
@@ -103,7 +113,6 @@ impl LiveValidator {
             let peer_pk = peer_cert.public_key;
             let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
             engine.register_validator_identity(peer_cert.validator_id.0, peer_id, peer_pk, 100);
-
         }
         Self {
             config,
@@ -117,6 +126,19 @@ impl LiveValidator {
             builder: Arc::new(Mutex::new(BlockBuilder::new())),
             governance: Arc::new(Mutex::new(GovernanceState::new())),
             authority_registry: Arc::new(Mutex::new(registry)),
+            certificate_gossip: Arc::new(Mutex::new(
+                amun_consensus_network::CertificateGossip::new(),
+            )),
+            applied_slashing_certificates: Arc::new(Mutex::new(std::collections::HashSet::new())),
+            staking_adapter: Arc::new(Mutex::new(StakingAdapter::new(
+                amun_consensus_network::MisbehaviorRegistry::new(
+                    amun_consensus_network::MisbehaviorThresholds::default(),
+                ),
+                RealStakingExecutor::new({
+                    // Use fully-qualified path to avoid ambiguity with amun_networking::validator_registry
+                    amun_staking::validator::ValidatorRegistry::new()
+                }),
+            ))),
         }
     }
 
@@ -182,6 +204,9 @@ impl LiveValidator {
         let builder_consensus = self.builder.clone();
         let governance_consensus = self.governance.clone();
         let authority_registry_consensus = self.authority_registry.clone();
+        let certificate_gossip_clone = self.certificate_gossip.clone();
+        let staking_adapter_clone = self.staking_adapter.clone();
+        let applied_certs_clone = self.applied_slashing_certificates.clone();
         let running_consensus = running.clone();
         let h2 = thread::spawn(move || {
             let signing_key = signing_key_clone;
@@ -229,16 +254,37 @@ impl LiveValidator {
                 // Proposer builds a real block from mempool transactions
                 let already_proposed = {
                     let eng = engine_consensus.lock().unwrap();
-                    eng.rounds.get(&height).and_then(|r| r.proposed_block_hash).is_some()
+                    eng.rounds
+                        .get(&height)
+                        .and_then(|r| r.proposed_block_hash)
+                        .is_some()
                 };
                 let (block_hash, state_root) = if is_proposer && !already_proposed {
                     let mut mp = mempool_consensus.lock().unwrap();
                     let mut bld = builder_consensus.lock().unwrap();
                     let parent = engine_consensus.lock().unwrap().history_root;
-                    let block = bld.build_block(height, parent, &mut mp, 1000, validator_id, timestamp);
+                    // N110.4b: Collect pending certificates from gossip
+                    let pending_certs: Vec<amun_consensus_network::SlashingCertificate> =
+                        certificate_gossip_clone
+                            .lock()
+                            .unwrap()
+                            .get_pending()
+                            .iter()
+                            .map(|c| (*c).clone())
+                            .collect();
+                    let block = bld.build_block_with_certificates(
+                        height,
+                        parent,
+                        &mut mp,
+                        1000,
+                        validator_id,
+                        timestamp,
+                        pending_certs,
+                    );
                     let hash = block.block_hash();
                     let root = block.state_root;
-                    let mut eng = engine_consensus.lock().unwrap();                    eng.start_round(height, validator_id);
+                    let mut eng = engine_consensus.lock().unwrap();
+                    eng.start_round(height, validator_id);
                     if let Some(round) = eng.round_mut(height) {
                         round.propose(hash, root);
                     }
@@ -246,15 +292,21 @@ impl LiveValidator {
                 } else if is_proposer && already_proposed {
                     let eng = engine_consensus.lock().unwrap();
                     let round = eng.rounds.get(&height);
-                    let hash = round.and_then(|r| r.proposed_block_hash).unwrap_or([height as u8; 32]);
-                    let root = round.and_then(|r| r.proposed_state_root).unwrap_or([0xBB; 32]);
+                    let hash = round
+                        .and_then(|r| r.proposed_block_hash)
+                        .unwrap_or([height as u8; 32]);
+                    let root = round
+                        .and_then(|r| r.proposed_state_root)
+                        .unwrap_or([0xBB; 32]);
                     (hash, root)
                 } else {
                     // Non-proposers: wait for proposer's vote to arrive, then use that hash
                     thread::sleep(Duration::from_millis(200));
                     let eng = engine_consensus.lock().unwrap();
                     if let Some(round) = eng.rounds.get(&height) {
-                        if let (Some(h), Some(r)) = (round.proposed_block_hash, round.proposed_state_root) {
+                        if let (Some(h), Some(r)) =
+                            (round.proposed_block_hash, round.proposed_state_root)
+                        {
                             (h, r)
                         } else {
                             ([height as u8; 32], [0xBB; 32])
@@ -281,6 +333,7 @@ impl LiveValidator {
                     approve: true,
                     signature: sig,
                     timestamp,
+                    commitment: None,
                 };
 
                 // Process own vote — with fallback proposal if proposer is silent
@@ -346,7 +399,7 @@ impl LiveValidator {
                     let mut gov = governance_consensus.lock().unwrap();
                     let mut reg = authority_registry_consensus.lock().unwrap();
                     let _ = gov.finalize_block(4, &mut reg);
-                    
+
                     let record = FinalizedChainRecord {
                         height,
                         block_hash: cert.block_hash,
@@ -360,6 +413,56 @@ impl LiveValidator {
                     };
                     if let Err(e) = store_consensus.lock().unwrap().append(record) {
                         eprintln!("STORE ERROR: {}", e);
+                    }
+
+                    // N110.4c: Apply slashing certificates after finality
+                    {
+                        // Clone pending certs to avoid borrow conflict
+                        let pending: Vec<amun_consensus_network::SlashingCertificate> = {
+                            let gossip = certificate_gossip_clone.lock().unwrap();
+                            gossip.get_pending().iter().map(|c| (*c).clone()).collect()
+                        };
+
+                        let mut adapter = staking_adapter_clone.lock().unwrap();
+                        let mut applied_hashes: Vec<[u8; 32]> = Vec::new();
+                        let mut applied = applied_certs_clone.lock().unwrap();
+
+                        for cert in &pending {
+                            // N110.4c.1: Replay protection
+                            if applied.contains(&cert.certificate_hash) {
+                                eprintln!("N110.4c REPLAY_SKIP: already applied");
+                                applied_hashes.push(cert.certificate_hash);
+                                continue;
+                            }
+                            let result = adapter.try_slash(&cert.validator_id);
+                            match result {
+                                Some(slash_result) => {
+                                    eprintln!(
+                                        "N110.4c SLASH_APPLIED: validator={:?} amount={} remaining={}",
+                                        &cert.validator_id[..4],
+                                        slash_result.amount_slashed,
+                                        slash_result.remaining_stake
+                                    );
+                                    applied.insert(cert.certificate_hash);
+                                    applied_hashes.push(cert.certificate_hash);
+                                }
+                                None => {
+                                    eprintln!(
+                                        "N110.4c SLASH_SKIPPED: validator={:?} (threshold not reached)",
+                                        &cert.validator_id[..4]
+                                    );
+                                }
+                            }
+                        }
+                        drop(applied);
+
+                        // Mark as included after releasing adapter borrow
+                        if !applied_hashes.is_empty() {
+                            let mut gossip = certificate_gossip_clone.lock().unwrap();
+                            for hash in &applied_hashes {
+                                gossip.mark_included(hash);
+                            }
+                        }
                     }
                 }
 
@@ -404,7 +507,6 @@ mod tests {
 
     static PORT_BASE: AtomicU16 = AtomicU16::new(9700);
 
-    
     #[test]
     fn n108_1_governance_updates_live_authority_registry() {
         use amun_authority_registry::governance::{GovernanceAction, GovernanceProposal};
@@ -467,7 +569,10 @@ mod tests {
         // Verify the journal recorded the execution
         {
             let gov = v.governance.lock().unwrap();
-            assert!(gov.journal.is_executed(&proposal.proposal_id), "Journal should record execution");
+            assert!(
+                gov.journal.is_executed(&proposal.proposal_id),
+                "Journal should record execution"
+            );
         }
 
         // Verify idempotency: second finalization should not re-execute
@@ -475,12 +580,14 @@ mod tests {
             let mut gov = v.governance.lock().unwrap();
             let mut reg = v.authority_registry.lock().unwrap();
             let executed = gov.finalize_block(4, &mut reg).unwrap();
-            assert!(executed.is_empty(), "Second finalization should produce no new executions");
+            assert!(
+                executed.is_empty(),
+                "Second finalization should produce no new executions"
+            );
         }
 
         v.stop();
     }
-
 
     #[test]
     fn n108_2_runtime_authority_rotation() {
@@ -503,7 +610,10 @@ mod tests {
         // Phase 2: AddAuthority v2 via governance
         let add_proposal = GovernanceProposal::new(
             [0xAA; 32],
-            GovernanceAction::AddAuthority { authority_public_key: [2u8; 32], authority_version: 2 },
+            GovernanceAction::AddAuthority {
+                authority_public_key: [2u8; 32],
+                authority_version: 2,
+            },
             100,
         );
         {
@@ -511,7 +621,9 @@ mod tests {
             gov.apply_transaction(&GovernanceTransaction::SubmitProposal(add_proposal.clone()));
             for id in 1..=3u8 {
                 gov.apply_transaction(&GovernanceTransaction::CastVote {
-                    proposal_id: add_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                    proposal_id: add_proposal.proposal_id,
+                    validator_id: [id; 32],
+                    vote: GovernanceVote::Approve,
                 });
             }
             let mut reg = v.authority_registry.lock().unwrap();
@@ -527,16 +639,23 @@ mod tests {
         let trans_proposal = GovernanceProposal::new(
             [0xBB; 32],
             GovernanceAction::ScheduleTransition {
-                from_version: 1, to_version: 2, activation_height: 500, grace_period_blocks: 100,
+                from_version: 1,
+                to_version: 2,
+                activation_height: 500,
+                grace_period_blocks: 100,
             },
             200,
         );
         {
             let mut gov = v.governance.lock().unwrap();
-            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(trans_proposal.clone()));
+            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(
+                trans_proposal.clone(),
+            ));
             for id in 1..=3u8 {
                 gov.apply_transaction(&GovernanceTransaction::CastVote {
-                    proposal_id: trans_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                    proposal_id: trans_proposal.proposal_id,
+                    validator_id: [id; 32],
+                    vote: GovernanceVote::Approve,
                 });
             }
             let mut reg = v.authority_registry.lock().unwrap();
@@ -577,15 +696,21 @@ mod tests {
         // Phase 8: Retire v1
         let retire_proposal = GovernanceProposal::new(
             [0xCC; 32],
-            GovernanceAction::RetireAuthority { authority_version: 1 },
+            GovernanceAction::RetireAuthority {
+                authority_version: 1,
+            },
             700,
         );
         {
             let mut gov = v.governance.lock().unwrap();
-            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(retire_proposal.clone()));
+            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(
+                retire_proposal.clone(),
+            ));
             for id in 1..=3u8 {
                 gov.apply_transaction(&GovernanceTransaction::CastVote {
-                    proposal_id: retire_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                    proposal_id: retire_proposal.proposal_id,
+                    validator_id: [id; 32],
+                    vote: GovernanceVote::Approve,
                 });
             }
             let mut reg = v.authority_registry.lock().unwrap();
@@ -600,7 +725,6 @@ mod tests {
 
         v.stop();
     }
-
 
     #[test]
     fn n108_3e_authority_rotation_certificate_validation() {
@@ -631,13 +755,22 @@ mod tests {
 
         // Create a v1 certificate
         let v1_cert = ValidatorCertificate::issue_v2(
-            PeerId::from_bytes([1u8; 32]), [1u8; 32], 1, [0u8; 32], &v1_kp, 0, 0,
+            PeerId::from_bytes([1u8; 32]),
+            [1u8; 32],
+            1,
+            [0u8; 32],
+            &v1_kp,
+            0,
+            0,
         );
 
         // Phase 2: Add v2 and schedule transition via governance
         let add_proposal = GovernanceProposal::new(
             [0xAA; 32],
-            GovernanceAction::AddAuthority { authority_public_key: v2_pk, authority_version: 2 },
+            GovernanceAction::AddAuthority {
+                authority_public_key: v2_pk,
+                authority_version: 2,
+            },
             100,
         );
         {
@@ -645,7 +778,9 @@ mod tests {
             gov.apply_transaction(&GovernanceTransaction::SubmitProposal(add_proposal.clone()));
             for id in 1..=3u8 {
                 gov.apply_transaction(&GovernanceTransaction::CastVote {
-                    proposal_id: add_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                    proposal_id: add_proposal.proposal_id,
+                    validator_id: [id; 32],
+                    vote: GovernanceVote::Approve,
                 });
             }
             let mut reg = v.authority_registry.lock().unwrap();
@@ -655,16 +790,23 @@ mod tests {
         let trans_proposal = GovernanceProposal::new(
             [0xBB; 32],
             GovernanceAction::ScheduleTransition {
-                from_version: 1, to_version: 2, activation_height: 500, grace_period_blocks: 100,
+                from_version: 1,
+                to_version: 2,
+                activation_height: 500,
+                grace_period_blocks: 100,
             },
             200,
         );
         {
             let mut gov = v.governance.lock().unwrap();
-            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(trans_proposal.clone()));
+            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(
+                trans_proposal.clone(),
+            ));
             for id in 1..=3u8 {
                 gov.apply_transaction(&GovernanceTransaction::CastVote {
-                    proposal_id: trans_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                    proposal_id: trans_proposal.proposal_id,
+                    validator_id: [id; 32],
+                    vote: GovernanceVote::Approve,
                 });
             }
             let mut reg = v.authority_registry.lock().unwrap();
@@ -674,33 +816,48 @@ mod tests {
         // Phase 3: Before activation - v1 accepted, v2 unknown
         {
             let reg = v.authority_registry.lock().unwrap();
-            assert!(reg.verify_certificate_at(&v1_cert, 400), "v1 cert should be accepted before activation");
+            assert!(
+                reg.verify_certificate_at(&v1_cert, 400),
+                "v1 cert should be accepted before activation"
+            );
         }
 
         // Phase 4: During grace window - both accepted
         {
             let reg = v.authority_registry.lock().unwrap();
-            assert!(reg.verify_certificate_at(&v1_cert, 550), "v1 cert should be accepted during grace window");
+            assert!(
+                reg.verify_certificate_at(&v1_cert, 550),
+                "v1 cert should be accepted during grace window"
+            );
         }
 
         // Phase 5: After grace - v1 rejected
         {
             let reg = v.authority_registry.lock().unwrap();
-            assert!(!reg.verify_certificate_at(&v1_cert, 650), "v1 cert should be rejected after grace window");
+            assert!(
+                !reg.verify_certificate_at(&v1_cert, 650),
+                "v1 cert should be rejected after grace window"
+            );
         }
 
         // Phase 6: Retire v1, verify it's rejected even at low heights
         let retire_proposal = GovernanceProposal::new(
             [0xCC; 32],
-            GovernanceAction::RetireAuthority { authority_version: 1 },
+            GovernanceAction::RetireAuthority {
+                authority_version: 1,
+            },
             700,
         );
         {
             let mut gov = v.governance.lock().unwrap();
-            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(retire_proposal.clone()));
+            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(
+                retire_proposal.clone(),
+            ));
             for id in 1..=3u8 {
                 gov.apply_transaction(&GovernanceTransaction::CastVote {
-                    proposal_id: retire_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                    proposal_id: retire_proposal.proposal_id,
+                    validator_id: [id; 32],
+                    vote: GovernanceVote::Approve,
                 });
             }
             let mut reg = v.authority_registry.lock().unwrap();
@@ -708,14 +865,17 @@ mod tests {
         }
         {
             let reg = v.authority_registry.lock().unwrap();
-            assert!(!reg.verify_certificate_at(&v1_cert, 800), "v1 cert should be rejected after retirement");
+            assert!(
+                !reg.verify_certificate_at(&v1_cert, 800),
+                "v1 cert should be rejected after retirement"
+            );
             assert!(reg.is_revoked(1), "v1 should be revoked");
         }
 
         v.stop();
     }
 
-fn next_ports() -> [u16; 4] {
+    fn next_ports() -> [u16; 4] {
         let base = PORT_BASE.fetch_add(10, Ordering::SeqCst);
         [base, base + 1, base + 2, base + 3]
     }

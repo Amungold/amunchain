@@ -86,9 +86,21 @@ fn main() {
                 },
                 detected_at_height: h,
             };
-            match eng.misbehavior_registry.add_proof(proof) {
-                Ok(hash) => println!("  Offense {} recorded: proof_hash={:?}", i, &hash[..4]),
-                Err(e) => println!("  Offense {} failed: {}", i, e),
+            // N109.13: record_misbehavior replaces add_proof
+            let evidence_id = amun_consensus_network::EvidenceRecord::compute_evidence_id(
+                &proof.validator_id, proof.height,
+                &amun_consensus_network::EvidenceType::DoubleVote,
+                &postcard::to_stdvec(&proof).unwrap_or_default(),
+            );
+            let is_new = eng.misbehavior_registry.record_misbehavior(
+                &proof.validator_id, &evidence_id,
+                &amun_consensus_network::EvidenceType::DoubleVote, proof.height,
+            );
+            if is_new {
+                println!("  Offense recorded: evidence_id={:?}", &evidence_id[..4]);
+            } else {
+                println!("  Offense duplicate: already recorded");
+            }
             }
         }
 

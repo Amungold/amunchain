@@ -1,7 +1,7 @@
 use crate::messages::{
     ConsensusVote, EquivocationProof, FinalityCertificate, QuorumCertificate, SignedVote,
 };
-use crate::misbehavior::MisbehaviorRegistry;
+use crate::misbehavior_registry::MisbehaviorRegistry;
 use crate::validator_status::ValidatorStatusRegistry;
 use amun_validator_identity::ValidatorKeyRegistry;
 use std::collections::HashMap;
@@ -245,7 +245,9 @@ impl ConsensusEngine {
             needs_catchup: false,
             node_state: NodeState::Active,
             validator_status: None,
-            misbehavior_registry: MisbehaviorRegistry::new(),
+            misbehavior_registry: MisbehaviorRegistry::new(
+                crate::misbehavior_registry::MisbehaviorThresholds::default(),
+            ),
             validator_keys: ValidatorKeyRegistry::new(),
             validator_powers: HashMap::new(),
             total_voting_power: 0,
@@ -306,6 +308,8 @@ impl ConsensusEngine {
                 vote.timestamp,
             );
             if !amun_validator_identity::verify_ed25519(pk, &payload, &vote.signature) {
+                // N109.9: Vote binding enforcement — verify ExecutionCommitment
+                crate::vote_binding::verify_vote_binding(&vote)?;
                 return Err(format!(
                     "Invalid vote signature from {:?}",
                     &vote.voter_id[..4]
@@ -371,10 +375,22 @@ impl ConsensusEngine {
                     vote_b: signed_b,
                     detected_at_height: self.current_height,
                 };
-                if let Ok(hash) = self.misbehavior_registry.add_proof(proof) {
+                // N109.13: Use unified misbehavior registry
+                let evidence_id = crate::evidence_store::EvidenceRecord::compute_evidence_id(
+                    &vote.voter_id,
+                    vote.height,
+                    &crate::evidence_store::EvidenceType::DoubleVote,
+                    &postcard::to_stdvec(&proof).unwrap_or_default(),
+                );
+                if self.misbehavior_registry.record_misbehavior(
+                    &vote.voter_id,
+                    &evidence_id,
+                    &crate::evidence_store::EvidenceType::DoubleVote,
+                    vote.height,
+                ) {
                     eprintln!(
-                        "EVIDENCE_RECORDED: proof_hash={:?} validator={:?}",
-                        &hash[..4],
+                        "EVIDENCE_RECORDED: evidence_id={:?} validator={:?}",
+                        &evidence_id[..4],
                         &vote.voter_id[..4]
                     );
                     if crate::slashing::should_slash(&self.misbehavior_registry, &vote.voter_id) {
@@ -497,6 +513,7 @@ mod tests {
                 approve: true,
                 signature: [0u8; 64],
                 timestamp: 1000,
+                commitment: None,
             };
             engine.process_vote(vote).unwrap();
         }
@@ -526,6 +543,7 @@ mod tests {
                     approve: true,
                     signature: [0u8; 64],
                     timestamp: 1000,
+                    commitment: None,
                 })
                 .unwrap();
         }
@@ -551,6 +569,7 @@ mod tests {
             approve: true,
             signature: [0u8; 64],
             timestamp: 1000,
+            commitment: None,
         };
         assert!(engine.process_vote(vote.clone()).is_ok());
         assert!(
@@ -572,6 +591,7 @@ mod tests {
             approve: true,
             signature: [0u8; 64],
             timestamp: 1000,
+            commitment: None,
         };
         assert!(engine.process_vote(vote).is_err());
     }
@@ -599,6 +619,7 @@ mod tests {
                         approve: true,
                         signature: [0u8; 64],
                         timestamp: 1000,
+                        commitment: None,
                     })
                     .unwrap();
             }
@@ -646,6 +667,7 @@ mod tests {
             approve: true,
             signature: sig_ok,
             timestamp: 1000,
+            commitment: None,
         };
         assert!(engine.process_vote(vote_ok).is_ok());
 
@@ -658,6 +680,7 @@ mod tests {
             approve: true,
             signature: [0u8; 64],
             timestamp: 1000,
+            commitment: None,
         };
         assert!(engine.process_vote(vote_bad).is_err());
     }

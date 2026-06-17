@@ -137,6 +137,7 @@ mod tests {
             approve: true,
             signature: [0u8; 64],
             timestamp: round,
+            commitment: None,
         };
         SignedVote {
             vote,

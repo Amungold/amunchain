@@ -16,16 +16,14 @@ pub enum GovernanceAction {
         grace_period_blocks: u64,
     },
     /// Retire an authority so it can no longer issue certificates.
-    RetireAuthority {
-        authority_version: u64,
-    },
+    RetireAuthority { authority_version: u64 },
 }
 
 /// A governance proposal submitted by a validator.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GovernanceProposal {
     pub proposal_id: [u8; 32],
-    pub proposer: [u8; 32],        // ValidatorId
+    pub proposer: [u8; 32], // ValidatorId
     pub action: GovernanceAction,
     pub created_height: u64,
 }
@@ -37,12 +35,20 @@ impl GovernanceProposal {
         hasher.update(&proposer);
         hasher.update(&created_height.to_le_bytes());
         match &action {
-            GovernanceAction::AddAuthority { authority_public_key, authority_version } => {
+            GovernanceAction::AddAuthority {
+                authority_public_key,
+                authority_version,
+            } => {
                 hasher.update(b"AddAuthority");
                 hasher.update(authority_public_key);
                 hasher.update(&authority_version.to_le_bytes());
             }
-            GovernanceAction::ScheduleTransition { from_version, to_version, activation_height, grace_period_blocks } => {
+            GovernanceAction::ScheduleTransition {
+                from_version,
+                to_version,
+                activation_height,
+                grace_period_blocks,
+            } => {
                 hasher.update(b"ScheduleTransition");
                 hasher.update(&from_version.to_le_bytes());
                 hasher.update(&to_version.to_le_bytes());
@@ -103,12 +109,16 @@ mod tests {
     fn n107_7_different_actions_produce_different_ids() {
         let p1 = GovernanceProposal::new(
             [0xAA; 32],
-            GovernanceAction::RetireAuthority { authority_version: 1 },
+            GovernanceAction::RetireAuthority {
+                authority_version: 1,
+            },
             100,
         );
         let p2 = GovernanceProposal::new(
             [0xAA; 32],
-            GovernanceAction::RetireAuthority { authority_version: 2 },
+            GovernanceAction::RetireAuthority {
+                authority_version: 2,
+            },
             100,
         );
         assert_ne!(p1.proposal_id, p2.proposal_id);

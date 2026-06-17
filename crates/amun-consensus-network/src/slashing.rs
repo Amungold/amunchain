@@ -1,158 +1,161 @@
-use crate::misbehavior::{MisbehaviorRegistry, OffenseType};
+// ============================================================================
+// N109.13 — Unified Slashing Interface
+// ============================================================================
+// This replaces the old slashing.rs that depended on misbehavior.rs (N101).
+// Now uses the N109 misbehavior_registry and integrated_slashing pipeline.
+//
+// The old should_slash() and slash_percentage() are reimplemented on top
+// of the new MisbehaviorRegistry, maintaining backward compatibility while
+// unifying the architecture.
+// ============================================================================
 
-/// Minimum number of offenses before slashing is triggered
-pub const DEFAULT_SLASHING_THRESHOLD: u64 = 2;
+use crate::misbehavior_registry::{MisbehaviorRegistry, ValidatorAction, ValidatorStatus};
 
-/// Percentage of stake to slash for each offense level
-pub const FIRST_OFFENSE_SLASH_PERCENT: u8 = 5;
-pub const SECOND_OFFENSE_SLASH_PERCENT: u8 = 10;
-pub const THIRD_OFFENSE_SLASH_PERCENT: u8 = 25;
-
-/// Returns true if the validator should be slashed based on their offense count
+/// N109.13: Returns true if the validator should be slashed.
+/// Now uses the N109 MisbehaviorRegistry instead of the old misbehavior.rs.
 pub fn should_slash(registry: &MisbehaviorRegistry, validator_id: &[u8; 32]) -> bool {
-    registry.offense_count(validator_id) >= DEFAULT_SLASHING_THRESHOLD
+    registry.check_thresholds(validator_id) == Some(ValidatorAction::Slash)
 }
 
-/// Returns the slash percentage for a validator based on their offense count
+/// N109.13: Returns the slash percentage for a validator based on their misbehavior score.
+/// Maps score ranges to penalty percentages.
 pub fn slash_percentage(registry: &MisbehaviorRegistry, validator_id: &[u8; 32]) -> u8 {
-    let count = registry.offense_count(validator_id);
-    match count {
+    let score = registry.get_score(validator_id);
+    match score {
         0 => 0,
-        1 => FIRST_OFFENSE_SLASH_PERCENT,
-        2 => SECOND_OFFENSE_SLASH_PERCENT,
-        _ => THIRD_OFFENSE_SLASH_PERCENT,
+        1..=14 => 5,   // Warning level
+        15..=29 => 10, // Suspension level
+        _ => 25,       // Slashing level
     }
 }
 
-/// Returns the most severe offense type found for a validator
-pub fn most_severe_offense(
+/// N109.13: Returns the validator's current status
+pub fn validator_status(
     registry: &MisbehaviorRegistry,
     validator_id: &[u8; 32],
-) -> Option<OffenseType> {
-    let history = registry.validator_history(validator_id);
-    if history.is_empty() {
-        None
-    } else {
-        // Currently only DoubleVote exists, so return it
-        Some(OffenseType::DoubleVote)
-    }
+) -> ValidatorStatus {
+    registry.get_status(validator_id)
+}
+
+/// N109.13: Returns the total misbehavior score
+pub fn misbehavior_score(registry: &MisbehaviorRegistry, validator_id: &[u8; 32]) -> u64 {
+    registry.get_score(validator_id)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::messages::{ConsensusVote, EquivocationProof, SignedVote};
-    use crate::misbehavior::MisbehaviorRegistry;
+    use crate::evidence_store::EvidenceType;
+    use crate::misbehavior_registry::{MisbehaviorRegistry, MisbehaviorThresholds};
 
-    fn make_proof(
-        validator_id: u8,
-        height: u64,
-        block_a: [u8; 32],
-        block_b: [u8; 32],
-    ) -> EquivocationProof {
-        let mut proof = EquivocationProof {
-            validator_id: [validator_id; 32],
-            height,
-            round: 1,
-            vote_a: SignedVote {
-                vote: ConsensusVote {
-                    voter_id: [validator_id; 32],
-                    height,
-                    block_hash: block_a,
-                    state_root: [0xBB; 32],
-                    approve: true,
-                    signature: [0u8; 64],
-                    timestamp: 1,
-                },
-                signature: [1u8; 64],
-            },
-            vote_b: SignedVote {
-                vote: ConsensusVote {
-                    voter_id: [validator_id; 32],
-                    height,
-                    block_hash: block_b,
-                    state_root: [0xBB; 32],
-                    approve: true,
-                    signature: [0u8; 64],
-                    timestamp: 1,
-                },
-                signature: [2u8; 64],
-            },
-            detected_at_height: height + 1,
-        };
-        proof.vote_a.signature = [1u8; 64];
-        proof.vote_b.signature = [2u8; 64];
-        proof
+    fn make_registry() -> MisbehaviorRegistry {
+        MisbehaviorRegistry::new(MisbehaviorThresholds::default())
     }
 
     #[test]
-    fn n101_5_no_offenses_no_slash() {
-        let registry = MisbehaviorRegistry::new();
+    fn n109_13_no_offenses_no_slash() {
+        let registry = make_registry();
         assert!(!should_slash(&registry, &[1u8; 32]));
         assert_eq!(slash_percentage(&registry, &[1u8; 32]), 0);
+        assert_eq!(misbehavior_score(&registry, &[1u8; 32]), 0);
     }
 
     #[test]
-    fn n101_5_single_offense_below_threshold() {
-        let mut registry = MisbehaviorRegistry::new();
-        let proof = make_proof(1, 10, [0xAA; 32], [0xBB; 32]);
-        registry.add_proof(proof).unwrap();
-        assert_eq!(registry.offense_count(&[1u8; 32]), 1);
+    fn n109_13_single_offense_below_threshold() {
+        let mut registry = make_registry();
+        // One StateRootMismatch (weight 3) → score=3, below warning (5)
+        registry.record_misbehavior(
+            &[1u8; 32],
+            &[0xA1; 32],
+            &EvidenceType::StateRootMismatch,
+            10,
+        );
+        assert_eq!(registry.get_score(&[1u8; 32]), 3);
         assert!(
             !should_slash(&registry, &[1u8; 32]),
             "Single offense should not trigger slash"
         );
-        assert_eq!(
-            slash_percentage(&registry, &[1u8; 32]),
-            FIRST_OFFENSE_SLASH_PERCENT
-        );
+        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 5); // Warning level
     }
 
     #[test]
-    fn n101_5_two_offenses_triggers_slash() {
-        let mut registry = MisbehaviorRegistry::new();
-        let proof1 = make_proof(1, 10, [0xAA; 32], [0xBB; 32]);
-        let proof2 = make_proof(1, 20, [0xCC; 32], [0xDD; 32]);
-        registry.add_proof(proof1).unwrap();
-        registry.add_proof(proof2).unwrap();
-        assert_eq!(registry.offense_count(&[1u8; 32]), 2);
+    fn n109_13_two_offenses_triggers_warning() {
+        let mut registry = make_registry();
+        // Two DoubleVotes (weight 10 each) → score=20, suspension (15-29)
+        registry.record_misbehavior(&[1u8; 32], &[0xB1; 32], &EvidenceType::DoubleVote, 10);
+        registry.record_misbehavior(&[1u8; 32], &[0xB2; 32], &EvidenceType::DoubleVote, 20);
+        assert_eq!(registry.get_score(&[1u8; 32]), 20);
+        assert_eq!(registry.get_status(&[1u8; 32]), ValidatorStatus::Suspended);
+        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 10); // Suspension level
+    }
+
+    #[test]
+    fn n109_13_three_offenses_triggers_slash() {
+        let mut registry = make_registry();
+        // Three DoubleVotes (weight 10 each) → score=30, slashing (>=30)
+        registry.record_misbehavior(&[1u8; 32], &[0xC1; 32], &EvidenceType::DoubleVote, 10);
+        registry.record_misbehavior(&[1u8; 32], &[0xC2; 32], &EvidenceType::DoubleVote, 20);
+        registry.record_misbehavior(&[1u8; 32], &[0xC3; 32], &EvidenceType::DoubleVote, 30);
+        assert_eq!(registry.get_score(&[1u8; 32]), 30);
         assert!(
             should_slash(&registry, &[1u8; 32]),
-            "Two offenses should trigger slash"
+            "Three offenses should trigger slash"
         );
-        assert_eq!(
-            slash_percentage(&registry, &[1u8; 32]),
-            SECOND_OFFENSE_SLASH_PERCENT
-        );
+        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 25); // Slashing level
     }
 
     #[test]
-    fn n101_5_three_offenses_higher_slash() {
-        let mut registry = MisbehaviorRegistry::new();
-        registry
-            .add_proof(make_proof(1, 10, [0xAA; 32], [0xBB; 32]))
-            .unwrap();
-        registry
-            .add_proof(make_proof(1, 20, [0xCC; 32], [0xDD; 32]))
-            .unwrap();
-        registry
-            .add_proof(make_proof(1, 30, [0xEE; 32], [0xFF; 32]))
-            .unwrap();
-        assert_eq!(registry.offense_count(&[1u8; 32]), 3);
-        assert_eq!(
-            slash_percentage(&registry, &[1u8; 32]),
-            THIRD_OFFENSE_SLASH_PERCENT
-        );
+    fn n109_13_mixed_offenses_accumulate() {
+        let mut registry = make_registry();
+        // Mix of offense types
+        registry.record_misbehavior(&[1u8; 32], &[0xD1; 32], &EvidenceType::InvalidSignature, 1); // +2
+        registry.record_misbehavior(&[1u8; 32], &[0xD2; 32], &EvidenceType::StateRootMismatch, 2); // +3
+        registry.record_misbehavior(
+            &[1u8; 32],
+            &[0xD3; 32],
+            &EvidenceType::VoteBindingViolation,
+            3,
+        ); // +2
+        registry.record_misbehavior(&[1u8; 32], &[0xD4; 32], &EvidenceType::FutureVote, 4); // +1
+        assert_eq!(registry.get_score(&[1u8; 32]), 8);
+        assert_eq!(registry.get_status(&[1u8; 32]), ValidatorStatus::Warned);
+        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 5);
     }
 
     #[test]
-    fn n101_5_most_severe_offense() {
-        let mut registry = MisbehaviorRegistry::new();
-        registry
-            .add_proof(make_proof(1, 10, [0xAA; 32], [0xBB; 32]))
-            .unwrap();
-        let offense = most_severe_offense(&registry, &[1u8; 32]);
-        assert!(offense.is_some());
-        assert_eq!(offense.unwrap(), OffenseType::DoubleVote);
+    fn n109_13_all_slashable_offenses_flow_through_unified_api() {
+        let mut registry = make_registry();
+
+        // Process various offense types through the unified API
+        let offenses = vec![
+            (EvidenceType::DoubleVote, 10),
+            (EvidenceType::StateRootMismatch, 13),
+            (EvidenceType::InvalidSignature, 2),
+            (EvidenceType::VoteBindingViolation, 2),
+            (EvidenceType::ExecutionFailure, 3),
+            (EvidenceType::FutureVote, 1),
+        ];
+
+        let mut evidence_counter = 0u8;
+        for (offense_type, _weight) in &offenses {
+            evidence_counter += 1;
+            registry.record_misbehavior(
+                &[0x42; 32],
+                &[evidence_counter; 32],
+                offense_type,
+                100 + evidence_counter as u64,
+            );
+        }
+
+        // Total: 10+3+2+2+3+1 = 21 → Suspension (15-29)
+        assert_eq!(registry.get_score(&[0x42; 32]), 21);
+        assert_eq!(registry.get_status(&[0x42; 32]), ValidatorStatus::Suspended);
+        assert!(!should_slash(&registry, &[0x42; 32])); // 21 < 30
+        assert_eq!(slash_percentage(&registry, &[0x42; 32]), 10); // Suspension level
+
+        // Add one more DoubleVote → 31 → Slashing
+        registry.record_misbehavior(&[0x42; 32], &[0xFF; 32], &EvidenceType::DoubleVote, 200);
+        assert!(should_slash(&registry, &[0x42; 32]));
+        assert_eq!(slash_percentage(&registry, &[0x42; 32]), 25);
     }
 }

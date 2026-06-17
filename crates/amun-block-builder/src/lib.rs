@@ -1,4 +1,5 @@
 use amun_accounts::AccountStore;
+use amun_consensus_network::SlashingCertificate;
 use amun_execution::ExecutionEngine;
 use amun_mempool::Mempool;
 use amun_transactions::{Transaction, TransactionReceipt};
@@ -14,9 +15,40 @@ pub struct Block {
     pub state_root: [u8; 32],
     pub proposer: [u8; 32],
     pub timestamp: u64,
+    /// N110.4: Slashing certificates included in this block
+    pub slashing_certificates: Vec<amun_consensus_network::SlashingCertificate>,
 }
 
 impl Block {
+    /// N110.4b: Verify all slashing certificates in this block.
+    pub fn verify_slashing_certificates(&self) -> Result<(), String> {
+        const MAX_CERTS_PER_BLOCK: usize = 10;
+
+        if self.slashing_certificates.len() > MAX_CERTS_PER_BLOCK {
+            return Err(format!(
+                "Too many slashing certificates ({} > {})",
+                self.slashing_certificates.len(),
+                MAX_CERTS_PER_BLOCK
+            ));
+        }
+
+        for (i, cert) in self.slashing_certificates.iter().enumerate() {
+            cert.verify()
+                .map_err(|e| format!("Certificate {} invalid: {}", i, e))?;
+
+            let recomputed = cert.compute_hash();
+            if recomputed != cert.certificate_hash {
+                return Err(format!("Certificate {} hash mismatch", i));
+            }
+
+            if cert.evidence_ids.is_empty() {
+                return Err(format!("Certificate {} has no evidence IDs", i));
+            }
+        }
+
+        Ok(())
+    }
+
     /// Compute the Blake3 block hash with domain separation.
     pub fn block_hash(&self) -> [u8; 32] {
         let mut hasher = Hasher::new();
@@ -28,6 +60,10 @@ impl Block {
         hasher.update(&self.timestamp.to_le_bytes());
         for tx in &self.transactions {
             hasher.update(&tx.tx_hash());
+        }
+        // N110.4: Include slashing certificates in block hash
+        for cert in &self.slashing_certificates {
+            hasher.update(&cert.certificate_hash);
         }
         hasher.finalize().into()
     }
@@ -46,6 +82,8 @@ impl BlockBuilder {
     }
 
     /// Build a block from the mempool, executing all transactions.
+    /// N110.4a: Build a block with slashing certificates included.
+    /// The certificates MUST have been verified before being passed here.
     pub fn build_block(
         &mut self,
         height: u64,
@@ -54,6 +92,31 @@ impl BlockBuilder {
         max_txs: usize,
         proposer: [u8; 32],
         timestamp: u64,
+    ) -> Block {
+        self.build_block_with_certificates(
+            height,
+            parent_hash,
+            mempool,
+            max_txs,
+            proposer,
+            timestamp,
+            vec![],
+        )
+    }
+
+    /// N110.4: Build a block with pending slashing certificates.
+    /// N110.4a: Build a block with slashing certificates.
+    /// Note: arguments kept as-is for clarity in consensus integration.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_block_with_certificates(
+        &mut self,
+        height: u64,
+        parent_hash: [u8; 32],
+        mempool: &mut Mempool,
+        max_txs: usize,
+        proposer: [u8; 32],
+        timestamp: u64,
+        slashing_certificates: Vec<SlashingCertificate>,
     ) -> Block {
         let transactions = mempool.take_for_block(max_txs);
         let receipts = self.engine.execute_block(&transactions);
@@ -67,6 +130,7 @@ impl BlockBuilder {
             state_root,
             proposer,
             timestamp,
+            slashing_certificates,
         }
     }
 

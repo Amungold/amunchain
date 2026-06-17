@@ -11,10 +11,16 @@ pub struct TransactionService;
 impl TransactionService {
     pub fn build_transaction(req: BuildTransactionRequest) -> ApiResult<BuildTransactionResponse> {
         if req.sender.is_empty() || req.recipient.is_empty() {
-            return Err(ApiError::new("INVALID_REQUEST", "Sender or recipient is empty"));
+            return Err(ApiError::new(
+                "INVALID_REQUEST",
+                "Sender or recipient is empty",
+            ));
         }
         if req.amount == 0 {
-            return Err(ApiError::new("INVALID_REQUEST", "Amount must be greater than zero"));
+            return Err(ApiError::new(
+                "INVALID_REQUEST",
+                "Amount must be greater than zero",
+            ));
         }
 
         use amun_transactions::{Transaction, TransactionPayload, TransferPayload};
@@ -31,7 +37,10 @@ impl TransactionService {
             version: 1,
             sender,
             nonce: req.nonce,
-            payload: TransactionPayload::Transfer(TransferPayload { to: recipient, amount: req.amount }),
+            payload: TransactionPayload::Transfer(TransferPayload {
+                to: recipient,
+                amount: req.amount,
+            }),
             signature: vec![],
         };
 
@@ -48,7 +57,10 @@ impl TransactionService {
         req: SubmitTransactionRequest,
     ) -> ApiResult<SubmitTransactionResponse> {
         if req.transaction_bytes.is_empty() || req.signature.is_empty() {
-            return Err(ApiError::new("INVALID_REQUEST", "Missing transaction bytes or signature"));
+            return Err(ApiError::new(
+                "INVALID_REQUEST",
+                "Missing transaction bytes or signature",
+            ));
         }
 
         let tx_bytes = hex::decode(&req.transaction_bytes)
@@ -61,14 +73,18 @@ impl TransactionService {
         tx.signature = sig;
 
         if !tx.verify() {
-            return Err(ApiError::new("INVALID_REQUEST", "Invalid transaction signature"));
+            return Err(ApiError::new(
+                "INVALID_REQUEST",
+                "Invalid transaction signature",
+            ));
         }
 
         let tx_json = serde_json::json!({
             "transaction_bytes": req.transaction_bytes,
             "signature": req.signature,
             "public_key": req.public_key,
-        }).to_string();
+        })
+        .to_string();
 
         let hash = crate::services::account_service::provider()
             .submit_transaction(&tx_json)

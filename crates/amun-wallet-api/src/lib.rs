@@ -57,7 +57,7 @@ mod tests {
     #[tokio::test]
     async fn n48_3_build_transaction() {
         let app = server::build_app();
-        let body = json!({"transaction_type":"transfer","sender":"0xaaa","recipient":"0xbbb","amount":1000,"nonce":1});
+        let body = json!({"transaction_type":"transfer","sender":"1111111111111111111111111111111111111111111111111111111111111111","recipient":"2222222222222222222222222222222222222222222222222222222222222222","amount":1000,"nonce":1});
         let response = app
             .oneshot(
                 Request::builder()

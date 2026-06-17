@@ -14,6 +14,10 @@ pub struct ConsensusVote {
     #[serde(with = "serde_bytes")]
     pub signature: [u8; 64],
     pub timestamp: u64,
+    /// N109.8: Cryptographic execution commitment (optional for backward compatibility).
+    /// When present, MUST pass N109.9 vote binding verification before quorum counting.
+    #[serde(default)]
+    pub commitment: Option<ExecutionCommitment>,
 }
 
 /// A signed vote — the vote payload plus a cryptographic signature.
@@ -116,6 +120,7 @@ mod tests {
             approve,
             signature: [0u8; 64],
             timestamp: 1000,
+            commitment: None,
         }
     }
 
@@ -358,4 +363,82 @@ mod n104_1_tests {
 
         assert_eq!(h1, h2);
     }
+}
+
+// ============================================================================
+// N109 — Constitutional Block Propagation Types
+// ============================================================================
+
+/// N109.1: Full block proposal for constitutional propagation.
+/// Carries the complete serialized block so every validator can re-execute.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct N109BlockProposal {
+    pub proposer_id: [u8; 32],
+    pub height: u64,
+    pub timestamp: u64,
+    #[serde(with = "serde_bytes")]
+    pub block_hash: [u8; 32],
+    #[serde(with = "serde_bytes")]
+    pub parent_root: [u8; 32],
+    #[serde(with = "serde_bytes")]
+    pub state_root: [u8; 32],
+    #[serde(with = "serde_bytes")]
+    pub block_bytes: Vec<u8>,
+}
+
+/// N109.2: Unified network message type.
+/// Replaces direct ConsensusVote decoding in the listener.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum NetworkMessage {
+    Proposal(N109BlockProposal),
+    Vote(Box<ConsensusVote>),
+    /// N110.3: Slashing certificate for network propagation
+    SlashingCertificate(crate::slashing_certificate::SlashingCertificate),
+}
+
+// ============================================================================
+// N109.8: Updated ConsensusVote carrying ExecutionCommitment
+// ============================================================================
+// The old ConsensusVote is kept for backward compatibility during migration.
+// New code should use N109ConsensusVote which binds the vote to an
+// ExecutionCommitment, ensuring every vote is a cryptographically signed
+// execution result, not just a hash approval.
+//
+// Migration path:
+//   1. Add N109ConsensusVote (this file)
+//   2. Update engine.rs to accept N109ConsensusVote
+//   3. Update validator.rs to produce N109ConsensusVote
+//   4. Remove old ConsensusVote after all tests pass
+
+use crate::execution_commitment::ExecutionCommitment;
+
+/// N109.8: A vote that carries a full execution commitment.
+/// Every vote is now a signed statement: "I executed block X and got state_root Y".
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct N109ConsensusVote {
+    /// The validator casting this vote
+    #[serde(with = "serde_bytes")]
+    pub voter_id: [u8; 32],
+
+    /// Block height
+    pub height: u64,
+
+    /// Hash of the block being voted on
+    #[serde(with = "serde_bytes")]
+    pub block_hash: [u8; 32],
+
+    /// State root obtained from execution
+    #[serde(with = "serde_bytes")]
+    pub state_root: [u8; 32],
+
+    /// Whether the validator approves this block
+    pub approve: bool,
+
+    /// Unix timestamp when vote was created
+    pub timestamp: u64,
+
+    /// N109.8: Cryptographic execution commitment
+    /// Binds validator_id, height, block_hash, and state_root
+    /// with a signature that can be verified independently.
+    pub commitment: ExecutionCommitment,
 }

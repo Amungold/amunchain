@@ -59,6 +59,7 @@ fn main() {
                 approve: true,
                 signature: [0u8; 64],
                 timestamp: now / 1_000_000,
+                commitment: None,
             };
             let data = postcard::to_stdvec(&vote).unwrap();
 

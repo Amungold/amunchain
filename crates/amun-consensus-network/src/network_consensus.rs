@@ -67,6 +67,7 @@ impl NetworkConsensus {
             approve: true,
             signature: [0u8; 64],
             timestamp: 1000,
+            commitment: None,
         };
 
         {
@@ -142,6 +143,7 @@ mod tests {
                 approve: true,
                 signature: [0u8; 64],
                 timestamp: 1000,
+                commitment: None,
             })
             .unwrap();
 

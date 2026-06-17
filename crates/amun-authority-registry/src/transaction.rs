@@ -33,7 +33,8 @@ impl GovernanceState {
     pub fn apply_transaction(&mut self, tx: &GovernanceTransaction) {
         match tx {
             GovernanceTransaction::SubmitProposal(proposal) => {
-                self.proposals.insert(proposal.proposal_id, proposal.clone());
+                self.proposals
+                    .insert(proposal.proposal_id, proposal.clone());
                 self.votes.insert(
                     proposal.proposal_id,
                     crate::voting::ProposalVotes::new(proposal.proposal_id),
@@ -83,7 +84,8 @@ impl GovernanceState {
 
     /// Restore governance state from a previously saved snapshot.
     pub fn restore(bytes: &[u8]) -> Result<Self, String> {
-        postcard::from_bytes(bytes).map_err(|e| format!("GovernanceState deserialization failed: {}", e))
+        postcard::from_bytes(bytes)
+            .map_err(|e| format!("GovernanceState deserialization failed: {}", e))
     }
 }
 
@@ -110,7 +112,9 @@ mod tests {
     #[test]
     fn n107_7d_cast_vote_transaction() {
         let mut state = GovernanceState::new();
-        let action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let proposal = GovernanceProposal::new([0xAA; 32], action, 100);
         state.apply_transaction(&GovernanceTransaction::SubmitProposal(proposal.clone()));
 
@@ -120,7 +124,14 @@ mod tests {
             vote: GovernanceVote::Approve,
         };
         state.apply_transaction(&vote_tx);
-        assert_eq!(state.votes.get(&proposal.proposal_id).unwrap().total_votes(), 1);
+        assert_eq!(
+            state
+                .votes
+                .get(&proposal.proposal_id)
+                .unwrap()
+                .total_votes(),
+            1
+        );
     }
 
     #[test]
@@ -168,7 +179,14 @@ mod tests {
         let bytes = state.snapshot();
         let restored = GovernanceState::restore(&bytes).unwrap();
         assert!(restored.proposals.contains_key(&proposal.proposal_id));
-        assert_eq!(restored.votes.get(&proposal.proposal_id).unwrap().total_votes(), 1);
+        assert_eq!(
+            restored
+                .votes
+                .get(&proposal.proposal_id)
+                .unwrap()
+                .total_votes(),
+            1
+        );
     }
 
     #[test]
@@ -183,7 +201,9 @@ mod tests {
     fn n107_8a_multiple_proposals() {
         let mut state = GovernanceState::new();
         for i in 0..3u8 {
-            let action = GovernanceAction::RetireAuthority { authority_version: i as u64 };
+            let action = GovernanceAction::RetireAuthority {
+                authority_version: i as u64,
+            };
             let proposal = GovernanceProposal::new([i; 32], action, 100 + i as u64);
             state.apply_transaction(&GovernanceTransaction::SubmitProposal(proposal));
         }

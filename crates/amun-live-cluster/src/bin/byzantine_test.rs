@@ -41,6 +41,7 @@ fn main() {
             approve: true,
             signature: [0u8; 64],
             timestamp: 0,
+            commitment: None,
         };
 
         let attack_types = [

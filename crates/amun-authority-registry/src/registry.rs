@@ -1,7 +1,7 @@
-use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
 use crate::authority::ConstitutionalAuthority;
 use amun_networking::validator_certificate::ValidatorCertificate;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AuthorityRegistry {
@@ -45,7 +45,6 @@ impl AuthorityRegistry {
             auth.revoked = true;
         }
     }
-
 
     /// Create a registry pre-populated with a single genesis authority.
     pub fn from_genesis(authority: ConstitutionalAuthority) -> Self {
@@ -114,11 +113,7 @@ impl AuthorityRegistry {
     /// Verify a certificate against the authority registry at a given block height.
     /// Follows the Authority Sunset Model: the authority must be currently valid
     /// at the verification height, not just at issuance time.
-    pub fn verify_certificate_at(
-        &self,
-        cert: &ValidatorCertificate,
-        height: u64,
-    ) -> bool {
+    pub fn verify_certificate_at(&self, cert: &ValidatorCertificate, height: u64) -> bool {
         // 1. Authority version must exist
         let authority = match self.by_version(cert.authority_version) {
             Some(a) => a,
@@ -139,7 +134,10 @@ impl AuthorityRegistry {
 
         // 4. Authority must be valid at this height (transition/grace window check)
         let valid = self.valid_authorities_at(height);
-        if !valid.iter().any(|a| a.authority_version == cert.authority_version) {
+        if !valid
+            .iter()
+            .any(|a| a.authority_version == cert.authority_version)
+        {
             return false;
         }
 
@@ -285,15 +283,15 @@ mod tests {
         reg.register(a1);
         reg.register(a2);
         reg.schedule_transition(AuthorityTransition {
-            from_version: 1, to_version: 2,
-            activation_height: 100, grace_period_blocks: 50,
+            from_version: 1,
+            to_version: 2,
+            activation_height: 100,
+            grace_period_blocks: 50,
         });
         let valid = reg.valid_authorities_at(50);
         assert_eq!(valid.len(), 1);
         assert_eq!(valid[0].authority_version, 1);
     }
-
-    #[test]
 
     #[test]
     fn n108_3b_accept_v1_before_grace_end() {
@@ -314,8 +312,10 @@ mod tests {
         reg.register(v2);
 
         reg.schedule_transition(AuthorityTransition {
-            from_version: 1, to_version: 2,
-            activation_height: 500, grace_period_blocks: 100,
+            from_version: 1,
+            to_version: 2,
+            activation_height: 500,
+            grace_period_blocks: 100,
         });
 
         // Certificate issued by v1, verified during grace window (height 550)
@@ -325,9 +325,13 @@ mod tests {
             1,
             v1_id,
             &v1_kp,
-            0, 0,
+            0,
+            0,
         );
-        assert!(reg.verify_certificate_at(&cert, 550), "v1 cert should be valid during grace window");
+        assert!(
+            reg.verify_certificate_at(&cert, 550),
+            "v1 cert should be valid during grace window"
+        );
     }
 
     #[test]
@@ -349,8 +353,10 @@ mod tests {
         reg.register(v2);
 
         reg.schedule_transition(AuthorityTransition {
-            from_version: 1, to_version: 2,
-            activation_height: 500, grace_period_blocks: 100,
+            from_version: 1,
+            to_version: 2,
+            activation_height: 500,
+            grace_period_blocks: 100,
         });
 
         let cert = ValidatorCertificate::issue_v2(
@@ -359,9 +365,13 @@ mod tests {
             1,
             v1_id,
             &v1_kp,
-            0, 0,
+            0,
+            0,
         );
-        assert!(!reg.verify_certificate_at(&cert, 650), "v1 cert should be rejected after grace window");
+        assert!(
+            !reg.verify_certificate_at(&cert, 650),
+            "v1 cert should be rejected after grace window"
+        );
     }
 
     #[test]
@@ -382,8 +392,10 @@ mod tests {
         reg.register(v2);
 
         reg.schedule_transition(AuthorityTransition {
-            from_version: 1, to_version: 2,
-            activation_height: 500, grace_period_blocks: 100,
+            from_version: 1,
+            to_version: 2,
+            activation_height: 500,
+            grace_period_blocks: 100,
         });
 
         let cert = ValidatorCertificate::issue_v2(
@@ -392,9 +404,13 @@ mod tests {
             2,
             v2_id,
             &v2_kp,
-            0, 0,
+            0,
+            0,
         );
-        assert!(reg.verify_certificate_at(&cert, 650), "v2 cert should be accepted after activation");
+        assert!(
+            reg.verify_certificate_at(&cert, 650),
+            "v2 cert should be accepted after activation"
+        );
     }
 
     #[test]
@@ -417,11 +433,16 @@ mod tests {
             1,
             v1_id,
             &v1_kp,
-            0, 0,
+            0,
+            0,
         );
-        assert!(!reg.verify_certificate_at(&cert, 600), "revoked authority cert should be rejected");
+        assert!(
+            !reg.verify_certificate_at(&cert, 600),
+            "revoked authority cert should be rejected"
+        );
     }
 
+    #[test]
     fn n107_6_dual_validation_window() {
         let mut reg = AuthorityRegistry::new();
         let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
@@ -429,8 +450,10 @@ mod tests {
         reg.register(a1);
         reg.register(a2);
         reg.schedule_transition(AuthorityTransition {
-            from_version: 1, to_version: 2,
-            activation_height: 100, grace_period_blocks: 50,
+            from_version: 1,
+            to_version: 2,
+            activation_height: 100,
+            grace_period_blocks: 50,
         });
         let valid = reg.valid_authorities_at(120);
         assert_eq!(valid.len(), 2);
@@ -444,8 +467,10 @@ mod tests {
         reg.register(a1);
         reg.register(a2);
         reg.schedule_transition(AuthorityTransition {
-            from_version: 1, to_version: 2,
-            activation_height: 100, grace_period_blocks: 50,
+            from_version: 1,
+            to_version: 2,
+            activation_height: 100,
+            grace_period_blocks: 50,
         });
         let valid = reg.valid_authorities_at(200);
         assert_eq!(valid.len(), 1);
@@ -460,8 +485,10 @@ mod tests {
         reg.register(a1);
         reg.register(a2);
         reg.schedule_transition(AuthorityTransition {
-            from_version: 1, to_version: 2,
-            activation_height: 100, grace_period_blocks: 50,
+            from_version: 1,
+            to_version: 2,
+            activation_height: 100,
+            grace_period_blocks: 50,
         });
         assert!(!reg.can_issue_at(1, 150));
         assert!(reg.can_issue_at(2, 150));

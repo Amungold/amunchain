@@ -133,15 +133,14 @@ async fn metrics(State(state): State<AppState>) -> Json<MetricsResponse> {
     })
 }
 
-
 async fn submit_tx(
     State(state): State<AppState>,
     Json(body): Json<serde_json::Value>,
 ) -> Result<Json<serde_json::Value>, StatusCode> {
     let tx_bytes = hex::decode(body["transaction_bytes"].as_str().unwrap_or(""))
         .map_err(|_| StatusCode::BAD_REQUEST)?;
-    let mut tx: amun_transactions::Transaction = serde_json::from_slice(&tx_bytes)
-        .map_err(|_| StatusCode::BAD_REQUEST)?;
+    let mut tx: amun_transactions::Transaction =
+        serde_json::from_slice(&tx_bytes).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     if let Some(sig_hex) = body["signature"].as_str() {
         if let Ok(sig) = hex::decode(sig_hex) {
@@ -156,8 +155,12 @@ async fn submit_tx(
     }
 
     let hash = tx.tx_hash();
-    let mut mp = state.mempool.lock().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    mp.add_transaction(tx).map_err(|_| StatusCode::BAD_REQUEST)?;
+    let mut mp = state
+        .mempool
+        .lock()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    mp.add_transaction(tx)
+        .map_err(|_| StatusCode::BAD_REQUEST)?;
 
     Ok(Json(serde_json::json!({
         "hash": hex::encode(hash),
@@ -165,17 +168,12 @@ async fn submit_tx(
     })))
 }
 
-
-
-async fn mempool_count(
-    State(state): State<AppState>,
-) -> Json<serde_json::Value> {
+async fn mempool_count(State(state): State<AppState>) -> Json<serde_json::Value> {
     let count = state.mempool.lock().unwrap().pending_count();
     Json(serde_json::json!({
         "pending_transactions": count
     }))
 }
-
 
 pub fn build_app(state: AppState) -> Router {
     Router::new()

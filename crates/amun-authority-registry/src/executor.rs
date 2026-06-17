@@ -78,14 +78,16 @@ pub fn execute_governance(
         } => {
             // Verify both versions exist
             if registry.by_version(*from_version).is_none() {
-                return Err(GovernanceError::InvalidAction(
-                    format!("from_version {} does not exist", from_version)
-                ));
+                return Err(GovernanceError::InvalidAction(format!(
+                    "from_version {} does not exist",
+                    from_version
+                )));
             }
             if registry.by_version(*to_version).is_none() {
-                return Err(GovernanceError::InvalidAction(
-                    format!("to_version {} does not exist", to_version)
-                ));
+                return Err(GovernanceError::InvalidAction(format!(
+                    "to_version {} does not exist",
+                    to_version
+                )));
             }
             let transition = AuthorityTransition {
                 from_version: *from_version,
@@ -97,9 +99,10 @@ pub fn execute_governance(
         }
         GovernanceAction::RetireAuthority { authority_version } => {
             if registry.by_version(*authority_version).is_none() {
-                return Err(GovernanceError::InvalidAction(
-                    format!("authority_version {} does not exist", authority_version)
-                ));
+                return Err(GovernanceError::InvalidAction(format!(
+                    "authority_version {} does not exist",
+                    authority_version
+                )));
             }
             registry.retire(*authority_version, proposal.created_height);
         }
@@ -165,7 +168,9 @@ mod tests {
     #[test]
     fn n107_7c_execute_retirement() {
         let mut reg = setup_registry_with_two_authorities();
-        let action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let proposal = GovernanceProposal::new([0xCC; 32], action, 300);
         let mut votes = ProposalVotes::new(proposal.proposal_id);
         votes.submit_vote([1u8; 32], GovernanceVote::Approve);
@@ -180,7 +185,9 @@ mod tests {
     #[test]
     fn n107_7c_reject_without_quorum() {
         let mut reg = setup_registry_with_two_authorities();
-        let action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let proposal = GovernanceProposal::new([0xDD; 32], action, 400);
         let mut votes = ProposalVotes::new(proposal.proposal_id);
         votes.submit_vote([1u8; 32], GovernanceVote::Approve);
@@ -194,7 +201,9 @@ mod tests {
     #[test]
     fn n107_7c_reject_failed_vote() {
         let mut reg = setup_registry_with_two_authorities();
-        let action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let proposal = GovernanceProposal::new([0xEE; 32], action, 500);
         let mut votes = ProposalVotes::new(proposal.proposal_id);
         votes.submit_vote([1u8; 32], GovernanceVote::Reject);
@@ -209,7 +218,9 @@ mod tests {
     #[test]
     fn n107_7c_idempotent_execution() {
         let mut reg = setup_registry_with_two_authorities();
-        let action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let proposal = GovernanceProposal::new([0xFF; 32], action, 600);
         let mut votes = ProposalVotes::new(proposal.proposal_id);
         votes.submit_vote([1u8; 32], GovernanceVote::Approve);

@@ -88,6 +88,7 @@ version = "0.1.0"
 dependencies = [
  "amun-accounts",
  "amun-consensus",
+ "amun-consensus-network",
  "amun-execution",
  "amun-mempool",
  "amun-transactions",
@@ -262,9 +263,14 @@ dependencies = [
 name = "amun-consensus-network"
 version = "0.1.0"
 dependencies = [
+ "amun-block-builder",
+ "amun-kernel-types",
+ "amun-mempool",
+ "amun-staking",
  "amun-validator-identity",
  "blake3",
  "ed25519-dalek",
+ "hex",
  "postcard",
  "rand 0.8.6",
  "serde",
@@ -555,6 +561,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-economics"
+version = "1.0.0"
+dependencies = [
+ "amun-constitution",
+ "amun-failure",
+ "amun-kernel-types",
+ "heapless 0.8.0",
+]
+
+[[package]]
 name = "amun-evidence"
 version = "3.0.0"
 dependencies = [
@@ -663,6 +679,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-failure"
+version = "1.0.0"
+
+[[package]]
 name = "amun-finality-certificate"
 version = "0.1.0"
 dependencies = [
@@ -744,6 +764,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-kernel-types"
+version = "1.0.0"
+dependencies = [
+ "amun-failure",
+ "zeroize",
+]
+
+[[package]]
 name = "amun-light-client"
 version = "1.0.0"
 dependencies = [
@@ -779,10 +807,12 @@ dependencies = [
  "amun-block-builder",
  "amun-chain-store",
  "amun-consensus-network",
+ "amun-kernel-types",
  "amun-mempool",
  "amun-network-transport",
  "amun-networking",
  "amun-rpc",
+ "amun-staking",
  "amun-sync",
  "amun-validator-identity",
  "ed25519-dalek",
@@ -1124,6 +1154,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-sdk-layer"
+version = "1.0.0"
+
+[[package]]
 name = "amun-self-preservation"
 version = "1.0.0"
 dependencies = [
@@ -1161,6 +1195,16 @@ dependencies = [
  "amun-persistence",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "amun-staking"
+version = "1.0.0"
+dependencies = [
+ "amun-economics",
+ "amun-failure",
+ "amun-kernel-types",
+ "heapless 0.8.0",
 ]
 
 [[package]]

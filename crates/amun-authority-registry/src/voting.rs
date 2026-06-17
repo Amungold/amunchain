@@ -54,7 +54,11 @@ impl ProposalVotes {
                 GovernanceVote::Abstain => abstentions += 1,
             }
         }
-        VoteTally { approvals, rejections, abstentions }
+        VoteTally {
+            approvals,
+            rejections,
+            abstentions,
+        }
     }
 
     /// Check whether quorum has been reached (2/3 of total validators).
@@ -64,8 +68,7 @@ impl ProposalVotes {
 
     /// Determine whether the proposal has been approved.
     pub fn is_approved(&self, total_validators: usize) -> bool {
-        self.reached_quorum(total_validators)
-            && self.tally().approvals > self.tally().rejections
+        self.reached_quorum(total_validators) && self.tally().approvals > self.tally().rejections
     }
 }
 

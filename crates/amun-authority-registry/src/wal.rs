@@ -50,7 +50,10 @@ impl GovernanceWal {
 
     /// Return all WAL entries with block_height greater than the given height.
     pub fn entries_since(&self, height: u64) -> Vec<&GovernanceWalRecord> {
-        self.entries.iter().filter(|e| e.block_height >= height).collect()
+        self.entries
+            .iter()
+            .filter(|e| e.block_height >= height)
+            .collect()
     }
 }
 
@@ -77,17 +80,29 @@ mod tests {
     #[test]
     fn n107_8b_replay_votes() {
         let mut wal = GovernanceWal::new();
-        let action = GovernanceAction::RetireAuthority { authority_version: 1 };
+        let action = GovernanceAction::RetireAuthority {
+            authority_version: 1,
+        };
         let proposal = GovernanceProposal::new([0xBB; 32], action, 100);
         wal.append(1, GovernanceTransaction::SubmitProposal(proposal.clone()));
-        wal.append(1, GovernanceTransaction::CastVote {
-            proposal_id: proposal.proposal_id,
-            validator_id: [1u8; 32],
-            vote: GovernanceVote::Approve,
-        });
+        wal.append(
+            1,
+            GovernanceTransaction::CastVote {
+                proposal_id: proposal.proposal_id,
+                validator_id: [1u8; 32],
+                vote: GovernanceVote::Approve,
+            },
+        );
 
         let restored = wal.replay();
-        assert_eq!(restored.votes.get(&proposal.proposal_id).unwrap().total_votes(), 1);
+        assert_eq!(
+            restored
+                .votes
+                .get(&proposal.proposal_id)
+                .unwrap()
+                .total_votes(),
+            1
+        );
     }
 
     #[test]
@@ -100,15 +115,20 @@ mod tests {
         let proposal = GovernanceProposal::new([0xCC; 32], action, 100);
         wal.append(1, GovernanceTransaction::SubmitProposal(proposal.clone()));
         for id in 1..=3u8 {
-            wal.append(1, GovernanceTransaction::CastVote {
-                proposal_id: proposal.proposal_id,
-                validator_id: [id; 32],
-                vote: GovernanceVote::Approve,
-            });
+            wal.append(
+                1,
+                GovernanceTransaction::CastVote {
+                    proposal_id: proposal.proposal_id,
+                    validator_id: [id; 32],
+                    vote: GovernanceVote::Approve,
+                },
+            );
         }
 
         let mut registry = crate::registry::AuthorityRegistry::new();
-        registry.register(crate::authority::ConstitutionalAuthority::new([1u8; 32], 1, 0));
+        registry.register(crate::authority::ConstitutionalAuthority::new(
+            [1u8; 32], 1, 0,
+        ));
 
         let restored = wal.replay_and_finalize(4, &mut registry).unwrap();
         assert!(restored.journal.is_executed(&proposal.proposal_id));
@@ -118,13 +138,16 @@ mod tests {
     #[test]
     fn n107_8b_replay_after_crash() {
         let mut wal = GovernanceWal::new();
-        wal.append(1, GovernanceTransaction::SubmitProposal(
-            GovernanceProposal::new(
+        wal.append(
+            1,
+            GovernanceTransaction::SubmitProposal(GovernanceProposal::new(
                 [0xDD; 32],
-                GovernanceAction::RetireAuthority { authority_version: 1 },
+                GovernanceAction::RetireAuthority {
+                    authority_version: 1,
+                },
                 100,
-            )
-        ));
+            )),
+        );
 
         // Simulate crash: create a new WAL and replay from persisted entries
         let persisted = postcard::to_stdvec(&wal).unwrap();

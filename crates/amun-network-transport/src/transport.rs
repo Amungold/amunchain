@@ -203,6 +203,7 @@ fn extract_sender_id(msg: &NetworkMessage) -> NodeId {
         NetworkMessage::StateSyncResponse(_) => NodeId([0u8; 32]),
         NetworkMessage::Ping(p) => NodeId(p.sender_id),
         NetworkMessage::Pong(p) => NodeId(p.sender_id),
+        NetworkMessage::SlashingCertificateAnnounce(s) => NodeId(s.validator_id),
     }
 }
 
