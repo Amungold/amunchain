@@ -111,7 +111,6 @@ impl AuthorityRegistry {
     }
 
     /// Check if an authority can issue new certificates at a given height.
-
     /// Verify a certificate against the authority registry at a given block height.
     /// Follows the Authority Sunset Model: the authority must be currently valid
     /// at the verification height, not just at issuance time.

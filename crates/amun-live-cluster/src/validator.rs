@@ -601,6 +601,120 @@ mod tests {
         v.stop();
     }
 
+
+    #[test]
+    fn n108_3e_authority_rotation_certificate_validation() {
+        use amun_authority_registry::governance::{GovernanceAction, GovernanceProposal};
+        use amun_authority_registry::transaction::GovernanceTransaction;
+        use amun_authority_registry::voting::GovernanceVote;
+        use amun_networking::crypto_identity::PeerKeyPair;
+        use amun_networking::peer_identity::PeerId;
+        use amun_networking::validator_certificate::ValidatorCertificate;
+
+        let ports = next_ports();
+        let config = ValidatorConfig::test_cluster(0, &ports).with_quorum(3);
+        let v = LiveValidator::new(config);
+        v.start().unwrap();
+
+        // Create authority keypairs
+        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+        let _v1_pk = v1_kp.verifying_key.to_bytes();
+        let v2_kp = PeerKeyPair::from_seed([0x43; 32]);
+        let v2_pk = v2_kp.verifying_key.to_bytes();
+
+        // Phase 1: Genesis has v1 only
+        {
+            let reg = v.authority_registry.lock().unwrap();
+            assert!(reg.by_version(1).is_some(), "v1 should exist");
+            assert!(reg.by_version(2).is_none(), "v2 should not exist yet");
+        }
+
+        // Create a v1 certificate
+        let v1_cert = ValidatorCertificate::issue_v2(
+            PeerId::from_bytes([1u8; 32]), [1u8; 32], 1, [0u8; 32], &v1_kp, 0, 0,
+        );
+
+        // Phase 2: Add v2 and schedule transition via governance
+        let add_proposal = GovernanceProposal::new(
+            [0xAA; 32],
+            GovernanceAction::AddAuthority { authority_public_key: v2_pk, authority_version: 2 },
+            100,
+        );
+        {
+            let mut gov = v.governance.lock().unwrap();
+            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(add_proposal.clone()));
+            for id in 1..=3u8 {
+                gov.apply_transaction(&GovernanceTransaction::CastVote {
+                    proposal_id: add_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                });
+            }
+            let mut reg = v.authority_registry.lock().unwrap();
+            gov.finalize_block(4, &mut reg).unwrap();
+        }
+
+        let trans_proposal = GovernanceProposal::new(
+            [0xBB; 32],
+            GovernanceAction::ScheduleTransition {
+                from_version: 1, to_version: 2, activation_height: 500, grace_period_blocks: 100,
+            },
+            200,
+        );
+        {
+            let mut gov = v.governance.lock().unwrap();
+            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(trans_proposal.clone()));
+            for id in 1..=3u8 {
+                gov.apply_transaction(&GovernanceTransaction::CastVote {
+                    proposal_id: trans_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                });
+            }
+            let mut reg = v.authority_registry.lock().unwrap();
+            gov.finalize_block(4, &mut reg).unwrap();
+        }
+
+        // Phase 3: Before activation - v1 accepted, v2 unknown
+        {
+            let reg = v.authority_registry.lock().unwrap();
+            assert!(reg.verify_certificate_at(&v1_cert, 400), "v1 cert should be accepted before activation");
+        }
+
+        // Phase 4: During grace window - both accepted
+        {
+            let reg = v.authority_registry.lock().unwrap();
+            assert!(reg.verify_certificate_at(&v1_cert, 550), "v1 cert should be accepted during grace window");
+        }
+
+        // Phase 5: After grace - v1 rejected
+        {
+            let reg = v.authority_registry.lock().unwrap();
+            assert!(!reg.verify_certificate_at(&v1_cert, 650), "v1 cert should be rejected after grace window");
+        }
+
+        // Phase 6: Retire v1, verify it's rejected even at low heights
+        let retire_proposal = GovernanceProposal::new(
+            [0xCC; 32],
+            GovernanceAction::RetireAuthority { authority_version: 1 },
+            700,
+        );
+        {
+            let mut gov = v.governance.lock().unwrap();
+            gov.apply_transaction(&GovernanceTransaction::SubmitProposal(retire_proposal.clone()));
+            for id in 1..=3u8 {
+                gov.apply_transaction(&GovernanceTransaction::CastVote {
+                    proposal_id: retire_proposal.proposal_id, validator_id: [id; 32], vote: GovernanceVote::Approve,
+                });
+            }
+            let mut reg = v.authority_registry.lock().unwrap();
+            gov.finalize_block(4, &mut reg).unwrap();
+        }
+        {
+            let reg = v.authority_registry.lock().unwrap();
+            assert!(!reg.verify_certificate_at(&v1_cert, 800), "v1 cert should be rejected after retirement");
+            assert!(reg.is_revoked(1), "v1 should be revoked");
+        }
+
+        v.stop();
+    }
+
 fn next_ports() -> [u16; 4] {
         let base = PORT_BASE.fetch_add(10, Ordering::SeqCst);
         [base, base + 1, base + 2, base + 3]
