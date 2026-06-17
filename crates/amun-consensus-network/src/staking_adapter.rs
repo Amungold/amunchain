@@ -108,7 +108,7 @@ impl<E: SlashingExecutor> StakingAdapter<E> {
 mod tests {
     use super::*;
     use crate::evidence_store::EvidenceType;
-    use crate::misbehavior_registry::{MisbehaviorRegistry, MisbehaviorThresholds};
+    use crate::misbehavior_registry::MisbehaviorRegistry;
     use std::collections::HashMap;
 
     /// N110.1: Simulated staking implementation for testing
@@ -154,7 +154,8 @@ mod tests {
         let validator_id = [0x42; 32];
         staking.set_stake(validator_id, 100_000); // 100k initial stake
 
-        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        let registry =
+            MisbehaviorRegistry::new(crate::misbehavior_registry::MisbehaviorThresholds::default());
         let mut adapter = StakingAdapter::new(registry, staking);
 
         // Accumulate misbehavior until slashing threshold
@@ -223,7 +224,8 @@ mod tests {
         let validator_id = [0xAA; 32];
         staking.set_stake(validator_id, 50_000);
 
-        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        let registry =
+            MisbehaviorRegistry::new(crate::misbehavior_registry::MisbehaviorThresholds::default());
         let mut adapter = StakingAdapter::new(registry, staking);
 
         // Only one offense — score=10, below slashing threshold (30)
@@ -253,7 +255,8 @@ mod tests {
         let validator_id = [0xCC; 32];
         staking.set_stake(validator_id, 200_000);
 
-        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        let registry =
+            MisbehaviorRegistry::new(crate::misbehavior_registry::MisbehaviorThresholds::default());
         let mut adapter = StakingAdapter::new(registry, staking);
 
         // First set of offenses → first slash
@@ -318,7 +321,8 @@ mod tests {
         staking.set_stake([1u8; 32], 100_000);
         staking.set_stake([2u8; 32], 100_000);
 
-        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        let registry =
+            MisbehaviorRegistry::new(crate::misbehavior_registry::MisbehaviorThresholds::default());
         let mut adapter = StakingAdapter::new(registry, staking);
 
         // Validator 1: commit offenses

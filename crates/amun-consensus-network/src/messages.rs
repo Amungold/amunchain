@@ -365,6 +365,20 @@ mod n104_1_tests {
     }
 }
 
+/// N111.5: Request for missing evidence records.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct MissingEvidenceRequest {
+    pub requester_id: [u8; 32],
+    pub evidence_ids: Vec<[u8; 32]>,
+}
+
+/// N111.5: Response containing requested evidence records.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct MissingEvidenceResponse {
+    pub responder_id: [u8; 32],
+    /// Serialized EvidenceRecords (postcard-encoded)
+    pub evidence_data: Vec<Vec<u8>>,
+}
 // ============================================================================
 // N109 — Constitutional Block Propagation Types
 // ============================================================================

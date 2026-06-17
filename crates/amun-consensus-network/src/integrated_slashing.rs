@@ -163,6 +163,7 @@ impl Default for IntegratedSlashingPipeline {
 mod tests {
     use super::*;
     use crate::evidence_store::EvidenceType;
+    use crate::misbehavior_registry::ValidatorStatus;
 
     /// N109.12 GATEKEEPER: Evidence triggers the full slashing pipeline
     #[test]

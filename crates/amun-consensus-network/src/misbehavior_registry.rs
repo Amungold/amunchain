@@ -255,6 +255,8 @@ impl Default for MisbehaviorRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::evidence_store::{EvidenceRecord, EvidenceStore, EvidenceType};
+    use crate::misbehavior_registry::MisbehaviorRegistry;
 
     #[test]
     fn n109_11_record_misbehavior() {

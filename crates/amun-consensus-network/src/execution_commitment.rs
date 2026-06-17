@@ -130,7 +130,7 @@ impl ExecutionCommitment {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ed25519_dalek::{Signer, SigningKey};
+    use ed25519_dalek::SigningKey;
 
     fn make_keypair(seed: u8) -> (SigningKey, [u8; 32]) {
         let sk = SigningKey::from_bytes(&[seed; 32]);

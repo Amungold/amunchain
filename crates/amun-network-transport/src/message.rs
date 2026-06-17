@@ -10,6 +10,8 @@ pub enum NetworkMessage {
     CertificateAnnounce(CertificateAnnounce),
     /// N110.3: Slashing certificate announcement
     SlashingCertificateAnnounce(SlashingCertificateAnnounce),
+    /// N111.3: Evidence announcement for network propagation
+    EvidenceAnnounce(EvidenceAnnouncement),
     /// State sync request (snapshot or delta).
     StateSyncRequest(StateSyncRequest),
     /// State sync response (snapshot or delta).
@@ -50,6 +52,16 @@ pub struct SlashingCertificateAnnounce {
     pub amount_slashed: u64,
     pub remaining_stake: u64,
     pub offense_count: u32,
+    pub timestamp: u64,
+}
+
+/// N111.3: Evidence announcement for network propagation.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EvidenceAnnouncement {
+    pub evidence_id: [u8; 32],
+    pub validator_id: [u8; 32],
+    pub evidence_type_byte: u8,
+    pub height: u64,
     pub timestamp: u64,
 }
 
@@ -218,6 +230,28 @@ mod tests {
                 assert_eq!(c.amount_slashed, 15000);
                 assert_eq!(c.remaining_stake, 85000);
                 assert_eq!(c.offense_count, 3);
+            }
+            _ => panic!("Wrong variant"),
+        }
+    }
+
+    #[test]
+    fn n111_3_roundtrip_evidence_announcement() {
+        let msg = NetworkMessage::EvidenceAnnounce(EvidenceAnnouncement {
+            evidence_id: [0xA1; 32],
+            validator_id: [0x42; 32],
+            evidence_type_byte: 0x05,
+            height: 10,
+            timestamp: 3000,
+        });
+        let encoded = msg.encode().unwrap();
+        let decoded = NetworkMessage::decode(&encoded).unwrap();
+        match decoded {
+            NetworkMessage::EvidenceAnnounce(e) => {
+                assert_eq!(e.evidence_id, [0xA1; 32]);
+                assert_eq!(e.validator_id, [0x42; 32]);
+                assert_eq!(e.evidence_type_byte, 0x05);
+                assert_eq!(e.height, 10);
             }
             _ => panic!("Wrong variant"),
         }

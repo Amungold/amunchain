@@ -1,9 +1,9 @@
 use amun_consensus_network::{
-    CertificateGossip, EvidenceCount, EvidenceType, MisbehaviorRegistry, MisbehaviorThresholds,
-    RealStakingExecutor, SlashingCertificate, SlashingExecutor, StakingAdapter, ValidatorStatus,
+    EvidenceCount, EvidenceType, MisbehaviorRegistry, MisbehaviorThresholds, RealStakingExecutor,
+    SlashingCertificate, StakingAdapter, ValidatorStatus,
 };
 use amun_kernel_types::PublicKey;
-use amun_staking::slashing::SlashingConditions;
+// use amun_staking::slashing::SlashingConditions;
 use amun_staking::validator::ValidatorRegistry;
 use std::collections::HashSet;
 

@@ -2,9 +2,7 @@
 // N110.4b — Consensus Verification of SlashingCertificates
 // ============================================================================
 use amun_block_builder::{Block, BlockBuilder};
-use amun_consensus_network::{
-    CertificateResultingStatus, EvidenceCount, EvidenceType, SlashingCertificate, ValidatorStatus,
-};
+use amun_consensus_network::{EvidenceCount, EvidenceType, SlashingCertificate, ValidatorStatus};
 use amun_mempool::Mempool;
 
 /// Create a valid slashing certificate for testing
