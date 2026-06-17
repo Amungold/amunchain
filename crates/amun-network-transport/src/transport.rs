@@ -205,6 +205,7 @@ fn extract_sender_id(msg: &NetworkMessage) -> NodeId {
         NetworkMessage::Pong(p) => NodeId(p.sender_id),
         NetworkMessage::SlashingCertificateAnnounce(s) => NodeId(s.validator_id),
         NetworkMessage::EvidenceAnnounce(e) => NodeId(e.validator_id),
+        NetworkMessage::EvidencePush(p) => NodeId(p.sender_id),
     }
 }
 

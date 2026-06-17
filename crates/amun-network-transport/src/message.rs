@@ -12,6 +12,8 @@ pub enum NetworkMessage {
     SlashingCertificateAnnounce(SlashingCertificateAnnounce),
     /// N111.3: Evidence announcement for network propagation
     EvidenceAnnounce(EvidenceAnnouncement),
+    /// N112.2: Push-based evidence propagation
+    EvidencePush(EvidencePushMessage),
     /// State sync request (snapshot or delta).
     StateSyncRequest(StateSyncRequest),
     /// State sync response (snapshot or delta).
@@ -63,6 +65,14 @@ pub struct EvidenceAnnouncement {
     pub evidence_type_byte: u8,
     pub height: u64,
     pub timestamp: u64,
+}
+
+/// N112.2: Push evidence message containing full evidence records.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EvidencePushMessage {
+    pub sender_id: [u8; 32],
+    pub records: Vec<Vec<u8>>,
+    pub sequence: u64,
 }
 
 /// Request for state sync from a peer.

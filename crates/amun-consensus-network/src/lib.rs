@@ -9,6 +9,11 @@ pub mod validator_status;
 pub mod certificate_evidence_validation;
 pub mod certificate_gossip;
 pub mod evidence_gossip;
+pub mod evidence_push;
+pub mod evidence_push_processor;
+
+pub use evidence_push::{EvidencePush, EvidencePushConfig};
+pub use evidence_push_processor::{process_incoming_evidence_push, PushProcessResult};
 pub mod evidence_store;
 pub mod execution_commitment;
 pub mod execution_receipt;
