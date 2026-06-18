@@ -1,12 +1,11 @@
 // N120.4 — Consensus Enforcement of slashing_root
-use amun_block_builder::{Block, BlockBuilder};
+use amun_block_builder::BlockBuilder;
 use amun_consensus_network::{
     merkle_root, EvidenceType, MisbehaviorRegistry, MisbehaviorThresholds, RealStakingExecutor,
     SlashingLedger, StakingAdapter, ValidatorIdentity,
 };
-use amun_kernel_types::PublicKey;
+
 use amun_mempool::Mempool;
-use amun_staking::validator::ValidatorRegistry;
 
 #[test]
 fn n120_4a_validator_accepts_matching_slashing_root() {
