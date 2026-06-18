@@ -1,3 +1,6 @@
+pub mod constitutional_evidence;
+pub mod evidence_providers;
+pub mod evidence_records;
 pub mod proof_engine;
 pub mod state_transition;
 
@@ -41,6 +44,29 @@ pub struct ConstitutionalEnforcementKernel {
 }
 
 impl ConstitutionalEnforcementKernel {
+    /// N127A: Review a block using structured constitutional evidence.
+    /// This is the preferred interface — all evidence is explicitly typed.
+    pub fn review_block_with_evidence(
+        &mut self,
+        height: u64,
+        evidence: &crate::constitutional_evidence::ConstitutionalEvidence,
+    ) -> ConstitutionalVerdict {
+        self.review_block(
+            height,
+            evidence.state_root_valid,
+            evidence.chain_continuous,
+            evidence.signatures_valid,
+            evidence.no_double_spend,
+            evidence.slashing_bound,
+            evidence.governance_valid,
+            evidence.replay_deterministic,
+            evidence.finality_supermajority,
+            evidence.transition_valid,
+            evidence.evidence_valid,
+        )
+    }
+
+    /// Legacy interface — still supported, delegates to review_block_with_evidence.
     pub fn new() -> Self {
         Self {
             active_laws: vec![
@@ -61,6 +87,7 @@ impl ConstitutionalEnforcementKernel {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn review_block(
         &mut self,
         height: u64,

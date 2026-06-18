@@ -86,6 +86,7 @@ impl ConstitutionalProofEngine {
     }
 
     /// N124: Run all constitutional checks with real data.
+    #[allow(clippy::too_many_arguments)]
     pub fn run_constitutional_review(
         height: u64,
         block_state_root: &[u8; 32],
