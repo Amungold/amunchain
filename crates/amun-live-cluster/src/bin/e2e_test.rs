@@ -2,6 +2,7 @@ use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
 use amun_rpc::client::RpcClient;
 use amun_rpc::{serve, AppState};
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 #[tokio::main]
@@ -15,6 +16,8 @@ async fn main() {
         store: validator.store.clone(),
         engine: validator.engine.clone(),
         mempool: validator.mempool.clone(),
+        faucet: Arc::new(Mutex::new(amun_rpc::faucet::FaucetState::default())),
+        account_store: Arc::new(Mutex::new(amun_accounts::AccountStore::new())),
     };
     tokio::spawn(async move { serve(state, 9070).await });
 

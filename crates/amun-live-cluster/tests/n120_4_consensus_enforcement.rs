@@ -1,9 +1,5 @@
 // N120.4 — Consensus Enforcement of slashing_root
 use amun_block_builder::BlockBuilder;
-use amun_consensus_network::{
-    merkle_root, EvidenceType, MisbehaviorRegistry, MisbehaviorThresholds, RealStakingExecutor,
-    SlashingLedger, StakingAdapter, ValidatorIdentity,
-};
 
 use amun_mempool::Mempool;
 

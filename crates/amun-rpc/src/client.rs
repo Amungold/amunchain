@@ -3,6 +3,13 @@ use std::io::{Read, Write};
 use std::net::TcpStream;
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct AccountResponse {
+    pub address: String,
+    pub balance: u64,
+    pub nonce: u64,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StatusResponse {
     pub height: u64,
     pub qcs_formed: u64,
@@ -97,6 +104,15 @@ impl RpcClient {
 
     pub fn get_block_range(&self, from: u64, to: u64) -> Result<RangeResponse, String> {
         self.get_json(&format!("blocks/{}/{}", from, to))
+    }
+
+    pub fn get_account(&self, address: &str) -> Result<AccountResponse, String> {
+        let url = format!(
+            "http://{}:{}/account/{}/balance",
+            self.host, self.port, address
+        );
+        let response = reqwest::blocking::get(&url).map_err(|e| format!("HTTP error: {}", e))?;
+        response.json().map_err(|e| format!("JSON error: {}", e))
     }
 
     pub fn submit_transaction(&self, tx_json: &str) -> Result<String, String> {

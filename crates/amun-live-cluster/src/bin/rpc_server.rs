@@ -1,6 +1,7 @@
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
 use amun_rpc::{serve, AppState};
+use std::sync::{Arc, Mutex};
 
 #[tokio::main]
 async fn main() {
@@ -26,6 +27,8 @@ async fn main() {
         store: validator.store.clone(),
         engine: validator.engine.clone(),
         mempool: validator.mempool.clone(),
+        faucet: Arc::new(Mutex::new(amun_rpc::faucet::FaucetState::default())),
+        account_store: Arc::new(Mutex::new(amun_accounts::AccountStore::new())),
     };
 
     eprintln!("RPC server on port {}", rpc_port);

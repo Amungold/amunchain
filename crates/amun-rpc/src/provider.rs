@@ -1,5 +1,6 @@
 use crate::client::{
-    BlockResponse, HeadResponse, MetricsResponse, RangeResponse, RpcClient, StatusResponse,
+    AccountResponse, BlockResponse, HeadResponse, MetricsResponse, RangeResponse, RpcClient,
+    StatusResponse,
 };
 
 pub trait ChainDataProvider: Send + Sync {
@@ -9,6 +10,7 @@ pub trait ChainDataProvider: Send + Sync {
     fn get_block_range(&self, from: u64, to: u64) -> Result<RangeResponse, String>;
     fn get_metrics(&self) -> Result<MetricsResponse, String>;
     fn submit_transaction(&self, tx_json: &str) -> Result<String, String>;
+    fn get_account(&self, address: &str) -> Result<AccountResponse, String>;
 }
 
 pub struct LiveRpcProvider {
@@ -41,6 +43,9 @@ impl ChainDataProvider for LiveRpcProvider {
     }
     fn submit_transaction(&self, tx_json: &str) -> Result<String, String> {
         self.client.submit_transaction(tx_json)
+    }
+    fn get_account(&self, address: &str) -> Result<AccountResponse, String> {
+        self.client.get_account(address)
     }
 }
 
@@ -79,6 +84,13 @@ impl ChainDataProvider for MockProvider {
     }
     fn submit_transaction(&self, _tx_json: &str) -> Result<String, String> {
         Ok("mock_hash".to_string())
+    }
+    fn get_account(&self, address: &str) -> Result<AccountResponse, String> {
+        Ok(AccountResponse {
+            address: address.to_string(),
+            balance: 1000000,
+            nonce: 0,
+        })
     }
     fn get_metrics(&self) -> Result<MetricsResponse, String> {
         Ok(MetricsResponse {
