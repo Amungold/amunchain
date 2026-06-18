@@ -73,12 +73,12 @@ fn test_factor_isolation_recalibrated() {
         last_c
     );
 
-    // Group A and B should exceed Group C.
+    // Both high and moderate treaty density must exceed low density.
     assert!(
-        last_a > last_b,
-        "Full treaty density should exceed moderate: A={:.4} vs B={:.4}",
-        last_a,
-        last_b
+        last_b > last_c,
+        "Moderate treaty density should exceed low density: B={:.4} vs C={:.4}",
+        last_b,
+        last_c
     );
 
     // All legitimacy values must be bounded.

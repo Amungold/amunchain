@@ -57,11 +57,29 @@ impl<E: SlashingExecutor> StakingAdapter<E> {
     pub fn try_slash(&mut self, validator_id: &[u8; 32]) -> Option<SlashResult> {
         // Check if validator crossed slashing threshold
         match self.registry.check_thresholds(validator_id) {
-            Some(ValidatorAction::Slash) => {
-                // Validator is slashable — execute
-                Some(self.execute_slash(validator_id))
-            }
+            Some(ValidatorAction::Slash) => Some(self.execute_slash(validator_id)),
             _ => None,
+        }
+    }
+
+    /// N115: Execute slash only if the certificate carries a valid signature.
+    /// Returns an error if the certificate is unsigned or tampered.
+    pub fn try_slash_with_certificate(
+        &mut self,
+        validator_id: &[u8; 32],
+        cert: &crate::SlashingCertificate,
+    ) -> Result<Option<SlashResult>, String> {
+        // N115: Verify certificate signature before executing slash
+        if cert.signature == [0u8; 64] {
+            return Err("N115: unsigned certificate rejected".into());
+        }
+        cert.verify_signature()
+            .map_err(|e| format!("N115: certificate verification failed: {}", e))?;
+
+        // Check if validator crossed slashing threshold
+        match self.registry.check_thresholds(validator_id) {
+            Some(ValidatorAction::Slash) => Ok(Some(self.execute_slash(validator_id))),
+            _ => Ok(None),
         }
     }
 
@@ -109,6 +127,8 @@ mod tests {
     use super::*;
     use crate::evidence_store::EvidenceType;
     use crate::misbehavior_registry::MisbehaviorRegistry;
+    use crate::misbehavior_registry::MisbehaviorThresholds;
+    use crate::ValidatorStatus;
     use std::collections::HashMap;
 
     /// N110.1: Simulated staking implementation for testing
@@ -346,5 +366,124 @@ mod tests {
 
         // Validator 2's stake should be intact
         assert_eq!(adapter.executor.get_stake(&[2u8; 32]), 100_000);
+    }
+
+    /// N115: Unsigned certificate is rejected before slash execution
+    #[test]
+    fn n115_unsigned_certificate_rejected_before_slash() {
+        let mut staking = SimulatedStaking::new();
+        let validator_id = [0x42; 32];
+        staking.set_stake(validator_id, 100_000);
+
+        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        registry.record_misbehavior(&validator_id, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+        registry.record_misbehavior(&validator_id, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+        registry.record_misbehavior(&validator_id, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+
+        let mut adapter = StakingAdapter::new(registry, staking);
+
+        // Create an unsigned certificate
+        let cert = crate::SlashingCertificate::from_slash_result(
+            validator_id,
+            30,
+            vec![[0xA1; 32]],
+            vec![],
+            1500,
+            15000,
+            85000,
+            3,
+            crate::ValidatorStatus::SlashEligible,
+            100,
+        );
+
+        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+        assert!(
+            result.is_err(),
+            "N115 FAIL: Unsigned certificate must be rejected"
+        );
+        assert!(result.unwrap_err().contains("unsigned"));
+    }
+
+    /// N115: Signed certificate executes slash successfully
+    #[test]
+    fn n115_signed_certificate_executes_slash() {
+        let mut staking = SimulatedStaking::new();
+        let validator_id = [0x42; 32];
+        staking.set_stake(validator_id, 100_000);
+
+        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        registry.record_misbehavior(&validator_id, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+        registry.record_misbehavior(&validator_id, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+        registry.record_misbehavior(&validator_id, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+
+        let mut adapter = StakingAdapter::new(registry, staking);
+
+        // Create and sign a certificate
+        let mut cert = crate::SlashingCertificate::from_slash_result(
+            validator_id,
+            30,
+            vec![[0xA1; 32]],
+            vec![],
+            1500,
+            15000,
+            85000,
+            3,
+            crate::ValidatorStatus::SlashEligible,
+            100,
+        );
+        let signing_key = ed25519_dalek::SigningKey::from_bytes(&[0x42; 32]);
+        cert.sign(&signing_key);
+
+        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+        assert!(
+            result.is_ok(),
+            "N115 FAIL: Signed certificate must be accepted"
+        );
+        let slash_result = result.unwrap();
+        assert!(
+            slash_result.is_some(),
+            "N115 FAIL: Slash must execute with signed certificate"
+        );
+        assert!(slash_result.unwrap().amount_slashed > 0);
+    }
+
+    /// N115: Tampered certificate is rejected
+    #[test]
+    fn n115_tampered_certificate_rejected_before_slash() {
+        let mut staking = SimulatedStaking::new();
+        let validator_id = [0x42; 32];
+        staking.set_stake(validator_id, 100_000);
+
+        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        registry.record_misbehavior(&validator_id, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+        registry.record_misbehavior(&validator_id, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+        registry.record_misbehavior(&validator_id, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+
+        let mut adapter = StakingAdapter::new(registry, staking);
+
+        let mut cert = crate::SlashingCertificate::from_slash_result(
+            validator_id,
+            30,
+            vec![[0xA1; 32]],
+            vec![],
+            1500,
+            15000,
+            85000,
+            3,
+            crate::ValidatorStatus::SlashEligible,
+            100,
+        );
+        let signing_key = ed25519_dalek::SigningKey::from_bytes(&[0x42; 32]);
+        cert.sign(&signing_key);
+
+        // Tamper after signing
+        cert.amount_slashed = 1;
+
+        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+        assert!(
+            result.is_err(),
+            "N115 FAIL: Tampered certificate must be rejected"
+        );
+        assert!(result.unwrap_err().contains("verification failed"));
     }
 }

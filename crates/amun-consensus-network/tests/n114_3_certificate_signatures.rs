@@ -1,9 +1,7 @@
 // ============================================================================
 // N114.3 — SlashingCertificate Signature Tests
 // ============================================================================
-use amun_consensus_network::{
-    SlashingCertificate, EvidenceCount, EvidenceType, ValidatorStatus,
-};
+use amun_consensus_network::{EvidenceCount, EvidenceType, SlashingCertificate, ValidatorStatus};
 use ed25519_dalek::SigningKey;
 
 fn make_unsigned_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
@@ -35,9 +33,15 @@ fn n114_3_signed_certificate_verifies() {
 
     cert.sign(&signing_key);
 
-    assert_eq!(cert.signer_public_key, signing_key.verifying_key().to_bytes());
+    assert_eq!(
+        cert.signer_public_key,
+        signing_key.verifying_key().to_bytes()
+    );
     assert_ne!(cert.signature, [0u8; 64], "Signature must not be zero");
-    assert!(cert.verify_signature().is_ok(), "N114.3 FAIL: Signed certificate must verify");
+    assert!(
+        cert.verify_signature().is_ok(),
+        "N114.3 FAIL: Signed certificate must verify"
+    );
 }
 
 // ============================================================================
@@ -47,9 +51,14 @@ fn n114_3_signed_certificate_verifies() {
 fn n114_3_unsigned_certificate_rejected() {
     let cert = make_unsigned_certificate([0x42; 32]);
 
-    assert_eq!(cert.signature, [0u8; 64], "Unsigned cert must have zero signature");
-    assert!(cert.verify_signature().is_err(),
-        "N114.3 FAIL: Unsigned certificate must be rejected");
+    assert_eq!(
+        cert.signature, [0u8; 64],
+        "Unsigned cert must have zero signature"
+    );
+    assert!(
+        cert.verify_signature().is_err(),
+        "N114.3 FAIL: Unsigned certificate must be rejected"
+    );
 }
 
 // ============================================================================
@@ -64,8 +73,10 @@ fn n114_3_tampered_certificate_rejected() {
     // Tamper with amount_slashed after signing
     cert.amount_slashed = 1; // Changed from 15000 to 1
 
-    assert!(cert.verify_signature().is_err(),
-        "N114.3 FAIL: Tampered certificate must be rejected");
+    assert!(
+        cert.verify_signature().is_err(),
+        "N114.3 FAIL: Tampered certificate must be rejected"
+    );
 }
 
 // ============================================================================
@@ -80,8 +91,10 @@ fn n114_3_wrong_public_key_rejected() {
     // Replace signer_public_key with a different key
     cert.signer_public_key = [0xFF; 32];
 
-    assert!(cert.verify_signature().is_err(),
-        "N114.3 FAIL: Wrong public key must be rejected");
+    assert!(
+        cert.verify_signature().is_err(),
+        "N114.3 FAIL: Wrong public key must be rejected"
+    );
 }
 
 // ============================================================================
@@ -99,8 +112,10 @@ fn n114_3_signature_changes_with_certificate_content() {
     cert1.sign(&signing_key);
     cert2.sign(&signing_key);
 
-    assert_ne!(cert1.signature, cert2.signature,
-        "N114.3 FAIL: Different content must produce different signatures");
+    assert_ne!(
+        cert1.signature, cert2.signature,
+        "N114.3 FAIL: Different content must produce different signatures"
+    );
     assert!(cert1.verify_signature().is_ok());
     assert!(cert2.verify_signature().is_ok());
 }
@@ -119,6 +134,8 @@ fn n114_3_signed_certificate_roundtrip() {
 
     assert_eq!(decoded.signer_public_key, cert.signer_public_key);
     assert_eq!(decoded.signature, cert.signature);
-    assert!(decoded.verify_signature().is_ok(),
-        "N114.3 FAIL: Roundtripped certificate must verify");
+    assert!(
+        decoded.verify_signature().is_ok(),
+        "N114.3 FAIL: Roundtripped certificate must verify"
+    );
 }

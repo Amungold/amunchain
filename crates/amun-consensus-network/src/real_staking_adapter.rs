@@ -27,7 +27,11 @@ impl RealStakingExecutor {
         registry: ValidatorRegistry,
         identity_registry: ValidatorIdentityRegistry,
     ) -> Self {
-        Self { registry, rules: SlashingConditions::new(), identity_registry }
+        Self {
+            registry,
+            rules: SlashingConditions::new(),
+            identity_registry,
+        }
     }
 
     /// N113.2b: Resolve PublicKey strictly through identity registry.
@@ -101,9 +105,10 @@ mod tests {
 
         let mut executor = RealStakingExecutor::new(registry);
         // N113.2b: Register identity before using the adapter
-        executor.identity_registry.register(
-            crate::ValidatorIdentity::new(validator_id, pk.0, 1)
-        ).unwrap();
+        executor
+            .identity_registry
+            .register(crate::ValidatorIdentity::new(validator_id, pk.0, 1))
+            .unwrap();
         let mut adapter = StakingAdapter::new(
             MisbehaviorRegistry::new(MisbehaviorThresholds::default()),
             executor,
@@ -159,9 +164,14 @@ mod tests {
         let mut executor = RealStakingExecutor::new(registry);
         let validator_id = [0xAA; 32];
         let result = executor.slash(&validator_id, 1000);
-        assert!(result.is_err(), "N113.2b FAIL: Unregistered identity must be rejected");
-        assert!(result.unwrap_err().contains("not registered"),
-            "Error must mention identity not registered");
+        assert!(
+            result.is_err(),
+            "N113.2b FAIL: Unregistered identity must be rejected"
+        );
+        assert!(
+            result.unwrap_err().contains("not registered"),
+            "Error must mention identity not registered"
+        );
     }
 
     /// N113.2: Real executor resolves PublicKey through identity registry
@@ -173,13 +183,15 @@ mod tests {
         registry.register(pk, 100_000).unwrap();
 
         let mut id_registry = ValidatorIdentityRegistry::new();
-        id_registry.register(
-            crate::ValidatorIdentity::new(validator_id, [0x42u8; 48], 1)
-        ).unwrap();
+        id_registry
+            .register(crate::ValidatorIdentity::new(validator_id, [0x42u8; 48], 1))
+            .unwrap();
 
         let executor = RealStakingExecutor::with_identity_registry(registry, id_registry);
         let resolved_pk = executor.to_public_key(&validator_id).unwrap();
-        assert_eq!(resolved_pk.0, [0x42u8; 48],
-            "N113.2 FAIL: PublicKey must come from identity registry");
+        assert_eq!(
+            resolved_pk.0, [0x42u8; 48],
+            "N113.2 FAIL: PublicKey must come from identity registry"
+        );
     }
 }

@@ -53,13 +53,10 @@ fn n110_4c_slash_applied_after_finality() {
 
     let mut executor = RealStakingExecutor::new(staking_registry);
 
-    executor.identity_registry.register(
-        amun_consensus_network::ValidatorIdentity::new(
-            vid,
-            pk.0,
-            1,
-        )
-    ).unwrap();
+    executor
+        .identity_registry
+        .register(amun_consensus_network::ValidatorIdentity::new(vid, pk.0, 1))
+        .unwrap();
 
     let mut adapter = StakingAdapter::new(misbehavior, executor);
     let result = adapter.try_slash(&vid);
