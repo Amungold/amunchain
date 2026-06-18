@@ -55,6 +55,14 @@ pub struct SlashingCertificate {
     /// Validator status after this certificate
     pub resulting_status: CertificateResultingStatus,
 
+    /// N114.1: Ed25519 public key of the signer (32 bytes)
+    #[serde(with = "serde_bytes")]
+    pub signer_public_key: [u8; 32],
+
+    /// N114.1: Ed25519 signature over signing_bytes()
+    #[serde(with = "serde_bytes")]
+    pub signature: [u8; 64],
+
     /// Height at which slashing was executed
     pub executed_at_height: u64,
 
@@ -83,6 +91,47 @@ pub enum CertificateResultingStatus {
 }
 
 impl SlashingCertificate {
+    /// N114.1: Canonical bytes to be signed (excludes signature and hash).
+    pub fn signing_bytes(&self) -> Vec<u8> {
+        let mut data = Vec::new();
+        data.extend_from_slice(b"AMUN_SLASH_CERT_SIGN_V1");
+        data.extend_from_slice(&self.validator_id);
+        data.extend_from_slice(&self.score.to_le_bytes());
+        data.extend_from_slice(&self.penalty_bps.to_le_bytes());
+        data.extend_from_slice(&self.amount_slashed.to_le_bytes());
+        data.extend_from_slice(&self.executed_at_height.to_le_bytes());
+        data.extend_from_slice(&self.timestamp.to_le_bytes());
+        for id in &self.evidence_ids {
+            data.extend_from_slice(id);
+        }
+        data.extend_from_slice(&self.signer_public_key);
+        data
+    }
+
+    /// N114.2: Verify signature against the signer_public_key.
+    pub fn verify_signature(&self) -> Result<(), String> {
+        use ed25519_dalek::Verifier;
+        if self.signature == [0u8; 64] {
+            return Err("N114.2: certificate is unsigned".into());
+        }
+        let verifying_key = ed25519_dalek::VerifyingKey::from_bytes(&self.signer_public_key)
+            .map_err(|e| format!("N114.2: invalid public key: {}", e))?;
+        let sig = ed25519_dalek::Signature::from_bytes(&self.signature);
+        let payload = self.signing_bytes();
+        verifying_key
+            .verify(&payload, &sig)
+            .map_err(|e| format!("N114.2: signature verification failed: {}", e))
+    }
+
+    /// N114.1: Sign the certificate with an Ed25519 signing key.
+    /// Sets signer_public_key and signature.
+    pub fn sign(&mut self, signing_key: &ed25519_dalek::SigningKey) {
+        use ed25519_dalek::Signer;
+        self.signer_public_key = signing_key.verifying_key().to_bytes();
+        let payload = self.signing_bytes();
+        self.signature = signing_key.sign(&payload).to_bytes();
+    }
+
     /// N110.2: Compute deterministic certificate hash
     pub fn compute_hash(&self) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
@@ -142,6 +191,8 @@ impl SlashingCertificate {
             resulting_status,
             executed_at_height,
             timestamp,
+            signer_public_key: [0u8; 32],
+            signature: [0u8; 64],
             certificate_hash: [0u8; 32],
         };
 
@@ -160,6 +211,10 @@ impl SlashingCertificate {
         }
         if self.evidence_ids.is_empty() {
             return Err("N110.2: no evidence provided".into());
+        }
+        // N114.2: If signed, verify the signature
+        if self.signature != [0u8; 64] {
+            self.verify_signature()?;
         }
         Ok(())
     }
