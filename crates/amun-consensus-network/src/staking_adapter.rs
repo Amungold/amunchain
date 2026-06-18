@@ -62,6 +62,31 @@ impl<E: SlashingExecutor> StakingAdapter<E> {
         }
     }
 
+    /// N118.2: The unified entry point for slashing.
+    /// Requires finality + signature + quorum before executing the slash.
+    pub fn execute_after_finality(
+        &mut self,
+        validator_id: &[u8; 32],
+        cert: &crate::MultiSignerCertificate,
+        finalized_height: u64,
+    ) -> Result<Option<SlashResult>, String> {
+        if !crate::finality_gate::is_certificate_finalized(cert, finalized_height) {
+            return Err("N118.2: certificate not finalized".to_string());
+        }
+        if cert.certificate.signature == [0u8; 64] {
+            return Err("N118.2: unsigned certificate".into());
+        }
+        cert.certificate.verify_signature()
+            .map_err(|e| format!("N118.2: signature: {}", e))?;
+        if !cert.has_quorum()? {
+            return Err("N118.2: quorum not reached".into());
+        }
+        match self.registry.check_thresholds(validator_id) {
+            Some(ValidatorAction::Slash) => Ok(Some(self.execute_slash(validator_id))),
+            _ => Ok(None),
+        }
+    }
+
     /// N115: Execute slash only if the certificate carries a valid signature.
     /// Returns an error if the certificate is unsigned or tampered.
     pub fn try_slash_with_certificate(
@@ -486,4 +511,48 @@ mod tests {
         );
         assert!(result.unwrap_err().contains("verification failed"));
     }
+
+    #[test]
+    fn n118_2a_unfinalized_certificate_rejected() {
+        let mut staking = SimulatedStaking::new();
+        let vid = [0x42; 32];
+        staking.set_stake(vid, 100_000);
+        let mut reg = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        reg.record_misbehavior(&vid, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+        reg.record_misbehavior(&vid, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+        reg.record_misbehavior(&vid, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+        let mut adapter = StakingAdapter::new(reg, staking);
+        let mut cert = crate::MultiSignerCertificate::new(
+            crate::SlashingCertificate::from_slash_result(vid, 30, vec![[0xA1; 32]], vec![], 1500, 15000, 85000, 3, crate::ValidatorStatus::SlashEligible, 100), 3, 5);
+        let k = ed25519_dalek::SigningKey::from_bytes(&[0x42; 32]);
+        cert.add_approval(k.verifying_key().to_bytes(), &k).unwrap();
+        cert.certificate.sign(&k);
+        let r = adapter.execute_after_finality(&vid, &cert, 99);
+        assert!(r.is_err() && r.unwrap_err().contains("not finalized"), "N118.2a FAIL");
+    }
+
+    #[test]
+    fn n118_2b_finalized_certificate_executes() {
+        let mut staking = SimulatedStaking::new();
+        let vid = [0x42; 32];
+        staking.set_stake(vid, 100_000);
+        let mut reg = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+        reg.record_misbehavior(&vid, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+        reg.record_misbehavior(&vid, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+        reg.record_misbehavior(&vid, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+        let mut adapter = StakingAdapter::new(reg, staking);
+        let mut cert = crate::MultiSignerCertificate::new(
+            crate::SlashingCertificate::from_slash_result(vid, 30, vec![[0xA1; 32]], vec![], 1500, 15000, 85000, 3, crate::ValidatorStatus::SlashEligible, 100), 3, 5);
+        // N118: Sign certificate FIRST so signing_bytes is stable for approvals
+        let sk = ed25519_dalek::SigningKey::from_bytes(&[0x42; 32]);
+        cert.certificate.sign(&sk);
+        for seed in [1u8, 2, 3] {
+            let ak = ed25519_dalek::SigningKey::from_bytes(&[seed; 32]);
+            cert.add_approval(ak.verifying_key().to_bytes(), &ak).unwrap();
+        }
+        let r = adapter.execute_after_finality(&vid, &cert, 100);
+        if let Err(ref e) = r { eprintln!("N118.2b DEBUG: {}", e); }
+        assert!(r.is_ok() && r.unwrap().is_some(), "N118.2b FAIL");
+    }
+
 }
