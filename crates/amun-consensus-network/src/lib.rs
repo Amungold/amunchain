@@ -28,6 +28,7 @@ pub mod slashing_certificate;
 pub mod slashing_certificate_builder;
 pub mod multi_signer_certificate;
 pub mod finality_gate;
+pub mod slashing_ledger;
 pub mod staking_adapter;
 pub mod validation;
 pub mod vote_binding;
@@ -56,5 +57,6 @@ pub use slashing_certificate::{CertificateResultingStatus, EvidenceCount, Slashi
 pub use slashing_certificate_builder::SlashingCertificateBuilder;
 pub use multi_signer_certificate::MultiSignerCertificate;
 pub use finality_gate::{is_certificate_finalized, execute_if_finalized};
+pub use slashing_ledger::{SlashingLedger, ExecutedSlash, certificate_id};
 pub use staking_adapter::{SlashResult, SlashingExecutor, StakingAdapter};
 pub use vote_binding::verify_vote_binding;
