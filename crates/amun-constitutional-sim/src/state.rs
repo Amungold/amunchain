@@ -1,5 +1,7 @@
 use crate::types::{ClaimAction, Jurisdiction};
 use rand::Rng;
+use rand::SeedableRng;
+use rand::rngs::StdRng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -30,7 +32,7 @@ pub struct LegitimacyClaim {
 
 impl SimulationState {
     pub fn new(num_sovereigns: usize, recognition_density: f64, treaty_density: f64) -> Self {
-        let mut rng = rand::thread_rng();
+        let mut rng = StdRng::seed_from_u64(42);
 
         let sovereigns: Vec<Sovereign> = (0..num_sovereigns)
             .map(|id| Sovereign { id, weight: 1.0 })

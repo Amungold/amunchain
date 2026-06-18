@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExperimentalProtocol {
+    pub random_seed: u64,
     pub num_sovereigns: usize,
     pub num_steps: usize,
     pub initial_recognition_density: f64,

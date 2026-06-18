@@ -8,6 +8,7 @@ fn test_engineering_map() {
 
     // Reference baseline
     let base = ExperimentalProtocol {
+        random_seed: 42,
         num_sovereigns: n,
         num_steps: steps,
         initial_recognition_density: 0.8,

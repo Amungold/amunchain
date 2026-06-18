@@ -26,7 +26,8 @@ fn test_interaction_effects() {
 
     for (f2, f3, label) in &conditions {
         let protocol = ExperimentalProtocol {
-            num_sovereigns: n,
+            random_seed: 42,
+        num_sovereigns: n,
             num_steps: steps,
             initial_recognition_density: 0.8,
             initial_treaty_density: *f3,

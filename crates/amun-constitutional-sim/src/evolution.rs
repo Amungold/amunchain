@@ -1,12 +1,14 @@
 use crate::state::SimulationState;
 use crate::types::ClaimAction;
 use rand::Rng;
+use rand::SeedableRng;
+use rand::rngs::StdRng;
 
 pub struct EvolutionOperator;
 
 impl EvolutionOperator {
     pub fn recognition_erosion(state: &mut SimulationState, erosion_rate: f64) {
-        let mut rng = rand::thread_rng();
+        let mut rng = StdRng::seed_from_u64(42);
         let n = state.sovereigns.len();
         for i in 0..n {
             for j in 0..n {
@@ -23,7 +25,7 @@ impl EvolutionOperator {
         legitimacy_factor: f64,
         reciprocity_bias: f64,
     ) {
-        let mut rng = rand::thread_rng();
+        let mut rng = StdRng::seed_from_u64(42);
         let n = state.sovereigns.len();
 
         // Use average effectiveness per entity (not total)
@@ -56,7 +58,7 @@ impl EvolutionOperator {
     }
 
     pub fn treaty_evolution(state: &mut SimulationState, failure_rate: f64) {
-        let mut rng = rand::thread_rng();
+        let mut rng = StdRng::seed_from_u64(42);
         let n = state.sovereigns.len();
         for i in 0..n {
             for j in (i + 1)..n {
@@ -69,7 +71,7 @@ impl EvolutionOperator {
     }
 
     pub fn jurisdiction_evolution(state: &mut SimulationState, shift_rate: f64) {
-        let mut rng = rand::thread_rng();
+        let mut rng = StdRng::seed_from_u64(42);
         for j in &mut state.jurisdictions {
             if rng.gen::<f64>() < shift_rate {
                 let new_region = rng.gen_range(0..10);
@@ -81,7 +83,7 @@ impl EvolutionOperator {
     }
 
     pub fn claim_generation(state: &mut SimulationState, generation_rate: f64) {
-        let mut rng = rand::thread_rng();
+        let mut rng = StdRng::seed_from_u64(42);
         let n = state.sovereigns.len();
         if n < 2 {
             return;

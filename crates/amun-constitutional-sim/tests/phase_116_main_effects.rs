@@ -8,6 +8,7 @@ fn test_main_effects() {
 
     // Baseline: all factors at minimum
     let base = ExperimentalProtocol {
+        random_seed: 42,
         num_sovereigns: n,
         num_steps: steps,
         initial_recognition_density: 0.8,

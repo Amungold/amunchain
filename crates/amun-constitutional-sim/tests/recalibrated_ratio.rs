@@ -18,7 +18,8 @@ fn test_ratio_scan_recalibrated() {
 
         for _ in 0..runs {
             let protocol = ExperimentalProtocol {
-                num_sovereigns: n,
+                random_seed: 42,
+        num_sovereigns: n,
                 num_steps: steps,
                 initial_recognition_density: 0.8,
                 initial_treaty_density: 0.0,

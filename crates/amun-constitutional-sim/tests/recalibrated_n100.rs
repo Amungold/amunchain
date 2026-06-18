@@ -3,6 +3,7 @@ use amun_constitutional_sim::{ExperimentalProtocol, SimulationRunner};
 #[test]
 fn test_n100_validation_recalibrated() {
     let protocol = ExperimentalProtocol {
+        random_seed: 42,
         num_sovereigns: 100,
         num_steps: 300,
         initial_recognition_density: 0.8,
