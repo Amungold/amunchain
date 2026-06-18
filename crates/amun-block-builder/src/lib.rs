@@ -51,6 +51,19 @@ impl Block {
         Ok(())
     }
 
+    /// N120.3: Verify that the slashing_root matches the given ledger root.
+    /// Returns Err if the block's slashing_root doesn't match.
+    pub fn verify_slashing_root(&self, expected_root: &[u8; 32]) -> Result<(), String> {
+        if self.slashing_root != *expected_root {
+            return Err(format!(
+                "N120.3: slashing_root mismatch: block={:02x?} expected={:02x?}",
+                &self.slashing_root[..4],
+                &expected_root[..4]
+            ));
+        }
+        Ok(())
+    }
+
     /// Compute the Blake3 block hash with domain separation.
     pub fn block_hash(&self) -> [u8; 32] {
         let mut hasher = Hasher::new();

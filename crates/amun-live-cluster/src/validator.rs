@@ -37,6 +37,8 @@ pub struct LiveValidator {
     /// N110.4c: Staking adapter for applying slashes after finality
     pub staking_adapter: Arc<Mutex<StakingAdapter<RealStakingExecutor>>>,
     pub applied_slashing_certificates: Arc<Mutex<std::collections::HashSet<[u8; 32]>>>,
+    /// N120.4: Slashing ledger for computing the merkle root
+    pub slashing_ledger: Arc<Mutex<amun_consensus_network::SlashingLedger>>,
 }
 
 impl LiveValidator {
@@ -130,6 +132,7 @@ impl LiveValidator {
                 amun_consensus_network::CertificateGossip::new(),
             )),
             applied_slashing_certificates: Arc::new(Mutex::new(std::collections::HashSet::new())),
+            slashing_ledger: Arc::new(Mutex::new(amun_consensus_network::SlashingLedger::new())),
             staking_adapter: Arc::new(Mutex::new(StakingAdapter::new(
                 amun_consensus_network::MisbehaviorRegistry::new(
                     amun_consensus_network::MisbehaviorThresholds::default(),
@@ -207,6 +210,7 @@ impl LiveValidator {
         let certificate_gossip_clone = self.certificate_gossip.clone();
         let staking_adapter_clone = self.staking_adapter.clone();
         let applied_certs_clone = self.applied_slashing_certificates.clone();
+        let slashing_ledger_clone = self.slashing_ledger.clone();
         let running_consensus = running.clone();
         let h2 = thread::spawn(move || {
             let signing_key = signing_key_clone;
@@ -272,7 +276,7 @@ impl LiveValidator {
                             .iter()
                             .map(|c| (*c).clone())
                             .collect();
-                    let block = bld.build_block_with_certificates(
+                    let mut block = bld.build_block_with_certificates(
                         height,
                         parent,
                         &mut mp,
@@ -281,6 +285,12 @@ impl LiveValidator {
                         timestamp,
                         pending_certs,
                     );
+                    // N120.4: Compute and set the slashing root from the ledger
+                    {
+                        let ledger = slashing_ledger_clone.lock().unwrap();
+                        block.slashing_root = amun_consensus_network::merkle_root(&ledger.history);
+                    }
+                    // Recompute hash after setting slashing_root (N120.2 requires it in hash)
                     let hash = block.block_hash();
                     let root = block.state_root;
                     let mut eng = engine_consensus.lock().unwrap();

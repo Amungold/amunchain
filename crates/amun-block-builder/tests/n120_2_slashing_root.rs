@@ -70,3 +70,38 @@ fn n120_2_zero_root_vs_nonzero_root_different_hash() {
         "N120.2 FAIL: zero root vs nonzero root must produce different hashes"
     );
 }
+
+// N120.3 — Consensus Verification of slashing_root
+#[test]
+fn n120_3_matching_root_accepted() {
+    let root = [0x42; 32];
+    let block = build_block_with_root(root);
+    assert!(
+        block.verify_slashing_root(&root).is_ok(),
+        "N120.3 FAIL: matching root must be accepted"
+    );
+}
+
+#[test]
+fn n120_3_mismatched_root_rejected() {
+    let block = build_block_with_root([0x42; 32]);
+    let result = block.verify_slashing_root(&[0xFF; 32]);
+    assert!(
+        result.is_err(),
+        "N120.3 FAIL: mismatched root must be rejected"
+    );
+    assert!(result.unwrap_err().contains("slashing_root mismatch"));
+}
+
+#[test]
+fn n120_3_zero_root_verified_correctly() {
+    let block = build_block_with_root([0u8; 32]);
+    assert!(
+        block.verify_slashing_root(&[0u8; 32]).is_ok(),
+        "N120.3 FAIL: zero root must match zero root"
+    );
+    assert!(
+        block.verify_slashing_root(&[0x01; 32]).is_err(),
+        "N120.3 FAIL: zero root must not match nonzero root"
+    );
+}
