@@ -19,15 +19,15 @@ pub use validator_identity::{ValidatorIdentity, ValidatorIdentityRegistry};
 pub mod evidence_store;
 pub mod execution_commitment;
 pub mod execution_receipt;
+pub mod finality_gate;
 pub mod integrated_slashing;
 pub mod metrics;
 pub mod misbehavior_registry;
+pub mod multi_signer_certificate;
 pub mod re_executor;
 pub mod real_staking_adapter;
 pub mod slashing_certificate;
 pub mod slashing_certificate_builder;
-pub mod multi_signer_certificate;
-pub mod finality_gate;
 pub mod slashing_ledger;
 pub mod slashing_merkle;
 pub mod staking_adapter;
@@ -43,6 +43,7 @@ pub use evidence_gossip::{EvidenceAnnouncement, EvidenceGossip};
 pub use evidence_store::{EvidenceRecord, EvidenceStatus, EvidenceStore, EvidenceType};
 pub use execution_commitment::ExecutionCommitment;
 pub use execution_receipt::ExecutionReceipt;
+pub use finality_gate::{execute_if_finalized, is_certificate_finalized};
 pub use integrated_slashing::{IntegratedSlashingPipeline, PipelineResult};
 pub use messages::{
     BlockProposal, ConsensusVote, N109BlockProposal, N109ConsensusVote, NetworkMessage,
@@ -52,13 +53,12 @@ pub use metrics::ConsensusMetrics;
 pub use misbehavior_registry::{
     MisbehaviorRecord, MisbehaviorRegistry, MisbehaviorThresholds, ValidatorAction, ValidatorStatus,
 };
+pub use multi_signer_certificate::MultiSignerCertificate;
 pub use re_executor::verify_block_execution;
 pub use real_staking_adapter::RealStakingExecutor;
 pub use slashing_certificate::{CertificateResultingStatus, EvidenceCount, SlashingCertificate};
 pub use slashing_certificate_builder::SlashingCertificateBuilder;
-pub use multi_signer_certificate::MultiSignerCertificate;
-pub use finality_gate::{is_certificate_finalized, execute_if_finalized};
-pub use slashing_ledger::{SlashingLedger, ExecutedSlash, certificate_id};
+pub use slashing_ledger::{certificate_id, ExecutedSlash, SlashingLedger};
 pub use slashing_merkle::merkle_root;
 pub use staking_adapter::{SlashResult, SlashingExecutor, StakingAdapter};
 pub use vote_binding::verify_vote_binding;

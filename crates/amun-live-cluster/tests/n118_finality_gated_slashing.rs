@@ -2,11 +2,11 @@
 // Verifies that slashing executes in the finality path and reduces stake.
 
 use amun_consensus_network::{
-    ValidatorIdentity, EvidenceType,
-    StakingAdapter, RealStakingExecutor, MisbehaviorRegistry, MisbehaviorThresholds,
+    EvidenceType, MisbehaviorRegistry, MisbehaviorThresholds, RealStakingExecutor, StakingAdapter,
+    ValidatorIdentity,
 };
-use amun_staking::validator::ValidatorRegistry;
 use amun_kernel_types::PublicKey;
+use amun_staking::validator::ValidatorRegistry;
 
 #[test]
 fn n118_slashing_executes_after_finality() {
@@ -22,15 +22,21 @@ fn n118_slashing_executes_after_finality() {
     misbehavior.record_misbehavior(&validator_id, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
 
     let mut executor = RealStakingExecutor::new(staking);
-    executor.identity_registry.register(
-        ValidatorIdentity::new(validator_id, [0x42u8; 48], 1)
-    ).unwrap();
+    executor
+        .identity_registry
+        .register(ValidatorIdentity::new(validator_id, [0x42u8; 48], 1))
+        .unwrap();
     let mut adapter = StakingAdapter::new(misbehavior, executor);
 
     let result = adapter.try_slash(&validator_id);
-    assert!(result.is_some(), "N118: Slashing must execute in finality path");
-    assert!(adapter.executor.registry.total_stake < initial_stake,
-        "N118: Stake must decrease after finality-gated slash");
+    assert!(
+        result.is_some(),
+        "N118: Slashing must execute in finality path"
+    );
+    assert!(
+        adapter.executor.registry.total_stake < initial_stake,
+        "N118: Stake must decrease after finality-gated slash"
+    );
 
     eprintln!("N118 PASSED: Slashing executes in finality-gated path");
 }

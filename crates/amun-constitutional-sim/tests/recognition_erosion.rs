@@ -62,7 +62,7 @@ fn test_saturation_ratio_scan_n100() {
         for _ in 0..runs {
             let protocol = ExperimentalProtocol {
                 random_seed: 42,
-        num_sovereigns: 100,
+                num_sovereigns: 100,
                 num_steps: 500,
                 initial_recognition_density: 0.8,
                 initial_treaty_density: 0.0,

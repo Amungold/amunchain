@@ -147,6 +147,7 @@ mod tests {
             state_root: [0xBB; 32],
             history_root: [0xCC; 32],
             certificate_hash: [0xDD; 32],
+            slashing_root: [0u8; 32],
             timestamp: h * 1000,
         }
     }

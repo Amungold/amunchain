@@ -17,6 +17,8 @@ pub struct Block {
     pub timestamp: u64,
     /// N110.4: Slashing certificates included in this block
     pub slashing_certificates: Vec<amun_consensus_network::SlashingCertificate>,
+    /// N120.2: Merkle root of the slashing ledger after this block
+    pub slashing_root: [u8; 32],
 }
 
 impl Block {
@@ -65,6 +67,8 @@ impl Block {
         for cert in &self.slashing_certificates {
             hasher.update(&cert.certificate_hash);
         }
+        // N120.2: Include slashing root in block hash
+        hasher.update(&self.slashing_root);
         hasher.finalize().into()
     }
 }
@@ -131,6 +135,7 @@ impl BlockBuilder {
             proposer,
             timestamp,
             slashing_certificates,
+            slashing_root: [0u8; 32], // N120.2: computed after ledger update
         }
     }
 

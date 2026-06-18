@@ -76,7 +76,8 @@ impl<E: SlashingExecutor> StakingAdapter<E> {
         if cert.certificate.signature == [0u8; 64] {
             return Err("N118.2: unsigned certificate".into());
         }
-        cert.certificate.verify_signature()
+        cert.certificate
+            .verify_signature()
             .map_err(|e| format!("N118.2: signature: {}", e))?;
         if !cert.has_quorum()? {
             return Err("N118.2: quorum not reached".into());
@@ -523,12 +524,29 @@ mod tests {
         reg.record_misbehavior(&vid, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
         let mut adapter = StakingAdapter::new(reg, staking);
         let mut cert = crate::MultiSignerCertificate::new(
-            crate::SlashingCertificate::from_slash_result(vid, 30, vec![[0xA1; 32]], vec![], 1500, 15000, 85000, 3, crate::ValidatorStatus::SlashEligible, 100), 3, 5);
+            crate::SlashingCertificate::from_slash_result(
+                vid,
+                30,
+                vec![[0xA1; 32]],
+                vec![],
+                1500,
+                15000,
+                85000,
+                3,
+                crate::ValidatorStatus::SlashEligible,
+                100,
+            ),
+            3,
+            5,
+        );
         let k = ed25519_dalek::SigningKey::from_bytes(&[0x42; 32]);
         cert.add_approval(k.verifying_key().to_bytes(), &k).unwrap();
         cert.certificate.sign(&k);
         let r = adapter.execute_after_finality(&vid, &cert, 99);
-        assert!(r.is_err() && r.unwrap_err().contains("not finalized"), "N118.2a FAIL");
+        assert!(
+            r.is_err() && r.unwrap_err().contains("not finalized"),
+            "N118.2a FAIL"
+        );
     }
 
     #[test]
@@ -542,17 +560,33 @@ mod tests {
         reg.record_misbehavior(&vid, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
         let mut adapter = StakingAdapter::new(reg, staking);
         let mut cert = crate::MultiSignerCertificate::new(
-            crate::SlashingCertificate::from_slash_result(vid, 30, vec![[0xA1; 32]], vec![], 1500, 15000, 85000, 3, crate::ValidatorStatus::SlashEligible, 100), 3, 5);
+            crate::SlashingCertificate::from_slash_result(
+                vid,
+                30,
+                vec![[0xA1; 32]],
+                vec![],
+                1500,
+                15000,
+                85000,
+                3,
+                crate::ValidatorStatus::SlashEligible,
+                100,
+            ),
+            3,
+            5,
+        );
         // N118: Sign certificate FIRST so signing_bytes is stable for approvals
         let sk = ed25519_dalek::SigningKey::from_bytes(&[0x42; 32]);
         cert.certificate.sign(&sk);
         for seed in [1u8, 2, 3] {
             let ak = ed25519_dalek::SigningKey::from_bytes(&[seed; 32]);
-            cert.add_approval(ak.verifying_key().to_bytes(), &ak).unwrap();
+            cert.add_approval(ak.verifying_key().to_bytes(), &ak)
+                .unwrap();
         }
         let r = adapter.execute_after_finality(&vid, &cert, 100);
-        if let Err(ref e) = r { eprintln!("N118.2b DEBUG: {}", e); }
+        if let Err(ref e) = r {
+            eprintln!("N118.2b DEBUG: {}", e);
+        }
         assert!(r.is_ok() && r.unwrap().is_some(), "N118.2b FAIL");
     }
-
 }

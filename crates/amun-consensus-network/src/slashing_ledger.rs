@@ -60,11 +60,7 @@ impl SlashingLedger {
 
     /// N119.2: Execute a slash and record it in the ledger.
     /// Returns Err if the certificate was already executed (replay protection).
-    pub fn execute<F, T>(
-        &mut self,
-        cert: &SlashingCertificate,
-        execute_fn: F,
-    ) -> Result<T, String>
+    pub fn execute<F, T>(&mut self, cert: &SlashingCertificate, execute_fn: F) -> Result<T, String>
     where
         F: FnOnce() -> Result<T, String>,
     {
@@ -119,17 +115,26 @@ impl Default for SlashingLedger {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::slashing_certificate::{SlashingCertificate, EvidenceCount};
     use crate::evidence_store::EvidenceType;
+    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
     use crate::ValidatorStatus;
 
     fn make_cert(id: u64) -> SlashingCertificate {
         SlashingCertificate::from_slash_result(
-            [0x42; 32], 30,
+            [0x42; 32],
+            30,
             vec![[0xA1; 32], [0xA2; 32], [0xA3; 32]],
-            vec![EvidenceCount { evidence_type: EvidenceType::DoubleVote, count: 3, weight: 30 }],
-            1500, 15000, 85000, 3,
-            ValidatorStatus::SlashEligible, 100 + id,
+            vec![EvidenceCount {
+                evidence_type: EvidenceType::DoubleVote,
+                count: 3,
+                weight: 30,
+            }],
+            1500,
+            15000,
+            85000,
+            3,
+            ValidatorStatus::SlashEligible,
+            100 + id,
         )
     }
 
@@ -138,8 +143,14 @@ mod tests {
         let cert = make_cert(0);
         let id1 = certificate_id(&cert);
         let id2 = certificate_id(&cert);
-        assert_eq!(id1, id2, "N119.1 FAIL: certificate_id must be deterministic");
-        assert_ne!(id1, [0u8; 32], "N119.1 FAIL: certificate_id must not be zero");
+        assert_eq!(
+            id1, id2,
+            "N119.1 FAIL: certificate_id must be deterministic"
+        );
+        assert_ne!(
+            id1, [0u8; 32],
+            "N119.1 FAIL: certificate_id must not be zero"
+        );
     }
 
     #[test]
@@ -178,7 +189,10 @@ mod tests {
         let cert2 = make_cert(1);
         let id1 = certificate_id(&cert1);
         let id2 = certificate_id(&cert2);
-        assert_ne!(id1, id2, "N119.4 FAIL: different certificates must have different IDs");
+        assert_ne!(
+            id1, id2,
+            "N119.4 FAIL: different certificates must have different IDs"
+        );
     }
 
     #[test]
@@ -192,7 +206,11 @@ mod tests {
         // Second: error, no change to ledger
         let r2 = ledger.execute(&cert, || Ok(200u64));
         assert!(r2.is_err());
-        assert_eq!(ledger.executed_count(), 1, "N119.5 FAIL: duplicate must not increase count");
+        assert_eq!(
+            ledger.executed_count(),
+            1,
+            "N119.5 FAIL: duplicate must not increase count"
+        );
         assert_eq!(ledger.history.len(), 1);
     }
 
@@ -200,11 +218,20 @@ mod tests {
     fn n119_5_audit_trail_by_validator() {
         let cert1 = make_cert(0);
         let cert2 = SlashingCertificate::from_slash_result(
-            [0x99; 32], 20,
+            [0x99; 32],
+            20,
             vec![[0xB1; 32]],
-            vec![EvidenceCount { evidence_type: EvidenceType::InvalidSignature, count: 1, weight: 2 }],
-            500, 5000, 95000, 1,
-            ValidatorStatus::Warned, 200,
+            vec![EvidenceCount {
+                evidence_type: EvidenceType::InvalidSignature,
+                count: 1,
+                weight: 2,
+            }],
+            500,
+            5000,
+            95000,
+            1,
+            ValidatorStatus::Warned,
+            200,
         );
         let mut ledger = SlashingLedger::new();
 

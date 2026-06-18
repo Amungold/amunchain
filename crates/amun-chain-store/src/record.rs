@@ -7,6 +7,8 @@ pub struct FinalizedChainRecord {
     pub state_root: [u8; 32],
     pub history_root: [u8; 32],
     pub certificate_hash: [u8; 32],
+    /// N120.2: Merkle root of the slashing ledger
+    pub slashing_root: [u8; 32],
     pub timestamp: u64,
 }
 
@@ -30,6 +32,7 @@ mod tests {
             state_root: [0xBB; 32],
             history_root: [0xCC; 32],
             certificate_hash: [0xDD; 32],
+            slashing_root: [0u8; 32],
             timestamp: 1000,
         };
         let encoded = record.encode();

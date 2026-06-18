@@ -74,7 +74,10 @@ mod tests {
         let root1 = merkle_root(&[slash.clone()]);
         let root2 = merkle_root(&[slash]);
         assert_eq!(root1, root2, "N120.1 FAIL: root must be deterministic");
-        assert_ne!(root1, [0u8; 32], "N120.1 FAIL: single leaf root must not be zero");
+        assert_ne!(
+            root1, [0u8; 32],
+            "N120.1 FAIL: single leaf root must not be zero"
+        );
     }
 
     #[test]
@@ -84,7 +87,10 @@ mod tests {
         let s2 = make_slash(2, 200);
         let root1 = merkle_root(&[s1.clone(), s2.clone()]);
         let root2 = merkle_root(&[s1, s2]);
-        assert_eq!(root1, root2, "N120.1 FAIL: identical inputs must produce identical roots");
+        assert_eq!(
+            root1, root2,
+            "N120.1 FAIL: identical inputs must produce identical roots"
+        );
     }
 
     #[test]
@@ -93,7 +99,10 @@ mod tests {
         let s2 = make_slash(2, 100);
         let root1 = merkle_root(&[s1.clone()]);
         let root2 = merkle_root(&[s2]);
-        assert_ne!(root1, root2, "N120.1 FAIL: different slashes must have different roots");
+        assert_ne!(
+            root1, root2,
+            "N120.1 FAIL: different slashes must have different roots"
+        );
     }
 
     #[test]
@@ -102,7 +111,10 @@ mod tests {
         let s2 = make_slash(2, 200);
         let root_before = merkle_root(&[s1.clone()]);
         let root_after = merkle_root(&[s1, s2]);
-        assert_ne!(root_before, root_after, "N120.1 FAIL: root must change when new slash is added");
+        assert_ne!(
+            root_before, root_after,
+            "N120.1 FAIL: root must change when new slash is added"
+        );
     }
 
     #[test]
@@ -110,7 +122,10 @@ mod tests {
         let slashes: Vec<_> = (1..=7).map(|i| make_slash(i, i as u64 * 100)).collect();
         let root1 = merkle_root(&slashes);
         let root2 = merkle_root(&slashes);
-        assert_eq!(root1, root2, "N120.1 FAIL: larger tree must be deterministic");
+        assert_eq!(
+            root1, root2,
+            "N120.1 FAIL: larger tree must be deterministic"
+        );
     }
 
     #[test]
@@ -119,8 +134,9 @@ mod tests {
         let s2 = make_slash(2, 200);
         let root_ab = merkle_root(&[s1.clone(), s2.clone()]);
         let root_ba = merkle_root(&[s2, s1]);
-        assert_ne!(root_ab, root_ba,
-            "N120.1 FAIL: Merkle root must be order-sensitive (A,B) != (B,A)");
+        assert_ne!(
+            root_ab, root_ba,
+            "N120.1 FAIL: Merkle root must be order-sensitive (A,B) != (B,A)"
+        );
     }
-
 }

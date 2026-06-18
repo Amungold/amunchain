@@ -87,18 +87,27 @@ impl MultiSignerCertificate {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::slashing_certificate::{SlashingCertificate, EvidenceCount};
     use crate::evidence_store::EvidenceType;
+    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
     use crate::ValidatorStatus;
     use ed25519_dalek::SigningKey;
 
     fn make_certificate() -> SlashingCertificate {
         SlashingCertificate::from_slash_result(
-            [0x42; 32], 30,
+            [0x42; 32],
+            30,
             vec![[0xA1; 32], [0xA2; 32], [0xA3; 32]],
-            vec![EvidenceCount { evidence_type: EvidenceType::DoubleVote, count: 3, weight: 30 }],
-            1500, 15000, 85000, 3,
-            ValidatorStatus::SlashEligible, 100,
+            vec![EvidenceCount {
+                evidence_type: EvidenceType::DoubleVote,
+                count: 3,
+                weight: 30,
+            }],
+            1500,
+            15000,
+            85000,
+            3,
+            ValidatorStatus::SlashEligible,
+            100,
         )
     }
 

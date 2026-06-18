@@ -1,8 +1,8 @@
 use crate::state::SimulationState;
 use crate::types::ClaimAction;
+use rand::rngs::StdRng;
 use rand::Rng;
 use rand::SeedableRng;
-use rand::rngs::StdRng;
 
 pub struct EvolutionOperator;
 

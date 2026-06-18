@@ -137,6 +137,7 @@ pub fn restore_snapshot(snapshot_dir: &Path, store_dir: &Path) -> Result<Snapsho
         state_root,
         history_root: manifest.history_root,
         certificate_hash: [0u8; 32],
+        slashing_root: [0u8; 32],
         timestamp: 0,
     };
 

@@ -406,6 +406,7 @@ impl LiveValidator {
                         state_root: cert.state_root,
                         history_root: cert.history_root,
                         certificate_hash: [0u8; 32],
+                        slashing_root: [0u8; 32],
                         timestamp: SystemTime::now()
                             .duration_since(SystemTime::UNIX_EPOCH)
                             .unwrap()

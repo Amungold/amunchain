@@ -10,10 +10,7 @@
 use crate::multi_signer_certificate::MultiSignerCertificate;
 
 /// N118.1: Check if a certificate can be executed at the given finalized height.
-pub fn is_certificate_finalized(
-    cert: &MultiSignerCertificate,
-    finalized_height: u64,
-) -> bool {
+pub fn is_certificate_finalized(cert: &MultiSignerCertificate, finalized_height: u64) -> bool {
     cert.certificate.executed_at_height <= finalized_height
 }
 
@@ -39,16 +36,24 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::slashing_certificate::{SlashingCertificate, EvidenceCount};
     use crate::evidence_store::EvidenceType;
+    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
     use crate::ValidatorStatus;
 
     fn make_certificate(height: u64) -> SlashingCertificate {
         SlashingCertificate::from_slash_result(
-            [0x42; 32], 30,
+            [0x42; 32],
+            30,
             vec![[0xA1; 32], [0xA2; 32], [0xA3; 32]],
-            vec![EvidenceCount { evidence_type: EvidenceType::DoubleVote, count: 3, weight: 30 }],
-            1500, 15000, 85000, 3,
+            vec![EvidenceCount {
+                evidence_type: EvidenceType::DoubleVote,
+                count: 3,
+                weight: 30,
+            }],
+            1500,
+            15000,
+            85000,
+            3,
             ValidatorStatus::SlashEligible,
             height,
         )
@@ -81,7 +86,13 @@ mod tests {
     #[test]
     fn n118_1_exact_height_boundary() {
         let cert = make_multi_signer(100);
-        assert!(is_certificate_finalized(&cert, 100), "height 100 == finalized 100 must be accepted");
-        assert!(!is_certificate_finalized(&cert, 99), "height 100 > finalized 99 must be rejected");
+        assert!(
+            is_certificate_finalized(&cert, 100),
+            "height 100 == finalized 100 must be accepted"
+        );
+        assert!(
+            !is_certificate_finalized(&cert, 99),
+            "height 100 > finalized 99 must be rejected"
+        );
     }
 }
