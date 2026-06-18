@@ -2,6 +2,7 @@
 // N110.1b — Real Staking Adapter
 // ============================================================================
 use crate::staking_adapter::SlashingExecutor;
+use crate::validator_identity::ValidatorIdentityRegistry;
 use amun_kernel_types::PublicKey;
 use amun_staking::slashing::SlashingConditions;
 use amun_staking::validator::ValidatorRegistry;
@@ -10,6 +11,7 @@ use amun_staking::validator::ValidatorRegistry;
 pub struct RealStakingExecutor {
     pub registry: ValidatorRegistry,
     pub rules: SlashingConditions,
+    pub identity_registry: ValidatorIdentityRegistry,
 }
 
 impl RealStakingExecutor {
@@ -17,27 +19,44 @@ impl RealStakingExecutor {
         Self {
             registry,
             rules: SlashingConditions::new(),
+            identity_registry: ValidatorIdentityRegistry::new(),
         }
     }
 
-    /// Convert [u8; 32] validator_id to PublicKey (48 bytes).
-    /// Pads with zeros to fill the 48-byte key.
-    fn to_public_key(validator_id: &[u8; 32]) -> PublicKey {
-        let mut key = [0u8; 48];
-        key[..32].copy_from_slice(validator_id);
-        PublicKey(key)
+    pub fn with_identity_registry(
+        registry: ValidatorRegistry,
+        identity_registry: ValidatorIdentityRegistry,
+    ) -> Self {
+        Self { registry, rules: SlashingConditions::new(), identity_registry }
+    }
+
+    /// N113.2b: Resolve PublicKey strictly through identity registry.
+    /// Returns an error if the validator is not registered.
+    fn to_public_key(&self, validator_id: &[u8; 32]) -> Result<PublicKey, String> {
+        self.identity_registry
+            .get_public_key(validator_id)
+            .ok_or_else(|| {
+                format!(
+                    "N113.2b: validator identity not registered: {:02x?}",
+                    &validator_id[..4]
+                )
+            })
     }
 }
 
 impl SlashingExecutor for RealStakingExecutor {
-    fn get_stake(&self, _validator_id: &[u8; 32]) -> u64 {
-        // ValidatorRegistry doesn't expose individual stake via public API.
-        // We track it through slash results. Return total as approximation.
-        self.registry.total_stake
+    fn get_stake(&self, validator_id: &[u8; 32]) -> u64 {
+        // Returns total_stake if the validator is registered; 0 otherwise.
+        // Individual stake is tracked through slash results.
+        if self.to_public_key(validator_id).is_ok() {
+            self.registry.total_stake
+        } else {
+            0
+        }
     }
 
     fn slash(&mut self, validator_id: &[u8; 32], _amount: u64) -> Result<u64, String> {
-        let pk = Self::to_public_key(validator_id);
+        let pk = self.to_public_key(validator_id)?;
         self.registry
             .slash(&pk, &self.rules)
             .map_err(|e| format!("Slash failed: {:?}", e))
@@ -80,7 +99,11 @@ mod tests {
             .expect("Registration should succeed");
         assert_eq!(registry.total_stake, 100_000);
 
-        let executor = RealStakingExecutor::new(registry);
+        let mut executor = RealStakingExecutor::new(registry);
+        // N113.2b: Register identity before using the adapter
+        executor.identity_registry.register(
+            crate::ValidatorIdentity::new(validator_id, pk.0, 1)
+        ).unwrap();
         let mut adapter = StakingAdapter::new(
             MisbehaviorRegistry::new(MisbehaviorThresholds::default()),
             executor,
@@ -127,5 +150,36 @@ mod tests {
             "N110.1b GATEKEEPER PASSED: real_stake_before=100000, slashed={}, registry_total={}",
             slash_result.amount_slashed, adapter.executor.registry.total_stake
         );
+    }
+
+    /// N113.2b: Unregistered validator must be rejected (no fallback)
+    #[test]
+    fn n113_2b_unregistered_validator_rejected() {
+        let registry = ValidatorRegistry::new();
+        let mut executor = RealStakingExecutor::new(registry);
+        let validator_id = [0xAA; 32];
+        let result = executor.slash(&validator_id, 1000);
+        assert!(result.is_err(), "N113.2b FAIL: Unregistered identity must be rejected");
+        assert!(result.unwrap_err().contains("not registered"),
+            "Error must mention identity not registered");
+    }
+
+    /// N113.2: Real executor resolves PublicKey through identity registry
+    #[test]
+    fn n113_2_real_executor_uses_identity_registry() {
+        let mut registry = ValidatorRegistry::new();
+        let pk = PublicKey([0x42u8; 48]);
+        let validator_id = [0x42u8; 32];
+        registry.register(pk, 100_000).unwrap();
+
+        let mut id_registry = ValidatorIdentityRegistry::new();
+        id_registry.register(
+            crate::ValidatorIdentity::new(validator_id, [0x42u8; 48], 1)
+        ).unwrap();
+
+        let executor = RealStakingExecutor::with_identity_registry(registry, id_registry);
+        let resolved_pk = executor.to_public_key(&validator_id).unwrap();
+        assert_eq!(resolved_pk.0, [0x42u8; 48],
+            "N113.2 FAIL: PublicKey must come from identity registry");
     }
 }

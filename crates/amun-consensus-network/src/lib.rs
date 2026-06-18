@@ -11,9 +11,11 @@ pub mod certificate_gossip;
 pub mod evidence_gossip;
 pub mod evidence_push;
 pub mod evidence_push_processor;
+pub mod validator_identity;
 
 pub use evidence_push::{EvidencePush, EvidencePushConfig};
 pub use evidence_push_processor::{process_incoming_evidence_push, PushProcessResult};
+pub use validator_identity::{ValidatorIdentity, ValidatorIdentityRegistry};
 pub mod evidence_store;
 pub mod execution_commitment;
 pub mod execution_receipt;
