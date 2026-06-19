@@ -7,8 +7,13 @@ pub struct FinalizedChainRecord {
     pub state_root: [u8; 32],
     pub history_root: [u8; 32],
     pub certificate_hash: [u8; 32],
-    /// N120.2: Merkle root of the slashing ledger
     pub slashing_root: [u8; 32],
+    /// N129.1: Hash of the constitutional verdict for this block
+    pub verdict_hash: [u8; 32],
+    /// N129.2: Hash of the constitutional evidence record
+    pub evidence_record_hash: [u8; 32],
+    /// N129.3: Evidence root chaining all constitutional proofs
+    pub evidence_root: [u8; 32],
     pub timestamp: u64,
 }
 
@@ -33,6 +38,9 @@ mod tests {
             history_root: [0xCC; 32],
             certificate_hash: [0xDD; 32],
             slashing_root: [0u8; 32],
+            verdict_hash: [0u8; 32],
+            evidence_record_hash: [0u8; 32],
+            evidence_root: [0u8; 32],
             timestamp: 1000,
         };
         let encoded = record.encode();

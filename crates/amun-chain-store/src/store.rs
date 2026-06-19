@@ -148,6 +148,9 @@ mod tests {
             history_root: [0xCC; 32],
             certificate_hash: [0xDD; 32],
             slashing_root: [0u8; 32],
+            verdict_hash: [0u8; 32],
+            evidence_record_hash: [0u8; 32],
+            evidence_root: [0u8; 32],
             timestamp: h * 1000,
         }
     }

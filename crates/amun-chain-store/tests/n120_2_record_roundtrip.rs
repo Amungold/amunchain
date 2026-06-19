@@ -9,6 +9,9 @@ fn n120_2_record_roundtrip_preserves_slashing_root() {
         history_root: [0xCC; 32],
         certificate_hash: [0xDD; 32],
         slashing_root: [0x42; 32],
+        verdict_hash: [0u8; 32],
+        evidence_record_hash: [0u8; 32],
+        evidence_root: [0u8; 32],
         timestamp: 1000,
     };
     let encoded = record.encode();

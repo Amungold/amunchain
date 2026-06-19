@@ -138,6 +138,9 @@ pub fn restore_snapshot(snapshot_dir: &Path, store_dir: &Path) -> Result<Snapsho
         history_root: manifest.history_root,
         certificate_hash: [0u8; 32],
         slashing_root: [0u8; 32],
+        verdict_hash: [0u8; 32],
+        evidence_record_hash: [0u8; 32],
+        evidence_root: [0u8; 32],
         timestamp: 0,
     };
 

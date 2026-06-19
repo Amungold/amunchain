@@ -9,7 +9,14 @@ use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
 use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
-use amun_constitutional_enforcement::{ConstitutionalEnforcementKernel, ConstitutionalVerdict};
+use amun_constitutional_enforcement::{
+    ConstitutionalEnforcementKernel, ConstitutionalVerdict,
+    evidence_records::{
+        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence,
+        ReplayEvidence, SignatureEvidence,
+    },
+};
+use amun_evidence_root::EvidenceRoot;
 use amun_mempool::Mempool;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
 use amun_sync::protocol::{MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE};
@@ -43,6 +50,8 @@ pub struct LiveValidator {
     pub slashing_ledger: Arc<Mutex<amun_consensus_network::SlashingLedger>>,
     /// N123.1: Constitutional enforcement kernel
     pub constitutional_kernel: Arc<Mutex<ConstitutionalEnforcementKernel>>,
+    /// N129.3: Previous evidence root for chain continuity
+    pub previous_evidence_root: Arc<Mutex<[u8; 32]>>,
 }
 
 impl LiveValidator {
@@ -138,6 +147,7 @@ impl LiveValidator {
             applied_slashing_certificates: Arc::new(Mutex::new(std::collections::HashSet::new())),
             slashing_ledger: Arc::new(Mutex::new(amun_consensus_network::SlashingLedger::new())),
             constitutional_kernel: Arc::new(Mutex::new(ConstitutionalEnforcementKernel::new())),
+            previous_evidence_root: Arc::new(Mutex::new([0u8; 32])),
             staking_adapter: Arc::new(Mutex::new(StakingAdapter::new(
                 amun_consensus_network::MisbehaviorRegistry::new(
                     amun_consensus_network::MisbehaviorThresholds::default(),
@@ -270,6 +280,7 @@ impl LiveValidator {
         let applied_certs_clone = self.applied_slashing_certificates.clone();
         let slashing_ledger_clone = self.slashing_ledger.clone();
         let constitutional_kernel_clone = self.constitutional_kernel.clone();
+        let previous_evidence_root_clone = self.previous_evidence_root.clone();
         let running_consensus = running.clone();
         let h2 = thread::spawn(move || {
             let signing_key = signing_key_clone;
@@ -469,18 +480,7 @@ impl LiveValidator {
                     let mut reg = authority_registry_consensus.lock().unwrap();
                     let _ = gov.finalize_block(4, &mut reg);
 
-                    let record = FinalizedChainRecord {
-                        height,
-                        block_hash: cert.block_hash,
-                        state_root: cert.state_root,
-                        history_root: cert.history_root,
-                        certificate_hash: [0u8; 32],
-                        slashing_root: [0u8; 32],
-                        timestamp: SystemTime::now()
-                            .duration_since(SystemTime::UNIX_EPOCH)
-                            .unwrap()
-                            .as_secs(),
-                    };
+                    // N129.2: record will be created after hashing
                     // N126.3: Evidence-Based Constitutional Verification
                     {
                         let mut kernel = constitutional_kernel_clone.lock().unwrap();
@@ -536,11 +536,11 @@ impl LiveValidator {
                             transition_valid,
                             evidence_valid,
                         );
-                        match verdict {
+                        match &verdict {
                             ConstitutionalVerdict::Constitutional => {
                                 eprintln!("N123.1: Block {} is CONSTITUTIONAL", height);
                             }
-                            ConstitutionalVerdict::Unconstitutional { ref violations } => {
+                            ConstitutionalVerdict::Unconstitutional { violations } => {
                                 eprintln!(
                                     "N123.1: Block {} is UNCONSTITUTIONAL: {} violations",
                                     height,
@@ -551,10 +551,82 @@ impl LiveValidator {
                                 }
                             }
                         }
-                    }
 
-                    if let Err(e) = store_consensus.lock().unwrap().append(record) {
-                        eprintln!("STORE ERROR: {}", e);
+                        // N129.2: Compute verdict hash from the constitutional verdict
+                        let mut hasher = blake3::Hasher::new();
+                        hasher.update(b"AMUN_VERDICT_V1");
+                        hasher.update(&height.to_le_bytes());
+                        let vbytes = postcard::to_stdvec(&verdict).unwrap_or_default();
+                        hasher.update(&vbytes);
+                        let mut verdict_hash = [0u8; 32];
+                        verdict_hash.copy_from_slice(&hasher.finalize().as_bytes()[..32]);
+
+                        // N129.2: Build ConstitutionalEvidenceRecord from real evidence data
+                        let sig_ev = SignatureEvidence::new(
+                            if signatures_valid { 1 } else { 0 },
+                            if signatures_valid { 0 } else { 1 },
+                        );
+                        let ds_ev = DoubleSpendEvidence::new(
+                            if no_double_spend { 1 } else { 0 },
+                            if no_double_spend { 0 } else { 1 },
+                        );
+                        let gov_ev = GovernanceEvidence::new(
+                            cert.block_hash,
+                            height / 100,
+                            governance_valid,
+                        );
+                        let rep_ev = ReplayEvidence::new(
+                            cert.state_root,
+                            history_root,
+                        );
+                        let evidence_record = ConstitutionalEvidenceRecord::new(
+                            height,
+                            cert.block_hash,
+                            sig_ev,
+                            ds_ev,
+                            gov_ev,
+                            rep_ev,
+                            slashing_bound,
+                            evidence_valid,
+                            finality_supermajority,
+                            chain_continuous,
+                            state_root_valid,
+                            transition_valid,
+                        );
+                        let evidence_record_hash = evidence_record.evidence_hash;
+
+                        // N129.3: Compute EvidenceRoot with constitutional continuity
+                        let mut prev_root = previous_evidence_root_clone.lock().unwrap();
+                        let evidence_root_obj = EvidenceRoot::compute(
+                            cert.state_root,
+                            cert.block_hash,
+                            [0u8; 32], // replay_certificate: placeholder until N126.4
+                            evidence_record.evidence_hash,
+                            *prev_root,
+                            height,
+                        );
+                        let evidence_root = evidence_root_obj.root;
+                        *prev_root = evidence_root;
+
+                        let record = FinalizedChainRecord {
+                            height,
+                            block_hash: cert.block_hash,
+                            state_root: cert.state_root,
+                            history_root: cert.history_root,
+                            certificate_hash: [0u8; 32],
+                            slashing_root: [0u8; 32],
+                            verdict_hash,
+                            evidence_record_hash,
+                            evidence_root,
+                            timestamp: SystemTime::now()
+                                .duration_since(SystemTime::UNIX_EPOCH)
+                                .unwrap()
+                                .as_secs(),
+                        };
+
+                        if let Err(e) = store_consensus.lock().unwrap().append(record) {
+                            eprintln!("STORE ERROR: {}", e);
+                        }
                     }
 
                     // N110.4c: Apply slashing certificates after finality

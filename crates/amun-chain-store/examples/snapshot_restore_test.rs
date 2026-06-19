@@ -11,6 +11,9 @@ fn make_record(height: u64) -> FinalizedChainRecord {
         history_root: [height as u8; 32],
         certificate_hash: [0u8; 32],
         slashing_root: [0u8; 32],
+            verdict_hash: [0u8; 32],
+            evidence_record_hash: [0u8; 32],
+            evidence_root: [0u8; 32],
         timestamp: height * 1000,
     }
 }

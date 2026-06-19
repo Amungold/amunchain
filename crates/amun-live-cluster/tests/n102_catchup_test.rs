@@ -101,13 +101,26 @@ fn n102_3_catchup_after_50_block_gap() {
     
     // Final assertions
     let final_h = validators[3].store.lock().unwrap().latest_height();
+    let all_heights: Vec<u64> = validators.iter()
+        .map(|v| v.store.lock().unwrap().latest_height())
+        .collect();
     let max_h = validators[0..3].iter()
         .map(|v| v.store.lock().unwrap().latest_height())
         .max()
         .unwrap_or(0);
-    
-    println!("Final - V3: {}, Max: {}, Spread: {}", final_h, max_h, max_h - final_h);
-    
+    let final_spread = max_h - final_h;
+    let consensus_pass = final_spread <= 2 && all_heights.iter().all(|h| *h > 0);
+
+    println!("\n============================================");
+    println!(" N102.3 CATCHUP AFTER 50 BLOCK GAP");
+    println!("============================================");
+    println!("  Final heights: {:?}", all_heights);
+    println!("  Spread:        {}", final_spread);
+    println!("  Catch-up:      {}", if caught_up { "PASS" } else { "FAIL" });
+    println!("  Consensus:     {}", if consensus_pass { "PASS" } else { "FAIL" });
+    println!("  Verdict:       {}", if caught_up && consensus_pass { "PASS" } else { "FAIL" });
+    println!("============================================\n");
+
     // Clean up
     for v in &validators {
         v.stop();
@@ -115,7 +128,7 @@ fn n102_3_catchup_after_50_block_gap() {
     for i in 0..4 {
         let _ = std::fs::remove_dir_all(format!("/tmp/amun-test-validator-{}", i));
     }
-    
+
     assert!(caught_up, "Validator 3 failed to catch up within 2 minutes");
-    assert!(final_h >= max_h.saturating_sub(2), "Spread too large: {}", max_h - final_h);
+    assert!(consensus_pass, "Spread too large: {}", final_spread);
 }
