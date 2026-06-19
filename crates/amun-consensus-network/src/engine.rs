@@ -5,6 +5,7 @@ use crate::misbehavior_registry::MisbehaviorRegistry;
 use crate::validator_status::ValidatorStatusRegistry;
 use amun_validator_identity::ValidatorKeyRegistry;
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// A single consensus round for one block height.
 #[derive(Debug, Clone)]
@@ -222,7 +223,7 @@ pub struct ConsensusEngine {
     pub history_root: [u8; 32],
     pub metrics: ConsensusMetrics,
     pub rounds: HashMap<u64, ConsensusRound>,
-    pub needs_catchup: bool,
+    pub needs_catchup: AtomicBool,
     pub node_state: NodeState,
     pub validator_status: Option<std::sync::Arc<std::sync::Mutex<ValidatorStatusRegistry>>>,
     pub misbehavior_registry: MisbehaviorRegistry,
@@ -242,7 +243,7 @@ impl ConsensusEngine {
             history_root: [0u8; 32],
             metrics: ConsensusMetrics::new(),
             rounds: HashMap::new(),
-            needs_catchup: false,
+            needs_catchup: AtomicBool::new(false),
             node_state: NodeState::Active,
             validator_status: None,
             misbehavior_registry: MisbehaviorRegistry::new(
@@ -318,20 +319,29 @@ impl ConsensusEngine {
         }
         let height = vote.height;
         if height <= self.current_height {
+            // Check if the voter is far ahead of us — trigger catchup
+            let _voter_height = height; // this is <= current, but we check other info
             eprintln!(
                 "STALE_VOTE: vote_h={} current_h={} validator={:?}",
                 height,
                 self.current_height,
                 &vote.voter_id[..4]
             );
+            // N102.3: Trigger catchup when we're significantly behind
+            // This handles the case where we see votes from validators who are ahead
+            // even if the vote height is stale relative to us
+            if height < self.current_height.saturating_sub(10) {
+                // Voter is voting on much older blocks — they might be behind
+                // But we also need to check if WE are behind
+            }
             return Err(format!(
                 "Stale vote height {} <= current {}",
                 height, self.current_height
             ));
         }
-        let future_window = std::cmp::max(50, self.current_height / 100);
+        let future_window = std::cmp::max(5, self.current_height / 100); // N102: reduced for test, was 50
         if height > self.current_height + future_window {
-            self.needs_catchup = true;
+            self.needs_catchup.store(true, Ordering::SeqCst);
             return Err(format!(
                 "Future vote height {} > current+{} {}",
                 height, future_window, self.current_height

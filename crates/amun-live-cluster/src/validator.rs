@@ -12,6 +12,7 @@ use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
 use amun_constitutional_enforcement::{ConstitutionalEnforcementKernel, ConstitutionalVerdict};
 use amun_mempool::Mempool;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
+use amun_sync::protocol::{MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE};
 use amun_validator_identity::derive_validator_id;
 use amun_validator_identity::vote_signing_payload;
 use ed25519_dalek::{Signer, SigningKey};
@@ -168,19 +169,71 @@ impl LiveValidator {
 
         // Listen thread
         let engine_listen = engine.clone();
+        let store_listen = store.clone();
         let running_listen = running.clone();
         let h1 = thread::spawn(move || {
             while *running_listen.lock().unwrap() {
                 match listener.accept() {
                     Ok((mut stream, _)) => {
                         let _ = stream.set_nonblocking(false);
-                        let mut len_buf = [0u8; 4];
-                        if stream.read_exact(&mut len_buf).is_ok() {
-                            let len = u32::from_be_bytes(len_buf) as usize;
-                            if len < 1024 * 1024 {
-                                let mut buf = vec![0u8; len];
-                                if stream.read_exact(&mut buf).is_ok() {
-                                    if let Ok(vote) = postcard::from_bytes::<ConsensusVote>(&buf) {
+                        // Peek at first byte without consuming it
+                        let mut peek_buf = [0u8; 1];
+                        let peek_result = stream.peek(&mut peek_buf);
+                        if peek_result.is_err() {
+                            continue;
+                        }
+                        // MSG_TIP_REQUEST=0x02, MSG_BLOCK_RANGE_REQUEST=0x03
+                        // Vote messages start with 4-byte length (first byte is 0x00 for small votes)
+                        if peek_buf[0] == MSG_TIP_REQUEST {
+                            // Consume the type byte
+                            let _ = stream.read_exact(&mut [0u8; 1]);
+                            let store_g = store_listen.lock().unwrap();
+                            let tip = store_g.load_tip();
+                            let height = tip.as_ref().map(|r| r.height).unwrap_or(0);
+                            let hash = tip.map(|r| r.block_hash).unwrap_or([0u8; 32]);
+                            let mut response = vec![0u8; 1 + 8 + 32];
+                            response[0] = MSG_TIP_RESPONSE;
+                            response[1..9].copy_from_slice(&height.to_be_bytes());
+                            response[9..41].copy_from_slice(&hash);
+                            let _ = stream.write_all(&response);
+                            let _ = stream.flush();
+                            eprintln!("SYNC_SERVED: tip_request -> height={}", height);
+                        } else if peek_buf[0] == MSG_BLOCK_RANGE_REQUEST {
+                            // Consume the type byte
+                            let _ = stream.read_exact(&mut [0u8; 1]);
+                            let mut range_buf = [0u8; 16];
+                            if stream.read_exact(&mut range_buf).is_ok() {
+                                let start = u64::from_be_bytes(range_buf[0..8].try_into().unwrap());
+                                let end = u64::from_be_bytes(range_buf[8..16].try_into().unwrap());
+                                eprintln!("SYNC_SERVED: block_range_request {}..{}", start, end);
+                                let store_g = store_listen.lock().unwrap();
+                                let mut records: Vec<Vec<u8>> = Vec::new();
+                                for h in start..=end {
+                                    if let Some(record) = store_g.load_height(h) {
+                                        records.push(record.encode());
+                                    }
+                                }
+                                let _response = [MSG_BLOCK_RANGE_RESPONSE];
+                                let mut response = vec![MSG_BLOCK_RANGE_RESPONSE];
+                                response.extend_from_slice(&(records.len() as u32).to_be_bytes());
+                                for rec in &records {
+                                    let len_bytes = (rec.len() as u32).to_be_bytes();
+                                    response.extend_from_slice(&len_bytes);
+                                    response.extend_from_slice(rec);
+                                }
+                                let _ = stream.write_all(&response);
+                                let _ = stream.flush();
+                                eprintln!("SYNC_SERVED: sent {} records", records.len());
+                            }
+                        } else {
+                            // Vote message: 4-byte length + payload (no type prefix)
+                            let mut len_buf = [0u8; 4];
+                            if stream.read_exact(&mut len_buf).is_ok() {
+                                let len = u32::from_be_bytes(len_buf) as usize;
+                                if len < 1024 * 1024 {
+                                    let mut buf = vec![0u8; len];
+                                    if stream.read_exact(&mut buf).is_ok() {
+                                        if let Ok(vote) = postcard::from_bytes::<ConsensusVote>(&buf) {
                                         let mut eng = engine_listen.lock().unwrap();
                                         if let Err(e) = eng.process_vote(vote) {
                                             if e != "Duplicate vote from validator" {
@@ -190,6 +243,7 @@ impl LiveValidator {
                                     }
                                 }
                             }
+                        }
                         }
                     }
                     Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
@@ -221,10 +275,10 @@ impl LiveValidator {
             let signing_key = signing_key_clone;
             while *running_consensus.lock().unwrap() {
                 let (height, needs_sync) = {
-                    let mut eng = engine_consensus.lock().unwrap();
+                    let eng = engine_consensus.lock().unwrap();
                     let h = eng.current_height + 1;
-                    let sync = eng.needs_catchup;
-                    eng.needs_catchup = false;
+                    let sync = eng.needs_catchup.load(std::sync::atomic::Ordering::SeqCst);
+                    eng.needs_catchup.store(false, std::sync::atomic::Ordering::SeqCst);
                     (h, sync)
                 };
                 if needs_sync {
