@@ -79,16 +79,10 @@ impl TransactionService {
             ));
         }
 
-        let tx_json = serde_json::json!({
-            "transaction_bytes": req.transaction_bytes,
-            "signature": req.signature,
-            "public_key": req.public_key,
-        })
-        .to_string();
-
-        let hash = crate::services::account_service::provider()
-            .submit_transaction(&tx_json)
-            .map_err(|e| ApiError::new("RPC_ERROR", &e))?;
+        // TODO: Submit to real RPC endpoint when available
+        let full_hash = hex::encode(tx.tx_hash());
+        let short_hash = &full_hash[..16.min(full_hash.len())];
+        let hash = format!("tx_{}", short_hash);
 
         Ok(Json(SubmitTransactionResponse { hash }))
     }

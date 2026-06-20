@@ -1,0 +1,260 @@
+crates/amun-validator-attestation/src/lib.rs:2:pub use validator_set::{ValidatorInfo, ValidatorSet, ValidatorSetError};
+crates/amun-validator-attestation/src/validator_set.rs:12:pub struct ValidatorSet {
+crates/amun-validator-attestation/src/validator_set.rs:19:impl ValidatorSet {
+crates/amun-validator-attestation/src/validator_set.rs:20:    pub fn new(epoch: Epoch, validators: Vec<ValidatorInfo>) -> Result<Self, ValidatorSetError> {
+crates/amun-validator-attestation/src/validator_set.rs:22:            return Err(ValidatorSetError::EmptySet);
+crates/amun-validator-attestation/src/validator_set.rs:69:pub enum ValidatorSetError {
+crates/amun-codec/src/domain.rs:14:    ValidatorSet = 0x07,
+crates/amun-codec/src/domain.rs:27:            0x07 => Some(Self::ValidatorSet),
+crates/amun-codec/src/domain.rs:41:            Self::ValidatorSet => &VALSET_KEY,
+crates/amun-qc-canonical/src/validator.rs:2:use amun_validator_attestation::ValidatorSet;
+crates/amun-qc-canonical/src/validator.rs:7:    validator_set: &ValidatorSet,
+crates/amun-qc-canonical/src/canonicalize.rs:4:use amun_validator_attestation::ValidatorSet;
+crates/amun-qc-canonical/src/canonicalize.rs:7:pub fn canonicalize_qc(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> QuorumCertificate {
+crates/amun-qc-canonical/src/canonicalize.rs:37:fn is_vote_valid(vote: &ConsensusVote, validator_set: &ValidatorSet) -> bool {
+crates/amun-qc-canonical/src/canonicalize.rs:62:    validator_set: &ValidatorSet,
+crates/amun-qc-canonical/src/canonicalize.rs:84:        let set = ValidatorSet::new(
+crates/amun-node/src/bin/test_crash_recovery_7.rs:1:use amun_consensus::validator::{Validator, ValidatorSet};
+crates/amun-node/src/bin/test_crash_recovery_7.rs:29:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-node/src/bin/test_crash_recovery_7.rs:33:                         validator_set: &ValidatorSet,
+crates/amun-node/src/bin/test_crash_recovery_7.rs:134:    let live_set = ValidatorSet::new(live_validators).unwrap();
+crates/amun-node/src/bin/test_crash_recovery.rs:1:use amun_consensus::validator::{Validator, ValidatorSet};
+crates/amun-node/src/bin/test_crash_recovery.rs:29:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-node/src/bin/test_crash_recovery.rs:35:                         validator_set: &ValidatorSet,
+crates/amun-node/src/bin/test_crash_recovery.rs:139:    let live_set = ValidatorSet::new(live_validators).unwrap();
+crates/amun-node/src/bin/test_crash_recovery.rs:179:    let full_set = ValidatorSet::new(all_validators).unwrap();
+crates/amun-node/src/bin/test_sync_rejoin.rs:1:use amun_consensus::validator::{Validator, ValidatorSet};
+crates/amun-node/src/bin/test_sync_rejoin.rs:32:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-node/src/bin/test_sync_rejoin.rs:36:                         validator_set: &ValidatorSet,
+crates/amun-node/src/bin/test_sync_rejoin.rs:130:    let live_set = ValidatorSet::new(live_validators).unwrap();
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:1:use amun_consensus::validator::{Validator, ValidatorSet};
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:33:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:37:                         validator_set: &ValidatorSet,
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:132:    let live_set = ValidatorSet::new(live_validators).unwrap();
+crates/amun-node/src/bin/test_network_state_convergence.rs:1:use amun_consensus::validator::{Validator, ValidatorSet};
+crates/amun-node/src/bin/test_network_state_convergence.rs:31:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-node/src/bin/test_multi_byzantine.rs:1:use amun_consensus::validator::{Validator, ValidatorSet};
+crates/amun-node/src/bin/test_multi_byzantine.rs:32:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-node/src/bin/test_multi_byzantine.rs:36:                         validator_set: &ValidatorSet,
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:1:use amun_consensus::validator::{Validator, ValidatorSet};
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:35:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:39:                         validator_set: &ValidatorSet,
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:148:    let live_set = ValidatorSet::new(live_validators).unwrap();
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:1:use amun_consensus::validator::{Validator, ValidatorSet};
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:36:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:40:                         validator_set: &ValidatorSet,
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:145:    let live_set = ValidatorSet::new(live_validators).unwrap();
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:202:    let full_set = ValidatorSet::new(all_validators).unwrap();
+crates/amun-constitutional-enforcement/src/lib.rs:31:    ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/lib.rs:78:                ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/lib.rs:133:                &ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:164:                law: ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-quorum-certificate/src/verifier.rs:2:use amun_validator_attestation::ValidatorSet;
+crates/amun-quorum-certificate/src/verifier.rs:7:    validator_set: &ValidatorSet,
+crates/amun-timeout-aggregator/src/aggregator.rs:3:use amun_validator_attestation::ValidatorSet;
+crates/amun-timeout-aggregator/src/aggregator.rs:11:    validator_set: ValidatorSet,
+crates/amun-timeout-aggregator/src/aggregator.rs:15:    pub fn new(validator_set: ValidatorSet) -> Self {
+crates/amun-kernel-types/src/hash.rs:78:pub struct ValidatorSetDomain;
+crates/amun-kernel-types/src/lib.rs:23:    StateCommitmentDomain, TransactionDomain, TxHash, ValidatorSetDomain, VoteDomain, VoteHash,
+crates/amun-qc-weight/src/derive.rs:2:use amun_validator_attestation::ValidatorSet;
+crates/amun-qc-weight/src/derive.rs:4:/// Derive QC weight from the ValidatorSet.
+crates/amun-qc-weight/src/derive.rs:9:    validator_set: &ValidatorSet,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:12:    validator::{Validator, ValidatorSet},
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:104:    validator_set: ValidatorSet,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:123:        validator_set: ValidatorSet,
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:418:    let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-networking/tests/n17_multi_node_network.rs:4:use amun_consensus::validator::ValidatorSet;
+crates/amun-networking/tests/n17_multi_node_network.rs:18:    validator_set: ValidatorSet,
+crates/amun-networking/tests/n17_multi_node_network.rs:34:        let validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-networking/tests/n17_multi_node_network.rs:131:    net.validator_set = ValidatorSet::new(validators).unwrap();
+crates/amun-networking/tests/harness/handlers.rs:72:    validator_set: &amun_consensus::validator::ValidatorSet,
+crates/amun-networking/src/node.rs:7:use amun_consensus::validator::ValidatorSet;
+crates/amun-networking/src/node.rs:156:    pub fn process_incoming(&mut self, validator_set: &ValidatorSet) {
+crates/amun-epoch-transition/src/validator_rotation.rs:1:use amun_validator_attestation::ValidatorSet;
+crates/amun-epoch-transition/src/validator_rotation.rs:21:        _current_set: &ValidatorSet,
+crates/amun-epoch-transition/src/validator_rotation.rs:22:        _new_set: &ValidatorSet,
+crates/amun-constitution/src/stake_quorum.rs:17:pub struct WeightedValidatorSet {
+crates/amun-constitution/src/stake_quorum.rs:22:impl WeightedValidatorSet {
+crates/amun-constitution/src/stake_quorum.rs:79:impl Default for WeightedValidatorSet {
+crates/amun-unlock-law/src/lib.rs:2:use amun_validator_attestation::ValidatorSet;
+crates/amun-unlock-law/src/lib.rs:5:pub fn can_unlock(validator_id: u64, qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+crates/amun-unlock-law/src/lib.rs:13:pub fn verify_unlock_condition(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+crates/amun-unlock-law/src/lib.rs:34:        let set = ValidatorSet::new(
+crates/amun-constitutional-verifier/src/verifier.rs:3:use amun_validator_attestation::ValidatorSet;
+crates/amun-constitutional-verifier/src/verifier.rs:6:pub fn verify_qc(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+crates/amun-constitutional-verifier/src/verifier.rs:36:pub fn verify_vote(vote: &ConsensusVote, validator_set: &ValidatorSet) -> bool {
+crates/amun-constitutional-verifier/src/verifier.rs:71:pub fn check_quorum(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> Result<u64, String> {
+crates/amun-constitutional-verifier/src/verifier.rs:100:        let set = ValidatorSet::new(
+crates/amun-constitutional-evidence/src/lib.rs:17:use amun_validator_attestation::validator_set::ValidatorSet;
+crates/amun-constitutional-evidence/src/lib.rs:27:    pub validator_set: ValidatorSet,
+crates/amun-consensus/src/vote_collector.rs:2:use crate::validator::ValidatorSet;
+crates/amun-consensus/src/vote_collector.rs:37:        validator_set: &ValidatorSet,
+crates/amun-consensus/src/proposal_manager.rs:2:use crate::validator::ValidatorSet;
+crates/amun-consensus/src/proposal_manager.rs:5:    fn leader(&self, height: u64, round: u64, validator_set: &ValidatorSet) -> Option<Hash256>;
+crates/amun-consensus/src/proposal_manager.rs:11:    fn leader(&self, height: u64, round: u64, validator_set: &ValidatorSet) -> Option<Hash256> {
+crates/amun-consensus/src/proposal_manager.rs:38:        validator_set: &ValidatorSet,
+crates/amun-consensus/src/validator.rs:12:pub struct ValidatorSet {
+crates/amun-consensus/src/validator.rs:21:impl ValidatorSet {
+crates/amun-consensus/src/round_state_machine.rs:5:use crate::validator::ValidatorSet;
+crates/amun-consensus/src/round_state_machine.rs:83:        validator_set: &ValidatorSet,
+crates/amun-consensus-execution/src/leader.rs:1:use amun_validator_attestation::ValidatorSet;
+crates/amun-consensus-execution/src/leader.rs:5:    validator_set: ValidatorSet,
+crates/amun-consensus-execution/src/leader.rs:9:    pub fn new(validator_set: ValidatorSet) -> Self {
+crates/amun-consensus-execution/src/voter.rs:3:use amun_validator_attestation::ValidatorSet;
+crates/amun-consensus-execution/src/voter.rs:24:    validator_set: ValidatorSet,
+crates/amun-consensus-execution/src/voter.rs:28:    pub fn new(validator_set: ValidatorSet) -> Self {
+crates/amun-consensus-execution/src/leader_schedule.rs:1:use amun_validator_attestation::ValidatorSet;
+crates/amun-consensus-execution/src/leader_schedule.rs:7:    validators: ValidatorSet,
+crates/amun-consensus-execution/src/leader_schedule.rs:12:    pub fn new(validators: ValidatorSet) -> Self {
+crates/amun-consensus-network/src/messages.rs:69:pub struct QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs:80:impl QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs:106:    pub qc: QuorumCertificate,
+crates/amun-consensus-network/src/messages.rs:223:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs:242:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs:260:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs:289:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs:298:        let decoded: QuorumCertificate = postcard::from_bytes(&encoded).unwrap();
+crates/amun-consensus-network/src/messages.rs.bak:65:pub struct QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs.bak:76:impl QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs.bak:102:    pub qc: QuorumCertificate,
+crates/amun-consensus-network/src/messages.rs.bak:218:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs.bak:237:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs.bak:255:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs.bak:284:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/messages.rs.bak:293:        let decoded: QuorumCertificate = postcard::from_bytes(&encoded).unwrap();
+crates/amun-consensus-network/src/engine.rs:2:    ConsensusVote, EquivocationProof, FinalityCertificate, QuorumCertificate, SignedVote,
+crates/amun-consensus-network/src/engine.rs:18:    pub qc: Option<QuorumCertificate>,
+crates/amun-consensus-network/src/engine.rs:80:    ) -> Option<QuorumCertificate> {
+crates/amun-consensus-network/src/engine.rs:132:        let qc = QuorumCertificate {
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:2:    ConsensusVote, EquivocationProof, FinalityCertificate, QuorumCertificate, SignedVote,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:17:    pub qc: Option<QuorumCertificate>,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:74:    pub fn try_form_qc(&mut self, total_validators: usize) -> Option<QuorumCertificate> {
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:89:        let qc = QuorumCertificate {
+crates/amun-network-constitution/src/message.rs:10:    QuorumCertificate,
+crates/amun-network-constitution/src/message.rs:21:            NetworkMessageType::QuorumCertificate => 2,
+crates/amun-network-constitution/src/message.rs:32:            2 => Some(NetworkMessageType::QuorumCertificate),
+crates/amun-network-constitution/src/message.rs:46:            NetworkMessageType::QuorumCertificate => 2,
+crates/amun-codec/src/domain.rs:11:    QuorumCertificate = 0x04,
+crates/amun-codec/src/domain.rs:24:            0x04 => Some(Self::QuorumCertificate),
+crates/amun-codec/src/domain.rs:38:            Self::QuorumCertificate => &QC_KEY,
+crates/amun-fork-choice-law/src/fork_choice.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-fork-choice-law/src/fork_choice.rs:4:pub fn select_best_qc(qcs: &[QuorumCertificate]) -> Option<&QuorumCertificate> {
+crates/amun-fork-choice-law/src/fork_choice.rs:17:pub fn qc_extends(qc: &QuorumCertificate, parent: &QuorumCertificate) -> bool {
+crates/amun-fork-choice-law/src/fork_choice.rs:22:    qc: &'a QuorumCertificate,
+crates/amun-fork-choice-law/src/fork_choice.rs:23:    all_qcs: &'a [QuorumCertificate],
+crates/amun-fork-choice-law/src/fork_choice.rs:24:) -> Vec<&'a QuorumCertificate> {
+crates/amun-fork-choice-law/src/fork_choice.rs:60:    ) -> QuorumCertificate {
+crates/amun-fork-choice-law/src/fork_choice.rs:61:        QuorumCertificate::new(
+crates/amun-qc-canonical/src/canonicalize.rs:3:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-qc-canonical/src/canonicalize.rs:7:pub fn canonicalize_qc(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> QuorumCertificate {
+crates/amun-qc-canonical/src/canonicalize.rs:27:    QuorumCertificate::new(
+crates/amun-qc-canonical/src/canonicalize.rs:61:    qc: &QuorumCertificate,
+crates/amun-qc-canonical/src/canonicalize.rs:124:        let qc = QuorumCertificate::new(pos, 0, block, [0x00; 32], votes);
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:25:    // N127A.5: From QuorumCertificate
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:133:/// Evidence sourced from QuorumCertificate.
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:64:/// N127D: Provides QC evidence from QuorumCertificate.
+crates/amun-quorum-certificate/src/verifier.rs:1:use crate::certificate::QuorumCertificate;
+crates/amun-quorum-certificate/src/verifier.rs:6:    qc: &QuorumCertificate,
+crates/amun-quorum-certificate/src/lib.rs:5:pub struct QuorumCertificate {
+crates/amun-quorum-certificate/src/lib.rs:14:impl QuorumCertificate {
+crates/amun-quorum-certificate/src/certificate.rs:6:pub struct QuorumCertificate {
+crates/amun-quorum-certificate/src/certificate.rs:16:impl QuorumCertificate {
+crates/amun-lock-rule/src/lock.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-lock-rule/src/lock.rs:7:    pub locked_qc: Option<QuorumCertificate>,
+crates/amun-lock-rule/src/lock.rs:19:    pub fn try_lock(&mut self, qc: &QuorumCertificate) -> Result<(), &'static str> {
+crates/amun-kernel-types/src/hash.rs:72:pub struct QuorumCertificateDomain;
+crates/amun-kernel-types/src/hash.rs:112:pub type QcHash = Hash<QuorumCertificateDomain>;
+crates/amun-kernel-types/src/lib.rs:22:    PublicHash32, QcHash, QuorumCertificateDomain, SecretHash32, StateCommitment,
+crates/amun-qc-weight/src/derive.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-qc-weight/src/derive.rs:8:    qc: &QuorumCertificate,
+crates/amun-block-builder/tests/n32_certified_block.rs:2:use amun_consensus::types::QuorumCertificate;
+crates/amun-block-builder/tests/n32_certified_block.rs:11:    pub quorum_certificate: QuorumCertificate,
+crates/amun-block-builder/tests/n32_certified_block.rs:15:    pub fn new(block: Block, qc: QuorumCertificate) -> Self {
+crates/amun-block-builder/tests/n32_certified_block.rs:55:    let qc = QuorumCertificate {
+crates/amun-block-builder/tests/n32_certified_block.rs:101:    let qc1 = QuorumCertificate {
+crates/amun-block-builder/tests/n32_certified_block.rs:131:    let qc2 = QuorumCertificate {
+crates/amun-block-builder/tests/n32_certified_block.rs:174:    let qc = QuorumCertificate {
+crates/amun-constitution/src/hash_domains.rs:10:    QuorumCertificate = 0x07,
+crates/amun-finality-law/src/finality.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-finality-law/src/finality.rs:3:pub fn is_finalized_simple(block_qc: &QuorumCertificate, child_qc: &QuorumCertificate) -> bool {
+crates/amun-finality-law/src/finality.rs:46:        let qc_a = QuorumCertificate::new(
+crates/amun-finality-law/src/finality.rs:55:        let qc_b = QuorumCertificate::new(
+crates/amun-finality-law/src/finality.rs:75:        let qc_a = QuorumCertificate::new(
+crates/amun-finality-law/src/finality.rs:84:        let qc_b = QuorumCertificate::new(
+crates/amun-unlock-law/src/lib.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-unlock-law/src/lib.rs:5:pub fn can_unlock(validator_id: u64, qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+crates/amun-unlock-law/src/lib.rs:13:pub fn verify_unlock_condition(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+crates/amun-unlock-law/src/lib.rs:77:        let qc = QuorumCertificate::new(pos, 0, block, [0x00; 32], votes);
+crates/amun-unlock-law/src/unlock.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-unlock-law/src/unlock.rs:8:    pub higher_qc: QuorumCertificate,
+crates/amun-unlock-law/src/unlock.rs:16:        higher_qc: QuorumCertificate,
+crates/amun-constitutional-verifier/src/verifier.rs:2:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-constitutional-verifier/src/verifier.rs:5:/// Verify a QuorumCertificate structurally
+crates/amun-constitutional-verifier/src/verifier.rs:6:pub fn verify_qc(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+crates/amun-constitutional-verifier/src/verifier.rs:59:pub fn verify_vote_uniqueness(qc: &QuorumCertificate) -> bool {
+crates/amun-constitutional-verifier/src/verifier.rs:71:pub fn check_quorum(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> Result<u64, String> {
+crates/amun-constitutional-verifier/src/verifier.rs:143:        let qc = QuorumCertificate::new(pos, 0, block, [0x00; 32], votes);
+crates/amun-network-scheduler/src/message.rs:28:    QuorumCertificate {
+crates/amun-network-scheduler/src/message.rs:42:            NetworkMessage::QuorumCertificate { from, .. } => *from,
+crates/amun-network-scheduler/src/message.rs:51:            NetworkMessage::QuorumCertificate { to, .. } => *to,
+crates/amun-network-scheduler/src/message.rs:60:            NetworkMessage::QuorumCertificate { round, .. } => *round,
+crates/amun-constitutional-evidence/src/lib.rs:9://! - Evidence `E` → `QuorumCertificate`
+crates/amun-constitutional-evidence/src/lib.rs:16:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-constitutional-evidence/src/lib.rs:35:    pub qc: QuorumCertificate,
+crates/amun-constitutional-evidence/src/lib.rs:93:        // TODO: Add test once QuorumCertificate construction is available
+crates/amun-constitutional-evidence/src/lib.rs:98:        // TODO: Add test once QuorumCertificate construction is available
+crates/amun-constitutional-evidence/src/lib.rs:103:        // TODO: Add test once QuorumCertificate construction is available
+crates/amun-constitutional-evidence/src/lib.rs:108:        // TODO: Add test once QuorumCertificate construction is available
+crates/amun-consensus/src/vote_collector.rs:1:use crate::types::{Hash256, QuorumCertificate, Vote, VoteType};
+crates/amun-consensus/src/vote_collector.rs:38:    ) -> Option<QuorumCertificate> {
+crates/amun-consensus/src/vote_collector.rs:52:            Some(QuorumCertificate {
+crates/amun-consensus/src/action.rs:1:use crate::types::{BlockProposal, QuorumCertificate, Vote};
+crates/amun-consensus/src/action.rs:9:    Commit(QuorumCertificate),
+crates/amun-consensus/src/types.rs:32:pub struct QuorumCertificate {
+crates/amun-consensus/src/round_state_machine.rs:4:use crate::types::{BlockProposal, QuorumCertificate, Vote, VoteType};
+crates/amun-consensus/src/round_state_machine.rs:15:    pub pending_commit_qc: Option<QuorumCertificate>,
+crates/amun-consensus/src/round_state_machine.rs:17:    pub committed_qc: Option<QuorumCertificate>,
+crates/amun-consensus/src/round_state_machine.rs:84:    ) -> Option<QuorumCertificate> {
+crates/amun-consensus/src/round_state_machine.rs:126:    pub fn finalize_commit(&mut self) -> Result<QuorumCertificate, &'static str> {
+crates/amun-consensus-signatures/src/domain.rs:8:    QuorumCertificate,
+crates/amun-consensus-signatures/src/domain.rs:18:            SignatureDomain::QuorumCertificate => b"AMUN_SIGN_QC_V1",
+crates/amun-consensus-execution/src/qc_store.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/qc_store.rs:6:    pub by_round: BTreeMap<u64, Vec<QuorumCertificate>>,
+crates/amun-consensus-execution/src/qc_store.rs:7:    pub by_block: BTreeMap<[u8; 32], QuorumCertificate>,
+crates/amun-consensus-execution/src/qc_store.rs:18:    pub fn insert(&mut self, qc: QuorumCertificate) {
+crates/amun-consensus-execution/src/qc_store.rs:27:    pub fn get_by_block(&self, hash: &[u8; 32]) -> Option<&QuorumCertificate> {
+crates/amun-consensus-execution/src/qc_store.rs:31:    pub fn get_by_round(&self, round: u64) -> &[QuorumCertificate] {
+crates/amun-consensus-execution/src/voter.rs:2:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/voter.rs:39:    pub fn add_vote(&mut self, vote: ConsensusVote) -> Result<Option<QuorumCertificate>, String> {
+crates/amun-consensus-execution/src/voter.rs:90:                    return Ok(Some(QuorumCertificate::new(
+crates/amun-consensus-execution/src/voter.rs:116:                    return Ok(Some(QuorumCertificate::new(
+crates/amun-consensus-execution/src/block_dag.rs:2:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/block_dag.rs:14:    pub justify_qc: Option<QuorumCertificate>,
+crates/amun-consensus-execution/src/block_dag.rs:25:        justify_qc: Option<QuorumCertificate>,
+crates/amun-consensus-execution/src/proposal.rs:3:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/proposal.rs:13:    pub justify_qc: Option<QuorumCertificate>,
+crates/amun-consensus-execution/src/commit.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/commit.rs:14:    pub last_qc: Option<QuorumCertificate>,
+crates/amun-consensus-execution/src/commit.rs:15:    pub locked_qc: Option<QuorumCertificate>,
+crates/amun-consensus-execution/src/commit.rs:82:    pub fn try_commit_2chain(&mut self, qc: &QuorumCertificate) -> Option<[u8; 32]> {
+crates/amun-consensus-execution/src/commit.rs:110:        qc3: &QuorumCertificate,
+crates/amun-consensus-execution/src/commit.rs:111:        qc2: &QuorumCertificate,
+crates/amun-consensus-execution/src/commit.rs:112:        qc1: &QuorumCertificate,
+crates/amun-consensus-execution/src/persistent_state.rs:5:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/persistent_state.rs:236:    pub fn record_qc(&mut self, qc: &QuorumCertificate) -> Result<(), String> {
+crates/amun-consensus-execution/src/fork_choice.rs:2:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/fork_choice.rs:8:    pub high_qcs: BTreeMap<u64, QuorumCertificate>,
+crates/amun-consensus-execution/src/fork_choice.rs:9:    pub locked_qc: Option<QuorumCertificate>,
+crates/amun-consensus-execution/src/fork_choice.rs:10:    pub validated_qc: Option<QuorumCertificate>,
+crates/amun-consensus-execution/src/fork_choice.rs:12:    pub committed_qcs: Vec<QuorumCertificate>,
+crates/amun-consensus-execution/src/fork_choice.rs:29:    pub fn update_qc(&mut self, qc: QuorumCertificate, dag: &BlockDAG) {
+crates/amun-consensus-execution/src/fork_choice.rs:46:    pub fn highest_qc(&self) -> Option<&QuorumCertificate> {
+crates/amun-consensus-execution/src/fork_choice.rs:53:    fn try_advance_lock_and_commit(&mut self, qc3: &QuorumCertificate, dag: &BlockDAG) {
+crates/amun-consensus-execution/src/fork_choice.rs:111:    fn update_validated_qc(&mut self, qc: QuorumCertificate) {
+crates/amun-consensus-types/src/tests.rs:50:    assert_eq!(QuorumCertificate::MAX_ENCODED_SIZE, 177);
+crates/amun-consensus-types/src/tests.rs:70:    assert!(QuorumCertificate::decode(&buf).is_err());
+crates/amun-consensus-types/src/lib.rs:17:pub use qc::QuorumCertificate;
+crates/amun-consensus-types/src/qc.rs:9:pub struct QuorumCertificate {
+crates/amun-consensus-types/src/qc.rs:18:impl QuorumCertificate {
+crates/amun-consensus-types/src/qc.rs:25:impl CanonicalEncode for QuorumCertificate {
+crates/amun-consensus-types/src/qc.rs:38:impl CanonicalDecode for QuorumCertificate {

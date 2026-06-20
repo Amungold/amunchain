@@ -1,0 +1,209 @@
+crates/amun-constitutional-integration/src/lib.rs:71:            "forall rc in ReplayCertificate : exists ev in EvidenceRoot : ev.replay = rc",
+crates/amun-constitutional-integration/src/lib.rs:81:            "forall ev : ev in EvidenceRoot implies hash(ev) = constant",
+crates/amun-live-cluster/src/validator.rs:19:use amun_evidence_root::EvidenceRoot;
+crates/amun-live-cluster/src/validator.rs:598:                        // N129.3: Compute EvidenceRoot with constitutional continuity
+crates/amun-live-cluster/src/validator.rs:600:                        let evidence_root_obj = EvidenceRoot::compute(
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:2:use amun_evidence_root::{EvidenceChain, EvidenceRoot};
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:30:    let evidence = EvidenceRoot::compute(
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:100:    let e1 = EvidenceRoot::compute(before, [0u8; 32], [0u8; 32], [0u8; 32], [0u8; 32], 1);
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:101:    let e2 = EvidenceRoot::compute(after, [0u8; 32], [0u8; 32], [0u8; 32], [0u8; 32], 1);
+crates/amun-evidence-root/src/lib.rs:5:/// The EvidenceRoot binds together:
+crates/amun-evidence-root/src/lib.rs:12:pub struct EvidenceRoot {
+crates/amun-evidence-root/src/lib.rs:22:impl EvidenceRoot {
+crates/amun-evidence-root/src/lib.rs:72:    pub roots: Vec<EvidenceRoot>,
+crates/amun-evidence-root/src/lib.rs:87:    ) -> &EvidenceRoot {
+crates/amun-evidence-root/src/lib.rs:89:        self.roots.push(EvidenceRoot::compute(
+crates/amun-evidence-root/src/lib.rs:126:        let genesis = EvidenceRoot::genesis();
+crates/amun-evidence-root/src/lib.rs:133:        let r1 = EvidenceRoot::compute([1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [0u8; 32], 1);
+crates/amun-evidence-root/src/lib.rs:134:        let r2 = EvidenceRoot::compute([1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [0u8; 32], 1);
+crates/amun-evidence-root/src/lib.rs:140:        let r1 = EvidenceRoot::compute([1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [0u8; 32], 1);
+crates/amun-evidence-root/src/lib.rs:141:        let r2 = EvidenceRoot::compute([9u8; 32], [2u8; 32], [3u8; 32], [4u8; 32], [0u8; 32], 1);
+crates/amun-light-client/tests/light_client_tests.rs:70:        evidence_root: cert1.evidence_root,
+crates/amun-light-client/tests/light_client_tests.rs:96:        evidence_root: cert1.evidence_root,
+crates/amun-light-client/src/constitutional_client.rs:15:    pub evidence_root: [u8; 32],
+crates/amun-light-client/src/constitutional_client.rs:76:            evidence_root: tip.evidence_root,
+crates/amun-light-client/src/constitutional_client.rs:169:            evidence_root: cert.evidence_root,
+crates/amun-light-client/src/constitutional_client.rs:202:            evidence_root: cert1.evidence_root,
+crates/amun-light-client/src/constitutional_client.rs:223:            evidence_root: cert1.evidence_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:20:    pub evidence_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:26:    pub fn compute_evidence_root(evidence: &[ConstitutionalEvidence]) -> [u8; 32] {
+crates/amun-evidence-finality/src/evidence_finality.rs:44:        evidence_root: &[u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:53:        hasher.update(evidence_root);
+crates/amun-evidence-finality/src/evidence_finality.rs:69:    pub evidence_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:89:    pub evidence_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:102:            evidence_root: block.evidence_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:118:        hasher.update(&self.evidence_root);
+crates/amun-evidence-finality/src/evidence_finality.rs:136:            &self.evidence_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:205:        let evidence_root = EvidenceVerifiedBlock::compute_evidence_root(&all_evidence);
+crates/amun-evidence-finality/src/evidence_finality.rs:212:            &evidence_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:221:            evidence_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:241:            evidence_root: block.evidence_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:285:    fn w19_evidence_root_in_certificate() {
+crates/amun-evidence-finality/src/evidence_finality.rs:308:        assert_ne!(cert.evidence_root, [0u8; 32]);
+crates/amun-evidence-finality/src/evidence_finality.rs:338:        assert_eq!(er, &cert.evidence_root);
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:129:            evidence_root: hex::encode([0u8; 32]),
+crates/amun-persistence/src/lib.rs:10:    pub evidence_root: String,
+crates/amun-persistence/src/lib.rs:20:            evidence_root: String::new(),
+crates/amun-persistence/src/lib.rs:79:            evidence_root: "def456".into(),
+crates/amun-persistence/src/lib.rs:89:        assert_eq!(restored.evidence_root, "def456");
+crates/amun-persistence/src/lib.rs:104:        assert!(state.evidence_root.is_empty());
+crates/amun-persistence/src/lib.rs:117:            evidence_root: "evidence100".into(),
+crates/amun-constitutional-block/tests/block_tests.rs:62:fn test_evidence_root_affects_hash() {
+crates/amun-constitutional-block/tests/block_tests.rs:98:fn test_evidence_root_determinism() {
+crates/amun-constitutional-block/tests/block_tests.rs:128:    assert_eq!(b1.evidence_root, b2.evidence_root);
+crates/amun-constitutional-block/tests/block_tests.rs:133:fn test_evidence_root_sensitivity() {
+crates/amun-constitutional-block/tests/block_tests.rs:163:    assert_ne!(b1.evidence_root, b2.evidence_root);
+crates/amun-constitutional-block/tests/replay_tests.rs:8:fn test_evidence_root_matches_block() {
+crates/amun-constitutional-block/src/chain.rs:60:    /// Verify that a block's evidence_root matches the given ActionLog.
+crates/amun-constitutional-block/src/chain.rs:70:        let computed = hex::encode(log.evidence_root());
+crates/amun-constitutional-block/src/chain.rs:71:        if block.evidence_root != computed {
+crates/amun-constitutional-block/src/chain.rs:74:                height, block.evidence_root, computed
+crates/amun-constitutional-block/src/block.rs:16:    pub evidence_root: String,
+crates/amun-constitutional-block/src/block.rs:32:        evidence_root: String,
+crates/amun-constitutional-block/src/block.rs:45:            evidence_root,
+crates/amun-constitutional-block/src/block.rs:88:        let evidence_root = hex::encode(evidence_tree.root());
+crates/amun-constitutional-block/src/block.rs:99:            evidence_root,
+crates/amun-constitutional-block/src/finalizer.rs:32:        let evidence_root = hex::encode(action_log.evidence_root());
+crates/amun-constitutional-block/src/finalizer.rs:52:            evidence_root,
+crates/amun-constitutional-block/src/block.rs.n2bak:20:    pub evidence_root: String,
+crates/amun-constitutional-block/src/block.rs.n2bak:34:        evidence_root: String,
+crates/amun-constitutional-block/src/block.rs.n2bak:46:            evidence_root,
+crates/amun-constitutional-block/src/block.rs.n2bak:87:        let evidence_root = hex::encode(evidence_tree.root());
+crates/amun-constitutional-block/src/block.rs.n2bak:98:            evidence_root,
+crates/amun-block-store/src/lib.rs:12:    pub evidence_root: String,
+crates/amun-block-store/src/lib.rs:70:            evidence_root: format!("evidence{}", h),
+crates/amun-finality-certificate/src/lib.rs:14:    pub evidence_root: [u8; 32],
+crates/amun-finality-certificate/src/lib.rs:27:        evidence_root: [u8; 32],
+crates/amun-finality-certificate/src/lib.rs:38:            evidence_root,
+crates/amun-finality-certificate/src/lib.rs:54:        hasher.update(&self.evidence_root);
+crates/amun-finality-certificate/src/lib.rs:66:            && self.evidence_root != [0u8; 32]
+crates/amun-finality-certificate/src/lib.rs:141:        cert.evidence_root = [0xFF; 32];
+crates/amun-recovery/src/lib.rs:11:    pub evidence_root: String,
+crates/amun-recovery/src/lib.rs:75:            evidence_root: state.evidence_root.clone(),
+crates/amun-recovery/src/lib.rs:103:            evidence_root: "evidence42".into(),
+crates/amun-recovery/src/lib.rs:113:            evidence_root: "evidence42".into(),
+crates/amun-recovery/src/lib.rs:129:        assert_eq!(recovered.evidence_root, "evidence42");
+crates/amun-recovery/src/lib.rs:162:                evidence_root: format!("evidence{}", i),
+crates/amun-recovery/src/lib.rs:171:                evidence_root: format!("evidence{}", i),
+crates/amun-constitutional-runtime/src/finality_certificate.rs:12:    pub evidence_root: [u8; 32],
+crates/amun-constitutional-runtime/src/finality_certificate.rs:33:        let evidence_root = Self::compute_evidence_root(&transitions);
+crates/amun-constitutional-runtime/src/finality_certificate.rs:45:            evidence_root,
+crates/amun-constitutional-runtime/src/finality_certificate.rs:73:        hasher.update(&self.evidence_root);
+crates/amun-constitutional-runtime/src/finality_certificate.rs:109:    pub fn compute_evidence_root(transitions: &[TransitionProof]) -> [u8; 32] {
+crates/amun-constitutional-runtime/src/history_root.rs:78:            hasher.update(&cert.evidence_root);
+crates/amun-rpc/src/lib.rs:348:        "evidence_root": tip.map(|r| hex::encode(r.evidence_root)).unwrap_or_default(),
+crates/amun-rpc/src/lib.rs:369:                "evidence_root": hex::encode(r.evidence_root),
+crates/amun-rpc/src/lib.rs:398:            "evidence_root": hex::encode(r.evidence_root),
+crates/amun-rpc/src/lib.rs:436:            "evidence_root": hex::encode(r.evidence_root),
+crates/amun-rpc/src/lib.rs:438:            "chain_evidence_root": hex::encode(r.evidence_root),
+crates/amun-block/src/block.rs:9:    pub evidence_root: [u8; 32],
+crates/amun-block/src/block.rs:38:                evidence_root: [0u8; 32],
+crates/amun-block/src/block.rs:55:        bytes.extend_from_slice(&self.header.evidence_root);
+crates/amun-benchmarks/benches/storage_bench.rs:15:            evidence_root: [0u8; 32],
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:62:            record.evidence_root, [0u8; 32],
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:63:            "N129.4 FAIL: evidence_root is zero at height {}",
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:68:    // N129.4-B: Verify evidence_root changes between consecutive blocks
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:73:            prev.evidence_root, curr.evidence_root,
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:74:            "N129.4 FAIL: evidence_root unchanged between {} and {}",
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:79:    // N129.4-C: Tamper detection — modifying any field changes evidence_root
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:100:        original.evidence_root, tampered_hash,
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:101:        "N129.4 FAIL: evidence_root must change when state_root is tampered"
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:104:    // N129.4-D: Tamper detection — modifying verdict_hash changes evidence_root
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:121:        original.evidence_root, tampered2_hash,
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:122:        "N129.4 FAIL: evidence_root must change when verdict_hash is tampered"
+crates/amun-live-cluster/src/validator.rs:19:use amun_evidence_root::EvidenceRoot;
+crates/amun-live-cluster/src/validator.rs:54:    pub previous_evidence_root: Arc<Mutex<[u8; 32]>>,
+crates/amun-live-cluster/src/validator.rs:150:            previous_evidence_root: Arc::new(Mutex::new([0u8; 32])),
+crates/amun-live-cluster/src/validator.rs:283:        let previous_evidence_root_clone = self.previous_evidence_root.clone();
+crates/amun-live-cluster/src/validator.rs:599:                        let mut prev_root = previous_evidence_root_clone.lock().unwrap();
+crates/amun-live-cluster/src/validator.rs:600:                        let evidence_root_obj = EvidenceRoot::compute(
+crates/amun-live-cluster/src/validator.rs:608:                        let evidence_root = evidence_root_obj.root;
+crates/amun-live-cluster/src/validator.rs:609:                        *prev_root = evidence_root;
+crates/amun-live-cluster/src/validator.rs:620:                            evidence_root,
+crates/amun-live-cluster/src/bin/replay_audit.rs:31:    let mut last_evidence_root: Option<[u8; 32]> = None;
+crates/amun-live-cluster/src/bin/replay_audit.rs:54:                if let Some(expected) = last_evidence_root {
+crates/amun-live-cluster/src/bin/replay_audit.rs:60:                    last_evidence_root = Some(record.certificate_hash);
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:2:use amun_evidence_root::{EvidenceChain, EvidenceRoot};
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:76:fn n40_evidence_root_changes_with_state() {
+crates/amun-evidence-root/src/lib.rs:125:    fn n39_genesis_evidence_root() {
+crates/amun-evidence-root/src/lib.rs:132:    fn n39_evidence_root_deterministic() {
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:14:        evidence_root: [0u8; 32],
+crates/amun-chain-store/src/store.rs:153:            evidence_root: [0u8; 32],
+crates/amun-chain-store/src/sync.rs:164:            evidence_root: [0u8; 32],
+crates/amun-chain-store/src/snapshot.rs:143:        evidence_root: [0u8; 32],
+crates/amun-chain-store/src/record.rs:16:    pub evidence_root: [u8; 32],
+crates/amun-chain-store/src/record.rs:43:            evidence_root: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_builder_test.rs:16:            evidence_root: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_verification_test.rs:16:            evidence_root: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_restore_test.rs:16:            evidence_root: [0u8; 32],
+crates/amun-snapshot-engine-unified/src/lib.rs:11:    pub evidence_root: String,
+crates/amun-snapshot-engine-unified/src/lib.rs:21:            evidence_root: state.evidence_root.clone(),
+crates/amun-snapshot-engine-unified/src/lib.rs:78:            evidence_root: "evidence100".into(),
+crates/amun-snapshot-engine-unified/src/lib.rs:97:        assert_eq!(snapshot.evidence_root, "evidence100");
+crates/amun-snapshot-engine-unified/src/lib.rs:113:            evidence_root: "ev1000".into(),
+crates/amun-snapshot-engine-unified/src/lib.rs:135:            evidence_root: "evidence_root_42".into(),
+crates/amun-snapshot-engine-unified/src/lib.rs:143:        assert_eq!(snapshot.evidence_root, "evidence_root_42");
+crates/amun-snapshot-engine-unified/src/lib.rs:154:        let bad_snapshot = r#"{"height":1,"state_root":"x","evidence_root":"y","block_hash":"z","snapshot_version":99}"#;
+crates/amun-chain-checkpoint/src/lib.rs:28:    pub final_evidence_root: String,
+crates/amun-chain-checkpoint/src/lib.rs:92:            final_evidence_root: last_bundle.block_header.evidence_root.clone(),
+crates/amun-chain-checkpoint/src/lib.rs:113:        bytes.extend_from_slice(self.final_evidence_root.as_bytes());
+crates/amun-consensus/src/action.rs:98:    pub fn evidence_root(&self) -> [u8; 32] {
+crates/amun-consensus/src/action.rs:124:            evidence_root: tree.root(),
+crates/amun-consensus/src/action.rs:133:    pub evidence_root: [u8; 32],
+crates/amun-consensus/src/action.rs:139:        tree.verify(&self.evidence_root, &self.proof)
+crates/amun-rpc/src/lib.rs:347:        "constitutional": tip.map(|r| r.verdict_hash != [0u8; 32]).unwrap_or(false),
+crates/amun-rpc/src/lib.rs:370:                "verdict_hash": hex::encode(r.verdict_hash),
+crates/amun-rpc/src/lib.rs:396:            "verdict_hash": hex::encode(r.verdict_hash),
+crates/amun-rpc/src/lib.rs:434:            "verdict_hash": hex::encode(r.verdict_hash),
+crates/amun-rpc/src/lib.rs:437:            "constitutional": r.verdict_hash != [0u8; 32],
+crates/amun-benchmarks/benches/storage_bench.rs:13:            verdict_hash: [0u8; 32],
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:52:            record.verdict_hash, [0u8; 32],
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:53:            "N129.4 FAIL: verdict_hash is zero at height {}",
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:92:        hasher.update(&tampered.verdict_hash);
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:104:    // N129.4-D: Tamper detection — modifying verdict_hash changes evidence_root
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:106:    tampered2.verdict_hash[0] ^= 0xFF;
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:113:        hasher.update(&tampered2.verdict_hash);
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:122:        "N129.4 FAIL: evidence_root must change when verdict_hash is tampered"
+crates/amun-live-cluster/src/validator.rs:561:                        let mut verdict_hash = [0u8; 32];
+crates/amun-live-cluster/src/validator.rs:562:                        verdict_hash.copy_from_slice(&hasher.finalize().as_bytes()[..32]);
+crates/amun-live-cluster/src/validator.rs:618:                            verdict_hash,
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:12:        verdict_hash: [0u8; 32],
+crates/amun-chain-store/src/store.rs:151:            verdict_hash: [0u8; 32],
+crates/amun-chain-store/src/sync.rs:162:            verdict_hash: [0u8; 32],
+crates/amun-chain-store/src/snapshot.rs:141:        verdict_hash: [0u8; 32],
+crates/amun-chain-store/src/record.rs:12:    pub verdict_hash: [u8; 32],
+crates/amun-chain-store/src/record.rs:41:            verdict_hash: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_builder_test.rs:14:            verdict_hash: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_verification_test.rs:14:            verdict_hash: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_restore_test.rs:14:            verdict_hash: [0u8; 32],
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:11:/// The `verdict_hash` covers the identity fields and results so that the verdict
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:34:    pub verdict_hash: String,
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:69:            verdict_hash: String::new(),
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:72:        verdict.verdict_hash = verdict.compute_hash();
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:78:        self.verdict_hash == self.compute_hash()
+crates/amun-constitutional-proof/src/lib.rs:645:    fn n47_2_s1_compute_verdict_hash() {
+crates/amun-constitutional-proof/src/lib.rs:670:        assert_eq!(v1.verdict_hash, v2.verdict_hash);
+crates/amun-constitutional-proof/src/publication_package.rs:36:    pub verdict_hashes: Vec<String>,
+crates/amun-constitutional-proof/src/publication_package.rs:57:        let verdict_hashes: Vec<String> = verdicts.iter().map(|v| v.verdict_hash.clone()).collect();
+crates/amun-constitutional-proof/src/publication_package.rs:62:            verdict_hashes,
+crates/amun-constitutional-proof/src/publication_package.rs:111:        for vh in &self.manifest.verdict_hashes {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:217:    fn n128_evidence_record_hash_verifiable() {
+crates/amun-rpc/src/lib.rs:371:                "evidence_record_hash": hex::encode(r.evidence_record_hash),
+crates/amun-rpc/src/lib.rs:397:            "evidence_record_hash": hex::encode(r.evidence_record_hash),
+crates/amun-rpc/src/lib.rs:435:            "evidence_record_hash": hex::encode(r.evidence_record_hash),
+crates/amun-benchmarks/benches/storage_bench.rs:14:            evidence_record_hash: [0u8; 32],
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:57:            record.evidence_record_hash, [0u8; 32],
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:58:            "N129.4 FAIL: evidence_record_hash is zero at height {}",
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:93:        hasher.update(&tampered.evidence_record_hash);
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:114:        hasher.update(&tampered2.evidence_record_hash);
+crates/amun-live-cluster/src/validator.rs:596:                        let evidence_record_hash = evidence_record.evidence_hash;
+crates/amun-live-cluster/src/validator.rs:619:                            evidence_record_hash,
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:13:        evidence_record_hash: [0u8; 32],
+crates/amun-chain-store/src/store.rs:152:            evidence_record_hash: [0u8; 32],
+crates/amun-chain-store/src/sync.rs:163:            evidence_record_hash: [0u8; 32],
+crates/amun-chain-store/src/snapshot.rs:142:        evidence_record_hash: [0u8; 32],
+crates/amun-chain-store/src/record.rs:14:    pub evidence_record_hash: [u8; 32],
+crates/amun-chain-store/src/record.rs:42:            evidence_record_hash: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_builder_test.rs:15:            evidence_record_hash: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_verification_test.rs:15:            evidence_record_hash: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_restore_test.rs:15:            evidence_record_hash: [0u8; 32],

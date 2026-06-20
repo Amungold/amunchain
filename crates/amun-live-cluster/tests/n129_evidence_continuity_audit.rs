@@ -1,5 +1,3 @@
-use amun_chain_store::record::FinalizedChainRecord;
-use amun_chain_store::store::ChainStore;
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
 use std::thread;
@@ -8,12 +6,12 @@ use std::time::Duration;
 #[test]
 fn n129_4_evidence_continuity_audit() {
     let ports = [9710, 9711, 9712, 9713];
-    
+
     for i in 0..4 {
         let _ = std::fs::remove_dir_all(format!("/tmp/amun-test-validator-{}", i));
     }
 
-    let mut validators: Vec<LiveValidator> = (0..4)
+    let validators: Vec<LiveValidator> = (0..4)
         .map(|i| {
             let mut config = ValidatorConfig::test_cluster(i, &ports).with_quorum(3);
             config.data_dir = format!("/tmp/amun-test-validator-{}", i);
@@ -28,7 +26,8 @@ fn n129_4_evidence_continuity_audit() {
     // Wait for at least 30 blocks
     for _ in 0..120 {
         thread::sleep(Duration::from_secs(1));
-        let heights: Vec<u64> = validators.iter()
+        let heights: Vec<u64> = validators
+            .iter()
             .map(|v| v.store.lock().unwrap().latest_height())
             .collect();
         if heights.iter().all(|&h| h >= 30) {
@@ -70,9 +69,11 @@ fn n129_4_evidence_continuity_audit() {
         let prev = store.load_height(h - 1).unwrap();
         let curr = store.load_height(h).unwrap();
         assert_ne!(
-            prev.evidence_root, curr.evidence_root,
+            prev.evidence_root,
+            curr.evidence_root,
             "N129.4 FAIL: evidence_root unchanged between {} and {}",
-            h - 1, h
+            h - 1,
+            h
         );
     }
 

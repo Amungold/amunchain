@@ -1,0 +1,30 @@
+   Compiling amun-load-generator v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-load-generator)
+   Compiling amun-wallet-api v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-wallet-api)
+error[E0599]: `Arc<LiveRpcProvider>` doesn't implement `std::fmt::Display`
+   --> crates/amun-wallet-api/src/main.rs:9:88
+    |
+  9 |   ...set_provider(&provider.to_string());
+    |                             ^^^^^^^^^ method cannot be called on `Arc<LiveRpcProvider>` due to unsatisfied trait bounds
+    |
+   ::: crates/amun-rpc/src/provider.rs:16:1
+    |
+ 16 |   pub struct LiveRpcProvider {
+    |   -------------------------- doesn't satisfy `LiveRpcProvider: ToString` or `LiveRpcProvider: std::fmt::Display`
+    |
+   ::: /root/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/sync.rs:269:1
+    |
+269 | / pub struct Arc<
+270 | |     T: ?Sized,
+271 | |     #[unstable(feature = "allocator_api", issue = "32838")] A: Allocator...
+272 | | > {
+    | |_- doesn't satisfy `Arc<LiveRpcProvider>: ToString` or `Arc<LiveRpcProvider>: std::fmt::Display`
+    |
+    = note: the following trait bounds were not satisfied:
+            `Arc<LiveRpcProvider>: std::fmt::Display`
+            which is required by `Arc<LiveRpcProvider>: ToString`
+            `LiveRpcProvider: std::fmt::Display`
+            which is required by `LiveRpcProvider: ToString`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `amun-wallet-api` (bin "amun-wallet-api" test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

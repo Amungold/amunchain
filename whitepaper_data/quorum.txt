@@ -1,0 +1,20 @@
+crates/amun-consensus/src/vote_collector.rs:49:        if validator_set.has_quorum(total_power) {
+crates/amun-consensus/src/validator.rs:57:    pub fn has_quorum(&self, voting_power: u64) -> bool {
+crates/amun-consensus/src/validator.rs:8:    pub voting_power: u64,
+crates/amun-consensus/src/validator.rs:29:            power_index.insert(v.id, v.voting_power);
+crates/amun-consensus/src/validator.rs:31:        let total_power = validators.iter().map(|v| v.voting_power).sum();
+crates/amun-consensus/src/validator.rs:44:            self.power_index.insert(v.id, v.voting_power);
+crates/amun-consensus/src/validator.rs:57:    pub fn has_quorum(&self, voting_power: u64) -> bool {
+crates/amun-consensus/src/validator.rs:58:        (voting_power as u128) * 3 > (self.total_power as u128) * 2
+crates/amun-consensus/src/validator.rs:61:    pub fn has_majority(&self, voting_power: u64) -> bool {
+crates/amun-consensus/src/validator.rs:62:        (voting_power as u128) * 2 > (self.total_power as u128)
+crates/amun-consensus/src/vote_collector.rs:2:use crate::validator::ValidatorSet;
+crates/amun-consensus/src/vote_collector.rs:37:        validator_set: &ValidatorSet,
+crates/amun-consensus/src/proposal_manager.rs:2:use crate::validator::ValidatorSet;
+crates/amun-consensus/src/proposal_manager.rs:5:    fn leader(&self, height: u64, round: u64, validator_set: &ValidatorSet) -> Option<Hash256>;
+crates/amun-consensus/src/proposal_manager.rs:11:    fn leader(&self, height: u64, round: u64, validator_set: &ValidatorSet) -> Option<Hash256> {
+crates/amun-consensus/src/proposal_manager.rs:38:        validator_set: &ValidatorSet,
+crates/amun-consensus/src/validator.rs:12:pub struct ValidatorSet {
+crates/amun-consensus/src/validator.rs:21:impl ValidatorSet {
+crates/amun-consensus/src/round_state_machine.rs:5:use crate::validator::ValidatorSet;
+crates/amun-consensus/src/round_state_machine.rs:83:        validator_set: &ValidatorSet,

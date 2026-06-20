@@ -1,0 +1,114 @@
+crates/amun-networking/src/transport.rs:6:/// TCP, QUIC, or libp2p.
+crates/amun-consensus-network/src/engine.rs:266:    /// Register a validator with both PeerId and ValidatorId (unified identity).
+crates/amun-node/src/certificate_loader.rs:48:/// Verify that the validator's PeerId is listed in the genesis validator set.
+crates/amun-node/src/certificate_loader.rs:49:/// Verify that the validator's PeerId is listed in the genesis validator set
+crates/amun-node/src/certificate_loader.rs:51:/// Verify that the validator's PeerId is listed in the genesis validator set
+crates/amun-node/src/certificate_loader.rs:53:/// Verify that the validator's PeerId is listed in the genesis validator set
+crates/amun-node/src/peer_registry.rs:3:use amun_networking::peer_identity::PeerId;
+crates/amun-node/src/peer_registry.rs:9:    peers: HashMap<PeerId, AuthenticatedPeer>,
+crates/amun-node/src/peer_registry.rs:27:    pub fn remove(&mut self, peer_id: &PeerId) -> bool {
+crates/amun-node/src/peer_registry.rs:32:    pub fn get(&self, peer_id: &PeerId) -> Option<&AuthenticatedPeer> {
+crates/amun-node/src/peer_registry.rs:47:    pub fn peer_ids(&self) -> Vec<PeerId> {
+crates/amun-node/src/peer_handshake.rs:3:use amun_networking::peer_identity::PeerId;
+crates/amun-node/src/peer_handshake.rs:10:    pub peer_id: PeerId,
+crates/amun-node/src/peer_handshake.rs:70:    pub peer_id: PeerId,
+crates/amun-constitutional-authority-semantics/src/institution.rs:2:use amun_peer_identity::ConstitutionalPeerId;
+crates/amun-constitutional-authority-semantics/src/institution.rs:10:    pub peer_id: ConstitutionalPeerId,
+crates/amun-peer-identity/tests/peer_identity_tests.rs:2:use amun_peer_identity::{ConstitutionalPeerId, IdentityVerifier, PeerCertificate, PeerRegistry};
+crates/amun-peer-identity/tests/peer_identity_tests.rs:8:    let a = ConstitutionalPeerId::new("key_a".into(), GENESIS.into());
+crates/amun-peer-identity/tests/peer_identity_tests.rs:9:    let b = ConstitutionalPeerId::new("key_a".into(), GENESIS.into());
+crates/amun-peer-identity/tests/peer_identity_tests.rs:15:    let a = ConstitutionalPeerId::new("key".into(), GENESIS.into());
+crates/amun-peer-identity/tests/peer_identity_tests.rs:16:    let b = ConstitutionalPeerId::new("key".into(), "other_genesis".into());
+crates/amun-peer-identity/tests/peer_identity_tests.rs:23:    let peer_id = ConstitutionalPeerId::new(keypair.verifying_key_hex(), GENESIS.into());
+crates/amun-peer-identity/tests/peer_identity_tests.rs:31:    let peer_id = ConstitutionalPeerId::new(keypair.verifying_key_hex(), "other_genesis".into());
+crates/amun-peer-identity/tests/peer_identity_tests.rs:39:    let peer_id = ConstitutionalPeerId::new(keypair.verifying_key_hex(), GENESIS.into());
+crates/amun-peer-identity/src/lib.rs:14:pub use peer_id::ConstitutionalPeerId;
+crates/amun-peer-identity/src/peer_id.rs:7:pub struct ConstitutionalPeerId {
+crates/amun-peer-identity/src/peer_id.rs:13:impl ConstitutionalPeerId {
+crates/amun-peer-identity/src/certificate.rs:6:    pub peer_id: super::peer_id::ConstitutionalPeerId,
+crates/amun-peer-identity/src/certificate.rs:12:        peer_id: super::peer_id::ConstitutionalPeerId,
+crates/amun-peer-identity/src/certificate.rs:15:        let bytes = serde_json::to_vec(&peer_id).expect("PeerId serialization must not fail");
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:15:use amun_networking::peer_identity::PeerIdentity;
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:66:    let alice_identity = PeerIdentity::new(
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:71:    let bob_identity = PeerIdentity::new(
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:169:        let identity = PeerIdentity::new(
+crates/amun-networking/src/validator_registry.rs:1:use crate::peer_identity::PeerId;
+crates/amun-networking/src/validator_registry.rs:9:    validators: BTreeMap<PeerId, ValidatorCertificate>,
+crates/amun-networking/src/validator_registry.rs:38:    pub fn remove(&mut self, validator_id: &PeerId) -> bool {
+crates/amun-networking/src/validator_registry.rs:43:    pub fn is_validator(&self, peer_id: &PeerId) -> bool {
+crates/amun-networking/src/node.rs:100:    /// Get this node's PeerId if a keypair is set.
+crates/amun-networking/src/node.rs:101:    pub fn peer_id(&self) -> Option<crate::peer_identity::PeerId> {
+crates/amun-networking/src/crypto_identity.rs:1:use crate::peer_identity::PeerId;
+crates/amun-networking/src/crypto_identity.rs:38:    /// Derive the PeerId from the verifying key.
+crates/amun-networking/src/crypto_identity.rs:39:    pub fn peer_id(&self) -> PeerId {
+crates/amun-networking/src/crypto_identity.rs:40:        PeerId::from_bytes(self.verifying_key.to_bytes())
+crates/amun-networking/src/crypto_identity.rs:88:    /// Get the PeerId of the sender.
+crates/amun-networking/src/crypto_identity.rs:89:    pub fn sender_peer_id(&self) -> PeerId {
+crates/amun-networking/src/crypto_identity.rs:90:        PeerId::from_bytes(self.sender_public_key)
+crates/amun-networking/src/signed_envelope.rs:3:use crate::peer_identity::PeerId;
+crates/amun-networking/src/signed_envelope.rs:10:    pub sender_peer_id: PeerId,
+crates/amun-networking/src/signed_envelope.rs:36:    pub to: PeerId,
+crates/amun-networking/src/signed_envelope.rs:41:    pub fn new(to: PeerId, signed_envelope: SignedEnvelope) -> Self {
+crates/amun-networking/src/trust_anchor.rs:1:use crate::peer_identity::PeerId;
+crates/amun-networking/src/trust_anchor.rs:10:    anchors: BTreeMap<PeerId, [u8; 32]>, // peer_id -> public_key
+crates/amun-networking/src/trust_anchor.rs:19:    pub fn register(&mut self, peer_id: PeerId, public_key: [u8; 32]) {
+crates/amun-networking/src/trust_anchor.rs:24:    pub fn revoke(&mut self, peer_id: &PeerId) -> bool {
+crates/amun-networking/src/trust_anchor.rs:29:    pub fn is_trusted(&self, peer_id: &PeerId) -> bool {
+crates/amun-networking/src/trust_anchor.rs:34:    pub fn get_key(&self, peer_id: &PeerId) -> Option<&[u8; 32]> {
+crates/amun-networking/src/peer_identity.rs:6:pub struct PeerId(pub [u8; 32]);
+crates/amun-networking/src/peer_identity.rs:8:impl PeerId {
+crates/amun-networking/src/peer_identity.rs:16:pub struct PeerIdentity {
+crates/amun-networking/src/peer_identity.rs:17:    pub peer_id: PeerId,
+crates/amun-networking/src/peer_identity.rs:22:impl PeerIdentity {
+crates/amun-networking/src/peer_identity.rs:23:    pub fn new(peer_id: PeerId, public_key: [u8; 32], address: SocketAddr) -> Self {
+crates/amun-networking/src/peer_discovery.rs:2:use crate::peer_identity::{PeerId, PeerIdentity};
+crates/amun-networking/src/peer_discovery.rs:9:    pub peer_id: PeerId,
+crates/amun-networking/src/peer_discovery.rs:38:    peers: BTreeMap<PeerId, PeerIdentity>,
+crates/amun-networking/src/peer_discovery.rs:39:    last_seen: BTreeMap<PeerId, u64>,
+crates/amun-networking/src/peer_discovery.rs:48:    pub fn register(&mut self, identity: PeerIdentity, timestamp: u64) {
+crates/amun-networking/src/peer_discovery.rs:56:        let expired: Vec<PeerId> = self
+crates/amun-networking/src/peer_discovery.rs:71:    pub fn get(&self, peer_id: &PeerId) -> Option<&PeerIdentity> {
+crates/amun-networking/src/peer_discovery.rs:86:    pub fn peer_ids(&self) -> Vec<PeerId> {
+crates/amun-networking/src/peer_discovery.rs:117:        let identity = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:132:        let identity = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:151:        let identity = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:173:        let id1 = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:178:        let id2 = PeerIdentity::new(
+crates/amun-networking/src/validator_certificate.rs:2:use crate::peer_identity::PeerId;
+crates/amun-networking/src/validator_certificate.rs:11:    pub validator_id: PeerId,
+crates/amun-networking/src/validator_certificate.rs:15:    pub issuer: PeerId,
+crates/amun-networking/src/validator_certificate.rs:29:        validator_id: PeerId,
+crates/amun-networking/src/validator_certificate.rs:77:        validator_id: PeerId,
+crates/amun-networking/src/peers.rs:3:pub struct PeerIdentity {
+crates/amun-networking/src/peers.rs:25:    pub fn can_request_sync(peer: &PeerIdentity) -> bool {
+crates/amun-networking/src/peers.rs:29:    pub fn can_accept_manifest(peer: &PeerIdentity) -> bool {
+crates/amun-networking/src/peers.rs:33:    pub fn upgrade_trust(peer: &mut PeerIdentity, new_level: TrustLevel) {
+crates/amun-networking/src/peers.rs:39:    pub fn degrade_trust(peer: &mut PeerIdentity, _reason: &str) {
+crates/amun-validator-identity/src/validator_id.rs:15:/// Derive a PeerId (network identifier) from the public key and genesis hash.
+crates/amun-validator-identity/src/registry.rs:4:/// Maps ValidatorId → Ed25519 public key, and optionally PeerId → ValidatorId.
+crates/amun-validator-identity/src/registry.rs:8:    peer_to_validator: BTreeMap<[u8; 32], ValidatorId>, // PeerId → ValidatorId
+crates/amun-validator-identity/src/registry.rs:19:    /// Insert a validator with only its ValidatorId (legacy, no PeerId).
+crates/amun-validator-identity/src/registry.rs:24:    /// Register a validator with both PeerId and ValidatorId.
+crates/amun-validator-identity/src/registry.rs:47:    /// Resolve a PeerId to the corresponding ValidatorId (if registered).
+crates/amun-live-cluster/src/validator.rs.bak:54:        let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
+crates/amun-live-cluster/src/validator.rs:95:        let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
+crates/amun-live-cluster/src/validator.rs:949:        use amun_networking::peer_identity::PeerId;
+crates/amun-live-cluster/src/validator.rs:972:            PeerId::from_bytes([1u8; 32]),
+crates/amun-network-transport/src/peer.rs:14:pub struct PeerIdentity {
+crates/amun-network-transport/src/peer.rs:20:impl PeerIdentity {
+crates/amun-network-transport/src/peer.rs:36:        let peer = PeerIdentity::new(
+crates/amun-network-transport/src/transport.rs:2:use crate::peer::{NodeId, PeerIdentity};
+crates/amun-network-transport/src/transport.rs:82:    pub identity: PeerIdentity,
+crates/amun-network-transport/src/transport.rs:83:    peers: Arc<Mutex<HashMap<NodeId, PeerIdentity>>>,
+crates/amun-network-transport/src/transport.rs:90:    pub fn new(identity: PeerIdentity, bind_address: SocketAddr) -> Self {
+crates/amun-network-transport/src/transport.rs:100:    pub fn add_peer(&self, peer: PeerIdentity) {
+crates/amun-network-transport/src/transport.rs:222:        let identity = PeerIdentity::new(
+crates/amun-network-transport/src/transport.rs:231:        let peer = PeerIdentity::new(
+crates/amun-authority-registry/src/registry.rs:299:        use amun_networking::peer_identity::PeerId;
+crates/amun-authority-registry/src/registry.rs:323:            PeerId::from_bytes([1u8; 32]),
+crates/amun-authority-registry/src/registry.rs:340:        use amun_networking::peer_identity::PeerId;
+crates/amun-authority-registry/src/registry.rs:363:            PeerId::from_bytes([1u8; 32]),
+crates/amun-authority-registry/src/registry.rs:380:        use amun_networking::peer_identity::PeerId;
+crates/amun-authority-registry/src/registry.rs:402:            PeerId::from_bytes([2u8; 32]),
+crates/amun-authority-registry/src/registry.rs:419:        use amun_networking::peer_identity::PeerId;
+crates/amun-authority-registry/src/registry.rs:431:            PeerId::from_bytes([1u8; 32]),

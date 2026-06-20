@@ -98,6 +98,7 @@ mod tests {
         assert!(result.is_ok());
         let account = result.unwrap();
         assert_eq!(account.address, "0xalice");
+        assert_eq!(account.balance, 0);
     }
 
     #[test]

@@ -1,0 +1,1533 @@
+crates/amun-constitutional-integration/src/lib.rs:30:            "Finality requires quorum certification",
+crates/amun-constitutional-integration/src/lib.rs:88:            ObligationId::new(ObligationNamespace::Finality, 1),
+crates/amun-constitutional-integration/src/lib.rs:98:            ObligationId::new(ObligationNamespace::Finality, 2),
+crates/amun-constitutional-integration/src/lib.rs:100:            "Finality certificates are cryptographically valid",
+crates/amun-constitutional-integration/src/lib.rs:101:            "forall fc in FinalityCertificate : verify_signatures(fc) = true",
+crates/amun-constitutional-integration/src/lib.rs:226:                ObligationId::new(ObligationNamespace::Finality, 3),
+crates/amun-constitutional-integration/src/lib.rs:233:            .with_dependency(ObligationId::new(ObligationNamespace::Finality, 1))
+crates/amun-constitutional-integration/src/lib.rs:247:            .with_dependency(ObligationId::new(ObligationNamespace::Finality, 1))
+crates/amun-constitutional-integration/src/lib.rs:289:            .with_dependency(ObligationId::new(ObligationNamespace::Finality, 3)),
+crates/amun-light-client/tests/light_client_tests.rs:3:use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-light-client/tests/light_client_tests.rs:22:) -> ConstitutionalFinalityCertificate {
+crates/amun-light-client/tests/light_client_tests.rs:45:    let mut cert = ConstitutionalFinalityCertificate::issue(
+crates/amun-light-client/src/constitutional_client.rs:4:use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-light-client/src/constitutional_client.rs:37:    pub fn verify_certificate(&self, cert: &ConstitutionalFinalityCertificate) -> bool {
+crates/amun-light-client/src/constitutional_client.rs:106:    use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-light-client/src/constitutional_client.rs:122:    ) -> ConstitutionalFinalityCertificate {
+crates/amun-light-client/src/constitutional_client.rs:145:        let mut cert = ConstitutionalFinalityCertificate::issue(
+crates/amun-evidence-finality/src/evidence_finality.rs:83:pub struct ConstitutionalFinalityCertificate {
+crates/amun-evidence-finality/src/evidence_finality.rs:94:impl ConstitutionalFinalityCertificate {
+crates/amun-evidence-finality/src/evidence_finality.rs:231:    ) -> Result<ConstitutionalFinalityCertificate, String> {
+crates/amun-evidence-finality/src/evidence_finality.rs:256:        Ok(ConstitutionalFinalityCertificate::issue(block, qc))
+crates/amun-consensus-network/src/messages.rs:98:pub struct FinalityCertificate {
+crates/amun-consensus-network/src/finality_gate.rs:1:// N118.1 — Finality Gate for Slashing Certificates
+crates/amun-consensus-network/src/messages.rs.bak:94:pub struct FinalityCertificate {
+crates/amun-consensus-network/src/slashing_certificate.rs:7:// Unlike FinalityCertificate (produced by Quorum), SlashingCertificate is
+crates/amun-consensus-network/src/engine.rs:2:    ConsensusVote, EquivocationProof, FinalityCertificate, QuorumCertificate, SignedVote,
+crates/amun-consensus-network/src/engine.rs:19:    pub finality: Option<FinalityCertificate>,
+crates/amun-consensus-network/src/engine.rs:154:    pub fn finalize(&mut self, history_root: [u8; 32]) -> Option<FinalityCertificate> {
+crates/amun-consensus-network/src/engine.rs:156:        let cert = FinalityCertificate {
+crates/amun-consensus-network/src/engine.rs:233:    finality_chain: Vec<FinalityCertificate>,
+crates/amun-consensus-network/src/engine.rs:452:    ) -> Option<FinalityCertificate> {
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:2:    ConsensusVote, EquivocationProof, FinalityCertificate, QuorumCertificate, SignedVote,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:18:    pub finality: Option<FinalityCertificate>,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:107:    pub fn finalize(&mut self, history_root: [u8; 32]) -> Option<FinalityCertificate> {
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:109:        let cert = FinalityCertificate {
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:184:    finality_chain: Vec<FinalityCertificate>,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:334:    ) -> Option<FinalityCertificate> {
+crates/amun-consensus-network/src/network_consensus.rs:2:use crate::messages::{ConsensusVote, FinalityCertificate};
+crates/amun-consensus-network/src/network_consensus.rs:42:    ) -> Result<FinalityCertificate, String> {
+crates/amun-constitutional-enforcement/src/lib.rs:33:    FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/lib.rs:80:                ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/lib.rs:143:                &ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:179:        // Finality Supermajority
+crates/amun-constitutional-enforcement/src/proof_engine.rs:182:                law: ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:184:                    "Finality lacks supermajority: {}/{}",
+crates/amun-constitutional-enforcement/src/proof_engine.rs:306:                    .any(|v| v.law == ConstitutionalLaw::FinalitySupermajority));
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:14:    /// Build execution evidence from FinalityCertificate data.
+crates/amun-constitutional/src/architectural_invariants.rs:29:/// consensus proofs. Finality is a consensus concern layered
+crates/amun-constitutional/src/architectural_invariants.rs:32:    "Certificate attests admissibility, not finality. Finality is above the kernel.";
+crates/amun-constitutional/src/execution_receipt.rs:44:/// admissible, not that it achieved finality. Finality is a consensus concern
+crates/amun-consensus-integration/src/consensus_integrator.rs:9:    ConstitutionalBlock, ConstitutionalFinalityCertificate, ConstitutionalQC,
+crates/amun-consensus-integration/src/consensus_integrator.rs:82:    ) -> Result<ConstitutionalFinalityCertificate, String> {
+crates/amun-consensus-integration/src/consensus_integrator.rs:96:        Ok(ConstitutionalFinalityCertificate::issue(block, qc))
+crates/amun-consensus-integration/src/consensus_types.rs:78:pub struct ConstitutionalFinalityCertificate {
+crates/amun-consensus-integration/src/consensus_types.rs:87:impl ConstitutionalFinalityCertificate {
+crates/amun-finality-certificate/src/lib.rs:10:pub struct ConstitutionalFinalityCertificate {
+crates/amun-finality-certificate/src/lib.rs:22:impl ConstitutionalFinalityCertificate {
+crates/amun-finality-certificate/src/lib.rs:72:pub struct FinalityChain {
+crates/amun-finality-certificate/src/lib.rs:73:    certificates: HashMap<[u8; 32], ConstitutionalFinalityCertificate>,
+crates/amun-finality-certificate/src/lib.rs:77:impl FinalityChain {
+crates/amun-finality-certificate/src/lib.rs:82:    pub fn append(&mut self, cert: ConstitutionalFinalityCertificate) -> Result<(), &'static str> {
+crates/amun-finality-certificate/src/lib.rs:88:                return Err("Finality chain broken");
+crates/amun-finality-certificate/src/lib.rs:102:    pub fn latest(&self) -> Option<&ConstitutionalFinalityCertificate> {
+crates/amun-finality-certificate/src/lib.rs:111:    fn issue_cert(h: u64) -> ConstitutionalFinalityCertificate {
+crates/amun-finality-certificate/src/lib.rs:112:        ConstitutionalFinalityCertificate::issue(
+crates/amun-finality-certificate/src/lib.rs:154:        let mut chain = FinalityChain::new();
+crates/amun-finality-certificate/src/lib.rs:155:        let c1 = ConstitutionalFinalityCertificate::issue(
+crates/amun-finality-certificate/src/lib.rs:160:        let c2 = ConstitutionalFinalityCertificate::issue(
+crates/amun-constitutional-semantics/src/lib.rs:26:// ─── Event Finality ────────────────────────────────────────
+crates/amun-constitutional-semantics/src/lib.rs:27:#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)] pub enum EventFinality { Tentative, QuorumAccepted, Finalized, ReplayCertified }
+crates/amun-constitutional-semantics/src/lib.rs:28:impl EventFinality {
+crates/amun-constitutional-semantics/src/lib.rs:29:    pub fn is_replay_safe(&self) -> bool { matches!(self, EventFinality::Finalized | EventFinality::ReplayCertified) }
+crates/amun-constitutional-semantics/src/lib.rs:30:    pub fn is_immutable(&self) -> bool { matches!(self, EventFinality::Finalized | EventFinality::ReplayCertified) }
+crates/amun-constitutional-semantics/src/lib.rs:32:#[derive(Debug, Clone, PartialEq, Eq)] pub struct FinalizedEvent { pub event: TranscriptEntry, pub finality: EventFinality, pub finalized_at_sequence: Option<u64>, pub commitment_root: Option<[u8; 32]> }
+crates/amun-constitutional-semantics/src/lib.rs:34:    pub fn new(event: TranscriptEntry, finality: EventFinality) -> Self { Self { event, finality, finalized_at_sequence: None, commitment_root: None } }
+crates/amun-constitutional-semantics/src/lib.rs:35:    pub fn with_finalization(mut self, at_sequence: u64, commitment: [u8; 32]) -> Self { self.finality = EventFinality::Finalized; self.finalized_at_sequence = Some(at_sequence); self.commitment_root = Some(commitment); self }
+crates/amun-constitutional-semantics/src/lib.rs:36:    pub fn with_replay_certification(mut self, at_sequence: u64) -> Self { self.finality = EventFinality::ReplayCertified; self.finalized_at_sequence = Some(at_sequence); self }
+crates/amun-constitutional-semantics/src/lib.rs:116:    #[test] fn test_finality_progression() { assert!(EventFinality::Tentative < EventFinality::Finalized); assert!(EventFinality::Finalized < EventFinality::ReplayCertified); }
+crates/amun-constitutional-semantics/src/lib.rs:117:    #[test] fn test_finality_replay_safety() { assert!(!EventFinality::Tentative.is_replay_safe()); assert!(EventFinality::Finalized.is_replay_safe()); }
+crates/amun-constitutional-runtime/src/finality_certificate.rs:7:pub struct ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:22:impl ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:186:        let cert = ConstitutionalFinalityCertificate::issue(
+crates/amun-constitutional-runtime/src/finality_certificate.rs:208:        let c1 = ConstitutionalFinalityCertificate::issue(&br, vec![], [0xaa; 32], 1, [0xbb; 32]);
+crates/amun-constitutional-runtime/src/finality_certificate.rs:209:        let c2 = ConstitutionalFinalityCertificate::issue(&br, vec![], [0xaa; 32], 1, [0xbb; 32]);
+crates/amun-constitutional-runtime/src/finality_certificate.rs:225:            ConstitutionalFinalityCertificate::issue(&br, vec![], [0xaa; 32], 1, [0xbb; 32]);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:5:    pub certificates: Vec<crate::finality_certificate::ConstitutionalFinalityCertificate>,
+crates/amun-constitutional-runtime/src/certificate_chain.rs:12:        certificates: Vec<crate::finality_certificate::ConstitutionalFinalityCertificate>,
+crates/amun-constitutional-runtime/src/certificate_chain.rs:71:    pub fn tip(&self) -> &crate::finality_certificate::ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:75:    pub fn genesis(&self) -> &crate::finality_certificate::ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:80:        certs: &[crate::finality_certificate::ConstitutionalFinalityCertificate],
+crates/amun-constitutional-runtime/src/certificate_chain.rs:101:    use crate::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-constitutional-runtime/src/certificate_chain.rs:116:    ) -> ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:139:        let mut cert = ConstitutionalFinalityCertificate::issue(
+crates/amun-constitutional-runtime/src/history_root.rs:93:    use crate::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-constitutional-runtime/src/history_root.rs:108:    ) -> ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/history_root.rs:131:        let mut cert = ConstitutionalFinalityCertificate::issue(
+crates/amun-explorer-api/src/services/finality_service.rs:2:use crate::types::FinalityCertificateSummary;
+crates/amun-explorer-api/src/services/finality_service.rs:5:pub struct FinalityService;
+crates/amun-explorer-api/src/services/finality_service.rs:7:impl FinalityService {
+crates/amun-explorer-api/src/services/finality_service.rs:8:    pub fn list_certificates() -> ApiResult<Vec<FinalityCertificateSummary>> {
+crates/amun-explorer-api/src/services/finality_service.rs:10:            FinalityCertificateSummary {
+crates/amun-explorer-api/src/services/finality_service.rs:17:            FinalityCertificateSummary {
+crates/amun-explorer-api/src/services/finality_service.rs:27:    pub fn get_certificate(id: &str) -> ApiResult<FinalityCertificateSummary> {
+crates/amun-explorer-api/src/services/finality_service.rs:29:            return Err(ApiError::not_found("Finality Certificate", id));
+crates/amun-explorer-api/src/services/finality_service.rs:31:        Ok(Json(FinalityCertificateSummary {
+crates/amun-explorer-api/src/routes/finality.rs:1:use crate::services::finality_service::FinalityService;
+crates/amun-explorer-api/src/routes/finality.rs:5:) -> crate::errors::ApiResult<Vec<crate::types::FinalityCertificateSummary>> {
+crates/amun-explorer-api/src/routes/finality.rs:6:    FinalityService::list_certificates()
+crates/amun-explorer-api/src/routes/finality.rs:10:) -> crate::errors::ApiResult<crate::types::FinalityCertificateSummary> {
+crates/amun-explorer-api/src/routes/finality.rs:11:    FinalityService::get_certificate(&id)
+crates/amun-explorer-api/src/types.rs:34:pub struct FinalityCertificateSummary {
+crates/amun-consensus-law/src/lib.rs:7:pub use finality::FinalityLaw;
+crates/amun-consensus-law/src/finality.rs:3:pub struct FinalityLaw;
+crates/amun-consensus-law/src/finality.rs:5:impl FinalityLaw {
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:39:                    .any(|v| v.law == ConstitutionalLaw::FinalitySupermajority),
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:40:                "Must detect FinalitySupermajority violation"
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:1:// N118 — Finality-Gated Slashing Verification
+crates/amun-live-cluster/src/validator.rs:514:                        // N126.3: Finality supermajority from QC voting power
+crates/amun-verification-kernel/src/lib.rs:19:    Finality,
+crates/amun-invariants/src/kernel.rs:36:        name: "Single Finality",
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:11:    ReplayBackedFinalityCertificate, ReplayBackedQC, ReplayVerificationRecord, ReplayVerifiedBlock,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:119:    ) -> Result<ReplayBackedFinalityCertificate, String> {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:137:        Ok(ReplayBackedFinalityCertificate::issue(block, qc))
+crates/amun-replay-consensus/src/replay_backed_types.rs:86:pub struct ReplayBackedFinalityCertificate {
+crates/amun-replay-consensus/src/replay_backed_types.rs:96:impl ReplayBackedFinalityCertificate {
+crates/amun-constitutional-proof/src/lib.rs:122:            ObligationNamespace::Finality,
+crates/amun-constitutional-proof/src/lib.rs:136:        let id = ObligationId::new(ObligationNamespace::Finality, 3);
+crates/amun-constitutional-proof/src/lib.rs:166:        let dep = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:413:            make_id(ObligationNamespace::Finality, 1),
+crates/amun-constitutional-proof/src/lib.rs:422:            make_id(ObligationNamespace::Finality, 2),
+crates/amun-constitutional-proof/src/lib.rs:570:            "N41-Finality".into(),
+crates/amun-constitutional-proof/src/lib.rs:677:                ObligationId::new(ObligationNamespace::Finality, 1),
+crates/amun-constitutional-proof/src/lib.rs:681:                ObligationId::new(ObligationNamespace::Finality, 2),
+crates/amun-constitutional-proof/src/lib.rs:851:            ObligationId::new(ObligationNamespace::Finality, 1),
+crates/amun-constitutional-proof/src/lib.rs:994:        let id = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:1085:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:1142:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:1176:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:1245:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:1306:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/obligation_namespace.rs:14:    Finality,
+crates/amun-constitutional-proof/src/obligation_namespace.rs:31:            Self::Finality => "FINALITY",
+crates/amun-constitutional-proof/src/obligation_namespace.rs:49:            "FINALITY" => Ok(Self::Finality),
+crates/amun-constitutional-integration/src/lib.rs:51:            "forall b in Finalized : exists replay_certificate(b)",
+crates/amun-constitutional-integration/src/lib.rs:70:            "Every replay certificate maps to evidence",
+crates/amun-constitutional-integration/src/lib.rs:90:            "Every finalized block has finality certificate",
+crates/amun-constitutional-integration/src/lib.rs:91:            "forall b in Finalized : exists finality_certificate(b)",
+crates/amun-constitutional-integration/src/lib.rs:100:            "Finality certificates are cryptographically valid",
+crates/amun-constitutional-integration/src/lib.rs:176:                "Replay certificates are unique",
+crates/amun-constitutional-integration/src/lib.rs:228:                "Conflicting finality certificates are impossible",
+crates/amun-constitutional-integration/src/lib.rs:310:    pub fn verification_certificate_to_evidence(
+crates/amun-constitutional-integration/src/lib.rs:316:        hasher.update(cert.certificate_hash.as_bytes());
+crates/amun-constitutional-integration/src/lib.rs:317:        hasher.update(cert.certificate_id.as_bytes());
+crates/amun-constitutional-integration/src/lib.rs:322:            format!("EV-{}-{}-{}", phase, cert.certificate_id, obligation_id),
+crates/amun-constitutional-integration/src/lib.rs:334:        phase_certificates: HashMap<String, VerificationCertificate>,
+crates/amun-constitutional-integration/src/lib.rs:348:        for (phase, cert) in &phase_certificates {
+crates/amun-constitutional-integration/src/lib.rs:352:                    cert.certificate_id
+crates/amun-constitutional-integration/src/lib.rs:361:                let ev = Self::verification_certificate_to_evidence(cert, phase, &obl.id);
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:19:    let phase_certificates = load_phase_certificates(&data_dir)?;
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:21:    if phase_certificates.is_empty() {
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:23:        println!("WARNING: No verification certificates found.");
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:25:        println!("  Run an AmunChain node first to produce certificates,");
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:29:        println!("  {}/certificates/N41-CERT.json", data_dir.display());
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:30:        println!("  {}/certificates/N42-CERT.json", data_dir.display());
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:37:    println!("   Loaded {} phase certificates", phase_certificates.len());
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:38:    for (phase, cert) in &phase_certificates {
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:42:            cert.certificate_id,
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:56:        ConstitutionalBridge::run_full_pipeline(phase_certificates, timestamp)
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:86:    // Phase 5: Issue constitutional certificate
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:88:    println!("[5/6] Issuing constitutional certificate...");
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:132:fn load_phase_certificates(
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:138:    let cert_dir = data_dir.join("certificates");
+crates/amun-transcript-semantics/src/lib.rs:40:#[derive(Debug, Clone, PartialEq, Eq)] pub struct CertifyingEvent { pub identity: EventIdentity, pub certifies: EventIdentity, pub certificate_hash: [u8; 32], pub certifier_authority: [u8; 32] }
+crates/amun-transcript-semantics/src/lib.rs:61:struct CertifiedEnvelope { domain: ReplayDomain, epoch_id: [u8; 32], transcript_root: [u8; 32], state_root: [u8; 32], receipt_root: [u8; 32], ordering_root: [u8; 32], event_count: u64, replay_version: u32, certificate_hash: [u8; 32] }
+crates/amun-transcript-semantics/src/lib.rs:65:        let mut env = CertifiedEnvelope { domain, epoch_id, transcript_root, state_root, receipt_root, ordering_root, event_count, replay_version, certificate_hash: [0; 32] };
+crates/amun-transcript-semantics/src/lib.rs:66:        env.certificate_hash = Self::compute(&env); Self { inner: env }
+crates/amun-transcript-semantics/src/lib.rs:71:    pub fn certificate_hash(&self) -> [u8; 32] { self.inner.certificate_hash }
+crates/amun-transcript-semantics/src/lib.rs:72:    pub fn verify(&self) -> bool { self.inner.certificate_hash == Self::compute(&self.inner) }
+crates/amun-transcript-semantics/src/lib.rs:104:    #[test] fn test_immutable_cert() { let c = ImmutableReplayCertificate::new(ReplayDomain::Consensus,[0xBB;32],[0x01;32],[0x02;32],[0x03;32],[0x04;32],100,1); assert!(c.verify()); let h1 = c.certificate_hash(); let h2 = c.certificate_hash(); assert_eq!(h1, h2); }
+crates/amun-light-client/tests/light_client_tests.rs:2:use amun_constitutional_runtime::certificate_chain::CertificateChain;
+crates/amun-light-client/tests/light_client_tests.rs:3:use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-light-client/tests/light_client_tests.rs:52:    cert.previous_certificate_hash = prev_hash;
+crates/amun-light-client/tests/light_client_tests.rs:53:    cert.certificate_hash = cert.compute_hash();
+crates/amun-light-client/tests/light_client_tests.rs:66:        certificate_hash: cert1.certificate_hash,
+crates/amun-light-client/tests/light_client_tests.rs:78:    let cert2 = make_cert(2, [0x02; 32], [0xdd; 32], cert1.certificate_hash);
+crates/amun-light-client/tests/light_client_tests.rs:79:    let cert3 = make_cert(3, [0x03; 32], [0xee; 32], cert2.certificate_hash);
+crates/amun-light-client/tests/light_client_tests.rs:92:        certificate_hash: cert1.certificate_hash,
+crates/amun-light-client/Cargo.toml:5:description = "Constitutional light client — verifies certificates, chains, and history roots"
+crates/amun-light-client/src/constitutional_client.rs:3:use amun_constitutional_runtime::certificate_chain::CertificateChain;
+crates/amun-light-client/src/constitutional_client.rs:4:use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-light-client/src/constitutional_client.rs:11:    pub certificate_hash: [u8; 32],
+crates/amun-light-client/src/constitutional_client.rs:37:    pub fn verify_certificate(&self, cert: &ConstitutionalFinalityCertificate) -> bool {
+crates/amun-light-client/src/constitutional_client.rs:49:            chain.certificates[0].previous_certificate_hash == checkpoint.certificate_hash
+crates/amun-light-client/src/constitutional_client.rs:72:            certificate_hash: tip.certificate_hash,
+crates/amun-light-client/src/constitutional_client.rs:89:            && checkpoint.certificate_hash != [0u8; 32]
+crates/amun-light-client/src/constitutional_client.rs:105:    use amun_constitutional_runtime::certificate_chain::CertificateChain;
+crates/amun-light-client/src/constitutional_client.rs:106:    use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-light-client/src/constitutional_client.rs:152:        cert.previous_certificate_hash = prev_hash;
+crates/amun-light-client/src/constitutional_client.rs:153:        cert.certificate_hash = cert.compute_hash();
+crates/amun-light-client/src/constitutional_client.rs:165:            certificate_hash: cert.certificate_hash,
+crates/amun-light-client/src/constitutional_client.rs:178:    fn n55_verify_valid_certificate() {
+crates/amun-light-client/src/constitutional_client.rs:181:        assert!(client.verify_certificate(&cert));
+crates/amun-light-client/src/constitutional_client.rs:185:    fn n55_reject_tampered_certificate() {
+crates/amun-light-client/src/constitutional_client.rs:189:        assert!(!client.verify_certificate(&cert));
+crates/amun-light-client/src/constitutional_client.rs:198:            certificate_hash: cert1.certificate_hash,
+crates/amun-light-client/src/constitutional_client.rs:207:        let cert2 = make_cert(2, [0x02; 32], [0xdd; 32], cert1.certificate_hash);
+crates/amun-light-client/src/constitutional_client.rs:208:        let cert3 = make_cert(3, [0x03; 32], [0xee; 32], cert2.certificate_hash);
+crates/amun-light-client/src/constitutional_client.rs:219:            certificate_hash: cert1.certificate_hash,
+crates/amun-light-client/src/constitutional_client.rs:228:        let cert2 = make_cert(2, [0x02; 32], [0xdd; 32], cert1.certificate_hash);
+crates/amun-light-client/src/constitutional_client.rs:229:        let cert3 = make_cert(3, [0x03; 32], [0xee; 32], cert2.certificate_hash);
+crates/amun-lineage-law/src/lineage.rs:5:/// parent's freeze certificate and golden fixtures.
+crates/amun-lineage-law/src/lineage.rs:8:    /// Hash of the parent protocol's freeze certificate
+crates/amun-lineage-law/src/lineage.rs:9:    pub parent_freeze_certificate_hash: [u8; 32],
+crates/amun-lineage-law/src/lineage.rs:10:    /// Hash of the child protocol's freeze certificate
+crates/amun-lineage-law/src/lineage.rs:11:    pub child_freeze_certificate_hash: [u8; 32],
+crates/amun-lineage-law/src/lineage.rs:30:            parent_freeze_certificate_hash: parent_freeze_hash,
+crates/amun-lineage-law/src/lineage.rs:31:            child_freeze_certificate_hash: child_freeze_hash,
+crates/amun-lineage-law/src/lineage.rs:44:        h.update(self.parent_freeze_certificate_hash);
+crates/amun-lineage-law/src/lineage.rs:45:        h.update(self.child_freeze_certificate_hash);
+crates/amun-lineage-law/src/lineage.rs:67:    pub certificate_hash: [u8; 32],
+crates/amun-lineage-law/src/lineage.rs:75:            certificate_hash: [0u8; 32],
+crates/amun-lineage-law/src/lineage.rs:77:        cert.certificate_hash = cert.compute_hash();
+crates/amun-lineage-law/src/lineage.rs:90:        self.compute_hash() == self.certificate_hash && self.proof.is_verified
+crates/amun-lineage-law/src/lineage.rs:106:            if child.parent_freeze_certificate_hash != parent.child_freeze_certificate_hash {
+crates/amun-lineage-law/src/migration.rs:64:    pub certificate_hash: [u8; 32],
+crates/amun-lineage-law/src/migration.rs:72:            certificate_hash: [0u8; 32],
+crates/amun-lineage-law/src/migration.rs:74:        cert.certificate_hash = cert.compute_hash();
+crates/amun-lineage-law/src/migration.rs:87:        self.compute_hash() == self.certificate_hash && self.witness.verify()
+crates/amun-lineage-law/src/ancestry.rs:7:    pub freeze_certificate_hash: [u8; 32],
+crates/amun-lineage-law/src/ancestry.rs:24:            freeze_certificate_hash: freeze_hash,
+crates/amun-lineage-law/src/ancestry.rs:86:            h.update(node.freeze_certificate_hash);
+crates/amun-evidence-finality/Cargo.toml:5:description = "Evidence-backed finality: binding execution, proof, replay, and evidence into one certificate"
+crates/amun-evidence-finality/src/evidence_finality.rs:81:/// The final constitutional finality certificate.
+crates/amun-evidence-finality/src/evidence_finality.rs:91:    pub certificate_hash: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:104:            certificate_hash: [0u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:106:        cert.certificate_hash = cert.compute_hash();
+crates/amun-evidence-finality/src/evidence_finality.rs:127:        self.certificate_hash == self.compute_hash() && self.qc.is_valid()
+crates/amun-evidence-finality/src/evidence_finality.rs:130:    /// The certificate binds five independent roots into one cryptographic commitment.
+crates/amun-evidence-finality/src/evidence_finality.rs:285:    fn w19_evidence_root_in_certificate() {
+crates/amun-evidence-finality/src/evidence_finality.rs:312:    fn w19_five_roots_bound_in_certificate() {
+crates/amun-evidence-finality/src/evidence_finality.rs:343:    fn w19_certificate_deterministic() {
+crates/amun-evidence-finality/src/evidence_finality.rs:366:        assert_eq!(c1.certificate_hash, c2.certificate_hash);
+crates/amun-byzantine-harness/Cargo.toml:12:amun-quorum-certificate = { path = "../amun-quorum-certificate" }
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:14:// HashMap imported for future multi-certificate tests
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:7:fn make_unsigned_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:27:// Gatekeeper 1: Signed certificate verifies successfully
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:30:fn n114_3_signed_certificate_verifies() {
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:31:    let mut cert = make_unsigned_certificate([0x42; 32]);
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:43:        "N114.3 FAIL: Signed certificate must verify"
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:48:// Gatekeeper 2: Unsigned certificate is rejected
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:51:fn n114_3_unsigned_certificate_rejected() {
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:52:    let cert = make_unsigned_certificate([0x42; 32]);
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:60:        "N114.3 FAIL: Unsigned certificate must be rejected"
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:65:// Gatekeeper 3: Tampered certificate is rejected
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:68:fn n114_3_tampered_certificate_rejected() {
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:69:    let mut cert = make_unsigned_certificate([0x42; 32]);
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:78:        "N114.3 FAIL: Tampered certificate must be rejected"
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:87:    let mut cert = make_unsigned_certificate([0x42; 32]);
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:101:// Additional: Signature changes when certificate content changes
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:104:fn n114_3_signature_changes_with_certificate_content() {
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:105:    let mut cert1 = make_unsigned_certificate([0x42; 32]);
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:106:    let mut cert2 = make_unsigned_certificate([0x42; 32]);
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:127:fn n114_3_signed_certificate_roundtrip() {
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:128:    let mut cert = make_unsigned_certificate([0x42; 32]);
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:139:        "N114.3 FAIL: Roundtripped certificate must verify"
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:3:// Verifies that replaying the same sequence of slashing certificates
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:72:    // Rebuild from the same certificates (simulating restore from snapshot)
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:6:// MissingEvidenceRequest/Response cycle.  The certificate is accepted
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:11:    process_incoming_evidence_push, validate_certificate_evidence, EvidenceCount, EvidenceGossip,
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:26:fn make_certificate(validator_id: [u8; 32], evidence_ids: Vec<[u8; 32]>) -> SlashingCertificate {
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:84:    // Create certificate referencing these evidence IDs
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:85:    let cert = make_certificate(
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:102:    // Before push: certificate should be rejected
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:103:    let result_before = validate_certificate_evidence(&cert, &store_b);
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:128:    // Phase 4: Node B validates the certificate — ACCEPTED without pull
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:130:    let result_after = validate_certificate_evidence(&cert, &store_b);
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:134:        "N112.4 FAIL: After push, certificate must be accepted without MissingEvidenceRequest"
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:180:fn n112_4_certificate_immediately_accepted_after_push() {
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:194:    let cert = make_certificate(validator_id, vec![ev.evidence_id]);
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:205:    let result = validate_certificate_evidence(&cert, &store_b);
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:6:// verifies it, and finally accepts the certificate.
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:12:    build_missing_evidence_request, process_evidence_response, validate_certificate_evidence,
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:18:fn make_certificate(validator_id: [u8; 32], evidence_ids: Vec<[u8; 32]>) -> SlashingCertificate {
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:61:    // Phase 1: Node A creates evidence and a certificate
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:89:    // Create certificate referencing all 3 evidence IDs
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:90:    let cert = make_certificate(validator_id, vec![id1, id2, id3]);
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:93:    let result_a = validate_certificate_evidence(&cert, &store_a);
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:101:    // Phase 2: Node B receives the certificate but has NO evidence
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:107:    let result_b = validate_certificate_evidence(&cert, &store_b);
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:153:    let result_b_after = validate_certificate_evidence(&cert, &store_b);
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:167:fn n111_7_certificate_gossip_between_nodes() {
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:170:    // Node A: create certificate with evidence
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:176:    let cert = make_certificate(validator_id, vec![ev_id]);
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:177:    let cert_hash = cert.certificate_hash;
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:181:    cert_gossip_a.receive_certificate(cert.clone()).unwrap();
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:183:    // Node B: receive certificate (but no evidence yet)
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:188:    cert_gossip_b.receive_certificate(cert.clone()).unwrap();
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:189:    assert!(cert_gossip_b.certificates.contains_key(&cert_hash));
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:192:    let result = validate_certificate_evidence(&cert, &store_b);
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:203:    let result_after = validate_certificate_evidence(&cert, &store_b);
+crates/amun-consensus-network/src/messages.rs:67:/// A quorum certificate: proof that >2/3 validators approved.
+crates/amun-consensus-network/src/messages.rs:96:/// A finality certificate issued after a QC is formed.
+crates/amun-consensus-network/src/messages.rs:409:    /// N110.3: Slashing certificate for network propagation
+crates/amun-consensus-network/src/messages.rs:410:    SlashingCertificate(crate::slashing_certificate::SlashingCertificate),
+crates/amun-consensus-network/src/slashing_ledger.rs:7:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/slashing_ledger.rs:10:/// N119.3: Computed from canonical certificate data.
+crates/amun-consensus-network/src/slashing_ledger.rs:11:pub fn certificate_id(cert: &SlashingCertificate) -> [u8; 32] {
+crates/amun-consensus-network/src/slashing_ledger.rs:32:    pub certificate_id: [u8; 32],
+crates/amun-consensus-network/src/slashing_ledger.rs:40:/// N119.1: Persistent ledger preventing replay of slashing certificates.
+crates/amun-consensus-network/src/slashing_ledger.rs:56:    /// N119.1: Check if a certificate has already been executed.
+crates/amun-consensus-network/src/slashing_ledger.rs:62:    /// Returns Err if the certificate was already executed (replay protection).
+crates/amun-consensus-network/src/slashing_ledger.rs:67:        let id = certificate_id(cert);
+crates/amun-consensus-network/src/slashing_ledger.rs:72:                "N119: certificate already executed: {:02x?}",
+crates/amun-consensus-network/src/slashing_ledger.rs:85:            certificate_id: id,
+crates/amun-consensus-network/src/slashing_ledger.rs:119:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_ledger.rs:142:    fn n119_1_certificate_id_stable() {
+crates/amun-consensus-network/src/slashing_ledger.rs:144:        let id1 = certificate_id(&cert);
+crates/amun-consensus-network/src/slashing_ledger.rs:145:        let id2 = certificate_id(&cert);
+crates/amun-consensus-network/src/slashing_ledger.rs:148:            "N119.1 FAIL: certificate_id must be deterministic"
+crates/amun-consensus-network/src/slashing_ledger.rs:152:            "N119.1 FAIL: certificate_id must not be zero"
+crates/amun-consensus-network/src/slashing_ledger.rs:160:        let id = certificate_id(&cert);
+crates/amun-consensus-network/src/slashing_ledger.rs:187:    fn n119_4_different_certificates_different_ids() {
+crates/amun-consensus-network/src/slashing_ledger.rs:190:        let id1 = certificate_id(&cert1);
+crates/amun-consensus-network/src/slashing_ledger.rs:191:        let id2 = certificate_id(&cert2);
+crates/amun-consensus-network/src/slashing_ledger.rs:194:            "N119.4 FAIL: different certificates must have different IDs"
+crates/amun-consensus-network/src/slashing_state.rs:29:        cert: &crate::slashing_certificate::SlashingCertificate,
+crates/amun-consensus-network/src/slashing_state.rs:71:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_state.rs:161:        // Second execution of same certificate must fail
+crates/amun-consensus-network/src/slashing_merkle.rs:3:// Computes a Merkle root from the SlashingLedger's executed certificates,
+crates/amun-consensus-network/src/slashing_merkle.rs:14:    hasher.update(&slash.certificate_id);
+crates/amun-consensus-network/src/slashing_merkle.rs:58:            certificate_id: [id; 32],
+crates/amun-consensus-network/src/finality_gate.rs:7://   certificate.executed_at_height <= finalized_height → ACCEPT
+crates/amun-consensus-network/src/finality_gate.rs:8://   certificate.executed_at_height > finalized_height  → REJECT
+crates/amun-consensus-network/src/finality_gate.rs:10:use crate::multi_signer_certificate::MultiSignerCertificate;
+crates/amun-consensus-network/src/finality_gate.rs:12:/// N118.1: Check if a certificate can be executed at the given finalized height.
+crates/amun-consensus-network/src/finality_gate.rs:13:pub fn is_certificate_finalized(cert: &MultiSignerCertificate, finalized_height: u64) -> bool {
+crates/amun-consensus-network/src/finality_gate.rs:14:    cert.certificate.executed_at_height <= finalized_height
+crates/amun-consensus-network/src/finality_gate.rs:17:/// N118.1: Execute a certificate only if it has been finalized.
+crates/amun-consensus-network/src/finality_gate.rs:18:/// Returns Err if the certificate's height exceeds the finalized height.
+crates/amun-consensus-network/src/finality_gate.rs:27:    if !is_certificate_finalized(cert, finalized_height) {
+crates/amun-consensus-network/src/finality_gate.rs:29:            "N118.1: certificate not finalized (cert_height={}, finalized={})",
+crates/amun-consensus-network/src/finality_gate.rs:30:            cert.certificate.executed_at_height, finalized_height
+crates/amun-consensus-network/src/finality_gate.rs:40:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/finality_gate.rs:43:    fn make_certificate(height: u64) -> SlashingCertificate {
+crates/amun-consensus-network/src/finality_gate.rs:63:        MultiSignerCertificate::new(make_certificate(height), 3, 5)
+crates/amun-consensus-network/src/finality_gate.rs:67:    fn n118_1_finalized_certificate_accepted() {
+crates/amun-consensus-network/src/finality_gate.rs:69:        assert!(is_certificate_finalized(&cert, 100));
+crates/amun-consensus-network/src/finality_gate.rs:70:        assert!(is_certificate_finalized(&cert, 150));
+crates/amun-consensus-network/src/finality_gate.rs:77:    fn n118_1_unfinalized_certificate_rejected() {
+crates/amun-consensus-network/src/finality_gate.rs:79:        assert!(!is_certificate_finalized(&cert, 99));
+crates/amun-consensus-network/src/finality_gate.rs:90:            is_certificate_finalized(&cert, 100),
+crates/amun-consensus-network/src/finality_gate.rs:94:            !is_certificate_finalized(&cert, 99),
+crates/amun-consensus-network/src/messages.rs.bak:63:/// A quorum certificate: proof that >2/3 validators approved.
+crates/amun-consensus-network/src/messages.rs.bak:92:/// A finality certificate issued after a QC is formed.
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:35:        hasher.update(&slash.certificate_id);
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:168:            certificate_id: [id; 32],
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:198:        assert_eq!(proof.slash.certificate_id, [3; 32]);
+crates/amun-consensus-network/src/lib.rs:9:pub mod certificate_evidence_validation;
+crates/amun-consensus-network/src/lib.rs:10:pub mod certificate_gossip;
+crates/amun-consensus-network/src/lib.rs:26:pub mod multi_signer_certificate;
+crates/amun-consensus-network/src/lib.rs:29:pub mod slashing_certificate;
+crates/amun-consensus-network/src/lib.rs:30:pub mod slashing_certificate_builder;
+crates/amun-consensus-network/src/lib.rs:40:pub use certificate_evidence_validation::{
+crates/amun-consensus-network/src/lib.rs:41:    build_missing_evidence_request, process_evidence_response, validate_certificate_evidence,
+crates/amun-consensus-network/src/lib.rs:44:pub use certificate_gossip::CertificateGossip;
+crates/amun-consensus-network/src/lib.rs:49:pub use finality_gate::{execute_if_finalized, is_certificate_finalized};
+crates/amun-consensus-network/src/lib.rs:59:pub use multi_signer_certificate::MultiSignerCertificate;
+crates/amun-consensus-network/src/lib.rs:62:pub use slashing_certificate::{CertificateResultingStatus, EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/lib.rs:63:pub use slashing_certificate_builder::SlashingCertificateBuilder;
+crates/amun-consensus-network/src/lib.rs:66:pub use slashing_ledger::{certificate_id, ExecutedSlash, SlashingLedger};
+crates/amun-consensus-network/src/multi_signer_certificate.rs:1:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/multi_signer_certificate.rs:5:    pub certificate: SlashingCertificate,
+crates/amun-consensus-network/src/multi_signer_certificate.rs:14:        certificate: SlashingCertificate,
+crates/amun-consensus-network/src/multi_signer_certificate.rs:19:            certificate,
+crates/amun-consensus-network/src/multi_signer_certificate.rs:38:        let payload = self.certificate.signing_bytes();
+crates/amun-consensus-network/src/multi_signer_certificate.rs:54:        let payload = self.certificate.signing_bytes();
+crates/amun-consensus-network/src/multi_signer_certificate.rs:91:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/multi_signer_certificate.rs:95:    fn make_certificate() -> SlashingCertificate {
+crates/amun-consensus-network/src/multi_signer_certificate.rs:122:        let cert = make_certificate();
+crates/amun-consensus-network/src/multi_signer_certificate.rs:133:        let cert = make_certificate();
+crates/amun-consensus-network/src/multi_signer_certificate.rs:143:        let cert = make_certificate();
+crates/amun-consensus-network/src/multi_signer_certificate.rs:159:        let cert = make_certificate();
+crates/amun-consensus-network/src/multi_signer_certificate.rs:171:        let cert = make_certificate();
+crates/amun-consensus-network/src/certificate_gossip.rs:7:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/certificate_gossip.rs:11:    pub certificates: HashMap<[u8; 32], SlashingCertificate>,
+crates/amun-consensus-network/src/certificate_gossip.rs:19:            certificates: HashMap::new(),
+crates/amun-consensus-network/src/certificate_gossip.rs:25:    pub fn receive_certificate(&mut self, cert: SlashingCertificate) -> Result<bool, String> {
+crates/amun-consensus-network/src/certificate_gossip.rs:27:        let hash = cert.certificate_hash;
+crates/amun-consensus-network/src/certificate_gossip.rs:28:        if self.certificates.contains_key(&hash) {
+crates/amun-consensus-network/src/certificate_gossip.rs:31:        self.certificates.insert(hash, cert);
+crates/amun-consensus-network/src/certificate_gossip.rs:47:            .filter_map(|h| self.certificates.get(h))
+crates/amun-consensus-network/src/certificate_gossip.rs:56:        self.certificates.len()
+crates/amun-consensus-network/src/certificate_gossip.rs:59:        self.certificates.is_empty()
+crates/amun-consensus-network/src/certificate_gossip.rs:74:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/certificate_gossip.rs:96:    fn n110_3_receive_valid_certificate() {
+crates/amun-consensus-network/src/certificate_gossip.rs:99:        assert!(g.receive_certificate(c.clone()).unwrap());
+crates/amun-consensus-network/src/certificate_gossip.rs:107:        assert!(g.receive_certificate(c.clone()).unwrap());
+crates/amun-consensus-network/src/certificate_gossip.rs:108:        assert!(!g.receive_certificate(c).unwrap());
+crates/amun-consensus-network/src/certificate_gossip.rs:116:        let h = c.certificate_hash;
+crates/amun-consensus-network/src/certificate_gossip.rs:117:        g.receive_certificate(c).unwrap();
+crates/amun-consensus-network/src/certificate_gossip.rs:127:        let h = c.certificate_hash;
+crates/amun-consensus-network/src/certificate_gossip.rs:128:        g.receive_certificate(c).unwrap();
+crates/amun-consensus-network/src/certificate_gossip.rs:139:        assert!(g.receive_certificate(c).is_err());
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:2:use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_certificate.rs:20:/// N110.2: A constitutional certificate proving a validator should be slashed.
+crates/amun-consensus-network/src/slashing_certificate.rs:55:    /// Validator status after this certificate
+crates/amun-consensus-network/src/slashing_certificate.rs:72:    /// Hash of this certificate: blake3(AMUN_SLASH_CERT_V1 || certificate fields)
+crates/amun-consensus-network/src/slashing_certificate.rs:74:    pub certificate_hash: [u8; 32],
+crates/amun-consensus-network/src/slashing_certificate.rs:115:            return Err("N114.2: certificate is unsigned".into());
+crates/amun-consensus-network/src/slashing_certificate.rs:126:    /// N114.1: Sign the certificate with an Ed25519 signing key.
+crates/amun-consensus-network/src/slashing_certificate.rs:135:    /// N110.2: Compute deterministic certificate hash
+crates/amun-consensus-network/src/slashing_certificate.rs:196:            certificate_hash: [0u8; 32],
+crates/amun-consensus-network/src/slashing_certificate.rs:199:        cert.certificate_hash = cert.compute_hash();
+crates/amun-consensus-network/src/slashing_certificate.rs:203:    /// N110.2: Verify certificate integrity
+crates/amun-consensus-network/src/slashing_certificate.rs:206:        if recomputed != self.certificate_hash {
+crates/amun-consensus-network/src/slashing_certificate.rs:207:            return Err("N110.2: certificate_hash mismatch".into());
+crates/amun-consensus-network/src/slashing_certificate.rs:228:    fn n110_2_certificate_roundtrip() {
+crates/amun-consensus-network/src/slashing_certificate.rs:250:        assert_eq!(decoded.certificate_hash, cert.certificate_hash);
+crates/amun-consensus-network/src/slashing_certificate.rs:257:    fn n110_2_certificate_hash_is_deterministic() {
+crates/amun-consensus-network/src/slashing_certificate.rs:284:        assert_eq!(cert1.compute_hash(), cert1.certificate_hash);
+crates/amun-consensus-network/src/slashing_certificate.rs:285:        assert_eq!(cert2.compute_hash(), cert2.certificate_hash);
+crates/amun-consensus-network/src/slashing_certificate.rs:314:        assert_ne!(c1.certificate_hash, c2.certificate_hash);
+crates/amun-consensus-network/src/engine.rs:153:    /// Finalize the round with a QC, producing a finality certificate.
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:106:    /// Finalize the round with a QC, producing a finality certificate.
+crates/amun-consensus-network/src/staking_adapter.rs:73:        if !crate::finality_gate::is_certificate_finalized(cert, finalized_height) {
+crates/amun-consensus-network/src/staking_adapter.rs:74:            return Err("N118.2: certificate not finalized".to_string());
+crates/amun-consensus-network/src/staking_adapter.rs:76:        if cert.certificate.signature == [0u8; 64] {
+crates/amun-consensus-network/src/staking_adapter.rs:77:            return Err("N118.2: unsigned certificate".into());
+crates/amun-consensus-network/src/staking_adapter.rs:79:        cert.certificate
+crates/amun-consensus-network/src/staking_adapter.rs:91:    /// N115: Execute slash only if the certificate carries a valid signature.
+crates/amun-consensus-network/src/staking_adapter.rs:92:    /// Returns an error if the certificate is unsigned or tampered.
+crates/amun-consensus-network/src/staking_adapter.rs:93:    pub fn try_slash_with_certificate(
+crates/amun-consensus-network/src/staking_adapter.rs:98:        // N115: Verify certificate signature before executing slash
+crates/amun-consensus-network/src/staking_adapter.rs:100:            return Err("N115: unsigned certificate rejected".into());
+crates/amun-consensus-network/src/staking_adapter.rs:103:            .map_err(|e| format!("N115: certificate verification failed: {}", e))?;
+crates/amun-consensus-network/src/staking_adapter.rs:397:    /// N115: Unsigned certificate is rejected before slash execution
+crates/amun-consensus-network/src/staking_adapter.rs:399:    fn n115_unsigned_certificate_rejected_before_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs:411:        // Create an unsigned certificate
+crates/amun-consensus-network/src/staking_adapter.rs:425:        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+crates/amun-consensus-network/src/staking_adapter.rs:428:            "N115 FAIL: Unsigned certificate must be rejected"
+crates/amun-consensus-network/src/staking_adapter.rs:433:    /// N115: Signed certificate executes slash successfully
+crates/amun-consensus-network/src/staking_adapter.rs:435:    fn n115_signed_certificate_executes_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs:447:        // Create and sign a certificate
+crates/amun-consensus-network/src/staking_adapter.rs:463:        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+crates/amun-consensus-network/src/staking_adapter.rs:466:            "N115 FAIL: Signed certificate must be accepted"
+crates/amun-consensus-network/src/staking_adapter.rs:471:            "N115 FAIL: Slash must execute with signed certificate"
+crates/amun-consensus-network/src/staking_adapter.rs:476:    /// N115: Tampered certificate is rejected
+crates/amun-consensus-network/src/staking_adapter.rs:478:    fn n115_tampered_certificate_rejected_before_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs:508:        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+crates/amun-consensus-network/src/staking_adapter.rs:511:            "N115 FAIL: Tampered certificate must be rejected"
+crates/amun-consensus-network/src/staking_adapter.rs:517:    fn n118_2a_unfinalized_certificate_rejected() {
+crates/amun-consensus-network/src/staking_adapter.rs:544:        cert.certificate.sign(&k);
+crates/amun-consensus-network/src/staking_adapter.rs:553:    fn n118_2b_finalized_certificate_executes() {
+crates/amun-consensus-network/src/staking_adapter.rs:578:        // N118: Sign certificate FIRST so signing_bytes is stable for approvals
+crates/amun-consensus-network/src/staking_adapter.rs:580:        cert.certificate.sign(&sk);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:13://   - Evidence received → certificate retried → accepted
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:18:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:20:/// N111.6: Result of validating a certificate's evidence availability.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:23:    /// All evidence IDs are present locally — certificate can be accepted.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:29:/// N111.6: Check that every evidence_id referenced by a certificate
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:31:pub fn validate_certificate_evidence(
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:86:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:109:    fn n111_6_certificate_rejected_when_evidence_missing() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:113:        let result = validate_certificate_evidence(&cert, &store);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:126:    fn n111_6_certificate_accepted_after_evidence_sync() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:139:        let result = validate_certificate_evidence(&cert, &store);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:153:        let result = validate_certificate_evidence(&cert, &store);
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:104:            certificate_id: [id; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:8:// misbehaviour will reject a certificate that references unknown
+crates/amun-constitution-builder/src/lib.rs:6:pub mod certificate;
+crates/amun-constitution-builder/src/lib.rs:18:pub use certificate::FreezeCertificate;
+crates/amun-evolution/src/transition.rs:6:use super::certificate::EvolutionActivationCertificate;
+crates/amun-evolution/src/transition.rs:15:    pub active_certificate_hash: Option<[u8; 32]>,
+crates/amun-evolution/src/transition.rs:25:        active_certificate: Option<&EvolutionActivationCertificate>,
+crates/amun-evolution/src/transition.rs:27:        let cert_hash = active_certificate.map(|c| c.certificate_hash);
+crates/amun-evolution/src/transition.rs:33:            active_certificate_hash: cert_hash,
+crates/amun-evolution/src/transition.rs:46:        if let Some(cert) = &self.active_certificate_hash {
+crates/amun-evolution/src/transition.rs:64:    /// Transition requires an evolution certificate.
+crates/amun-evolution/src/executor.rs:1:use super::certificate::EvolutionActivationCertificate;
+crates/amun-evolution/src/executor.rs:12:        certificate: &EvolutionActivationCertificate,
+crates/amun-evolution/src/executor.rs:14:        if !certificate.verify() {
+crates/amun-evolution/src/executor.rs:17:        if certificate.validator_quorum == 0 {
+crates/amun-evolution/src/lib.rs:3:pub mod certificate;
+crates/amun-evolution/src/lib.rs:9:pub use certificate::{ConstitutionalPhysicsProof, EvolutionActivationCertificate};
+crates/amun-evolution/src/certificate.rs:60:    pub certificate_signature_root: [u8; 32],
+crates/amun-evolution/src/certificate.rs:65:    pub parent_certificate_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs:73:    pub certificate_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs:89:        parent_certificate_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs:104:            certificate_signature_root: signature_root,
+crates/amun-evolution/src/certificate.rs:109:            parent_certificate_hash,
+crates/amun-evolution/src/certificate.rs:117:            certificate_hash: [0u8; 32],
+crates/amun-evolution/src/certificate.rs:119:        cert.certificate_hash = cert.compute_hash();
+crates/amun-evolution/src/certificate.rs:130:        h.update(&self.certificate_signature_root);
+crates/amun-evolution/src/certificate.rs:135:        h.update(&self.parent_certificate_hash);
+crates/amun-evolution/src/certificate.rs:147:        self.physics_proof.verify() && self.compute_hash() == self.certificate_hash
+crates/amun-evolution/src/validator.rs:1:use super::certificate::EvolutionActivationCertificate;
+crates/amun-evolution/src/validator.rs:11:        certificate: &EvolutionActivationCertificate,
+crates/amun-evolution/src/validator.rs:13:        proof.replay_guarantee == certificate.replay_guarantee
+crates/amun-evolution/src/validator.rs:14:            && proof.snapshot_guarantee == certificate.snapshot_guarantee
+crates/amun-evolution/src/validator.rs:15:            && proof.proof_guarantee == certificate.proof_guarantee
+crates/amun-evolution/src/validator.rs:16:            && proof.governance_guarantee == certificate.governance_guarantee
+crates/amun-evolution/src/validator.rs:18:            && certificate.verify()
+crates/amun-replay-semantics/src/lib.rs:28:    pub certificate_hash: [u8; 32],
+crates/amun-replay-semantics/src/lib.rs:33:        let mut cert = Self { domain, epoch, transcript_root, state_root, receipt_root, ordering_root, boundary, event_count, replay_version, certificate_hash: [0; 32] };
+crates/amun-replay-semantics/src/lib.rs:34:        cert.certificate_hash = cert.compute_hash(); cert
+crates/amun-replay-semantics/src/lib.rs:42:    pub fn verify(&self) -> bool { self.certificate_hash == self.compute_hash() }
+crates/amun-replay-semantics/src/lib.rs:49:        match self { ReplayEquivalence::Strict => a.certificate_hash == b.certificate_hash, ReplayEquivalence::Semantic => ReplayCertificate::prove_equivalence(a, b), ReplayEquivalence::EpochBounded(ep) => a.epoch.epoch_id == ep.epoch_id && b.epoch.epoch_id == ep.epoch_id && ReplayCertificate::prove_equivalence(a, b) }
+crates/amun-replay-semantics/src/lib.rs:70:pub struct ReplayCheckpoint { pub sequence: u64, pub state_root: [u8; 32], pub transcript_chain_hash: [u8; 32], pub certificate: ReplayCertificate }
+crates/amun-replay-semantics/src/lib.rs:71:impl ReplayCheckpoint { pub fn verify(&self, boundary: &ReplayBoundary) -> bool { self.sequence >= boundary.finalized_sequence && self.certificate.verify() && self.certificate.boundary.boundary_chain_hash == boundary.boundary_chain_hash } }
+crates/amun-fork-choice-law/Cargo.toml:8:amun-quorum-certificate = { path = "../amun-quorum-certificate" }
+crates/amun-fork-choice-law/src/fork_choice.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-constitutional-kernel/src/context.rs:12:    /// The certificate chain that proves the caller's authority.
+crates/amun-qc-canonical/Cargo.toml:8:amun-quorum-certificate = { path = "../amun-quorum-certificate" }
+crates/amun-qc-canonical/src/canonicalize.rs:3:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-node/src/certificate_loader.rs:3:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-node/src/certificate_loader.rs:7:/// Load a validator certificate from disk or generate a self-signed one for development.
+crates/amun-node/src/certificate_loader.rs:8:/// Returns the certificate and optionally a development trust anchor (for self-signed certs).
+crates/amun-node/src/certificate_loader.rs:9:pub fn load_validator_certificate(
+crates/amun-node/src/certificate_loader.rs:15:        return Err(format!("Validator certificate not found: {}", cert_file));
+crates/amun-node/src/certificate_loader.rs:18:        fs::read_to_string(path).map_err(|e| format!("Cannot read certificate: {}", e))?;
+crates/amun-node/src/certificate_loader.rs:20:        serde_json::from_str(&cert_json).map_err(|e| format!("Invalid certificate JSON: {}", e))?;
+crates/amun-node/src/certificate_loader.rs:21:    println!("Loaded existing certificate from {}", cert_file);
+crates/amun-node/src/certificate_loader.rs:22:    verify_certificate_against_genesis(&cert, genesis)?;
+crates/amun-node/src/certificate_loader.rs:27:/// Verify a validator certificate against the genesis trust anchors.
+crates/amun-node/src/certificate_loader.rs:28:pub fn verify_certificate_against_genesis(
+crates/amun-node/src/certificate_loader.rs:50:/// and that the certificate's public key matches the one declared in genesis.
+crates/amun-node/src/certificate_loader.rs:52:/// and that the certificate's public key matches the one declared in genesis.
+crates/amun-node/src/certificate_loader.rs:54:/// and that the certificate's public key matches the one declared in genesis.
+crates/amun-node/src/certificate_loader.rs:66:                    "Validator {} public key mismatch: certificate key does not match genesis",
+crates/amun-node/src/certificate_loader.rs:107:    fn n106_0_missing_certificate_rejected() {
+crates/amun-node/src/certificate_loader.rs:115:        let result = load_validator_certificate(cert_path.to_str().unwrap(), &genesis);
+crates/amun-node/src/certificate_loader.rs:120:    fn n106_2_certificate_with_matching_genesis_passes() {
+crates/amun-node/src/certificate_loader.rs:132:        let loaded = load_validator_certificate(cert_path.to_str().unwrap(), &genesis).unwrap();
+crates/amun-node/src/certificate_loader.rs:155:        let result = load_validator_certificate(cert_path.to_str().unwrap(), &genesis);
+crates/amun-node/src/certificate_loader.rs:160:    fn n106_0_tampered_certificate_rejected() {
+crates/amun-node/src/certificate_loader.rs:179:        let result = load_validator_certificate(cert_path.to_str().unwrap(), &genesis);
+crates/amun-node/src/certificate_loader.rs:204:        let result = load_validator_certificate(cert_path.to_str().unwrap(), &genesis);
+crates/amun-node/src/main.rs:1:mod certificate_loader;
+crates/amun-node/src/main.rs:97:    let cert = crate::certificate_loader::load_validator_certificate(
+crates/amun-node/src/main.rs:101:    .expect("Failed to load validator certificate");
+crates/amun-node/src/peer_handshake.rs:4:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-node/src/peer_handshake.rs:12:    pub certificate: ValidatorCertificate,
+crates/amun-node/src/peer_handshake.rs:22:        certificate: &ValidatorCertificate,
+crates/amun-node/src/peer_handshake.rs:30:            certificate: certificate.clone(),
+crates/amun-node/src/peer_handshake.rs:38:    /// Verify the handshake message against our genesis and certificate expectations.
+crates/amun-node/src/peer_handshake.rs:49:        // Verify certificate is self-consistent
+crates/amun-node/src/peer_handshake.rs:50:        if self.certificate.validator_id != self.peer_id {
+crates/amun-node/src/peer_handshake.rs:54:        if self.certificate.public_key != self.public_key {
+crates/amun-node/src/peer_handshake.rs:58:        // Verify certificate signature
+crates/amun-node/src/peer_handshake.rs:59:        if !self.certificate.verify(&self.public_key) {
+crates/amun-node/src/peer_handshake.rs:122:    fn n22_5_tampered_certificate_rejected() {
+crates/amun-node/src/peer_handshake.rs:124:        handshake.certificate.valid_from = 99999;
+crates/amun-peer-identity/tests/peer_identity_tests.rs:21:fn test_self_signed_certificate_verification() {
+crates/amun-peer-identity/tests/peer_identity_tests.rs:29:fn test_certificate_rejected_for_wrong_civilisation() {
+crates/amun-peer-identity/src/verifier.rs:1:use super::certificate::PeerCertificate;
+crates/amun-peer-identity/src/lib.rs:8:pub mod certificate;
+crates/amun-peer-identity/src/lib.rs:13:pub use certificate::PeerCertificate;
+crates/amun-peer-identity/src/registry.rs:1:use super::certificate::PeerCertificate;
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:29:    // From EvidenceStore (slashing certificates)
+crates/amun-constitutional-enforcement/src/proof_engine.rs:51:    /// Verify slashing certificate is backed by valid evidence.
+crates/amun-constitutional-enforcement/src/proof_engine.rs:156:                description: "Slashing certificate lacks valid evidence".into(),
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:19:    pub fn from_finality_certificate(
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:68:    pub fn from_quorum_certificate(block_hash: &[u8; 32], qc_verify_quorum: bool) -> QcEvidence {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:86:    let execution = ExecutionEvidenceProvider::from_finality_certificate(state_root, history_root);
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:93:    let qc = QcEvidenceProvider::from_quorum_certificate(block_hash, qc_verify_quorum);
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:117:        let evidence = ExecutionEvidenceProvider::from_finality_certificate(&state, &history);
+crates/amun-quorum-certificate/Cargo.toml:2:name = "amun-quorum-certificate"
+crates/amun-quorum-certificate/Cargo.toml:6:description = "AmunChain quorum certificate law"
+crates/amun-quorum-certificate/src/verifier.rs:1:use crate::certificate::QuorumCertificate;
+crates/amun-quorum-certificate/src/verifier.rs:4:/// Verify a quorum certificate against a validator set.
+crates/amun-quorum-certificate/src/certificate.rs:13:    pub certificate_hash: [u8; 32],
+crates/amun-quorum-certificate/src/certificate.rs:36:        let mut certificate_hash = [0u8; 32];
+crates/amun-quorum-certificate/src/certificate.rs:37:        certificate_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
+crates/amun-quorum-certificate/src/certificate.rs:39:        Self { position, round, block_hash, state_root, votes, total_weight, certificate_hash }
+crates/amun-quorum-certificate/src/certificate.rs:58:        computed == self.certificate_hash
+crates/amun-constitutional/src/replay_certificate.rs:7:use crate::certificate_scope::CertificateScope;
+crates/amun-constitutional/src/replay_certificate.rs:23:    pub certificate_id: u64,
+crates/amun-constitutional/src/replay_certificate.rs:24:    pub certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/replay_certificate.rs:28:    pub parent_certificate_hash: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/replay_certificate.rs:52:            .update_u64(self.certificate_id)
+crates/amun-constitutional/src/replay_certificate.rs:62:            .update_optional_hash(self.parent_certificate_hash.as_ref());
+crates/amun-constitutional/src/replay_certificate.rs:69:                self.certificate_id,
+crates/amun-constitutional/src/replay_certificate.rs:73:                "Invalid certificate schema",
+crates/amun-constitutional/src/replay_certificate.rs:78:                self.certificate_id,
+crates/amun-constitutional/src/replay_certificate.rs:89:        if self.certificate_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/replay_certificate.rs:91:                self.certificate_id,
+crates/amun-constitutional/src/replay_certificate.rs:104:                self.certificate_id,
+crates/amun-constitutional/src/replay_certificate.rs:119:                self.certificate_id,
+crates/amun-constitutional/src/replay_certificate.rs:132:        certificate_id: u64,
+crates/amun-constitutional/src/replay_certificate.rs:142:        parent_certificate_hash: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/replay_certificate.rs:158:            certificate_id,
+crates/amun-constitutional/src/replay_certificate.rs:159:            certificate_hash: [0; 32],
+crates/amun-constitutional/src/replay_certificate.rs:163:            parent_certificate_hash,
+crates/amun-constitutional/src/replay_certificate.rs:166:        c.certificate_hash = c.constitutional_hash();
+crates/amun-constitutional/src/replay_certificate.rs:184:                self.certificate_id,
+crates/amun-constitutional/src/replay_certificate.rs:218:            mc(1, 0, 99, ReplayOutcome::Admitted, None).certificate_hash,
+crates/amun-constitutional/src/replay_certificate.rs:219:            mc(1, 0, 99, ReplayOutcome::Admitted, None).certificate_hash
+crates/amun-constitutional/src/replay_certificate.rs:225:            mc(1, 0, 49, ReplayOutcome::Admitted, None).certificate_hash,
+crates/amun-constitutional/src/replay_certificate.rs:226:            mc(1, 0, 99, ReplayOutcome::Admitted, None).certificate_hash
+crates/amun-constitutional/src/replay_certificate.rs:232:            mc(1, 0, 99, ReplayOutcome::Admitted, None).certificate_hash,
+crates/amun-constitutional/src/replay_certificate.rs:233:            mc(1, 0, 99, ReplayOutcome::Divergent, None).certificate_hash
+crates/amun-constitutional/src/replay_certificate.rs:239:        let c = mc(2, 0, 49, ReplayOutcome::Admitted, Some(p.certificate_hash));
+crates/amun-constitutional/src/replay_certificate.rs:258:            Some(p.certificate_hash),
+crates/amun-constitutional/src/replay_certificate.rs:266:        c.certificate_hash = c.constitutional_hash();
+crates/amun-constitutional/src/replay_certificate.rs:273:        c.certificate_hash = c.constitutional_hash();
+crates/amun-constitutional/src/witness_type.rs:15:    /// Example: the certificate that attests admissibility for a receipt.
+crates/amun-constitutional/src/causality_type.rs:41:    /// Example: certificate admits a state anchor.
+crates/amun-constitutional/src/causality_type.rs:45:    /// Example: new certificate supersedes old certificate.
+crates/amun-constitutional/src/divergence_type.rs:31:    /// Example: two certificates claim different state roots for same span.
+crates/amun-constitutional/src/architectural_invariants.rs:119:/// anchor lineage, certificate scope, and constitutional revisions —
+crates/amun-constitutional/src/lib.rs:26:pub mod certificate_scope;
+crates/amun-constitutional/src/lib.rs:28:pub mod replay_certificate;
+crates/amun-constitutional/src/lib.rs:72:pub use certificate_scope::{CertificateScope, ScopeRelationship};
+crates/amun-constitutional/src/lib.rs:90:pub use replay_certificate::ReplayCertificate;
+crates/amun-constitutional/src/certificate_scope.rs:1://! CertificateScope — the admissibility envelope of a replay certificate.
+crates/amun-constitutional/src/certificate_scope.rs:3://! A certificate scope defines the exact constitutional boundaries
+crates/amun-constitutional/src/certificate_scope.rs:4://! that the certificate attests to. Every scope is independently
+crates/amun-constitutional/src/certificate_scope.rs:8://!   A broader certificate cannot contradict a narrower certificate
+crates/amun-constitutional/src/certificate_scope.rs:21:/// The relationship between two certificate scopes.
+crates/amun-constitutional/src/certificate_scope.rs:41:/// The constitutional scope of a replay certificate.
+crates/amun-constitutional/src/certificate_scope.rs:44:/// This is the admissibility envelope — it defines what the certificate attests to.
+crates/amun-constitutional/src/certificate_scope.rs:47:    /// Start of the transcript span covered by this certificate.
+crates/amun-constitutional/src/certificate_scope.rs:53:    /// Context this certificate is scoped to.
+crates/amun-constitutional/src/certificate_scope.rs:56:    /// Constitutional revision this certificate was issued under.
+crates/amun-constitutional/src/certificate_scope.rs:59:    /// Replay revision this certificate was issued under.
+crates/amun-constitutional/src/certificate_scope.rs:62:    /// Boundary that was active for this certificate's scope.
+crates/amun-constitutional/src/execution_receipt.rs:15://!   The certificate_hash links to a ReplayCertificate that attests
+crates/amun-constitutional/src/execution_receipt.rs:17://!   This is an admissibility-first certificate model.
+crates/amun-constitutional/src/execution_receipt.rs:42:/// `certificate_hash` links to a ReplayCertificate. The certificate model
+crates/amun-constitutional/src/execution_receipt.rs:73:    pub certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/execution_receipt.rs:113:            .update_bytes(&self.certificate_hash)
+crates/amun-constitutional/src/execution_receipt.rs:178:        certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/execution_receipt.rs:195:            certificate_hash,
+crates/amun-constitutional/src/snapshot.rs:55:    pub certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/snapshot.rs:97:            .update_bytes(&self.certificate_hash)
+crates/amun-constitutional/src/snapshot.rs:189:        certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/snapshot.rs:211:            certificate_hash,
+crates/amun-constitutional/src/state_anchor.rs:47:    pub certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs:90:            .update_bytes(&self.certificate_hash)
+crates/amun-constitutional/src/state_anchor.rs:172:        certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs:193:            certificate_hash,
+crates/amun-consensus-integration/src/consensus_integrator.rs:191:    fn w17_finality_certificate_deterministic() {
+crates/amun-consensus-integration/src/consensus_integrator.rs:214:        assert_eq!(cert1.certificate_hash, cert2.certificate_hash);
+crates/amun-consensus-integration/src/consensus_types.rs:84:    pub certificate_hash: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs:95:            certificate_hash: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs:97:        cert.certificate_hash = cert.compute_hash();
+crates/amun-consensus-integration/src/consensus_types.rs:116:        self.certificate_hash == self.compute_hash() && self.qc.is_valid()
+crates/amun-lock-rule/Cargo.toml:10:amun-quorum-certificate = { path = "../amun-quorum-certificate" }
+crates/amun-lock-rule/src/lock.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-timeout-aggregator/Cargo.toml:6:description = "AmunChain timeout certificate aggregator"
+crates/amun-timeout-aggregator/src/timeout_cert.rs:4:/// A timeout certificate: proves that 2/3+ validators timed out.
+crates/amun-timeout-aggregator/src/timeout_cert.rs:10:    pub certificate_hash: [u8; 32],
+crates/amun-timeout-aggregator/src/timeout_cert.rs:27:        let mut certificate_hash = [0u8; 32];
+crates/amun-timeout-aggregator/src/timeout_cert.rs:28:        certificate_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
+crates/amun-timeout-aggregator/src/timeout_cert.rs:34:            certificate_hash,
+crates/amun-timeout-aggregator/src/timeout_cert.rs:49:        computed == self.certificate_hash
+crates/amun-constitutional-block/tests/block_tests.rs:174:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:175:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs:202:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:203:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs:224:fn test_verify_block_provenance_wrong_certificate_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs:230:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:232:    // Use a different certificate's merkle root
+crates/amun-constitutional-block/tests/block_tests.rs:233:    let wrong_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&[]));
+crates/amun-constitutional-block/tests/block_tests.rs:259:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:260:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs:288:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:289:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs:320:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:321:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs:349:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:351:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-constitutional-block/tests/block_tests.rs:352:    let hash = cert.certificate_hash();
+crates/amun-constitutional-block/tests/block_tests.rs:354:        ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-block/tests/block_tests.rs:379:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:381:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-constitutional-block/tests/block_tests.rs:382:    let hash = cert.certificate_hash();
+crates/amun-constitutional-block/tests/block_tests.rs:384:        ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-block/tests/block_tests.rs:406:fn n8_light_client_wrong_certificate_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs:412:    let cert1 = rt1.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:416:    let cert2 = rt2.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:419:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-constitutional-block/tests/block_tests.rs:420:    let hash1 = cert1.certificate_hash();
+crates/amun-constitutional-block/tests/block_tests.rs:422:        ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash1).unwrap();
+crates/amun-constitutional-block/tests/block_tests.rs:448:    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:450:    let hash = cert.certificate_hash();
+crates/amun-constitutional-block/tests/block_tests.rs:452:        ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-block/tests/block_tests.rs:454:    // Block has a different replay_certificate_root
+crates/amun-constitutional-block/tests/finalizer_tests.rs:29:    assert!(!block.replay_certificate_root.is_empty());
+crates/amun-constitutional-block/tests/finalizer_tests.rs:65:    assert_ne!(b1.replay_certificate_root, b2.replay_certificate_root);
+crates/amun-constitutional-block/src/lib.rs:13:/// 1. Block's replay_certificate_root matches the certificate's merkle root.
+crates/amun-constitutional-block/src/lib.rs:14:/// 2. Block's state_root matches the certificate's post_state_root.
+crates/amun-constitutional-block/src/lib.rs:21:    // 1. Verify certificate merkle root matches block commitment
+crates/amun-constitutional-block/src/lib.rs:22:    let computed_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/src/lib.rs:25:    if block.replay_certificate_root != computed_root {
+crates/amun-constitutional-block/src/lib.rs:28:            block.replay_certificate_root, computed_root
+crates/amun-constitutional-block/src/lib.rs:53:///   - verify_block_provenance() for block↔certificate binding
+crates/amun-constitutional-block/src/lib.rs:60:    // Step 1: Verify block ↔ certificate commitment
+crates/amun-constitutional-block/src/lib.rs:78:/// No full state, no journal replay, no full certificate set needed.
+crates/amun-constitutional-block/src/lib.rs:81:///   1. Inclusion proof is valid → certificate is in the merkle root
+crates/amun-constitutional-block/src/lib.rs:83:///   3. Merkle root matches block.replay_certificate_root
+crates/amun-constitutional-block/src/lib.rs:92:        return Err("Invalid certificate inclusion proof".into());
+crates/amun-constitutional-block/src/lib.rs:95:    // Step 2: Verify certificate hash matches the proof's leaf value
+crates/amun-constitutional-block/src/lib.rs:96:    if inclusion_proof.certificate_hash != cert.certificate_hash() {
+crates/amun-constitutional-block/src/lib.rs:99:            inclusion_proof.certificate_hash,
+crates/amun-constitutional-block/src/lib.rs:100:            cert.certificate_hash()
+crates/amun-constitutional-block/src/lib.rs:106:    if block.replay_certificate_root != proof_root {
+crates/amun-constitutional-block/src/lib.rs:109:            block.replay_certificate_root, proof_root
+crates/amun-constitutional-block/src/lib.rs:113:    // Step 4: Verify the certificate's state root matches the block
+crates/amun-constitutional-block/src/block.rs:11:    pub proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs:17:    pub replay_certificate_root: String,
+crates/amun-constitutional-block/src/block.rs:27:        proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs:33:        replay_certificate_root: String,
+crates/amun-constitutional-block/src/block.rs:40:            proposer_certificate_id,
+crates/amun-constitutional-block/src/block.rs:46:            replay_certificate_root,
+crates/amun-constitutional-block/src/block.rs:77:        proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs:83:        replay_certificate_root: String,
+crates/amun-constitutional-block/src/block.rs:94:            proposer_certificate_id,
+crates/amun-constitutional-block/src/block.rs:100:            replay_certificate_root,
+crates/amun-constitutional-block/src/finalizer.rs:34:        let (state_root, replay_certificate_root) = match &ctx.state_runtime {
+crates/amun-constitutional-block/src/finalizer.rs:36:                let cert = rt.create_certificate(height, ctx.pre_state_root);
+crates/amun-constitutional-block/src/finalizer.rs:37:                let merkle_root = ConstitutionalStateRuntime::certificate_merkle_root(&[cert]);
+crates/amun-constitutional-block/src/finalizer.rs:53:            replay_certificate_root,
+crates/amun-constitutional-block/src/block.rs.n2bak:15:    pub proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs.n2bak:29:        proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs.n2bak:41:            proposer_certificate_id,
+crates/amun-constitutional-block/src/block.rs.n2bak:77:        proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs.n2bak:93:            proposer_certificate_id,
+crates/amun-replay-engine/src/lib.rs:154:    fn session_replay_produces_self_verified_certificate() {
+crates/amun-qc-weight/Cargo.toml:8:amun-quorum-certificate = { path = "../amun-quorum-certificate" }
+crates/amun-qc-weight/src/derive.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:18:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:20:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:21:        let hash = cert.certificate_hash();
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:22:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-networking/tests/n18_full_rejoin.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-networking/tests/n18_full_rejoin.rs:20:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-networking/tests/n18_full_rejoin.rs:22:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-networking/tests/n18_full_rejoin.rs:23:        let hash = cert.certificate_hash();
+crates/amun-networking/tests/n18_full_rejoin.rs:24:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-networking/tests/n18_checkpoint_sync.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-networking/tests/n18_checkpoint_sync.rs:20:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-networking/tests/n18_checkpoint_sync.rs:22:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-networking/tests/n18_checkpoint_sync.rs:23:        let hash = cert.certificate_hash();
+crates/amun-networking/tests/n18_checkpoint_sync.rs:24:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:20:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:22:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:23:        let hash = cert.certificate_hash();
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:24:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:19:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:21:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:22:        let hash = cert.certificate_hash();
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:23:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:5:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:92:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:94:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:95:        let hash = cert.certificate_hash();
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:96:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-networking/Cargo.toml:9:amun-certificate-network = { path = "../amun-certificate-network" }
+crates/amun-networking/src/validator_registry.rs:3:use crate::validator_certificate::ValidatorCertificate;
+crates/amun-networking/src/validator_registry.rs:6:/// Registry of active validators with verified certificates.
+crates/amun-networking/src/validator_registry.rs:17:    /// Register a validator after verifying their certificate against trust anchors.
+crates/amun-networking/src/validator_registry.rs:20:        certificate: ValidatorCertificate,
+crates/amun-networking/src/validator_registry.rs:23:        // Verify the certificate was issued by a trusted authority
+crates/amun-networking/src/validator_registry.rs:25:            .get_key(&certificate.issuer)
+crates/amun-networking/src/validator_registry.rs:28:        if !certificate.verify(authority_key) {
+crates/amun-networking/src/validator_registry.rs:33:            .insert(certificate.validator_id, certificate);
+crates/amun-networking/src/validator_registry.rs:64:    fn n21_validator_registration_with_valid_certificate() {
+crates/amun-networking/src/validator_registry.rs:105:    fn n21_validator_rejected_with_forged_certificate() {
+crates/amun-networking/src/validator_registry.rs:113:        // Impostor tries to issue a certificate pretending to be the authority
+crates/amun-networking/src/lib.rs:17:pub mod validator_certificate;
+crates/amun-networking/src/validator_certificate.rs:5:/// A constitutional certificate binding a validator's identity to their public key.
+crates/amun-networking/src/validator_certificate.rs:14:    /// The authority that issued this certificate.
+crates/amun-networking/src/validator_certificate.rs:16:    /// When this certificate becomes valid.
+crates/amun-networking/src/validator_certificate.rs:20:    /// When this certificate expires (0 = never).
+crates/amun-networking/src/validator_certificate.rs:22:    /// The authority's signature over the certificate fields.
+crates/amun-networking/src/validator_certificate.rs:27:    /// Create a new certificate signed by an authority.
+crates/amun-networking/src/validator_certificate.rs:45:        // Sign the certificate fields (excluding signature itself)
+crates/amun-networking/src/validator_certificate.rs:51:    /// Serialize certificate fields for signing (excludes the signature).
+crates/amun-networking/src/validator_certificate.rs:64:    /// Verify the authority's signature on this certificate.
+crates/amun-networking/src/validator_certificate.rs:70:    /// Check if the certificate is currently valid.
+crates/amun-networking/src/validator_certificate.rs:75:    /// Create a new certificate with explicit authority version and id.
+crates/amun-networking/src/validator_certificate.rs:106:    fn n21_validator_certificate_issue_and_verify() {
+crates/amun-networking/src/validator_certificate.rs:124:    fn n21_certificate_rejects_wrong_authority() {
+crates/amun-networking/src/validator_certificate.rs:142:    fn n21_certificate_tampered_fields_rejected() {
+crates/amun-networking/src/validator_certificate.rs:160:    fn n21_certificate_validity_window() {
+crates/amun-networking/src/validator_certificate.rs:180:    fn n21_certificate_serialization_roundtrip() {
+crates/amun-networking/src/validator_certificate.rs:196:                eprintln!("validator_cert: invalid certificate: {}", e);
+crates/amun-certificate-network/Cargo.toml:2:name = "amun-certificate-network"
+crates/amun-certificate-network/src/gossip.rs:13:        certificate_hash: [u8; 32],
+crates/amun-certificate-network/src/gossip.rs:24:    Inventory { certificate_hashes: Vec<[u8; 32]> },
+crates/amun-certificate-network/src/gossip.rs:38:        certificates: Vec<ReplayCertificate>,
+crates/amun-certificate-network/src/gossip.rs:48:    RequestProof { certificate_hash: [u8; 32] },
+crates/amun-certificate-network/src/gossip.rs:61:        certificate_hash: [u8; 32],
+crates/amun-certificate-network/src/gossip.rs:77:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-certificate-network/src/gossip.rs:88:    pub fn store_certificate(&mut self, cert: ReplayCertificate) {
+crates/amun-certificate-network/src/gossip.rs:89:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:90:        self.certificates.insert(hash, cert);
+crates/amun-certificate-network/src/gossip.rs:109:    pub fn has_certificate(&self, hash: &[u8; 32]) -> bool {
+crates/amun-certificate-network/src/gossip.rs:110:        self.certificates.contains_key(hash)
+crates/amun-certificate-network/src/gossip.rs:117:    pub fn get_certificate(&self, hash: &[u8; 32]) -> Option<&ReplayCertificate> {
+crates/amun-certificate-network/src/gossip.rs:118:        self.certificates.get(hash)
+crates/amun-certificate-network/src/gossip.rs:129:    pub fn missing_certificates(&self, inventory: &[[u8; 32]]) -> Vec<[u8; 32]> {
+crates/amun-certificate-network/src/gossip.rs:132:            .filter(|h| !self.has_certificate(h))
+crates/amun-certificate-network/src/gossip.rs:138:        self.certificates.keys().copied().collect()
+crates/amun-certificate-network/src/gossip.rs:141:    pub fn certificate_count(&self) -> usize {
+crates/amun-certificate-network/src/gossip.rs:142:        self.certificates.len()
+crates/amun-certificate-network/src/gossip.rs:169:        let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-certificate-network/src/gossip.rs:171:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-certificate-network/src/gossip.rs:172:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:173:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-certificate-network/src/gossip.rs:191:    fn n10a_certificate_announcement() {
+crates/amun-certificate-network/src/gossip.rs:193:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:195:            certificate_hash: hash,
+crates/amun-certificate-network/src/gossip.rs:200:                certificate_hash,
+crates/amun-certificate-network/src/gossip.rs:203:                assert_eq!(certificate_hash, hash);
+crates/amun-certificate-network/src/gossip.rs:212:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:214:            certificate_hashes: vec![hash],
+crates/amun-certificate-network/src/gossip.rs:217:            CertificateInventory::Inventory { certificate_hashes } => {
+crates/amun-certificate-network/src/gossip.rs:218:                assert!(certificate_hashes.contains(&hash));
+crates/amun-certificate-network/src/gossip.rs:225:    fn n10c_certificate_sync() {
+crates/amun-certificate-network/src/gossip.rs:227:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:229:            certificates: vec![cert.clone()],
+crates/amun-certificate-network/src/gossip.rs:232:            CertificateSync::BatchResponse { certificates } => {
+crates/amun-certificate-network/src/gossip.rs:233:                assert_eq!(certificates[0].certificate_hash(), hash);
+crates/amun-certificate-network/src/gossip.rs:266:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:268:        cache.store_certificate(cert.clone());
+crates/amun-certificate-network/src/gossip.rs:271:        assert!(cache.has_certificate(&hash));
+crates/amun-certificate-network/src/gossip.rs:274:        assert_eq!(cache.certificate_count(), 1);
+crates/amun-certificate-network/src/gossip.rs:282:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:284:        cache.store_certificate(cert);
+crates/amun-certificate-network/src/gossip.rs:287:        let missing = cache.missing_certificates(&inventory);
+crates/amun-certificate-network/src/gossip.rs:304:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:306:        cache.store_certificate(cert);
+crates/amun-certificate-network/src/gossip.rs:314:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/gossip.rs:317:            certificate_hash: hash,
+crates/amun-certificate-network/src/gossip.rs:321:            certificates: vec![cert.clone()],
+crates/amun-certificate-network/src/gossip.rs:334:            CertificateSync::BatchResponse { certificates } => {
+crates/amun-certificate-network/src/gossip.rs:335:                for c in &certificates {
+crates/amun-certificate-network/src/gossip.rs:336:                    cache.store_certificate(c.clone());
+crates/amun-certificate-network/src/gossip.rs:353:        assert!(cache.has_certificate(&hash));
+crates/amun-certificate-network/src/gossip.rs:356:        assert_eq!(cache.certificate_count(), 1);
+crates/amun-certificate-network/src/gossip.rs:362:            certificate_hash: [1u8; 32],
+crates/amun-certificate-network/src/gossip.rs:375:                certificate_hash,
+crates/amun-certificate-network/src/gossip.rs:378:                assert_eq!(certificate_hash, [1u8; 32]);
+crates/amun-certificate-network/src/distribution.rs:17:    RequestCertificate { certificate_hash: [u8; 32] },
+crates/amun-certificate-network/src/distribution.rs:18:    CertificateResponse { certificate: ReplayCertificate },
+crates/amun-certificate-network/src/distribution.rs:22:    pub fn certificate_hash(&self) -> Option<[u8; 32]> {
+crates/amun-certificate-network/src/distribution.rs:24:            CertificateMessage::RequestCertificate { certificate_hash } => Some(*certificate_hash),
+crates/amun-certificate-network/src/distribution.rs:25:            CertificateMessage::CertificateResponse { certificate } => {
+crates/amun-certificate-network/src/distribution.rs:26:                Some(certificate.certificate_hash())
+crates/amun-certificate-network/src/distribution.rs:38:    RequestInclusionProof { certificate_hash: [u8; 32] },
+crates/amun-certificate-network/src/distribution.rs:49:    pub certificate: ReplayCertificate,
+crates/amun-certificate-network/src/distribution.rs:56:        certificate: ReplayCertificate,
+crates/amun-certificate-network/src/distribution.rs:61:            certificate,
+crates/amun-certificate-network/src/distribution.rs:69:            &self.certificate,
+crates/amun-certificate-network/src/distribution.rs:77:    pub fn certificate_hash(&self) -> [u8; 32] {
+crates/amun-certificate-network/src/distribution.rs:78:        self.certificate.certificate_hash()
+crates/amun-certificate-network/src/distribution.rs:90:    RequestBundleByHash { certificate_hash: [u8; 32] },
+crates/amun-certificate-network/src/distribution.rs:107:        let cert = rt.create_certificate(block.block_height, pre_state_root);
+crates/amun-certificate-network/src/distribution.rs:109:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/distribution.rs:111:            ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash)?;
+crates/amun-certificate-network/src/distribution.rs:114:            certificate: cert,
+crates/amun-certificate-network/src/distribution.rs:131:        let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-certificate-network/src/distribution.rs:133:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-certificate-network/src/distribution.rs:134:        let hash = cert.certificate_hash();
+crates/amun-certificate-network/src/distribution.rs:136:            ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-certificate-network/src/distribution.rs:153:    fn n9a_certificate_request_response() {
+crates/amun-certificate-network/src/distribution.rs:155:        let cert_hash = bundle.certificate_hash();
+crates/amun-certificate-network/src/distribution.rs:157:            certificate: bundle.certificate.clone(),
+crates/amun-certificate-network/src/distribution.rs:160:            CertificateMessage::CertificateResponse { certificate } => {
+crates/amun-certificate-network/src/distribution.rs:161:                assert_eq!(certificate.certificate_hash(), cert_hash)
+crates/amun-certificate-network/src/distribution.rs:184:            bundle.certificate_hash(),
+crates/amun-certificate-network/src/distribution.rs:185:            bundle.inclusion_proof.certificate_hash
+crates/amun-certificate-network/src/distribution.rs:233:        let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-certificate-network/src/distribution.rs:234:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-certificate-network/src/distribution.rs:255:    fn n9_serialize_certificate_message() {
+crates/amun-certificate-network/src/distribution.rs:258:            certificate_hash: bundle.certificate_hash(),
+crates/amun-certificate-network/src/distribution.rs:264:                eprintln!("distribution: invalid certificate message: {}", e);
+crates/amun-certificate-network/src/distribution.rs:269:            CertificateMessage::RequestCertificate { certificate_hash } => {
+crates/amun-certificate-network/src/distribution.rs:270:                assert_eq!(certificate_hash, bundle.certificate_hash())
+crates/amun-certificate-network/src/distribution.rs:289:        assert_eq!(deserialized.certificate_hash(), bundle.certificate_hash());
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:8:/// Create a valid slashing certificate for testing
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:9:fn make_valid_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:28:/// Build a test block with given certificates
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:32:    builder.build_block_with_certificates(1, [0u8; 32], &mut mempool, 10, [0u8; 32], 1000, certs)
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:40:fn n110_4b_valid_certificates_pass_verification() {
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:41:    let cert = make_valid_certificate([0x42; 32]);
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:44:        block.verify_slashing_certificates().is_ok(),
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:45:        "N110.4b FAIL: Valid certificates should pass verification"
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:50:fn n110_4b_tampered_certificate_rejected() {
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:51:    let mut cert = make_valid_certificate([0x42; 32]);
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:56:    let result = block.verify_slashing_certificates();
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:59:        "N110.4b FAIL: Tampered certificate must be rejected"
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:63:        "Error should reference certificate index"
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:68:fn n110_4b_too_many_certificates_rejected() {
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:71:        certs.push(make_valid_certificate([i as u8; 32]));
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:74:    let result = block.verify_slashing_certificates();
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:77:        "N110.4b FAIL: Too many certificates must be rejected"
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:82:            .contains("Too many slashing certificates"),
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:83:        "Error should mention max certificates"
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:106:    let result = block.verify_slashing_certificates();
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:115:    let mut cert = make_valid_certificate([0x42; 32]);
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:116:    // Tamper certificate_hash without changing content
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:117:    cert.certificate_hash = [0xFF; 32];
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:119:    let result = block.verify_slashing_certificates();
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:131:fn n110_4b_empty_certificates_list_passes() {
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:134:        block.verify_slashing_certificates().is_ok(),
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:135:        "N110.4b FAIL: Block with no certificates should pass verification"
+crates/amun-block-builder/tests/n32_certified_block.rs:11:    pub quorum_certificate: QuorumCertificate,
+crates/amun-block-builder/tests/n32_certified_block.rs:18:            quorum_certificate: qc,
+crates/amun-block-builder/tests/n32_certified_block.rs:68:    assert_eq!(certified.quorum_certificate.height, 1);
+crates/amun-block-builder/tests/n32_certified_block.rs:69:    assert_eq!(certified.quorum_certificate.block_hash, block.block_hash());
+crates/amun-block-builder/tests/n32_certified_block.rs:143:        certified1.quorum_certificate.block_hash,
+crates/amun-block-builder/tests/n32_certified_block.rs:144:        certified2.quorum_certificate.block_hash
+crates/amun-block-builder/src/lib.rs:18:    /// N110.4: Slashing certificates included in this block
+crates/amun-block-builder/src/lib.rs:19:    pub slashing_certificates: Vec<amun_consensus_network::SlashingCertificate>,
+crates/amun-block-builder/src/lib.rs:25:    /// N110.4b: Verify all slashing certificates in this block.
+crates/amun-block-builder/src/lib.rs:26:    pub fn verify_slashing_certificates(&self) -> Result<(), String> {
+crates/amun-block-builder/src/lib.rs:29:        if self.slashing_certificates.len() > MAX_CERTS_PER_BLOCK {
+crates/amun-block-builder/src/lib.rs:31:                "Too many slashing certificates ({} > {})",
+crates/amun-block-builder/src/lib.rs:32:                self.slashing_certificates.len(),
+crates/amun-block-builder/src/lib.rs:37:        for (i, cert) in self.slashing_certificates.iter().enumerate() {
+crates/amun-block-builder/src/lib.rs:42:            if recomputed != cert.certificate_hash {
+crates/amun-block-builder/src/lib.rs:79:        // N110.4: Include slashing certificates in block hash
+crates/amun-block-builder/src/lib.rs:80:        for cert in &self.slashing_certificates {
+crates/amun-block-builder/src/lib.rs:81:            hasher.update(&cert.certificate_hash);
+crates/amun-block-builder/src/lib.rs:102:    /// N110.4a: Build a block with slashing certificates included.
+crates/amun-block-builder/src/lib.rs:103:    /// The certificates MUST have been verified before being passed here.
+crates/amun-block-builder/src/lib.rs:113:        self.build_block_with_certificates(
+crates/amun-block-builder/src/lib.rs:124:    /// N110.4: Build a block with pending slashing certificates.
+crates/amun-block-builder/src/lib.rs:125:    /// N110.4a: Build a block with slashing certificates.
+crates/amun-block-builder/src/lib.rs:128:    pub fn build_block_with_certificates(
+crates/amun-block-builder/src/lib.rs:136:        slashing_certificates: Vec<SlashingCertificate>,
+crates/amun-block-builder/src/lib.rs:150:            slashing_certificates,
+crates/amun-finality-certificate/Cargo.toml:2:name = "amun-finality-certificate"
+crates/amun-finality-certificate/Cargo.toml:6:description = "Constitutional finality certificate binding evidence to consensus"
+crates/amun-finality-certificate/src/lib.rs:7:/// A constitutional finality certificate that binds consensus quorum
+crates/amun-finality-certificate/src/lib.rs:15:    pub replay_certificate_head: [u8; 32],
+crates/amun-finality-certificate/src/lib.rs:17:    pub quorum_certificate_hash: [u8; 32],
+crates/amun-finality-certificate/src/lib.rs:39:            replay_certificate_head: replay_head,
+crates/amun-finality-certificate/src/lib.rs:41:            quorum_certificate_hash: qc_hash,
+crates/amun-finality-certificate/src/lib.rs:55:        hasher.update(&self.replay_certificate_head);
+crates/amun-finality-certificate/src/lib.rs:57:        hasher.update(&self.quorum_certificate_hash);
+crates/amun-finality-certificate/src/lib.rs:70:/// A verifiable chain of constitutional finality certificates.
+crates/amun-finality-certificate/src/lib.rs:73:    certificates: HashMap<[u8; 32], ConstitutionalFinalityCertificate>,
+crates/amun-finality-certificate/src/lib.rs:92:        self.certificates.insert(cert.finality_id, cert);
+crates/amun-finality-certificate/src/lib.rs:97:        self.certificates.is_empty()
+crates/amun-finality-certificate/src/lib.rs:100:        self.certificates.len()
+crates/amun-finality-certificate/src/lib.rs:103:        self.latest_id.and_then(|id| self.certificates.get(&id))
+crates/amun-finality-certificate/src/lib.rs:125:    fn n41_single_finality_certificate() {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:15:    pub previous_certificate_hash: [u8; 32],
+crates/amun-constitutional-runtime/src/finality_certificate.rs:16:    pub certificate_hash: [u8; 32],
+crates/amun-constitutional-runtime/src/finality_certificate.rs:48:            previous_certificate_hash: [0u8; 32],
+crates/amun-constitutional-runtime/src/finality_certificate.rs:49:            certificate_hash: [0u8; 32],
+crates/amun-constitutional-runtime/src/finality_certificate.rs:54:        cert.certificate_hash = cert.compute_hash();
+crates/amun-constitutional-runtime/src/finality_certificate.rs:59:        self.certificate_hash == self.compute_hash() && self.all_verified
+crates/amun-constitutional-runtime/src/finality_certificate.rs:76:        hasher.update(&self.previous_certificate_hash);
+crates/amun-constitutional-runtime/src/finality_certificate.rs:150:    fn n52_issue_finality_certificate() {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:198:    fn n52_certificate_deterministic() {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:210:        assert_eq!(c1.certificate_hash, c2.certificate_hash);
+crates/amun-constitutional-runtime/src/finality_certificate.rs:214:    fn n52_certificate_detects_tampering() {
+crates/amun-constitutional-runtime/src/lib.rs:2:pub mod certificate_chain;
+crates/amun-constitutional-runtime/src/lib.rs:3:pub mod finality_certificate;
+crates/amun-constitutional-runtime/src/lib.rs:7:pub use certificate_chain::*;
+crates/amun-constitutional-runtime/src/lib.rs:8:pub use finality_certificate::*;
+crates/amun-constitutional-runtime/src/certificate_chain.rs:5:    pub certificates: Vec<crate::finality_certificate::ConstitutionalFinalityCertificate>,
+crates/amun-constitutional-runtime/src/certificate_chain.rs:12:        certificates: Vec<crate::finality_certificate::ConstitutionalFinalityCertificate>,
+crates/amun-constitutional-runtime/src/certificate_chain.rs:14:        if certificates.is_empty() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:17:        if !certificates[0].verify() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:18:            return Err("First certificate is invalid".into());
+crates/amun-constitutional-runtime/src/certificate_chain.rs:20:        for i in 1..certificates.len() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:21:            if !certificates[i].verify() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:24:            let expected_prev = certificates[i - 1].certificate_hash;
+crates/amun-constitutional-runtime/src/certificate_chain.rs:25:            let actual_prev = certificates[i].previous_certificate_hash;
+crates/amun-constitutional-runtime/src/certificate_chain.rs:35:        let chain_root = Self::compute_chain_root(&certificates);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:36:        let len = certificates.len();
+crates/amun-constitutional-runtime/src/certificate_chain.rs:38:            certificates,
+crates/amun-constitutional-runtime/src/certificate_chain.rs:45:        if self.certificates.is_empty() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:48:        for cert in &self.certificates {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:53:        for i in 1..self.certificates.len() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:54:            if self.certificates[i].previous_certificate_hash
+crates/amun-constitutional-runtime/src/certificate_chain.rs:55:                != self.certificates[i - 1].certificate_hash
+crates/amun-constitutional-runtime/src/certificate_chain.rs:60:        Self::compute_chain_root(&self.certificates) == self.chain_root
+crates/amun-constitutional-runtime/src/certificate_chain.rs:66:                .certificates
+crates/amun-constitutional-runtime/src/certificate_chain.rs:71:    pub fn tip(&self) -> &crate::finality_certificate::ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:72:        &self.certificates[self.certificates.len() - 1]
+crates/amun-constitutional-runtime/src/certificate_chain.rs:75:    pub fn genesis(&self) -> &crate::finality_certificate::ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:76:        &self.certificates[0]
+crates/amun-constitutional-runtime/src/certificate_chain.rs:80:        certs: &[crate::finality_certificate::ConstitutionalFinalityCertificate],
+crates/amun-constitutional-runtime/src/certificate_chain.rs:85:            hasher.update(&cert.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:88:            hasher.update(&cert.previous_certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:101:    use crate::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-constitutional-runtime/src/certificate_chain.rs:146:        cert.previous_certificate_hash = prev_hash;
+crates/amun-constitutional-runtime/src/certificate_chain.rs:147:        cert.certificate_hash = cert.compute_hash();
+crates/amun-constitutional-runtime/src/certificate_chain.rs:152:    fn n53_create_certificate_chain() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:154:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:155:        let c3 = make_cert(3, [0x03; 32], [0xee; 32], c2.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:164:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:173:    fn n53_chain_rejects_invalid_certificate() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:175:        let mut c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:183:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:185:        chain.certificates[0].block_height = 999;
+crates/amun-constitutional-runtime/src/certificate_chain.rs:192:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:193:        let c3 = make_cert(3, [0x03; 32], [0xee; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:198:    fn n53a_replaced_certificate_detected() {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:200:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:201:        let c3 = make_cert(3, [0x03; 32], [0xee; 32], c2.certificate_hash);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:207:            chain.certificates[0].certificate_hash,
+crates/amun-constitutional-runtime/src/certificate_chain.rs:209:        chain.certificates[1] = fake;
+crates/amun-constitutional-runtime/src/history_root.rs:1:use crate::certificate_chain::CertificateChain;
+crates/amun-constitutional-runtime/src/history_root.rs:18:    /// Compute the history root from a certificate chain.
+crates/amun-constitutional-runtime/src/history_root.rs:21:            chain.certificates.iter().map(|c| c.transitions.len()).sum();
+crates/amun-constitutional-runtime/src/history_root.rs:24:            .certificates
+crates/amun-constitutional-runtime/src/history_root.rs:72:        hasher.update(&chain.genesis().certificate_hash);
+crates/amun-constitutional-runtime/src/history_root.rs:73:        hasher.update(&chain.tip().certificate_hash);
+crates/amun-constitutional-runtime/src/history_root.rs:75:        for cert in &chain.certificates {
+crates/amun-constitutional-runtime/src/history_root.rs:92:    use crate::certificate_chain::CertificateChain;
+crates/amun-constitutional-runtime/src/history_root.rs:93:    use crate::finality_certificate::ConstitutionalFinalityCertificate;
+crates/amun-constitutional-runtime/src/history_root.rs:138:        cert.previous_certificate_hash = prev_hash;
+crates/amun-constitutional-runtime/src/history_root.rs:139:        cert.certificate_hash = cert.compute_hash();
+crates/amun-constitutional-runtime/src/history_root.rs:146:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/history_root.rs:147:        let c3 = make_cert(3, [0x03; 32], [0xee; 32], c2.certificate_hash);
+crates/amun-constitutional-runtime/src/history_root.rs:162:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/history_root.rs:176:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/history_root.rs:187:        let c2 = make_cert(2, [0x02; 32], [0xdd; 32], c1.certificate_hash);
+crates/amun-constitutional-runtime/src/history_root.rs:194:        tampered_chain.certificates[0].block_height = 999;
+crates/amun-explorer-api/src/services/chain_service.rs:39:            has_finality_certificate: true,
+crates/amun-explorer-api/src/services/chain_service.rs:55:            has_finality_certificate: true,
+crates/amun-explorer-api/src/services/finality_service.rs:8:    pub fn list_certificates() -> ApiResult<Vec<FinalityCertificateSummary>> {
+crates/amun-explorer-api/src/services/finality_service.rs:11:                certificate_id: "N41-CERT-001".into(),
+crates/amun-explorer-api/src/services/finality_service.rs:18:                certificate_id: "N41-CERT-002".into(),
+crates/amun-explorer-api/src/services/finality_service.rs:27:    pub fn get_certificate(id: &str) -> ApiResult<FinalityCertificateSummary> {
+crates/amun-explorer-api/src/services/finality_service.rs:32:            certificate_id: id.to_string(),
+crates/amun-explorer-api/src/lib.rs:46:    async fn n48_4_list_finality_certificates() {
+crates/amun-explorer-api/src/lib.rs:50:                    .uri("/explorer/finality/certificates")
+crates/amun-explorer-api/src/lib.rs:108:        assert!(block.has_finality_certificate);
+crates/amun-explorer-api/src/routes/finality.rs:4:async fn list_certificates(
+crates/amun-explorer-api/src/routes/finality.rs:6:    FinalityService::list_certificates()
+crates/amun-explorer-api/src/routes/finality.rs:8:async fn get_certificate(
+crates/amun-explorer-api/src/routes/finality.rs:11:    FinalityService::get_certificate(&id)
+crates/amun-explorer-api/src/routes/finality.rs:16:        .route("/certificates", get(list_certificates))
+crates/amun-explorer-api/src/routes/finality.rs:17:        .route("/certificates/{id}", get(get_certificate))
+crates/amun-explorer-api/src/types.rs:11:    pub has_finality_certificate: bool,
+crates/amun-explorer-api/src/types.rs:35:    pub certificate_id: String,
+crates/amun-rpc/src/lib.rs:46:    pub certificate_hash: String,
+crates/amun-rpc/src/lib.rs:100:            certificate_hash: hex::encode(record.certificate_hash),
+crates/amun-rpc/src/lib.rs:120:            certificate_hash: hex::encode(r.certificate_hash),
+crates/amun-rpc/src/lib.rs:394:            "certificate_hash": hex::encode(r.certificate_hash),
+crates/amun-rpc/src/provider.rs:78:            certificate_hash: "0xcert".into(),
+crates/amun-rpc/src/client.rs:35:    pub certificate_hash: String,
+crates/amun-finality-law/Cargo.toml:8:amun-quorum-certificate = { path = "../amun-quorum-certificate" }
+crates/amun-finality-law/src/finality.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-unlock-law/Cargo.toml:8:amun-quorum-certificate = { path = "../amun-quorum-certificate" }
+crates/amun-unlock-law/src/lib.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-unlock-law/src/unlock.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-unlock-law/src/unlock.rs:26:        h.update(&higher_qc.certificate_hash);
+crates/amun-unlock-law/src/unlock.rs:44:        h.update(&self.higher_qc.certificate_hash);
+crates/amun-benchmarks/benches/storage_bench.rs:11:        certificate_hash: [0xDD; 32],
+crates/amun-tls/Cargo.toml:6:description = "AmunChain TLS 1.3 with mTLS and certificate pinning"
+crates/amun-tls/src/config.rs:19:        let certs = CertificateManager::load_certificates(cert_path)?;
+crates/amun-tls/src/cert.rs:7:    pub fn load_certificates(path: &str) -> std::io::Result<Vec<CertificateDer<'static>>> {
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:22:fn make_valid_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:70:fn n110_4c_duplicate_certificate_not_reapplied() {
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:124:    let cert = make_valid_certificate([0x42; 32]);
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:125:    let hash = cert.certificate_hash;
+crates/amun-live-cluster/src/validator.rs.before_sync_fix:242:                        certificate_hash: [0u8; 32],
+crates/amun-live-cluster/src/config.rs:31:    pub certificate_path: Option<String>,
+crates/amun-live-cluster/src/config.rs:42:                certificate_path: None,
+crates/amun-live-cluster/src/config.rs:66:                certificate_path: None,
+crates/amun-live-cluster/src/config.rs:113:        peer.certificate_path = Some(path.to_str().unwrap().to_string());
+crates/amun-live-cluster/src/validator.rs.bak2:351:                            certificate_hash: [0u8; 32],
+crates/amun-live-cluster/src/validator.rs.bak:47:        // N105.5: Register validators using certificates verified by genesis trust anchors
+crates/amun-live-cluster/src/validator.rs.bak:53:        // Create self certificate and verify it
+crates/amun-live-cluster/src/validator.rs.bak:55:        let self_cert = amun_networking::validator_certificate::ValidatorCertificate::issue(
+crates/amun-live-cluster/src/validator.rs.bak:63:            panic!("Self certificate verification failed");
+crates/amun-live-cluster/src/validator.rs.bak:68:        // N105.5D: Load peer certificates from disk (mandatory)
+crates/amun-live-cluster/src/validator.rs.bak:73:                .certificate_path
+crates/amun-live-cluster/src/validator.rs.bak:75:                .expect("Peer certificate_path not set");
+crates/amun-live-cluster/src/validator.rs.bak:77:                .unwrap_or_else(|_| panic!("Failed to read certificate {}", cert_path));
+crates/amun-live-cluster/src/validator.rs.bak:78:            let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
+crates/amun-live-cluster/src/validator.rs.bak:80:                    .unwrap_or_else(|_| panic!("Invalid certificate JSON in {}", cert_path));
+crates/amun-live-cluster/src/validator.rs.bak:82:                panic!("Peer certificate verification failed for {}", cert_path);
+crates/amun-live-cluster/src/validator.rs.bak:298:                        certificate_hash: [0u8; 32],
+crates/amun-live-cluster/src/validator.rs:44:    /// N110.4: Certificate gossip for slashing certificate propagation
+crates/amun-live-cluster/src/validator.rs:45:    pub certificate_gossip: Arc<Mutex<amun_consensus_network::CertificateGossip>>,
+crates/amun-live-cluster/src/validator.rs:48:    pub applied_slashing_certificates: Arc<Mutex<std::collections::HashSet<[u8; 32]>>>,
+crates/amun-live-cluster/src/validator.rs:71:        // N105.4A: Deterministic key matching committed test certificates
+crates/amun-live-cluster/src/validator.rs:79:        // N105.5: Register validators using certificates verified by genesis trust anchors
+crates/amun-live-cluster/src/validator.rs:94:        // Create self certificate and verify it
+crates/amun-live-cluster/src/validator.rs:98:        let self_cert = amun_networking::validator_certificate::ValidatorCertificate::issue_v2(
+crates/amun-live-cluster/src/validator.rs:107:        if !registry.verify_certificate_at(&self_cert, 0) {
+crates/amun-live-cluster/src/validator.rs:108:            panic!("Self certificate verification failed");
+crates/amun-live-cluster/src/validator.rs:114:        // N105.5D: Load peer certificates from disk (mandatory)
+crates/amun-live-cluster/src/validator.rs:117:                .certificate_path
+crates/amun-live-cluster/src/validator.rs:119:                .expect("Peer certificate_path not set");
+crates/amun-live-cluster/src/validator.rs:121:                .unwrap_or_else(|_| panic!("Failed to read certificate {}", cert_path));
+crates/amun-live-cluster/src/validator.rs:122:            let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
+crates/amun-live-cluster/src/validator.rs:124:                    .unwrap_or_else(|_| panic!("Invalid certificate JSON in {}", cert_path));
+crates/amun-live-cluster/src/validator.rs:125:            if !registry.verify_certificate_at(&peer_cert, 0) {
+crates/amun-live-cluster/src/validator.rs:126:                panic!("Peer certificate verification failed for {}", cert_path);
+crates/amun-live-cluster/src/validator.rs:144:            certificate_gossip: Arc::new(Mutex::new(
+crates/amun-live-cluster/src/validator.rs:147:            applied_slashing_certificates: Arc::new(Mutex::new(std::collections::HashSet::new())),
+crates/amun-live-cluster/src/validator.rs:278:        let certificate_gossip_clone = self.certificate_gossip.clone();
+crates/amun-live-cluster/src/validator.rs:280:        let applied_certs_clone = self.applied_slashing_certificates.clone();
+crates/amun-live-cluster/src/validator.rs:340:                    // N110.4b: Collect pending certificates from gossip
+crates/amun-live-cluster/src/validator.rs:342:                        certificate_gossip_clone
+crates/amun-live-cluster/src/validator.rs:349:                    let mut block = bld.build_block_with_certificates(
+crates/amun-live-cluster/src/validator.rs:488:                        // Real data from the finalized certificate
+crates/amun-live-cluster/src/validator.rs:498:                        // Slashing evidence: certificates have non-empty evidence_ids
+crates/amun-live-cluster/src/validator.rs:500:                            let gossip = certificate_gossip_clone.lock().unwrap();
+crates/amun-live-cluster/src/validator.rs:520:                        // Evidence validity: all certificates pass .verify()
+crates/amun-live-cluster/src/validator.rs:522:                            let gossip = certificate_gossip_clone.lock().unwrap();
+crates/amun-live-cluster/src/validator.rs:603:                            [0u8; 32], // replay_certificate: placeholder until N126.4
+crates/amun-live-cluster/src/validator.rs:616:                            certificate_hash: [0u8; 32],
+crates/amun-live-cluster/src/validator.rs:632:                    // N110.4c: Apply slashing certificates after finality
+crates/amun-live-cluster/src/validator.rs:636:                            let gossip = certificate_gossip_clone.lock().unwrap();
+crates/amun-live-cluster/src/validator.rs:646:                            if applied.contains(&cert.certificate_hash) {
+crates/amun-live-cluster/src/validator.rs:648:                                applied_hashes.push(cert.certificate_hash);
+crates/amun-live-cluster/src/validator.rs:660:                                    applied.insert(cert.certificate_hash);
+crates/amun-live-cluster/src/validator.rs:661:                                    applied_hashes.push(cert.certificate_hash);
+crates/amun-live-cluster/src/validator.rs:675:                            let mut gossip = certificate_gossip_clone.lock().unwrap();
+crates/amun-live-cluster/src/validator.rs:944:    fn n108_3e_authority_rotation_certificate_validation() {
+crates/amun-live-cluster/src/validator.rs:950:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-live-cluster/src/validator.rs:970:        // Create a v1 certificate
+crates/amun-live-cluster/src/validator.rs:1034:                reg.verify_certificate_at(&v1_cert, 400),
+crates/amun-live-cluster/src/validator.rs:1043:                reg.verify_certificate_at(&v1_cert, 550),
+crates/amun-live-cluster/src/validator.rs:1052:                !reg.verify_certificate_at(&v1_cert, 650),
+crates/amun-live-cluster/src/validator.rs:1083:                !reg.verify_certificate_at(&v1_cert, 800),
+crates/amun-live-cluster/src/bin/benchmark_10.rs:17:            certificate_path: None,
+crates/amun-live-cluster/src/bin/replay_audit.rs:44:                    &record.certificate_hash[..4]
+crates/amun-live-cluster/src/bin/replay_audit.rs:55:                    if record.certificate_hash != expected {
+crates/amun-live-cluster/src/bin/replay_audit.rs:60:                    last_evidence_root = Some(record.certificate_hash);
+crates/amun-live-cluster/src/bin/benchmark_10_event.rs:17:            certificate_path: None,
+crates/amun-live-cluster/src/validator.rs.backup:350:                            certificate_hash: [0u8; 32],
+crates/amun-verification-kernel/src/lib.rs:57:/// A certificate binding claims to evidence with cryptographic integrity.
+crates/amun-verification-kernel/src/lib.rs:60:    pub certificate_id: String,
+crates/amun-verification-kernel/src/lib.rs:64:    pub certificate_hash: String,
+crates/amun-verification-kernel/src/lib.rs:70:    /// Issue a new verification certificate for a phase.
+crates/amun-verification-kernel/src/lib.rs:79:            certificate_id: String::new(),
+crates/amun-verification-kernel/src/lib.rs:83:            certificate_hash: String::new(),
+crates/amun-verification-kernel/src/lib.rs:87:        cert.certificate_id = cert.compute_id();
+crates/amun-verification-kernel/src/lib.rs:88:        cert.certificate_hash = cert.compute_hash();
+crates/amun-verification-kernel/src/lib.rs:106:        hasher.update(self.certificate_id.as_bytes());
+crates/amun-verification-kernel/src/lib.rs:118:    /// Verify the certificate's integrity.
+crates/amun-verification-kernel/src/lib.rs:120:        self.certificate_id == self.compute_id() && self.certificate_hash == self.compute_hash()
+crates/amun-verification-kernel/src/lib.rs:129:/// Registry of all verification certificates.
+crates/amun-verification-kernel/src/lib.rs:132:    pub certificates: Vec<VerificationCertificate>,
+crates/amun-verification-kernel/src/lib.rs:144:        self.certificates.push(cert);
+crates/amun-verification-kernel/src/lib.rs:148:    pub fn phase_certificate(&self, phase: &str) -> Option<&VerificationCertificate> {
+crates/amun-verification-kernel/src/lib.rs:149:        self.certificates.iter().find(|c| c.phase == phase)
+crates/amun-verification-kernel/src/lib.rs:153:        self.certificates.len()
+crates/amun-verification-kernel/src/lib.rs:185:    fn n46_5_issue_certificate() {
+crates/amun-verification-kernel/src/lib.rs:198:    fn n46_5_tampered_certificate_rejected() {
+crates/amun-verification-kernel/src/lib.rs:211:    fn n46_5_registry_accepts_valid_certificates() {
+crates/amun-verification-kernel/src/lib.rs:225:    fn n46_5_registry_rejects_invalid_certificates() {
+crates/amun-verification-kernel/src/lib.rs:249:        let found = registry.phase_certificate("N46");
+crates/amun-verification-kernel/src/lib.rs:252:        assert!(registry.phase_certificate("N99").is_none());
+crates/amun-constitutional-verifier/src/verifier.rs:2:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-constitutional-authority/tests/authority_tests.rs:22:        parent.certificate_id.clone(),
+crates/amun-constitutional-authority/tests/authority_tests.rs:24:        parent.certificate_id.clone(),
+crates/amun-constitutional-authority/tests/authority_tests.rs:33:fn stable_certificate_id() {
+crates/amun-constitutional-authority/tests/authority_tests.rs:37:    assert_eq!(a.certificate_id, b.certificate_id);
+crates/amun-constitutional-authority/tests/authority_tests.rs:38:    assert_eq!(a.certificate_id, a.digest_hex());
+crates/amun-constitutional-authority/tests/authority_tests.rs:83:fn revoked_certificate_rejected() {
+crates/amun-constitutional-authority/tests/authority_tests.rs:94:    reg.revoke(signed_child.artifact.certificate_id.clone());
+crates/amun-constitutional-authority/Cargo.toml:6:description = "Constitutional authority layer: certificate chains, revocation, rotation, trust anchors"
+crates/amun-constitutional-authority/src/rotation.rs:5:use crate::certificate::ConstitutionalCertificate;
+crates/amun-constitutional-authority/src/rotation.rs:15:    /// The new certificate must be signed by the old authority key
+crates/amun-constitutional-authority/src/lib.rs:9://! signing infrastructure.  Every certificate is content-addressed
+crates/amun-constitutional-authority/src/lib.rs:14://! - `certificate`  – the core `ConstitutionalCertificate` type
+crates/amun-constitutional-authority/src/lib.rs:15://! - `chain`        – cryptographically verified certificate chains
+crates/amun-constitutional-authority/src/lib.rs:20:pub mod certificate;
+crates/amun-constitutional-authority/src/lib.rs:26:pub use certificate::ConstitutionalCertificate;
+crates/amun-constitutional-authority/src/certificate.rs:8:/// A constitutional certificate whose identity is derived from a
+crates/amun-constitutional-authority/src/certificate.rs:9:/// stable subset of its fields (everything except `certificate_id`,
+crates/amun-constitutional-authority/src/certificate.rs:10:/// `issuer`, and `subject`).  This guarantees that the certificate
+crates/amun-constitutional-authority/src/certificate.rs:17:    pub certificate_id: String, // hex BLAKE3 of identity bytes
+crates/amun-constitutional-authority/src/certificate.rs:18:    pub issuer: String,         // certificate_id of the issuer
+crates/amun-constitutional-authority/src/certificate.rs:19:    pub subject: String,        // certificate_id of the subject
+crates/amun-constitutional-authority/src/certificate.rs:46:    /// Create a self-signed root certificate.
+crates/amun-constitutional-authority/src/certificate.rs:62:        tmp.certificate_id = id.clone();
+crates/amun-constitutional-authority/src/certificate.rs:68:    /// Create a child certificate issued by a parent.
+crates/amun-constitutional-authority/src/certificate.rs:70:        issuer_id: String, // parent certificate_id
+crates/amun-constitutional-authority/src/certificate.rs:88:        tmp.certificate_id = id.clone();
+crates/amun-constitutional-authority/src/certificate.rs:97:    /// Build a bare certificate used as a template for identity computation.
+crates/amun-constitutional-authority/src/certificate.rs:101:            certificate_id: String::new(),
+crates/amun-constitutional-authority/src/certificate.rs:113:    /// Compute the certificate id from the canonical identity bytes.
+crates/amun-constitutional-authority/src/certificate.rs:124:    /// This deliberately omits `certificate_id`, `issuer`, and `subject`
+crates/amun-constitutional-authority/src/certificate.rs:126:    /// certificates, which would create a circular dependency.
+crates/amun-constitutional-authority/src/certificate.rs:129:        c.certificate_id = String::new();
+crates/amun-constitutional-authority/src/chain.rs:5:use crate::certificate::ConstitutionalCertificate;
+crates/amun-constitutional-authority/src/chain.rs:9:/// A cryptographically verified chain of signed constitutional certificates.
+crates/amun-constitutional-authority/src/chain.rs:11:    pub certificates: Vec<SignedArtifact<ConstitutionalCertificate>>,
+crates/amun-constitutional-authority/src/chain.rs:17:            certificates: vec![root],
+crates/amun-constitutional-authority/src/chain.rs:21:    /// Append a signed certificate that chains to the current tail.
+crates/amun-constitutional-authority/src/chain.rs:26:        let tail = &self.certificates.last().ok_or("Empty chain")?.artifact;
+crates/amun-constitutional-authority/src/chain.rs:27:        if cert.artifact.lineage_parent_hash != Some(tail.certificate_id.clone()) {
+crates/amun-constitutional-authority/src/chain.rs:30:        self.certificates.push(cert);
+crates/amun-constitutional-authority/src/chain.rs:34:    /// Look up the public verifying key for a given certificate id.
+crates/amun-constitutional-authority/src/chain.rs:36:        self.certificates
+crates/amun-constitutional-authority/src/chain.rs:38:            .find(|s| s.artifact.certificate_id == cert_id)
+crates/amun-constitutional-authority/src/chain.rs:43:    /// - every certificate is signed by its issuer's key
+crates/amun-constitutional-authority/src/chain.rs:45:    /// - no certificate is revoked
+crates/amun-constitutional-authority/src/chain.rs:48:        for i in 0..self.certificates.len() {
+crates/amun-constitutional-authority/src/chain.rs:49:            let signed = &self.certificates[i];
+crates/amun-constitutional-authority/src/chain.rs:53:            if revocation.is_revoked(&cert.certificate_id) {
+crates/amun-constitutional-authority/src/chain.rs:54:                return Err(format!("Certificate {} revoked", cert.certificate_id));
+crates/amun-constitutional-authority/src/chain.rs:60:                    return Err("Root certificate is not self-signed".into());
+crates/amun-constitutional-authority/src/chain.rs:67:                    format!("Issuer certificate {} not found in chain", cert.issuer)
+crates/amun-constitutional-authority/src/chain.rs:72:                        cert.certificate_id, cert.issuer
+crates/amun-constitutional-authority/src/chain.rs:77:                    .map_err(|e| format!("Signature invalid on {}: {}", cert.certificate_id, e))?;
+crates/amun-constitutional-authority/src/chain.rs:82:                let parent = &self.certificates[i - 1].artifact;
+crates/amun-constitutional-authority/src/chain.rs:86:                        cert.certificate_id, parent.certificate_id
+crates/amun-constitutional-authority/src/revocation.rs:24:    pub fn revoke(&mut self, certificate_id: String) {
+crates/amun-constitutional-authority/src/revocation.rs:25:        self.revoked.insert(certificate_id);
+crates/amun-constitutional-authority/src/revocation.rs:28:    pub fn is_revoked(&self, certificate_id: &str) -> bool {
+crates/amun-constitutional-authority/src/revocation.rs:29:        self.revoked.contains(certificate_id)
+crates/amun-constitutional-authority/src/trust.rs:5:use crate::certificate::ConstitutionalCertificate;
+crates/amun-constitutional-governance/src/delegation.rs:30:        // The current certificate must be signed by the previous subject's key.
+crates/amun-validator-networking/src/sync_transport.rs:2:use amun_state_sync::snapshot_certificate::StateSnapshotCertificate;
+crates/amun-crypto-hardening/src/key_rotation.rs:70:            return Err("Rotation certificate verification failed".into());
+crates/amun-evidence-root/src/lib.rs:8:/// - Replay certificate (replay verification proof)
+crates/amun-evidence-root/src/lib.rs:16:    pub replay_certificate: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:26:        replay_certificate: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:35:        hasher.update(&replay_certificate);
+crates/amun-evidence-root/src/lib.rs:44:            replay_certificate,
+crates/amun-evidence-root/src/lib.rs:60:            self.replay_certificate,
+crates/amun-evidence-root/src/lib.rs:84:        replay_certificate: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:92:            replay_certificate,
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:10:        certificate_hash: [0xDD; 32],
+crates/amun-chain-store/src/store.rs:149:            certificate_hash: [0xDD; 32],
+crates/amun-chain-store/src/sync.rs:160:            certificate_hash: [0xDD; 32],
+crates/amun-chain-store/src/snapshot.rs:139:        certificate_hash: [0u8; 32],
+crates/amun-chain-store/src/record.rs:9:    pub certificate_hash: [u8; 32],
+crates/amun-chain-store/src/record.rs:39:            certificate_hash: [0xDD; 32],
+crates/amun-chain-store/examples/snapshot_builder_test.rs:12:        certificate_hash: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_verification_test.rs:12:        certificate_hash: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_restore_test.rs:12:        certificate_hash: [0u8; 32],
+crates/amun-network-transport/src/message.rs:9:    /// A finality certificate for a block.
+crates/amun-network-transport/src/message.rs:11:    /// N110.3: Slashing certificate announcement
+crates/amun-network-transport/src/message.rs:44:    pub certificate_hash: [u8; 32],
+crates/amun-network-transport/src/message.rs:49:/// N110.3: Slashing certificate announcement for network propagation.
+crates/amun-network-transport/src/message.rs:53:    pub certificate_hash: [u8; 32],
+crates/amun-network-transport/src/message.rs:169:    fn n66_message_roundtrip_certificate() {
+crates/amun-network-transport/src/message.rs:174:            certificate_hash: [0x33; 32],
+crates/amun-network-transport/src/message.rs:226:    fn n110_3b_roundtrip_slashing_certificate() {
+crates/amun-network-transport/src/message.rs:229:            certificate_hash: [0xAA; 32],
+crates/amun-network-transport/src/transport.rs:395:    fn n66_real_socket_certificate_announce() {
+crates/amun-network-transport/src/transport.rs:426:            certificate_hash: [0x33; 32],
+crates/amun-replay/Cargo.toml:6:description = "Constitutional replay system: commit log, validation, and certificates"
+crates/amun-replay/src/store.rs:4:/// Stores ReplayCertificates keyed by their certificate_hash.
+crates/amun-replay/src/store.rs:7:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-replay/src/store.rs:13:            certificates: BTreeMap::new(),
+crates/amun-replay/src/store.rs:17:    /// Insert a certificate. Key is certificate.certificate_hash().
+crates/amun-replay/src/store.rs:19:        let hash = cert.certificate_hash();
+crates/amun-replay/src/store.rs:20:        self.certificates.insert(hash, cert);
+crates/amun-replay/src/store.rs:23:    /// Look up a certificate by its hash.
+crates/amun-replay/src/store.rs:25:        self.certificates.get(hash)
+crates/amun-replay/src/store.rs:28:    /// Check if a certificate with the given hash exists.
+crates/amun-replay/src/store.rs:30:        self.certificates.contains_key(hash)
+crates/amun-replay/src/store.rs:33:    /// Number of stored certificates.
+crates/amun-replay/src/store.rs:35:        self.certificates.len()
+crates/amun-replay/src/store.rs:40:        self.certificates.is_empty()
+crates/amun-replay/src/store.rs:52:    fn get_certificate(&self, hash: &[u8; 32]) -> Option<ReplayCertificate>;
+crates/amun-replay/src/store.rs:56:    fn get_certificate(&self, hash: &[u8; 32]) -> Option<ReplayCertificate> {
+crates/amun-replay/src/store.rs:57:        self.certificates.get(hash).cloned()
+crates/amun-replay/src/store.rs:70:        let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-replay/src/store.rs:71:        let hash = cert.certificate_hash();
+crates/amun-replay/src/store.rs:77:        assert_eq!(store.get(&hash).unwrap().certificate_hash(), hash);
+crates/amun-replay/src/store.rs:82:    fn test_missing_certificate() {
+crates/amun-replay/src/store.rs:92:        let cert1 = rt.create_certificate(1, [0u8; 32]);
+crates/amun-replay/src/store.rs:96:        let cert2 = rt2.create_certificate(1, [0u8; 32]);
+crates/amun-replay/src/lib.rs:1:pub mod certificate;
+crates/amun-replay/src/lib.rs:5:pub use certificate::{ReplayCertificate, ReplayCertificateStore};
+crates/amun-replay/src/certificate.rs:7:    pub certificate_id: [u8; 32],
+crates/amun-replay/src/certificate.rs:8:    pub previous_certificate: [u8; 32],
+crates/amun-replay/src/certificate.rs:21:        previous_certificate: [u8; 32],
+crates/amun-replay/src/certificate.rs:29:            certificate_id: [0u8; 32],
+crates/amun-replay/src/certificate.rs:30:            previous_certificate,
+crates/amun-replay/src/certificate.rs:43:        cert.certificate_id = cert.compute_id();
+crates/amun-replay/src/certificate.rs:49:            certificate_id: [0u8; 32],
+crates/amun-replay/src/certificate.rs:50:            previous_certificate: [0u8; 32],
+crates/amun-replay/src/certificate.rs:58:        cert.certificate_id = cert.compute_id();
+crates/amun-replay/src/certificate.rs:65:        hasher.update(&self.previous_certificate);
+crates/amun-replay/src/certificate.rs:76:        self.certificate_id == self.compute_id()
+crates/amun-replay/src/certificate.rs:82:    certificates: HashMap<[u8; 32], ReplayCertificate>,
+crates/amun-replay/src/certificate.rs:96:            if cert.previous_certificate != *latest {
+crates/amun-replay/src/certificate.rs:100:            if cert.previous_certificate != [0u8; 32] {
+crates/amun-replay/src/certificate.rs:101:                return Err("First certificate must have zero previous");
+crates/amun-replay/src/certificate.rs:104:        self.latest_id = Some(cert.certificate_id);
+crates/amun-replay/src/certificate.rs:105:        self.certificates.insert(cert.certificate_id, cert);
+crates/amun-replay/src/certificate.rs:110:        self.certificates.is_empty()
+crates/amun-replay/src/certificate.rs:113:        self.certificates.len()
+crates/amun-replay/src/certificate.rs:118:            .and_then(|id| self.certificates.get(id))
+crates/amun-replay/src/certificate.rs:148:    fn n37_genesis_certificate() {
+crates/amun-replay/src/certificate.rs:151:        assert_ne!(genesis.certificate_id, [0u8; 32]);
+crates/amun-replay/src/certificate.rs:152:        assert_eq!(genesis.previous_certificate, [0u8; 32]);
+crates/amun-replay/src/certificate.rs:160:        let prev_id = store.latest().unwrap().certificate_id;
+crates/amun-replay/src/certificate.rs:164:        let prev_id2 = store.latest().unwrap().certificate_id;
+crates/amun-replay/src/certificate.rs:177:        cert.previous_certificate = [0xDE; 32];
+crates/amun-replay/src/certificate.rs:186:        let prev_id = store.latest().unwrap().certificate_id;
+crates/amun-replay/src/certificate.rs:194:    fn n37_certificate_chain_verification() {
+crates/amun-replay/src/certificate.rs:200:        let id1 = store.latest().unwrap().certificate_id;
+crates/amun-replay/src/certificate.rs:204:        let id2 = store.latest().unwrap().certificate_id;
+crates/amun-stateless-sync/Cargo.toml:6:description = "Stateless synchronization using headers, certificates, and inclusion proofs"
+crates/amun-stateless-sync/Cargo.toml:11:amun-certificate-network = { path = "../amun-certificate-network" }
+crates/amun-stateless-sync/src/lib.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-stateless-sync/src/lib.rs:28:        certificates: Vec<ReplayCertificate>,
+crates/amun-stateless-sync/src/lib.rs:49:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-stateless-sync/src/lib.rs:59:            certificates: BTreeMap::new(),
+crates/amun-stateless-sync/src/lib.rs:74:    pub fn import_certificate(&mut self, cert: ReplayCertificate) {
+crates/amun-stateless-sync/src/lib.rs:75:        let hash = cert.certificate_hash();
+crates/amun-stateless-sync/src/lib.rs:76:        self.certificates.insert(hash, cert);
+crates/amun-stateless-sync/src/lib.rs:96:        let cert_hash = bundle.certificate.certificate_hash();
+crates/amun-stateless-sync/src/lib.rs:100:            .ok_or("Missing inclusion proof for certificate")?;
+crates/amun-stateless-sync/src/lib.rs:101:        amun_constitutional_block::verify_light_client_proof(header, &bundle.certificate, proof)
+crates/amun-stateless-sync/src/lib.rs:139:            let cert_hash = bundle.certificate.certificate_hash();
+crates/amun-stateless-sync/src/lib.rs:142:            node.import_certificate(bundle.certificate.clone());
+crates/amun-stateless-sync/src/lib.rs:168:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-stateless-sync/src/lib.rs:170:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-stateless-sync/src/lib.rs:171:        let hash = cert.certificate_hash();
+crates/amun-stateless-sync/src/lib.rs:172:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-stateless-sync/src/lib.rs:201:    fn n11b_certificate_sync() {
+crates/amun-stateless-sync/src/lib.rs:204:            certificates: vec![bundle.certificate.clone()],
+crates/amun-stateless-sync/src/lib.rs:207:            CertificateSyncMessage::CertificateBatch { certificates } => {
+crates/amun-stateless-sync/src/lib.rs:208:                assert!(!certificates.is_empty())
+crates/amun-stateless-sync/src/lib.rs:229:        let cert_hash = bundle.certificate.certificate_hash();
+crates/amun-stateless-sync/src/lib.rs:232:        node.import_certificate(bundle.certificate.clone());
+crates/amun-stateless-sync/src/lib.rs:246:            let cert_hash = b.certificate.certificate_hash();
+crates/amun-stateless-sync/src/lib.rs:248:            node.import_certificate(b.certificate.clone());
+crates/amun-constitutional-state/src/lib.rs:195:/// A certificate proving that a state root was produced by a specific journal.
+crates/amun-constitutional-state/src/lib.rs:218:    /// Create a replay certificate for a block transition.
+crates/amun-constitutional-state/src/lib.rs:219:    pub fn create_certificate(
+crates/amun-constitutional-state/src/lib.rs:245:mod certificate_tests {
+crates/amun-constitutional-state/src/lib.rs:249:    fn test_replay_certificate_valid() {
+crates/amun-constitutional-state/src/lib.rs:255:        let cert = rt.create_certificate(1, pre_root);
+crates/amun-constitutional-state/src/lib.rs:260:    fn test_replay_certificate_detects_tampering() {
+crates/amun-constitutional-state/src/lib.rs:265:        let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:274:// Phase N1: certificate_hash() — blake3 + domain separation
+crates/amun-constitutional-state/src/lib.rs:278:    /// Compute a deterministic constitutional hash of this certificate.
+crates/amun-constitutional-state/src/lib.rs:283:    pub fn certificate_hash(&self) -> [u8; 32] {
+crates/amun-constitutional-state/src/lib.rs:309:        let c1 = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:310:        let c2 = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:311:        assert_eq!(c1.certificate_hash(), c2.certificate_hash());
+crates/amun-constitutional-state/src/lib.rs:318:        let c1 = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:319:        let c2 = rt.create_certificate(2, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:320:        assert_ne!(c1.certificate_hash(), c2.certificate_hash());
+crates/amun-constitutional-state/src/lib.rs:329:        let c1 = rt1.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:330:        let c2 = rt2.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:331:        assert_ne!(c1.certificate_hash(), c2.certificate_hash());
+crates/amun-constitutional-state/src/lib.rs:338:        let c1 = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:339:        let c2 = rt.create_certificate(1, [1u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:340:        assert_ne!(c1.certificate_hash(), c2.certificate_hash());
+crates/amun-constitutional-state/src/lib.rs:350:        let c1 = rt1.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:351:        let c2 = rt2.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:352:        assert_ne!(c1.certificate_hash(), c2.certificate_hash());
+crates/amun-constitutional-state/src/lib.rs:358:    /// Even with a single certificate, this provides future-proof structure.
+crates/amun-constitutional-state/src/lib.rs:359:    pub fn certificate_merkle_root(certificates: &[ReplayCertificate]) -> [u8; 32] {
+crates/amun-constitutional-state/src/lib.rs:361:        for (i, cert) in certificates.iter().enumerate() {
+crates/amun-constitutional-state/src/lib.rs:363:            tree.insert(key.as_bytes(), &cert.certificate_hash());
+crates/amun-constitutional-state/src/lib.rs:374:    fn n3_single_certificate_merkle_root() {
+crates/amun-constitutional-state/src/lib.rs:377:        let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:378:        let root = ConstitutionalStateRuntime::certificate_merkle_root(std::slice::from_ref(&cert));
+crates/amun-constitutional-state/src/lib.rs:380:        let root2 = ConstitutionalStateRuntime::certificate_merkle_root(&[cert]);
+crates/amun-constitutional-state/src/lib.rs:386:    fn n3_multiple_certificates_different_root() {
+crates/amun-constitutional-state/src/lib.rs:389:        let c1 = rt1.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:393:        let c2 = rt2.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:396:            ConstitutionalStateRuntime::certificate_merkle_root(std::slice::from_ref(&c1));
+crates/amun-constitutional-state/src/lib.rs:397:        let root_multi = ConstitutionalStateRuntime::certificate_merkle_root(&[c1, c2]);
+crates/amun-constitutional-state/src/lib.rs:405:/// in a certificate merkle root stored in a block.
+crates/amun-constitutional-state/src/lib.rs:408:    pub certificate_hash: [u8; 32],
+crates/amun-constitutional-state/src/lib.rs:415:    /// Generate an inclusion proof that a certificate with the given hash
+crates/amun-constitutional-state/src/lib.rs:416:    /// is part of the merkle root computed from the provided certificates.
+crates/amun-constitutional-state/src/lib.rs:417:    pub fn prove_certificate_inclusion(
+crates/amun-constitutional-state/src/lib.rs:418:        certificates: &[ReplayCertificate],
+crates/amun-constitutional-state/src/lib.rs:421:        let index = certificates
+crates/amun-constitutional-state/src/lib.rs:423:            .position(|c| c.certificate_hash() == *cert_hash)?;
+crates/amun-constitutional-state/src/lib.rs:425:        for (i, cert) in certificates.iter().enumerate() {
+crates/amun-constitutional-state/src/lib.rs:427:            tree.insert(key.as_bytes(), &cert.certificate_hash());
+crates/amun-constitutional-state/src/lib.rs:432:            certificate_hash: *cert_hash,
+crates/amun-constitutional-state/src/lib.rs:443:        // Verify that the stored certificate_hash matches the leaf_value in the Merkle proof
+crates/amun-constitutional-state/src/lib.rs:444:        if self.proof.leaf_value != Some(self.certificate_hash) {
+crates/amun-constitutional-state/src/lib.rs:460:        let c1 = rt1.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:464:        let c2 = rt2.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:467:        let root = ConstitutionalStateRuntime::certificate_merkle_root(&certs);
+crates/amun-constitutional-state/src/lib.rs:468:        let hash = c1.certificate_hash();
+crates/amun-constitutional-state/src/lib.rs:470:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-state/src/lib.rs:476:    fn n7_inclusion_proof_wrong_certificate_fails() {
+crates/amun-constitutional-state/src/lib.rs:479:        let c1 = rt1.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:483:        let c2 = rt2.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:486:        let hash = c1.certificate_hash();
+crates/amun-constitutional-state/src/lib.rs:489:            ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-state/src/lib.rs:490:        // Tamper with the certificate hash
+crates/amun-constitutional-state/src/lib.rs:491:        proof.certificate_hash = [0xFF; 32];
+crates/amun-constitutional-state/src/lib.rs:496:    fn n7_inclusion_proof_missing_certificate() {
+crates/amun-constitutional-state/src/lib.rs:499:        let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-state/src/lib.rs:503:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &unknown_hash);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:246:    fn w18_replay_finality_certificate_deterministic() {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:269:        assert_eq!(cert1.certificate_hash, cert2.certificate_hash);
+crates/amun-replay-consensus/src/replay_backed_types.rs:84:/// A constitutional finality certificate backed by replay verification.
+crates/amun-replay-consensus/src/replay_backed_types.rs:93:    pub certificate_hash: [u8; 32],
+crates/amun-replay-consensus/src/replay_backed_types.rs:105:            certificate_hash: [0u8; 32],
+crates/amun-replay-consensus/src/replay_backed_types.rs:107:        cert.certificate_hash = cert.compute_hash();
+crates/amun-replay-consensus/src/replay_backed_types.rs:126:        self.certificate_hash == self.compute_hash() && self.qc.is_valid()
+crates/amun-timeout-law/Cargo.toml:6:description = "AmunChain timeout certificate law"
+crates/amun-timeout-law/src/timeout.rs:9:    pub certificate_hash: [u8; 32],
+crates/amun-timeout-law/src/timeout.rs:26:        let mut certificate_hash = [0u8; 32];
+crates/amun-timeout-law/src/timeout.rs:27:        certificate_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
+crates/amun-timeout-law/src/timeout.rs:33:            certificate_hash,
+crates/amun-timeout-law/src/timeout.rs:48:        computed == self.certificate_hash
+crates/amun-audit-trail/src/lib.rs:12:    pub replay_certificate: [u8; 32],
+crates/amun-audit-trail/src/lib.rs:25:        hasher.update(&self.replay_certificate);
+crates/amun-audit-trail/src/lib.rs:48:        replay_certificate: [u8; 32],
+crates/amun-audit-trail/src/lib.rs:61:            replay_certificate,
+crates/amun-constitutional-evidence/src/lib.rs:16:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-state-sync/src/stateless_verifier.rs:29:        let cert = &package.snapshot_certificate;
+crates/amun-state-sync/src/stateless_verifier.rs:32:                reason: "Snapshot certificate verification failed".into(),
+crates/amun-state-sync/src/sync_protocol.rs:1:use crate::snapshot_certificate::StateSnapshotCertificate;
+crates/amun-state-sync/src/sync_package.rs:3:use crate::snapshot_certificate::StateSnapshotCertificate;
+crates/amun-state-sync/src/sync_package.rs:9:    pub snapshot_certificate: StateSnapshotCertificate,
+crates/amun-state-sync/src/sync_package.rs:17:        snapshot_certificate: StateSnapshotCertificate,
+crates/amun-state-sync/src/sync_package.rs:22:            snapshot_certificate,
+crates/amun-state-sync/src/sync_package.rs:34:        hasher.update(&self.snapshot_certificate.certificate_hash);
+crates/amun-state-sync/src/sync_package.rs:35:        hasher.update(&self.snapshot_certificate.chunk_root);
+crates/amun-state-sync/src/lib.rs:1:pub mod snapshot_certificate;
+crates/amun-state-sync/src/lib.rs:6:pub use snapshot_certificate::*;
+crates/amun-state-sync/src/lib.rs:37:    fn n56_snapshot_certificate_verify() {
+crates/amun-state-sync/src/lib.rs:53:    fn n56_snapshot_certificate_detects_tampering() {
+crates/amun-state-sync/src/lib.rs:120:        // Create snapshot certificate
+crates/amun-state-sync/src/snapshot_certificate.rs:4:/// A certificate authenticating a state snapshot at a specific height.
+crates/amun-state-sync/src/snapshot_certificate.rs:16:    pub certificate_hash: [u8; 32],
+crates/amun-state-sync/src/snapshot_certificate.rs:41:            certificate_hash: [0u8; 32],
+crates/amun-state-sync/src/snapshot_certificate.rs:45:        cert.certificate_hash = cert.compute_hash();
+crates/amun-state-sync/src/snapshot_certificate.rs:68:        self.certificate_hash == self.compute_hash()
+crates/amun-operations/src/backup_recovery.rs:25:        let state_root = sync_package.snapshot_certificate.state_root;
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:19:        let cert = rt_a.create_certificate(height, [0u8; 32]);
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:21:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:22:        let hash = cert.certificate_hash();
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:23:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:96:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:98:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:99:        let hash = cert.certificate_hash();
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:100:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:20:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:22:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:23:        let hash = cert.certificate_hash();
+crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:24:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-chain-checkpoint/Cargo.toml:6:description = "Chain checkpoint certificates for Proof-Carrying Chain"
+crates/amun-chain-checkpoint/Cargo.toml:14:amun-certificate-network = { path = "../amun-certificate-network" }
+crates/amun-chain-checkpoint/src/lib.rs:1:use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-chain-checkpoint/src/lib.rs:12:/// A checkpoint certificate covering a range of blocks [start_height, end_height].
+crates/amun-chain-checkpoint/src/lib.rs:14:/// It commits to the final state root, evidence root, and replay certificate root
+crates/amun-chain-checkpoint/src/lib.rs:29:    /// Replay certificate merkle root at end_height.
+crates/amun-chain-checkpoint/src/lib.rs:30:    pub final_replay_certificate_root: String,
+crates/amun-chain-checkpoint/src/lib.rs:36:    /// Create a checkpoint certificate from a set of proof bundles.
+crates/amun-chain-checkpoint/src/lib.rs:93:            final_replay_certificate_root: last_bundle.block_header.replay_certificate_root.clone(),
+crates/amun-chain-checkpoint/src/lib.rs:102:    /// Compute a constitutional hash of this checkpoint certificate using Blake3.
+crates/amun-chain-checkpoint/src/lib.rs:114:        bytes.extend_from_slice(self.final_replay_certificate_root.as_bytes());
+crates/amun-chain-checkpoint/src/lib.rs:142:/// Stores checkpoint certificates keyed by their end_height.
+crates/amun-chain-checkpoint/src/lib.rs:157:    /// Store a checkpoint certificate.
+crates/amun-chain-checkpoint/src/lib.rs:158:    /// The certificate is keyed by its end_height.
+crates/amun-chain-checkpoint/src/lib.rs:210:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-chain-checkpoint/src/lib.rs:212:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-chain-checkpoint/src/lib.rs:213:        let hash = cert.certificate_hash();
+crates/amun-chain-checkpoint/src/lib.rs:214:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-chain-checkpoint/src/bootstrap.rs:45:    use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-chain-checkpoint/src/bootstrap.rs:52:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-chain-checkpoint/src/bootstrap.rs:54:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-chain-checkpoint/src/bootstrap.rs:55:        let hash = cert.certificate_hash();
+crates/amun-chain-checkpoint/src/bootstrap.rs:56:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-chain-checkpoint/src/inclusion.rs:104:    use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-chain-checkpoint/src/inclusion.rs:111:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-chain-checkpoint/src/inclusion.rs:113:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-chain-checkpoint/src/inclusion.rs:114:        let hash = cert.certificate_hash();
+crates/amun-chain-checkpoint/src/inclusion.rs:115:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-chain-checkpoint/src/chain.rs:50:    use amun_certificate_network::distribution::LightClientProofBundle;
+crates/amun-chain-checkpoint/src/chain.rs:57:        let cert = rt.create_certificate(height, [0u8; 32]);
+crates/amun-chain-checkpoint/src/chain.rs:59:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-chain-checkpoint/src/chain.rs:60:        let hash = cert.certificate_hash();
+crates/amun-chain-checkpoint/src/chain.rs:61:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:12:/// can be referenced immutably in certificates and publication packages.
+crates/amun-constitutional-proof/src/article_iii_certificate.rs:13:    pub certificate_id: String,
+crates/amun-constitutional-proof/src/article_iii_certificate.rs:31:            certificate_id: "N47.3-CERT-001".into(),
+crates/amun-constitutional-proof/src/evidence_type.rs:12:    #[serde(rename = "certificate")]
+crates/amun-constitutional-proof/src/lib.rs:1:mod article_i_certificate;
+crates/amun-constitutional-proof/src/lib.rs:2:mod article_iii_certificate;
+crates/amun-constitutional-proof/src/lib.rs:28:pub use article_i_certificate::*;
+crates/amun-constitutional-proof/src/lib.rs:29:pub use article_iii_certificate::*;
+crates/amun-constitutional-proof/src/lib.rs:1603:        assert_eq!(cert.certificate_id, "N47-CERT-001");
+crates/amun-constitutional-proof/src/article_i_certificate.rs:14:    pub certificate_id: String,
+crates/amun-constitutional-proof/src/article_i_certificate.rs:29:    /// Try to issue an Article I certificate by inspecting the registry.
+crates/amun-constitutional-proof/src/article_i_certificate.rs:83:            certificate_id: "N47.1-CERT-001".into(),
+crates/amun-constitutional-proof/src/certification.rs:22:    pub certificate_id: String,
+crates/amun-constitutional-proof/src/certification.rs:73:            certificate_id: "N47-CERT-001".into(),
+crates/amun-consensus/src/types.rs:3:/// 256-bit hash – used for block hashes, certificate IDs, etc.
+crates/amun-consensus-execution/Cargo.toml:8:amun-quorum-certificate = { path = "../amun-quorum-certificate" }
+crates/amun-consensus-execution/src/qc_store.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/voter.rs:2:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/block_dag.rs:2:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/proposal.rs:3:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/commit.rs:1:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/persistent_state.rs:5:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-consensus-execution/src/fork_choice.rs:2:use amun_quorum_certificate::QuorumCertificate;
+crates/amun-replay-cert/src/verifier.rs:1:use crate::certificate::ReplayCertificate;
+crates/amun-replay-cert/src/verifier.rs:3:/// Verify a replay certificate. Returns Ok if the certificate
+crates/amun-replay-cert/src/verifier.rs:5:pub fn verify_certificate(cert: &ReplayCertificate) -> Result<(), &'static str> {
+crates/amun-replay-cert/src/verifier.rs:7:        return Err("certificate hash mismatch");
+crates/amun-replay-cert/src/certificate.rs:15:    pub certificate_hash: [u8; 32],
+crates/amun-replay-cert/src/certificate.rs:42:        let mut certificate_hash = [0u8; 32];
+crates/amun-replay-cert/src/certificate.rs:43:        certificate_hash.copy_from_slice(&h.finalize().as_bytes()[..32]);
+crates/amun-replay-cert/src/certificate.rs:54:            certificate_hash,
+crates/amun-replay-cert/src/certificate.rs:73:        computed == self.certificate_hash
+crates/amun-authority-registry/src/governance.rs:18:    /// Retire an authority so it can no longer issue certificates.
+crates/amun-authority-registry/src/registry.rs:2:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:67:    /// Retire an authority so it can no longer issue new certificates.
+crates/amun-authority-registry/src/registry.rs:112:    /// Check if an authority can issue new certificates at a given height.
+crates/amun-authority-registry/src/registry.rs:113:    /// Verify a certificate against the authority registry at a given block height.
+crates/amun-authority-registry/src/registry.rs:116:    pub fn verify_certificate_at(&self, cert: &ValidatorCertificate, height: u64) -> bool {
+crates/amun-authority-registry/src/registry.rs:300:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:332:            reg.verify_certificate_at(&cert, 550),
+crates/amun-authority-registry/src/registry.rs:341:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:372:            !reg.verify_certificate_at(&cert, 650),
+crates/amun-authority-registry/src/registry.rs:381:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:411:            reg.verify_certificate_at(&cert, 650),
+crates/amun-authority-registry/src/registry.rs:420:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:440:            !reg.verify_certificate_at(&cert, 600),
+crates/amun-authority-registry/src/registry.rs:498:    fn n107_6_historical_certificates_survive() {

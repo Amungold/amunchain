@@ -6,12 +6,12 @@ use std::time::Duration;
 #[test]
 fn n102_3_catchup_after_50_block_gap() {
     let ports = [9704, 9705, 9706, 9707];
-    
+
     // Clean up first
     for i in 0..4 {
         let _ = std::fs::remove_dir_all(format!("/tmp/amun-test-validator-{}", i));
     }
-    
+
     // Start 4 validators
     let mut validators: Vec<LiveValidator> = (0..4)
         .map(|i| {
@@ -20,16 +20,17 @@ fn n102_3_catchup_after_50_block_gap() {
             LiveValidator::new(config)
         })
         .collect();
-    
+
     for v in &validators {
         v.start().unwrap();
     }
-    
+
     println!("=== Waiting for chain to reach height 100+ ... ===");
     // Wait until all validators reach height 100+
     for _ in 0..120 {
         thread::sleep(Duration::from_secs(1));
-        let heights: Vec<u64> = validators.iter()
+        let heights: Vec<u64> = validators
+            .iter()
             .map(|v| v.store.lock().unwrap().latest_height())
             .collect();
         println!("Heights: {:?}", heights);
@@ -37,41 +38,52 @@ fn n102_3_catchup_after_50_block_gap() {
             break;
         }
     }
-    
-    let initial_heights: Vec<u64> = validators.iter()
+
+    let initial_heights: Vec<u64> = validators
+        .iter()
         .map(|v| v.store.lock().unwrap().latest_height())
         .collect();
     println!("Initial heights: {:?}", initial_heights);
-    
+
     // Stop validator 3
     println!("=== Stopping validator 3 ===");
     let v3_height_before = validators[3].store.lock().unwrap().latest_height();
     validators[3].stop();
     println!("Validator 3 stopped at height {}", v3_height_before);
-    
+
     // Let others advance 50+ blocks - wait longer
     println!("=== Waiting for others to advance 50+ blocks... ===");
     for i in 0..300 {
         thread::sleep(Duration::from_secs(1));
-        let max_h = validators[0..3].iter()
+        let max_h = validators[0..3]
+            .iter()
             .map(|v| v.store.lock().unwrap().latest_height())
             .max()
             .unwrap_or(0);
         if i % 10 == 0 {
-            println!("Max height of active validators: {} (target: {})", max_h, v3_height_before + 50);
+            println!(
+                "Max height of active validators: {} (target: {})",
+                max_h,
+                v3_height_before + 50
+            );
         }
         if max_h >= v3_height_before + 50 {
-            println!("Target reached! max_h={} >= {}", max_h, v3_height_before + 50);
+            println!(
+                "Target reached! max_h={} >= {}",
+                max_h,
+                v3_height_before + 50
+            );
             break;
         }
     }
-    
-    let max_height = validators[0..3].iter()
+
+    let max_height = validators[0..3]
+        .iter()
         .map(|v| v.store.lock().unwrap().latest_height())
         .max()
         .unwrap_or(0);
     println!("Max height reached: {}", max_height);
-    
+
     // Restart validator 3
     println!("=== Restarting validator 3 ===");
     let mut config = ValidatorConfig::test_cluster(3, &ports).with_quorum(3);
@@ -79,32 +91,38 @@ fn n102_3_catchup_after_50_block_gap() {
     let v3_new = LiveValidator::new(config);
     v3_new.start().unwrap();
     validators[3] = v3_new;
-    
+
     // Wait for catchup
     println!("=== Waiting for catchup... ===");
     let mut caught_up = false;
     for i in 0..60 {
         thread::sleep(Duration::from_secs(2));
         let h = validators[3].store.lock().unwrap().latest_height();
-        let max_h = validators[0..3].iter()
+        let max_h = validators[0..3]
+            .iter()
             .map(|v| v.store.lock().unwrap().latest_height())
             .max()
             .unwrap_or(0);
         let spread = max_h - h;
-        println!("Validator 3 height: {}, max: {}, spread: {}", h, max_h, spread);
+        println!(
+            "Validator 3 height: {}, max: {}, spread: {}",
+            h, max_h, spread
+        );
         if spread <= 2 {
             caught_up = true;
-            println!("Catchup successful after {} seconds", (i+1)*2);
+            println!("Catchup successful after {} seconds", (i + 1) * 2);
             break;
         }
     }
-    
+
     // Final assertions
     let final_h = validators[3].store.lock().unwrap().latest_height();
-    let all_heights: Vec<u64> = validators.iter()
+    let all_heights: Vec<u64> = validators
+        .iter()
         .map(|v| v.store.lock().unwrap().latest_height())
         .collect();
-    let max_h = validators[0..3].iter()
+    let max_h = validators[0..3]
+        .iter()
         .map(|v| v.store.lock().unwrap().latest_height())
         .max()
         .unwrap_or(0);
@@ -116,9 +134,22 @@ fn n102_3_catchup_after_50_block_gap() {
     println!("============================================");
     println!("  Final heights: {:?}", all_heights);
     println!("  Spread:        {}", final_spread);
-    println!("  Catch-up:      {}", if caught_up { "PASS" } else { "FAIL" });
-    println!("  Consensus:     {}", if consensus_pass { "PASS" } else { "FAIL" });
-    println!("  Verdict:       {}", if caught_up && consensus_pass { "PASS" } else { "FAIL" });
+    println!(
+        "  Catch-up:      {}",
+        if caught_up { "PASS" } else { "FAIL" }
+    );
+    println!(
+        "  Consensus:     {}",
+        if consensus_pass { "PASS" } else { "FAIL" }
+    );
+    println!(
+        "  Verdict:       {}",
+        if caught_up && consensus_pass {
+            "PASS"
+        } else {
+            "FAIL"
+        }
+    );
     println!("============================================\n");
 
     // Clean up

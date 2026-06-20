@@ -1,0 +1,1128 @@
+crates/amun-constitutional-integration/src/lib.rs:121:            "forall s : state_root(Recover(s)) = state_root(Original(s))",
+crates/amun-constitutional-integration/src/lib.rs:163:                "forall b in Finalized : state_root(Replay(b)) = state_root(b)",
+crates/amun-transcript-semantics/src/lib.rs:37:#[derive(Debug, Clone, PartialEq, Eq)] pub struct ExecutionEvent { pub identity: EventIdentity, pub block_hash: [u8; 32], pub pre_state_root: [u8; 32], pub post_state_root: [u8; 32], pub receipt_hash: [u8; 32], pub authority: EventAuthority }
+crates/amun-transcript-semantics/src/lib.rs:61:struct CertifiedEnvelope { domain: ReplayDomain, epoch_id: [u8; 32], transcript_root: [u8; 32], state_root: [u8; 32], receipt_root: [u8; 32], ordering_root: [u8; 32], event_count: u64, replay_version: u32, certificate_hash: [u8; 32] }
+crates/amun-transcript-semantics/src/lib.rs:64:    pub fn new(domain: ReplayDomain, epoch_id: [u8; 32], transcript_root: [u8; 32], state_root: [u8; 32], receipt_root: [u8; 32], ordering_root: [u8; 32], event_count: u64, replay_version: u32) -> Self {
+crates/amun-transcript-semantics/src/lib.rs:65:        let mut env = CertifiedEnvelope { domain, epoch_id, transcript_root, state_root, receipt_root, ordering_root, event_count, replay_version, certificate_hash: [0; 32] };
+crates/amun-transcript-semantics/src/lib.rs:68:    fn compute(env: &CertifiedEnvelope) -> [u8; 32] { let mut h = Sha256::new(); h.update(b"AMUN|IMMUTABLE_CERT|V1"); h.update((env.domain as u8).to_le_bytes()); h.update(env.epoch_id); h.update(env.transcript_root); h.update(env.state_root); h.update(env.receipt_root); h.update(env.ordering_root); h.update(env.event_count.to_le_bytes()); h.update(env.replay_version.to_le_bytes()); h.finalize().into() }
+crates/amun-transcript-semantics/src/lib.rs:70:    pub fn state_root(&self) -> [u8; 32] { self.inner.state_root }
+crates/amun-transcript-semantics/src/lib.rs:73:    pub fn prove_equivalence(a: &Self, b: &Self) -> bool { a.inner.transcript_root == b.inner.transcript_root && a.inner.state_root == b.inner.state_root && a.inner.receipt_root == b.inner.receipt_root && a.inner.ordering_root == b.inner.ordering_root && a.inner.domain == b.inner.domain }
+crates/amun-cross-contract/src/transfer_proof.rs:20:    pub source_state_root: [u8; 32],
+crates/amun-cross-contract/src/transfer_proof.rs:32:        source_state_root: [u8; 32],
+crates/amun-cross-contract/src/transfer_proof.rs:41:        hasher.update(&source_state_root);
+crates/amun-cross-contract/src/transfer_proof.rs:53:            source_state_root,
+crates/amun-cross-contract/src/transfer_proof.rs:66:        hasher.update(&self.source_state_root);
+crates/amun-smt/src/proof.rs:121:    /// Verify the proof against `state_root`.
+crates/amun-smt/src/proof.rs:122:    /// `state_root` is `H(AMUN_ROOT_V1 || internal_root_hash)`.
+crates/amun-smt/src/proof.rs:123:    pub fn verify(&self, state_root: &Hash) -> Result<bool, SmtError> {
+crates/amun-smt/src/proof.rs:154:                    return Ok(crate::hash::hash_root(&EMPTY_NODE_HASH) == *state_root);
+crates/amun-smt/src/proof.rs:246:                    return Ok(crate::hash::hash_root(&current) == *state_root);
+crates/amun-smt/src/proof.rs:311:                Ok(crate::hash::hash_root(&EMPTY_NODE_HASH) == *state_root
+crates/amun-smt/src/proof.rs:314:            _ if self.is_inclusion => Ok(crate::hash::hash_root(&current) == *state_root),
+crates/amun-smt/src/proof.rs:315:            _ => Ok(crate::hash::hash_root(&current) == *state_root),
+crates/amun-smt/src/tree.rs.backup:7://! MUST have identical `internal_root` and `state_root`, regardless of
+crates/amun-smt/src/tree.rs:7://! MUST have identical `internal_root` and `state_root`, regardless of
+crates/amun-light-client/tests/light_client_tests.rs:19:    state_root: [u8; 32],
+crates/amun-light-client/tests/light_client_tests.rs:30:        state_root,
+crates/amun-light-client/tests/light_client_tests.rs:38:        state_root,
+crates/amun-light-client/tests/light_client_tests.rs:68:        state_root: cert1.state_root,
+crates/amun-light-client/tests/light_client_tests.rs:94:        state_root: cert1.state_root,
+crates/amun-light-client/src/constitutional_client.rs:13:    pub state_root: [u8; 32],
+crates/amun-light-client/src/constitutional_client.rs:74:            state_root: tip.state_root,
+crates/amun-light-client/src/constitutional_client.rs:91:            && checkpoint.state_root != [0u8; 32]
+crates/amun-light-client/src/constitutional_client.rs:119:        state_root: [u8; 32],
+crates/amun-light-client/src/constitutional_client.rs:130:            state_root,
+crates/amun-light-client/src/constitutional_client.rs:138:            state_root,
+crates/amun-light-client/src/constitutional_client.rs:167:            state_root: cert.state_root,
+crates/amun-light-client/src/constitutional_client.rs:200:            state_root: cert1.state_root,
+crates/amun-light-client/src/constitutional_client.rs:221:            state_root: cert1.state_root,
+crates/amun-proof-carrying/tests/proof_tests.rs:36:        block.state_root.clone(),
+crates/amun-proof-carrying/src/verifier.rs:16:        let state_root_bytes = hex::decode(&receipt.state_root)
+crates/amun-proof-carrying/src/verifier.rs:18:        let state_root: [u8; 32] = state_root_bytes
+crates/amun-proof-carrying/src/verifier.rs:23:        if !state_tree.verify(&state_root, &receipt.state_proof) {
+crates/amun-proof-carrying/src/receipt.rs:23:    pub state_root: String,
+crates/amun-proof-carrying/src/receipt.rs:37:        state_root: String,
+crates/amun-proof-carrying/src/receipt.rs:47:            state_root,
+crates/amun-lineage-law/src/migration.rs:9:    pub parent_state_root: [u8; 32],
+crates/amun-lineage-law/src/migration.rs:11:    pub child_state_root: [u8; 32],
+crates/amun-lineage-law/src/migration.rs:31:            parent_state_root: parent_root,
+crates/amun-lineage-law/src/migration.rs:32:            child_state_root: child_root,
+crates/amun-lineage-law/src/migration.rs:45:        h.update(self.parent_state_root);
+crates/amun-lineage-law/src/migration.rs:46:        h.update(self.child_state_root);
+crates/amun-evidence-finality/src/evidence_finality.rs:17:    pub state_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:41:        state_root: &[u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:50:        hasher.update(state_root);
+crates/amun-evidence-finality/src/evidence_finality.rs:66:    pub state_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:86:    pub state_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:99:            state_root: block.state_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:115:        hasher.update(&self.state_root);
+crates/amun-evidence-finality/src/evidence_finality.rs:133:            &self.state_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:202:        let state_root = registry.compute_state_root();
+crates/amun-evidence-finality/src/evidence_finality.rs:209:            &state_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:218:            state_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:238:            state_root: block.state_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:294:            pre_state_root: registry.compute_state_root(),
+crates/amun-evidence-finality/src/evidence_finality.rs:321:            pre_state_root: registry.compute_state_root(),
+crates/amun-evidence-finality/src/evidence_finality.rs:335:        assert_eq!(sr, &cert.state_root);
+crates/amun-evidence-finality/src/evidence_finality.rs:352:            pre_state_root: registry.compute_state_root(),
+crates/amun-audit/tests/audit_layer03_snapshot.rs:15:            state_root: [0u8; 32],
+crates/amun-audit/tests/audit_layer03_snapshot.rs:36:            [0x02u8; 32], // state_root
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:7:    // CONST-MESH-001: Conflicting manifests (different state_root) are detected
+crates/amun-vm-kernel/src/vm_kernel.rs:9:        post_state_root: [u8; 32],
+crates/amun-vm-kernel/src/vm_kernel.rs:130:        let post_state_root = registry.compute_state_root();
+crates/amun-vm-kernel/src/vm_kernel.rs:133:            post_state_root,
+crates/amun-vm-kernel/src/execution_context.rs:11:    pub pre_state_root: [u8; 32],
+crates/amun-pccv/tests/replay_equivalence.rs:33:    let pre_root1 = reg1.compute_state_root();
+crates/amun-pccv/tests/replay_equivalence.rs:34:    let pre_root2 = reg2.compute_state_root();
+crates/amun-pccv/tests/replay_equivalence.rs:97:    assert_eq!(proof1.pre_state_root, proof2.pre_state_root);
+crates/amun-pccv/tests/replay_equivalence.rs:98:    assert_eq!(proof1.post_state_root, proof2.post_state_root);
+crates/amun-pccv/tests/replay_equivalence.rs:118:    let pre_root = reg.compute_state_root();
+crates/amun-pccv/src/pccv_verifier.rs:9:        post_state_root: [u8; 32],
+crates/amun-pccv/src/pccv_verifier.rs:28:            if merkle_proof.state_root != proof.pre_state_root {
+crates/amun-pccv/src/pccv_verifier.rs:143:            post_state_root: proof.post_state_root,
+crates/amun-pccv/src/pccv_verifier.rs:155:        hasher.update(&proof.pre_state_root);
+crates/amun-pccv/src/pccv_verifier.rs:156:        hasher.update(&proof.post_state_root);
+crates/amun-pccv/src/lib.rs:33:            pre_state_root: [0x01; 32],
+crates/amun-pccv/src/lib.rs:34:            post_state_root: [0x02; 32],
+crates/amun-pccv/src/lib.rs:72:            pre_state_root: reg.compute_state_root(),
+crates/amun-pccv/src/lib.rs:73:            post_state_root: reg.compute_state_root(),
+crates/amun-pccv/src/lib.rs:127:            pre_state_root: reg.compute_state_root(),
+crates/amun-pccv/src/lib.rs:128:            post_state_root: reg.compute_state_root(),
+crates/amun-pccv/src/lib.rs:179:            pre_state_root: reg.compute_state_root(),
+crates/amun-pccv/src/lib.rs:180:            post_state_root: reg.compute_state_root(),
+crates/amun-pccv/src/lib.rs:233:            pre_state_root: reg.compute_state_root(),
+crates/amun-pccv/src/lib.rs:234:            post_state_root: reg.compute_state_root(),
+crates/amun-pccv/src/witness_builder.rs:17:                let state_root = registry.compute_state_root();
+crates/amun-pccv/src/witness_builder.rs:18:                let merkle_proof = Self::build_merkle_proof(registry, resource_id, state_root);
+crates/amun-pccv/src/witness_builder.rs:36:        state_root: [u8; 32],
+crates/amun-pccv/src/witness_builder.rs:41:            state_root,
+crates/amun-pccv/src/transition_proof_engine.rs:19:        pre_state_root: [u8; 32],
+crates/amun-pccv/src/transition_proof_engine.rs:20:        post_state_root: [u8; 32],
+crates/amun-pccv/src/transition_proof_engine.rs:57:            pre_state_root,
+crates/amun-pccv/src/transition_proof_engine.rs:58:            post_state_root,
+crates/amun-pccv/src/transition_proof_engine.rs:79:        pre_state_root: [u8; 32],
+crates/amun-pccv/src/transition_proof_engine.rs:80:        post_state_root: [u8; 32],
+crates/amun-pccv/src/transition_proof_engine.rs:90:            pre_state_root,
+crates/amun-pccv/src/transition_proof_engine.rs:91:            post_state_root,
+crates/amun-pccv/src/transition_proof_engine.rs:132:        let pre_root = reg.compute_state_root();
+crates/amun-pccv/src/transition_proof_engine.rs:183:        let pre_root = reg.compute_state_root();
+crates/amun-pccv/src/transition_proof_engine.rs:223:            pre_state_root: pre_root,
+crates/amun-pccv/src/transition_proof_engine.rs:224:            post_state_root: pre_root,
+crates/amun-pccv/src/transition_proof_engine.rs:251:        let pre_root = reg.compute_state_root();
+crates/amun-snapshot-constitution/src/snapshot.rs:52:    pub state_root: [u8; 32],
+crates/amun-snapshot-constitution/src/snapshot.rs:62:        state_root: [u8; 32],
+crates/amun-snapshot-constitution/src/snapshot.rs:90:        h.update(&state_root);
+crates/amun-snapshot-constitution/src/snapshot.rs:104:            state_root,
+crates/amun-snapshot-constitution/src/snapshot.rs:125:        h.update(&self.state_root);
+crates/amun-snapshot-constitution/src/import.rs:25:    if recomputed_root != snapshot.state_root {
+crates/amun-snapshot-constitution/src/import.rs:30:    sm.current_root = snapshot.state_root;
+crates/amun-evidence-engine/src/evidence_types.rs:29:        state_root: [u8; 32],
+crates/amun-evidence-engine/src/evidence_engine.rs:39:                    state_root: [0u8; 32],
+crates/amun-evidence-engine/src/evidence_engine.rs:158:            state_root: [0u8; 32],
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:28:    state_root: [u8; 32],
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:43:    state_root: [u8; 32],
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:50:// Helper: compute execution_root = blake3(validator_id || height || block_hash || state_root)
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:56:    state_root: &[u8; 32],
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:63:    hasher.update(state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:72:    state_root: [u8; 32],
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:74:    let execution_root = compute_execution_root(&validator_id, height, &block_hash, &state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:79:        state_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:90:    state_root: [u8; 32],
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:96:        state_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:99:        commitment: make_commitment(voter_id, height, block_hash, state_root),
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:116:    assert_eq!(decoded.state_root, commit.state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:133:    assert_eq!(c1.state_root, c2.state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:142:    let c2 = make_commitment([1u8; 32], 5, [0xAA; 32], [0xCC; 32]); // Different state_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:146:        "N109.8 FAIL: different state_root must produce different execution_root"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:148:    assert_ne!(c1.state_root, c2.state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:158:    // Tamper: change state_root but keep old execution_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:159:    commit.state_root = [0xFF; 32];
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:166:        &commit.state_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:170:        "N109.8 FAIL: tampered state_root must not match original execution_root"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:182:    // The execution_root is a deterministic function of (pk, height, block_hash, state_root)
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:185:        compute_execution_root(&pk, commit.height, &commit.block_hash, &commit.state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:220://   Vote(block=A, state_root=X)
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:221://   Commitment(block=B, state_root=Y)
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:228:    let state_root = [0xCD; 32];
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:230:    let vote = make_vote(voter, height, block_hash, state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:245:    // GATEKEEPER CHECK 3: vote.state_root == commitment.state_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:247:        vote.state_root, vote.commitment.state_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:248:        "N109.8 GATEKEEPER FAIL: vote.state_root != commitment.state_root"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:258:    let recomputed = compute_execution_root(&voter, height, &block_hash, &state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:280:        || vote.state_root != vote.commitment.state_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:308:    assert_eq!(decoded.state_root, vote.state_root);
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:4:// Validator A (proposer): state_root = X
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:8:// Constitutional requirement: state_root mismatch → no vote → no QC formed.
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:21:    state_root: [u8; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:30:    state_root: [u8; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:41:    state_root_mismatches: u64,
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:61:    if computed_root != proposal.state_root {
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:65:            hex::encode(proposal.state_root),
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:71:        state_root: computed_root,
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:93:fn n109_7_re_execution_accepts_matching_state_root() {
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:103:        state_root: honest_root, // Proposer computed correctly
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:114:    assert_eq!(receipt.state_root, honest_root);
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:122:fn n109_7_re_execution_rejects_mismatched_state_root() {
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:132:        state_root: proposer_root,
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:164:        state_root: honest_root,
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:191:                    metrics.state_root_mismatches += 1;
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:204:        metrics.state_root_mismatches, 1,
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:233:fn n109_7b_metrics_counts_state_root_mismatches() {
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:243:        state_root: [0xAA; 32], // Wrong root
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:251:    metrics.state_root_mismatches += 1;
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:253:    assert_eq!(metrics.state_root_mismatches, 1);
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:273:        state_root: [0u8; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:306:        state_root: simulate_executor(&block_bytes, 1).unwrap(),
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:338:// TEST: Determinism — same input → same state_root every time
+crates/amun-consensus-network/tests/n109_block_propagation.rs:25:    state_root: [u8; 32],
+crates/amun-consensus-network/tests/n109_block_propagation.rs:34:    state_root: [u8; 32],
+crates/amun-consensus-network/tests/n109_block_propagation.rs:61:    let state_root: [u8; 32] = state_hasher.finalize().into();
+crates/amun-consensus-network/tests/n109_block_propagation.rs:68:        state_root,
+crates/amun-consensus-network/tests/n109_block_propagation.rs:119:    assert_eq!(decoded.state_root, proposal.state_root, "state_root");
+crates/amun-consensus-network/tests/n109_block_propagation.rs:145:        state_root: [3u8; 32],
+crates/amun-consensus-network/tests/n109_block_propagation.rs:158:            assert_eq!(v.state_root, vote.state_root, "state_root");
+crates/amun-consensus-network/tests/n109_block_propagation.rs:178:            assert_eq!(p.state_root, proposal.state_root, "state_root");
+crates/amun-consensus-network/tests/n109_block_propagation.rs:325:        state_root: [4u8; 32],
+crates/amun-consensus-network/src/messages.rs:12:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs:74:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs:103:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs:119:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs:226:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs:245:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs:263:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs:292:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs:398:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs:430:/// Every vote is now a signed statement: "I executed block X and got state_root Y".
+crates/amun-consensus-network/src/messages.rs:446:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs:455:    /// Binds validator_id, height, block_hash, and state_root
+crates/amun-consensus-network/src/misbehavior_registry.rs:26:    pub state_root_mismatch_weight: u64,
+crates/amun-consensus-network/src/misbehavior_registry.rs:40:            state_root_mismatch_weight: 3,
+crates/amun-consensus-network/src/misbehavior_registry.rs:164:            EvidenceType::StateRootMismatch => self.thresholds.state_root_mismatch_weight,
+crates/amun-consensus-network/src/slashing_state.rs:5:// This root is committed alongside state_root and history_root.
+crates/amun-consensus-network/src/re_executor.rs:17:    if computed_root != proposal.state_root {
+crates/amun-consensus-network/src/re_executor.rs:21:            hex::encode(proposal.state_root),
+crates/amun-consensus-network/src/re_executor.rs:27:        state_root: computed_root,
+crates/amun-consensus-network/src/metrics.rs:2:// state_root_mismatches increments when a validator's re-execution
+crates/amun-consensus-network/src/metrics.rs:11:    pub state_root_mismatches: u64,
+crates/amun-consensus-network/src/metrics.rs:30:            self.state_root_mismatches,
+crates/amun-consensus-network/src/messages.rs.bak:12:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs.bak:70:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs.bak:99:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs.bak:115:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs.bak:221:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs.bak:240:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs.bak:258:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs.bak:287:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs.bak:379:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs.bak:409:/// Every vote is now a signed statement: "I executed block X and got state_root Y".
+crates/amun-consensus-network/src/messages.rs.bak:425:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/messages.rs.bak:434:    /// Binds validator_id, height, block_hash, and state_root
+crates/amun-consensus-network/src/execution_commitment.rs:8://   RESULT:        state_root
+crates/amun-consensus-network/src/execution_commitment.rs:10:// execution_root = blake3(validator_id || height || block_hash || state_root)
+crates/amun-consensus-network/src/execution_commitment.rs:44:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/execution_commitment.rs:46:    /// blake3(validator_id || height.to_le_bytes() || block_hash || state_root)
+crates/amun-consensus-network/src/execution_commitment.rs:64:        state_root: &[u8; 32],
+crates/amun-consensus-network/src/execution_commitment.rs:71:        hasher.update(state_root);
+crates/amun-consensus-network/src/execution_commitment.rs:81:        state_root: [u8; 32],
+crates/amun-consensus-network/src/execution_commitment.rs:84:            Self::compute_execution_root(&validator_id, height, &block_hash, &state_root);
+crates/amun-consensus-network/src/execution_commitment.rs:89:            state_root,
+crates/amun-consensus-network/src/execution_commitment.rs:113:            &self.state_root,
+crates/amun-consensus-network/src/execution_commitment.rs:188:    fn n109_8_tampered_state_root_rejected() {
+crates/amun-consensus-network/src/execution_commitment.rs:196:        // Tamper: change state_root without re-signing
+crates/amun-consensus-network/src/execution_commitment.rs:197:        commit.state_root = [0xFF; 32];
+crates/amun-consensus-network/src/execution_commitment.rs:201:            "tampered state_root must fail verification"
+crates/amun-consensus-network/src/misbehavior.rs:136:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/execution_receipt.rs:3:// state_root is the SMT root after applying all transactions in the block.
+crates/amun-consensus-network/src/execution_receipt.rs:6:    pub state_root: [u8; 32],
+crates/amun-consensus-network/src/evidence_store.rs:93:    pub fn state_root_mismatch(
+crates/amun-consensus-network/src/engine.rs:16:    pub proposed_state_root: Option<[u8; 32]>,
+crates/amun-consensus-network/src/engine.rs:30:            proposed_state_root: None,
+crates/amun-consensus-network/src/engine.rs:40:    pub fn propose(&mut self, block_hash: [u8; 32], state_root: [u8; 32]) {
+crates/amun-consensus-network/src/engine.rs:42:        self.proposed_state_root = Some(state_root);
+crates/amun-consensus-network/src/engine.rs:49:            self.proposed_state_root = Some(vote.state_root);
+crates/amun-consensus-network/src/engine.rs:135:            state_root: self.proposed_state_root?,
+crates/amun-consensus-network/src/engine.rs:159:            state_root: qc.state_root,
+crates/amun-consensus-network/src/engine.rs:307:                &vote.state_root,
+crates/amun-consensus-network/src/engine.rs:522:                state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs:552:                    state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs:578:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs:600:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs:628:                        state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs:676:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs:689:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:15:    pub proposed_state_root: Option<[u8; 32]>,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:29:            proposed_state_root: None,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:39:    pub fn propose(&mut self, block_hash: [u8; 32], state_root: [u8; 32]) {
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:41:        self.proposed_state_root = Some(state_root);
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:48:            self.proposed_state_root = Some(vote.state_root);
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:92:            state_root: self.proposed_state_root?,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:112:            state_root: qc.state_root,
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:404:                state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:433:                    state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:455:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:476:            state_root: [0xBB; 32],
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:503:                        state_root: [0xBB; 32],
+crates/amun-consensus-network/src/network_consensus.rs:40:        state_root: [u8; 32],
+crates/amun-consensus-network/src/network_consensus.rs:57:                .propose(block_hash, state_root);
+crates/amun-consensus-network/src/network_consensus.rs:66:            state_root,
+crates/amun-consensus-network/src/network_consensus.rs:142:                state_root: [0xBB; 32],
+crates/amun-consensus-network/src/vote_binding.rs:51:        &c.state_root,
+crates/amun-consensus-network/src/vote_binding.rs:86:        state_root: [u8; 32],
+crates/amun-consensus-network/src/vote_binding.rs:88:        let mut commit = ExecutionCommitment::new(pk, height, block_hash, state_root);
+crates/amun-consensus-network/src/vote_binding.rs:98:        state_root: [u8; 32],
+crates/amun-consensus-network/src/vote_binding.rs:104:            state_root,
+crates/amun-consensus-network/src/vote_binding.rs:109:                sk, pk, height, block_hash, state_root,
+crates/amun-consensus-network/src/vote_binding.rs:119:            state_root: [0xBB; 32],
+crates/amun-validator-attestation/src/attestation.rs:9:    pub state_root: [u8; 32],
+crates/amun-validator-attestation/src/attestation.rs:19:        state_root: [u8; 32],
+crates/amun-validator-attestation/src/attestation.rs:27:        h.update(&state_root);
+crates/amun-validator-attestation/src/attestation.rs:32:        Self { validator_id, public_key, position, state_root, signature, attestation_hash }
+crates/amun-validator-attestation/src/attestation.rs:41:        h.update(&self.state_root);
+crates/amun-evolution/src/transition.rs:13:    pub state_root: [u8; 32],
+crates/amun-evolution/src/transition.rs:23:        state_root: [u8; 32],
+crates/amun-evolution/src/transition.rs:31:            state_root,
+crates/amun-evolution/src/transition.rs:44:        h.update(&self.state_root);
+crates/amun-experimental-framework/src/main.rs:190:            pre_state_root: reg.compute_state_root(),
+crates/amun-experimental-framework/src/main.rs:249:            pre_state_root: reg.compute_state_root(),
+crates/amun-experimental-framework/src/main.rs:353:                    pre_state_root: reg.compute_state_root(),
+crates/amun-experimental-framework/src/main.rs:445:                pre_state_root: reg.compute_state_root(),
+crates/amun-experimental-framework/src/main.rs:491:            let _root = reg.compute_state_root();
+crates/amun-execution-receipt/src/lib.rs:42:    pub pre_state_root: [u8; 32],
+crates/amun-execution-receipt/src/lib.rs:43:    pub post_state_root: [u8; 32],
+crates/amun-execution-receipt/src/lib.rs:54:        out.extend_from_slice(&self.pre_state_root);
+crates/amun-execution-receipt/src/lib.rs:55:        out.extend_from_slice(&self.post_state_root);
+crates/amun-execution-receipt/src/lib.rs:67:        pre_state_root: [u8; 32],
+crates/amun-execution-receipt/src/lib.rs:68:        post_state_root: [u8; 32],
+crates/amun-execution-receipt/src/lib.rs:76:            pre_state_root,
+crates/amun-execution-receipt/src/lib.rs:77:            post_state_root,
+crates/amun-execution-receipt/src/lib.rs:94:        if self.pre_state_root == self.post_state_root && self.state_changed {
+crates/amun-execution-receipt/src/lib.rs:97:        if self.pre_state_root != self.post_state_root && !self.state_changed {
+crates/amun-execution-receipt/src/lib.rs:149:            if &first.pre_state_root != declared_pre_root {
+crates/amun-execution-receipt/src/lib.rs:174:            if w[0].post_state_root != w[1].pre_state_root {
+crates/amun-persistent-node/src/persistent_store.rs:121:    pub fn state_root(&self) -> [u8; 32] {
+crates/amun-persistent-node/src/persistent_store.rs:122:        self.registry.compute_state_root()
+crates/amun-persistent-node/src/persistent_store.rs:164:        let root_before = store.state_root();
+crates/amun-persistent-node/src/persistent_store.rs:171:        assert_eq!(restored.state_root(), root_before);
+crates/amun-persistent-node/src/persistent_store.rs:192:        let state_root = store.state_root();
+crates/amun-persistent-node/src/persistent_store.rs:199:        assert_eq!(recovered.state_root(), state_root);
+crates/amun-replay-semantics/src/lib.rs:19:pub struct ReplayBoundary { pub finalized_sequence: u64, pub boundary_chain_hash: [u8; 32], pub boundary_state_root: [u8; 32], pub epoch: ReplayEpoch, pub replay_version: u32 }
+crates/amun-replay-semantics/src/lib.rs:20:impl ReplayBoundary { pub fn genesis(genesis_hash: [u8; 32]) -> Self { Self { finalized_sequence: 0, boundary_chain_hash: genesis_hash, boundary_state_root: genesis_hash, epoch: ReplayEpoch::new(genesis_hash, 0, 1), replay_version: 1 } } }
+crates/amun-replay-semantics/src/lib.rs:25:    pub transcript_root: [u8; 32], pub state_root: [u8; 32],
+crates/amun-replay-semantics/src/lib.rs:32:    pub fn new(domain: ReplayDomain, epoch: ReplayEpoch, transcript_root: [u8; 32], state_root: [u8; 32], receipt_root: [u8; 32], ordering_root: [u8; 32], boundary: ReplayBoundary, event_count: u64, replay_version: u32) -> Self {
+crates/amun-replay-semantics/src/lib.rs:33:        let mut cert = Self { domain, epoch, transcript_root, state_root, receipt_root, ordering_root, boundary, event_count, replay_version, certificate_hash: [0; 32] };
+crates/amun-replay-semantics/src/lib.rs:38:        h.update(self.transcript_root); h.update(self.state_root); h.update(self.receipt_root); h.update(self.ordering_root);
+crates/amun-replay-semantics/src/lib.rs:43:    pub fn prove_equivalence(a: &Self, b: &Self) -> bool { a.transcript_root == b.transcript_root && a.state_root == b.state_root && a.receipt_root == b.receipt_root && a.ordering_root == b.ordering_root && a.domain == b.domain }
+crates/amun-replay-semantics/src/lib.rs:67:pub struct ReplayWitness { pub start_sequence: u64, pub end_sequence: u64, pub pre_state_root: [u8; 32], pub post_state_root: [u8; 32], pub transcript_fragment_hash: [u8; 32], pub witness_data: Vec<u8> }
+crates/amun-replay-semantics/src/lib.rs:70:pub struct ReplayCheckpoint { pub sequence: u64, pub state_root: [u8; 32], pub transcript_chain_hash: [u8; 32], pub certificate: ReplayCertificate }
+crates/amun-replay-semantics/src/lib.rs:77:        if a.state_root != b.state_root { return Err(ReplayFailure::StateDivergence { expected_root: a.state_root, actual_root: b.state_root }); }
+crates/amun-replay-semantics/src/lib.rs:88:    #[test] fn test_cert_tamper_detected() { let mut c = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1); c.state_root = [0xFF;32]; assert!(!c.verify()); }
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:15:2. Root hash matches lineage's state_root
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:21:- Lineage reference (epoch, generation, state_root)
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:79:1. Snapshot root == lineage state_root
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:146:reconstructed root MUST equal the lineage's current state_root.
+crates/amun-storage-kernel/ATOMIC_SNAPSHOT_CONSTITUTION.md:21:cutoff_sequence+1 to current MUST produce the claimed state_root
+crates/amun-storage-kernel/ATOMIC_SNAPSHOT_CONSTITUTION.md:51:snapshot's state_root matches the state at cutoff_sequence.
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:132:                if rr != entry.state_root {
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:137:                        &entry.state_root[..8]
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:16:    pub state_root: [u8; 32],
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:31:        state_root: [u8; 32],
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:43:            &state_root,
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:55:            state_root,
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:74:            &self.state_root,
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:89:        state_root: &[u8; 32],
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:105:        hasher.update(state_root);
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:120:        enc.write_bytes(&self.state_root);
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:136:        let state_root: [u8; 32] = dec.read_bytes()?.try_into().ok()?;
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:151:            state_root,
+crates/amun-storage-kernel/src/lib.rs:55:    pub state_root: StateRoot,
+crates/amun-storage-kernel/src/lib.rs:56:    pub prev_state_root: StateRoot,
+crates/amun-storage-kernel/src/lib.rs:65:        state_root: StateRoot,
+crates/amun-storage-kernel/src/lib.rs:66:        prev_state_root: StateRoot,
+crates/amun-storage-kernel/src/lib.rs:73:        hasher.update(&state_root.0);
+crates/amun-storage-kernel/src/lib.rs:74:        hasher.update(&prev_state_root.0);
+crates/amun-storage-kernel/src/lib.rs:80:            state_root,
+crates/amun-storage-kernel/src/lib.rs:81:            prev_state_root,
+crates/amun-storage-kernel/src/lib.rs:113:        if next.prev_state_root != prev.state_root {
+crates/amun-storage-kernel/src/lib.rs:116:                &prev.state_root.0[..8],
+crates/amun-storage-kernel/src/lib.rs:117:                &next.prev_state_root.0[..8]
+crates/amun-storage-kernel/CONSTITUTION.md:78:prev_state_root of next MUST equal state_root of prev.
+crates/amun-storage-kernel/SPECIFICATION.md:19:- WAL: blake3("AMUN_WAL_FRAME_V1" || "AMUNCHAIN_MAINNET_V1" || epoch || generation || sequence || op_type || tx_id || key || value || version || state_root || prev_hash)
+crates/amun-storage-kernel/SPECIFICATION.md:20:- Lineage: blake3("AMUN_LINEAGE_V1" || epoch || generation || state_root || prev_state_root || wal_sequence)
+crates/amun-snapshot-engine/src/byzantine_sync.rs:108:                manifest_root: peers[0].manifest.state_root,
+crates/amun-snapshot-engine/src/manifest.rs:15:    pub state_root: [u8; 32],
+crates/amun-snapshot-engine/src/manifest.rs:32:        state_root: [u8; 32],
+crates/amun-snapshot-engine/src/manifest.rs:48:            state_root,
+crates/amun-snapshot-engine/src/manifest.rs:70:        h.update(&self.state_root);
+crates/amun-snapshot-engine/src/manifest.rs:93:        w.write_hash(&self.state_root);
+crates/amun-snapshot-engine/src/manifest.rs:116:        let state_root = r.read_hash()?;
+crates/amun-snapshot-engine/src/manifest.rs:135:            state_root,
+crates/amun-snapshot-engine/src/manifest.rs:155:    state_root: Option<[u8; 32]>,
+crates/amun-snapshot-engine/src/manifest.rs:168:            state_root: None,
+crates/amun-snapshot-engine/src/manifest.rs:179:    pub fn with_state_root(mut self, root: [u8; 32]) -> Self {
+crates/amun-snapshot-engine/src/manifest.rs:180:        self.state_root = Some(root);
+crates/amun-snapshot-engine/src/manifest.rs:211:            self.state_root?,
+crates/amun-snapshot-engine/src/snapshot.rs:12:    pub state_root: [u8; 32],
+crates/amun-snapshot-engine/src/snapshot.rs:31:        w.write_hash(&self.state_root);
+crates/amun-snapshot-engine/src/snapshot.rs:56:        let state_root = r.read_hash()?;
+crates/amun-snapshot-engine/src/snapshot.rs:71:            state_root,
+crates/amun-snapshot-engine/src/replay_continuity.rs:58:                if actual_root != entry.state_root {
+crates/amun-snapshot-engine/src/replay_continuity.rs:61:                        expected_root: entry.state_root,
+crates/amun-snapshot/src/state.rs:5:    pub state_root: [u8; 32],
+crates/amun-snapshot/src/state.rs:14:            state_root: root,
+crates/amun-snapshot/src/state.rs:36:            .sign(&self.state_root, b"AMUN_SNAPSHOT_V4", chain_id)
+crates/amun-snapshot/src/state.rs:47:                Ed25519Signer::verify(pk, &self.state_root, sig, b"AMUN_SNAPSHOT_V4", chain_id)
+crates/amun-node/src/bin/dump_state_root.rs:8:        eprintln!("Usage: dump_state_root <data_directory>");
+crates/amun-node/src/bin/dump_state_root.rs:14:    let root = store.state_root();
+crates/amun-node/src/bin/test_replay_determinism.rs:48:    let ref_root = ref_store.state_root();
+crates/amun-node/src/bin/test_replay_determinism.rs:71:        let replay_root = replay_store.state_root();
+crates/amun-node/src/bin/test_persistence_determinism.rs:48:        let root_before = store.state_root();
+crates/amun-node/src/bin/test_persistence_determinism.rs:60:        let root_after = restored.state_root();
+crates/amun-node/src/bin/test_multi_height_determinism.rs:22:        let mut prev_root = store.state_root();
+crates/amun-node/src/bin/test_multi_height_determinism.rs:49:            let current_root = store.state_root();
+crates/amun-node/src/bin/test_crash_recovery_7.rs:115:    let pre_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
+crates/amun-node/src/bin/test_crash_recovery_7.rs:141:        let final_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
+crates/amun-node/src/bin/test_crash_recovery_7.rs:154:        let final_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
+crates/amun-node/src/bin/test_constitutional_stress.rs:26:        let mut prev_root = store.state_root();
+crates/amun-node/src/bin/test_constitutional_stress.rs:68:                pre_state_root: store.state_root(),
+crates/amun-node/src/bin/test_constitutional_stress.rs:90:                    let current_root = store.state_root();
+crates/amun-node/src/bin/test_runtime_mutation_integration.rs:23:        let mut prev_root = node.store.state_root();
+crates/amun-node/src/bin/test_runtime_mutation_integration.rs:51:            let current_root = node.store.state_root();
+crates/amun-node/src/bin/test_live_state.rs:20:        let root = node.store.state_root();
+crates/amun-node/src/bin/test_live_state.rs:29:            "PASS: All validators have state_root = {}",
+crates/amun-node/src/bin/test_constitutional_mutation.rs:23:        let root0 = store.state_root();
+crates/amun-node/src/bin/test_constitutional_mutation.rs:46:                pre_state_root: store.state_root(),
+crates/amun-node/src/bin/test_constitutional_mutation.rs:66:                    let current_root = store.state_root();
+crates/amun-node/src/bin/test_constitutional_mutation.rs:83:        let final_root = store.state_root();
+crates/amun-node/src/bin/test_crash_recovery.rs:120:    let pre_crash_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
+crates/amun-node/src/bin/test_crash_recovery.rs:146:    let mid_recovery_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
+crates/amun-node/src/bin/test_crash_recovery.rs:185:    let final_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
+crates/amun-node/src/bin/test_sync_rejoin.rs:136:    let live_root = stores[&0].state_root();
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:137:    let live_root = stores[&0].state_root();
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:178:                let root = recovered_store.state_root();
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:198:                Some(stores[&i].state_root())
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:207:        .map(|&i| stores[&i].state_root())
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:209:    let recovered_roots: Vec<_> = [2, 4].iter().map(|&i| stores[&i].state_root()).collect();
+crates/amun-node/src/bin/test_replay_stress.rs:60:            pre_state_root: ref_store.state_root(),
+crates/amun-node/src/bin/test_replay_stress.rs:81:    let ref_root = ref_store.state_root();
+crates/amun-node/src/bin/test_replay_stress.rs:118:                pre_state_root: replay_store.state_root(),
+crates/amun-node/src/bin/test_replay_stress.rs:137:        let replay_root = replay_store.state_root();
+crates/amun-node/src/bin/test_network_state_convergence.rs:112:        let root = stores[&i].state_root();
+crates/amun-node/src/bin/test_state_determinism.rs:21:        let root_initial = store.state_root();
+crates/amun-node/src/bin/test_state_determinism.rs:45:        let root_final = store.state_root();
+crates/amun-node/src/bin/test_constitutional_multi_block.rs:26:        let mut prev_root = store.state_root();
+crates/amun-node/src/bin/test_constitutional_multi_block.rs:69:                pre_state_root: store.state_root(),
+crates/amun-node/src/bin/test_constitutional_multi_block.rs:91:                    let current_root = store.state_root();
+crates/amun-node/src/bin/test_multi_byzantine.rs:151:        .map(|&i| stores[&i].state_root())
+crates/amun-node/src/bin/test_validator_cluster_determinism.rs:24:            let root = node.store.state_root();
+crates/amun-node/src/bin/test_state_evolution.rs:19:    let root_before = store.state_root();
+crates/amun-node/src/bin/test_state_evolution.rs:40:    let root_after = store.state_root();
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:125:        let root = stores[&i].state_root();
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:128:            state_root: hex::encode(root),
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:181:                let root = store.state_root();
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:197:    let all_roots: Vec<_> = (0..7).map(|i| stores[&i].state_root()).collect();
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:124:    let pre_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:160:    let recovered_root = recovered_store.state_root();
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:183:        hex::encode(recovered_store_4.state_root())
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:209:    let final_roots: Vec<_> = stores.values().map(|s| s.state_root()).collect();
+crates/amun-node/src/bin/test_constitutional_determinism.rs:31:                pre_state_root: store.state_root(),
+crates/amun-node/src/bin/test_constitutional_determinism.rs:58:        let root = store.state_root();
+crates/amun-persistence/src/lib.rs:9:    pub state_root: String,
+crates/amun-persistence/src/lib.rs:19:            state_root: String::new(),
+crates/amun-persistence/src/lib.rs:78:            state_root: "abc123".into(),
+crates/amun-persistence/src/lib.rs:88:        assert_eq!(restored.state_root, "abc123");
+crates/amun-persistence/src/lib.rs:103:        assert!(state.state_root.is_empty());
+crates/amun-persistence/src/lib.rs:116:            state_root: "state100".into(),
+crates/amun-constitutional-enforcement/src/state_transition.rs:13:    pub pre_state_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/state_transition.rs:15:    pub post_state_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/state_transition.rs:29:        pre_state_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/state_transition.rs:30:        post_state_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/state_transition.rs:36:            pre_state_root,
+crates/amun-constitutional-enforcement/src/state_transition.rs:37:            post_state_root,
+crates/amun-constitutional-enforcement/src/state_transition.rs:50:        if self.pre_state_root == self.post_state_root && height > 0 {
+crates/amun-constitutional-enforcement/src/state_transition.rs:55:        if self.post_state_root != self.replay_root {
+crates/amun-constitutional-enforcement/src/state_transition.rs:60:                    &self.post_state_root[..4],
+crates/amun-constitutional-enforcement/src/state_transition.rs:92:/// `execute_fn` is the actual execution function that produces post_state_root.
+crates/amun-constitutional-enforcement/src/state_transition.rs:97:    pre_state_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/state_transition.rs:107:    let post_state_root = execute_fn();
+crates/amun-constitutional-enforcement/src/state_transition.rs:112:        pre_state_root,
+crates/amun-constitutional-enforcement/src/state_transition.rs:113:        post_state_root,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:14:    pub state_root_valid: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:39:        state_root_valid: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:51:            state_root_valid,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:66:        state_root_valid: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:72:            state_root_valid,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:106:    pub state_root_valid: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:156:            state_root_valid: execution.state_root_valid,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:178:        assert!(evidence.state_root_valid);
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:185:            state_root_valid: true,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:203:        assert!(evidence.state_root_valid);
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:219:        assert_eq!(evidence.state_root_valid, true);
+crates/amun-constitutional-enforcement/src/lib.rs:56:            evidence.state_root_valid,
+crates/amun-constitutional-enforcement/src/lib.rs:94:        state_root_valid: bool,
+crates/amun-constitutional-enforcement/src/lib.rs:109:                state_root_valid,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:77:    pub original_state_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/evidence_records.rs:80:    pub replay_state_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/evidence_records.rs:88:            original_state_root: original,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:89:            replay_state_root: replay,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:113:    pub state_root_valid: bool,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:134:        state_root_valid: bool,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:148:            state_root_valid,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:163:        hasher.update(&[self.state_root_valid as u8]);
+crates/amun-constitutional-enforcement/src/proof_engine.rs:13:    /// Requires the block's state_root to match the execution result.
+crates/amun-constitutional-enforcement/src/proof_engine.rs:14:    pub fn verify_state_root_integrity(
+crates/amun-constitutional-enforcement/src/proof_engine.rs:15:        block_state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:16:        execution_state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:18:        block_state_root == execution_state_root
+crates/amun-constitutional-enforcement/src/proof_engine.rs:76:        pre_state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:77:        post_state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:80:        pre_state_root != post_state_root && transition_valid
+crates/amun-constitutional-enforcement/src/proof_engine.rs:92:        block_state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:93:        execution_state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:105:        pre_state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:106:        post_state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:113:        if !Self::verify_state_root_integrity(block_state_root, execution_state_root) {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:117:                    "Block state_root {:02x?} != execution {:02x?}",
+crates/amun-constitutional-enforcement/src/proof_engine.rs:118:                    &block_state_root[..4],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:119:                    &execution_state_root[..4]
+crates/amun-constitutional-enforcement/src/proof_engine.rs:192:        if !Self::verify_state_transition(pre_state_root, post_state_root, transition_valid) {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:222:    fn n124_state_root_mismatch_detected() {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:18:    ///   - State transition occurred (state_root != history_root)
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:20:        state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:24:            state_root_valid: *state_root != [0u8; 32],
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:30:            transition_valid: state_root != history_root || *history_root == [0u8; 32],
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:37:/// and compares state_root before voting. QC formation = replay verified.
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:43:        state_root_valid: bool,
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:47:            // QC formation = validators re-executed and agreed on state_root
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:48:            replay_deterministic: qc_verified && state_root_valid && transition_valid,
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:78:    state_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:86:    let execution = ExecutionEvidenceProvider::from_finality_certificate(state_root, history_root);
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:89:        execution.state_root_valid,
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:96:        execution.state_root_valid,
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:118:        assert!(evidence.state_root_valid);
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:147:        assert!(evidence.state_root_valid);
+crates/amun-quorum-certificate/src/certificate.rs:10:    pub state_root: [u8; 32],
+crates/amun-quorum-certificate/src/certificate.rs:21:        state_root: [u8; 32],
+crates/amun-quorum-certificate/src/certificate.rs:31:        h.update(&state_root);
+crates/amun-quorum-certificate/src/certificate.rs:39:        Self { position, round, block_hash, state_root, votes, total_weight, certificate_hash }
+crates/amun-quorum-certificate/src/certificate.rs:51:        h.update(&self.state_root);
+crates/amun-constitutional/src/replay_certificate.rs:27:    pub state_root: ConstitutionalHash,
+crates/amun-constitutional/src/replay_certificate.rs:61:            .update_bytes(&self.state_root)
+crates/amun-constitutional/src/replay_certificate.rs:141:        state_root: ConstitutionalHash,
+crates/amun-constitutional/src/replay_certificate.rs:162:            state_root,
+crates/amun-constitutional/src/state_anchor_scope.rs:37:/// The state_root is the attested state at the end of this scope's transcript span.
+crates/amun-constitutional/src/state_anchor_scope.rs:45:    pub state_root: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor_scope.rs:62:            .update_bytes(&self.state_root)
+crates/amun-constitutional/src/state_anchor_scope.rs:101:        if self_contains_other && self.state_root == other.state_root {
+crates/amun-constitutional/src/state_anchor_scope.rs:103:        } else if self_contains_other && self.state_root != other.state_root {
+crates/amun-constitutional/src/state_anchor_scope.rs:105:        } else if other_contains_self && other.state_root == self.state_root {
+crates/amun-constitutional/src/state_anchor_scope.rs:107:        } else if other_contains_self && other.state_root != self.state_root {
+crates/amun-constitutional/src/state_anchor_scope.rs:145:            state_root: root,
+crates/amun-constitutional/src/state_anchor.rs:84:            .update_bytes(&self.scope.state_root)
+crates/amun-constitutional/src/state_anchor.rs:169:        state_root: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs:179:            state_root,
+crates/amun-constitutional/src/state_anchor.rs:203:    pub fn state_root(&self) -> ConstitutionalHash {
+crates/amun-constitutional/src/state_anchor.rs:204:        self.scope.state_root
+crates/amun-constitutional/src/state_anchor.rs:253:    fn test_state_root_affects_hash() {
+crates/amun-consensus-integration/src/consensus_integrator.rs:50:        let state_root = registry.compute_state_root();
+crates/amun-consensus-integration/src/consensus_integrator.rs:55:            state_root,
+crates/amun-consensus-integration/src/consensus_integrator.rs:67:        hasher.update(&block.state_root);
+crates/amun-consensus-integration/src/consensus_integrator.rs:122:            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs:148:            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs:175:            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs:200:            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs:227:            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs:238:        assert_eq!(block.state_root, registry.compute_state_root());
+crates/amun-consensus-integration/src/consensus_types.rs:10:    pub state_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs:47:    pub state_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs:63:            state_root: block.state_root,
+crates/amun-consensus-integration/src/consensus_types.rs:81:    pub state_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs:92:            state_root: block.state_root,
+crates/amun-consensus-integration/src/consensus_types.rs:106:        hasher.update(&self.state_root);
+crates/amun-constitutional-block/tests/block_tests.rs:185:        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs:241:        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs:270:        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs:299:        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs:331:        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs:362:        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs:395:        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs:430:        hex::encode(rt1.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs:461:        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/finalizer_tests.rs:9:fn test_commit_creates_block_with_state_root() {
+crates/amun-constitutional-block/tests/finalizer_tests.rs:19:        pre_state_root: [0u8; 32],
+crates/amun-constitutional-block/tests/finalizer_tests.rs:28:    assert!(!block.state_root.is_empty());
+crates/amun-constitutional-block/tests/finalizer_tests.rs:33:fn test_state_root_changes_block_hash() {
+crates/amun-constitutional-block/tests/finalizer_tests.rs:45:        pre_state_root: [0u8; 32],
+crates/amun-constitutional-block/tests/finalizer_tests.rs:53:        pre_state_root: [0u8; 32],
+crates/amun-constitutional-block/tests/finalizer_tests.rs:63:    assert_ne!(b1.state_root, b2.state_root);
+crates/amun-constitutional-block/tests/replay_tests.rs:15:        pre_state_root: [0u8; 32],
+crates/amun-constitutional-block/tests/replay_tests.rs:33:        pre_state_root: [0u8; 32],
+crates/amun-constitutional-block/tests/replay_tests.rs:55:            pre_state_root: [0u8; 32],
+crates/amun-constitutional-block/src/lib.rs:14:/// 2. Block's state_root matches the certificate's post_state_root.
+crates/amun-constitutional-block/src/lib.rs:33:    let cert_state_root = hex::encode(cert.post_state_root);
+crates/amun-constitutional-block/src/lib.rs:34:    if block.state_root != cert_state_root {
+crates/amun-constitutional-block/src/lib.rs:37:            block.state_root, cert_state_root
+crates/amun-constitutional-block/src/lib.rs:84:///   4. Certificate's post_state_root matches block.state_root
+crates/amun-constitutional-block/src/lib.rs:114:    let cert_state_root = hex::encode(cert.post_state_root);
+crates/amun-constitutional-block/src/lib.rs:115:    if block.state_root != cert_state_root {
+crates/amun-constitutional-block/src/lib.rs:118:            block.state_root, cert_state_root
+crates/amun-constitutional-block/src/block.rs:13:    pub state_root: String,
+crates/amun-constitutional-block/src/block.rs:29:        state_root: String,
+crates/amun-constitutional-block/src/block.rs:42:            state_root,
+crates/amun-constitutional-block/src/block.rs:85:        let state_root = hex::encode(state_tree.root());
+crates/amun-constitutional-block/src/block.rs:96:            state_root,
+crates/amun-constitutional-block/src/finalizer.rs:9:    pub pre_state_root: [u8; 32],
+crates/amun-constitutional-block/src/finalizer.rs:34:        let (state_root, replay_certificate_root) = match &ctx.state_runtime {
+crates/amun-constitutional-block/src/finalizer.rs:36:                let cert = rt.create_certificate(height, ctx.pre_state_root);
+crates/amun-constitutional-block/src/finalizer.rs:38:                (hex::encode(rt.state_root()), hex::encode(merkle_root))
+crates/amun-constitutional-block/src/finalizer.rs:49:            state_root,
+crates/amun-constitutional-block/src/block.rs.n2bak:17:    pub state_root: String,
+crates/amun-constitutional-block/src/block.rs.n2bak:31:        state_root: String,
+crates/amun-constitutional-block/src/block.rs.n2bak:43:            state_root,
+crates/amun-constitutional-block/src/block.rs.n2bak:84:        let state_root = hex::encode(state_tree.root());
+crates/amun-constitutional-block/src/block.rs.n2bak:95:            state_root,
+crates/amun-accounts/src/lib.rs:66:    pub fn state_root(&self) -> [u8; 32] {
+crates/amun-accounts/src/lib.rs:147:        assert_eq!(s1.state_root(), s2.state_root());
+crates/amun-accounts/src/lib.rs:156:        assert_ne!(s1.state_root(), s2.state_root());
+crates/amun-replay-engine/src/lib.rs:51:    pub fn new(initial_state_root: ConstitutionalHash, start_sequence: u64) -> Self {
+crates/amun-replay-engine/src/lib.rs:53:            state: ReplayState::new(initial_state_root),
+crates/amun-replay-engine/src/lib.rs:78:            replay_root: self.state.state_root,
+crates/amun-replay-engine/src/lib.rs:84:                checkpoint_hash: self.state.state_root,
+crates/amun-replay-engine/src/lib.rs:89:                authority_root: self.state.state_root,
+crates/amun-replay-engine/src/state.rs:9:// evolve_state_root() provides CRYPTOGRAPHIC CONTINUITY.
+crates/amun-replay-engine/src/state.rs:22:    pub state_root: ConstitutionalHash,
+crates/amun-replay-engine/src/state.rs:30:            state_root: initial_root,
+crates/amun-replay-engine/src/state.rs:46:        hasher.update(&self.state_root);
+crates/amun-replay-engine/src/state.rs:53:            state_root: new_root,
+crates/amun-replay-engine/src/state.rs:66:    fn state_root_evolves_after_entry() {
+crates/amun-replay-engine/src/state.rs:68:        let root_before = state.state_root;
+crates/amun-replay-engine/src/state.rs:77:        assert_ne!(root_before, new_state.state_root);
+crates/amun-replay-engine/src/state.rs:94:        assert_eq!(r1.state_root, r2.state_root);
+crates/amun-replay-engine/src/state.rs:114:        assert_ne!(r1.state_root, r2.state_root);
+crates/amun-replay-engine/src/equivalence.rs:58:        let is_equivalent = result.final_state == expected_state.state_root;
+crates/amun-replay-engine/src/equivalence.rs:62:            expected_result_hash: expected_state.state_root,
+crates/amun-replay-engine/src/equivalence.rs:75:            initial_state.state_root,
+crates/amun-replay-engine/src/equivalence.rs:137:            DeterministicExecutor::execute_with_trace(&entries, state.state_root, 1).unwrap();
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:36:            hex::encode(rt.state_root()),
+crates/amun-networking/tests/n18_full_rejoin.rs:38:            hex::encode(rt.state_root()),
+crates/amun-networking/tests/n18_checkpoint_sync.rs:38:            hex::encode(rt.state_root()),
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:38:            hex::encode(rt.state_root()),
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:37:            hex::encode(rt.state_root()),
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:110:            hex::encode(rt.state_root()),
+crates/amun-networking/tests/n18_catchup_and_rejoin.rs:95:    // assert_eq!(node2.state_root, network.state_root)
+crates/amun-networking/tests/n18_node_rejoin.rs:69:    // 9. assert_eq!(node2.state_root, canonical_root)
+crates/amun-certificate-network/src/gossip.rs:180:            hex::encode(rt.state_root()),
+crates/amun-certificate-network/src/distribution.rs:105:        pre_state_root: [u8; 32],
+crates/amun-certificate-network/src/distribution.rs:107:        let cert = rt.create_certificate(block.block_height, pre_state_root);
+crates/amun-certificate-network/src/distribution.rs:143:            hex::encode(rt.state_root()),
+crates/amun-certificate-network/src/distribution.rs:198:        bundle.block_header.state_root = "tampered".into();
+crates/amun-certificate-network/src/distribution.rs:243:            hex::encode(rt.state_root()),
+crates/amun-block-store/src/lib.rs:11:    pub state_root: String,
+crates/amun-block-store/src/lib.rs:69:            state_root: format!("state{}", h),
+crates/amun-block-store/src/lib.rs:118:        assert_eq!(block.unwrap().state_root, "state2");
+crates/amun-byzantine-tests/tests/attack_suite.rs:32:        pre_state_root: [0u8; 32],
+crates/amun-byzantine-tests/tests/attack_suite.rs:54:    proof.post_state_root = [0xff; 32];
+crates/amun-epoch-transition/src/transition.rs:10:    pub state_root: [u8; 32],
+crates/amun-epoch-transition/src/transition.rs:20:        state_root: [u8; 32],
+crates/amun-epoch-transition/src/transition.rs:28:        h.update(&state_root);
+crates/amun-epoch-transition/src/transition.rs:37:            state_root,
+crates/amun-epoch-transition/src/transition.rs:49:        h.update(&self.state_root);
+crates/amun-block-builder/tests/n32_certified_block.rs:150:fn n32_certified_block_preserves_state_root() {
+crates/amun-block-builder/tests/n32_certified_block.rs:158:    let state_root_before = builder.engine.state.state_root();
+crates/amun-block-builder/tests/n32_certified_block.rs:184:    assert_ne!(certified.block.state_root, state_root_before);
+crates/amun-block-builder/tests/n32_certified_block.rs:187:        certified.block.state_root,
+crates/amun-block-builder/tests/n32_certified_block.rs:188:        builder.engine.state.state_root()
+crates/amun-block-builder/tests/n28_first_economic_block.rs:29:    let genesis_root = builder.engine.state.state_root();
+crates/amun-block-builder/tests/n28_first_economic_block.rs:36:    assert_ne!(block.state_root, genesis_root);
+crates/amun-block-builder/src/lib.rs:15:    pub state_root: [u8; 32],
+crates/amun-block-builder/src/lib.rs:73:        hasher.update(&self.state_root);
+crates/amun-block-builder/src/lib.rs:140:        let state_root = self.engine.state.state_root();
+crates/amun-block-builder/src/lib.rs:147:            state_root,
+crates/amun-genesis/src/block.rs:7:    pub initial_state_root: [u8; 32],
+crates/amun-genesis/src/block.rs:17:        initial_state_root: [u8; 32],
+crates/amun-genesis/src/block.rs:25:        hasher.update(&initial_state_root);
+crates/amun-genesis/src/block.rs:34:            initial_state_root,
+crates/amun-genesis/src/block.rs:46:        hasher.update(&self.initial_state_root);
+crates/amun-recovery/src/lib.rs:10:    pub state_root: String,
+crates/amun-recovery/src/lib.rs:74:            state_root: state.state_root.clone(),
+crates/amun-recovery/src/lib.rs:102:            state_root: "state42".into(),
+crates/amun-recovery/src/lib.rs:112:            state_root: "state42".into(),
+crates/amun-recovery/src/lib.rs:119:            state_root_before: "state41".into(),
+crates/amun-recovery/src/lib.rs:120:            state_root_after: "state42".into(),
+crates/amun-recovery/src/lib.rs:128:        assert_eq!(recovered.state_root, "state42");
+crates/amun-recovery/src/lib.rs:161:                state_root: format!("state{}", i),
+crates/amun-recovery/src/lib.rs:170:                state_root: format!("state{}", i),
+crates/amun-recovery/src/lib.rs:176:                state_root_before: format!("state{}", i.saturating_sub(1)),
+crates/amun-recovery/src/lib.rs:177:                state_root_after: format!("state{}", i),
+crates/amun-recovery/src/lib.rs:187:        assert_eq!(recovered.state_root, "state3");
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:19:        post_state_root: [u8; 32],
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:46:        let pre_state_root = registry.compute_state_root();
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:81:                pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:82:                pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:109:                pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:110:                pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:128:        let post_state_root = match &commit_result {
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:130:                post_state_root, ..
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:131:            } => *post_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:132:            _ => pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:141:            post_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:156:            pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:157:            post_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:171:            pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:172:            post_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:200:                pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:201:                pre_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:218:            post_state_root,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:252:            pre_state_root: registry.compute_state_root(),
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:294:            pre_state_root: registry.compute_state_root(),
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:332:        let root_before = registry.compute_state_root();
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:342:            pre_state_root: root_before,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:358:            registry.compute_state_root(),
+crates/amun-constitutional-runtime/src/finality_certificate.rs:10:    pub state_root: [u8; 32],
+crates/amun-constitutional-runtime/src/finality_certificate.rs:30:        let state_root = block_result.state_root;
+crates/amun-constitutional-runtime/src/finality_certificate.rs:43:            state_root,
+crates/amun-constitutional-runtime/src/finality_certificate.rs:71:        hasher.update(&self.state_root);
+crates/amun-constitutional-runtime/src/finality_certificate.rs:165:                    pre_state_root: registry.compute_state_root(),
+crates/amun-constitutional-runtime/src/finality_certificate.rs:206:            state_root: [0x01; 32],
+crates/amun-constitutional-runtime/src/finality_certificate.rs:222:            state_root: [0x01; 32],
+crates/amun-constitutional-runtime/src/block_validator.rs:19:    pub state_root: [u8; 32],
+crates/amun-constitutional-runtime/src/block_validator.rs:71:        let state_root = registry.compute_state_root();
+crates/amun-constitutional-runtime/src/block_validator.rs:81:            state_root,
+crates/amun-constitutional-runtime/src/block_validator.rs:117:                    pre_state_root: registry.compute_state_root(),
+crates/amun-constitutional-runtime/src/block_validator.rs:166:                    pre_state_root: registry.compute_state_root(),
+crates/amun-constitutional-runtime/src/block_validator.rs:182:    fn n51_block_state_root_consistent() {
+crates/amun-constitutional-runtime/src/block_validator.rs:186:        let _root_before = registry.compute_state_root();
+crates/amun-constitutional-runtime/src/block_validator.rs:200:                    pre_state_root: registry.compute_state_root(),
+crates/amun-constitutional-runtime/src/block_validator.rs:212:        assert_eq!(result.state_root, registry.compute_state_root());
+crates/amun-constitutional-runtime/src/certificate_chain.rs:87:            hasher.update(&cert.state_root);
+crates/amun-constitutional-runtime/src/certificate_chain.rs:113:        state_root: [u8; 32],
+crates/amun-constitutional-runtime/src/certificate_chain.rs:124:            state_root,
+crates/amun-constitutional-runtime/src/certificate_chain.rs:132:            state_root,
+crates/amun-constitutional-runtime/src/history_root.rs:76:            hasher.update(&cert.state_root);
+crates/amun-constitutional-runtime/src/history_root.rs:105:        state_root: [u8; 32],
+crates/amun-constitutional-runtime/src/history_root.rs:116:            state_root,
+crates/amun-constitutional-runtime/src/history_root.rs:124:            state_root,
+crates/amun-replay-store/src/lib.rs:11:    pub state_root_before: String,
+crates/amun-replay-store/src/lib.rs:12:    pub state_root_after: String,
+crates/amun-replay-store/src/lib.rs:23:        hasher.update(self.state_root_before.as_bytes());
+crates/amun-replay-store/src/lib.rs:24:        hasher.update(self.state_root_after.as_bytes());
+crates/amun-replay-store/src/lib.rs:68:    /// Verify chain continuity: each record's state_root_before
+crates/amun-replay-store/src/lib.rs:69:    /// must match the previous record's state_root_after.
+crates/amun-replay-store/src/lib.rs:76:            if records[i].state_root_before != records[i - 1].state_root_after {
+crates/amun-replay-store/src/lib.rs:93:            state_root_before: before.to_string(),
+crates/amun-replay-store/src/lib.rs:94:            state_root_after: after.to_string(),
+crates/amun-replay-store/src/lib.rs:145:        assert_eq!(r.unwrap().state_root_after, "r2");
+crates/amun-execution/src/lib.rs:190:    fn n26_state_root_changes() {
+crates/amun-execution/src/lib.rs:198:        let root_before = engine.state.state_root();
+crates/amun-execution/src/lib.rs:201:        let root_after = engine.state.state_root();
+crates/amun-state-root/src/replay.rs:21:    pub pre_state_roots: Vec<[u8; 32]>,
+crates/amun-state-root/src/replay.rs:22:    pub post_state_roots: Vec<[u8; 32]>,
+crates/amun-state-root/src/replay.rs:32:        encode_hash_slice(&self.pre_state_roots, out);
+crates/amun-state-root/src/replay.rs:33:        encode_hash_slice(&self.post_state_roots, out);
+crates/amun-state-root/src/snapshot.rs:11:    pub state_root: [u8; 32],
+crates/amun-state-root/src/snapshot.rs:52:        out.extend_from_slice(&self.state_root);
+crates/amun-explorer-api/src/services/chain_service.rs:36:            state_root: head.state_root,
+crates/amun-explorer-api/src/services/chain_service.rs:52:            state_root: block.state_root,
+crates/amun-explorer-api/src/types.rs:8:    pub state_root: String,
+crates/amun-rpc/src/lib.rs:36:    pub state_root: String,
+crates/amun-rpc/src/lib.rs:45:    pub state_root: String,
+crates/amun-rpc/src/lib.rs:82:            state_root: hex::encode(record.state_root),
+crates/amun-rpc/src/lib.rs:99:            state_root: hex::encode(record.state_root),
+crates/amun-rpc/src/lib.rs:119:            state_root: hex::encode(r.state_root),
+crates/amun-rpc/src/lib.rs:292:            "state_root": store.load_tip().map(|r| hex::encode(r.state_root)).unwrap_or_default(),
+crates/amun-rpc/src/lib.rs:325:            "state_root": hex::encode(record.state_root),
+crates/amun-rpc/src/lib.rs:368:                "state_root": hex::encode(r.state_root),
+crates/amun-rpc/src/lib.rs:392:            "state_root": hex::encode(r.state_root),
+crates/amun-rpc/src/provider.rs:68:            state_root: "0xstate".into(),
+crates/amun-rpc/src/provider.rs:77:            state_root: "0xstate".into(),
+crates/amun-rpc/src/client.rs:25:    pub state_root: String,
+crates/amun-rpc/src/client.rs:34:    pub state_root: String,
+crates/amun-transition-proof/src/enhanced_proof.rs:9:    pub state_root: [u8; 32],
+crates/amun-transition-proof/src/enhanced_proof.rs:30:        current == self.state_root
+crates/amun-transition-proof/src/enhanced_proof.rs:82:    pub pre_state_root: [u8; 32],
+crates/amun-transition-proof/src/enhanced_proof.rs:83:    pub post_state_root: [u8; 32],
+crates/amun-transition-proof/src/transition_proof.rs:18:    pub pre_state_root: [u8; 32],
+crates/amun-transition-proof/src/transition_proof.rs:19:    pub post_state_root: [u8; 32],
+crates/amun-transition-proof/src/transition_proof.rs:35:        pre_state_root: [u8; 32],
+crates/amun-transition-proof/src/transition_proof.rs:36:        post_state_root: [u8; 32],
+crates/amun-transition-proof/src/transition_proof.rs:48:            pre_state_root,
+crates/amun-transition-proof/src/transition_proof.rs:49:            post_state_root,
+crates/amun-transition-proof/src/transition_proof.rs:70:        hasher.update(&self.pre_state_root);
+crates/amun-transition-proof/src/transition_proof.rs:71:        hasher.update(&self.post_state_root);
+crates/amun-transition-proof/src/transition_proof.rs:104:            return self.pre_state_root == self.post_state_root;
+crates/amun-transition-proof/src/transition_proof.rs:106:        // If resources changed, post_state_root must differ from pre_state_root
+crates/amun-transition-proof/src/transition_proof.rs:108:            return self.pre_state_root != self.post_state_root;
+crates/amun-transition-proof/src/proof_builder.rs:19:        pre_state_root: [u8; 32],
+crates/amun-transition-proof/src/proof_builder.rs:20:        post_state_root: [u8; 32],
+crates/amun-transition-proof/src/proof_builder.rs:44:            pre_state_root,
+crates/amun-transition-proof/src/proof_builder.rs:45:            post_state_root,
+crates/amun-transition-proof/src/proof_builder.rs:61:        pre_state_root: [u8; 32],
+crates/amun-transition-proof/src/proof_builder.rs:62:        post_state_root: [u8; 32],
+crates/amun-transition-proof/src/proof_builder.rs:86:                let mp = Self::build_merkle_proof(registry, rid, pre_state_root);
+crates/amun-transition-proof/src/proof_builder.rs:104:            pre_state_root,
+crates/amun-transition-proof/src/proof_builder.rs:105:            post_state_root,
+crates/amun-transition-proof/src/proof_builder.rs:121:        pre_state_root: [u8; 32],
+crates/amun-transition-proof/src/proof_builder.rs:126:            state_root: pre_state_root,
+crates/amun-transition-proof/src/proof_builder.rs:210:        h.update(&proof.pre_state_root);
+crates/amun-transition-proof/src/proof_builder.rs:211:        h.update(&proof.post_state_root);
+crates/amun-block/src/block.rs:8:    pub state_root: [u8; 32],
+crates/amun-block/src/block.rs:37:                state_root: [0u8; 32],
+crates/amun-block/src/block.rs:54:        bytes.extend_from_slice(&self.header.state_root);
+crates/amun-block/src/header.rs:12:    pub state_root: StateCommitment,
+crates/amun-block/src/header.rs:29:        state_root: StateCommitment,
+crates/amun-block/src/header.rs:41:            state_root,
+crates/amun-block/src/header.rs:58:        self.state_root.encode_to_writer(writer)?;
+crates/amun-block/src/header.rs:84:        let (state_root, len5) = StateCommitment::decode(&input[pos..])?;
+crates/amun-block/src/header.rs:102:                state_root,
+crates/amun-unsigned-messages/src/proposal.rs:14:    pub state_root: [u8; 32],
+crates/amun-unsigned-messages/src/proposal.rs:25:        state_root: [u8; 32],
+crates/amun-unsigned-messages/src/proposal.rs:34:        h.update(&state_root);
+crates/amun-unsigned-messages/src/proposal.rs:47:            state_root,
+crates/amun-unsigned-messages/src/proposal.rs:60:        h.update(&self.state_root);
+crates/amun-unsigned-messages/src/proposal.rs:78:        buf.extend_from_slice(&self.state_root);
+crates/amun-unsigned-messages/src/proposal.rs:107:        let mut state_root = [0u8; 32];
+crates/amun-unsigned-messages/src/proposal.rs:108:        state_root.copy_from_slice(&data[65..97]);
+crates/amun-unsigned-messages/src/proposal.rs:135:            state_root,
+crates/amun-consensus-law/src/invariants.rs:6:    pub fn single_truth_holds(state_roots: &[[u8; 32]]) -> bool {
+crates/amun-consensus-law/src/invariants.rs:7:        if state_roots.len() <= 1 {
+crates/amun-consensus-law/src/invariants.rs:10:        let reference = state_roots[0];
+crates/amun-consensus-law/src/invariants.rs:11:        state_roots.iter().all(|r| *r == reference)
+crates/amun-benchmarks/benches/consensus_bench.rs:10:        state_root: [0xBB; 32],
+crates/amun-benchmarks/benches/storage_bench.rs:9:        state_root: [0xBB; 32],
+crates/amun-benchmarks/benches/sync_bench.rs:47:            black_box(imported.compute_state_root());
+crates/amun-validator-identity/src/signature.rs:8:    state_root: &[u8; 32],
+crates/amun-validator-identity/src/signature.rs:16:    data.extend_from_slice(state_root);
+crates/amun-stf/tests/replay_equivalence.rs:42:        .post_state_root;
+crates/amun-stf/tests/replay_equivalence.rs:75:        assert_eq!(live.pre_state_root, replay.pre_state_root);
+crates/amun-stf/tests/replay_equivalence.rs:76:        assert_eq!(live.post_state_root, replay.post_state_root);
+crates/amun-stf/tests/replay_equivalence.rs:123:        .post_state_root;
+crates/amun-stf/tests/integration_test.rs:31:    assert_ne!(receipt.pre_state_root, receipt.post_state_root);
+crates/amun-stf/tests/integration_test.rs:57:    assert_eq!(receipt.pre_state_root, receipt.post_state_root);
+crates/amun-stf/src/tests.rs:9:    let old_root = stf.state_root;
+crates/amun-stf/src/tests.rs:22:    let old_root = stf.state_root;
+crates/amun-stf/src/tests.rs:29:    assert_eq!(old_root, stf.state_root);
+crates/amun-stf/src/stf.rs:6:    pub state_root: PublicHash32,
+crates/amun-stf/src/stf.rs:15:            state_root: root,
+crates/amun-stf/src/stf.rs:48:            return Ok(self.state_root);
+crates/amun-stf/src/stf.rs:50:        self.state_root = self.compute_root();
+crates/amun-stf/src/stf.rs:54:        Ok(self.state_root)
+crates/amun-stf/src/stf.rs:64:        hasher.update(&self.state_root.0);
+crates/amun-stf/src/transition_result.rs:21:        use amun_state_root::root::{StateLeaf, StateRootEngine};
+crates/amun-stf/src/transition_result.rs:32:        use amun_state_root::root::{StateLeaf, StateRootEngine};
+crates/amun-resource-core/tests/stress_tests.rs:132:fn stress_004_state_root_10k() {
+crates/amun-resource-core/tests/stress_tests.rs:141:    let root = reg.compute_state_root();
+crates/amun-resource-core/src/resource_registry.rs:212:    pub fn compute_state_root(&self) -> [u8; 32] {
+crates/amun-resource-core/src/resource_registry.rs:436:    fn w21a_state_root_changes_with_owner() {
+crates/amun-resource-core/src/resource_registry.rs:441:        let root1 = reg.compute_state_root();
+crates/amun-resource-core/src/resource_registry.rs:448:        let root2 = reg2.compute_state_root();
+crates/amun-resource-core/src/resource_registry.rs:458:        let root = reg.compute_state_root();
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:7:fn n126_3_state_root_mismatch_rejected() {
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:11:        100, false, // state_root_valid = FALSE → violation
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:83:    // Tamper: modify state_root
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:85:    tampered.state_root[0] ^= 0xFF;
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:90:        hasher.update(&tampered.state_root);
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:101:        "N129.4 FAIL: evidence_root must change when state_root is tampered"
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:111:        hasher.update(&tampered2.state_root);
+crates/amun-live-cluster/src/validator.rs.before_sync_fix:165:                    state_root: [0xBB; 32],
+crates/amun-live-cluster/src/validator.rs.before_sync_fix:240:                        state_root: cert.state_root,
+crates/amun-live-cluster/src/validator.rs.bak2:304:                    state_root: [0xBB; 32],
+crates/amun-live-cluster/src/validator.rs.bak2:349:                            state_root: cert.state_root,
+crates/amun-live-cluster/src/validator.rs.bak:224:                    state_root: [0xBB; 32],
+crates/amun-live-cluster/src/validator.rs.bak:296:                        state_root: cert.state_root,
+crates/amun-live-cluster/src/validator.rs:336:                let (block_hash, state_root) = if is_proposer && !already_proposed {
+crates/amun-live-cluster/src/validator.rs:365:                    let root = block.state_root;
+crates/amun-live-cluster/src/validator.rs:379:                        .and_then(|r| r.proposed_state_root)
+crates/amun-live-cluster/src/validator.rs:388:                            (round.proposed_block_hash, round.proposed_state_root)
+crates/amun-live-cluster/src/validator.rs:403:                    &state_root,
+crates/amun-live-cluster/src/validator.rs:412:                    state_root,
+crates/amun-live-cluster/src/validator.rs:472:                let history_root = state_root;
+crates/amun-live-cluster/src/validator.rs:489:                        let state_root_valid = cert.state_root != [0u8; 32];
+crates/amun-live-cluster/src/validator.rs:491:                        let transition_valid = cert.state_root != [0u8; 32];
+crates/amun-live-cluster/src/validator.rs:511:                        // The block's state_root matches what execution produced
+crates/amun-live-cluster/src/validator.rs:512:                        let replay_deterministic = cert.state_root == history_root;
+crates/amun-live-cluster/src/validator.rs:528:                            state_root_valid,
+crates/amun-live-cluster/src/validator.rs:579:                            cert.state_root,
+crates/amun-live-cluster/src/validator.rs:593:                            state_root_valid,
+crates/amun-live-cluster/src/validator.rs:601:                            cert.state_root,
+crates/amun-live-cluster/src/validator.rs:614:                            state_root: cert.state_root,
+crates/amun-live-cluster/src/bin/load_test.rs:58:                state_root: [0xBB; 32],
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:61:                state_root: [0xBB; 32],
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:70:                state_root: [0xBB; 32],
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:134:                    state_root: [0xBB; 32],
+crates/amun-live-cluster/src/bin/replay_audit.rs:30:    let mut last_state_root: Option<[u8; 32]> = None;
+crates/amun-live-cluster/src/bin/replay_audit.rs:40:                    "Validator {}: height={} state_root={:?} evidence={:?}",
+crates/amun-live-cluster/src/bin/replay_audit.rs:43:                    &record.state_root[..4],
+crates/amun-live-cluster/src/bin/replay_audit.rs:46:                if let Some(expected) = last_state_root {
+crates/amun-live-cluster/src/bin/replay_audit.rs:47:                    if record.state_root != expected {
+crates/amun-live-cluster/src/bin/replay_audit.rs:48:                        println!("  MISMATCH state_root");
+crates/amun-live-cluster/src/bin/replay_audit.rs:52:                    last_state_root = Some(record.state_root);
+crates/amun-live-cluster/src/bin/byzantine_test.rs:40:            state_root: [0xFF; 32],
+crates/amun-live-cluster/src/validator.rs.backup:303:                    state_root: [0xBB; 32],
+crates/amun-live-cluster/src/validator.rs.backup:348:                            state_root: cert.state_root,
+crates/amun-header-gossip/tests/gossip_tests.rs:8:        state_root: "0xdef".into(),
+crates/amun-header-gossip/src/message.rs:8:    pub state_root: String,
+crates/amun-wal/src/recovery.rs:6:    pub last_state_root: Option<[u8; 32]>,
+crates/amun-wal/src/recovery.rs:15:    Ok(RecoveryPoint { last_sequence: last_seq, last_state_root: None, events_replayed: count, valid: count == wal.frame_count() })
+crates/amun-validator-networking/src/lib.rs:66:        let state_root = source_reg.compute_state_root();
+crates/amun-validator-networking/src/lib.rs:80:        assert_eq!(imported_reg.compute_state_root(), state_root);
+crates/amun-validator-networking/src/lib.rs:100:        let _state_root = source_reg.compute_state_root();
+crates/amun-validator-networking/src/sync_transport.rs:18:        let state_root = registry.compute_state_root();
+crates/amun-validator-networking/src/sync_transport.rs:31:            state_root,
+crates/amun-validator-networking/src/sync_transport.rs:49:                state_root,
+crates/amun-validator-networking/src/sync_transport.rs:60:                let imported_root = registry.compute_state_root();
+crates/amun-validator-networking/src/sync_transport.rs:61:                if imported_root != state_root {
+crates/amun-validator-networking/src/sync_transport.rs:64:                        hex::encode(state_root),
+crates/amun-wallet-api/src/services/chain_service.rs:13:            state_root: "0x0000".to_string(),
+crates/amun-wallet-api/src/services/chain_service.rs:23:            state_root: "0x0000".to_string(),
+crates/amun-wallet-api/src/types.rs:63:    pub state_root: String,
+crates/amun-wallet-api/src/types.rs:72:    pub state_root: String,
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:31:        block.state_root,
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:39:    assert_eq!(evidence.state_root, block.state_root);
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:69:        chain.append(b.state_root, b.block_hash(), [0u8; 32], [0u8; 32], i);
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:84:    let before = builder.engine.state.state_root();
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:99:    let after = builder.engine.state.state_root();
+crates/amun-evidence-root/src/lib.rs:14:    pub state_root: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:24:        state_root: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:33:        hasher.update(&state_root);
+crates/amun-evidence-root/src/lib.rs:42:            state_root,
+crates/amun-evidence-root/src/lib.rs:58:            self.state_root,
+crates/amun-evidence-root/src/lib.rs:82:        state_root: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:90:            state_root,
+crates/amun-evidence-root/src/lib.rs:161:        chain.roots[1].state_root = [0xFF; 32];
+crates/amun-crash-recovery/src/checkpoint.rs:7:    pub state_root: [u8; 32],
+crates/amun-crash-recovery/src/checkpoint.rs:13:    pub fn new(epoch: u64, sequence: u64, state_root: [u8; 32], wal_frame_count: u64) -> Self {
+crates/amun-crash-recovery/src/checkpoint.rs:18:        h.update(&state_root);
+crates/amun-crash-recovery/src/checkpoint.rs:22:        Self { epoch, sequence, state_root, wal_frame_count, checkpoint_hash: hash }
+crates/amun-crash-recovery/src/checkpoint.rs:30:        h.update(&self.state_root);
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:8:        state_root: [0xBB; 32],
+crates/amun-chain-store/src/store.rs:147:            state_root: [0xBB; 32],
+crates/amun-chain-store/src/sync.rs:158:            state_root: [0xBB; 32],
+crates/amun-chain-store/src/snapshot.rs:10:    pub state_root: [u8; 32],
+crates/amun-chain-store/src/snapshot.rs:24:    let state_root = tip.state_root;
+crates/amun-chain-store/src/snapshot.rs:31:        state_root,
+crates/amun-chain-store/src/snapshot.rs:40:        manifest.state_root,
+crates/amun-chain-store/src/snapshot.rs:54:    // Write state.bin (currently just the block height and state_root)
+crates/amun-chain-store/src/snapshot.rs:61:        .write_all(&state_root)
+crates/amun-chain-store/src/snapshot.rs:89:        manifest.state_root,
+crates/amun-chain-store/src/snapshot.rs:129:    let state_root: [u8; 32] = state_bytes[8..40]
+crates/amun-chain-store/src/snapshot.rs:137:        state_root,
+crates/amun-chain-store/src/record.rs:7:    pub state_root: [u8; 32],
+crates/amun-chain-store/src/record.rs:37:            state_root: [0xBB; 32],
+crates/amun-chain-store/examples/snapshot_builder_test.rs:10:        state_root: [0xBB; 32],
+crates/amun-chain-store/examples/snapshot_verification_test.rs:10:        state_root: [0xBB; 32],
+crates/amun-chain-store/examples/snapshot_restore_test.rs:10:        state_root: [0xBB; 32],
+crates/amun-chain-store/examples/snapshot_restore_test.rs:47:    assert_eq!(tip.state_root, [0xBB; 32]);
+crates/amun-verifier-node/src/verifier.rs:42:            if receipt.state_root != block.state_root {
+crates/amun-network-scheduler/src/message.rs:12:        state_root: [u8; 32],
+crates/amun-snapshot-engine-unified/src/lib.rs:10:    pub state_root: String,
+crates/amun-snapshot-engine-unified/src/lib.rs:20:            state_root: state.state_root.clone(),
+crates/amun-snapshot-engine-unified/src/lib.rs:77:            state_root: "state100".into(),
+crates/amun-snapshot-engine-unified/src/lib.rs:96:        assert_eq!(snapshot.state_root, "state100");
+crates/amun-snapshot-engine-unified/src/lib.rs:112:            state_root: "root1000".into(),
+crates/amun-snapshot-engine-unified/src/lib.rs:134:            state_root: "sr42".into(),
+crates/amun-snapshot-engine-unified/src/lib.rs:154:        let bad_snapshot = r#"{"height":1,"state_root":"x","evidence_root":"y","block_hash":"z","snapshot_version":99}"#;
+crates/amun-network-transport/src/sync_over_network.rs:171:                        state_root: [0xBB; 32],
+crates/amun-network-transport/src/sync_over_network.rs:190:            current_state_root: [0u8; 32],
+crates/amun-network-transport/src/sync_over_network.rs:200:                assert_eq!(snap.state_root, [0xBB; 32]);
+crates/amun-network-transport/src/sync_over_network.rs:224:                            state_root: [0xBB; 32],
+crates/amun-network-transport/src/sync_over_network.rs:241:            current_state_root: [0u8; 32],
+crates/amun-network-transport/src/sync_over_network.rs:274:                            state_root: [0xBB; 32],
+crates/amun-network-transport/src/sync_over_network.rs:291:            current_state_root: [0u8; 32],
+crates/amun-network-transport/src/message.rs:33:    pub state_root: [u8; 32],
+crates/amun-network-transport/src/message.rs:43:    pub state_root: [u8; 32],
+crates/amun-network-transport/src/message.rs:83:    pub current_state_root: [u8; 32],
+crates/amun-network-transport/src/message.rs:99:    pub state_root: [u8; 32],
+crates/amun-network-transport/src/message.rs:128:    pub state_root: [u8; 32],
+crates/amun-network-transport/src/message.rs:153:            state_root: [0xBB; 32],
+crates/amun-network-transport/src/message.rs:173:            state_root: [0x22; 32],
+crates/amun-network-transport/src/message.rs:201:            state_root: [0x99; 32],
+crates/amun-network-transport/src/transport.rs:245:            state_root: [0xCD; 32],
+crates/amun-network-transport/src/transport.rs:300:                        state_root: [0xCC; 32],
+crates/amun-network-transport/src/transport.rs:381:            state_root: [0xCD; 32],
+crates/amun-network-transport/src/transport.rs:425:            state_root: [0x22; 32],
+crates/amun-network-transport/src/transport.rs:466:                state_root: [0xBB; 32],
+crates/amun-network-transport/src/transport.rs:521:            state_root: [0x02; 32],
+crates/amun-storage-engine/src/checkpoint.rs:3:    pub state_root: [u8; 32],
+crates/amun-storage-engine/src/checkpoint.rs:11:            state_root: root,
+crates/amun-replay/src/certificate.rs:10:    pub state_root: [u8; 32],
+crates/amun-replay/src/certificate.rs:32:            state_root: result.expected_root,
+crates/amun-replay/src/certificate.rs:52:            state_root: [0u8; 32],
+crates/amun-replay/src/certificate.rs:67:        hasher.update(&self.state_root);
+crates/amun-replay-verifier/src/replay_verifier.rs:15:        state_root: [u8; 32],
+crates/amun-replay-verifier/src/replay_verifier.rs:63:            pre_state_root: proof.pre_state_root,
+crates/amun-replay-verifier/src/replay_verifier.rs:81:                post_state_root,
+crates/amun-replay-verifier/src/replay_verifier.rs:85:                if post_state_root != proof.post_state_root {
+crates/amun-replay-verifier/src/replay_verifier.rs:87:                        field: "post_state_root".into(),
+crates/amun-replay-verifier/src/replay_verifier.rs:88:                        original: hex::encode(proof.post_state_root),
+crates/amun-replay-verifier/src/replay_verifier.rs:89:                        replay: hex::encode(post_state_root),
+crates/amun-replay-verifier/src/replay_verifier.rs:107:                    state_root: post_state_root,
+crates/amun-replay-verifier/src/replay_verifier.rs:141:            pre_state_root: r1.compute_state_root(),
+crates/amun-replay-verifier/src/replay_verifier.rs:170:            pre_state_root: r.compute_state_root(),
+crates/amun-replay-verifier/src/replay_verifier.rs:200:            pre_state_root: [0u8; 32],
+crates/amun-bytecode/src/lib.rs:40:            pre_state_root: [0u8; 32],
+crates/amun-bytecode/src/lib.rs:65:            pre_state_root: [0u8; 32],
+crates/amun-stateless-sync/src/lib.rs:179:            hex::encode(rt.state_root()),
+crates/amun-stateless-sync/src/lib.rs:272:        bad.block_header.state_root = "tampered".into();
+crates/amun-invariants/src/kernel.rs:26:        specification: "forall h: |{state_roots_at_height(h)}| = 1",
+crates/amun-validator-runtime/src/validator_node.rs:45:            pre_state_root: self.store.state_root(),
+crates/amun-consensus-messages/src/proposal.rs:10:    pub state_root: [u8; 32],
+crates/amun-consensus-messages/src/proposal.rs:20:        state_root: [u8; 32],
+crates/amun-consensus-messages/src/proposal.rs:28:        h.update(&state_root);
+crates/amun-consensus-messages/src/proposal.rs:32:        Self { proposer_id, position, round, block_hash, state_root, proposal_hash }
+crates/amun-consensus-messages/src/proposal.rs:42:        h.update(&self.state_root);
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:36:    let state_root = state_tree.root();
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:38:    assert!(state_tree.verify(&state_root, &proof));
+crates/amun-dual-verification/src/dual_verifier.rs:22:        let pre_root = registry.compute_state_root();
+crates/amun-dual-verification/src/dual_verifier.rs:37:                post_state_root,
+crates/amun-dual-verification/src/dual_verifier.rs:50:                    post_state_root,
+crates/amun-constitutional-state/src/lib.rs:52:    pub fn state_root(&self) -> [u8; 32] {
+crates/amun-constitutional-state/src/lib.rs:118:    fn test_state_root_determinism() {
+crates/amun-constitutional-state/src/lib.rs:123:        assert_eq!(rt1.state_root(), rt2.state_root());
+crates/amun-constitutional-state/src/lib.rs:127:    fn test_state_root_sensitivity() {
+crates/amun-constitutional-state/src/lib.rs:132:        assert_ne!(rt1.state_root(), rt2.state_root());
+crates/amun-constitutional-state/src/lib.rs:140:        let empty = ConstitutionalStateRuntime::new().state_root();
+crates/amun-constitutional-state/src/lib.rs:141:        assert_eq!(rt.state_root(), empty);
+crates/amun-constitutional-state/src/lib.rs:152:    fn test_transition_changes_state_root() {
+crates/amun-constitutional-state/src/lib.rs:154:        let root_before = rt.state_root();
+crates/amun-constitutional-state/src/lib.rs:156:        assert_ne!(root_before, rt.state_root());
+crates/amun-constitutional-state/src/lib.rs:165:        assert_eq!(rt1.state_root(), rt2.state_root());
+crates/amun-constitutional-state/src/lib.rs:173:        let root1 = original.state_root();
+crates/amun-constitutional-state/src/lib.rs:176:        let root2 = replayed.state_root();
+crates/amun-constitutional-state/src/lib.rs:191:        assert_eq!(rt1.state_root(), rt2.state_root());
+crates/amun-constitutional-state/src/lib.rs:200:    pub pre_state_root: [u8; 32],
+crates/amun-constitutional-state/src/lib.rs:201:    pub post_state_root: [u8; 32],
+crates/amun-constitutional-state/src/lib.rs:222:        pre_state_root: [u8; 32],
+crates/amun-constitutional-state/src/lib.rs:227:            pre_state_root,
+crates/amun-constitutional-state/src/lib.rs:228:            post_state_root: self.state_root(),
+crates/amun-constitutional-state/src/lib.rs:235:    /// Verify that replaying the journal produces the claimed post_state_root.
+crates/amun-constitutional-state/src/lib.rs:238:        replayed.state_root() == self.post_state_root
+crates/amun-constitutional-state/src/lib.rs:282:    /// pre_state_root, post_state_root, journal_root.
+crates/amun-constitutional-state/src/lib.rs:287:        bytes.extend_from_slice(&self.pre_state_root);
+crates/amun-constitutional-state/src/lib.rs:288:        bytes.extend_from_slice(&self.post_state_root);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:60:                    state_root,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:64:                    state_root_match: state_root == proof.post_state_root,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:71:                    state_root_match: false,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:82:        let state_root = registry.compute_state_root();
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:89:            state_root,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:103:        hasher.update(&block.state_root);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:175:            pre_state_root: registry.compute_state_root(),
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:201:            pre_state_root: registry.compute_state_root(),
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:227:            pre_state_root: registry.compute_state_root(),
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:255:            pre_state_root: registry.compute_state_root(),
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:282:            pre_state_root: registry.compute_state_root(),
+crates/amun-replay-consensus/src/replay_backed_types.rs:8:    pub state_root_match: bool,
+crates/amun-replay-consensus/src/replay_backed_types.rs:17:        self.replay_success && self.state_root_match && self.proof_hash_match && self.gas_used_match
+crates/amun-replay-consensus/src/replay_backed_types.rs:26:    pub state_root: [u8; 32],
+crates/amun-replay-consensus/src/replay_backed_types.rs:55:    pub state_root: [u8; 32],
+crates/amun-replay-consensus/src/replay_backed_types.rs:73:            state_root: block.state_root,
+crates/amun-replay-consensus/src/replay_backed_types.rs:89:    pub state_root: [u8; 32],
+crates/amun-replay-consensus/src/replay_backed_types.rs:101:            state_root: block.state_root,
+crates/amun-replay-consensus/src/replay_backed_types.rs:116:        hasher.update(&self.state_root);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:52:        pre_state_root: reg.compute_state_root(),
+crates/amun-testnet-sim/tests/adversarial_tests.rs:95:        pre_state_root: reg.compute_state_root(),
+crates/amun-testnet-sim/tests/adversarial_tests.rs:124:        pre_state_root: reg.compute_state_root(),
+crates/amun-testnet-sim/tests/adversarial_tests.rs:149:    let state_root_before = source_reg.compute_state_root();
+crates/amun-testnet-sim/tests/adversarial_tests.rs:156:    assert_eq!(recovered_reg.compute_state_root(), state_root_before);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:185:            pre_state_root: reg.compute_state_root(),
+crates/amun-testnet-sim/tests/adversarial_tests.rs:202:                post_state_root,
+crates/amun-testnet-sim/tests/adversarial_tests.rs:208:                                                    // Set the fresh registry's state to match pre_state_root
+crates/amun-testnet-sim/tests/adversarial_tests.rs:216:                roots.push(post_state_root);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:239:        pre_state_root: reg.compute_state_root(),
+crates/amun-testnet-sim/tests/adversarial_tests.rs:251:    block.replay_verifications[0].state_root_match = false;
+crates/amun-testnet-sim/tests/adversarial_tests.rs:264:    let state_root = source_reg.compute_state_root();
+crates/amun-testnet-sim/tests/adversarial_tests.rs:270:    assert_eq!(result.unwrap().compute_state_root(), state_root);
+crates/amun-audit-trail/src/lib.rs:10:    pub state_root: [u8; 32],
+crates/amun-audit-trail/src/lib.rs:23:        hasher.update(&self.state_root);
+crates/amun-audit-trail/src/lib.rs:46:        state_root: [u8; 32],
+crates/amun-audit-trail/src/lib.rs:59:            state_root,
+crates/amun-audit-trail/src/lib.rs:112:        trail.records[1].state_root = [0xFF; 32];
+crates/amun-invariant-engine/src/invariant_engine.rs:17:        state_root: [u8; 32],
+crates/amun-invariant-engine/src/invariant_engine.rs:40:                    state_root,
+crates/amun-invariant-engine/src/invariant_engine.rs:180:    fn w8_evidence_contains_state_root() {
+crates/amun-invariant-engine/src/invariant_engine.rs:182:        let state_root = [0xab; 32];
+crates/amun-invariant-engine/src/invariant_engine.rs:188:            state_root,
+crates/amun-invariant-engine/src/invariant_engine.rs:194:                ConstitutionalEvidence::InvariantViolation { state_root: sr, .. } => {
+crates/amun-invariant-engine/src/invariant_engine.rs:195:                    assert_eq!(*sr, state_root);
+crates/amun-constitutional-evidence/src/lib.rs:23:/// - `state_root`: The finalized state hash `H` that this context is anchored to.
+crates/amun-constitutional-evidence/src/lib.rs:28:    pub state_root: [u8; 32],
+crates/amun-state-sync/src/stateless_verifier.rs:8:        state_root: [u8; 32],
+crates/amun-state-sync/src/stateless_verifier.rs:91:        let reconstructed_root = temp_reg.compute_state_root();
+crates/amun-state-sync/src/stateless_verifier.rs:93:        if reconstructed_root != cert.state_root {
+crates/amun-state-sync/src/stateless_verifier.rs:111:            state_root: reconstructed_root,
+crates/amun-state-sync/src/sync_protocol.rs:12:    pub current_state_root: [u8; 32],
+crates/amun-state-sync/src/sync_protocol.rs:27:    pub state_root: [u8; 32],
+crates/amun-state-sync/src/sync_protocol.rs:51:    pub state_root: [u8; 32],
+crates/amun-state-sync/src/sync_protocol.rs:67:        let state_root = registry.compute_state_root();
+crates/amun-state-sync/src/sync_protocol.rs:89:            state_root,
+crates/amun-state-sync/src/sync_protocol.rs:134:            snapshot.state_root,
+crates/amun-state-sync/src/sync_protocol.rs:146:            SyncVerificationResult::Verified { state_root, .. } => {
+crates/amun-state-sync/src/sync_protocol.rs:155:                if registry.compute_state_root() != state_root {
+crates/amun-state-sync/src/sync_protocol.rs:174:                state_root: registry.compute_state_root(),
+crates/amun-state-sync/src/sync_protocol.rs:196:            if registry.compute_state_root() != block.state_root {
+crates/amun-state-sync/src/sync_protocol.rs:268:        let root = reg.compute_state_root();
+crates/amun-state-sync/src/sync_protocol.rs:273:        assert_eq!(imported.compute_state_root(), root);
+crates/amun-state-sync/src/sync_protocol.rs:279:        let root = reg.compute_state_root();
+crates/amun-state-sync/src/sync_protocol.rs:283:        assert_eq!(imported.compute_state_root(), root);
+crates/amun-state-sync/src/sync_protocol.rs:309:            current_state_root: [0; 32],
+crates/amun-state-sync/src/sync_protocol.rs:324:            current_state_root: [0; 32],
+crates/amun-state-sync/src/sync_protocol.rs:341:            current_state_root: [0; 32],
+crates/amun-state-sync/src/sync_protocol.rs:353:        let root = reg.compute_state_root();
+crates/amun-state-sync/src/sync_protocol.rs:360:                    state_root: root,
+crates/amun-state-sync/src/sync_protocol.rs:366:                    state_root: root,
+crates/amun-state-sync/src/sync_protocol.rs:372:                    state_root: root,
+crates/amun-state-sync/src/sync_protocol.rs:379:        assert_eq!(reg.compute_state_root(), root);
+crates/amun-state-sync/src/lib.rs:105:        let state_root = reg.compute_state_root();
+crates/amun-state-sync/src/lib.rs:124:            state_root,
+crates/amun-state-sync/src/lib.rs:141:                state_root: verified_root,
+crates/amun-state-sync/src/lib.rs:144:                assert_eq!(verified_root, state_root);
+crates/amun-state-sync/src/lib.rs:175:        let state_root = reg.compute_state_root();
+crates/amun-state-sync/src/lib.rs:186:            state_root,
+crates/amun-state-sync/src/lib.rs:211:        let state_root = reg.compute_state_root();
+crates/amun-state-sync/src/lib.rs:225:            state_root,
+crates/amun-state-sync/src/snapshot_certificate.rs:11:    pub state_root: [u8; 32],
+crates/amun-state-sync/src/snapshot_certificate.rs:25:        state_root: [u8; 32],
+crates/amun-state-sync/src/snapshot_certificate.rs:36:            state_root,
+crates/amun-state-sync/src/snapshot_certificate.rs:54:        hasher.update(&self.state_root);
+crates/amun-operations/src/health_check.rs:10:    pub state_root: [u8; 32],
+crates/amun-operations/src/health_check.rs:24:            state_root: [0u8; 32],
+crates/amun-operations/src/backup_recovery.rs:10:    pub state_root: [u8; 32],
+crates/amun-operations/src/backup_recovery.rs:25:        let state_root = sync_package.snapshot_certificate.state_root;
+crates/amun-operations/src/backup_recovery.rs:29:            state_root,
+crates/amun-operations/src/backup_recovery.rs:44:        hasher.update(&self.state_root);
+crates/amun-operations/src/backup_recovery.rs:130:        let state_root = reg.compute_state_root();
+crates/amun-operations/src/backup_recovery.rs:141:        assert_eq!(restored.compute_state_root(), state_root);
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:37:            hex::encode(rt_a.state_root()),
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:47:    let final_state_root = hex::encode(rt_a.state_root());
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:73:    let expected_root = hex::encode(rt_b.state_root());
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:74:    assert_eq!(expected_root, final_state_root);
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:114:            hex::encode(rt.state_root()),
+crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:142:    assert_eq!(rt_check.state_root(), rt_verify.state_root());
+crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:38:            hex::encode(rt.state_root()),
+crates/amun-chain-checkpoint/src/lib.rs:26:    pub final_state_root: String,
+crates/amun-chain-checkpoint/src/lib.rs:91:            final_state_root: last_bundle.block_header.state_root.clone(),
+crates/amun-chain-checkpoint/src/lib.rs:112:        bytes.extend_from_slice(self.final_state_root.as_bytes());
+crates/amun-chain-checkpoint/src/lib.rs:221:            hex::encode(rt.state_root()),
+crates/amun-chain-checkpoint/src/lib.rs:283:        cert.final_state_root = "tampered".into();
+crates/amun-chain-checkpoint/src/bootstrap.rs:22:    pub fn verify_complete_chain(&self, expected_state_root: &str) -> Result<(), String> {
+crates/amun-chain-checkpoint/src/bootstrap.rs:25:        let current = hex::encode(rt.state_root());
+crates/amun-chain-checkpoint/src/bootstrap.rs:26:        if current != expected_state_root {
+crates/amun-chain-checkpoint/src/bootstrap.rs:29:                expected_state_root, current
+crates/amun-chain-checkpoint/src/bootstrap.rs:63:            hex::encode(rt.state_root()),
+crates/amun-chain-checkpoint/src/inclusion.rs:122:            hex::encode(rt.state_root()),
+crates/amun-chain-checkpoint/src/chain.rs:68:            hex::encode(rt.state_root()),
+crates/amun-consensus/src/round_state_machine.rs:137:                true, // state_root_valid
+crates/amun-consensus/amun_consensus/src/block/mod.rs:23:    pub state_root: [u8; 32],
+crates/amun-consensus/amun_consensus/src/block/mod.rs:36:        state_root: [u8; 32],
+crates/amun-consensus/amun_consensus/src/block/mod.rs:47:            state_root,
+crates/amun-consensus/amun_consensus/src/block/mod.rs:62:        bytes.extend_from_slice(&self.state_root);
+crates/amun-consensus-execution/src/block_dag.rs:15:    pub state_root: [u8; 32],
+crates/amun-consensus-execution/src/block_dag.rs:26:        state_root: [u8; 32],
+crates/amun-consensus-execution/src/block_dag.rs:34:            state_root,
+crates/amun-consensus-execution/src/block_dag.rs:101:            state_root: genesis_hash,
+crates/amun-consensus-execution/src/proposal.rs:11:    pub state_root: [u8; 32],
+crates/amun-consensus-execution/src/proposal.rs:22:        state_root: [u8; 32],
+crates/amun-consensus-execution/src/proposal.rs:30:            state_root,
+crates/amun-consensus-execution/src/proposer.rs:11:    pub state_root: [u8; 32],
+crates/amun-consensus-execution/src/proposer.rs:22:        state_root: [u8; 32],
+crates/amun-consensus-execution/src/proposer.rs:31:        h.update(&state_root);
+crates/amun-consensus-execution/src/proposer.rs:38:        Self { proposer_id, position, round, block_hash, state_root, parent_block_hash, proposal_hash }
+crates/amun-consensus-execution/src/proposer.rs:48:        h.update(&self.state_root);

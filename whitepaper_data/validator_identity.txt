@@ -1,0 +1,55 @@
+crates/amun-consensus-network/src/validator_identity.rs:4:// with a permanent ValidatorIdentity struct that binds consensus identity,
+crates/amun-consensus-network/src/validator_identity.rs:9:// Every ValidatorIdentity is cryptographically bound to its PublicKey.
+crates/amun-consensus-network/src/validator_identity.rs:19:pub struct ValidatorIdentity {
+crates/amun-consensus-network/src/validator_identity.rs:40:impl ValidatorIdentity {
+crates/amun-consensus-network/src/validator_identity.rs:87:/// N113.1: Registry mapping validator_id → ValidatorIdentity.
+crates/amun-consensus-network/src/validator_identity.rs:88:pub struct ValidatorIdentityRegistry {
+crates/amun-consensus-network/src/validator_identity.rs:89:    identities: std::collections::HashMap<[u8; 32], ValidatorIdentity>,
+crates/amun-consensus-network/src/validator_identity.rs:92:impl ValidatorIdentityRegistry {
+crates/amun-consensus-network/src/validator_identity.rs:100:    pub fn register(&mut self, identity: ValidatorIdentity) -> Result<(), String> {
+crates/amun-consensus-network/src/validator_identity.rs:115:    pub fn get(&self, validator_id: &[u8; 32]) -> Option<&ValidatorIdentity> {
+crates/amun-consensus-network/src/validator_identity.rs:150:impl Default for ValidatorIdentityRegistry {
+crates/amun-consensus-network/src/validator_identity.rs:168:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:174:        let mut id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:181:        let id1 = ValidatorIdentity::new([0x01; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:182:        let id2 = ValidatorIdentity::new([0x02; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:188:        let id1 = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:189:        let id2 = ValidatorIdentity::new([0x42; 32], make_pk_bytes(2), 100);
+crates/amun-consensus-network/src/validator_identity.rs:195:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:196:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:205:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:206:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:213:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:214:        let mut id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:221:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:222:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:232:        let identity = ValidatorIdentity::new(validator_id, pk_bytes, 100);
+crates/amun-consensus-network/src/validator_identity.rs:237:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:249:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:251:        let id1 = ValidatorIdentity::new([0x01; 32], make_pk_bytes(10), 1);
+crates/amun-consensus-network/src/validator_identity.rs:252:        let id2 = ValidatorIdentity::new([0x02; 32], make_pk_bytes(20), 2);
+crates/amun-consensus-network/src/validator_identity.rs:257:        let id1_alt = ValidatorIdentity::new([0x01; 32], make_pk_bytes(99), 3);
+crates/amun-consensus-network/src/validator_identity.rs:268:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:270:        let decoded: ValidatorIdentity = postcard::from_bytes(&encoded).unwrap();
+crates/amun-consensus-network/src/lib.rs:18:pub use validator_identity::{ValidatorIdentity, ValidatorIdentityRegistry};
+crates/amun-consensus-network/src/real_staking_adapter.rs:5:use crate::validator_identity::ValidatorIdentityRegistry;
+crates/amun-consensus-network/src/real_staking_adapter.rs:14:    pub identity_registry: ValidatorIdentityRegistry,
+crates/amun-consensus-network/src/real_staking_adapter.rs:22:            identity_registry: ValidatorIdentityRegistry::new(),
+crates/amun-consensus-network/src/real_staking_adapter.rs:28:        identity_registry: ValidatorIdentityRegistry,
+crates/amun-consensus-network/src/real_staking_adapter.rs:110:            .register(crate::ValidatorIdentity::new(validator_id, pk.0, 1))
+crates/amun-consensus-network/src/real_staking_adapter.rs:185:        let mut id_registry = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/real_staking_adapter.rs:187:            .register(crate::ValidatorIdentity::new(validator_id, [0x42u8; 48], 1))
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:58:        .register(amun_consensus_network::ValidatorIdentity::new(vid, pk.0, 1))
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:6:    ValidatorIdentity,
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:27:        .register(ValidatorIdentity::new(validator_id, [0x42u8; 48], 1))
+crates/amun-validator-networking/src/validator_identity.rs:5:pub struct ValidatorIdentity {
+crates/amun-validator-networking/src/validator_identity.rs:12:impl ValidatorIdentity {
+crates/amun-validator-networking/src/lib.rs:46:        let id = ValidatorIdentity::new([1u8; 32], [2u8; 32], "10.0.0.1".into(), 9000);
+crates/amun-validator-networking/src/lib.rs:56:        let id = ValidatorIdentity::new([1u8; 32], [2u8; 32], "10.0.0.1".into(), 9000);
+crates/amun-validator-networking/src/peer_discovery.rs:1:use crate::validator_identity::ValidatorIdentity;
+crates/amun-validator-networking/src/peer_discovery.rs:7:    peers: HashMap<[u8; 32], ValidatorIdentity>,
+crates/amun-validator-networking/src/peer_discovery.rs:15:    pub fn register(&mut self, identity: ValidatorIdentity) {
+crates/amun-validator-networking/src/peer_discovery.rs:23:    pub fn get(&self, fingerprint: &[u8; 32]) -> Option<&ValidatorIdentity> {
+crates/amun-validator-networking/src/peer_discovery.rs:31:    pub fn list_peers(&self) -> Vec<&ValidatorIdentity> {
+crates/amun-validator-networking/src/peer_discovery.rs:35:    pub fn random_peers(&self, count: usize) -> Vec<&ValidatorIdentity> {
+crates/amun-validator-networking/src/peer_discovery.rs:37:        let mut peers: Vec<&ValidatorIdentity> = self.peers.values().collect();

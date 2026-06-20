@@ -1,0 +1,596 @@
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:8:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:73:    // Tamper with amount_slashed after signing
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:74:    cert.amount_slashed = 1; // Changed from 15000 to 1
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:110:    cert2.amount_slashed = 9999;
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:3:// Verifies that replaying the same sequence of slashing certificates
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:4:// produces identical slashing roots across multiple validators.
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:11:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:58:        "N121.2 FAIL: Node A and Node B must produce the same slashing root"
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:62:        "N121.2 FAIL: Node B and Node C must produce the same slashing root"
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:4:// Verifies that slashing state can be snapshotted, restored,
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:12:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:109:        "N121.6 FAIL: validator 0x42 must have 2 slashes"
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:123:        "N121.6 FAIL: validator 0x99 must have 1 slash"
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:128:/// N121.6: Total slash count is auditable
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:130:fn n121_6_total_slash_count_auditable() {
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:27:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:19:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/messages.rs:410:    SlashingCertificate(crate::slashing_certificate::SlashingCertificate),
+crates/amun-consensus-network/src/misbehavior_registry.rs:25:    pub slashing_score: u64,
+crates/amun-consensus-network/src/misbehavior_registry.rs:39:            slashing_score: 30,
+crates/amun-consensus-network/src/misbehavior_registry.rs:150:        if score >= self.thresholds.slashing_score {
+crates/amun-consensus-network/src/misbehavior_registry.rs:181:        if score >= self.thresholds.slashing_score {
+crates/amun-consensus-network/src/misbehavior_registry.rs:194:        if score >= self.thresholds.slashing_score {
+crates/amun-consensus-network/src/misbehavior_registry.rs:320:    fn n109_11_slashing_threshold_triggered() {
+crates/amun-consensus-network/src/misbehavior_registry.rs:322:        // Score 31 > slashing threshold 30
+crates/amun-consensus-network/src/misbehavior_registry.rs:390:            slashing_score: 8,
+crates/amun-consensus-network/src/misbehavior_registry.rs:398:        reg.record_misbehavior(&[1u8; 32], &[0x03; 32], &EvidenceType::StateRootMismatch, 3); // +3 → 8 → slashing
+crates/amun-consensus-network/src/slashing_ledger.rs:4:// more than once, ensuring deterministic slashing across
+crates/amun-consensus-network/src/slashing_ledger.rs:7:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/slashing_ledger.rs:17:    hasher.update(&cert.amount_slashed.to_le_bytes());
+crates/amun-consensus-network/src/slashing_ledger.rs:28:/// N119.5: Record of an executed slash for auditability.
+crates/amun-consensus-network/src/slashing_ledger.rs:40:/// N119.1: Persistent ledger preventing replay of slashing certificates.
+crates/amun-consensus-network/src/slashing_ledger.rs:44:    /// N119.5: Audit trail of all executed slashes.
+crates/amun-consensus-network/src/slashing_ledger.rs:61:    /// N119.2: Execute a slash and record it in the ledger.
+crates/amun-consensus-network/src/slashing_ledger.rs:77:        // Execute the slash
+crates/amun-consensus-network/src/slashing_ledger.rs:87:            amount: cert.amount_slashed,
+crates/amun-consensus-network/src/slashing_ledger.rs:95:    /// N119.1: Get the number of executed slashes.
+crates/amun-consensus-network/src/slashing_ledger.rs:100:    /// N119.5: Get all executed slashes for a validator.
+crates/amun-consensus-network/src/slashing_ledger.rs:119:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_ledger.rs:123:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_ledger.rs:220:        let cert2 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_state.rs:3:// Elevates the slashing ledger from a sidecar structure to a
+crates/amun-consensus-network/src/slashing_state.rs:7:use crate::slashing_ledger::{ExecutedSlash, SlashingLedger};
+crates/amun-consensus-network/src/slashing_state.rs:8:use crate::slashing_merkle::merkle_root;
+crates/amun-consensus-network/src/slashing_state.rs:10:/// N121.1: Consensus-level slashing state.
+crates/amun-consensus-network/src/slashing_state.rs:19:    /// Create a new slashing state with an empty ledger.
+crates/amun-consensus-network/src/slashing_state.rs:26:    /// Execute a slash and update the root atomically.
+crates/amun-consensus-network/src/slashing_state.rs:29:        cert: &crate::slashing_certificate::SlashingCertificate,
+crates/amun-consensus-network/src/slashing_state.rs:45:            return Err("N121.1: slashing state root mismatch".into());
+crates/amun-consensus-network/src/slashing_state.rs:50:    /// Get the number of executed slashes.
+crates/amun-consensus-network/src/slashing_state.rs:71:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_state.rs:75:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_state.rs:125:        let cert2 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_merkle.rs:7:use crate::slashing_ledger::ExecutedSlash;
+crates/amun-consensus-network/src/slashing_merkle.rs:10:/// N120.1: Leaf hash for a single executed slash.
+crates/amun-consensus-network/src/slashing_merkle.rs:11:fn leaf_hash(slash: &ExecutedSlash) -> [u8; 32] {
+crates/amun-consensus-network/src/slashing_merkle.rs:14:    hasher.update(&slash.certificate_id);
+crates/amun-consensus-network/src/slashing_merkle.rs:15:    hasher.update(&slash.validator_id);
+crates/amun-consensus-network/src/slashing_merkle.rs:16:    hasher.update(&slash.amount.to_le_bytes());
+crates/amun-consensus-network/src/slashing_merkle.rs:17:    hasher.update(&slash.height.to_le_bytes());
+crates/amun-consensus-network/src/slashing_merkle.rs:18:    hasher.update(&slash.timestamp.to_le_bytes());
+crates/amun-consensus-network/src/slashing_merkle.rs:22:/// N120.1: Compute the Merkle root from a slice of executed slashes.
+crates/amun-consensus-network/src/slashing_merkle.rs:25:pub fn merkle_root(slashes: &[ExecutedSlash]) -> [u8; 32] {
+crates/amun-consensus-network/src/slashing_merkle.rs:26:    if slashes.is_empty() {
+crates/amun-consensus-network/src/slashing_merkle.rs:30:    let mut leaves: Vec<[u8; 32]> = slashes.iter().map(leaf_hash).collect();
+crates/amun-consensus-network/src/slashing_merkle.rs:54:    use crate::slashing_ledger::ExecutedSlash;
+crates/amun-consensus-network/src/slashing_merkle.rs:56:    fn make_slash(id: u8, height: u64) -> ExecutedSlash {
+crates/amun-consensus-network/src/slashing_merkle.rs:73:        let slash = make_slash(1, 100);
+crates/amun-consensus-network/src/slashing_merkle.rs:74:        let root1 = merkle_root(&[slash.clone()]);
+crates/amun-consensus-network/src/slashing_merkle.rs:75:        let root2 = merkle_root(&[slash]);
+crates/amun-consensus-network/src/slashing_merkle.rs:86:        let s1 = make_slash(1, 100);
+crates/amun-consensus-network/src/slashing_merkle.rs:87:        let s2 = make_slash(2, 200);
+crates/amun-consensus-network/src/slashing_merkle.rs:97:    fn n120_1_different_slashes_different_root() {
+crates/amun-consensus-network/src/slashing_merkle.rs:98:        let s1 = make_slash(1, 100);
+crates/amun-consensus-network/src/slashing_merkle.rs:99:        let s2 = make_slash(2, 100);
+crates/amun-consensus-network/src/slashing_merkle.rs:104:            "N120.1 FAIL: different slashes must have different roots"
+crates/amun-consensus-network/src/slashing_merkle.rs:109:    fn n120_1_root_changes_with_new_slash() {
+crates/amun-consensus-network/src/slashing_merkle.rs:110:        let s1 = make_slash(1, 100);
+crates/amun-consensus-network/src/slashing_merkle.rs:111:        let s2 = make_slash(2, 200);
+crates/amun-consensus-network/src/slashing_merkle.rs:116:            "N120.1 FAIL: root must change when new slash is added"
+crates/amun-consensus-network/src/slashing_merkle.rs:122:        let slashes: Vec<_> = (1..=7).map(|i| make_slash(i, i as u64 * 100)).collect();
+crates/amun-consensus-network/src/slashing_merkle.rs:123:        let root1 = merkle_root(&slashes);
+crates/amun-consensus-network/src/slashing_merkle.rs:124:        let root2 = merkle_root(&slashes);
+crates/amun-consensus-network/src/slashing_merkle.rs:133:        let s1 = make_slash(1, 100);
+crates/amun-consensus-network/src/slashing_merkle.rs:134:        let s2 = make_slash(2, 200);
+crates/amun-consensus-network/src/integrated_slashing.rs:7:// the existing slashing infrastructure.
+crates/amun-consensus-network/src/integrated_slashing.rs:20://   stake.slash(penalty_bps)
+crates/amun-consensus-network/src/integrated_slashing.rs:26:/// N109.12: Result of processing an evidence through the slashing pipeline
+crates/amun-consensus-network/src/integrated_slashing.rs:37:    /// Validator crossed slashing threshold — penalty amount in bps
+crates/amun-consensus-network/src/integrated_slashing.rs:43:/// N109.12: Integrated pipeline connecting evidence to slashing
+crates/amun-consensus-network/src/integrated_slashing.rs:47:    /// Penalty in basis points (1/10000) for slashing
+crates/amun-consensus-network/src/integrated_slashing.rs:123:    /// N109.12: Calculate slashing penalty in basis points based on score
+crates/amun-consensus-network/src/integrated_slashing.rs:126:        let multiplier = if score <= self.registry.thresholds.slashing_score {
+crates/amun-consensus-network/src/integrated_slashing.rs:129:            ((score - self.registry.thresholds.slashing_score) / 10 + 1)
+crates/amun-consensus-network/src/integrated_slashing.rs:138:    /// N109.12: Get penalty for a specific validator (if slashable)
+crates/amun-consensus-network/src/integrated_slashing.rs:149:    /// N109.12: Mark evidence as slashed after penalty is applied
+crates/amun-consensus-network/src/integrated_slashing.rs:150:    pub fn mark_slashed(&mut self, evidence_id: &[u8; 32]) -> bool {
+crates/amun-consensus-network/src/integrated_slashing.rs:168:    /// N109.12 GATEKEEPER: Evidence triggers the full slashing pipeline
+crates/amun-consensus-network/src/integrated_slashing.rs:170:    fn n109_12_evidence_triggers_slashing_pipeline() {
+crates/amun-consensus-network/src/integrated_slashing.rs:209:        // Not slashable yet
+crates/amun-consensus-network/src/integrated_slashing.rs:327:            slashing_score: 9,
+crates/amun-consensus-network/src/integrated_slashing.rs:337:        // Two double votes (weight 10) → >=9 slashing
+crates/amun-consensus-network/src/integrated_slashing.rs:342:    /// N109.12: Mark evidence as slashed after penalty applied
+crates/amun-consensus-network/src/integrated_slashing.rs:344:    fn n109_12_mark_slashed_updates_status() {
+crates/amun-consensus-network/src/integrated_slashing.rs:352:        assert!(pipeline.mark_slashed(&evidence_id));
+crates/amun-consensus-network/src/finality_gate.rs:40:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/finality_gate.rs:44:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing.rs:4:// This replaces the old slashing.rs that depended on misbehavior.rs (N101).
+crates/amun-consensus-network/src/slashing.rs:5:// Now uses the N109 misbehavior_registry and integrated_slashing pipeline.
+crates/amun-consensus-network/src/slashing.rs:7:// The old should_slash() and slash_percentage() are reimplemented on top
+crates/amun-consensus-network/src/slashing.rs:14:/// N109.13: Returns true if the validator should be slashed.
+crates/amun-consensus-network/src/slashing.rs:16:pub fn should_slash(registry: &MisbehaviorRegistry, validator_id: &[u8; 32]) -> bool {
+crates/amun-consensus-network/src/slashing.rs:20:/// N109.13: Returns the slash percentage for a validator based on their misbehavior score.
+crates/amun-consensus-network/src/slashing.rs:22:pub fn slash_percentage(registry: &MisbehaviorRegistry, validator_id: &[u8; 32]) -> u8 {
+crates/amun-consensus-network/src/slashing.rs:56:    fn n109_13_no_offenses_no_slash() {
+crates/amun-consensus-network/src/slashing.rs:58:        assert!(!should_slash(&registry, &[1u8; 32]));
+crates/amun-consensus-network/src/slashing.rs:59:        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 0);
+crates/amun-consensus-network/src/slashing.rs:75:            !should_slash(&registry, &[1u8; 32]),
+crates/amun-consensus-network/src/slashing.rs:76:            "Single offense should not trigger slash"
+crates/amun-consensus-network/src/slashing.rs:78:        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 5); // Warning level
+crates/amun-consensus-network/src/slashing.rs:89:        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 10); // Suspension level
+crates/amun-consensus-network/src/slashing.rs:93:    fn n109_13_three_offenses_triggers_slash() {
+crates/amun-consensus-network/src/slashing.rs:95:        // Three DoubleVotes (weight 10 each) → score=30, slashing (>=30)
+crates/amun-consensus-network/src/slashing.rs:101:            should_slash(&registry, &[1u8; 32]),
+crates/amun-consensus-network/src/slashing.rs:102:            "Three offenses should trigger slash"
+crates/amun-consensus-network/src/slashing.rs:104:        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 25); // Slashing level
+crates/amun-consensus-network/src/slashing.rs:122:        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 5);
+crates/amun-consensus-network/src/slashing.rs:126:    fn n109_13_all_slashable_offenses_flow_through_unified_api() {
+crates/amun-consensus-network/src/slashing.rs:153:        assert!(!should_slash(&registry, &[0x42; 32])); // 21 < 30
+crates/amun-consensus-network/src/slashing.rs:154:        assert_eq!(slash_percentage(&registry, &[0x42; 32]), 10); // Suspension level
+crates/amun-consensus-network/src/slashing.rs:158:        assert!(should_slash(&registry, &[0x42; 32]));
+crates/amun-consensus-network/src/slashing.rs:159:        assert_eq!(slash_percentage(&registry, &[0x42; 32]), 25);
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:4:// slash is included in the slashing ledger given only the
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:5:// slashing_root and a Merkle proof.
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:7:use crate::slashing_ledger::ExecutedSlash;
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:10:/// N121.4: A Merkle inclusion proof for an executed slash.
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:13:    /// The slash being proved
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:14:    pub slash: ExecutedSlash,
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:16:    /// Index of the slash in the ledger (0-based)
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:19:    /// Total number of slashes in the ledger
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:31:    /// N121.4: Compute leaf hash for a slash (same as merkle tree).
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:32:    fn leaf_hash(slash: &ExecutedSlash) -> [u8; 32] {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:35:        hasher.update(&slash.certificate_id);
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:36:        hasher.update(&slash.validator_id);
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:37:        hasher.update(&slash.amount.to_le_bytes());
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:38:        hasher.update(&slash.height.to_le_bytes());
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:39:        hasher.update(&slash.timestamp.to_le_bytes());
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:56:        let mut current = Self::leaf_hash(&self.slash);
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:93:/// N121.4: Build an inclusion proof from the full slash history.
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:95:    slashes: &[ExecutedSlash],
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:98:    if slashes.is_empty() {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:101:    if index >= slashes.len() {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:105:            slashes.len()
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:109:    let mut leaves: Vec<[u8; 32]> = slashes
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:114:    let slash = slashes[index].clone();
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:152:        slash,
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:163:    use crate::slashing_ledger::ExecutedSlash;
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:164:    use crate::slashing_merkle::merkle_root;
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:166:    fn make_slash(id: u8, height: u64) -> ExecutedSlash {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:178:        let slashes = vec![make_slash(1, 100)];
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:179:        let proof = build_inclusion_proof(&slashes, 0).unwrap();
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:190:        let slashes: Vec<_> = (1..=5).map(|i| make_slash(i, i as u64 * 100)).collect();
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:193:        let proof = build_inclusion_proof(&slashes, 2).unwrap();
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:198:        assert_eq!(proof.slash.certificate_id, [3; 32]);
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:203:        let slashes: Vec<_> = (1..=3).map(|i| make_slash(i, i as u64 * 100)).collect();
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:204:        let mut proof = build_inclusion_proof(&slashes, 1).unwrap();
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:206:        // Replace the slash with a different one
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:207:        proof.slash = make_slash(9, 999);
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:211:            "N121.4 FAIL: proof with wrong slash must be rejected"
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:217:        let slashes = vec![make_slash(1, 100)];
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:218:        assert!(build_inclusion_proof(&slashes, 5).is_err());
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:228:        let slashes: Vec<_> = (1..=7).map(|i| make_slash(i, i as u64 * 100)).collect();
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:229:        let expected = merkle_root(&slashes);
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:231:        for i in 0..slashes.len() {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:232:            let proof = build_inclusion_proof(&slashes, i).unwrap();
+crates/amun-consensus-network/src/lib.rs:5:pub mod slashing;
+crates/amun-consensus-network/src/lib.rs:23:pub mod integrated_slashing;
+crates/amun-consensus-network/src/lib.rs:29:pub mod slashing_certificate;
+crates/amun-consensus-network/src/lib.rs:30:pub mod slashing_certificate_builder;
+crates/amun-consensus-network/src/lib.rs:31:pub mod slashing_fraud_proof;
+crates/amun-consensus-network/src/lib.rs:32:pub mod slashing_inclusion_proof;
+crates/amun-consensus-network/src/lib.rs:33:pub mod slashing_ledger;
+crates/amun-consensus-network/src/lib.rs:34:pub mod slashing_merkle;
+crates/amun-consensus-network/src/lib.rs:35:pub mod slashing_state;
+crates/amun-consensus-network/src/lib.rs:50:pub use integrated_slashing::{IntegratedSlashingPipeline, PipelineResult};
+crates/amun-consensus-network/src/lib.rs:62:pub use slashing_certificate::{CertificateResultingStatus, EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/lib.rs:63:pub use slashing_certificate_builder::SlashingCertificateBuilder;
+crates/amun-consensus-network/src/lib.rs:64:pub use slashing_fraud_proof::SlashingFraudProof;
+crates/amun-consensus-network/src/lib.rs:65:pub use slashing_inclusion_proof::{build_inclusion_proof, SlashingInclusionProof};
+crates/amun-consensus-network/src/lib.rs:66:pub use slashing_ledger::{certificate_id, ExecutedSlash, SlashingLedger};
+crates/amun-consensus-network/src/lib.rs:67:pub use slashing_merkle::merkle_root;
+crates/amun-consensus-network/src/lib.rs:68:pub use slashing_state::SlashingState;
+crates/amun-consensus-network/src/multi_signer_certificate.rs:1:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/multi_signer_certificate.rs:91:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/multi_signer_certificate.rs:96:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/certificate_gossip.rs:7:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/certificate_gossip.rs:74:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/certificate_gossip.rs:77:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/certificate_gossip.rs:138:        c.amount_slashed = 0;
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:2:use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:10:    amount_slashed: Option<u64>,
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:25:            amount_slashed: None,
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:53:    pub fn amount_slashed(mut self, v: u64) -> Self {
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:54:        self.amount_slashed = Some(v);
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:75:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:81:            self.amount_slashed.unwrap(),
+crates/amun-consensus-network/src/real_staking_adapter.rs:7:use amun_staking::slashing::SlashingConditions;
+crates/amun-consensus-network/src/real_staking_adapter.rs:54:        // Individual stake is tracked through slash results.
+crates/amun-consensus-network/src/real_staking_adapter.rs:62:    fn slash(&mut self, validator_id: &[u8; 32], _amount: u64) -> Result<u64, String> {
+crates/amun-consensus-network/src/real_staking_adapter.rs:65:            .slash(&pk, &self.rules)
+crates/amun-consensus-network/src/real_staking_adapter.rs:70:        // Deactivation happens automatically in slash() when slash_count >= max_slash_count
+crates/amun-consensus-network/src/real_staking_adapter.rs:94:    /// N110.1b GATEKEEPER: Real staking slash reduces stake
+crates/amun-consensus-network/src/real_staking_adapter.rs:96:    fn n110_1b_real_staking_slash_reduces_validator_stake() {
+crates/amun-consensus-network/src/real_staking_adapter.rs:139:        // Execute real slash
+crates/amun-consensus-network/src/real_staking_adapter.rs:140:        let result = adapter.try_slash(&validator_id);
+crates/amun-consensus-network/src/real_staking_adapter.rs:141:        assert!(result.is_some(), "N110.1b FAIL: slash should execute");
+crates/amun-consensus-network/src/real_staking_adapter.rs:143:        let slash_result = result.unwrap();
+crates/amun-consensus-network/src/real_staking_adapter.rs:145:            slash_result.amount_slashed > 0,
+crates/amun-consensus-network/src/real_staking_adapter.rs:146:            "slashed amount must be positive"
+crates/amun-consensus-network/src/real_staking_adapter.rs:155:            "N110.1b GATEKEEPER PASSED: real_stake_before=100000, slashed={}, registry_total={}",
+crates/amun-consensus-network/src/real_staking_adapter.rs:156:            slash_result.amount_slashed, adapter.executor.registry.total_stake
+crates/amun-consensus-network/src/real_staking_adapter.rs:166:        let result = executor.slash(&validator_id, 1000);
+crates/amun-consensus-network/src/slashing_certificate.rs:4:// A constitutional object that makes slashing provable, auditable, and
+crates/amun-consensus-network/src/slashing_certificate.rs:8:// produced by the MisbehaviorRegistry when a validator crosses the slashing
+crates/amun-consensus-network/src/slashing_certificate.rs:10:// can independently verify that the slashing was justified.
+crates/amun-consensus-network/src/slashing_certificate.rs:12:// After N110.2, slashing is not just a local stake reduction — it becomes
+crates/amun-consensus-network/src/slashing_certificate.rs:20:/// N110.2: A constitutional certificate proving a validator should be slashed.
+crates/amun-consensus-network/src/slashing_certificate.rs:27:///   - RESULT: new stake after slashing
+crates/amun-consensus-network/src/slashing_certificate.rs:30:    /// Validator being slashed
+crates/amun-consensus-network/src/slashing_certificate.rs:34:    /// Total misbehavior score that triggered slashing
+crates/amun-consensus-network/src/slashing_certificate.rs:46:    /// Absolute amount slashed
+crates/amun-consensus-network/src/slashing_certificate.rs:47:    pub amount_slashed: u64,
+crates/amun-consensus-network/src/slashing_certificate.rs:49:    /// Validator's stake after slashing
+crates/amun-consensus-network/src/slashing_certificate.rs:52:    /// Number of times this validator has been slashed
+crates/amun-consensus-network/src/slashing_certificate.rs:66:    /// Height at which slashing was executed
+crates/amun-consensus-network/src/slashing_certificate.rs:85:/// N110.2: Resulting validator status after slashing
+crates/amun-consensus-network/src/slashing_certificate.rs:101:        data.extend_from_slice(&self.amount_slashed.to_le_bytes());
+crates/amun-consensus-network/src/slashing_certificate.rs:145:        hasher.update(&self.amount_slashed.to_le_bytes());
+crates/amun-consensus-network/src/slashing_certificate.rs:154:    pub fn from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:160:        amount_slashed: u64,
+crates/amun-consensus-network/src/slashing_certificate.rs:188:            amount_slashed,
+crates/amun-consensus-network/src/slashing_certificate.rs:209:        if self.amount_slashed == 0 {
+crates/amun-consensus-network/src/slashing_certificate.rs:210:            return Err("N110.2: amount_slashed is zero".into());
+crates/amun-consensus-network/src/slashing_certificate.rs:229:        let cert = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:251:        assert_eq!(decoded.amount_slashed, 15000);
+crates/amun-consensus-network/src/slashing_certificate.rs:258:        let cert1 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:270:        let cert2 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:290:        let c1 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:302:        let c2 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:319:        let mut cert = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:331:        cert.amount_slashed = 0; // Tamper
+crates/amun-consensus-network/src/engine.rs:406:                    if crate::slashing::should_slash(&self.misbehavior_registry, &vote.voter_id) {
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:288:                    if crate::slashing::should_slash(&self.misbehavior_registry, &vote.voter_id) {
+crates/amun-consensus-network/src/staking_adapter.rs:17:/// N110.1: Result of executing a slash on a validator's stake
+crates/amun-consensus-network/src/staking_adapter.rs:21:    pub amount_slashed: u64,
+crates/amun-consensus-network/src/staking_adapter.rs:28:/// N110.1: Trait for executing slashing on real stake.
+crates/amun-consensus-network/src/staking_adapter.rs:33:    fn slash(&mut self, validator_id: &[u8; 32], amount: u64) -> Result<u64, String>;
+crates/amun-consensus-network/src/staking_adapter.rs:53:    /// N110.1: Check if a validator is slashable and execute the slash.
+crates/amun-consensus-network/src/staking_adapter.rs:55:    /// Returns SlashResult if slashing was executed, None if validator
+crates/amun-consensus-network/src/staking_adapter.rs:56:    /// hasn't crossed the slashing threshold.
+crates/amun-consensus-network/src/staking_adapter.rs:57:    pub fn try_slash(&mut self, validator_id: &[u8; 32]) -> Option<SlashResult> {
+crates/amun-consensus-network/src/staking_adapter.rs:58:        // Check if validator crossed slashing threshold
+crates/amun-consensus-network/src/staking_adapter.rs:60:            Some(ValidatorAction::Slash) => Some(self.execute_slash(validator_id)),
+crates/amun-consensus-network/src/staking_adapter.rs:65:    /// N118.2: The unified entry point for slashing.
+crates/amun-consensus-network/src/staking_adapter.rs:66:    /// Requires finality + signature + quorum before executing the slash.
+crates/amun-consensus-network/src/staking_adapter.rs:86:            Some(ValidatorAction::Slash) => Ok(Some(self.execute_slash(validator_id))),
+crates/amun-consensus-network/src/staking_adapter.rs:91:    /// N115: Execute slash only if the certificate carries a valid signature.
+crates/amun-consensus-network/src/staking_adapter.rs:93:    pub fn try_slash_with_certificate(
+crates/amun-consensus-network/src/staking_adapter.rs:98:        // N115: Verify certificate signature before executing slash
+crates/amun-consensus-network/src/staking_adapter.rs:105:        // Check if validator crossed slashing threshold
+crates/amun-consensus-network/src/staking_adapter.rs:107:            Some(ValidatorAction::Slash) => Ok(Some(self.execute_slash(validator_id))),
+crates/amun-consensus-network/src/staking_adapter.rs:112:    /// N110.1: Execute the slash unconditionally.
+crates/amun-consensus-network/src/staking_adapter.rs:113:    fn execute_slash(&mut self, validator_id: &[u8; 32]) -> SlashResult {
+crates/amun-consensus-network/src/staking_adapter.rs:125:        // Calculate amount to slash
+crates/amun-consensus-network/src/staking_adapter.rs:130:        // Execute the slash on real stake
+crates/amun-consensus-network/src/staking_adapter.rs:131:        let _ = self.executor.slash(validator_id, amount);
+crates/amun-consensus-network/src/staking_adapter.rs:133:        // Deactivate if status is SlashEligible and this isn't first slash
+crates/amun-consensus-network/src/staking_adapter.rs:142:            amount_slashed: amount,
+crates/amun-consensus-network/src/staking_adapter.rs:182:        fn slash(&mut self, validator_id: &[u8; 32], amount: u64) -> Result<u64, String> {
+crates/amun-consensus-network/src/staking_adapter.rs:198:    fn n110_1_slashing_reduces_real_validator_stake() {
+crates/amun-consensus-network/src/staking_adapter.rs:207:        // Accumulate misbehavior until slashing threshold
+crates/amun-consensus-network/src/staking_adapter.rs:234:        // Execute slash
+crates/amun-consensus-network/src/staking_adapter.rs:235:        let result = adapter.try_slash(&validator_id);
+crates/amun-consensus-network/src/staking_adapter.rs:238:            "N110.1 FAIL: should execute slash when threshold crossed"
+crates/amun-consensus-network/src/staking_adapter.rs:241:        let slash_result = result.unwrap();
+crates/amun-consensus-network/src/staking_adapter.rs:242:        assert_eq!(slash_result.validator_id, validator_id);
+crates/amun-consensus-network/src/staking_adapter.rs:244:            slash_result.amount_slashed > 0,
+crates/amun-consensus-network/src/staking_adapter.rs:245:            "N110.1 FAIL: slash amount must be positive"
+crates/amun-consensus-network/src/staking_adapter.rs:248:            slash_result.remaining_stake < 100_000,
+crates/amun-consensus-network/src/staking_adapter.rs:250:            slash_result.remaining_stake
+crates/amun-consensus-network/src/staking_adapter.rs:253:            slash_result.remaining_stake,
+crates/amun-consensus-network/src/staking_adapter.rs:254:            100_000 - slash_result.amount_slashed,
+crates/amun-consensus-network/src/staking_adapter.rs:258:        eprintln!("N110.1 GATEKEEPER PASSED: initial=100000, slashed={}, remaining={}, penalty={}bps, offenses={}",
+crates/amun-consensus-network/src/staking_adapter.rs:259:            slash_result.amount_slashed,
+crates/amun-consensus-network/src/staking_adapter.rs:260:            slash_result.remaining_stake,
+crates/amun-consensus-network/src/staking_adapter.rs:261:            slash_result.penalty_bps,
+crates/amun-consensus-network/src/staking_adapter.rs:262:            slash_result.offense_count,
+crates/amun-consensus-network/src/staking_adapter.rs:266:    /// N110.1: Validator below threshold is not slashed
+crates/amun-consensus-network/src/staking_adapter.rs:268:    fn n110_1_validator_below_threshold_not_slashed() {
+crates/amun-consensus-network/src/staking_adapter.rs:277:        // Only one offense — score=10, below slashing threshold (30)
+crates/amun-consensus-network/src/staking_adapter.rs:285:        let result = adapter.try_slash(&validator_id);
+crates/amun-consensus-network/src/staking_adapter.rs:288:            "N110.1 FAIL: should not slash validator below threshold"
+crates/amun-consensus-network/src/staking_adapter.rs:293:            "N110.1 FAIL: stake should not change when not slashed"
+crates/amun-consensus-network/src/staking_adapter.rs:297:    /// N110.1: Multiple slashes accumulate correctly
+crates/amun-consensus-network/src/staking_adapter.rs:299:    fn n110_1_multiple_slashes_accumulate() {
+crates/amun-consensus-network/src/staking_adapter.rs:308:        // First set of offenses → first slash
+crates/amun-consensus-network/src/staking_adapter.rs:328:        let result1 = adapter.try_slash(&validator_id).unwrap();
+crates/amun-consensus-network/src/staking_adapter.rs:329:        assert!(result1.amount_slashed > 0);
+crates/amun-consensus-network/src/staking_adapter.rs:331:        // More offenses → score increases → should be slashable again
+crates/amun-consensus-network/src/staking_adapter.rs:351:        let result2 = adapter.try_slash(&validator_id).unwrap();
+crates/amun-consensus-network/src/staking_adapter.rs:352:        assert!(result2.amount_slashed > 0);
+crates/amun-consensus-network/src/staking_adapter.rs:355:            "Second slash should have higher offense_count"
+crates/amun-consensus-network/src/staking_adapter.rs:359:            "Stake should decrease further on second slash"
+crates/amun-consensus-network/src/staking_adapter.rs:363:    /// N110.1: Different validators have independent slashing
+crates/amun-consensus-network/src/staking_adapter.rs:385:        // Validator 1 should be slashed
+crates/amun-consensus-network/src/staking_adapter.rs:386:        let r1 = adapter.try_slash(&[1u8; 32]);
+crates/amun-consensus-network/src/staking_adapter.rs:389:        // Validator 2 should NOT be slashed (no offenses)
+crates/amun-consensus-network/src/staking_adapter.rs:390:        let r2 = adapter.try_slash(&[2u8; 32]);
+crates/amun-consensus-network/src/staking_adapter.rs:397:    /// N115: Unsigned certificate is rejected before slash execution
+crates/amun-consensus-network/src/staking_adapter.rs:399:    fn n115_unsigned_certificate_rejected_before_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs:412:        let cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs:425:        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+crates/amun-consensus-network/src/staking_adapter.rs:433:    /// N115: Signed certificate executes slash successfully
+crates/amun-consensus-network/src/staking_adapter.rs:435:    fn n115_signed_certificate_executes_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs:448:        let mut cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs:463:        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+crates/amun-consensus-network/src/staking_adapter.rs:468:        let slash_result = result.unwrap();
+crates/amun-consensus-network/src/staking_adapter.rs:470:            slash_result.is_some(),
+crates/amun-consensus-network/src/staking_adapter.rs:473:        assert!(slash_result.unwrap().amount_slashed > 0);
+crates/amun-consensus-network/src/staking_adapter.rs:478:    fn n115_tampered_certificate_rejected_before_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs:490:        let mut cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs:506:        cert.amount_slashed = 1;
+crates/amun-consensus-network/src/staking_adapter.rs:508:        let result = adapter.try_slash_with_certificate(&validator_id, &cert);
+crates/amun-consensus-network/src/staking_adapter.rs:527:            crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs:563:            crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:18:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:86:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:89:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:3:// Produces verifiable proofs when a block's slashing_root does not
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:7:use crate::slashing_ledger::ExecutedSlash;
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:8:use crate::slashing_merkle::merkle_root;
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:10:/// N121.3: A cryptographic proof that a block's slashing_root is invalid.
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:20:    /// The slashing_root claimed in the block header
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:24:    /// The correctly computed slashing_root
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:28:    /// The executed slashes that produce the expected_root
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:29:    pub slash_history: Vec<ExecutedSlash>,
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:42:        slash_history: Vec<ExecutedSlash>,
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:44:        let expected_root = merkle_root(&slash_history);
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:50:            slash_history,
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:78:        let recomputed_root = merkle_root(&self.slash_history);
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:80:            return Err("N121.3: expected_root does not match slash history".into());
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:100:    use crate::slashing_ledger::ExecutedSlash;
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:102:    fn make_slash(id: u8, height: u64) -> ExecutedSlash {
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:114:        let history = vec![make_slash(1, 100), make_slash(2, 200)];
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:130:        let history = vec![make_slash(1, 100)];
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:144:        let history = vec![make_slash(1, 100)];
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:150:        // Tamper with the slash history after proof creation
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:151:        proof.slash_history[0].amount = 99999;
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:155:            "N121.3 FAIL: tampered slash history must invalidate proof"
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:161:        let history = vec![make_slash(1, 100)];
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:177:        let history = vec![make_slash(1, 100), make_slash(2, 200)];
+crates/amun_state_machine/src/transition.rs:61:            EventType::Slash => Self::handle_slash(state, event),
+crates/amun_state_machine/src/transition.rs:215:    fn handle_slash(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs:226:        let slashed = source_balance * amount / Fixed::ONE;
+crates/amun_state_machine/src/transition.rs:229:            source.balance = source.balance - slashed;
+crates/amun_state_machine/src/transition.rs:231:        state.total_supply = state.total_supply - slashed;
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:53:| SealedEpochMutation | Attempt to modify sealed epoch | Reject, slash, permanent ban |
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:29:    // From EvidenceStore (slashing certificates)
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:30:    pub slashing_bound: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:43:        slashing_bound: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:55:            slashing_bound,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:152:        slashing_bound: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:164:            slashing_bound,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:207:        assert!(evidence.slashing_bound);
+crates/amun-constitutional-enforcement/src/lib.rs:60:            evidence.slashing_bound,
+crates/amun-constitutional-enforcement/src/lib.rs:98:        slashing_bound: bool,
+crates/amun-constitutional-enforcement/src/lib.rs:129:                slashing_bound,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:109:    pub slashing_bound: bool,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:130:        slashing_bound: bool,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:144:            slashing_bound,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:51:    /// Verify slashing certificate is backed by valid evidence.
+crates/amun-constitutional-enforcement/src/proof_engine.rs:52:    pub fn verify_slashing_evidence_binding(
+crates/amun-constitutional-enforcement/src/proof_engine.rs:153:        if !Self::verify_slashing_evidence_binding(evidence_ids, evidence_available) {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:82:    slashing_bound: bool,
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:100:        slashing_bound,
+crates/amun-ntr/src/tests.rs:4:    #[test] fn test_slash() { let mut t = NtrToken::new(0); t.staked = 10000; let s = t.slash(500); assert_eq!(s, 500); assert_eq!(t.staked, 9500); }
+crates/amun-ntr/src/token.rs:17:    pub fn slash(&mut self, bps: u16) -> u64 {
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:8:/// Create a valid slashing certificate for testing
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:10:    SlashingCertificate::from_slash_result(
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:44:        block.verify_slashing_certificates().is_ok(),
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:52:    cert.amount_slashed = 0; // Tamper with amount
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:54:                             // verify() should catch either amount_slashed=0 or hash mismatch.
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:56:    let result = block.verify_slashing_certificates();
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:74:    let result = block.verify_slashing_certificates();
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:82:            .contains("Too many slashing certificates"),
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:89:    let cert = SlashingCertificate::from_slash_result(
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:106:    let result = block.verify_slashing_certificates();
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:119:    let result = block.verify_slashing_certificates();
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:134:        block.verify_slashing_certificates().is_ok(),
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:9:    block.slashing_root = root;
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:14:fn n120_2_block_hash_changes_with_slashing_root() {
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:17:    block2.slashing_root = [0xAA; 32];
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:23:        "N120.2 FAIL: different slashing roots must produce different block hashes"
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:36:        "N120.2 FAIL: same slashing root must produce same block hash"
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:59:        "N120.2 FAIL: different slashing roots must produce different block hashes"
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:74:// N120.3 — Consensus Verification of slashing_root
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:80:        block.verify_slashing_root(&root).is_ok(),
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:88:    let result = block.verify_slashing_root(&[0xFF; 32]);
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:93:    assert!(result.unwrap_err().contains("slashing_root mismatch"));
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:100:        block.verify_slashing_root(&[0u8; 32]).is_ok(),
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:104:        block.verify_slashing_root(&[0x01; 32]).is_err(),
+crates/amun-block-builder/src/lib.rs:19:    pub slashing_certificates: Vec<amun_consensus_network::SlashingCertificate>,
+crates/amun-block-builder/src/lib.rs:20:    /// N120.2: Merkle root of the slashing ledger after this block
+crates/amun-block-builder/src/lib.rs:21:    pub slashing_root: [u8; 32],
+crates/amun-block-builder/src/lib.rs:25:    /// N110.4b: Verify all slashing certificates in this block.
+crates/amun-block-builder/src/lib.rs:26:    pub fn verify_slashing_certificates(&self) -> Result<(), String> {
+crates/amun-block-builder/src/lib.rs:29:        if self.slashing_certificates.len() > MAX_CERTS_PER_BLOCK {
+crates/amun-block-builder/src/lib.rs:31:                "Too many slashing certificates ({} > {})",
+crates/amun-block-builder/src/lib.rs:32:                self.slashing_certificates.len(),
+crates/amun-block-builder/src/lib.rs:37:        for (i, cert) in self.slashing_certificates.iter().enumerate() {
+crates/amun-block-builder/src/lib.rs:54:    /// N120.3: Verify that the slashing_root matches the given ledger root.
+crates/amun-block-builder/src/lib.rs:55:    /// Returns Err if the block's slashing_root doesn't match.
+crates/amun-block-builder/src/lib.rs:56:    pub fn verify_slashing_root(&self, expected_root: &[u8; 32]) -> Result<(), String> {
+crates/amun-block-builder/src/lib.rs:57:        if self.slashing_root != *expected_root {
+crates/amun-block-builder/src/lib.rs:59:                "N120.3: slashing_root mismatch: block={:02x?} expected={:02x?}",
+crates/amun-block-builder/src/lib.rs:60:                &self.slashing_root[..4],
+crates/amun-block-builder/src/lib.rs:79:        // N110.4: Include slashing certificates in block hash
+crates/amun-block-builder/src/lib.rs:80:        for cert in &self.slashing_certificates {
+crates/amun-block-builder/src/lib.rs:83:        // N120.2: Include slashing root in block hash
+crates/amun-block-builder/src/lib.rs:84:        hasher.update(&self.slashing_root);
+crates/amun-block-builder/src/lib.rs:102:    /// N110.4a: Build a block with slashing certificates included.
+crates/amun-block-builder/src/lib.rs:124:    /// N110.4: Build a block with pending slashing certificates.
+crates/amun-block-builder/src/lib.rs:125:    /// N110.4a: Build a block with slashing certificates.
+crates/amun-block-builder/src/lib.rs:136:        slashing_certificates: Vec<SlashingCertificate>,
+crates/amun-block-builder/src/lib.rs:150:            slashing_certificates,
+crates/amun-block-builder/src/lib.rs:151:            slashing_root: [0u8; 32], // N120.2: computed after ledger update
+crates/amun-sdk-layer/src/staking_api.rs:4:use amun_staking::slashing::SlashingConditions;
+crates/amun-sdk-layer/src/staking_api.rs:10:    pub slashing: SlashingConditions,
+crates/amun-sdk-layer/src/staking_api.rs:15:        Self { registry: ValidatorRegistry::new(), delegation: DelegationManager::new(), slashing: SlashingConditions::new() }
+crates/amun-sdk-layer/src/staking_api.rs:32:    pub fn slash_validator(&mut self, pubkey: &PublicKey) -> SdkResult<u64> {
+crates/amun-sdk-layer/src/staking_api.rs:33:        match self.registry.slash(pubkey, &self.slashing) {
+crates/amun-staking/src/slashing.rs:4:    pub max_slash_count: u32,
+crates/amun-staking/src/slashing.rs:10:            max_slash_count: 5,
+crates/amun-staking/src/slashing.rs:13:    pub fn calculate_slash(&self, stake: u64, count: u32) -> u64 {
+crates/amun-staking/src/tests.rs:12:fn test_slash() {
+crates/amun-staking/src/tests.rs:18:        r.slash(&pk, &rules)
+crates/amun-staking/src/tests.rs:19:            .expect("slash calculation must succeed")
+crates/amun-staking/src/lib.rs:4:pub mod slashing;
+crates/amun-staking/src/lib.rs:8:pub use slashing::SlashingConditions;
+crates/amun-staking/src/validator.rs:1:use crate::slashing::SlashingConditions;
+crates/amun-staking/src/validator.rs:9:    pub slash_count: u32,
+crates/amun-staking/src/validator.rs:17:            slash_count: 0,
+crates/amun-staking/src/validator.rs:49:    pub fn slash(&mut self, pk: &PublicKey, rules: &SlashingConditions) -> AmunResult<u64> {
+crates/amun-staking/src/validator.rs:51:            v.slash_count += 1;
+crates/amun-staking/src/validator.rs:52:            let amt = rules.calculate_slash(v.total_stake, v.slash_count);
+crates/amun-staking/src/validator.rs:55:            if v.slash_count >= rules.max_slash_count {
+crates/amun-constitution/src/adaptive_adversary.rs:8:    pub slashability_window_epochs: u64,
+crates/amun-constitution/src/adaptive_adversary.rs:17:            slashability_window_epochs: 2,
+crates/amun-constitution/src/adaptive_adversary.rs:30:        slashed_at_round: u64,
+crates/amun-rpc/src/lib.rs:395:            "slashing_root": hex::encode(r.slashing_root),
+crates/amun-economics/src/tests.rs:22:fn test_token_slash() {
+crates/amun-economics/src/tests.rs:25:    t.slash(500).expect("test invariant");
+crates/amun-economics/src/token.rs:55:    pub fn slash(&mut self, bps: u16) -> AmunResult<u64> {
+crates/amun-consensus-law/src/validator.rs:34:    pub fn slashable_offense(equivocation_proven: bool, downtime_exceeded: bool) -> bool {
+crates/amun-benchmarks/benches/storage_bench.rs:12:        slashing_root: [0u8; 32],
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:6:// use amun_staking::slashing::SlashingConditions;
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:23:    SlashingCertificate::from_slash_result(
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:42:fn n110_4c_slash_applied_after_finality() {
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:62:    let result = adapter.try_slash(&vid);
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:64:    let slash_result = result.unwrap();
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:65:    assert!(slash_result.amount_slashed > 0);
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:86:    // First slash: should succeed
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:87:    let r1 = adapter.try_slash(&vid);
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:88:    assert!(r1.is_some(), "First slash must succeed");
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:91:    // Second slash with SAME evidence (no new misbehavior added):
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:94:    // try_slash checks threshold and finds it's still Slash-eligible,
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:95:    // but the RealStakingExecutor's slash() counts as a new slash_count.
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:97:    // This is EXPECTED: each try_slash that finds threshold crossed will
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:98:    // execute another slash. The idempotency protection is at the
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:105:    let r2 = adapter.try_slash(&vid);
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:109:    // But the stake keeps decreasing because each slash is a real penalty
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:112:        "N110.4c: Stake after second slash must be <= stake after first"
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:116:        "N110.4c: First slash stake={}, second slash stake={}",
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:1:// N120.4 — Consensus Enforcement of slashing_root
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:7:fn n120_4a_validator_accepts_matching_slashing_root() {
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:8:    // Setup: build a block with a known slashing_root
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:13:    block.slashing_root = root;
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:17:        block.verify_slashing_root(&root).is_ok(),
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:18:        "N120.4a FAIL: Validator must accept matching slashing_root"
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:23:fn n120_4b_validator_rejects_mismatched_slashing_root() {
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:27:    block.slashing_root = [0x42; 32];
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:30:    let result = block.verify_slashing_root(&[0xFF; 32]);
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:33:        "N120.4b FAIL: Validator must reject mismatched slashing_root"
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:44:    block.slashing_root = [0x42; 32];
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:47:    block.slashing_root = [0xBA; 32]; // tampered
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:50:    let result = block.verify_slashing_root(&[0x42; 32]);
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:53:        "N120.4c FAIL: Tampered slashing_root must be rejected by validators"
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:67:    block.slashing_root = proposed_root;
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:70:    let mismatch = block.slashing_root != validator_root;
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:78:        block.verify_slashing_root(&validator_root).is_err(),
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:2:// Verifies that slashing executes in the finality path and reduces stake.
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:12:fn n118_slashing_executes_after_finality() {
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:31:    let result = adapter.try_slash(&validator_id);
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:38:        "N118: Stake must decrease after finality-gated slash"
+crates/amun-live-cluster/src/validator.rs:44:    /// N110.4: Certificate gossip for slashing certificate propagation
+crates/amun-live-cluster/src/validator.rs:46:    /// N110.4c: Staking adapter for applying slashes after finality
+crates/amun-live-cluster/src/validator.rs:48:    pub applied_slashing_certificates: Arc<Mutex<std::collections::HashSet<[u8; 32]>>>,
+crates/amun-live-cluster/src/validator.rs:50:    pub slashing_ledger: Arc<Mutex<amun_consensus_network::SlashingLedger>>,
+crates/amun-live-cluster/src/validator.rs:147:            applied_slashing_certificates: Arc::new(Mutex::new(std::collections::HashSet::new())),
+crates/amun-live-cluster/src/validator.rs:148:            slashing_ledger: Arc::new(Mutex::new(amun_consensus_network::SlashingLedger::new())),
+crates/amun-live-cluster/src/validator.rs:280:        let applied_certs_clone = self.applied_slashing_certificates.clone();
+crates/amun-live-cluster/src/validator.rs:281:        let slashing_ledger_clone = self.slashing_ledger.clone();
+crates/amun-live-cluster/src/validator.rs:358:                    // N120.4: Compute and set the slashing root from the ledger
+crates/amun-live-cluster/src/validator.rs:360:                        let ledger = slashing_ledger_clone.lock().unwrap();
+crates/amun-live-cluster/src/validator.rs:361:                        block.slashing_root = amun_consensus_network::merkle_root(&ledger.history);
+crates/amun-live-cluster/src/validator.rs:363:                    // Recompute hash after setting slashing_root (N120.2 requires it in hash)
+crates/amun-live-cluster/src/validator.rs:499:                        let slashing_bound = {
+crates/amun-live-cluster/src/validator.rs:532:                            slashing_bound,
+crates/amun-live-cluster/src/validator.rs:589:                            slashing_bound,
+crates/amun-live-cluster/src/validator.rs:617:                            slashing_root: [0u8; 32],
+crates/amun-live-cluster/src/validator.rs:632:                    // N110.4c: Apply slashing certificates after finality
+crates/amun-live-cluster/src/validator.rs:651:                            let result = adapter.try_slash(&cert.validator_id);
+crates/amun-live-cluster/src/validator.rs:653:                                Some(slash_result) => {
+crates/amun-live-cluster/src/validator.rs:657:                                        slash_result.amount_slashed,
+crates/amun-live-cluster/src/validator.rs:658:                                        slash_result.remaining_stake
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:2:use amun_consensus_network::slashing::should_slash;
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:108:        let should = should_slash(&eng.misbehavior_registry, &[88u8; 32]);
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:110:        println!("  should_slash: {}", should);
+crates/amun-evidence/src/lib.rs:2:pub mod slashing;
+crates/amun-evidence/src/lib.rs:5:pub use slashing::SlashingEngine;
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:4:fn n120_2_record_roundtrip_preserves_slashing_root() {
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:11:        slashing_root: [0x42; 32],
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:20:        decoded.slashing_root, [0x42; 32],
+crates/amun-chain-store/tests/n120_2_record_roundtrip.rs:21:        "N120.2 FAIL: slashing_root must survive encode/decode roundtrip"
+crates/amun-chain-store/src/store.rs:150:            slashing_root: [0u8; 32],
+crates/amun-chain-store/src/sync.rs:161:            slashing_root: [0u8; 32],
+crates/amun-chain-store/src/snapshot.rs:140:        slashing_root: [0u8; 32],
+crates/amun-chain-store/src/record.rs:10:    pub slashing_root: [u8; 32],
+crates/amun-chain-store/src/record.rs:40:            slashing_root: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_builder_test.rs:13:        slashing_root: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_verification_test.rs:13:        slashing_root: [0u8; 32],
+crates/amun-chain-store/examples/snapshot_restore_test.rs:13:        slashing_root: [0u8; 32],
+crates/amun-network-transport/src/message.rs:54:    pub amount_slashed: u64,
+crates/amun-network-transport/src/message.rs:226:    fn n110_3b_roundtrip_slashing_certificate() {
+crates/amun-network-transport/src/message.rs:230:            amount_slashed: 15000,
+crates/amun-network-transport/src/message.rs:240:                assert_eq!(c.amount_slashed, 15000);
+crates/amun-consensus/src/round_state_machine.rs:141:                true, // slashing_bound
+crates/amun-consensus-execution/src/voter.rs:23:    slashed: HashSet<u64>,
+crates/amun-consensus-execution/src/voter.rs:34:            slashed: HashSet::new(),
+crates/amun-consensus-execution/src/voter.rs:45:        if self.slashed.contains(&vid) {
+crates/amun-consensus-execution/src/voter.rs:61:                self.slashed.insert(vid);
+crates/amun-consensus-execution/src/voter.rs:83:                    .filter(|v| !self.slashed.contains(&v.message.validator_id))
+crates/amun-consensus-execution/src/voter.rs:109:                    .filter(|v| !self.slashed.contains(&v.message.validator_id))
+crates/amun-consensus-execution/src/voter.rs:148:                    .filter(|v| !self.slashed.contains(&v.message.validator_id))
+crates/amun-consensus-execution/src/voter.rs:164:    pub fn is_slashed(&self, validator_id: u64) -> bool {
+crates/amun-consensus-execution/src/voter.rs:165:        self.slashed.contains(&validator_id)
+crates/amun-attack-lab/src/simulator.rs:18:    pub equivocation_events: Vec<EquivocationEvent>,
+crates/amun-attack-lab/src/simulator.rs:102:            equivocation_events: Vec::new(),
+crates/amun-attack-lab/src/simulator.rs:115:                    state.equivocation_events.push(EquivocationEvent {
+crates/amun-attack-lab/src/simulator.rs:145:            if state.current_round.is_multiple_of(3) && state.equivocation_events.len() < 3 {
+crates/amun-byzantine-harness/src/scenarios.rs:7:    pub expect_equivocation_detection: bool,
+crates/amun-byzantine-harness/src/scenarios.rs:12:    pub fn equivocation_attack() -> Self {
+crates/amun-byzantine-harness/src/scenarios.rs:14:            name: "equivocation_attack".to_string(),
+crates/amun-byzantine-harness/src/scenarios.rs:18:            expect_equivocation_detection: true,
+crates/amun-byzantine-harness/src/scenarios.rs:23:    pub fn triple_equivocation() -> Self {
+crates/amun-byzantine-harness/src/scenarios.rs:25:            name: "triple_equivocation".to_string(),
+crates/amun-byzantine-harness/src/scenarios.rs:29:            expect_equivocation_detection: true,
+crates/amun-byzantine-harness/src/scenarios.rs:40:            expect_equivocation_detection: false,
+crates/amun-byzantine-harness/src/harness.rs:3:use amun_safety_laws::{check_vote_uniqueness, detect_equivocation, EquivocationEvidence};
+crates/amun-byzantine-harness/src/harness.rs:14:    /// Detect equivocation in a set of votes
+crates/amun-byzantine-harness/src/harness.rs:15:    pub fn detect_equivocation(votes: &[ConsensusVote]) -> Vec<EquivocationEvidence> {
+crates/amun-byzantine-harness/src/harness.rs:16:        detect_equivocation(votes)
+crates/amun-consensus-network/src/messages.rs:31:/// An equivocation proof: evidence that a validator voted for two different blocks
+crates/amun-consensus-network/src/messages.rs:55:            return Err("Same block hash – not equivocation".into());
+crates/amun-consensus-network/src/messages.rs:137:    fn n101_2_valid_equivocation_proof_accepted() {
+crates/amun-consensus-network/src/messages.rs.bak:27:/// An equivocation proof: evidence that a validator voted for two different blocks
+crates/amun-consensus-network/src/messages.rs.bak:51:            return Err("Same block hash – not equivocation".into());
+crates/amun-consensus-network/src/messages.rs.bak:132:    fn n101_2_valid_equivocation_proof_accepted() {
+crates/amun-consensus-network/src/engine.rs:57:        // Check for equivocation FIRST (before checking proposed_block_hash)
+crates/amun-consensus-network/src/engine.rs:209:/// Evidence of equivocation — same validator voted for two different blocks at the same height.
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:56:        // Check for equivocation FIRST (before checking proposed_block_hash)
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:162:/// Evidence of equivocation — same validator voted for two different blocks at the same height.
+crates/amun-safety-laws/src/lib.rs:1:pub mod equivocation;
+crates/amun-safety-laws/src/lib.rs:4:pub use equivocation::{detect_equivocation, EquivocationEvidence};
+crates/amun-safety-laws/src/slash.rs:1:use crate::equivocation::EquivocationProof;
+crates/amun-safety-laws/src/slash.rs:3:/// Slashing condition: what penalty applies for equivocation.
+crates/amun-safety-laws/src/slash.rs:22:            return Err("invalid equivocation proof");
+crates/amun-safety-laws/src/equivocation.rs:41:pub fn detect_equivocation(votes: &[ConsensusVote]) -> Vec<EquivocationEvidence> {
+crates/amun-consensus-law/src/validator.rs:34:    pub fn slashable_offense(equivocation_proven: bool, downtime_exceeded: bool) -> bool {
+crates/amun-consensus-law/src/validator.rs:35:        equivocation_proven || downtime_exceeded
+crates/amun-evidence/src/slashing.rs:1:use crate::equivocation::EquivocationProof;
+crates/amun-evidence/src/slashing.rs:24:            return Err("invalid equivocation proof");
+crates/amun-evidence/src/lib.rs:1:pub mod equivocation;
+crates/amun-evidence/src/lib.rs:4:pub use equivocation::EquivocationProof;
+crates/amun-evidence/src/evidence.rs:74:                    return Err("Not equivocation: same message hash");
+crates/amun-consensus-execution/src/voter.rs:16:/// Block-hash partitioned vote aggregator with equivocation detection

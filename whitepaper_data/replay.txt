@@ -1,0 +1,964 @@
+crates/amun-constitutional-integration/src/lib.rs:50:            "Every finalized block has replay evidence",
+crates/amun-constitutional-integration/src/lib.rs:51:            "forall b in Finalized : exists replay_certificate(b)",
+crates/amun-constitutional-integration/src/lib.rs:70:            "Every replay certificate maps to evidence",
+crates/amun-constitutional-integration/src/lib.rs:71:            "forall rc in ReplayCertificate : exists ev in EvidenceRoot : ev.replay = rc",
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:24:        println!("  This replay requires real AmunChain execution data.");
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:33:        println!("  Skipping production replay — N47.8 deferred.");
+crates/amun-transcript-semantics/Cargo.toml:9:amun-replay-semantics = { path = "../amun-replay-semantics" }
+crates/amun-transcript-semantics/src/lib.rs:6:use amun_replay_semantics::ReplayDomain;
+crates/amun-transcript-semantics/src/lib.rs:21:    pub fn is_replay_required(&self) -> bool { matches!(self, EventAuthority::Authoritative | EventAuthority::Certifying) }
+crates/amun-transcript-semantics/src/lib.rs:51:    pub fn is_replay_required(&self) -> bool { self.authority().is_replay_required() }
+crates/amun-transcript-semantics/src/lib.rs:61:struct CertifiedEnvelope { domain: ReplayDomain, epoch_id: [u8; 32], transcript_root: [u8; 32], state_root: [u8; 32], receipt_root: [u8; 32], ordering_root: [u8; 32], event_count: u64, replay_version: u32, certificate_hash: [u8; 32] }
+crates/amun-transcript-semantics/src/lib.rs:64:    pub fn new(domain: ReplayDomain, epoch_id: [u8; 32], transcript_root: [u8; 32], state_root: [u8; 32], receipt_root: [u8; 32], ordering_root: [u8; 32], event_count: u64, replay_version: u32) -> Self {
+crates/amun-transcript-semantics/src/lib.rs:65:        let mut env = CertifiedEnvelope { domain, epoch_id, transcript_root, state_root, receipt_root, ordering_root, event_count, replay_version, certificate_hash: [0; 32] };
+crates/amun-transcript-semantics/src/lib.rs:68:    fn compute(env: &CertifiedEnvelope) -> [u8; 32] { let mut h = Sha256::new(); h.update(b"AMUN|IMMUTABLE_CERT|V1"); h.update((env.domain as u8).to_le_bytes()); h.update(env.epoch_id); h.update(env.transcript_root); h.update(env.state_root); h.update(env.receipt_root); h.update(env.ordering_root); h.update(env.event_count.to_le_bytes()); h.update(env.replay_version.to_le_bytes()); h.finalize().into() }
+crates/amun-transcript-semantics/src/lib.rs:103:    #[test] fn test_authority_replay_required() { assert!(EventAuthority::Authoritative.is_replay_required()); assert!(!EventAuthority::Derived.is_replay_required()); }
+crates/amun-cross-contract/src/transfer_proof.rs:9:    /// Unique identifier for this proof — prevents replay.
+crates/amun-proof-carrying/src/lib.rs:9://! without a trusted node or full chain replay.
+crates/amun-lineage-law/src/migration.rs:12:    /// Whether replay determinism was preserved during migration
+crates/amun-lineage-law/src/migration.rs:13:    pub replay_preserved: bool,
+crates/amun-lineage-law/src/migration.rs:26:        replay_preserved: bool,
+crates/amun-lineage-law/src/migration.rs:33:            replay_preserved,
+crates/amun-lineage-law/src/migration.rs:47:        h.update([self.replay_preserved as u8]);
+crates/amun-lineage-law/src/migration.rs:97:    pub requires_replay: bool,
+crates/amun-lineage-law/src/migration.rs:107:        requires_replay: bool,
+crates/amun-lineage-law/src/migration.rs:114:            requires_replay,
+crates/amun-lineage-law/src/migration.rs:128:        h.update([self.requires_replay as u8]);
+crates/amun-lineage-law/src/compatibility.rs:13:    pub is_replay_compatible: bool,
+crates/amun-lineage-law/src/compatibility.rs:29:        let is_replay = migration_witness
+crates/amun-lineage-law/src/compatibility.rs:31:            .map(|w| w.replay_preserved)
+crates/amun-lineage-law/src/compatibility.rs:44:            is_replay_compatible: is_replay,
+crates/amun-lineage-law/src/compatibility.rs:59:        h.update([self.is_replay_compatible as u8]);
+crates/amun-lineage-law/src/compatibility.rs:78:    /// Compatible but replay not preserved
+crates/amun-lineage-law/src/compatibility.rs:90:            && theorem.is_replay_compatible
+crates/amun-evidence-finality/Cargo.toml:5:description = "Evidence-backed finality: binding execution, proof, replay, and evidence into one certificate"
+crates/amun-evidence-finality/Cargo.toml:14:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-evidence-finality/src/evidence_finality.rs:7:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-evidence-finality/src/evidence_finality.rs:12:/// A fully verified block with execution, proof, replay, and evidence roots.
+crates/amun-evidence-finality/src/evidence_finality.rs:19:    pub replay_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:43:        replay_root: &[u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:52:        hasher.update(replay_root);
+crates/amun-evidence-finality/src/evidence_finality.rs:68:    pub replay_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:88:    pub replay_root: [u8; 32],
+crates/amun-evidence-finality/src/evidence_finality.rs:101:            replay_root: block.replay_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:117:        hasher.update(&self.replay_root);
+crates/amun-evidence-finality/src/evidence_finality.rs:135:            &self.replay_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:158:        let mut replay_hashes = Vec::new();
+crates/amun-evidence-finality/src/evidence_finality.rs:184:            let replay = ReplayVerifier::replay(&proof, program, &mut fresh_reg, &[]);
+crates/amun-evidence-finality/src/evidence_finality.rs:186:            let verified = matches!(replay, ReplayResult::Match { .. });
+crates/amun-evidence-finality/src/evidence_finality.rs:187:            replay_hashes.push(if verified {
+crates/amun-evidence-finality/src/evidence_finality.rs:204:        let replay_root = Self::hash_list(b"AMUN_REPLAY_ROOT_V1", &replay_hashes);
+crates/amun-evidence-finality/src/evidence_finality.rs:211:            &replay_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:220:            replay_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:233:            return Err("Not all transitions passed replay verification".into());
+crates/amun-evidence-finality/src/evidence_finality.rs:240:            replay_root: block.replay_root,
+crates/amun-evidence-finality/src/evidence_finality.rs:337:        assert_eq!(rr, &cert.replay_root);
+crates/amun-audit/tests/audit_layer11_crash.rs:124:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer11_crash.rs:127:            "CONST-CRASH-003 VIOLATION: Corrupted frame must fail replay"
+crates/amun-audit/tests/audit_layer06_replay.rs:2:mod audit_replay {
+crates/amun-audit/tests/audit_layer06_replay.rs:27:    fn replay001_equivalence() {
+crates/amun-audit/tests/audit_layer06_replay.rs:29:        let path = dir.path().join("replay001.wal");
+crates/amun-audit/tests/audit_layer06_replay.rs:50:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer06_replay.rs:52:            Ok((replayed_root, count)) => {
+crates/amun-audit/tests/audit_layer06_replay.rs:59:                    replayed_root, root.0,
+crates/amun-audit/tests/audit_layer06_replay.rs:69:    fn replay002_divergence_detection() {
+crates/amun-audit/tests/audit_layer06_replay.rs:71:        let path = dir.path().join("replay002.wal");
+crates/amun-audit/tests/audit_layer06_replay.rs:91:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer06_replay.rs:100:    fn replay003_epoch_regression() {
+crates/amun-audit/tests/audit_layer06_replay.rs:102:        let path = dir.path().join("replay003.wal");
+crates/amun-audit/tests/audit_layer06_replay.rs:135:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer15_temporal.rs:27:    fn temp001_replay_twice_same_root() {
+crates/amun-audit/tests/audit_layer15_temporal.rs:50:        let result1 = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer15_temporal.rs:51:        let result2 = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-pccv/tests/replay_equivalence.rs:16:fn n49c_replay_produces_identical_proof() {
+crates/amun-pccv/tests/replay_equivalence.rs:107:fn n49c_replay_consistent_across_iterations() {
+crates/amun-constitutional-geometry/src/fields.rs:41:            tensor.replay_distance,
+crates/amun-constitutional-geometry/src/metrics.rs:11:    /// Distance in replay space (replay guarantee compatibility)
+crates/amun-constitutional-geometry/src/metrics.rs:12:    pub replay_distance: f64,
+crates/amun-constitutional-geometry/src/metrics.rs:35:            replay_distance: 0.0,
+crates/amun-constitutional-geometry/src/metrics.rs:47:            + self.replay_distance.powi(2)
+crates/amun-constitutional-geometry/src/metrics.rs:90:        // Replay distance: can replay be preserved?
+crates/amun-constitutional-geometry/src/metrics.rs:92:            tensor.replay_distance = 20.0;
+crates/amun-constitutional-geometry/src/metrics.rs:99:        let requires_causal_jump = tensor.replay_distance > 30.0;
+crates/amun-constitutional-geometry/src/horizons.rs:15:    /// Replay horizon: replay divergence has made reconciliation impossible
+crates/amun-constitutional-geometry/src/metric_tensor.rs:9:    /// The 7x7 metric tensor (physics, replay, lineage, temporal,
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:28:    /// Attraction toward replay determinism
+crates/amun-constitutional-geometry/src/curvature.rs:23:/// caused by replay divergence.
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:3:// Verifies that replaying the same sequence of slashing certificates
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:29:/// N121.2 Gatekeeper: Three nodes replay the same events → same root
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:31:fn n121_2_three_nodes_same_replay_same_root() {
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:94:fn n121_2_replay_empty_produces_zero_root() {
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:103:/// N121.2: Single event replay is deterministic
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:105:fn n121_2_single_event_replay_deterministic() {
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:116:        "N121.2 FAIL: single event replay must be deterministic"
+crates/amun-consensus-network/src/slashing_ledger.rs:40:/// N119.1: Persistent ledger preventing replay of slashing certificates.
+crates/amun-consensus-network/src/slashing_ledger.rs:62:    /// Returns Err if the certificate was already executed (replay protection).
+crates/amun-consensus-network/src/slashing_ledger.rs:157:    fn n119_2_replay_rejected() {
+crates/amun-consensus-network/src/slashing_ledger.rs:167:        // Second execution: rejected (replay protection)
+crates/amun-consensus-network/src/slashing_ledger.rs:169:        assert!(r2.is_err(), "N119.2 FAIL: replay must be rejected");
+crates/amun-consensus-network/src/slashing_state.rs:154:    fn n121_1_replay_protection_preserved() {
+crates/amun-consensus-network/src/slashing_state.rs:163:        assert!(result.is_err(), "N121.1 FAIL: replay must be rejected");
+crates/amun-consensus-network/src/slashing_state.rs:169:            "N121.1 FAIL: root must not change on replay"
+crates/amun-consensus-network/src/execution_commitment.rs:28:/// preventing any form of splitting or replay.
+crates/amun-consensus-network/src/execution_commitment.rs:206:    fn n109_8_replayed_commitment_rejected() {
+crates/amun-consensus-network/src/execution_commitment.rs:215:        // Try to replay the SAME commitment at height 2 (should fail)
+crates/amun-consensus-network/src/execution_commitment.rs:220:            "replay across heights must produce different execution_root"
+crates/amun-constitution-builder/tests/determinism_tests.rs:12:    VerificationEngine::verify_replay(&m1, &m2).expect("Manifests must be identical");
+crates/amun-constitution-builder/tests/determinism_tests.rs:40:    VerificationEngine::verify_replay(&f1, &f2).expect("Federation artifacts must be identical");
+crates/amun-constitution-builder/tests/determinism_tests.rs:58:    VerificationEngine::verify_replay(&t1, &t2).expect("Treaties must be identical");
+crates/amun-constitution-builder/src/verify.rs:11:    pub fn verify_replay<T: CanonicalSerialize + PartialEq>(
+crates/amun-constitution-builder/src/treaty.rs:18:    pub replay_boundaries: Vec<String>,
+crates/amun-constitution-builder/src/treaty.rs:38:            replay_boundaries: vec!["Treaty-scoped".into()],
+crates/amun-constitution-builder/src/treaty.rs:65:        for b in &self.replay_boundaries {
+crates/amun-constitution-builder/src/certificate.rs:39:            "replay semantics".into(),
+crates/amun-constitution-builder/src/federation.rs:23:    pub replay_boundary: String,
+crates/amun-constitution-builder/src/federation.rs:63:            replay_boundary: "Treaty-scoped".into(),
+crates/amun-constitution-builder/src/federation.rs:89:        lines.push(format!("Replay Boundary: {}", self.replay_boundary));
+crates/amun-evolution/src/signatures.rs:2:// Defines signing domains, aggregation rules, and anti-replay protection.
+crates/amun-evolution/src/certificate.rs:13:    pub preserves_replay_determinism: bool,
+crates/amun-evolution/src/certificate.rs:23:        preserves_replay_determinism: bool,
+crates/amun-evolution/src/certificate.rs:30:            preserves_replay_determinism,
+crates/amun-evolution/src/certificate.rs:43:        h.update(&[self.preserves_replay_determinism as u8]);
+crates/amun-evolution/src/certificate.rs:67:    pub replay_guarantee: ReplayGuarantee,
+crates/amun-evolution/src/certificate.rs:91:        replay: ReplayGuarantee,
+crates/amun-evolution/src/certificate.rs:111:            replay_guarantee: replay,
+crates/amun-evolution/src/certificate.rs:137:        h.update(&[self.replay_guarantee.canonical_tag()]);
+crates/amun-evolution/src/validator.rs:13:        proof.replay_guarantee == certificate.replay_guarantee
+crates/amun-evolution/src/validator.rs:22:        proof.replay_guarantee.rank() >= ReplayGuarantee::Deterministic.rank()
+crates/amun-experimental-framework/Cargo.toml:13:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-experimental-framework/src/main.rs:6:use amun_replay_verifier::replay_verifier::ReplayVerifier;
+crates/amun-experimental-framework/src/main.rs:212:        let stats = measure_us(&format!("replay_{}_active", size), 5, 30, || {
+crates/amun-experimental-framework/src/main.rs:214:            ReplayVerifier::replay(&proof, &program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs:224:        &["active_resources", "replay_time_us", "ci95_us"],
+crates/amun-experimental-framework/src/main.rs:230:fn exp2_replay_vs_execute() {
+crates/amun-experimental-framework/src/main.rs:308:        // Measure replay
+crates/amun-experimental-framework/src/main.rs:309:        let replay_stats = measure_us(&format!("replay_{}", name), 5, 30, || {
+crates/amun-experimental-framework/src/main.rs:311:            ReplayVerifier::replay(&proof, program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs:314:        let speedup = exec_stats.mean / replay_stats.mean;
+crates/amun-experimental-framework/src/main.rs:319:            format!("{:.4}", replay_stats.mean),
+crates/amun-experimental-framework/src/main.rs:325:        &["workload", "execution_us", "replay_us", "speedup"],
+crates/amun-experimental-framework/src/main.rs:371:                    ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs:511:    exp2_replay_vs_execute();
+crates/amun-network-constitution/src/lib.rs:1:pub mod anti_replay;
+crates/amun-network-constitution/src/lib.rs:4:pub use anti_replay::AntiReplayGuard;
+crates/amun-network-constitution/src/anti_replay.rs:21:                return Err("replay detected: nonce too low");
+crates/amun-chain-position/src/lib.rs:15:    pub replay_root: [u8; 32],
+crates/amun-chain-position/src/lib.rs:24:        replay_root: [u8; 32],
+crates/amun-chain-position/src/lib.rs:31:        h.update(&replay_root);
+crates/amun-chain-position/src/lib.rs:38:            replay_root,
+crates/amun-chain-position/src/lib.rs:48:        h.update(&self.replay_root);
+crates/amun_state_machine/src/log.rs:40:/// Causal execution log (for replay)
+crates/amun-replay-semantics/Cargo.toml:2:name = "amun-replay-semantics"
+crates/amun-replay-semantics/src/lib.rs:1://! Replay Semantics — formal constitutional model for replay.
+crates/amun-replay-semantics/src/lib.rs:3://! Defines WHAT replay IS, not HOW to implement it.
+crates/amun-replay-semantics/src/lib.rs:12:pub struct ReplayEpoch { pub epoch_id: [u8; 32], pub start_sequence: u64, pub end_sequence: Option<u64>, pub replay_version: u32 }
+crates/amun-replay-semantics/src/lib.rs:14:    pub fn new(epoch_id: [u8; 32], start_sequence: u64, replay_version: u32) -> Self { Self { epoch_id, start_sequence, end_sequence: None, replay_version } }
+crates/amun-replay-semantics/src/lib.rs:19:pub struct ReplayBoundary { pub finalized_sequence: u64, pub boundary_chain_hash: [u8; 32], pub boundary_state_root: [u8; 32], pub epoch: ReplayEpoch, pub replay_version: u32 }
+crates/amun-replay-semantics/src/lib.rs:20:impl ReplayBoundary { pub fn genesis(genesis_hash: [u8; 32]) -> Self { Self { finalized_sequence: 0, boundary_chain_hash: genesis_hash, boundary_state_root: genesis_hash, epoch: ReplayEpoch::new(genesis_hash, 0, 1), replay_version: 1 } } }
+crates/amun-replay-semantics/src/lib.rs:27:    pub boundary: ReplayBoundary, pub event_count: u64, pub replay_version: u32,
+crates/amun-replay-semantics/src/lib.rs:32:    pub fn new(domain: ReplayDomain, epoch: ReplayEpoch, transcript_root: [u8; 32], state_root: [u8; 32], receipt_root: [u8; 32], ordering_root: [u8; 32], boundary: ReplayBoundary, event_count: u64, replay_version: u32) -> Self {
+crates/amun-replay-semantics/src/lib.rs:33:        let mut cert = Self { domain, epoch, transcript_root, state_root, receipt_root, ordering_root, boundary, event_count, replay_version, certificate_hash: [0; 32] };
+crates/amun-replay-semantics/src/lib.rs:39:        h.update(self.boundary.boundary_chain_hash); h.update(self.event_count.to_le_bytes()); h.update(self.replay_version.to_le_bytes());
+crates/amun-replay-semantics/src/lib.rs:75:    pub fn replay_determinism(a: &ReplayCertificate, b: &ReplayCertificate) -> Result<(), ReplayFailure> {
+crates/amun-replay-semantics/src/lib.rs:90:    #[test] fn test_law_determinism_divergence() { let a = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1); let b = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0xFF;32], [0x03;32], [0x04;32], tb(), 100, 1); assert!(laws::replay_determinism(&a, &b).is_err()); }
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:142:replay(snapshot) + replay(WAL_after_snapshot) == replay(full_WAL)
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:149:If snapshot replay + WAL replay diverges from full replay,
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md:9:canonical layer required. Must not alter roots, proofs, or replay.
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md:15:Locking strategy, read/write isolation, snapshot consistency for sync/replay/GC.
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md:21:Pruning old WAL/state after snapshots. Balance storage vs replay/evidence retention.
+crates/amun-storage-kernel/tests/replay_equivalence.rs:28:    fn replay_equivalence_passes() {
+crates/amun-storage-kernel/tests/replay_equivalence.rs:53:        let (replayed_root, count) =
+crates/amun-storage-kernel/tests/replay_equivalence.rs:54:            ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap()).unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs:57:        assert_eq!(replayed_root, root.0);
+crates/amun-storage-kernel/tests/replay_equivalence.rs:61:    fn replay_detects_divergence() {
+crates/amun-storage-kernel/tests/replay_equivalence.rs:94:        let result = ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap());
+crates/amun-storage-kernel/tests/replay_equivalence.rs:96:        assert!(result.unwrap_err().contains("replay divergence"));
+crates/amun-storage-kernel/tests/replay_equivalence.rs:100:    fn replay_detects_epoch_regression() {
+crates/amun-storage-kernel/tests/replay_equivalence.rs:136:        let result = ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap());
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:11:| 2 | StateValid | Deterministic replay verified |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:83:| Local WAL corrupted | Request WAL from peers, verify, replay |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:87:| Genesis only | Full replay from genesis |
+crates/amun-storage-kernel/REPLAY_LAW.md:8:For any valid WAL W: replay(W) == original_execution(W).
+crates/amun-storage-kernel/REPLAY_LAW.md:12:- Full replay: reconstruct complete state, verify every frame
+crates/amun-storage-kernel/REPLAY_LAW.md:13:- Partial replay: snapshot + remaining WAL == full replay
+crates/amun-storage-kernel/REPLAY_LAW.md:18:Every replayed state traceable to genesis through unbroken root chain.
+crates/amun-storage-kernel/REPLAY_LAW.md:22:- Crash: scan WAL, find last valid entry, replay, verify manifest
+crates/amun-storage-kernel/REPLAY_LAW.md:23:- Corruption: quarantine corrupted frames, replay to last valid, request missing from peers
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:85:    pub fn verify_full_replay(wal_path: &str) -> Result<([u8; 32], u64), String> {
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:134:                        "replay divergence at {}: {:?} != {:?}",
+crates/amun-storage-kernel/CONSTITUTION.md:8:proof geometry, replay determinism, and lineage continuity. All implementations,
+crates/amun-storage-kernel/CONSTITUTION.md:96:no logical root, proof, or replay outcome is altered.
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:80:            "replay",
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:88:            "replay",
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:101:            "replay",
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:109:            "replay",
+crates/amun-snapshot-engine/src/verifier.rs:3:// canonical empty root, constitutional hash, and replay equivalence.
+crates/amun-snapshot-engine/src/verifier.rs:61:    /// state -> snapshot -> restore -> replay -> same root
+crates/amun-snapshot-engine/src/lib.rs:14:pub mod replay_continuity;
+crates/amun-snapshot-engine/src/lib.rs:31:pub use replay_continuity::{ContinuityResult, ReplayContinuityEngine};
+crates/amun-snapshot-engine/src/replay_continuity.rs:2:// THEOREM 11: state -> snapshot -> restore -> WAL replay -> final_root
+crates/amun-snapshot-engine/src/replay_continuity.rs:17:        replayed_frames: u64,
+crates/amun-snapshot-engine/src/replay_continuity.rs:28:    /// THEOREM 11: Verify that restoring a snapshot and replaying the
+crates/amun-snapshot-engine/src/replay_continuity.rs:43:        let mut replayed_frames: u64 = 0;
+crates/amun-snapshot-engine/src/replay_continuity.rs:65:                replayed_frames += 1;
+crates/amun-snapshot-engine/src/replay_continuity.rs:74:                at_frame: replayed_frames,
+crates/amun-snapshot-engine/src/replay_continuity.rs:82:            replayed_frames,
+crates/amun-snapshot-engine/src/constitutional_hash.rs:17:        replay_law_text: &str,
+crates/amun-snapshot-engine/src/constitutional_hash.rs:25:        h.update(replay_law_text.as_bytes());
+crates/amun-snapshot-engine/src/constitutional_hash.rs:38:        replay_law_text: &str,
+crates/amun-snapshot-engine/src/constitutional_hash.rs:46:            replay_law_text,
+crates/amun-snapshot-engine/src/compatibility.rs:12:    /// State replay is identical, proofs are identical
+crates/amun-node/src/bin/test_replay_determinism.rs:10:        eprintln!("Usage: test_replay_determinism <temp_dir_prefix>");
+crates/amun-node/src/bin/test_replay_determinism.rs:53:    let mut replay_roots = Vec::new();
+crates/amun-node/src/bin/test_replay_determinism.rs:55:        let replay_dir = format!("{}/replay{}", prefix, v);
+crates/amun-node/src/bin/test_replay_determinism.rs:56:        std::fs::create_dir_all(&replay_dir).expect("Failed to create dir");
+crates/amun-node/src/bin/test_replay_determinism.rs:57:        let mut replay_store =
+crates/amun-node/src/bin/test_replay_determinism.rs:58:            PersistentValidatorStore::open(&replay_dir).expect("Failed to open store");
+crates/amun-node/src/bin/test_replay_determinism.rs:62:                replay_store
+crates/amun-node/src/bin/test_replay_determinism.rs:67:            replay_store
+crates/amun-node/src/bin/test_replay_determinism.rs:71:        let replay_root = replay_store.state_root();
+crates/amun-node/src/bin/test_replay_determinism.rs:72:        println!("Replay {} root: {}", v, hex::encode(replay_root));
+crates/amun-node/src/bin/test_replay_determinism.rs:73:        replay_roots.push(replay_root);
+crates/amun-node/src/bin/test_replay_determinism.rs:76:    // Phase 3: Verify all replay roots match reference
+crates/amun-node/src/bin/test_replay_determinism.rs:77:    let all_match = replay_roots.iter().all(|r| *r == ref_root);
+crates/amun-node/src/bin/test_replay_determinism.rs:83:        for (i, r) in replay_roots.iter().enumerate() {
+crates/amun-node/src/bin/test_replay_stress.rs:14:        eprintln!("Usage: test_replay_stress <temp_dir_prefix>");
+crates/amun-node/src/bin/test_replay_stress.rs:90:    let mut replay_roots = Vec::new();
+crates/amun-node/src/bin/test_replay_stress.rs:92:        let replay_dir = format!("{}/replay{}", prefix, v);
+crates/amun-node/src/bin/test_replay_stress.rs:93:        std::fs::create_dir_all(&replay_dir).expect("Failed to create dir");
+crates/amun-node/src/bin/test_replay_stress.rs:94:        let mut replay_store =
+crates/amun-node/src/bin/test_replay_stress.rs:95:            PersistentValidatorStore::open(&replay_dir).expect("Failed to open store");
+crates/amun-node/src/bin/test_replay_stress.rs:107:            replay_store
+crates/amun-node/src/bin/test_replay_stress.rs:118:                pre_state_root: replay_store.state_root(),
+crates/amun-node/src/bin/test_replay_stress.rs:126:                replay_store.registry_mut(),
+crates/amun-node/src/bin/test_replay_stress.rs:133:            replay_store
+crates/amun-node/src/bin/test_replay_stress.rs:137:        let replay_root = replay_store.state_root();
+crates/amun-node/src/bin/test_replay_stress.rs:138:        println!("Replay {} final root: {}", v, hex::encode(replay_root));
+crates/amun-node/src/bin/test_replay_stress.rs:139:        replay_roots.push(replay_root);
+crates/amun-node/src/bin/test_replay_stress.rs:143:    let all_match = replay_roots.iter().all(|r| *r == ref_root);
+crates/amun-node/src/bin/test_replay_stress.rs:149:        for (i, r) in replay_roots.iter().enumerate() {
+crates/amun-constitutional-enforcement/src/state_transition.rs:5:// parameter with real execution and replay verification.
+crates/amun-constitutional-enforcement/src/state_transition.rs:16:    /// The replay state root (independently computed)
+crates/amun-constitutional-enforcement/src/state_transition.rs:17:    pub replay_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/state_transition.rs:27:    /// N126: Create from the raw data produced by execution and replay.
+crates/amun-constitutional-enforcement/src/state_transition.rs:31:        replay_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/state_transition.rs:38:            replay_root,
+crates/amun-constitutional-enforcement/src/state_transition.rs:55:        if self.post_state_root != self.replay_root {
+crates/amun-constitutional-enforcement/src/state_transition.rs:59:                    "Replay divergence: execution={:02x?} replay={:02x?}",
+crates/amun-constitutional-enforcement/src/state_transition.rs:61:                    &self.replay_root[..4]
+crates/amun-constitutional-enforcement/src/state_transition.rs:89:/// This function takes the pre-state, executes a block, replays it,
+crates/amun-constitutional-enforcement/src/state_transition.rs:93:/// `replay_fn` is the independent replay that must produce the same root.
+crates/amun-constitutional-enforcement/src/state_transition.rs:99:    replay_fn: R,
+crates/amun-constitutional-enforcement/src/state_transition.rs:108:    let replay_root = replay_fn();
+crates/amun-constitutional-enforcement/src/state_transition.rs:114:        replay_root,
+crates/amun-constitutional-enforcement/src/state_transition.rs:127:    fn n126_identical_execution_and_replay_is_constitutional() {
+crates/amun-constitutional-enforcement/src/state_transition.rs:135:            || post_root,          // replay matches
+crates/amun-constitutional-enforcement/src/state_transition.rs:142:    fn n126_replay_divergence_is_unconstitutional() {
+crates/amun-constitutional-enforcement/src/state_transition.rs:145:        let wrong_replay = [0xFF; 32];
+crates/amun-constitutional-enforcement/src/state_transition.rs:151:            || wrong_replay, // replay differs!
+crates/amun-constitutional-enforcement/src/state_transition.rs:160:            _ => panic!("Expected Unconstitutional for replay divergence"),
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:20:    pub replay_deterministic: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:45:        replay_deterministic: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:57:            replay_deterministic,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:79:    /// N127A.3: Build from replay verification.
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:80:    pub fn from_replay(replay_deterministic: bool) -> ReplayEvidence {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:82:            replay_deterministic,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:118:    pub replay_deterministic: bool,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:149:        replay: ReplayEvidence,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:160:            replay_deterministic: replay.replay_deterministic,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:190:        let replay = ReplayEvidence {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:191:            replay_deterministic: true,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:201:        let evidence = ConstitutionalEvidenceBuilder::build(exec, replay, gov, qc, true, true);
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:204:        assert!(evidence.replay_deterministic);
+crates/amun-constitutional-enforcement/src/lib.rs:62:            evidence.replay_deterministic,
+crates/amun-constitutional-enforcement/src/lib.rs:100:        replay_deterministic: bool,
+crates/amun-constitutional-enforcement/src/lib.rs:139:                replay_deterministic,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:72:/// N128: Structured replay evidence.
+crates/amun-constitutional-enforcement/src/evidence_records.rs:78:    /// State root from replay execution
+crates/amun-constitutional-enforcement/src/evidence_records.rs:80:    pub replay_state_root: [u8; 32],
+crates/amun-constitutional-enforcement/src/evidence_records.rs:86:    pub fn new(original: [u8; 32], replay: [u8; 32]) -> Self {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:89:            replay_state_root: replay,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:90:            deterministic: original == replay,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:106:    pub replay_evidence: ReplayEvidence,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:129:        replay_evidence: ReplayEvidence,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:143:            replay_evidence,
+crates/amun-constitutional-enforcement/src/evidence_records.rs:204:    fn n128_replay_evidence_deterministic() {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:211:    fn n128_replay_evidence_divergent() {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:64:    /// Verify replay determinism: replaying the block produces the same state root.
+crates/amun-constitutional-enforcement/src/proof_engine.rs:65:    pub fn verify_replay_determinism(original_root: &[u8; 32], replay_root: &[u8; 32]) -> bool {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:66:        original_root == replay_root
+crates/amun-constitutional-enforcement/src/proof_engine.rs:102:        replay_root: &[u8; 32],
+crates/amun-constitutional-enforcement/src/proof_engine.rs:171:        if !Self::verify_replay_determinism(original_root, replay_root) {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:235:            &[0x11; 32], // replay matches
+crates/amun-constitutional-enforcement/src/proof_engine.rs:268:            &root, // replay matches
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:35:/// N127D: Provides replay evidence.
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:37:/// and compares state_root before voting. QC formation = replay verified.
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:48:            replay_deterministic: qc_verified && state_root_valid && transition_valid,
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:87:    let replay = ReplayEvidenceProvider::from_qc_and_state(
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:102:        replay.replay_deterministic,
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:125:    fn n127d_replay_provider_with_qc() {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:127:        assert!(evidence.replay_deterministic);
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:131:    fn n127d_replay_provider_without_qc() {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:133:        assert!(!evidence.replay_deterministic);
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:149:        assert!(evidence.replay_deterministic);
+crates/amun-constitutional/src/restoration_point.rs:1://! RestorationPoint — the constitutional position where replay resumes.
+crates/amun-constitutional/src/restoration_point.rs:3://! A restoration point defines exactly where in the replay lineage
+crates/amun-constitutional/src/restoration_point.rs:18:/// Where replay resumes after restoration.
+crates/amun-constitutional/src/restoration_point.rs:29:    pub replay_revision: u32,
+crates/amun-constitutional/src/restoration_point.rs:40:    /// The transcript position where replay resumes.
+crates/amun-constitutional/src/restoration_point.rs:68:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/restoration_point.rs:69:        self.replay_revision
+crates/amun-constitutional/src/restoration_point.rs:78:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/restoration_point.rs:117:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/restoration_point.rs:134:        replay_revision: u32,
+crates/amun-constitutional/src/restoration_point.rs:146:            replay_revision,
+crates/amun-constitutional/src/replay_certificate.rs:22:    pub replay_revision: u32,
+crates/amun-constitutional/src/replay_certificate.rs:42:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/replay_certificate.rs:43:        self.replay_revision
+crates/amun-constitutional/src/replay_certificate.rs:51:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/replay_certificate.rs:57:            .update_u32(self.scope.replay_revision)
+crates/amun-constitutional/src/replay_certificate.rs:102:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/replay_certificate.rs:116:            || self.scope.replay_revision != self.replay_revision
+crates/amun-constitutional/src/replay_certificate.rs:134:        replay_revision: u32,
+crates/amun-constitutional/src/replay_certificate.rs:139:        outcome: crate::replay_outcome::ReplayOutcome,
+crates/amun-constitutional/src/replay_certificate.rs:149:            replay_revision,
+crates/amun-constitutional/src/replay_certificate.rs:157:            replay_revision,
+crates/amun-constitutional/src/replay_certificate.rs:170:    pub fn outcome(&self) -> crate::replay_outcome::ReplayOutcome {
+crates/amun-constitutional/src/replay_certificate.rs:197:    use crate::replay_outcome::ReplayOutcome;
+crates/amun-constitutional/src/causality_type.rs:32:    /// B's state is derived from A's state via replay.
+crates/amun-constitutional/src/replay_outcome.rs:10:/// The constitutional outcome of a replay.
+crates/amun-constitutional/src/replay_outcome.rs:38:    /// Returns true if this outcome represents a successful replay.
+crates/amun-constitutional/src/divergence_type.rs:1://! DivergenceType — constitutional classification of replay divergence.
+crates/amun-constitutional/src/divergence_type.rs:4://! governance transitions), others are violations (replay errors, boundary
+crates/amun-constitutional/src/divergence_type.rs:11:/// The constitutional classification of a replay divergence.
+crates/amun-constitutional/src/divergence_type.rs:18:    /// A divergence caused by replay error — should be investigated.
+crates/amun-constitutional/src/divergence_type.rs:56:    /// Returns true if this divergence indicates a replay error.
+crates/amun-constitutional/src/architectural_invariants.rs:11:/// replay locality, and admissibility are all local within a
+crates/amun-constitutional/src/architectural_invariants.rs:24:/// A ReplayCertificate attests replay ADMISSIBILITY, not
+crates/amun-constitutional/src/architectural_invariants.rs:28:/// CONSEQUENCE: Certificates are replay witnesses, not
+crates/amun-constitutional/src/architectural_invariants.rs:106:/// deterministic replay lineage and attested transcript scope,
+crates/amun-constitutional/src/architectural_invariants.rs:109:/// CONSEQUENCE: State roots are attestations of replay outcomes,
+crates/amun-constitutional/src/architectural_invariants.rs:111:/// the same replay lineage produced it — not the same database
+crates/amun-constitutional/src/architectural_invariants.rs:114:    "State identity is replay-derived, not storage-derived.";
+crates/amun-constitutional/src/architectural_invariants.rs:118:/// Snapshot restoration validity is derived from replay lineage,
+crates/amun-constitutional/src/architectural_invariants.rs:131:/// Restoration does not create a new replay lineage. It continues
+crates/amun-constitutional/src/architectural_invariants.rs:133:/// The restored execution is a CONTINUATION of the original replay,
+crates/amun-constitutional/src/architectural_invariants.rs:136:/// CONSEQUENCE: After restoration, the replay journal continues
+crates/amun-constitutional/src/architectural_invariants.rs:185:/// accidental replay equivalence, and operational proof leakage.
+crates/amun-constitutional/src/causality_chain.rs:31:    pub replay_revision: u32,
+crates/amun-constitutional/src/causality_chain.rs:56:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/causality_chain.rs:57:        self.replay_revision
+crates/amun-constitutional/src/causality_chain.rs:66:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/causality_chain.rs:116:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/causality_chain.rs:162:        replay_revision: u32,
+crates/amun-constitutional/src/causality_chain.rs:171:            replay_revision,
+crates/amun-constitutional/src/continuation_chain.rs:3://! The continuation chain verifies that the post-restoration replay
+crates/amun-constitutional/src/continuation_chain.rs:7://!   Restoration does not create a new replay lineage. The chain
+crates/amun-constitutional/src/continuation_chain.rs:24:///   - The restoration point (where replay resumes)
+crates/amun-constitutional/src/continuation_chain.rs:34:    pub replay_revision: u32,
+crates/amun-constitutional/src/continuation_chain.rs:69:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/continuation_chain.rs:70:        self.replay_revision
+crates/amun-constitutional/src/continuation_chain.rs:79:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/continuation_chain.rs:117:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/continuation_chain.rs:134:        replay_revision: u32,
+crates/amun-constitutional/src/continuation_chain.rs:146:            replay_revision,
+crates/amun-constitutional/src/divergence_resolution.rs:41:    pub replay_revision: u32,
+crates/amun-constitutional/src/divergence_resolution.rs:78:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/divergence_resolution.rs:79:        self.replay_revision
+crates/amun-constitutional/src/divergence_resolution.rs:88:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/divergence_resolution.rs:127:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/divergence_resolution.rs:144:        replay_revision: u32,
+crates/amun-constitutional/src/divergence_resolution.rs:157:            replay_revision,
+crates/amun-constitutional/src/transition_evidence.rs:13:    pub replay_revision: u32,
+crates/amun-constitutional/src/transition_evidence.rs:36:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/transition_evidence.rs:37:        self.replay_revision
+crates/amun-constitutional/src/transition_evidence.rs:45:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/transition_evidence.rs:80:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/transition_evidence.rs:107:            replay_revision: 1,
+crates/amun-constitutional/src/lib.rs:28:pub mod replay_certificate;
+crates/amun-constitutional/src/lib.rs:29:pub mod replay_outcome;
+crates/amun-constitutional/src/lib.rs:90:pub use replay_certificate::ReplayCertificate;
+crates/amun-constitutional/src/lib.rs:91:pub use replay_outcome::ReplayOutcome;
+crates/amun-constitutional/src/execution_limits.rs:9:    pub max_replay_divergence: u64,
+crates/amun-constitutional/src/execution_limits.rs:38:    pub replay_revision: u32,
+crates/amun-constitutional/src/execution_limits.rs:44:    pub replay: ReplayLimits,
+crates/amun-constitutional/src/execution_limits.rs:57:            replay_revision: 1,
+crates/amun-constitutional/src/execution_limits.rs:63:            replay: ReplayLimits {
+crates/amun-constitutional/src/execution_limits.rs:65:                max_replay_divergence: 1000,
+crates/amun-constitutional/src/execution_limits.rs:92:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_limits.rs:97:        h.update_u64(self.replay.max_transcript_span)
+crates/amun-constitutional/src/execution_limits.rs:98:            .update_u64(self.replay.max_replay_divergence)
+crates/amun-constitutional/src/execution_limits.rs:99:            .update_u64(self.replay.max_journal_entries);
+crates/amun-constitutional/src/execution_limits.rs:139:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_limits.rs:169:        if self.replay.max_transcript_span == 0 || self.admissibility.max_events_per_context == 0 {
+crates/amun-constitutional/src/certificate_scope.rs:1://! CertificateScope — the admissibility envelope of a replay certificate.
+crates/amun-constitutional/src/certificate_scope.rs:13://!   This prevents: replay ambiguity, overlapping admissibility conflicts,
+crates/amun-constitutional/src/certificate_scope.rs:19:use crate::replay_outcome::ReplayOutcome;
+crates/amun-constitutional/src/certificate_scope.rs:41:/// The constitutional scope of a replay certificate.
+crates/amun-constitutional/src/certificate_scope.rs:60:    pub replay_revision: u32,
+crates/amun-constitutional/src/certificate_scope.rs:78:            .update_u32(self.replay_revision)
+crates/amun-constitutional/src/certificate_scope.rs:113:            || self.replay_revision != other.replay_revision
+crates/amun-constitutional/src/certificate_scope.rs:180:            replay_revision: 1,
+crates/amun-constitutional/src/divergence_point.rs:1://! DivergencePoint — the constitutional position where replay diverged.
+crates/amun-constitutional/src/divergence_point.rs:16:/// The point in the transcript where replay diverged.
+crates/amun-constitutional/src/divergence_point.rs:26:    pub replay_revision: u32,
+crates/amun-constitutional/src/divergence_point.rs:69:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/divergence_point.rs:70:        self.replay_revision
+crates/amun-constitutional/src/divergence_point.rs:79:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/divergence_point.rs:120:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/divergence_point.rs:137:        replay_revision: u32,
+crates/amun-constitutional/src/divergence_point.rs:151:            replay_revision,
+crates/amun-constitutional/src/divergence_point.rs:216:    fn test_replay_error() {
+crates/amun-constitutional/src/state_anchor_scope.rs:51:    pub replay_revision: u32,
+crates/amun-constitutional/src/state_anchor_scope.rs:65:            .update_u32(self.replay_revision)
+crates/amun-constitutional/src/state_anchor_scope.rs:89:            || self.replay_revision != other.replay_revision
+crates/amun-constitutional/src/state_anchor_scope.rs:148:            replay_revision: 1,
+crates/amun-constitutional/src/constitutional_hasher.rs:23:    pub fn update_revision(&mut self, constitutional: u32, replay: u32) -> &mut Self {
+crates/amun-constitutional/src/constitutional_hasher.rs:25:        self.inner.update(replay.to_le_bytes());
+crates/amun-constitutional/src/constitutional_witness.rs:70:    pub replay_revision: u32,
+crates/amun-constitutional/src/constitutional_witness.rs:101:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/constitutional_witness.rs:102:        self.replay_revision
+crates/amun-constitutional/src/constitutional_witness.rs:111:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/constitutional_witness.rs:161:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/constitutional_witness.rs:202:        replay_revision: u32,
+crates/amun-constitutional/src/constitutional_witness.rs:213:            replay_revision,
+crates/amun-constitutional/src/execution_receipt.rs:9://!      This preserves replay locality and prevents global sequencing bottlenecks.
+crates/amun-constitutional/src/execution_receipt.rs:16://!   replay ADMISSIBILITY, not execution finality.
+crates/amun-constitutional/src/execution_receipt.rs:26:use crate::replay_outcome::ReplayOutcome;
+crates/amun-constitutional/src/execution_receipt.rs:28:/// A terminal constitutional witness attesting to replay admissibility.
+crates/amun-constitutional/src/execution_receipt.rs:51:    pub replay_revision: u32,
+crates/amun-constitutional/src/execution_receipt.rs:72:    /// Certificate attesting replay admissibility (admissibility-first model).
+crates/amun-constitutional/src/execution_receipt.rs:80:    pub replay_outcome: ReplayOutcome,
+crates/amun-constitutional/src/execution_receipt.rs:97:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_receipt.rs:98:        self.replay_revision
+crates/amun-constitutional/src/execution_receipt.rs:106:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_receipt.rs:115:            .update_u8(self.replay_outcome as u8);
+crates/amun-constitutional/src/execution_receipt.rs:147:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_receipt.rs:172:        replay_revision: u32,
+crates/amun-constitutional/src/execution_receipt.rs:180:        replay_outcome: ReplayOutcome,
+crates/amun-constitutional/src/execution_receipt.rs:187:            replay_revision,
+crates/amun-constitutional/src/execution_receipt.rs:197:            replay_outcome,
+crates/amun-constitutional/src/execution_receipt.rs:205:        self.replay_outcome.is_admitted()
+crates/amun-constitutional/src/execution_receipt.rs:208:        self.replay_outcome.is_failure()
+crates/amun-constitutional/src/transition_commitment.rs:12:    pub replay_revision: u32,
+crates/amun-constitutional/src/transition_commitment.rs:33:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/transition_commitment.rs:34:        self.replay_revision
+crates/amun-constitutional/src/transition_commitment.rs:42:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/transition_commitment.rs:77:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/transition_commitment.rs:104:            replay_revision: 1,
+crates/amun-constitutional/src/snapshot.rs:1://! ConstitutionalSnapshot — constitutionally restorable replay surface.
+crates/amun-constitutional/src/snapshot.rs:4://!   "This replay lineage, within this scope, produced this state anchor,
+crates/amun-constitutional/src/snapshot.rs:24:/// A constitutionally restorable replay surface.
+crates/amun-constitutional/src/snapshot.rs:27:/// replay lineage, is admissible for restoration under specific constitutional
+crates/amun-constitutional/src/snapshot.rs:43:    pub replay_revision: u32,
+crates/amun-constitutional/src/snapshot.rs:74:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/snapshot.rs:75:        self.replay_revision
+crates/amun-constitutional/src/snapshot.rs:84:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/snapshot.rs:92:            .update_u32(self.scope.replay_revision)
+crates/amun-constitutional/src/snapshot.rs:140:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/snapshot.rs:154:            || self.scope.replay_revision != self.replay_revision
+crates/amun-constitutional/src/snapshot.rs:182:        replay_revision: u32,
+crates/amun-constitutional/src/snapshot.rs:198:            replay_revision,
+crates/amun-constitutional/src/snapshot.rs:206:            replay_revision,
+crates/amun-constitutional/src/canonical_witness.rs:62:        witness.replay_revision,
+crates/amun-constitutional/src/causal_edge.rs:28:    pub replay_revision: u32,
+crates/amun-constitutional/src/causal_edge.rs:56:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/causal_edge.rs:57:        self.replay_revision
+crates/amun-constitutional/src/causal_edge.rs:66:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/causal_edge.rs:111:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/causal_edge.rs:128:        replay_revision: u32,
+crates/amun-constitutional/src/causal_edge.rs:138:            replay_revision,
+crates/amun-constitutional/src/constitutional_object.rs:24:    fn replay_revision(&self) -> u32;
+crates/amun-constitutional/src/snapshot_scope.rs:8://! replay surface, not a serialized storage image.
+crates/amun-constitutional/src/snapshot_scope.rs:42:    /// Snapshot is from a divergent replay lineage.
+crates/amun-constitutional/src/snapshot_scope.rs:64:/// The scope defines the restoration surface — what replay window
+crates/amun-constitutional/src/snapshot_scope.rs:80:    pub replay_revision: u32,
+crates/amun-constitutional/src/snapshot_scope.rs:96:            .update_u32(self.replay_revision)
+crates/amun-constitutional/src/snapshot_scope.rs:124:            || self.replay_revision != other.replay_revision
+crates/amun-constitutional/src/snapshot_scope.rs:180:            replay_revision: 1,
+crates/amun-constitutional/src/constitutional_failure.rs:39:    pub replay_revision: u32,
+crates/amun-constitutional/src/constitutional_failure.rs:46:    pub replay_domain: Option<u8>,
+crates/amun-constitutional/src/constitutional_failure.rs:70:            replay_revision: 1,
+crates/amun-constitutional/src/constitutional_failure.rs:77:            replay_domain: None,
+crates/amun-constitutional/src/constitutional_failure.rs:95:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/constitutional_failure.rs:102:            .update_optional_u64(self.replay_domain.map(|x| x as u64))
+crates/amun-constitutional/src/constitutional_failure.rs:146:            || self.replay_revision == 0
+crates/amun-constitutional/src/constitutional_failure.rs:186:    pub fn with_replay_domain(mut self, d: u8) -> Self {
+crates/amun-constitutional/src/constitutional_failure.rs:187:        self.replay_domain = Some(d);
+crates/amun-constitutional/src/execution_boundary.rs:13:    pub replay_revision: u32,
+crates/amun-constitutional/src/execution_boundary.rs:39:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_boundary.rs:40:        self.replay_revision
+crates/amun-constitutional/src/execution_boundary.rs:48:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_boundary.rs:108:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_boundary.rs:135:            replay_revision: 1,
+crates/amun-constitutional/src/execution_journal.rs:13:    pub replay_revision: u32,
+crates/amun-constitutional/src/execution_journal.rs:35:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_journal.rs:36:        self.replay_revision
+crates/amun-constitutional/src/execution_journal.rs:44:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_journal.rs:79:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_journal.rs:106:            replay_revision: 1,
+crates/amun-constitutional/src/execution_journal.rs:120:    pub fn with_revision(mut self, constitutional: u32, replay: u32) -> Self {
+crates/amun-constitutional/src/execution_journal.rs:122:        self.replay_revision = replay;
+crates/amun-constitutional/src/execution_journal.rs:138:    pub replay_revision: u32,
+crates/amun-constitutional/src/execution_journal.rs:157:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_journal.rs:158:        self.replay_revision
+crates/amun-constitutional/src/execution_journal.rs:166:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_journal.rs:199:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_journal.rs:218:            replay_revision: 1,
+crates/amun-constitutional/src/execution_journal.rs:241:        if entry.replay_revision != self.replay_revision {
+crates/amun-constitutional/src/state_anchor.rs:1://! ConstitutionalStateAnchor — immutable, replay-derived state attestation.
+crates/amun-constitutional/src/state_anchor.rs:6://! A StateAnchor attests that a specific replay lineage, within a specific
+crates/amun-constitutional/src/state_anchor.rs:11://! It is REPLAY-DERIVED: the state root is an output of replay, not storage.
+crates/amun-constitutional/src/state_anchor.rs:15://!   replay lineage and attested transcript scope, never from mutable storage
+crates/amun-constitutional/src/state_anchor.rs:28:/// An immutable constitutional attestation of replay-derived state.
+crates/amun-constitutional/src/state_anchor.rs:30:/// The anchor says: "Within this scope, replay produced this state root."
+crates/amun-constitutional/src/state_anchor.rs:38:    pub replay_revision: u32,
+crates/amun-constitutional/src/state_anchor.rs:69:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/state_anchor.rs:70:        self.replay_revision
+crates/amun-constitutional/src/state_anchor.rs:79:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/state_anchor.rs:87:            .update_u32(self.scope.replay_revision)
+crates/amun-constitutional/src/state_anchor.rs:134:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/state_anchor.rs:148:            || self.scope.replay_revision != self.replay_revision
+crates/amun-constitutional/src/state_anchor.rs:166:        replay_revision: u32,
+crates/amun-constitutional/src/state_anchor.rs:182:            replay_revision,
+crates/amun-constitutional/src/state_anchor.rs:189:            replay_revision,
+crates/amun-constitutional/src/execution_context.rs:12:    pub replay_revision: u32,
+crates/amun-constitutional/src/execution_context.rs:16:    pub replay_lineage_hash: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_context.rs:32:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_context.rs:33:        self.replay_revision
+crates/amun-constitutional/src/execution_context.rs:41:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_context.rs:44:            .update_optional_hash(self.replay_lineage_hash.as_ref())
+crates/amun-constitutional/src/execution_context.rs:75:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_context.rs:98:            replay_revision: 1,
+crates/amun-constitutional/src/execution_context.rs:102:            replay_lineage_hash: None,
+crates/amun-constitutional/src/execution_context.rs:110:    pub fn with_replay_lineage(mut self, h: [u8; 32]) -> Self {
+crates/amun-constitutional/src/execution_context.rs:111:        self.replay_lineage_hash = Some(h);
+crates/amun-consensus-integration/Cargo.toml:14:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-entropy-transcript/src/transcript.rs:33:    pub fn verify_replay(&self, other: &EntropyTranscript) -> bool {
+crates/amun-constitutional-block/tests/block_tests.rs:252:fn n6b_full_replay_valid() {
+crates/amun-constitutional-block/tests/block_tests.rs:253:    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:277:    assert!(verify_full_replay(&block, &cert, rt.journal()).is_ok());
+crates/amun-constitutional-block/tests/block_tests.rs:281:fn n6b_full_replay_tampered_journal_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs:282:    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:309:    assert!(verify_full_replay(&block, &cert, &tampered).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs:313:fn n6b_full_replay_wrong_count_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs:314:    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:339:    assert!(verify_full_replay(&block, &cert, &rt.journal()[..1]).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs:454:    // Block has a different replay_certificate_root
+crates/amun-constitutional-block/tests/finalizer_tests.rs:29:    assert!(!block.replay_certificate_root.is_empty());
+crates/amun-constitutional-block/tests/finalizer_tests.rs:65:    assert_ne!(b1.replay_certificate_root, b2.replay_certificate_root);
+crates/amun-constitutional-block/tests/replay_tests.rs:47:fn test_full_chain_replay_audit() {
+crates/amun-constitutional-block/src/lib.rs:13:/// 1. Block's replay_certificate_root matches the certificate's merkle root.
+crates/amun-constitutional-block/src/lib.rs:16:/// Note: Full replay verification (N6B) will add journal-based validation.
+crates/amun-constitutional-block/src/lib.rs:25:    if block.replay_certificate_root != computed_root {
+crates/amun-constitutional-block/src/lib.rs:28:            block.replay_certificate_root, computed_root
+crates/amun-constitutional-block/src/lib.rs:46:/// Full replay verification: cryptographic proof that the block's state
+crates/amun-constitutional-block/src/lib.rs:55:pub fn verify_full_replay(
+crates/amun-constitutional-block/src/lib.rs:66:            "Full replay verification failed: journal does not produce the claimed state".into(),
+crates/amun-constitutional-block/src/lib.rs:78:/// No full state, no journal replay, no full certificate set needed.
+crates/amun-constitutional-block/src/lib.rs:83:///   3. Merkle root matches block.replay_certificate_root
+crates/amun-constitutional-block/src/lib.rs:106:    if block.replay_certificate_root != proof_root {
+crates/amun-constitutional-block/src/lib.rs:109:            block.replay_certificate_root, proof_root
+crates/amun-constitutional-block/src/block.rs:17:    pub replay_certificate_root: String,
+crates/amun-constitutional-block/src/block.rs:33:        replay_certificate_root: String,
+crates/amun-constitutional-block/src/block.rs:46:            replay_certificate_root,
+crates/amun-constitutional-block/src/block.rs:83:        replay_certificate_root: String,
+crates/amun-constitutional-block/src/block.rs:100:            replay_certificate_root,
+crates/amun-constitutional-block/src/finalizer.rs:34:        let (state_root, replay_certificate_root) = match &ctx.state_runtime {
+crates/amun-constitutional-block/src/finalizer.rs:53:            replay_certificate_root,
+crates/amun-replay-engine/Cargo.toml:2:name = "amun-replay-engine"
+crates/amun-replay-engine/src/canonical.rs:5:// This file is the constitutional foundation of the entire replay system.
+crates/amun-replay-engine/src/canonical.rs:6:// Without a stable, deterministic byte representation, replay equivalence
+crates/amun-replay-engine/src/replay_result.rs:1://! replay_result — stub (pending migration to constitutional kernel)
+crates/amun-replay-engine/src/lib.rs:58:    pub fn replay(
+crates/amun-replay-engine/src/lib.rs:78:            replay_root: self.state.state_root,
+crates/amun-replay-engine/src/lib.rs:154:    fn session_replay_produces_self_verified_certificate() {
+crates/amun-replay-engine/src/lib.rs:157:        let cert = session.replay(&entries).unwrap();
+crates/amun-replay-engine/src/lib.rs:166:        assert!(session.replay(&entries).is_err());
+crates/amun-replay-engine/src/equivalence.rs:16:    pub replay_root: ConstitutionalHash,
+crates/amun-replay-engine/src/equivalence.rs:91:        // For self-verification: replay the entries through ReplayState
+crates/amun-networking/src/risk.rs:10:    /// Peer's replay history is unstable
+crates/amun-networking/src/sovereignty.rs:24:    pub replay_compatible: bool,
+crates/amun-networking/src/sovereignty.rs:51:            replay_compatible: false,
+crates/amun-networking/src/sovereignty.rs:87:            && self.replay_compatible
+crates/amun-byzantine-tests/tests/attack_suite.rs:9:use amun_replay_verifier::replay_verifier::ReplayVerifier;
+crates/amun-byzantine-tests/tests/attack_suite.rs:56:    let replay = ReplayVerifier::replay(&proof, &program, &mut fresh_reg, &[]);
+crates/amun-byzantine-tests/tests/attack_suite.rs:58:        replay,
+crates/amun-byzantine-tests/tests/attack_suite.rs:59:        amun_replay_verifier::replay_verifier::ReplayResult::Match { .. }
+crates/amun-byzantine-tests/tests/attack_suite.rs:283:fn byz_010_proof_replay_attack_blocked() {
+crates/amun-byzantine-tests/Cargo.toml:13:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-lineage/src/record.rs:169:    pub replay_guarantee: ReplayGuarantee,
+crates/amun-lineage/src/record.rs:181:        replay: ReplayGuarantee,
+crates/amun-lineage/src/record.rs:190:            replay_guarantee: replay,
+crates/amun-lineage/src/record.rs:205:        h.update(&[self.replay_guarantee.canonical_tag()]);
+crates/amun-finality-certificate/src/lib.rs:8:/// with the complete evidence chain (replay, audit, evidence root).
+crates/amun-finality-certificate/src/lib.rs:15:    pub replay_certificate_head: [u8; 32],
+crates/amun-finality-certificate/src/lib.rs:28:        replay_head: [u8; 32],
+crates/amun-finality-certificate/src/lib.rs:39:            replay_certificate_head: replay_head,
+crates/amun-finality-certificate/src/lib.rs:55:        hasher.update(&self.replay_certificate_head);
+crates/amun-constitutional-semantics/Cargo.toml:9:amun-replay-semantics = { path = "../amun-replay-semantics" }
+crates/amun-constitutional-semantics/src/lib.rs:1://! Constitutional Semantics — complete truth model for replay verification.
+crates/amun-constitutional-semantics/src/lib.rs:6:use amun_replay_semantics::{ReplayDomain, ReplayBoundary, ReplayFailure};
+crates/amun-constitutional-semantics/src/lib.rs:29:    pub fn is_replay_safe(&self) -> bool { matches!(self, EventFinality::Finalized | EventFinality::ReplayCertified) }
+crates/amun-constitutional-semantics/src/lib.rs:36:    pub fn with_replay_certification(mut self, at_sequence: u64) -> Self { self.finality = EventFinality::ReplayCertified; self.finalized_at_sequence = Some(at_sequence); self }
+crates/amun-constitutional-semantics/src/lib.rs:62:#[derive(Debug, Clone, PartialEq, Eq)] pub struct ReplayPolicy { pub authority: EventAuthority, pub replay_required: bool, pub divergence_is_violation: bool, pub contributes_to_causality: bool, pub can_be_checkpoint: bool, pub requires_certification: bool }
+crates/amun-constitutional-semantics/src/lib.rs:70:            self.replay_required as u8,
+crates/amun-constitutional-semantics/src/lib.rs:86:    pub const CONSENSUS_AUTHORITATIVE: Self = Self { authority: EventAuthority::Authoritative, replay_required: true, divergence_is_violation: true, contributes_to_causality: true, can_be_checkpoint: true, requires_certification: true };
+crates/amun-constitutional-semantics/src/lib.rs:87:    pub const DERIVED: Self = Self { authority: EventAuthority::Derived, replay_required: false, divergence_is_violation: false, contributes_to_causality: true, can_be_checkpoint: false, requires_certification: false };
+crates/amun-constitutional-semantics/src/lib.rs:88:    pub const EPHEMERAL: Self = Self { authority: EventAuthority::Ephemeral, replay_required: false, divergence_is_violation: false, contributes_to_causality: false, can_be_checkpoint: false, requires_certification: false };
+crates/amun-constitutional-semantics/src/lib.rs:89:    pub const CERTIFYING: Self = Self { authority: EventAuthority::Certifying, replay_required: true, divergence_is_violation: true, contributes_to_causality: true, can_be_checkpoint: true, requires_certification: true };
+crates/amun-constitutional-semantics/src/lib.rs:117:    #[test] fn test_finality_replay_safety() { assert!(!EventFinality::Tentative.is_replay_safe()); assert!(EventFinality::Finalized.is_replay_safe()); }
+crates/amun-constitutional-semantics/src/lib.rs:120:    #[test] fn test_replay_policy() { assert!(ReplayPolicy::CONSENSUS_AUTHORITATIVE.replay_required); assert!(!ReplayPolicy::EPHEMERAL.replay_required); }
+crates/amun-runtime-benchmarks/Cargo.toml:13:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-recovery/Cargo.toml:12:amun-replay-store = { path = "../amun-replay-store" }
+crates/amun-recovery/src/lib.rs:3:use amun_replay_store::{ReplayRecord, ReplayStore};
+crates/amun-recovery/src/lib.rs:15:    pub replay_count: usize,
+crates/amun-recovery/src/lib.rs:23:    replay: ReplayStore,
+crates/amun-recovery/src/lib.rs:32:            replay: ReplayStore::new(&format!("{}/replay.json", data_dir)),
+crates/amun-recovery/src/lib.rs:46:        self.replay.append(record)?;
+crates/amun-recovery/src/lib.rs:55:        let replay_records = self.replay.load_all().unwrap_or_default();
+crates/amun-recovery/src/lib.rs:67:        // Verify replay chain integrity
+crates/amun-recovery/src/lib.rs:68:        if !self.replay.verify_chain().unwrap_or(false) {
+crates/amun-recovery/src/lib.rs:79:            replay_count: replay_records.len(),
+crates/amun-recovery/src/lib.rs:131:        assert_eq!(recovered.replay_count, 1);
+crates/amun-recovery/src/lib.rs:145:        assert_eq!(recovered.replay_count, 0);
+crates/amun-recovery/src/lib.rs:186:        assert_eq!(recovered.replay_count, 3);
+crates/amun-replay-store/Cargo.toml:2:name = "amun-replay-store"
+crates/amun-replay-store/Cargo.toml:5:description = "Constitutional replay journal store"
+crates/amun-replay-store/src/lib.rs:6:/// A single replay record capturing a state transition.
+crates/amun-replay-store/src/lib.rs:30:/// Persistent store for replay journal.
+crates/amun-replay-store/src/lib.rs:42:    /// Append a replay record to the journal.
+crates/amun-replay-store/src/lib.rs:53:    /// Load all replay records.
+crates/amun-replay-store/src/lib.rs:62:    /// Load a specific replay record by height.
+crates/amun-replay-store/src/lib.rs:101:        let path = "/tmp/n45_replay_store.json";
+crates/amun-replay-store/src/lib.rs:113:    fn n45_replay_sequence() {
+crates/amun-state-root/src/verifier.rs:3:/// remains serializable and replayable without coupling.
+crates/amun-state-root/src/replay.rs:6:    pub replayed_root: [u8; 32],
+crates/amun-state-root/src/replay.rs:13:        out.extend_from_slice(&self.replayed_root);
+crates/amun-state-root/src/lib.rs:6:pub mod replay;
+crates/amun-state-root/src/lib.rs:13:pub use replay::{ReplayCertificate, ReplayEquivalenceProof, ReplayTranscript};
+crates/amun-state-root/src/laws.rs:2:pub const REPLAY_EQUIVALENCE_LAW: &str = "assert_eq!(live_execution_hash, replay_hash)";
+crates/amun-state-root/src/snapshot.rs:6:/// A snapshot carrying replay-verifiable constitutional truth.
+crates/amun-state-root/src/snapshot.rs:18:    pub replay_equivalence_proof: ReplayEquivalenceProof,
+crates/amun-state-root/src/snapshot.rs:22:/// Proof that live and replayed executions produced the same state root.
+crates/amun-state-root/src/snapshot.rs:29:    pub replayed_root: [u8; 32],
+crates/amun-state-root/src/snapshot.rs:36:        self.live_root == self.replayed_root
+crates/amun-state-root/src/snapshot.rs:43:        out.extend_from_slice(&self.replayed_root);
+crates/amun-state-root/src/snapshot.rs:57:        self.replay_equivalence_proof.encode_canonical(out);
+crates/amun-state-root/src/snapshot.rs:77:            && self.replay_equivalence_proof.verify()
+crates/amun-explorer-api/src/services/chain_service.rs:40:            has_replay_evidence: true,
+crates/amun-explorer-api/src/services/chain_service.rs:56:            has_replay_evidence: true,
+crates/amun-explorer-api/src/lib.rs:109:        assert!(block.has_replay_evidence);
+crates/amun-explorer-api/src/types.rs:12:    pub has_replay_evidence: bool,
+crates/amun-compatibility/src/migration.rs:6:    pub requires_replay: bool,
+crates/amun-compatibility/src/migration.rs:18:    /// Full migration - state must be replayed
+crates/amun-compatibility/src/matrix.rs:7:    pub replay_safe: bool,
+crates/amun-compatibility/src/matrix.rs:16:        if !self.replay_safe && !self.snapshot_safe {
+crates/amun-compatibility/src/matrix.rs:18:        } else if !self.replay_safe && self.snapshot_safe {
+crates/amun-compatibility/src/matrix.rs:20:        } else if self.replay_safe && self.proof_safe && self.governance_safe {
+crates/amun-compatibility/src/matrix.rs:22:        } else if self.replay_safe && self.proof_safe {
+crates/amun-compatibility/src/matrix.rs:24:        } else if self.replay_safe {
+crates/amun-compatibility/src/matrix.rs:51:            replay_safe: same_empty_root && same_max_depth && same_proof,
+crates/amun-constitution/src/freeze_validator.rs:17:    pub preserves_replay: bool,
+crates/amun-constitution/src/freeze_validator.rs:48:        if boundary.requires_replay_preservation && !context.preserves_replay {
+crates/amun-constitution/src/freeze_validator.rs:67:        } else if boundary.requires_replay_preservation || boundary.requires_snapshot_compatibility
+crates/amun-constitution/src/freeze_map.rs:8:    /// Amendment requires constitutional supermajority + replay proof
+crates/amun-constitution/src/freeze_map.rs:38:    pub requires_replay_preservation: bool,
+crates/amun-constitution/src/freeze_map.rs:53:                requires_replay_preservation: true,
+crates/amun-constitution/src/freeze_map.rs:55:                description: "Tree depth - changing this breaks all proofs, replays, and snapshots",
+crates/amun-constitution/src/freeze_map.rs:62:                requires_replay_preservation: true,
+crates/amun-constitution/src/freeze_map.rs:71:                requires_replay_preservation: true,
+crates/amun-constitution/src/freeze_map.rs:80:                requires_replay_preservation: true,
+crates/amun-constitution/src/freeze_map.rs:89:                requires_replay_preservation: false,
+crates/amun-constitution/src/freeze_map.rs:98:                requires_replay_preservation: false,
+crates/amun-transition-proof/src/transition_proof.rs:99:    /// In a full implementation, this replays the operation log.
+crates/amun-transition-proof/src/transition_proof.rs:102:        // Full replay verification comes in W6.
+crates/amun-truth-engine/Cargo.toml:6:description = "AmunChain deterministic replay engine"
+crates/amun-truth-engine/src/engine.rs:133:                .map_err(|_| "replay failed")?,
+crates/amun-truth-engine/src/engine.rs:197:                    replay_root: self
+crates/amun-truth-engine/src/engine.rs:199:                        .map_err(|_| "replay failed")?,
+crates/amun-host/src/replay.rs:19:            return Err("chain ID mismatch - cross-chain replay rejected");
+crates/amun-host/src/lib.rs:4:pub mod replay;
+crates/amun-host/src/lib.rs:9:pub use replay::ReplayGuard;
+crates/amun-stf/tests/replay_equivalence.rs:48:fn test_single_block_replay_equivalence() {
+crates/amun-stf/tests/replay_equivalence.rs:52:    let (replay_transcript, replay_state, replay_root) = execute_block(&txs);
+crates/amun-stf/tests/replay_equivalence.rs:54:    assert_eq!(live_root, replay_root, "live and replay roots diverged");
+crates/amun-stf/tests/replay_equivalence.rs:55:    assert_eq!(live_state, replay_state, "live and replay state diverged");
+crates/amun-stf/tests/replay_equivalence.rs:58:        replay_transcript.receipts.len(),
+crates/amun-stf/tests/replay_equivalence.rs:62:    for (index, (live, replay)) in live_transcript
+crates/amun-stf/tests/replay_equivalence.rs:65:        .zip(replay_transcript.receipts.iter())
+crates/amun-stf/tests/replay_equivalence.rs:70:            replay.receipt_hash(),
+crates/amun-stf/tests/replay_equivalence.rs:74:        assert_eq!(live.tx_hash, replay.tx_hash);
+crates/amun-stf/tests/replay_equivalence.rs:75:        assert_eq!(live.pre_state_root, replay.pre_state_root);
+crates/amun-stf/tests/replay_equivalence.rs:76:        assert_eq!(live.post_state_root, replay.post_state_root);
+crates/amun-stf/tests/replay_equivalence.rs:77:        assert_eq!(live.execution_result_hash, replay.execution_result_hash);
+crates/amun-stf/tests/replay_equivalence.rs:78:        assert_eq!(live.status, replay.status);
+crates/amun-stf/tests/replay_equivalence.rs:79:        assert_eq!(live.state_changed, replay.state_changed);
+crates/amun-stf/tests/replay_equivalence.rs:80:        assert_eq!(live.previous_receipt_hash, replay.previous_receipt_hash);
+crates/amun-stf/tests/replay_equivalence.rs:84:    assert!(replay_transcript.verify_transcript().is_ok());
+crates/amun-stf/tests/replay_equivalence.rs:88:fn test_replay_detects_divergent_execution() {
+crates/amun-stf/tests/replay_equivalence.rs:93:    let mut replay_transcript = ExecutionTranscript::new();
+crates/amun-stf/tests/replay_equivalence.rs:112:        .expect("corrupted replay must still execute");
+crates/amun-stf/tests/replay_equivalence.rs:116:        replay_transcript.add_receipt(receipt);
+crates/amun-stf/tests/replay_equivalence.rs:119:    let replay_root = replay_transcript
+crates/amun-stf/tests/replay_equivalence.rs:122:        .expect("replay transcript must not be empty")
+crates/amun-stf/tests/replay_equivalence.rs:126:        live_root, replay_root,
+crates/amun-stf/tests/replay_equivalence.rs:127:        "divergent replay unexpectedly matched"
+crates/amun-stf/tests/replay_equivalence.rs:135:    let replay_hashes: Vec<[u8; 32]> = replay_transcript
+crates/amun-stf/tests/replay_equivalence.rs:141:        live_hashes, replay_hashes,
+crates/amun-stf/tests/replay_equivalence.rs:142:        "divergent replay produced identical receipts"
+crates/amun-stf/src/tests.rs:55:fn test_nonce_rejects_replay() {}
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:122:fn n110_4c_applied_hashes_prevent_replay() {
+crates/amun-live-cluster/Cargo.toml:9:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-live-cluster/src/validator.rs:512:                        let replay_deterministic = cert.state_root == history_root;
+crates/amun-live-cluster/src/validator.rs:534:                            replay_deterministic,
+crates/amun-live-cluster/src/validator.rs:603:                            [0u8; 32], // replay_certificate: placeholder until N126.4
+crates/amun-constitutional-authority/src/lib.rs:7://! This crate provides the primitives for building replay-safe,
+crates/amun-constitutional-authority/src/revocation.rs:11:/// guaranteeing replay stability.
+crates/amun-wal/src/authority_index.rs:3:/// Authority index for O(1) replay lookup
+crates/amun-wal/src/wal.rs:36:        wal.replay_frames()?;
+crates/amun-wal/src/wal.rs:44:    fn replay_frames(&mut self) -> std::io::Result<()> {
+crates/amun-wal/src/recovery.rs:7:    pub events_replayed: u64,
+crates/amun-wal/src/recovery.rs:15:    Ok(RecoveryPoint { last_sequence: last_seq, last_state_root: None, events_replayed: count, valid: count == wal.frame_count() })
+crates/amun_consensus_math/tests/replay_binary.rs:1://! Binary transcript replay test with tolerance for rounding differences
+crates/amun_consensus_math/tests/replay_binary.rs:18:fn test_replay_binary_transcript() {
+crates/amun-constitutional-quarantine/src/levels.rs:25:    pub replay_verified: bool,
+crates/amun-constitutional-quarantine/src/pipeline.rs:38:            replay_verified: false,
+crates/amun-constitutional-quarantine/src/pipeline.rs:47:    pub fn verify_replay(&mut self, snapshot_root: [u8; 32], passed: bool) {
+crates/amun-constitutional-quarantine/src/pipeline.rs:54:            record.replay_verified = passed;
+crates/amun-constitutional-governance/src/lib.rs:7://! This crate provides the building blocks for replay-safe,
+crates/amun-constitutional-governance/src/lib.rs:15://! model formal and replay-verifiable.
+crates/amun-crypto-hardening/Cargo.toml:5:description = "Production-grade cryptographic hardening — Ed25519, BLS, anti-replay, key rotation"
+crates/amun-crypto-hardening/src/lib.rs:1:pub mod anti_replay;
+crates/amun-crypto-hardening/src/lib.rs:5:pub use anti_replay::*;
+crates/amun-crypto-hardening/src/anti_replay.rs:3:/// Anti-replay protection using a sliding window of seen message hashes.
+crates/amun-crypto-hardening/src/anti_replay.rs:21:    /// If seen, return false (replay detected).
+crates/amun-crypto-hardening/src/anti_replay.rs:24:            return false; // replay detected
+crates/amun-crypto-hardening/src/anti_replay.rs:59:    fn n58_detect_replay() {
+crates/amun-crypto-hardening/src/anti_replay.rs:63:        assert!(!guard.check_and_record(&hash)); // replay
+crates/amun-evidence-root/src/lib.rs:8:/// - Replay certificate (replay verification proof)
+crates/amun-evidence-root/src/lib.rs:16:    pub replay_certificate: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:26:        replay_certificate: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:35:        hasher.update(&replay_certificate);
+crates/amun-evidence-root/src/lib.rs:44:            replay_certificate,
+crates/amun-evidence-root/src/lib.rs:60:            self.replay_certificate,
+crates/amun-evidence-root/src/lib.rs:84:        replay_certificate: [u8; 32],
+crates/amun-evidence-root/src/lib.rs:92:            replay_certificate,
+crates/amun-crash-recovery/Cargo.toml:6:description = "AmunChain crash recovery with WAL replay"
+crates/amun-replay/Cargo.toml:2:name = "amun-replay"
+crates/amun-replay/Cargo.toml:6:description = "Constitutional replay system: commit log, validation, and certificates"
+crates/amun-replay/src/certificate.rs:11:    pub replay_root: [u8; 32],
+crates/amun-replay/src/certificate.rs:33:            replay_root: [0u8; 32],
+crates/amun-replay/src/certificate.rs:42:        cert.replay_root = hasher.finalize().into();
+crates/amun-replay/src/certificate.rs:53:            replay_root: [0u8; 32],
+crates/amun-replay/src/certificate.rs:68:        hasher.update(&self.replay_root);
+crates/amun-replay/src/certificate.rs:182:    fn n37_tampered_replay_root_rejected() {
+crates/amun-replay/src/certificate.rs:189:        cert.replay_root = [0xFF; 32];
+crates/amun-replay/src/validation.rs:6:    pub replayed_root: [u8; 32],
+crates/amun-replay/src/validation.rs:15:            replayed_root: expected,
+crates/amun-replay/src/validation.rs:24:            replayed_root: actual,
+crates/amun-replay/src/validation.rs:110:    fn n35_replay_result_deterministic() {
+crates/amun-replay-verifier/Cargo.toml:2:name = "amun-replay-verifier"
+crates/amun-replay-verifier/Cargo.toml:5:description = "Deterministic replay verification for constitutional contracts"
+crates/amun-replay-verifier/src/lib.rs:1:pub mod replay_verifier;
+crates/amun-replay-verifier/src/lib.rs:2:pub use replay_verifier::*;
+crates/amun-replay-verifier/src/replay_verifier.rs:21:        replay: String,
+crates/amun-replay-verifier/src/replay_verifier.rs:31:    pub fn replay(
+crates/amun-replay-verifier/src/replay_verifier.rs:82:                transition_proof: replay_proof,
+crates/amun-replay-verifier/src/replay_verifier.rs:89:                        replay: hex::encode(post_state_root),
+crates/amun-replay-verifier/src/replay_verifier.rs:92:                if replay_proof.gas_used != proof.gas_used {
+crates/amun-replay-verifier/src/replay_verifier.rs:96:                        replay: replay_proof.gas_used.to_string(),
+crates/amun-replay-verifier/src/replay_verifier.rs:99:                if replay_proof.proof_hash != proof.proof_hash {
+crates/amun-replay-verifier/src/replay_verifier.rs:103:                        replay: hex::encode(replay_proof.proof_hash),
+crates/amun-replay-verifier/src/replay_verifier.rs:108:                    proof_hash: replay_proof.proof_hash,
+crates/amun-replay-verifier/src/replay_verifier.rs:131:    fn w14_replay_equality() {
+crates/amun-replay-verifier/src/replay_verifier.rs:155:            ReplayVerifier::replay(&proof, &p, &mut r2, &[]),
+crates/amun-replay-verifier/src/replay_verifier.rs:161:    fn w14_replay_detects_tampered_proof() {
+crates/amun-replay-verifier/src/replay_verifier.rs:186:            ReplayVerifier::replay(&proof, &p, &mut r2, &[]),
+crates/amun-replay-verifier/src/replay_verifier.rs:192:    fn w14_multi_replay_same_result() {
+crates/amun-replay-verifier/src/replay_verifier.rs:217:                ReplayVerifier::replay(&proof, &p, &mut f, &[]),
+crates/amun-stateless-sync/Cargo.toml:12:amun-replay = { path = "../amun-replay" }
+crates/amun-invariants/src/kernel.rs:16:    pub requires_replay_verification: bool,
+crates/amun-invariants/src/kernel.rs:30:        requires_replay_verification: true,
+crates/amun-invariants/src/kernel.rs:41:        requires_replay_verification: false,
+crates/amun-invariants/src/kernel.rs:52:        requires_replay_verification: false,
+crates/amun-invariants/src/kernel.rs:63:        requires_replay_verification: false,
+crates/amun-validator-runtime/Cargo.toml:13:amun-replay-consensus = { path = "../amun-replay-consensus" }
+crates/amun-validator-runtime/src/validator_node.rs:70:                self.metrics.record_replay();
+crates/amun-dual-verification/Cargo.toml:14:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-constitutional-state/src/lib.rs:13:/// A record of a state transition for deterministic replay.
+crates/amun-constitutional-state/src/lib.rs:83:    pub fn replay(records: &[StateTransitionRecord]) -> Self {
+crates/amun-constitutional-state/src/lib.rs:169:    fn test_replay_produces_same_root() {
+crates/amun-constitutional-state/src/lib.rs:175:        let replayed = ConstitutionalStateRuntime::replay(original.journal());
+crates/amun-constitutional-state/src/lib.rs:176:        let root2 = replayed.state_root();
+crates/amun-constitutional-state/src/lib.rs:181:    fn test_replay_order_independence() {
+crates/amun-constitutional-state/src/lib.rs:189:        let rt2 = ConstitutionalStateRuntime::replay(&reversed);
+crates/amun-constitutional-state/src/lib.rs:218:    /// Create a replay certificate for a block transition.
+crates/amun-constitutional-state/src/lib.rs:235:    /// Verify that replaying the journal produces the claimed post_state_root.
+crates/amun-constitutional-state/src/lib.rs:237:        let replayed = ConstitutionalStateRuntime::replay(records);
+crates/amun-constitutional-state/src/lib.rs:238:        replayed.state_root() == self.post_state_root
+crates/amun-constitutional-state/src/lib.rs:239:            && replayed.journal_root() == self.journal_root
+crates/amun-constitutional-state/src/lib.rs:249:    fn test_replay_certificate_valid() {
+crates/amun-constitutional-state/src/lib.rs:260:    fn test_replay_certificate_detects_tampering() {
+crates/amun-replay-consensus/Cargo.toml:2:name = "amun-replay-consensus"
+crates/amun-replay-consensus/Cargo.toml:5:description = "Replay-backed consensus: vote only after deterministic replay verification"
+crates/amun-replay-consensus/Cargo.toml:14:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-replay-consensus/src/lib.rs:1:pub mod replay_backed_consensus;
+crates/amun-replay-consensus/src/lib.rs:2:pub mod replay_backed_types;
+crates/amun-replay-consensus/src/lib.rs:4:pub use replay_backed_consensus::*;
+crates/amun-replay-consensus/src/lib.rs:5:pub use replay_backed_types::*;
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:5:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:10:use crate::replay_backed_types::{
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:15:/// Requires every validator to replay and verify all transition proofs
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:20:    /// Execute a block and produce replay verifications for all transitions.
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:21:    pub fn execute_and_replay(
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:31:        let mut replay_records = Vec::new();
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:56:            let replay = ReplayVerifier::replay(&proof, program, &mut fresh_reg, &[]);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:58:            let record = match replay {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:67:                    replay_success: true,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:74:                    replay_success: false,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:78:            replay_records.push(record);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:84:        let all_verified = replay_records.iter().all(|r| r.is_verified());
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:91:            replay_root: [0u8; 32],
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:93:            replay_verifications: replay_records,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:96:        block.replay_root = block.compute_replay_root();
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:105:        hasher.update(&block.replay_root);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:114:    /// Form consensus on a replay-verified block.
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:121:            return Err("Not all transition proofs passed replay verification".into());
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:166:    fn w18_execute_and_replay_block() {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:178:        let block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:187:        assert_eq!(block.replay_verifications.len(), 1);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:188:        assert!(block.replay_verifications[0].is_verified());
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:192:    fn w18_form_replay_backed_consensus() {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:204:        let block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:218:    fn w18_reject_if_replay_fails() {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:230:        let mut block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:239:        block.replay_verifications[0].replay_success = false;
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:246:    fn w18_replay_finality_certificate_deterministic() {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:258:        let block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:273:    fn w18_replay_root_included_in_block() {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:285:        let block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:293:        assert_eq!(block.replay_root, block.compute_replay_root());
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:294:        assert_ne!(block.replay_root, [0u8; 32]);
+crates/amun-replay-consensus/src/replay_backed_types.rs:4:/// A replay verification result for a single transition proof.
+crates/amun-replay-consensus/src/replay_backed_types.rs:11:    pub replay_success: bool,
+crates/amun-replay-consensus/src/replay_backed_types.rs:17:        self.replay_success && self.state_root_match && self.proof_hash_match && self.gas_used_match
+crates/amun-replay-consensus/src/replay_backed_types.rs:21:/// A block that has been verified through deterministic replay.
+crates/amun-replay-consensus/src/replay_backed_types.rs:28:    pub replay_root: [u8; 32],
+crates/amun-replay-consensus/src/replay_backed_types.rs:30:    pub replay_verifications: Vec<ReplayVerificationRecord>,
+crates/amun-replay-consensus/src/replay_backed_types.rs:35:    /// Compute the replay root — Merkle root of all replay verification hashes.
+crates/amun-replay-consensus/src/replay_backed_types.rs:36:    pub fn compute_replay_root(&self) -> [u8; 32] {
+crates/amun-replay-consensus/src/replay_backed_types.rs:39:        for rv in &self.replay_verifications {
+crates/amun-replay-consensus/src/replay_backed_types.rs:41:            hasher.update(&[rv.replay_success as u8]);
+crates/amun-replay-consensus/src/replay_backed_types.rs:50:/// A QC that includes replay verification.
+crates/amun-replay-consensus/src/replay_backed_types.rs:57:    pub replay_root: [u8; 32],
+crates/amun-replay-consensus/src/replay_backed_types.rs:61:    pub all_replays_verified: bool,
+crates/amun-replay-consensus/src/replay_backed_types.rs:66:        self.signer_count >= self.quorum_threshold && self.all_replays_verified
+crates/amun-replay-consensus/src/replay_backed_types.rs:75:            replay_root: block.replay_root,
+crates/amun-replay-consensus/src/replay_backed_types.rs:79:            all_replays_verified: block.all_verified,
+crates/amun-replay-consensus/src/replay_backed_types.rs:84:/// A constitutional finality certificate backed by replay verification.
+crates/amun-replay-consensus/src/replay_backed_types.rs:91:    pub replay_root: [u8; 32],
+crates/amun-replay-consensus/src/replay_backed_types.rs:103:            replay_root: block.replay_root,
+crates/amun-replay-consensus/src/replay_backed_types.rs:118:        hasher.update(&self.replay_root);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:6:use amun_replay_consensus::replay_backed_consensus::ReplayBackedConsensus;
+crates/amun-testnet-sim/tests/adversarial_tests.rs:7:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-testnet-sim/tests/adversarial_tests.rs:55:    let block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-testnet-sim/tests/adversarial_tests.rs:98:    let block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-testnet-sim/tests/adversarial_tests.rs:127:    let mut block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-testnet-sim/tests/adversarial_tests.rs:136:    block.replay_verifications[0].replay_success = false;
+crates/amun-testnet-sim/tests/adversarial_tests.rs:162:fn n60_long_run_blocks_consistent_replay() {
+crates/amun-testnet-sim/tests/adversarial_tests.rs:163:    // Use the same initial state for all replays.
+crates/amun-testnet-sim/tests/adversarial_tests.rs:164:    // The key insight: replay verifies that the proof is consistent with
+crates/amun-testnet-sim/tests/adversarial_tests.rs:209:                                                    // Actually, ReplayVerifier::replay calls execute() which starts
+crates/amun-testnet-sim/tests/adversarial_tests.rs:212:                let replay = ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:213:                if !matches!(replay, ReplayResult::Match { .. }) {
+crates/amun-testnet-sim/tests/adversarial_tests.rs:214:                    panic!("Block {} replay failed: {:?}", i + 1, replay);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:242:    let mut block = ReplayBackedConsensus::execute_and_replay(
+crates/amun-testnet-sim/tests/adversarial_tests.rs:251:    block.replay_verifications[0].state_root_match = false;
+crates/amun-testnet-sim/Cargo.toml:12:amun-replay-verifier = { path = "../amun-replay-verifier" }
+crates/amun-testnet-sim/Cargo.toml:13:amun-replay-consensus = { path = "../amun-replay-consensus" }
+crates/amun-audit-trail/src/lib.rs:12:    pub replay_certificate: [u8; 32],
+crates/amun-audit-trail/src/lib.rs:25:        hasher.update(&self.replay_certificate);
+crates/amun-audit-trail/src/lib.rs:48:        replay_certificate: [u8; 32],
+crates/amun-audit-trail/src/lib.rs:61:            replay_certificate,
+crates/amun-operations/src/metrics.rs:11:    pub replays_performed: u64,
+crates/amun-operations/src/metrics.rs:39:    pub fn record_replay(&mut self) {
+crates/amun-operations/src/metrics.rs:40:        self.replays_performed += 1;
+crates/amun-operations/src/metrics.rs:54:            ("replays_performed", self.replays_performed),
+crates/amun-operations/src/metrics.rs:70:        metrics.record_replay();
+crates/amun-canonical-collections/src/lib.rs:1://! Canonical Collections — deterministic, replay-safe container types.
+crates/amun-canonical-collections/src/lib.rs:21:    fn is_replay_stable(&self) -> bool { true }
+crates/amun-canonical-collections/src/lib.rs:179:    #[test] fn test_replay_root_deterministic() { let mut a = CanonicalSet::new(); let mut b = CanonicalSet::new(); a.insert(1u64).unwrap(); a.insert(2u64).unwrap(); b.insert(2u64).unwrap(); b.insert(1u64).unwrap(); assert_eq!(a.canonical_root(), b.canonical_root()); }
+crates/amun-chain-checkpoint/Cargo.toml:10:amun-replay = { path = "../amun-replay" }
+crates/amun-chain-checkpoint/src/lib.rs:14:/// It commits to the final state root, evidence root, and replay certificate root
+crates/amun-chain-checkpoint/src/lib.rs:30:    pub final_replay_certificate_root: String,
+crates/amun-chain-checkpoint/src/lib.rs:93:            final_replay_certificate_root: last_bundle.block_header.replay_certificate_root.clone(),
+crates/amun-chain-checkpoint/src/lib.rs:114:        bytes.extend_from_slice(self.final_replay_certificate_root.as_bytes());
+crates/amun-constitutional-proof/src/evidence_type.rs:8:    #[serde(rename = "replay")]
+crates/amun-constitutional-proof/src/lib.rs:516:        let reason = FailureReason::new("MISSING_EVIDENCE", "No replay data found");
+crates/amun-constitutional-proof/src/lib.rs:956:            "amun-replay-engine".into(),
+crates/amun-constitutional-proof/src/obligation_namespace.rs:9:    #[serde(rename = "replay")]
+crates/amun-consensus/src/round_state_machine.rs:132:        //   - ReplayDeterminism (replay root == original root)
+crates/amun-consensus/src/round_state_machine.rs:143:                true, // replay_deterministic
+crates/amun-consensus-signatures/src/domain.rs:3:/// Domain-separated signing contexts to prevent cross-message replay.
+crates/amun-replay-cert/Cargo.toml:2:name = "amun-replay-cert"
+crates/amun-replay-cert/src/verifier.rs:3:/// Verify a replay certificate. Returns Ok if the certificate
+crates/amun-state-machine/src/axioms.rs:26:    /// Hostile forks cannot preserve replay
+crates/amun-state-machine/src/axioms.rs:47:            Self::HostileForkReplayImpossible => "Hostile forks cannot preserve replay",
+crates/amun-state-machine/src/thermodynamics.rs:2:/// Every fork, amendment, and replay divergence increases entropy.
+crates/amun-state-machine/src/thermodynamics.rs:3:/// Every merge, freeze, and replay convergence decreases it.
+crates/amun-state-machine/src/thermodynamics.rs:37:    /// Each replay divergence increases entropy.
+crates/amun-state-machine/src/thermodynamics.rs:38:    pub fn record_replay_divergence(&mut self, bytes: u64) {
+crates/amun-state-machine/src/fork_merge.rs:11:    pub preserves_replay: bool,
+crates/amun-state-machine/src/fork_merge.rs:35:        preserves_replay: bool,
+crates/amun-state-machine/src/fork_merge.rs:44:            preserves_replay,
+crates/amun-state-machine/src/fork_merge.rs:59:        h.update(&[self.preserves_replay as u8]);
+crates/amun-state-machine/src/fork_merge.rs:83:    pub replay_unified: bool,
+crates/amun-state-machine/src/fork_merge.rs:107:        replay_unified: bool,
+crates/amun-state-machine/src/fork_merge.rs:117:            replay_unified,
+crates/amun-state-machine/src/fork_merge.rs:136:        h.update(&[self.replay_unified as u8]);
+crates/amun-state-machine/src/meta_amendment.rs:22:    /// Can amend replay guarantees
+crates/amun-state-machine/src/meta_amendment.rs:60:                                    "Cannot amend replay guarantees: ReplayDeterminismAbsolute"
+crates/amun-state-machine/src/lib.rs:22:pub mod replay_log;
+crates/amun-state-machine/src/lib.rs:50:pub use replay_log::{ConstitutionalReplayDAG, ReplayLogEntry};
+crates/amun-state-machine/src/replay_log.rs:5:/// A node in the constitutional replay DAG.
+crates/amun-state-machine/src/stability.rs:6:    pub replay_integrity_score: f64,
+crates/amun-state-machine/src/stability.rs:26:            replay_integrity_score: 1.0,
+crates/amun-state-machine/src/impossibility.rs:9:    /// Hostile forks cannot preserve replay
+crates/amun-state-machine/src/engine.rs:4:use super::replay_log::ConstitutionalReplayDAG;
+crates/amun-state-machine/src/engine.rs:25:    pub replay_log: ConstitutionalReplayDAG,
+crates/amun-state-machine/src/engine.rs:38:            replay_log: ConstitutionalReplayDAG::new(),
+crates/amun-state-machine/src/engine.rs:109:        // Append to replay log
+crates/amun-state-machine/src/engine.rs:110:        self.replay_log
+crates/amun-state-machine/src/historical_invariants.rs:80:    pub cumulative_replay_divergence: u64,
+crates/amun-state-machine/src/historical_invariants.rs:96:            cumulative_replay_divergence: 0,
+crates/amun-state-machine/src/historical_invariants.rs:108:    pub fn record_replay_divergence(&mut self, bytes: u64) {
+crates/amun-state-machine/src/historical_invariants.rs:109:        self.cumulative_replay_divergence += bytes;
+crates/amun-state-machine/src/historical_invariants.rs:135:                current: self.cumulative_replay_divergence,
+crates/amun-state-machine/src/merge_math.rs:6:    /// The merged replay contains all entries from both parents (union)
+crates/amun-state-machine/src/merge_math.rs:8:    /// The longer replay chain survives (winner-takes-all)
+crates/amun-state-machine/src/merge_math.rs:27:    /// Resolve replay conflict between merging civilizations.
+crates/amun-state-machine/src/merge_math.rs:28:    pub fn resolve_replay(
+crates/amun-state-machine/src/merge_math.rs:29:        a_replay_height: u64,
+crates/amun-state-machine/src/merge_math.rs:30:        b_replay_height: u64,
+crates/amun-state-machine/src/merge_math.rs:36:                if a_replay_height >= b_replay_height {
+crates/amun-authority-registry/src/executor.rs:17:/// Tracks which proposals have been executed to prevent replay.
+crates/amun-authority-registry/src/wal.rs:12:/// and provides replay functionality.
+crates/amun-authority-registry/src/wal.rs:32:    pub fn replay(&self) -> GovernanceState {
+crates/amun-authority-registry/src/wal.rs:41:    pub fn replay_and_finalize(
+crates/amun-authority-registry/src/wal.rs:46:        let mut state = self.replay();
+crates/amun-authority-registry/src/wal.rs:67:    fn n107_8b_replay_single_proposal() {
+crates/amun-authority-registry/src/wal.rs:76:        let restored = wal.replay();
+crates/amun-authority-registry/src/wal.rs:81:    fn n107_8b_replay_votes() {
+crates/amun-authority-registry/src/wal.rs:97:        let restored = wal.replay();
+crates/amun-authority-registry/src/wal.rs:109:    fn n107_8b_replay_execution() {
+crates/amun-authority-registry/src/wal.rs:133:        let restored = wal.replay_and_finalize(4, &mut registry).unwrap();
+crates/amun-authority-registry/src/wal.rs:139:    fn n107_8b_replay_after_crash() {
+crates/amun-authority-registry/src/wal.rs:152:        // Simulate crash: create a new WAL and replay from persisted entries
+crates/amun-authority-registry/src/wal.rs:155:        let state = restored_wal.replay();
+crates/amun-authority-registry/src/wal.rs:160:    fn n107_8b_replay_deterministic() {
+crates/amun-authority-registry/src/wal.rs:171:        let state1 = wal1.replay();
+crates/amun-authority-registry/src/wal.rs:172:        let state2 = wal2.replay();
+crates/amun-authority-registry/src/recovery.rs:10:    /// replaying only WAL entries whose block_height is greater than
+crates/amun-authority-registry/src/recovery.rs:89:    fn n107_8c_partial_replay() {
+crates/amun-authority-registry/src/recovery.rs:105:        // This entry is AFTER the snapshot height and should be replayed

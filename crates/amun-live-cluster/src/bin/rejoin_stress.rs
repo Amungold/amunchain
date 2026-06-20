@@ -14,7 +14,9 @@ fn sync_to_tip(v: &LiveValidator, peer_addr: SocketAddr) {
         Ok(records) => {
             eprintln!("  sync_to_tip: downloaded {} records", records.len());
             if records.is_empty() {
-                eprintln!("  sync_to_tip: WARNING - no records downloaded, peer may be at same height");
+                eprintln!(
+                    "  sync_to_tip: WARNING - no records downloaded, peer may be at same height"
+                );
             }
             if !records.is_empty() {
                 let new_h = {
@@ -29,11 +31,17 @@ fn sync_to_tip(v: &LiveValidator, peer_addr: SocketAddr) {
                     let store = v.store.lock().unwrap();
                     if let Some(tip) = store.load_tip() {
                         eng.history_root = tip.history_root;
-                        eprintln!("  sync_to_tip: history_root updated to {:?}", &tip.history_root[..4]);
+                        eprintln!(
+                            "  sync_to_tip: history_root updated to {:?}",
+                            &tip.history_root[..4]
+                        );
                     }
                     eprintln!("  sync_to_tip: engine advanced to {}", new_h);
                 } else {
-                    eprintln!("  sync_to_tip: no advance (new_h={} <= current={})", new_h, eng.current_height);
+                    eprintln!(
+                        "  sync_to_tip: no advance (new_h={} <= current={})",
+                        new_h, eng.current_height
+                    );
                 }
             }
         }

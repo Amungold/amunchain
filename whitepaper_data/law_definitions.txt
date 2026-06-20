@@ -1,0 +1,50 @@
+crates/amun-constitutional-enforcement/src/state_transition.rs:7:use crate::{ConstitutionalLaw, ConstitutionalVerdict, ConstitutionalViolation};
+crates/amun-constitutional-enforcement/src/state_transition.rs:57:                law: ConstitutionalLaw::ReplayDeterminism,
+crates/amun-constitutional-enforcement/src/state_transition.rs:70:                law: ConstitutionalLaw::StateTransitionValidity,
+crates/amun-constitutional-enforcement/src/state_transition.rs:158:                    .any(|v| v.law == ConstitutionalLaw::ReplayDeterminism));
+crates/amun-constitutional-enforcement/src/state_transition.rs:178:                    .any(|v| v.law == ConstitutionalLaw::StateTransitionValidity));
+crates/amun-constitutional-enforcement/src/lib.rs:19:    pub law: ConstitutionalLaw,
+crates/amun-constitutional-enforcement/src/lib.rs:25:pub enum ConstitutionalLaw {
+crates/amun-constitutional-enforcement/src/lib.rs:40:    pub active_laws: Vec<ConstitutionalLaw>,
+crates/amun-constitutional-enforcement/src/lib.rs:73:                ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/lib.rs:74:                ConstitutionalLaw::ChainContinuity,
+crates/amun-constitutional-enforcement/src/lib.rs:75:                ConstitutionalLaw::SignatureValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:76:                ConstitutionalLaw::NoDoubleSpend,
+crates/amun-constitutional-enforcement/src/lib.rs:77:                ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/lib.rs:78:                ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/lib.rs:79:                ConstitutionalLaw::ReplayDeterminism,
+crates/amun-constitutional-enforcement/src/lib.rs:80:                ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/lib.rs:81:                ConstitutionalLaw::StateTransitionValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:82:                ConstitutionalLaw::EvidenceValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:106:        let checks: Vec<(&ConstitutionalLaw, bool, &str)> = vec![
+crates/amun-constitutional-enforcement/src/lib.rs:108:                &ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/lib.rs:113:                &ConstitutionalLaw::ChainContinuity,
+crates/amun-constitutional-enforcement/src/lib.rs:118:                &ConstitutionalLaw::SignatureValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:123:                &ConstitutionalLaw::NoDoubleSpend,
+crates/amun-constitutional-enforcement/src/lib.rs:128:                &ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/lib.rs:133:                &ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/lib.rs:138:                &ConstitutionalLaw::ReplayDeterminism,
+crates/amun-constitutional-enforcement/src/lib.rs:143:                &ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/lib.rs:148:                &ConstitutionalLaw::StateTransitionValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:153:                &ConstitutionalLaw::EvidenceValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:178:    pub fn is_law_active(&self, law: &ConstitutionalLaw) -> bool {
+crates/amun-constitutional-enforcement/src/lib.rs:181:    pub fn activate_law(&mut self, law: ConstitutionalLaw) {
+crates/amun-constitutional-enforcement/src/lib.rs:186:    pub fn deactivate_law(&mut self, law: &ConstitutionalLaw) {
+crates/amun-constitutional-enforcement/src/lib.rs:221:                assert_eq!(violations[0].law, ConstitutionalLaw::StateRootIntegrity);
+crates/amun-constitutional-enforcement/src/lib.rs:243:        k.deactivate_law(&ConstitutionalLaw::StateRootIntegrity);
+crates/amun-constitutional-enforcement/src/proof_engine.rs:6:use crate::{ConstitutionalLaw, ConstitutionalVerdict, ConstitutionalViolation};
+crates/amun-constitutional-enforcement/src/proof_engine.rs:115:                law: ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:128:                law: ConstitutionalLaw::ChainContinuity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:137:                law: ConstitutionalLaw::SignatureValidity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:146:                law: ConstitutionalLaw::NoDoubleSpend,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:155:                law: ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:164:                law: ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:173:                law: ConstitutionalLaw::ReplayDeterminism,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:182:                law: ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:194:                law: ConstitutionalLaw::StateTransitionValidity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:203:                law: ConstitutionalLaw::EvidenceValidity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:247:                    .any(|v| v.law == ConstitutionalLaw::StateRootIntegrity));
+crates/amun-constitutional-enforcement/src/proof_engine.rs:306:                    .any(|v| v.law == ConstitutionalLaw::FinalitySupermajority));
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:3:    ConstitutionalEnforcementKernel, ConstitutionalLaw, ConstitutionalVerdict,
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:19:                    .any(|v| v.law == ConstitutionalLaw::StateRootIntegrity),
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:39:                    .any(|v| v.law == ConstitutionalLaw::FinalitySupermajority),
