@@ -274,6 +274,73 @@ impl ResourceRegistry {
         }
         false
     }
+
+    /// Returns the hash of a resource without exposing the internal hash function.
+    pub fn resource_hash(&self, id: &ResourceId) -> Result<[u8; 32], RegistryError> {
+        let meta = self
+            .resources
+            .get(id)
+            .ok_or(RegistryError::NotFound(*id))?;
+        Ok(Self::hash_resource(meta))
+    }
+
+    /// Derives a new resource from a permanent collection (e.g., NFTCollection) without consuming it.
+    pub fn derive_from_collection(
+        &mut self,
+        collection_id: &ResourceId,
+        child_meta: ResourceMetadata,
+    ) -> Result<ResourceId, RegistryError> {
+        if self.resources.contains_key(&child_meta.resource_id) {
+            return Err(RegistryError::DuplicateId(child_meta.resource_id));
+        }
+
+        let parent = self
+            .resources
+            .get(collection_id)
+            .ok_or(RegistryError::NotFound(*collection_id))?;
+
+        if !matches!(parent.state, ResourceState::Active) {
+            return Err(RegistryError::NotActive(*collection_id));
+        }
+
+        if !TransformationMatrix::is_legal(parent.archetype, child_meta.archetype) {
+            return Err(RegistryError::IllegalTransformation {
+                src: parent.archetype,
+                tgt: child_meta.archetype,
+            });
+        }
+
+        let expected_version = parent.lineage.version + 1;
+        if child_meta.lineage.version != expected_version {
+            return Err(RegistryError::VersionMismatch {
+                expected: expected_version,
+                actual: child_meta.lineage.version,
+            });
+        }
+
+        let actual_parent_hash = Self::hash_resource(parent);
+        for claimed_hash in &child_meta.lineage.parent_hashes {
+            if *claimed_hash != actual_parent_hash {
+                return Err(RegistryError::ParentHashMismatch(child_meta.resource_id));
+            }
+        }
+
+        if !self.resources.contains_key(collection_id) {
+            return Err(RegistryError::ParentNotFound(*collection_id));
+        }
+
+        let child_id = child_meta.resource_id;
+        let mut child_ancestors = self
+            .ancestor_cache
+            .get(collection_id)
+            .cloned()
+            .unwrap_or_default();
+        child_ancestors.insert(*collection_id);
+        self.ancestor_cache.insert(child_id, child_ancestors);
+
+        self.resources.insert(child_id, child_meta);
+        Ok(child_id)
+    }
 }
 
 #[cfg(test)]

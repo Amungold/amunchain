@@ -8,6 +8,9 @@ pub enum ResourceArchetype {
     Claim,
     Certificate,
     ConstitutionalAsset,
+    // NFT Layer
+    NFTCollection,
+    NFTAsset,
 }
 
 /// Static transformation matrix enforcing Law T1.
@@ -32,6 +35,15 @@ impl TransformationMatrix {
                     ResourceArchetype::ConstitutionalAsset,
                     ResourceArchetype::Claim
                 )
+                // NFT
+                | (
+                    ResourceArchetype::NFTCollection,
+                    ResourceArchetype::NFTAsset
+                )
+                | (
+                    ResourceArchetype::NFTAsset,
+                    ResourceArchetype::NFTAsset
+                )
         )
     }
 
@@ -46,6 +58,8 @@ impl TransformationMatrix {
          Evidence -> Claim\n\
          Claim -> (evaluated by VerdictEvaluator, not a resource derivation)\n\
          Certificate -> (terminal, no derivations permitted)\n\
-         ConstitutionalAsset -> ConstitutionalAsset | Claim"
+         ConstitutionalAsset -> ConstitutionalAsset | Claim\n\
+         NFTCollection -> NFTAsset\n\
+         NFTAsset -> NFTAsset"
     }
 }
