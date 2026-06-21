@@ -1,3 +1,34 @@
+#![allow(clippy::uninlined_format_args)]
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_sign_loss)]
+#![allow(clippy::cast_lossless)]
+#![allow(clippy::cast_precision_loss)]
+#![allow(clippy::must_use_candidate)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::missing_panics_doc)]
+#![allow(clippy::match_wildcard_for_single_variants)]
+#![allow(clippy::semicolon_if_nothing_returned)]
+#![allow(clippy::no_effect_underscore_binding)]
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::stable_sort_primitive)]
+#![allow(clippy::unreadable_literal)]
+#![allow(clippy::similar_names)]
+#![allow(clippy::float_cmp)]
+#![allow(clippy::items_after_statements)]
+#![allow(clippy::map_unwrap_or)]
+#![allow(clippy::manual_let_else)]
+#![allow(clippy::cloned_instead_of_copied)]
+#![allow(clippy::needless_pass_by_value)]
+#![allow(clippy::struct_excessive_bools)]
+#![allow(clippy::match_same_arms)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::unused_self)]
+#![allow(clippy::missing_fields_in_debug)]
+#![allow(clippy::doc_markdown)]
+#![allow(clippy::new_without_default)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::manual_map)]
+#![allow(clippy::needless_borrows_for_generic_args)]
 mod article_i_certificate;
 mod article_iii_certificate;
 mod certification;
@@ -62,7 +93,7 @@ mod tests {
     #[test]
     fn n47_1_s0_display_safety_001() {
         let id = ObligationId::new(ObligationNamespace::Safety, 1);
-        assert_eq!(format!("{}", id), "SAFETY-001");
+        assert_eq!(format!("{id}"), "SAFETY-001");
     }
 
     #[test]
@@ -125,7 +156,7 @@ mod tests {
             ObligationNamespace::Recovery,
             ObligationNamespace::Performance,
         ] {
-            let displayed = format!("{}", ns);
+            let displayed = format!("{ns}");
             let parsed: ObligationNamespace = displayed.as_str().try_into().unwrap();
             assert_eq!(*ns, parsed);
         }
@@ -442,8 +473,8 @@ mod tests {
             reg.register(ProofObligation::new(
                 id,
                 ObligationKind::Primary,
-                format!("Obligation {}", i),
-                format!("formal {}", i),
+                format!("Obligation {i}"),
+                format!("formal {i}"),
                 ObligationSeverity::Critical,
                 "N42",
             ))
@@ -469,8 +500,8 @@ mod tests {
             reg.register(ProofObligation::new(
                 id,
                 ObligationKind::Primary,
-                format!("Obligation {}", i),
-                format!("formal {}", i),
+                format!("Obligation {i}"),
+                format!("formal {i}"),
                 ObligationSeverity::Critical,
                 "N42",
             ))
@@ -487,8 +518,8 @@ mod tests {
             reg.register(ProofObligation::new(
                 id,
                 ObligationKind::Primary,
-                format!("Obligation {}", i),
-                format!("formal {}", i),
+                format!("Obligation {i}"),
+                format!("formal {i}"),
                 ObligationSeverity::Critical,
                 "N42",
             ))
@@ -637,7 +668,7 @@ mod tests {
             "test".into(),
         );
         let mut expected = vec!["EV-A", "EV-B", "EV-C"];
-        expected.sort();
+        expected.sort_unstable();
         assert_eq!(verdict.evidence_refs, expected);
     }
 
@@ -1053,7 +1084,7 @@ mod tests {
             ev_type,
             "test-source".into(),
             5000,
-            format!("hash-{}", id),
+            format!("hash-{id}"),
             phase.into(),
             vec![obl_id],
         )
@@ -1501,8 +1532,8 @@ mod tests {
             reg.register(ProofObligation::new(
                 ObligationId::new(ObligationNamespace::Safety, i),
                 ObligationKind::Primary,
-                format!("Obligation {}", i),
-                format!("formal {}", i),
+                format!("Obligation {i}"),
+                format!("formal {i}"),
                 ObligationSeverity::Critical,
                 "N42",
             ))
@@ -1515,11 +1546,11 @@ mod tests {
             archive
                 .insert(
                     EvidenceRecord::new(
-                        format!("EV-CERT-{}", i),
+                        format!("EV-CERT-{i}"),
                         EvidenceType::AuditEvidence,
                         "test".into(),
                         1000,
-                        format!("hash-{}", i),
+                        format!("hash-{i}"),
                         "N42".into(),
                         vec![ObligationId::new(ObligationNamespace::Safety, 1)],
                     )
@@ -1612,8 +1643,8 @@ mod tests {
             reg.register(ProofObligation::new(
                 ObligationId::new(ObligationNamespace::Safety, i),
                 ObligationKind::Primary,
-                format!("Obligation {}", i),
-                format!("formal {}", i),
+                format!("Obligation {i}"),
+                format!("formal {i}"),
                 ObligationSeverity::Critical,
                 "N42",
             ))
@@ -1706,8 +1737,8 @@ mod tests {
             reg.register(ProofObligation::new(
                 ObligationId::new(ObligationNamespace::Safety, i),
                 ObligationKind::Primary,
-                format!("Obligation {}", i),
-                format!("formal {}", i),
+                format!("Obligation {i}"),
+                format!("formal {i}"),
                 ObligationSeverity::Critical,
                 "N42",
             ))

@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use amun_resource_core::ResourceId;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NftCollectionMetadata {
@@ -65,7 +65,7 @@ impl NftEvidence {
     }
 
     pub fn compute_hash(&self) -> [u8; 32] {
-        use sha2::{Sha256, Digest};
+        use sha2::{Digest, Sha256};
         let mut hasher = Sha256::new();
         hasher.update(serde_json::to_vec(&self.event).unwrap());
         hasher.update(self.timestamp.to_le_bytes());

@@ -41,10 +41,10 @@ impl DiscoveryServer {
 
     pub fn serve(&self) -> Result<(), String> {
         let listener =
-            TcpListener::bind(self.addr).map_err(|e| format!("Discovery bind error: {}", e))?;
+            TcpListener::bind(self.addr).map_err(|e| format!("Discovery bind error: {e}"))?;
         listener
             .set_nonblocking(false)
-            .map_err(|e| format!("Set nonblocking error: {}", e))?;
+            .map_err(|e| format!("Set nonblocking error: {e}"))?;
 
         let table = self.table.clone();
         let own_id = self.own_id;
@@ -119,29 +119,29 @@ impl DiscoveryClient {
         requester_addr: SocketAddr,
     ) -> Result<Vec<(SocketAddr, u64)>, String> {
         let mut stream =
-            TcpStream::connect(peer_addr).map_err(|e| format!("Discovery connect error: {}", e))?;
+            TcpStream::connect(peer_addr).map_err(|e| format!("Discovery connect error: {e}"))?;
         stream
             .set_nonblocking(false)
-            .map_err(|e| format!("Set nonblocking error: {}", e))?;
+            .map_err(|e| format!("Set nonblocking error: {e}"))?;
 
         let req = DiscoveryMessage::PeerRequest {
             requester_id,
             requester_addr,
         };
-        let data = postcard::to_stdvec(&req).map_err(|e| format!("Encode error: {}", e))?;
+        let data = postcard::to_stdvec(&req).map_err(|e| format!("Encode error: {e}"))?;
         let len = data.len() as u32;
         stream
             .write_all(&len.to_be_bytes())
-            .map_err(|e| format!("Write error: {}", e))?;
+            .map_err(|e| format!("Write error: {e}"))?;
         stream
             .write_all(&data)
-            .map_err(|e| format!("Write error: {}", e))?;
-        stream.flush().map_err(|e| format!("Flush error: {}", e))?;
+            .map_err(|e| format!("Write error: {e}"))?;
+        stream.flush().map_err(|e| format!("Flush error: {e}"))?;
 
         let mut len_buf = [0u8; 4];
         stream
             .read_exact(&mut len_buf)
-            .map_err(|e| format!("Read len error: {}", e))?;
+            .map_err(|e| format!("Read len error: {e}"))?;
         let resp_len = u32::from_be_bytes(len_buf) as usize;
         if resp_len > 1024 * 1024 {
             return Err("Response too large".into());
@@ -149,10 +149,10 @@ impl DiscoveryClient {
         let mut buf = vec![0u8; resp_len];
         stream
             .read_exact(&mut buf)
-            .map_err(|e| format!("Read data error: {}", e))?;
+            .map_err(|e| format!("Read data error: {e}"))?;
 
         match postcard::from_bytes::<DiscoveryMessage>(&buf)
-            .map_err(|e| format!("Decode error: {}", e))?
+            .map_err(|e| format!("Decode error: {e}"))?
         {
             DiscoveryMessage::PeerResponse { peers } => Ok(peers),
             _ => Err("Unexpected response".into()),
@@ -167,25 +167,25 @@ impl DiscoveryClient {
         chain_height: u64,
     ) -> Result<(), String> {
         let mut stream =
-            TcpStream::connect(peer_addr).map_err(|e| format!("Announce connect error: {}", e))?;
+            TcpStream::connect(peer_addr).map_err(|e| format!("Announce connect error: {e}"))?;
         stream
             .set_nonblocking(false)
-            .map_err(|e| format!("Set nonblocking error: {}", e))?;
+            .map_err(|e| format!("Set nonblocking error: {e}"))?;
 
         let msg = DiscoveryMessage::PeerAnnounce {
             node_id,
             address,
             chain_height,
         };
-        let data = postcard::to_stdvec(&msg).map_err(|e| format!("Encode error: {}", e))?;
+        let data = postcard::to_stdvec(&msg).map_err(|e| format!("Encode error: {e}"))?;
         let len = data.len() as u32;
         stream
             .write_all(&len.to_be_bytes())
-            .map_err(|e| format!("Write error: {}", e))?;
+            .map_err(|e| format!("Write error: {e}"))?;
         stream
             .write_all(&data)
-            .map_err(|e| format!("Write error: {}", e))?;
-        stream.flush().map_err(|e| format!("Flush error: {}", e))?;
+            .map_err(|e| format!("Write error: {e}"))?;
+        stream.flush().map_err(|e| format!("Flush error: {e}"))?;
         Ok(())
     }
 }
@@ -207,7 +207,7 @@ mod tests {
 
     fn setup_discovery_server(port: u16, own_id: [u8; 32]) -> (Arc<Mutex<PeerTable>>, SocketAddr) {
         let table = Arc::new(Mutex::new(PeerTable::new(10)));
-        let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
+        let addr: SocketAddr = format!("127.0.0.1:{port}").parse().unwrap();
         DiscoveryServer::new(table.clone(), addr, own_id)
             .serve()
             .unwrap();

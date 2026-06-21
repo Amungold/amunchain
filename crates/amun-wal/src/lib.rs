@@ -1007,7 +1007,7 @@ mod tests {
         let mut data = match std::fs::read(&seg1) {
             Ok(d) => d,
             Err(e) => {
-                eprintln!("WAL: cannot read segment: {}", e);
+                eprintln!("WAL: cannot read segment: {e}");
                 return;
             }
         };

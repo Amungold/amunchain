@@ -366,7 +366,7 @@ mod n10_tests {
         let decoded: CertificateAnnouncement = match serde_json::from_str(&json) {
             Ok(v) => v,
             Err(e) => {
-                eprintln!("gossip: invalid announcement: {}", e);
+                eprintln!("gossip: invalid announcement: {e}");
                 return;
             }
         };

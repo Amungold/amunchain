@@ -1,6 +1,6 @@
 use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry, RegistryError,
+    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+    ResourceRegistry, ResourceState,
 };
 
 #[test]
@@ -28,17 +28,14 @@ fn n130_duplicate_token_rejected() {
         resource_id: token1,
         archetype: ResourceArchetype::NFTAsset,
         state: ResourceState::Active,
-        lineage: ResourceLineage::single_ancestor(
-            token1,
-            col_id,
-            parent_hash,
-            parent_version + 1,
-        ),
+        lineage: ResourceLineage::single_ancestor(token1, col_id, parent_hash, parent_version + 1),
         contract_id: [0u8; 32],
         owner: [1u8; 32],
     };
 
-    assert!(reg.derive_from_collection(&col_id, child_meta.clone()).is_ok());
+    assert!(reg
+        .derive_from_collection(&col_id, child_meta.clone())
+        .is_ok());
     // محاولة تكرار نفس الـ id
     assert!(reg.derive_from_collection(&col_id, child_meta).is_err());
 }
@@ -62,12 +59,7 @@ fn n130_invalid_parent_hash_rejected() {
         resource_id: ResourceId([3u8; 32]),
         archetype: ResourceArchetype::NFTAsset,
         state: ResourceState::Active,
-        lineage: ResourceLineage::single_ancestor(
-            ResourceId([3u8; 32]),
-            col_id,
-            bad_hash,
-            2,
-        ),
+        lineage: ResourceLineage::single_ancestor(ResourceId([3u8; 32]), col_id, bad_hash, 2),
         contract_id: [0u8; 32],
         owner: [1u8; 32],
     };
@@ -123,7 +115,7 @@ fn n130_replay_determinism() {
     let mut reg1 = ResourceRegistry::new(10);
     let mut reg2 = ResourceRegistry::new(10);
     let col_id = ResourceId([1u8; 32]);
-    
+
     let setup = |reg: &mut ResourceRegistry| {
         reg.register_genesis(ResourceMetadata {
             resource_id: col_id,
@@ -132,25 +124,30 @@ fn n130_replay_determinism() {
             lineage: ResourceLineage::genesis(col_id),
             contract_id: [0u8; 32],
             owner: [10u8; 32],
-        }).unwrap();
-        
+        })
+        .unwrap();
+
         for i in 2..4u8 {
             let id = ResourceId([i; 32]);
             // احصل على الهاش داخل الإغلاق
             let hash = reg.resource_hash(&col_id).unwrap();
             let version = reg.get(&col_id).unwrap().lineage.version;
-            
-            reg.derive_from_collection(&col_id, ResourceMetadata {
-                resource_id: id,
-                archetype: ResourceArchetype::NFTAsset,
-                state: ResourceState::Active,
-                lineage: ResourceLineage::single_ancestor(id, col_id, hash, version + 1),
-                contract_id: [0u8; 32],
-                owner: [i; 32],
-            }).unwrap();
+
+            reg.derive_from_collection(
+                &col_id,
+                ResourceMetadata {
+                    resource_id: id,
+                    archetype: ResourceArchetype::NFTAsset,
+                    state: ResourceState::Active,
+                    lineage: ResourceLineage::single_ancestor(id, col_id, hash, version + 1),
+                    contract_id: [0u8; 32],
+                    owner: [i; 32],
+                },
+            )
+            .unwrap();
         }
     };
-    
+
     setup(&mut reg1);
     setup(&mut reg2);
     assert_eq!(reg1.compute_state_root(), reg2.compute_state_root());

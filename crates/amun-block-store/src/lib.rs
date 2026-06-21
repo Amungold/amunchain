@@ -64,10 +64,10 @@ mod tests {
     fn make_block(h: u64) -> StoredBlock {
         StoredBlock {
             height: h,
-            hash: format!("hash{}", h),
+            hash: format!("hash{h}"),
             parent_hash: format!("parent{}", h.saturating_sub(1)),
-            state_root: format!("state{}", h),
-            evidence_root: format!("evidence{}", h),
+            state_root: format!("state{h}"),
+            evidence_root: format!("evidence{h}"),
         }
     }
 

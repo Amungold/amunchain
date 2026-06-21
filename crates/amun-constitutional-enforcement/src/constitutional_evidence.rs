@@ -214,8 +214,8 @@ mod tests {
         let evidence = ConstitutionalEvidence::new(
             true, false, true, true, false, true, true, false, true, true,
         );
-        assert_eq!(evidence.chain_continuous, false);
-        assert_eq!(evidence.finality_supermajority, false);
-        assert_eq!(evidence.state_root_valid, true);
+        assert!(!evidence.chain_continuous);
+        assert!(!evidence.finality_supermajority);
+        assert!(evidence.state_root_valid);
     }
 }

@@ -218,7 +218,7 @@ mod tests {
 
     fn setup_gossip_server(port: u16) -> (Arc<Mutex<Mempool>>, SocketAddr) {
         let mempool = Arc::new(Mutex::new(Mempool::new(100)));
-        let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
+        let addr: SocketAddr = format!("127.0.0.1:{port}").parse().unwrap();
         GossipServer::new(mempool.clone(), addr).serve().unwrap();
         thread::sleep(Duration::from_millis(100));
         (mempool, addr)

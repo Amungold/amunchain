@@ -164,7 +164,7 @@ mod tests {
         buffer.record_operation("OP_SPLIT", vec![1], vec![2, 3]);
         let (safe, violations) =
             HandleResolver::validate_handle_safety(&buffer, make_id(99), 1, [0xcc; 32]);
-        assert!(safe, "Expected safe, got violations: {:?}", violations);
+        assert!(safe, "Expected safe, got violations: {violations:?}");
         assert!(violations.is_empty());
     }
 

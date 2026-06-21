@@ -31,7 +31,7 @@ fn find_available_port() -> u16 {
 #[test]
 fn n20_10_tcp_bind_and_connect() {
     let port = find_available_port();
-    let addr = SocketAddr::from_str(&format!("127.0.0.1:{}", port)).unwrap();
+    let addr = SocketAddr::from_str(&format!("127.0.0.1:{port}")).unwrap();
 
     // Server
     let mut server = TcpTransport::new(addr);

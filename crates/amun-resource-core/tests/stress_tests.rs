@@ -141,7 +141,7 @@ fn stress_004_state_root_10k() {
     let root = reg.compute_state_root();
     let elapsed = start.elapsed();
     assert_ne!(root, [0u8; 32]);
-    println!("State root 10k active: {:?}", elapsed);
+    println!("State root 10k active: {elapsed:?}");
 }
 
 #[test]
@@ -214,7 +214,7 @@ fn stress_006_parent_verification_under_load() {
     }
     let elapsed = start.elapsed();
     assert_eq!(verified, chain_length + 1);
-    println!("Parent verification {} deep: {:?}", chain_length, elapsed);
+    println!("Parent verification {chain_length} deep: {elapsed:?}");
 }
 
 #[test]
@@ -266,5 +266,5 @@ fn stress_007_cycle_detection_at_depth() {
     let result = reg.consume_and_derive(&parent_id, new_child);
     let elapsed = start.elapsed();
     assert!(result.is_ok());
-    println!("Cycle check at depth {}: {:?}", depth, elapsed);
+    println!("Cycle check at depth {depth}: {elapsed:?}");
 }

@@ -144,9 +144,9 @@ mod tests {
     #[test]
     fn test_u64_roundtrip() {
         let mut buf = Vec::new();
-        write_u64(&mut buf, 0xDEADBEEF_CAFEBABE);
+        write_u64(&mut buf, 0xDEAD_BEEF_CAFE_BABE);
         let mut pos = 0;
-        assert_eq!(read_u64(&buf, &mut pos), Some(0xDEADBEEF_CAFEBABE));
+        assert_eq!(read_u64(&buf, &mut pos), Some(0xDEAD_BEEF_CAFE_BABE));
     }
 
     #[test]

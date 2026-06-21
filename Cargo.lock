@@ -547,6 +547,95 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-defi-amm"
+version = "0.1.0"
+dependencies = [
+ "amun-defi-core",
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-defi-core"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-defi-evidence"
+version = "0.1.0"
+dependencies = [
+ "amun-defi-core",
+ "amun-resource-core",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-defi-governance"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-defi-lending-core"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-defi-lending-engine"
+version = "0.1.0"
+dependencies = [
+ "amun-defi-lending-core",
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-defi-lending-evidence"
+version = "0.1.0"
+dependencies = [
+ "amun-defi-lending-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-defi-stablecoin"
+version = "0.1.0"
+dependencies = [
+ "amun-defi-lending-core",
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-defi-stress"
+version = "0.1.0"
+dependencies = [
+ "amun-defi-amm",
+ "amun-defi-core",
+ "amun-defi-lending-core",
+ "amun-defi-lending-engine",
+ "amun-defi-stablecoin",
+ "amun-nft-collateral",
+ "amun-nft-core",
+ "amun-resource-core",
+ "rand 0.8.6",
+ "sha2 0.11.0",
+]
+
+[[package]]
 name = "amun-deterministic-allocator"
 version = "1.0.0"
 
@@ -905,6 +994,85 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-nft-adversarial"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-constitutional-enforcement",
+ "amun-nft-constitutional-registry",
+ "amun-nft-core",
+ "amun-nft-evidence",
+ "amun-nft-marketplace",
+ "amun-resource-core",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-benchmark"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-marketplace",
+ "amun-nft-royalty",
+ "amun-resource-core",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-bridge"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-collateral"
+version = "0.1.0"
+dependencies = [
+ "amun-defi-lending-core",
+ "amun-defi-lending-engine",
+ "amun-nft-core",
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-constitutional-enforcement"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-constitutional-registry",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-royalty",
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-constitutional-registry"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-royalty",
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
 name = "amun-nft-core"
 version = "0.1.0"
 dependencies = [
@@ -919,6 +1087,210 @@ name = "amun-nft-evidence"
 version = "0.1.0"
 dependencies = [
  "amun-nft-core",
+ "amun-resource-core",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-explorer"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-core",
+ "amun-nft-mining",
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-fuzz"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-marketplace",
+ "amun-nft-mining",
+ "amun-nft-royalty",
+ "amun-resource-core",
+ "rand 0.8.6",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-governance"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-governance-execution"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-governance",
+ "amun-nft-rights-enforcement",
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-indexer"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-constitutional-registry",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-marketplace",
+ "amun-nft-royalty",
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-integration"
+version = "0.1.0"
+dependencies = [
+ "amun-evidence-root",
+ "amun-nft-evidence",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-marketplace"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-core",
+ "amun-nft-evidence",
+ "amun-nft-integration",
+ "amun-resource-core",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-mining"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-core",
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-persistence"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-royalty",
+ "amun-nft-royalty-accounting",
+ "amun-resource-core",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-rights-enforcement"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-constitutional-registry",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-royalty",
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-royalty"
+version = "0.1.0"
+dependencies = [
+ "amun-resource-core",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-royalty-accounting"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-royalty",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-royalty-settlement"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-royalty",
+ "amun-nft-royalty-accounting",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-sdk"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-constitutional-registry",
+ "amun-nft-core",
+ "amun-nft-evidence",
+ "amun-nft-indexer",
+ "amun-nft-marketplace",
+ "amun-nft-mining",
+ "amun-resource-core",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-snapshot"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-constitutional-registry",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-royalty",
+ "amun-nft-royalty-accounting",
+ "amun-resource-core",
+ "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-nft-stress"
+version = "0.1.0"
+dependencies = [
+ "amun-nft-bridge",
+ "amun-nft-constitutional-enforcement",
+ "amun-nft-constitutional-registry",
+ "amun-nft-core",
+ "amun-nft-governance",
+ "amun-nft-marketplace",
+ "amun-nft-mining",
+ "amun-nft-royalty",
+ "amun-nft-royalty-accounting",
  "amun-resource-core",
  "serde_json",
  "sha2 0.11.0",

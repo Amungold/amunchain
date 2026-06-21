@@ -1,15 +1,17 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_nft_core::{NftEvent, NftEvidence};
-use amun_nft_evidence::{NftEvidenceKernel, CekError, accumulate_nft_evidence_root, MintVerificationContext};
+use amun_nft_evidence::{
+    accumulate_nft_evidence_root, CekError, MintVerificationContext, NftEvidenceKernel,
+};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
 
 #[test]
 fn n131_mint_produces_valid_evidence() {
     let mut reg = ResourceRegistry::new(10);
     let col_id = ResourceId([1u8; 32]);
-    
+
     reg.register_genesis(ResourceMetadata {
         resource_id: col_id,
         archetype: ResourceArchetype::NFTCollection,
@@ -17,7 +19,8 @@ fn n131_mint_produces_valid_evidence() {
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [10u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let token_id = ResourceId([2u8; 32]);
     let owner = [5u8; 32];
@@ -63,15 +66,10 @@ fn n131_law1_prevents_unauthorized_transfer() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: real_owner,
-    }).unwrap();
+    })
+    .unwrap();
 
-    let result = NftEvidenceKernel::verify_transfer(
-        &reg,
-        &token_id,
-        &thief,
-        2000,
-        1000,
-    );
+    let result = NftEvidenceKernel::verify_transfer(&reg, &token_id, &thief, 2000, 1000);
     assert_eq!(result, Err(CekError::Law1InvalidOwnership));
 }
 
@@ -87,7 +85,8 @@ fn n131_law2_prevents_duplicate_mint() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: [1u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let result = NftEvidenceKernel::verify_non_duplicate(&reg, &token_id);
     assert_eq!(result, Err(CekError::Law2DuplicateToken));
@@ -95,10 +94,7 @@ fn n131_law2_prevents_duplicate_mint() {
 
 #[test]
 fn n131_law3_rejects_invalid_metadata_hash() {
-    let result = NftEvidenceKernel::verify_metadata_hash(
-        &[1u8; 32],
-        &[2u8; 32],
-    );
+    let result = NftEvidenceKernel::verify_metadata_hash(&[1u8; 32], &[2u8; 32]);
     assert_eq!(result, Err(CekError::Law3InvalidMetadataHash));
 }
 
@@ -142,7 +138,8 @@ fn n131_full_mint_flow_with_evidence() {
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [10u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let token_id = ResourceId([2u8; 32]);
     let owner = [5u8; 32];

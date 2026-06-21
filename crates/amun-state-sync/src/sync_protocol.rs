@@ -149,7 +149,7 @@ impl SyncProtocol {
                     for meta in &chunk.resources {
                         registry
                             .register_genesis(meta.clone())
-                            .map_err(|e| format!("Import error: {:?}", e))?;
+                            .map_err(|e| format!("Import error: {e:?}"))?;
                     }
                 }
                 if registry.compute_state_root() != state_root {

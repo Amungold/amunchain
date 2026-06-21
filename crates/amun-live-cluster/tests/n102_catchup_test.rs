@@ -87,7 +87,7 @@ fn n102_3_catchup_after_50_block_gap() {
     // Restart validator 3
     println!("=== Restarting validator 3 ===");
     let mut config = ValidatorConfig::test_cluster(3, &ports).with_quorum(3);
-    config.data_dir = format!("/tmp/amun-test-validator-3");
+    config.data_dir = "/tmp/amun-test-validator-3".to_string();
     let v3_new = LiveValidator::new(config);
     v3_new.start().unwrap();
     validators[3] = v3_new;
@@ -103,7 +103,7 @@ fn n102_3_catchup_after_50_block_gap() {
             .map(|v| v.store.lock().unwrap().latest_height())
             .max()
             .unwrap_or(0);
-        let spread = if max_h >= h { max_h - h } else { h - max_h };
+        let spread = max_h.abs_diff(h);
         println!(
             "Validator 3 height: {}, max: {}, spread: {}",
             h, max_h, spread
@@ -126,7 +126,7 @@ fn n102_3_catchup_after_50_block_gap() {
         .map(|v| v.store.lock().unwrap().latest_height())
         .max()
         .unwrap_or(0);
-    let final_spread = max_h - final_h;
+    let final_spread = max_h.abs_diff(final_h);
     let consensus_pass = final_spread <= 2 && all_heights.iter().all(|h| *h > 0);
 
     println!("\n============================================");

@@ -277,10 +277,7 @@ impl ResourceRegistry {
 
     /// Returns the hash of a resource without exposing the internal hash function.
     pub fn resource_hash(&self, id: &ResourceId) -> Result<[u8; 32], RegistryError> {
-        let meta = self
-            .resources
-            .get(id)
-            .ok_or(RegistryError::NotFound(*id))?;
+        let meta = self.resources.get(id).ok_or(RegistryError::NotFound(*id))?;
         Ok(Self::hash_resource(meta))
     }
 

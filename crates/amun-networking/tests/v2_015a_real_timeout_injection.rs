@@ -428,7 +428,7 @@ fn test_timeout_injection_recovery() {
         let mut id = [0u8; 32];
         id[0] = i;
         sim.add_node(
-            format!("{:02x}", i),
+            format!("{i:02x}"),
             Validator {
                 id,
                 voting_power: 1,

@@ -1,7 +1,5 @@
-use amun_resource_core::{
-    ResourceId, ResourceRegistry, ResourceState, RegistryError,
-};
 use amun_nft_core::{NftEvent, NftEvidence};
+use amun_resource_core::{RegistryError, ResourceId, ResourceRegistry, ResourceState};
 
 /// Constitutional Evidence Kernel (CEK) for NFT operations.
 pub struct NftEvidenceKernel;
@@ -35,7 +33,8 @@ impl NftEvidenceKernel {
         token_id: &ResourceId,
         claimed_owner: &[u8; 32],
     ) -> Result<(), CekError> {
-        let token = registry.get(token_id)
+        let token = registry
+            .get(token_id)
             .ok_or(CekError::Registry(RegistryError::NotFound(*token_id)))?;
         if token.owner != *claimed_owner {
             return Err(CekError::Law1InvalidOwnership);
@@ -91,8 +90,12 @@ impl NftEvidenceKernel {
         Self::verify_non_duplicate(ctx.registry, ctx.token_id)?;
 
         // Law 1: collection must exist and be active
-        let collection = ctx.registry.get(ctx.collection_id)
-            .ok_or(CekError::Registry(RegistryError::NotFound(*ctx.collection_id)))?;
+        let collection = ctx
+            .registry
+            .get(ctx.collection_id)
+            .ok_or(CekError::Registry(RegistryError::NotFound(
+                *ctx.collection_id,
+            )))?;
         if !matches!(collection.state, ResourceState::Active) {
             return Err(CekError::Law1InvalidOwnership);
         }
@@ -149,7 +152,7 @@ impl From<RegistryError> for CekError {
 
 /// Accumulates NFT evidence hashes for inclusion in BlockEvidenceRoot.
 pub fn accumulate_nft_evidence_root(evidences: &[NftEvidence]) -> [u8; 32] {
-    use sha2::{Sha256, Digest};
+    use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
     for ev in evidences {
         hasher.update(ev.evidence_hash);

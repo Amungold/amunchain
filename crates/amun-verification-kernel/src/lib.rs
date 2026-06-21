@@ -162,7 +162,7 @@ mod tests {
         ConstitutionalClaim {
             claim_id: id.into(),
             claim_type: ClaimType::Safety,
-            description: format!("Claim {} for {}", id, phase),
+            description: format!("Claim {id} for {phase}"),
             phase: phase.into(),
             evidence_refs: vec![format!("ev-{}", id)],
             status,
@@ -174,8 +174,8 @@ mod tests {
             evidence_id: id.into(),
             claim_id: claim_id.into(),
             evidence_type: EvidenceType::TestResult,
-            description: format!("Evidence {} for {}", id, claim_id),
-            data_hash: format!("hash-{}", id),
+            description: format!("Evidence {id} for {claim_id}"),
+            data_hash: format!("hash-{id}"),
             source: "cargo test".into(),
             timestamp: 1000,
         }

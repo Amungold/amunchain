@@ -261,7 +261,7 @@ mod n9_tests {
         let deserialized: CertificateMessage = match serde_json::from_str(&json) {
             Ok(v) => v,
             Err(e) => {
-                eprintln!("distribution: invalid certificate message: {}", e);
+                eprintln!("distribution: invalid certificate message: {e}");
                 return;
             }
         };
@@ -280,7 +280,7 @@ mod n9_tests {
         let deserialized: LightClientProofBundle = match serde_json::from_str(&json) {
             Ok(v) => v,
             Err(e) => {
-                eprintln!("distribution: invalid proof bundle: {}", e);
+                eprintln!("distribution: invalid proof bundle: {e}");
                 return;
             }
         };

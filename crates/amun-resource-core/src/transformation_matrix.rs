@@ -11,6 +11,7 @@ pub enum ResourceArchetype {
     // NFT Layer
     NFTCollection,
     NFTAsset,
+    NFTMiningReward,
 }
 
 /// Static transformation matrix enforcing Law T1.
@@ -44,6 +45,10 @@ impl TransformationMatrix {
                     ResourceArchetype::NFTAsset,
                     ResourceArchetype::NFTAsset
                 )
+                | (
+                    ResourceArchetype::NFTMiningReward,
+                    ResourceArchetype::NFTAsset
+                )
         )
     }
 
@@ -60,6 +65,7 @@ impl TransformationMatrix {
          Certificate -> (terminal, no derivations permitted)\n\
          ConstitutionalAsset -> ConstitutionalAsset | Claim\n\
          NFTCollection -> NFTAsset\n\
-         NFTAsset -> NFTAsset"
+         NFTAsset -> NFTAsset\n\
+         NFTMiningReward -> NFTAsset"
     }
 }

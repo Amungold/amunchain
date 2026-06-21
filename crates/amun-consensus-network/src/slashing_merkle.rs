@@ -71,7 +71,7 @@ mod tests {
     #[test]
     fn n120_1_single_leaf_is_deterministic() {
         let slash = make_slash(1, 100);
-        let root1 = merkle_root(&[slash.clone()]);
+        let root1 = merkle_root(std::slice::from_ref(&slash));
         let root2 = merkle_root(&[slash]);
         assert_eq!(root1, root2, "N120.1 FAIL: root must be deterministic");
         assert_ne!(
@@ -97,7 +97,7 @@ mod tests {
     fn n120_1_different_slashes_different_root() {
         let s1 = make_slash(1, 100);
         let s2 = make_slash(2, 100);
-        let root1 = merkle_root(&[s1.clone()]);
+        let root1 = merkle_root(std::slice::from_ref(&s1));
         let root2 = merkle_root(&[s2]);
         assert_ne!(
             root1, root2,
@@ -109,7 +109,7 @@ mod tests {
     fn n120_1_root_changes_with_new_slash() {
         let s1 = make_slash(1, 100);
         let s2 = make_slash(2, 200);
-        let root_before = merkle_root(&[s1.clone()]);
+        let root_before = merkle_root(std::slice::from_ref(&s1));
         let root_after = merkle_root(&[s1, s2]);
         assert_ne!(
             root_before, root_after,

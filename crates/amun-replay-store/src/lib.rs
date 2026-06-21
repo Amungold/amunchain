@@ -89,10 +89,10 @@ mod tests {
     fn make_record(h: u64, before: &str, after: &str) -> ReplayRecord {
         ReplayRecord {
             height: h,
-            tx_hash: format!("tx{}", h),
+            tx_hash: format!("tx{h}"),
             state_root_before: before.to_string(),
             state_root_after: after.to_string(),
-            commit_hash: format!("commit{}", h),
+            commit_hash: format!("commit{h}"),
         }
     }
 

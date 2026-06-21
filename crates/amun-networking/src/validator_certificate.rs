@@ -193,7 +193,7 @@ mod tests {
         let decoded: ValidatorCertificate = match serde_json::from_str(&json) {
             Ok(v) => v,
             Err(e) => {
-                eprintln!("validator_cert: invalid certificate: {}", e);
+                eprintln!("validator_cert: invalid certificate: {e}");
                 return;
             }
         };
