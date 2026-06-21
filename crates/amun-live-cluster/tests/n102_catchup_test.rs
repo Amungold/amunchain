@@ -103,7 +103,7 @@ fn n102_3_catchup_after_50_block_gap() {
             .map(|v| v.store.lock().unwrap().latest_height())
             .max()
             .unwrap_or(0);
-        let spread = max_h - h;
+        let spread = if max_h >= h { max_h - h } else { h - max_h };
         println!(
             "Validator 3 height: {}, max: {}, spread: {}",
             h, max_h, spread

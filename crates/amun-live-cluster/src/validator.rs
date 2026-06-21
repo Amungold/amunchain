@@ -10,18 +10,16 @@ use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
 use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
 use amun_constitutional_enforcement::{
-    evidence_records::{
-        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence, ReplayEvidence,
-        SignatureEvidence,
-    },
     ConstitutionalEnforcementKernel, ConstitutionalVerdict,
+    evidence_records::{
+        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence,
+        ReplayEvidence, SignatureEvidence,
+    },
 };
 use amun_evidence_root::EvidenceRoot;
 use amun_mempool::Mempool;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
-use amun_sync::protocol::{
-    MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE,
-};
+use amun_sync::protocol::{MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE};
 use amun_validator_identity::derive_validator_id;
 use amun_validator_identity::vote_signing_payload;
 use ed25519_dalek::{Signer, SigningKey};
@@ -245,19 +243,17 @@ impl LiveValidator {
                                 if len < 1024 * 1024 {
                                     let mut buf = vec![0u8; len];
                                     if stream.read_exact(&mut buf).is_ok() {
-                                        if let Ok(vote) =
-                                            postcard::from_bytes::<ConsensusVote>(&buf)
-                                        {
-                                            let mut eng = engine_listen.lock().unwrap();
-                                            if let Err(e) = eng.process_vote(vote) {
-                                                if e != "Duplicate vote from validator" {
-                                                    eprintln!("VOTE REJECTED: {}", e);
-                                                }
+                                        if let Ok(vote) = postcard::from_bytes::<ConsensusVote>(&buf) {
+                                        let mut eng = engine_listen.lock().unwrap();
+                                        if let Err(e) = eng.process_vote(vote) {
+                                            if e != "Duplicate vote from validator" {
+                                                eprintln!("VOTE REJECTED: {}", e);
                                             }
                                         }
                                     }
                                 }
                             }
+                        }
                         }
                     }
                     Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
@@ -293,8 +289,7 @@ impl LiveValidator {
                     let eng = engine_consensus.lock().unwrap();
                     let h = eng.current_height + 1;
                     let sync = eng.needs_catchup.load(std::sync::atomic::Ordering::SeqCst);
-                    eng.needs_catchup
-                        .store(false, std::sync::atomic::Ordering::SeqCst);
+                    eng.needs_catchup.store(false, std::sync::atomic::Ordering::SeqCst);
                     (h, sync)
                 };
                 if needs_sync {
@@ -580,7 +575,10 @@ impl LiveValidator {
                             height / 100,
                             governance_valid,
                         );
-                        let rep_ev = ReplayEvidence::new(cert.state_root, history_root);
+                        let rep_ev = ReplayEvidence::new(
+                            cert.state_root,
+                            history_root,
+                        );
                         let evidence_record = ConstitutionalEvidenceRecord::new(
                             height,
                             cert.block_hash,
