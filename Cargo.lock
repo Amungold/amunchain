@@ -514,6 +514,53 @@ name = "amun-constitutional-verifier"
 version = "1.0.0"
 
 [[package]]
+name = "amun-contract-integration"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-contract-registry",
+ "amun-execution",
+ "amun-gas-engine",
+ "amun-nft-core",
+ "amun-pccv",
+ "amun-resource-core",
+ "amun-vm-kernel",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-contract-registry"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-contract-sdk"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-contract-integration",
+ "amun-contract-registry",
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-contract-security"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-contract-integration",
+ "amun-contract-registry",
+ "amun-gas-engine",
+ "amun-resource-core",
+ "sha2 0.11.0",
+]
+
+[[package]]
 name = "amun-core-optimization"
 version = "0.1.0"
 dependencies = [
@@ -1650,6 +1697,23 @@ version = "0.1.0"
 dependencies = [
  "amun-resource-core",
  "serde_json",
+ "sha2 0.11.0",
+]
+
+[[package]]
+name = "amun-soak-full"
+version = "0.1.0"
+dependencies = [
+ "amun-bytecode",
+ "amun-contract-integration",
+ "amun-contract-registry",
+ "amun-defi-amm",
+ "amun-defi-core",
+ "amun-defi-lending-engine",
+ "amun-defi-stablecoin",
+ "amun-nft-core",
+ "amun-resource-core",
+ "rand 0.8.6",
  "sha2 0.11.0",
 ]
 
