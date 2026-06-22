@@ -324,7 +324,7 @@ impl LiveValidator {
                     let eng = engine_consensus.lock().unwrap();
                     eng.proposer_for(height)
                 };
-                let is_proposer = my_index as usize == proposer_idx + 1;
+                let is_proposer = my_index as usize == proposer_idx;
                 let timestamp = SystemTime::now()
                     .duration_since(SystemTime::UNIX_EPOCH)
                     .unwrap()

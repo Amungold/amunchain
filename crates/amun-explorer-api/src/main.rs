@@ -1,15 +1,23 @@
-use amun_explorer_api::server;
-use amun_rpc::provider::LiveRpcProvider;
-use std::sync::Arc;
+use amun_explorer_api::{serve, AppState};
+use amun_consensus_network::engine::ConsensusEngine;
+use amun_chain_store::store::ChainStore;
+use std::sync::{Arc, Mutex};
 
 #[tokio::main]
 async fn main() {
-    // Inject real RPC provider
-    let provider = Arc::new(LiveRpcProvider::new("127.0.0.1", 9070));
-    amun_explorer_api::services::chain_service::set_provider(provider.clone());
-
-    let app = server::build_app();
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:9072").await.unwrap();
-    println!("Explorer API listening on 9072");
-    axum::serve(listener, app).await.unwrap();
+    let args: Vec<String> = std::env::args().collect();
+    let rpc_port: u16 = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(9072);
+    
+    // Connect to the existing validator's data
+    let store = ChainStore::open("/tmp/amun-test-validator-0")
+        .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").unwrap());
+    
+    let consensus = ConsensusEngine::new([1u8; 32], 4);
+    
+    let state = AppState {
+        consensus: Arc::new(Mutex::new(consensus)),
+        chain_store: Arc::new(Mutex::new(store)),
+    };
+    
+    serve(state, rpc_port).await;
 }

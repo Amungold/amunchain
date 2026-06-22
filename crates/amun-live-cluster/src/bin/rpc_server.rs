@@ -11,7 +11,7 @@ async fn main() {
     let rpc_port: u16 = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(9070);
     let quorum: usize = args.get(4).and_then(|s| s.parse().ok()).unwrap_or(4);
 
-    let ports = [base_port, base_port + 1, base_port + 2, base_port + 3];
+    let ports = [9900, 9901, 9902, 9903];
     let config = ValidatorConfig::test_cluster(index, &ports).with_quorum(quorum);
 
     eprintln!(

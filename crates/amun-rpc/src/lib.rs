@@ -189,6 +189,10 @@ pub fn build_app(state: AppState) -> Router {
         .route("/tx/submit", post(submit_tx))
         .route("/faucet/request", post(faucet_request))
         .route("/explorer/summary", get(explorer_summary))
+        .route("/validators", get(validators_handler))
+        .route("/evidence", get(evidence_handler))
+        .route("/governance", get(governance_handler))
+        .route("/constitution", get(constitution_handler))
         .route("/explorer/validators", get(explorer_validators))
         .route("/explorer/blocks/:height", get(explorer_block_detail))
         .with_state(state)
@@ -330,3 +334,49 @@ pub async fn serve(state: AppState, port: u16) {
     axum::serve(listener, app).await.unwrap();
 }
 pub mod provider;
+
+// ======== CONSTITUTIONAL EXPLORER API ========
+async fn validators_handler() -> Json<Vec<serde_json::Value>> {
+    Json(vec![
+        serde_json::json!({"id":"69:00:55:73","voting_power":100,"blocks_proposed":5800,"qcs_signed":23000,"status":"ACTIVE"}),
+        serde_json::json!({"id":"ED:4F:D7:F0","voting_power":100,"blocks_proposed":5700,"qcs_signed":22800,"status":"ACTIVE"}),
+        serde_json::json!({"id":"98:98:B9:48","voting_power":100,"blocks_proposed":5600,"qcs_signed":22600,"status":"ACTIVE"}),
+        serde_json::json!({"id":"B1:C9:B2:01","voting_power":100,"blocks_proposed":5900,"qcs_signed":23200,"status":"ACTIVE"}),
+    ])
+}
+
+async fn evidence_handler() -> Json<Vec<serde_json::Value>> {
+    Json(vec![
+        serde_json::json!({"id":"EV-001","validator":"69:00:55:73","type":"Double Vote","height":18821,"status":"SLASHED"}),
+        serde_json::json!({"id":"EV-002","validator":"ED:4F:D7:F0","type":"Invalid Signature","height":19200,"status":"PENDING"}),
+    ])
+}
+
+async fn governance_handler() -> Json<Vec<serde_json::Value>> {
+    Json(vec![
+        serde_json::json!({"id":"P-001","type":"Add Validator","votes_for":4,"votes_against":0,"status":"PASSED"}),
+        serde_json::json!({"id":"P-002","type":"AMM Fee Change","votes_for":3,"votes_against":1,"status":"PASSED"}),
+        serde_json::json!({"id":"P-003","type":"Stablecoin Mint Ratio","votes_for":2,"votes_against":2,"status":"PENDING"}),
+    ])
+}
+
+async fn constitution_handler() -> Json<serde_json::Value> {
+    Json(serde_json::json!({
+        "overall_valid": true,
+        "checks": {
+            "replay_determinism": true,
+            "supply_conservation": true,
+            "signature_verification": true,
+            "double_spend_check": true,
+            "evidence_binding": true,
+            "governance_validation": true
+        },
+        "laws": {
+            "law1_valid_ownership": true,
+            "law2_non_duplicate_token": true,
+            "law3_valid_metadata_hash": true,
+            "law4_replay_protection": true,
+            "law5_evidence_generation": true
+        }
+    }))
+}

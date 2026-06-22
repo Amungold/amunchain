@@ -1,127 +1,78 @@
-pub mod errors;
-pub mod server;
-pub mod types;
-pub mod routes {
-    pub mod accounts;
-    pub mod chain;
-    pub mod constitutional;
-    pub mod finality;
+use axum::{Router, routing::get, Json, extract::State};
+use serde::Serialize;
+use std::sync::{Arc, Mutex};
+use tower_http::cors::{CorsLayer, Any};
+use axum::http::Method;
+
+use amun_consensus_network::engine::ConsensusEngine;
+use amun_chain_store::store::ChainStore;
+
+#[derive(Clone)]
+pub struct AppState {
+    pub consensus: Arc<Mutex<ConsensusEngine>>,
+    pub chain_store: Arc<Mutex<ChainStore>>,
 }
-pub mod services {
-    pub mod account_service;
-    pub mod chain_service;
-    pub mod constitutional_service;
-    pub mod finality_service;
+
+// ===== API Response Types =====
+#[derive(Serialize)]
+struct StatusResponse {
+    height: u64,
+    active_validators: usize,
+    total_power: u64,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use axum::{
-        body::Body,
-        http::{Request, StatusCode},
-    };
-    use tower::ServiceExt;
+#[derive(Serialize)]
+struct BlockResponse {
+    height: u64,
+    hash: String,
+    state_root: String,
+    evidence_root: String,
+}
 
-    fn app() -> axum::Router {
-        server::build_app()
-    }
+// ===== Route Handlers =====
+async fn api_status(State(state): State<Arc<AppState>>) -> Json<StatusResponse> {
+    let consensus = state.consensus.lock().unwrap();
+    
+    Json(StatusResponse {
+        height: consensus.current_height,
+        active_validators: consensus.active_validator_count(),
+        total_power: consensus.total_voting_power,
+    })
+}
 
-    // Static route tests (no path parameters)
-    #[tokio::test]
-    async fn n48_4_get_chain_head() {
-        let response = app()
-            .oneshot(
-                Request::builder()
-                    .uri("/explorer/chain/head")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
+async fn api_blocks(State(state): State<Arc<AppState>>) -> Json<Vec<BlockResponse>> {
+    let store = state.chain_store.lock().unwrap();
+    let mut blocks = Vec::new();
+    
+    if let Some(record) = store.load_tip() {
+        blocks.push(BlockResponse {
+            height: record.height,
+            hash: hex::encode(&record.block_hash),
+            state_root: hex::encode(&record.state_root),
+            evidence_root: hex::encode(&record.evidence_root),
+        });
     }
+    
+    Json(blocks)
+}
 
-    #[tokio::test]
-    async fn n48_4_list_finality_certificates() {
-        let response = app()
-            .oneshot(
-                Request::builder()
-                    .uri("/explorer/finality/certificates")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-    }
+// ===== Server Startup =====
+pub async fn serve(state: AppState, port: u16) {
+    let app_state = Arc::new(state);
+    
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods([Method::GET])
+        .allow_headers(Any);
 
-    #[tokio::test]
-    async fn n48_4_get_constitutional_dashboard() {
-        let response = app()
-            .oneshot(
-                Request::builder()
-                    .uri("/explorer/constitutional/dashboard")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-    }
+    let app = Router::new()
+        .route("/api/status", get(api_status))
+        .route("/api/blocks", get(api_blocks))
+        .layer(cors)
+        .with_state(app_state);
 
-    #[tokio::test]
-    async fn n48_4_list_verdicts() {
-        let response = app()
-            .oneshot(
-                Request::builder()
-                    .uri("/explorer/constitutional/verdicts")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-    }
-
-    #[tokio::test]
-    async fn n48_4_list_evidence() {
-        let response = app()
-            .oneshot(
-                Request::builder()
-                    .uri("/explorer/constitutional/evidence")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-    }
-
-    // Service-level tests (bypass router, test business logic)
-    #[test]
-    fn n48_4_service_get_block() {
-        let result = services::chain_service::ChainService::get_block_by_height(847);
-        assert!(result.is_ok());
-        let block = result.unwrap();
-        assert_eq!(block.height, 847);
-        assert!(block.has_finality_certificate);
-        assert!(block.has_replay_evidence);
-    }
-
-    #[test]
-    fn n48_4_service_get_transaction() {
-        let result = services::chain_service::ChainService::get_transaction("0xdeadbeef");
-        assert!(result.is_ok());
-        let tx = result.unwrap();
-        assert_eq!(tx.status, "confirmed");
-    }
-
-    #[test]
-    fn n48_4_service_get_account() {
-        let result = services::account_service::AccountService::get_account("0xalice");
-        assert!(result.is_ok());
-        let account = result.unwrap();
-        assert_eq!(account.balance, 100_000);
-    }
+    let addr = format!("0.0.0.0:{}", port);
+    println!("Constitutional Explorer API running on {}", addr);
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 }

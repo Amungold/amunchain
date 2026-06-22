@@ -8,7 +8,7 @@ async fn main() {
     );
 
     let app = server::build_app();
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:9071").await.unwrap();
-    println!("Wallet API listening on 9071");
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:9081").await.unwrap();
+    println!("Wallet API listening on 9081");
     axum::serve(listener, app).await.unwrap();
 }
