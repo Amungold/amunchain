@@ -1,5 +1,11 @@
 use blake3::Hasher;
 use std::collections::BTreeMap;
+use amun_constitutional_commitment::{
+    EconomicSnapshot,
+    
+    EndBlockPipeline,
+    Hash32,
+};
 
 /// A constitutional account holding balance and nonce.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,8 +68,30 @@ impl AccountStore {
         account.nonce += 1;
     }
 
-    /// Compute a deterministic Blake3 state root over all accounts.
-    pub fn state_root(&self) -> [u8; 32] {
+    /// Compute the total supply from all account balances.
+    pub fn total_supply(&self) -> u64 {
+        self.accounts.values().map(|a| a.balance).sum()
+    }
+
+    /// Build an EconomicSnapshot from the current account state.
+    /// This bridges AccountStore to the CCA EconomicTree.
+    pub fn build_economic_snapshot(&self) -> EconomicSnapshot {
+        let total_supply = self.total_supply();
+        EconomicSnapshot {
+            total_supply,
+            treasury_balance: 0,
+            validator_reward_pool: 0,
+            ecosystem_pool: 0,
+            burned_supply: 0,
+            issued_supply: total_supply,
+            staked_supply: 0,
+            circulating_supply: total_supply,
+        }
+    }
+
+    /// Compute the raw account state root (without constitutional commitment).
+    /// This is the original state_root logic preserved for backward compatibility.
+    pub fn raw_state_root(&self) -> [u8; 32] {
         let mut hasher = Hasher::new();
         hasher.update(b"AMUN_ACCOUNTS_V1");
         for (addr, account) in &self.accounts {
@@ -72,6 +100,35 @@ impl AccountStore {
             hasher.update(&account.nonce.to_le_bytes());
         }
         hasher.finalize().into()
+    }
+
+    /// Compute the CCA-aware constitutional state root.
+    /// This injects the constitutional commitment into the state root
+    /// that enters BlockHeader and block_hash.
+    pub fn state_root(&self) -> [u8; 32] {
+        let raw_root = self.raw_state_root();
+        let snapshot = self.build_economic_snapshot();
+
+        let identity_root: Hash32 = [0u8; 32];
+        let evidence_root: Hash32 = [0u8; 32];
+        let governance_root: Hash32 = [0u8; 32];
+
+        if let Some(commitment) = EndBlockPipeline::execute(
+            identity_root,
+            evidence_root,
+            governance_root,
+            &snapshot,
+        ) {
+            let commitment_root = amun_constitutional_commitment::commitment_root(&commitment);
+
+            let mut hasher = Hasher::new();
+            hasher.update(b"AMUN_CCA_STATE_ROOT_V1");
+            hasher.update(&raw_root);
+            hasher.update(&commitment_root);
+            hasher.finalize().into()
+        } else {
+            raw_root
+        }
     }
 
     /// Number of accounts.
@@ -154,5 +211,48 @@ mod tests {
         s1.create_account([1u8; 32], 1000);
         s2.create_account([1u8; 32], 999);
         assert_ne!(s1.state_root(), s2.state_root());
+    }
+
+    #[test]
+    fn cca_state_root_changes_when_balance_changes() {
+        let mut s1 = AccountStore::new();
+        let mut s2 = AccountStore::new();
+        s1.create_account([1u8; 32], 1000);
+        s2.create_account([1u8; 32], 999);
+        assert_ne!(s1.state_root(), s2.state_root());
+    }
+
+    #[test]
+    fn cca_same_accounts_produce_same_state_root() {
+        let mut s1 = AccountStore::new();
+        let mut s2 = AccountStore::new();
+        s1.create_account([1u8; 32], 1000);
+        s2.create_account([1u8; 32], 1000);
+        assert_eq!(s1.state_root(), s2.state_root());
+    }
+
+    #[test]
+    fn cca_state_root_includes_commitment_root() {
+        let mut store = AccountStore::new();
+        store.create_account([1u8; 32], 1000);
+        let root = store.state_root();
+        let raw_root = store.raw_state_root();
+        assert_ne!(root, raw_root, "CCA state root must differ from raw root");
+    }
+
+    #[test]
+    fn cca_raw_state_root_matches_original_behavior() {
+        let mut store = AccountStore::new();
+        store.create_account([1u8; 32], 1000);
+        let raw = store.raw_state_root();
+
+        let mut hasher = Hasher::new();
+        hasher.update(b"AMUN_ACCOUNTS_V1");
+        hasher.update(&[1u8; 32]);
+        hasher.update(&1000u64.to_le_bytes());
+        hasher.update(&0u64.to_le_bytes());
+        let expected: [u8; 32] = hasher.finalize().into();
+
+        assert_eq!(raw, expected);
     }
 }
