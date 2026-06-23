@@ -1,4 +1,5 @@
 pub mod client;
+pub mod constitutional;
 pub mod faucet;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
@@ -191,6 +192,7 @@ pub fn build_app(state: AppState) -> Router {
         .route("/explorer/summary", get(explorer_summary))
         .route("/explorer/validators", get(explorer_validators))
         .route("/explorer/blocks/:height", get(explorer_block_detail))
+        .route("/constitutional/status/:height", get(constitutional::constitutional_status))
         .with_state(state)
 }
 
