@@ -1,11 +1,8 @@
+use amun_constitutional_commitment::{
+    ConstitutionalRoots, EconomicSnapshot, EndBlockPipeline, Hash32,
+};
 use blake3::Hasher;
 use std::collections::BTreeMap;
-use amun_constitutional_commitment::{
-    EconomicSnapshot,
-    
-    EndBlockPipeline,
-    Hash32,
-};
 
 /// A constitutional account holding balance and nonce.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -74,7 +71,6 @@ impl AccountStore {
     }
 
     /// Build an EconomicSnapshot from the current account state.
-    /// This bridges AccountStore to the CCA EconomicTree.
     pub fn build_economic_snapshot(&self) -> EconomicSnapshot {
         let total_supply = self.total_supply();
         EconomicSnapshot {
@@ -90,7 +86,6 @@ impl AccountStore {
     }
 
     /// Compute the raw account state root (without constitutional commitment).
-    /// This is the original state_root logic preserved for backward compatibility.
     pub fn raw_state_root(&self) -> [u8; 32] {
         let mut hasher = Hasher::new();
         hasher.update(b"AMUN_ACCOUNTS_V1");
@@ -103,9 +98,13 @@ impl AccountStore {
     }
 
     /// Compute the CCA-aware constitutional state root.
-    /// This injects the constitutional commitment into the state root
-    /// that enters BlockHeader and block_hash.
     pub fn state_root(&self) -> [u8; 32] {
+        self.constitutional_roots().state_root
+    }
+
+    /// Compute all constitutional roots for the current account state.
+    /// This is the canonical CCA output used by the finalization pipeline.
+    pub fn constitutional_roots(&self) -> ConstitutionalRoots {
         let raw_root = self.raw_state_root();
         let snapshot = self.build_economic_snapshot();
 
@@ -113,21 +112,25 @@ impl AccountStore {
         let evidence_root: Hash32 = [0u8; 32];
         let governance_root: Hash32 = [0u8; 32];
 
-        if let Some(commitment) = EndBlockPipeline::execute(
-            identity_root,
-            evidence_root,
-            governance_root,
-            &snapshot,
-        ) {
-            let commitment_root = amun_constitutional_commitment::commitment_root(&commitment);
-
-            let mut hasher = Hasher::new();
-            hasher.update(b"AMUN_CCA_STATE_ROOT_V1");
-            hasher.update(&raw_root);
-            hasher.update(&commitment_root);
-            hasher.finalize().into()
+        if let Some(commitment) =
+            EndBlockPipeline::execute(identity_root, evidence_root, governance_root, &snapshot)
+        {
+            ConstitutionalRoots::from_commitment(
+                raw_root,
+                commitment.economic_root,
+                identity_root,
+                governance_root,
+                &commitment,
+            )
         } else {
-            raw_root
+            ConstitutionalRoots {
+                state_root: raw_root,
+                commitment_root: [0u8; 32],
+                economic_root: [0u8; 32],
+                identity_root: [0u8; 32],
+                governance_root: [0u8; 32],
+                constitutional_root: [0u8; 32],
+            }
         }
     }
 
@@ -254,5 +257,16 @@ mod tests {
         let expected: [u8; 32] = hasher.finalize().into();
 
         assert_eq!(raw, expected);
+    }
+
+    #[test]
+    fn cca_constitutional_roots_consistent() {
+        let mut store = AccountStore::new();
+        store.create_account([1u8; 32], 1000);
+        let roots = store.constitutional_roots();
+        assert_eq!(roots.state_root, store.state_root());
+        assert_ne!(roots.commitment_root, [0u8; 32]);
+        assert_ne!(roots.economic_root, [0u8; 32]);
+        assert_ne!(roots.constitutional_root, [0u8; 32]);
     }
 }

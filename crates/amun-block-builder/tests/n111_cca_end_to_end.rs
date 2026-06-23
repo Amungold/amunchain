@@ -72,7 +72,8 @@ fn n111_cca_state_root_changes_reflected_in_block() {
         "Different economic state must produce different CCA state roots"
     );
     assert_ne!(
-        block1.block_hash(), block2.block_hash(),
+        block1.block_hash(),
+        block2.block_hash(),
         "Different CCA state roots must produce different block hashes"
     );
 }
@@ -86,8 +87,5 @@ fn n111_cca_raw_state_root_differs_from_cca_state_root() {
     let raw = store.raw_state_root();
     let cca = store.state_root();
 
-    assert_ne!(
-        raw, cca,
-        "CCA state_root must differ from raw account root"
-    );
+    assert_ne!(raw, cca, "CCA state_root must differ from raw account root");
 }

@@ -28,6 +28,15 @@ use ed25519_dalek::{Signer, SigningKey};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex};
+#[derive(Clone, Debug)]
+struct BlockRootsContext {
+    commitment_root: [u8; 32],
+    constitutional_root: [u8; 32],
+    economic_root: [u8; 32],
+    identity_root: [u8; 32],
+    governance_root: [u8; 32],
+}
+use std::collections::HashMap;
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant, SystemTime};
 
@@ -54,6 +63,7 @@ pub struct LiveValidator {
     pub constitutional_kernel: Arc<Mutex<ConstitutionalEnforcementKernel>>,
     /// N129.3: Previous evidence root for chain continuity
     pub previous_evidence_root: Arc<Mutex<[u8; 32]>>,
+    block_roots_map: Arc<Mutex<HashMap<u64, BlockRootsContext>>>,
 }
 
 impl LiveValidator {
@@ -150,6 +160,7 @@ impl LiveValidator {
             slashing_ledger: Arc::new(Mutex::new(amun_consensus_network::SlashingLedger::new())),
             constitutional_kernel: Arc::new(Mutex::new(ConstitutionalEnforcementKernel::new())),
             previous_evidence_root: Arc::new(Mutex::new([0u8; 32])),
+            block_roots_map: Arc::new(Mutex::new(HashMap::new())),
             staking_adapter: Arc::new(Mutex::new(StakingAdapter::new(
                 amun_consensus_network::MisbehaviorRegistry::new(
                     amun_consensus_network::MisbehaviorThresholds::default(),
@@ -178,6 +189,7 @@ impl LiveValidator {
         let signing_key_clone = self.signing_key.clone();
         let validator_id = self.validator_id;
         let my_index = self.config.validator_id[0];
+        let block_roots_map = self.block_roots_map.clone();
 
         // Listen thread
         let engine_listen = engine.clone();
@@ -366,6 +378,19 @@ impl LiveValidator {
                         block.slashing_root = amun_consensus_network::merkle_root(&ledger.history);
                     }
                     // Recompute hash after setting slashing_root (N120.2 requires it in hash)
+                    {
+                        let mut roots_map = block_roots_map.lock().unwrap();
+                        roots_map.insert(
+                            height,
+                            BlockRootsContext {
+                                commitment_root: block.commitment_root,
+                                constitutional_root: block.constitutional_root,
+                                economic_root: block.economic_root,
+                                identity_root: block.identity_root,
+                                governance_root: block.governance_root,
+                            },
+                        );
+                    }
                     let hash = block.block_hash();
                     let root = block.state_root;
                     let mut eng = engine_consensus.lock().unwrap();
@@ -610,6 +635,7 @@ impl LiveValidator {
                         let evidence_root = evidence_root_obj.root;
                         *prev_root = evidence_root;
 
+                        let roots_ctx = block_roots_map.lock().unwrap().remove(&height);
                         let record = FinalizedChainRecord {
                             height,
                             block_hash: cert.block_hash,
@@ -620,6 +646,26 @@ impl LiveValidator {
                             verdict_hash,
                             evidence_record_hash,
                             evidence_root,
+                            commitment_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.commitment_root)
+                                .unwrap_or([0u8; 32]),
+                            constitutional_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.constitutional_root)
+                                .unwrap_or([0u8; 32]),
+                            economic_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.economic_root)
+                                .unwrap_or([0u8; 32]),
+                            identity_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.identity_root)
+                                .unwrap_or([0u8; 32]),
+                            governance_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.governance_root)
+                                .unwrap_or([0u8; 32]),
                             timestamp: SystemTime::now()
                                 .duration_since(SystemTime::UNIX_EPOCH)
                                 .unwrap()

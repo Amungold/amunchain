@@ -5,7 +5,6 @@ use amun_mempool::Mempool;
 use amun_transactions::{Transaction, TransactionReceipt};
 use blake3::Hasher;
 
-/// A constitutional block containing transactions and their execution results.
 #[derive(Debug, Clone)]
 pub struct Block {
     pub height: u64,
@@ -15,17 +14,18 @@ pub struct Block {
     pub state_root: [u8; 32],
     pub proposer: [u8; 32],
     pub timestamp: u64,
-    /// N110.4: Slashing certificates included in this block
-    pub slashing_certificates: Vec<amun_consensus_network::SlashingCertificate>,
-    /// N120.2: Merkle root of the slashing ledger after this block
+    pub slashing_certificates: Vec<SlashingCertificate>,
     pub slashing_root: [u8; 32],
+    pub commitment_root: [u8; 32],
+    pub constitutional_root: [u8; 32],
+    pub economic_root: [u8; 32],
+    pub identity_root: [u8; 32],
+    pub governance_root: [u8; 32],
 }
 
 impl Block {
-    /// N110.4b: Verify all slashing certificates in this block.
     pub fn verify_slashing_certificates(&self) -> Result<(), String> {
         const MAX_CERTS_PER_BLOCK: usize = 10;
-
         if self.slashing_certificates.len() > MAX_CERTS_PER_BLOCK {
             return Err(format!(
                 "Too many slashing certificates ({} > {})",
@@ -33,26 +33,20 @@ impl Block {
                 MAX_CERTS_PER_BLOCK
             ));
         }
-
         for (i, cert) in self.slashing_certificates.iter().enumerate() {
             cert.verify()
                 .map_err(|e| format!("Certificate {} invalid: {}", i, e))?;
-
             let recomputed = cert.compute_hash();
             if recomputed != cert.certificate_hash {
                 return Err(format!("Certificate {} hash mismatch", i));
             }
-
             if cert.evidence_ids.is_empty() {
                 return Err(format!("Certificate {} has no evidence IDs", i));
             }
         }
-
         Ok(())
     }
 
-    /// N120.3: Verify that the slashing_root matches the given ledger root.
-    /// Returns Err if the block's slashing_root doesn't match.
     pub fn verify_slashing_root(&self, expected_root: &[u8; 32]) -> Result<(), String> {
         if self.slashing_root != *expected_root {
             return Err(format!(
@@ -64,7 +58,6 @@ impl Block {
         Ok(())
     }
 
-    /// Compute the Blake3 block hash with domain separation.
     pub fn block_hash(&self) -> [u8; 32] {
         let mut hasher = Hasher::new();
         hasher.update(b"AMUN_BLOCK_V1");
@@ -76,17 +69,19 @@ impl Block {
         for tx in &self.transactions {
             hasher.update(&tx.tx_hash());
         }
-        // N110.4: Include slashing certificates in block hash
         for cert in &self.slashing_certificates {
             hasher.update(&cert.certificate_hash);
         }
-        // N120.2: Include slashing root in block hash
         hasher.update(&self.slashing_root);
+        hasher.update(&self.commitment_root);
+        hasher.update(&self.constitutional_root);
+        hasher.update(&self.economic_root);
+        hasher.update(&self.identity_root);
+        hasher.update(&self.governance_root);
         hasher.finalize().into()
     }
 }
 
-/// Builds constitutional blocks from mempool transactions.
 pub struct BlockBuilder {
     pub engine: ExecutionEngine,
 }
@@ -98,9 +93,6 @@ impl BlockBuilder {
         }
     }
 
-    /// Build a block from the mempool, executing all transactions.
-    /// N110.4a: Build a block with slashing certificates included.
-    /// The certificates MUST have been verified before being passed here.
     pub fn build_block(
         &mut self,
         height: u64,
@@ -121,9 +113,6 @@ impl BlockBuilder {
         )
     }
 
-    /// N110.4: Build a block with pending slashing certificates.
-    /// N110.4a: Build a block with slashing certificates.
-    /// Note: arguments kept as-is for clarity in consensus integration.
     #[allow(clippy::too_many_arguments)]
     pub fn build_block_with_certificates(
         &mut self,
@@ -138,6 +127,7 @@ impl BlockBuilder {
         let transactions = mempool.take_for_block(max_txs);
         let receipts = self.engine.execute_block(&transactions);
         let state_root = self.engine.state.state_root();
+        let roots = self.engine.state.constitutional_roots();
 
         Block {
             height,
@@ -148,11 +138,15 @@ impl BlockBuilder {
             proposer,
             timestamp,
             slashing_certificates,
-            slashing_root: [0u8; 32], // N120.2: computed after ledger update
+            slashing_root: [0u8; 32],
+            commitment_root: roots.commitment_root,
+            constitutional_root: roots.constitutional_root,
+            economic_root: roots.economic_root,
+            identity_root: roots.identity_root,
+            governance_root: roots.governance_root,
         }
     }
 
-    /// Get a reference to the account store.
     pub fn account_store(&self) -> &AccountStore {
         &self.engine.state
     }
@@ -215,6 +209,8 @@ mod tests {
         assert!(block.receipts[1].success);
         assert_eq!(builder.engine.state.balance_of(&a1), 900);
         assert_eq!(builder.engine.state.balance_of(&a2), 600);
+        assert_ne!(block.commitment_root, [0u8; 32]);
+        assert_ne!(block.economic_root, [0u8; 32]);
     }
 
     #[test]
@@ -246,5 +242,26 @@ mod tests {
         let block1 = b1.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
         let block2 = b2.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
         assert_ne!(block1.block_hash(), block2.block_hash());
+    }
+
+    #[test]
+    fn cca_block_carries_constitutional_roots() {
+        let mut builder = BlockBuilder::new();
+        let sk = SigningKey::from_bytes(&[1u8; 32]);
+        let a1 = sk.verifying_key().to_bytes();
+        builder.engine.state.create_account(a1, 1000);
+        let block = builder.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
+        assert_ne!(
+            block.commitment_root, [0u8; 32],
+            "commitment_root must be non-zero"
+        );
+        assert_ne!(
+            block.constitutional_root, [0u8; 32],
+            "constitutional_root must be non-zero"
+        );
+        assert_ne!(
+            block.economic_root, [0u8; 32],
+            "economic_root must be non-zero"
+        );
     }
 }

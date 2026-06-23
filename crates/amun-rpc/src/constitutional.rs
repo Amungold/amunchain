@@ -16,6 +16,11 @@ pub struct ConstitutionalStatusResponse {
     pub evidence_record_hash: String,
     pub slashing_root: String,
     pub timestamp: u64,
+    pub commitment_root: String,
+    pub constitutional_root: String,
+    pub economic_root: String,
+    pub identity_root: String,
+    pub governance_root: String,
 }
 
 pub async fn constitutional_status(
@@ -33,6 +38,11 @@ pub async fn constitutional_status(
             evidence_record_hash: hex::encode(record.evidence_record_hash),
             slashing_root: hex::encode(record.slashing_root),
             timestamp: record.timestamp,
+            commitment_root: hex::encode(record.commitment_root),
+            constitutional_root: hex::encode(record.constitutional_root),
+            economic_root: hex::encode(record.economic_root),
+            identity_root: hex::encode(record.identity_root),
+            governance_root: hex::encode(record.governance_root),
         })),
         None => Err(StatusCode::NOT_FOUND),
     }

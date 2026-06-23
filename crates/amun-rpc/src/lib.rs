@@ -192,7 +192,10 @@ pub fn build_app(state: AppState) -> Router {
         .route("/explorer/summary", get(explorer_summary))
         .route("/explorer/validators", get(explorer_validators))
         .route("/explorer/blocks/:height", get(explorer_block_detail))
-        .route("/constitutional/status/:height", get(constitutional::constitutional_status))
+        .route(
+            "/constitutional/status/:height",
+            get(constitutional::constitutional_status),
+        )
         .with_state(state)
 }
 

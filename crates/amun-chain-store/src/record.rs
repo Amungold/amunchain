@@ -15,6 +15,16 @@ pub struct FinalizedChainRecord {
     /// N129.3: Evidence root chaining all constitutional proofs
     pub evidence_root: [u8; 32],
     pub timestamp: u64,
+    /// CCA v1.0: Constitutional commitment root (hash of serialized commitment)
+    pub commitment_root: [u8; 32],
+    /// CCA v1.0: Constitutional root (hash of identity, evidence, governance, economic)
+    pub constitutional_root: [u8; 32],
+    /// CCA v1.0: Economic Merkle tree root
+    pub economic_root: [u8; 32],
+    /// CCA v1.0: Identity root from authority registry
+    pub identity_root: [u8; 32],
+    /// CCA v1.0: Governance root from governance subsystem
+    pub governance_root: [u8; 32],
 }
 
 impl FinalizedChainRecord {
@@ -42,9 +52,19 @@ mod tests {
             evidence_record_hash: [0u8; 32],
             evidence_root: [0u8; 32],
             timestamp: 1000,
+            commitment_root: [0x11; 32],
+            constitutional_root: [0x22; 32],
+            economic_root: [0x33; 32],
+            identity_root: [0x44; 32],
+            governance_root: [0x55; 32],
         };
         let encoded = record.encode();
         let decoded = FinalizedChainRecord::decode(&encoded).unwrap();
         assert_eq!(decoded.height, 42);
+        assert_eq!(decoded.commitment_root, record.commitment_root);
+        assert_eq!(decoded.constitutional_root, record.constitutional_root);
+        assert_eq!(decoded.economic_root, record.economic_root);
+        assert_eq!(decoded.identity_root, record.identity_root);
+        assert_eq!(decoded.governance_root, record.governance_root);
     }
 }

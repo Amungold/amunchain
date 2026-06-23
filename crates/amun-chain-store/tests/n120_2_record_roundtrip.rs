@@ -13,6 +13,11 @@ fn n120_2_record_roundtrip_preserves_slashing_root() {
         evidence_record_hash: [0u8; 32],
         evidence_root: [0u8; 32],
         timestamp: 1000,
+        commitment_root: [0u8; 32],
+        constitutional_root: [0u8; 32],
+        economic_root: [0u8; 32],
+        identity_root: [0u8; 32],
+        governance_root: [0u8; 32],
     };
     let encoded = record.encode();
     let decoded = FinalizedChainRecord::decode(&encoded).unwrap();
