@@ -1,5 +1,5 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 /// Governance right attached to an NFT
@@ -20,7 +20,9 @@ pub struct GovernanceLedger {
 
 impl GovernanceLedger {
     pub fn new() -> Self {
-        Self { rights: BTreeMap::new() }
+        Self {
+            rights: BTreeMap::new(),
+        }
     }
 
     /// Grant or update governance rights for a token
@@ -35,21 +37,24 @@ impl GovernanceLedger {
 
     /// Check if a token holder can propose
     pub fn can_propose(&self, token_id: &[u8; 32], owner: &[u8; 32]) -> bool {
-        self.rights.get(token_id)
+        self.rights
+            .get(token_id)
             .map(|r| r.owner == *owner && r.can_propose)
             .unwrap_or(false)
     }
 
     /// Check if a token holder can veto
     pub fn can_veto(&self, token_id: &[u8; 32], owner: &[u8; 32]) -> bool {
-        self.rights.get(token_id)
+        self.rights
+            .get(token_id)
             .map(|r| r.owner == *owner && r.can_veto)
             .unwrap_or(false)
     }
 
     /// Get voting power of a token
     pub fn voting_power(&self, token_id: &[u8; 32], owner: &[u8; 32]) -> u64 {
-        self.rights.get(token_id)
+        self.rights
+            .get(token_id)
             .filter(|r| r.owner == *owner)
             .map(|r| r.voting_power)
             .unwrap_or(0)

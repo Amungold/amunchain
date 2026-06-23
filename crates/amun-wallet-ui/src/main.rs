@@ -1,9 +1,10 @@
-use axum::{Router, routing::get, response::Html};
-use tower_http::cors::{CorsLayer, Any};
 use axum::http::Method;
+use axum::{response::Html, routing::get, Router};
+use tower_http::cors::{Any, CorsLayer};
 
 async fn wallet_page() -> Html<&'static str> {
-    Html(r#"<!DOCTYPE html>
+    Html(
+        r#"<!DOCTYPE html>
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
@@ -119,7 +120,8 @@ async function sendTx() {
 }
 </script>
 </body>
-</html>"#)
+</html>"#,
+    )
 }
 
 #[tokio::main]
@@ -135,6 +137,8 @@ async fn main() {
         .layer(cors);
 
     println!("Wallet UI listening on http://127.0.0.1:8080");
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8080").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:8080")
+        .await
+        .unwrap();
     axum::serve(listener, app).await.unwrap();
 }

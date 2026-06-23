@@ -8,8 +8,15 @@ fn n165_full_soak_30s() {
         ..Default::default()
     };
     let result = run_full_soak(config);
-    println!("30s soak: {} ops, {} failures, {} roots", result.total_ops, result.total_failures, result.state_roots_collected);
-    assert!(result.passed, "Soak test failed: {} failures, roots_consistent: {}", result.total_failures, result.state_roots_consistent);
+    println!(
+        "30s soak: {} ops, {} failures, {} roots",
+        result.total_ops, result.total_failures, result.state_roots_collected
+    );
+    assert!(
+        result.passed,
+        "Soak test failed: {} failures, roots_consistent: {}",
+        result.total_failures, result.state_roots_consistent
+    );
 }
 
 #[test]
@@ -21,8 +28,15 @@ fn n165_full_soak_60s_with_adversarial() {
         ..Default::default()
     };
     let result = run_full_soak(config);
-    println!("60s soak: {} ops, {} failures, {} roots", result.total_ops, result.total_failures, result.state_roots_collected);
-    assert!(result.passed, "Soak test with adversarial events failed: {} failures", result.total_failures);
+    println!(
+        "60s soak: {} ops, {} failures, {} roots",
+        result.total_ops, result.total_failures, result.state_roots_collected
+    );
+    assert!(
+        result.passed,
+        "Soak test with adversarial events failed: {} failures",
+        result.total_failures
+    );
 }
 
 #[test]

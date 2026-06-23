@@ -1,9 +1,7 @@
-use amun_resource_core::{
-    ResourceId, ResourceRegistry,
-};
 use amun_bytecode::OpCode;
 use amun_contract_integration::ContractExecutor;
 use amun_contract_registry::ContractRegistry;
+use amun_resource_core::{ResourceId, ResourceRegistry};
 
 pub struct SecurityAuditResult {
     pub test_name: String,
@@ -17,9 +15,29 @@ pub fn audit_reentrancy() -> SecurityAuditResult {
     let owner = [10u8; 32];
     let contract_id = ResourceId([1u8; 32]);
     let code = vec![OpCode::Push(1), OpCode::Halt];
-    contract_reg.deploy(&mut reg, contract_id, owner, code.clone(), 1).unwrap();
-    let result1 = ContractExecutor::call(&mut reg, contract_id, owner, code.clone(), vec![], 1, [0u8; 32], 10000);
-    let result2 = ContractExecutor::call(&mut reg, contract_id, owner, code, vec![], 1, [0u8; 32], 10000);
+    contract_reg
+        .deploy(&mut reg, contract_id, owner, code.clone(), 1)
+        .unwrap();
+    let result1 = ContractExecutor::call(
+        &mut reg,
+        contract_id,
+        owner,
+        code.clone(),
+        vec![],
+        1,
+        [0u8; 32],
+        10000,
+    );
+    let result2 = ContractExecutor::call(
+        &mut reg,
+        contract_id,
+        owner,
+        code,
+        vec![],
+        1,
+        [0u8; 32],
+        10000,
+    );
     SecurityAuditResult {
         test_name: "reentrancy".into(),
         passed: result1.is_ok() && result2.is_ok(),
@@ -38,10 +56,21 @@ pub fn audit_gas_exhaustion() -> SecurityAuditResult {
         OpCode::JumpIfNonZero(-2),
         OpCode::Halt,
     ];
-    contract_reg.deploy(&mut reg, contract_id, owner, code.clone(), 1).unwrap();
+    contract_reg
+        .deploy(&mut reg, contract_id, owner, code.clone(), 1)
+        .unwrap();
     let code_len = code.len() as u64;
     let gas_limit = code_len * 5; // Very low gas limit
-    let result = ContractExecutor::call(&mut reg, contract_id, owner, code, vec![], 1, [0u8; 32], gas_limit);
+    let result = ContractExecutor::call(
+        &mut reg,
+        contract_id,
+        owner,
+        code,
+        vec![],
+        1,
+        [0u8; 32],
+        gas_limit,
+    );
     SecurityAuditResult {
         test_name: "gas_exhaustion".into(),
         passed: result.is_err(),
@@ -56,8 +85,12 @@ pub fn audit_state_isolation() -> SecurityAuditResult {
     let code2 = vec![OpCode::Push(2), OpCode::Halt];
     let id1 = ResourceId([10u8; 32]);
     let id2 = ResourceId([20u8; 32]);
-    contract_reg.deploy(&mut reg, id1, [10u8; 32], code1, 1).unwrap();
-    contract_reg.deploy(&mut reg, id2, [20u8; 32], code2, 1).unwrap();
+    contract_reg
+        .deploy(&mut reg, id1, [10u8; 32], code1, 1)
+        .unwrap();
+    contract_reg
+        .deploy(&mut reg, id2, [20u8; 32], code2, 1)
+        .unwrap();
     let c1 = contract_reg.get_contract(&id1);
     let c2 = contract_reg.get_contract(&id2);
     SecurityAuditResult {
@@ -74,7 +107,8 @@ pub fn audit_determinism() -> SecurityAuditResult {
     let mut cr2 = ContractRegistry::new();
     let code = vec![OpCode::Push(42), OpCode::Halt];
     let id = ResourceId([1u8; 32]);
-    cr1.deploy(&mut reg1, id, [10u8; 32], code.clone(), 1).unwrap();
+    cr1.deploy(&mut reg1, id, [10u8; 32], code.clone(), 1)
+        .unwrap();
     cr2.deploy(&mut reg2, id, [10u8; 32], code, 1).unwrap();
     let root1 = cr1.compute_registry_root();
     let root2 = cr2.compute_registry_root();
@@ -101,7 +135,9 @@ pub fn audit_evidence_consistency() -> SecurityAuditResult {
     let mut reg = ResourceRegistry::new(100);
     let mut contract_reg = ContractRegistry::new();
     let code = vec![OpCode::Push(99), OpCode::Halt];
-    contract_reg.deploy(&mut reg, ResourceId([1u8; 32]), [10u8; 32], code, 1).unwrap();
+    contract_reg
+        .deploy(&mut reg, ResourceId([1u8; 32]), [10u8; 32], code, 1)
+        .unwrap();
     let root1 = contract_reg.compute_registry_root();
     let root2 = contract_reg.compute_registry_root();
     SecurityAuditResult {

@@ -7,10 +7,20 @@ fn n142_settle_accumulated_royalties() {
     let mut ledger = RoyaltyLedger::new();
     let creator = [10u8; 32];
     ledger.settle(&RoyaltyRecord {
-        token_id: [1u8; 32], creator, payer: [20u8; 32], sale_price: 1000, royalty_amount: 50, block_height: 1,
+        token_id: [1u8; 32],
+        creator,
+        payer: [20u8; 32],
+        sale_price: 1000,
+        royalty_amount: 50,
+        block_height: 1,
     });
     ledger.settle(&RoyaltyRecord {
-        token_id: [2u8; 32], creator, payer: [20u8; 32], sale_price: 2000, royalty_amount: 100, block_height: 2,
+        token_id: [2u8; 32],
+        creator,
+        payer: [20u8; 32],
+        sale_price: 2000,
+        royalty_amount: 100,
+        block_height: 2,
     });
 
     let mut engine = SettlementEngine::new();
@@ -32,7 +42,12 @@ fn n142_deterministic_settlement_root() {
     let mut ledger = RoyaltyLedger::new();
     let creator = [10u8; 32];
     ledger.settle(&RoyaltyRecord {
-        token_id: [1u8; 32], creator, payer: [20u8; 32], sale_price: 500, royalty_amount: 25, block_height: 10,
+        token_id: [1u8; 32],
+        creator,
+        payer: [20u8; 32],
+        sale_price: 500,
+        royalty_amount: 25,
+        block_height: 10,
     });
 
     let mut e1 = SettlementEngine::new();
@@ -49,10 +64,20 @@ fn n142_multiple_settlements_differ() {
     let c1 = [10u8; 32];
     let c2 = [20u8; 32];
     ledger.settle(&RoyaltyRecord {
-        token_id: [1u8; 32], creator: c1, payer: [30u8; 32], sale_price: 100, royalty_amount: 10, block_height: 1,
+        token_id: [1u8; 32],
+        creator: c1,
+        payer: [30u8; 32],
+        sale_price: 100,
+        royalty_amount: 10,
+        block_height: 1,
     });
     ledger.settle(&RoyaltyRecord {
-        token_id: [2u8; 32], creator: c2, payer: [30u8; 32], sale_price: 200, royalty_amount: 20, block_height: 2,
+        token_id: [2u8; 32],
+        creator: c2,
+        payer: [30u8; 32],
+        sale_price: 200,
+        royalty_amount: 20,
+        block_height: 2,
     });
 
     let mut engine = SettlementEngine::new();

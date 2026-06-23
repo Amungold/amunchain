@@ -1,8 +1,8 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry, RegistryError,
-};
 use amun_defi_core::DefiPool;
+use amun_resource_core::{
+    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+    ResourceRegistry, ResourceState,
+};
 use std::collections::BTreeMap;
 
 pub struct AmmEngine {
@@ -17,7 +17,9 @@ impl Default for AmmEngine {
 
 impl AmmEngine {
     pub fn new() -> Self {
-        Self { pools: BTreeMap::new() }
+        Self {
+            pools: BTreeMap::new(),
+        }
     }
 
     pub fn create_pool(
@@ -38,7 +40,10 @@ impl AmmEngine {
             owner: creator,
         };
         registry.register_genesis(meta)?;
-        self.pools.insert(pool_id_bytes, DefiPool::new(pool_id, ResourceId(token_a), ResourceId(token_b)));
+        self.pools.insert(
+            pool_id_bytes,
+            DefiPool::new(pool_id, ResourceId(token_a), ResourceId(token_b)),
+        );
         Ok(pool_id)
     }
 
@@ -48,23 +53,23 @@ impl AmmEngine {
         amount_a: u64,
         amount_b: u64,
     ) -> Option<u64> {
-        self.pools.get_mut(pool_id).map(|pool| pool.add_liquidity(amount_a, amount_b))
+        self.pools
+            .get_mut(pool_id)
+            .map(|pool| pool.add_liquidity(amount_a, amount_b))
     }
 
-    pub fn swap(
-        &mut self,
-        pool_id: &[u8; 32],
-        amount_in: u64,
-        swap_a_for_b: bool,
-    ) -> Option<u64> {
+    pub fn swap(&mut self, pool_id: &[u8; 32], amount_in: u64, swap_a_for_b: bool) -> Option<u64> {
         self.pools.get_mut(pool_id).map(|pool| {
-            if swap_a_for_b { pool.swap_a_for_b(amount_in) }
-            else { pool.swap_b_for_a(amount_in) }
+            if swap_a_for_b {
+                pool.swap_a_for_b(amount_in)
+            } else {
+                pool.swap_b_for_a(amount_in)
+            }
         })
     }
 
     pub fn compute_evidence_root(&self) -> [u8; 32] {
-        use sha2::{Sha256, Digest};
+        use sha2::{Digest, Sha256};
         let mut hasher = Sha256::new();
         hasher.update(b"AMUN_AMM_EVIDENCE_V1");
         for (id, pool) in &self.pools {

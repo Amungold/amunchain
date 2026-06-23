@@ -1,11 +1,11 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry, RegistryError,
-};
-use amun_vm_kernel::execution_context::ExecutionContext;
 use amun_bytecode::ConstitutionalProgram;
 use amun_bytecode::OpCode;
 use amun_gas_engine::GasEngine;
+use amun_resource_core::{
+    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+    ResourceRegistry, ResourceState,
+};
+use amun_vm_kernel::execution_context::ExecutionContext;
 
 pub struct ContractDeployer;
 
@@ -40,6 +40,7 @@ impl ContractDeployer {
 pub struct ContractExecutor;
 
 impl ContractExecutor {
+    #[allow(clippy::too_many_arguments)]
     pub fn call(
         registry: &mut ResourceRegistry,
         contract_id: ResourceId,
@@ -51,8 +52,7 @@ impl ContractExecutor {
         gas_limit: u64,
     ) -> Result<Vec<u8>, String> {
         // Verify contract exists
-        registry.get(&contract_id)
-            .ok_or("Contract not found")?;
+        registry.get(&contract_id).ok_or("Contract not found")?;
 
         let code_len = code.len() as u64;
 
@@ -91,10 +91,10 @@ impl ContractExecutor {
     }
 
     pub fn compute_contract_evidence_root(registry: &ResourceRegistry) -> [u8; 32] {
-        use sha2::{Sha256, Digest};
+        use sha2::{Digest, Sha256};
         let mut hasher = Sha256::new();
         hasher.update(b"AMUN_CONTRACT_EVIDENCE_V1");
-        hasher.update(&registry.compute_state_root());
+        hasher.update(registry.compute_state_root());
         hasher.finalize().into()
     }
 }

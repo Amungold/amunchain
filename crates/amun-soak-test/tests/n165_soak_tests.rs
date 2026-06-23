@@ -4,8 +4,15 @@ use amun_soak_test::ValidatorSimulator;
 fn n165_soak_30_seconds_no_events() {
     let sim = ValidatorSimulator::new();
     let result = sim.run(30, false);
-    println!("30s soak: {} ops, {} failures, height {}", result.operations, result.failures, result.final_height);
-    assert!(result.passed(), "Soak test failed: {} failures", result.failures);
+    println!(
+        "30s soak: {} ops, {} failures, height {}",
+        result.operations, result.failures, result.final_height
+    );
+    assert!(
+        result.passed(),
+        "Soak test failed: {} failures",
+        result.failures
+    );
     assert!(result.operations > 0, "No operations performed");
 }
 
@@ -13,8 +20,15 @@ fn n165_soak_30_seconds_no_events() {
 fn n165_soak_60_seconds_with_events() {
     let sim = ValidatorSimulator::new();
     let result = sim.run(60, true);
-    println!("60s soak with events: {} ops, {} failures, height {}", result.operations, result.failures, result.final_height);
-    assert!(result.passed(), "Soak test with events failed: {} failures", result.failures);
+    println!(
+        "60s soak with events: {} ops, {} failures, height {}",
+        result.operations, result.failures, result.final_height
+    );
+    assert!(
+        result.passed(),
+        "Soak test with events failed: {} failures",
+        result.failures
+    );
     assert!(result.operations > 0, "No operations performed");
 }
 

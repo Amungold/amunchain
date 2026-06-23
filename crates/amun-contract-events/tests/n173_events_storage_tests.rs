@@ -1,5 +1,5 @@
-use amun_resource_core::ResourceId;
 use amun_contract_events::ContractStorage;
+use amun_resource_core::ResourceId;
 
 #[test]
 fn n173_store_and_retrieve() {
@@ -27,5 +27,8 @@ fn n173_events_root_deterministic() {
     let cid = ResourceId([1u8; 32]);
     storage1.emit_event(cid, "Mint".into(), vec![1], 1);
     storage2.emit_event(cid, "Mint".into(), vec![1], 1);
-    assert_eq!(storage1.compute_events_root(), storage2.compute_events_root());
+    assert_eq!(
+        storage1.compute_events_root(),
+        storage2.compute_events_root()
+    );
 }

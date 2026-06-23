@@ -1,7 +1,7 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
 use amun_nft_bridge::BridgeLedger;
-use amun_nft_constitutional_registry::{ConstitutionalRegistry};
+use amun_nft_constitutional_registry::ConstitutionalRegistry;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 
 /// Constitutional proof combining all NFT roots
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -59,7 +59,10 @@ impl EnforcementEngine {
     ) -> Option<u64> {
         if let Some(record) = registry.get(token_id) {
             if let Some(ref policy) = record.royalty_policy {
-                return Some(amun_nft_royalty::RoyaltyEngine::compute_royalty(sale_price, policy.royalty_bps));
+                return Some(amun_nft_royalty::RoyaltyEngine::compute_royalty(
+                    sale_price,
+                    policy.royalty_bps,
+                ));
             }
         }
         None

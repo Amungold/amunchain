@@ -1,9 +1,9 @@
-use sha2::Digest;
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_core_optimization::OptimizedRegistry;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
+use sha2::Digest;
 use std::time::Instant;
 
 #[test]
@@ -13,14 +13,16 @@ fn n161_compare_cached_vs_uncached() {
     let col_id = ResourceId([1u8; 32]);
 
     for reg_ref in [&mut reg, &mut opt_reg.registry].iter_mut() {
-        reg_ref.register_genesis(ResourceMetadata {
-            resource_id: col_id,
-            archetype: ResourceArchetype::NFTCollection,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::genesis(col_id),
-            contract_id: [0u8; 32],
-            owner: [0u8; 32],
-        }).unwrap();
+        reg_ref
+            .register_genesis(ResourceMetadata {
+                resource_id: col_id,
+                archetype: ResourceArchetype::NFTCollection,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::genesis(col_id),
+                contract_id: [0u8; 32],
+                owner: [0u8; 32],
+            })
+            .unwrap();
     }
 
     for i in 0..5_000u64 {
@@ -36,7 +38,10 @@ fn n161_compare_cached_vs_uncached() {
             owner: [1u8; 32],
         };
         reg.derive_from_collection(&col_id, meta.clone()).unwrap();
-        opt_reg.registry.derive_from_collection(&col_id, meta).unwrap();
+        opt_reg
+            .registry
+            .derive_from_collection(&col_id, meta)
+            .unwrap();
     }
 
     let start = Instant::now();

@@ -1,0 +1,695 @@
+    Checking amun-vm-kernel v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-vm-kernel)
+    Checking amun-constitutional-signing v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-signing)
+    Checking amun-evidence-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-evidence-engine)
+    Checking amun-constitutional-authority v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-authority)
+    Checking amun-transition-proof v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transition-proof)
+    Checking amun-consensus v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-consensus)
+    Checking amun-constitutional-governance v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-governance)
+    Checking amun-bytecode v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-bytecode)
+    Checking amun-constitutional-kernel v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-kernel)
+    Checking amun-pccv v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-pccv)
+    Checking amun-gas-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-gas-engine)
+    Checking amun-validator-networking v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-validator-networking)
+    Checking amun-constitutional-block v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-block)
+    Checking amun-certificate-network v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-certificate-network)
+    Checking amun-operations v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-operations)
+    Checking amun-persistent-node v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-persistent-node)
+    Checking amun-stateless-sync v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-stateless-sync)
+    Checking amun-proof-archive v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-proof-archive)
+    Checking amun-invariant-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-invariant-engine)
+    Checking amun-cross-contract v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-cross-contract)
+    Checking amun-chain-checkpoint v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-chain-checkpoint)
+    Checking amun-handle-resolver v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-handle-resolver)
+    Checking amun-constitutional-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-runtime)
+    Checking amun-networking v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-networking)
+    Checking amun-replay-verifier v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-verifier)
+    Checking amun-consensus-network v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-consensus-network)
+    Checking amun-transactions v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-transactions)
+    Checking amun-execution v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-execution)
+    Checking amun-mempool v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-mempool)
+    Checking amun-wallet-management v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-wallet-management)
+    Checking amun-replay-consensus v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-consensus)
+    Checking amun-validator-runtime v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-validator-runtime)
+    Checking amun-authority-registry v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-authority-registry)
+    Checking amun-block-builder v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-block-builder)
+    Checking amun-sync v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-sync)
+    Checking amun-rpc v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-rpc)
+    Checking amun-nft-royalty v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-royalty)
+    Checking amun-nft-governance v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-governance)
+    Checking amun-nft-bridge v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-bridge)
+    Checking amun-nft-constitutional-registry v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-constitutional-registry)
+    Checking amun-live-cluster v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-live-cluster)
+    Checking amun-defi-lending-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-defi-lending-core)
+    Checking amun-nft-marketplace v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-marketplace)
+    Checking amun-contract-registry v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-contract-registry)
+    Checking amun-defi-core v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-defi-core)
+warning: you should consider adding a `Default` implementation for `ContractRegistry`
+  --> crates/amun-contract-registry/src/lib.rs:20:5
+   |
+20 | /     pub fn new() -> Self {
+21 | |         Self {
+22 | |             contracts: BTreeMap::new(),
+23 | |         }
+24 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+19 + impl Default for ContractRegistry {
+20 +     fn default() -> Self {
+21 +         Self::new()
+22 +     }
+23 + }
+   |
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-contract-registry/src/lib.rs:74:27
+   |
+74 |             hasher.update(&id.0);
+   |                           ^^^^^ help: change this to: `id.0`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+   = note: `#[warn(clippy::needless_borrows_for_generic_args)]` on by default
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-contract-registry/src/lib.rs:75:27
+   |
+75 |             hasher.update(&record.owner);
+   |                           ^^^^^^^^^^^^^ help: change this to: `record.owner`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-contract-registry/src/lib.rs:76:27
+   |
+76 |             hasher.update(&record.code_hash);
+   |                           ^^^^^^^^^^^^^^^^^ help: change this to: `record.code_hash`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-contract-registry/src/lib.rs:77:27
+   |
+77 |             hasher.update(&record.deployed_height.to_le_bytes());
+   |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: change this to: `record.deployed_height.to_le_bytes()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: `amun-contract-registry` (lib) generated 5 warnings (run `cargo clippy --fix --lib -p amun-contract-registry -- ` to apply 5 suggestions)
+    Checking amun-contract-integration v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-contract-integration)
+    Checking amun-defi-lending-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-defi-lending-engine)
+warning: this function has too many arguments (8/7)
+  --> crates/amun-contract-integration/src/lib.rs:43:5
+   |
+43 | /     pub fn call(
+44 | |         registry: &mut ResourceRegistry,
+45 | |         contract_id: ResourceId,
+46 | |         _caller: [u8; 32],
+...  |
+51 | |         gas_limit: u64,
+52 | |     ) -> Result<Vec<u8>, String> {
+   | |________________________________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#too_many_arguments
+   = note: `#[warn(clippy::too_many_arguments)]` on by default
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-contract-integration/src/lib.rs:96:23
+   |
+96 |         hasher.update(&registry.compute_state_root());
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: change this to: `registry.compute_state_root()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+   = note: `#[warn(clippy::needless_borrows_for_generic_args)]` on by default
+
+warning: `amun-contract-integration` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p amun-contract-integration -- ` to apply 1 suggestion)
+    Checking amun-nft-royalty-accounting v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-royalty-accounting)
+    Checking amun-nft-mining v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-mining)
+    Checking amun_consensus_math v1.0.0 (/root/projects/amunchain/amunchain/crates/amun_consensus_math)
+    Checking amun-defi-amm v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-defi-amm)
+warning: method `from_str` can be confused for the standard trait method `std::str::FromStr::from_str`
+  --> crates/amun_consensus_math/src/fixed.rs:20:5
+   |
+20 | /     pub fn from_str(s: &str) -> Option<Self> {
+21 | |         let s = s.trim();
+22 | |         if s.is_empty() {
+23 | |             return None;
+...  |
+69 | |         Some(Self(value))
+70 | |     }
+   | |_____^
+   |
+   = help: consider implementing the trait `std::str::FromStr` or choosing a less ambiguous method name
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#should_implement_trait
+   = note: `#[warn(clippy::should_implement_trait)]` on by default
+
+warning: stripping a prefix manually
+  --> crates/amun_consensus_math/src/fixed.rs:27:18
+   |
+27 |             (-1, &s[1..])
+   |                  ^^^^^^^
+   |
+note: the prefix was tested here
+  --> crates/amun_consensus_math/src/fixed.rs:26:31
+   |
+26 |         let (sign, num_str) = if s.starts_with('-') {
+   |                               ^^^^^^^^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_strip
+   = note: `#[warn(clippy::manual_strip)]` on by default
+help: try using the `strip_prefix` method
+   |
+26 ~         let (sign, num_str) = if let Some(<stripped>) = s.strip_prefix('-') {
+27 ~             (-1, <stripped>)
+   |
+
+warning: stripping a prefix manually
+  --> crates/amun_consensus_math/src/fixed.rs:29:17
+   |
+29 |             (1, &s[1..])
+   |                 ^^^^^^^
+   |
+note: the prefix was tested here
+  --> crates/amun_consensus_math/src/fixed.rs:28:16
+   |
+28 |         } else if s.starts_with('+') {
+   |                ^^^^^^^^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_strip
+help: try using the `strip_prefix` method
+   |
+28 ~         } else if let Some(<stripped>) = s.strip_prefix('+') {
+29 ~             (1, <stripped>)
+   |
+
+warning: manual `!RangeInclusive::contains` implementation
+  --> crates/amun_consensus_math/src/fixed.rs:66:12
+   |
+66 |         if value < MIN_FIXED || value > MAX_FIXED {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use: `!(MIN_FIXED..=MAX_FIXED).contains(&value)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_range_contains
+   = note: `#[warn(clippy::manual_range_contains)]` on by default
+
+    Checking amun-constitutional-sim v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-sim)
+warning: `amun_consensus_math` (lib) generated 4 warnings (run `cargo clippy --fix --lib -p amun_consensus_math -- ` to apply 1 suggestion)
+    Checking amun-defi-stablecoin v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-defi-stablecoin)
+    Checking amun-nft-constitutional-enforcement v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-constitutional-enforcement)
+    Checking amun-tokenomics v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-tokenomics)
+warning: you should consider adding a `Default` implementation for `EpochEconomics`
+  --> crates/amun-tokenomics/src/lib.rs:17:5
+   |
+17 | /     pub fn new() -> Self {
+18 | |         Self {
+19 | |             epoch: 0,
+20 | |             reward_pool: 0,
+...  |
+25 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+16 + impl Default for EpochEconomics {
+17 +     fn default() -> Self {
+18 +         Self::new()
+19 +     }
+20 + }
+   |
+
+warning: `amun-tokenomics` (lib) generated 1 warning (run `cargo clippy --fix --lib -p amun-tokenomics -- ` to apply 1 suggestion)
+    Checking amun-proof-carrying v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-proof-carrying)
+    Checking amun-constitutional-commitment v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-commitment)
+    Checking amun-nft-collateral v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-collateral)
+    Checking amun-nft-indexer v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-indexer)
+    Checking amun-nft-rights-enforcement v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-rights-enforcement)
+    Checking amun-light-client v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-light-client)
+    Checking amun-peer-identity v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-peer-identity)
+    Checking amun-verifier-node v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-verifier-node)
+    Checking amun-tokenomics-ledger v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-tokenomics-ledger)
+    Checking amun-explorer-api v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-explorer-api)
+warning: you should consider adding a `Default` implementation for `EconomicLedger`
+  --> crates/amun-tokenomics-ledger/src/lib.rs:16:5
+   |
+16 | /     pub fn new() -> Self {
+17 | |         Self {
+18 | |             treasury_balance: 0,
+19 | |             validator_reward_pool: 0,
+...  |
+26 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+15 + impl Default for EconomicLedger {
+16 +     fn default() -> Self {
+17 +         Self::new()
+18 +     }
+19 + }
+   |
+
+warning: `amun-tokenomics-ledger` (lib) generated 1 warning (run `cargo clippy --fix --lib -p amun-tokenomics-ledger -- ` to apply 1 suggestion)
+    Checking amun-wallet-api v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-wallet-api)
+warning: the borrowed expression implements the required traits
+  --> crates/amun-explorer-api/src/lib.rs:50:31
+   |
+50 |             hash: hex::encode(&record.block_hash),
+   |                               ^^^^^^^^^^^^^^^^^^ help: change this to: `record.block_hash`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+   = note: `#[warn(clippy::needless_borrows_for_generic_args)]` on by default
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-explorer-api/src/lib.rs:51:37
+   |
+51 |             state_root: hex::encode(&record.state_root),
+   |                                     ^^^^^^^^^^^^^^^^^^ help: change this to: `record.state_root`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-explorer-api/src/lib.rs:52:40
+   |
+52 |             evidence_root: hex::encode(&record.evidence_root),
+   |                                        ^^^^^^^^^^^^^^^^^^^^^ help: change this to: `record.evidence_root`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: `amun-explorer-api` (lib) generated 3 warnings (run `cargo clippy --fix --lib -p amun-explorer-api -- ` to apply 3 suggestions)
+    Checking amun-header-gossip v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-header-gossip)
+    Checking amun-constitutional-authority-semantics v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-authority-semantics)
+    Checking amun-nft-governance-execution v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-governance-execution)
+    Checking amun-nft-sdk v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-sdk)
+    Checking amun-defi-stress v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-defi-stress)
+    Checking amun-nft-adversarial v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-adversarial)
+    Checking amun-nft-stress v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-stress)
+    Checking amun-soak-full v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-soak-full)
+    Checking amun-soak-test v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-soak-test)
+warning: you should consider adding a `Default` implementation for `SoakValidator`
+  --> crates/amun-soak-full/src/lib.rs:54:5
+   |
+54 | /     pub fn new() -> Self {
+55 | |         let mut reg = ResourceRegistry::new(10000);
+56 | |         let col_id = ResourceId([1u8; 32]);
+57 | |         reg.register_genesis(ResourceMetadata {
+...  |
+80 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+53 + impl Default for SoakValidator {
+54 +     fn default() -> Self {
+55 +         Self::new()
+56 +     }
+57 + }
+   |
+
+warning: manual implementation of `.is_multiple_of()`
+  --> crates/amun-soak-full/src/lib.rs:95:16
+   |
+95 |             if self.height % config.nft_mint_rate == 0 {
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.height.is_multiple_of(config.nft_mint_rate)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_multiple_of
+   = note: `#[warn(clippy::manual_is_multiple_of)]` on by default
+
+warning: manual implementation of `.is_multiple_of()`
+   --> crates/amun-soak-full/src/lib.rs:126:16
+    |
+126 |             if self.height % config.amm_swap_rate == 0 {
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.height.is_multiple_of(config.amm_swap_rate)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_multiple_of
+
+warning: using `clone` on type `[u8; 32]` which implements the `Copy` trait
+   --> crates/amun-soak-full/src/lib.rs:136:37
+    |
+136 | ..._key = self.amm.pools.keys().next().unwrap().clone();
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try dereferencing it: `*self.amm.pools.keys().next().unwrap()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#clone_on_copy
+    = note: `#[warn(clippy::clone_on_copy)]` on by default
+
+warning: manual implementation of `.is_multiple_of()`
+   --> crates/amun-soak-full/src/lib.rs:144:16
+    |
+144 |             if self.height % config.contract_deploy_rate == 0 {
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.height.is_multiple_of(config.contract_deploy_rate)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_multiple_of
+
+warning: manual implementation of `.is_multiple_of()`
+   --> crates/amun-soak-full/src/lib.rs:160:16
+    |
+160 |             if self.height % 200 == 0 {
+    |                ^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.height.is_multiple_of(200)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_multiple_of
+
+warning: manual implementation of `.is_multiple_of()`
+   --> crates/amun-soak-full/src/lib.rs:176:16
+    |
+176 |             if self.height % 300 == 0 {
+    |                ^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.height.is_multiple_of(300)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_multiple_of
+
+warning: manual implementation of `.is_multiple_of()`
+   --> crates/amun-soak-full/src/lib.rs:189:16
+    |
+189 |             if self.height % config.snapshot_interval == 0 {
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.height.is_multiple_of(config.snapshot_interval)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_multiple_of
+
+warning: `amun-soak-full` (lib) generated 8 warnings (run `cargo clippy --fix --lib -p amun-soak-full -- ` to apply 8 suggestions)
+    Checking amun-nft-royalty-settlement v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-royalty-settlement)
+warning: you should consider adding a `Default` implementation for `ValidatorSimulator`
+  --> crates/amun-soak-test/src/lib.rs:21:5
+   |
+21 | /     pub fn new() -> Self {
+22 | |         Self {
+23 | |             registry: Arc::new(Mutex::new(ResourceRegistry::new(500...
+24 | |             amm: Arc::new(Mutex::new(AmmEngine::new())),
+...  |
+29 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+20 + impl Default for ValidatorSimulator {
+21 +     fn default() -> Self {
+22 +         Self::new()
+23 +     }
+24 + }
+   |
+
+warning: using `clone` on type `[u8; 32]` which implements the `Copy` trait
+   --> crates/amun-soak-test/src/lib.rs:100:41
+    |
+100 | ...st_key = amm.pools.keys().next().unwrap().clone();
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try dereferencing it: `*amm.pools.keys().next().unwrap()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#clone_on_copy
+    = note: `#[warn(clippy::clone_on_copy)]` on by default
+
+warning: `amun-soak-test` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p amun-soak-test -- ` to apply 2 suggestions)
+    Checking amun-nft-snapshot v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-snapshot)
+    Checking amun-nft-persistence v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-persistence)
+    Checking amun-nft-explorer v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-explorer)
+    Checking amun-nft-fuzz v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-fuzz)
+    Checking amun-contract-fuzzing v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-contract-fuzzing)
+warning: you should consider adding a `Default` implementation for `FuzzResult`
+  --> crates/amun-contract-fuzzing/src/lib.rs:18:5
+   |
+18 | /     pub fn new() -> Self {
+19 | |         Self {
+20 | |             iterations: 0,
+21 | |             successful_deploys: 0,
+...  |
+28 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+17 + impl Default for FuzzResult {
+18 +     fn default() -> Self {
+19 +         Self::new()
+20 +     }
+21 + }
+   |
+
+warning: `amun-contract-fuzzing` (lib) generated 1 warning (run `cargo clippy --fix --lib -p amun-contract-fuzzing -- ` to apply 1 suggestion)
+    Checking amun-contract-security v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-contract-security)
+    Checking amun-defi-evidence v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-defi-evidence)
+    Checking amun-contract-upgrade v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-contract-upgrade)
+    Checking amun-nft-benchmark v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-nft-benchmark)
+    Checking amun-defi-governance v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-defi-governance)
+    Checking amun-state-pruning v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-state-pruning)
+warning: unused imports: `ResourceArchetype`, `ResourceLineage`, and `ResourceState`
+ --> crates/amun-state-pruning/src/lib.rs:2:5
+  |
+2 |     ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ...
+  |     ^^^^^^^^^^^^^^^^^              ^^^^^^^^^^^^^^^
+3 |     ResourceState,
+  |     ^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+    Checking amun-replay-optimization v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-optimization)
+warning: the borrowed expression implements the required traits
+  --> crates/amun-state-pruning/src/lib.rs:57:23
+   |
+57 |         hasher.update(&self.registry.compute_state_root());
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: change this to: `self.registry.compute_state_root()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+   = note: `#[warn(clippy::needless_borrows_for_generic_args)]` on by default
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-state-pruning/src/lib.rs:58:23
+   |
+58 |         hasher.update(&self.pruned_count.to_le_bytes());
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: change this to: `self.pruned_count.to_le_bytes()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: `amun-state-pruning` (lib) generated 3 warnings (run `cargo clippy --fix --lib -p amun-state-pruning -- ` to apply 3 suggestions)
+    Checking amun-network-fastpath v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-network-fastpath)
+warning: you should consider adding a `Default` implementation for `ReplayCache`
+  --> crates/amun-replay-optimization/src/lib.rs:25:5
+   |
+25 | /     pub fn new() -> Self {
+26 | |         Self {
+27 | |             certificates: BTreeMap::new(),
+28 | |             headers: BTreeMap::new(),
+...  |
+32 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+24 + impl Default for ReplayCache {
+25 +     fn default() -> Self {
+26 +         Self::new()
+27 +     }
+28 + }
+   |
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-replay-optimization/src/lib.rs:73:23
+   |
+73 |         hasher.update(&self.hits.to_le_bytes());
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^ help: change this to: `self.hits.to_le_bytes()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+   = note: `#[warn(clippy::needless_borrows_for_generic_args)]` on by default
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-replay-optimization/src/lib.rs:74:23
+   |
+74 |         hasher.update(&self.misses.to_le_bytes());
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^ help: change this to: `self.misses.to_le_bytes()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: `amun-replay-optimization` (lib) generated 3 warnings (run `cargo clippy --fix --lib -p amun-replay-optimization -- ` to apply 3 suggestions)
+    Checking amun-contract-events v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-contract-events)
+warning: you should consider adding a `Default` implementation for `MessageBatch`
+  --> crates/amun-network-fastpath/src/lib.rs:10:5
+   |
+10 | /     pub fn new() -> Self {
+11 | |         Self {
+12 | |             messages: Vec::new(),
+13 | |             batch_hash: [0u8; 32],
+14 | |         }
+15 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+ 9 + impl Default for MessageBatch {
+10 +     fn default() -> Self {
+11 +         Self::new()
+12 +     }
+13 + }
+   |
+
+warning: struct `MessageBatch` has a public `len` method, but no `is_empty` method
+  --> crates/amun-network-fastpath/src/lib.rs:30:5
+   |
+30 |     pub fn len(&self) -> usize {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#len_without_is_empty
+   = note: `#[warn(clippy::len_without_is_empty)]` on by default
+
+warning: `amun-network-fastpath` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p amun-network-fastpath -- ` to apply 1 suggestion)
+    Checking amun-snapshot-optimization v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-snapshot-optimization)
+warning: you should consider adding a `Default` implementation for `ContractStorage`
+  --> crates/amun-contract-events/src/lib.rs:19:5
+   |
+19 | /     pub fn new() -> Self {
+20 | |         Self {
+21 | |             storage: BTreeMap::new(),
+22 | |             events: Vec::new(),
+23 | |         }
+24 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+   = note: `#[warn(clippy::new_without_default)]` on by default
+help: try adding this
+   |
+18 + impl Default for ContractStorage {
+19 +     fn default() -> Self {
+20 +         Self::new()
+21 +     }
+22 + }
+   |
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-contract-events/src/lib.rs:43:23
+   |
+43 |         hasher.update(&contract_id.0);
+   |                       ^^^^^^^^^^^^^^ help: change this to: `contract_id.0`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+   = note: `#[warn(clippy::needless_borrows_for_generic_args)]` on by default
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-contract-events/src/lib.rs:46:23
+   |
+46 |         hasher.update(&block_height.to_le_bytes());
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: change this to: `block_height.to_le_bytes()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: the borrowed expression implements the required traits
+  --> crates/amun-contract-events/src/lib.rs:71:27
+   |
+71 |             hasher.update(&event.event_hash);
+   |                           ^^^^^^^^^^^^^^^^^ help: change this to: `event.event_hash`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args
+
+warning: `amun-contract-events` (lib) generated 4 warnings (run `cargo clippy --fix --lib -p amun-contract-events -- ` to apply 4 suggestions)
+    Checking amun-core-optimization v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-core-optimization)
+warning: length comparison to zero
+   --> crates/amun-snapshot-optimization/tests/n162_snapshot_optimization_tests.rs:112:9
+    |
+112 |         compressed.len() > 0,
+    |         ^^^^^^^^^^^^^^^^^^^^ help: using `!is_empty` is clearer and more explicit: `!compressed.is_empty()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#len_zero
+    = note: `#[warn(clippy::len_zero)]` on by default
+
+warning: `amun-snapshot-optimization` (test "n162_snapshot_optimization_tests") generated 1 warning (run `cargo clippy --fix --test "n162_snapshot_optimization_tests" -p amun-snapshot-optimization -- ` to apply 1 suggestion)
+warning: unused import: `ResourceRegistry`
+ --> crates/amun-state-pruning/tests/n166_pruning_tests.rs:2:71
+  |
+2 | ...neage, ResourceMetadata, ResourceRegistry,
+  |                             ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `amun-state-pruning` (test "n166_pruning_tests") generated 1 warning (run `cargo clippy --fix --test "n166_pruning_tests" -p amun-state-pruning -- ` to apply 1 suggestion)
+warning: very complex type used. Consider factoring parts into `type` definitions
+  --> crates/amun-nft-snapshot/tests/n151_snapshot_tests.rs:17:21
+   |
+17 |   fn build_state() -> (
+   |  _____________________^
+18 | |     ResourceRegistry,
+19 | |     RoyaltyLedger,
+20 | |     GovernanceLedger,
+...  |
+27 | |     [u8; 32],
+28 | | ) {
+   | |_^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#type_complexity
+   = note: `#[warn(clippy::type_complexity)]` on by default
+
+warning: `amun-nft-snapshot` (test "n151_snapshot_tests") generated 1 warning
+    Checking amun-recovery v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-recovery)
+    Checking amun-replay-engine v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-replay-engine)
+    Checking amun-load-generator v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-load-generator)
+    Checking amun-evidence v3.0.0 (/root/projects/amunchain/amunchain/crates/amun-evidence)
+    Checking amun-wallet-ui v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-wallet-ui)
+    Checking amun-self-preservation v1.0.0 (/root/projects/amunchain/amunchain/crates/amun-self-preservation)
+    Checking amun-constitutional-integration v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-constitutional-integration)
+    Checking amun-economic-service v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-economic-service)
+    Checking amun-experimental-framework v0.1.0 (/root/projects/amunchain/amunchain/crates/amun-experimental-framework)
+error[E0308]: mismatched types
+  --> crates/amun-tokenomics-ledger/tests/test_ledger.rs:9:35
+   |
+ 9 |         ledger.on_block_finalized(total_supply);
+   |                ------------------ ^^^^^^^^^^^^ expected `&EpochEconomics`, found `u64`
+   |                |
+   |                arguments to this method are incorrect
+   |
+note: method defined here
+  --> crates/amun-tokenomics-ledger/src/lib.rs:28:12
+   |
+28 |     pub fn on_block_finalized(&mut self, epoch_economics: &EpochEcono...
+   |            ^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+  --> crates/amun-tokenomics-ledger/tests/test_ledger.rs:41:31
+   |
+41 |         l1.on_block_finalized(supply);
+   |            ------------------ ^^^^^^ expected `&EpochEconomics`, found `u64`
+   |            |
+   |            arguments to this method are incorrect
+   |
+note: method defined here
+  --> crates/amun-tokenomics-ledger/src/lib.rs:28:12
+   |
+28 |     pub fn on_block_finalized(&mut self, epoch_economics: &EpochEcono...
+   |            ^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+  --> crates/amun-tokenomics-ledger/tests/test_ledger.rs:42:31
+   |
+42 |         l2.on_block_finalized(supply);
+   |            ------------------ ^^^^^^ expected `&EpochEconomics`, found `u64`
+   |            |
+   |            arguments to this method are incorrect
+   |
+note: method defined here
+  --> crates/amun-tokenomics-ledger/src/lib.rs:28:12
+   |
+28 |     pub fn on_block_finalized(&mut self, epoch_economics: &EpochEcono...
+   |            ^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+  --> crates/amun-tokenomics-ledger/tests/test_ledger.rs:54:35
+   |
+54 |         ledger.on_block_finalized(supply);
+   |                ------------------ ^^^^^^ expected `&EpochEconomics`, found `u64`
+   |                |
+   |                arguments to this method are incorrect
+   |
+note: method defined here
+  --> crates/amun-tokenomics-ledger/src/lib.rs:28:12
+   |
+28 |     pub fn on_block_finalized(&mut self, epoch_economics: &EpochEcono...
+   |            ^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `amun-tokenomics-ledger` (test "test_ledger") due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...

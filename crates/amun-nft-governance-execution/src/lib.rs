@@ -1,6 +1,6 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
 use amun_nft_governance::GovernanceLedger;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -29,7 +29,10 @@ pub struct GovernanceExecution {
 
 impl GovernanceExecution {
     pub fn new() -> Self {
-        Self { proposals: BTreeMap::new(), votes: Vec::new() }
+        Self {
+            proposals: BTreeMap::new(),
+            votes: Vec::new(),
+        }
     }
 
     pub fn propose(
@@ -40,7 +43,10 @@ impl GovernanceExecution {
         created_height: u64,
         expires_height: u64,
     ) -> Option<[u8; 32]> {
-        let has_rights = ledger.rights.values().any(|r| r.owner == *proposer && r.can_propose);
+        let has_rights = ledger
+            .rights
+            .values()
+            .any(|r| r.owner == *proposer && r.can_propose);
         if !has_rights {
             return None;
         }
@@ -50,14 +56,17 @@ impl GovernanceExecution {
         hasher.update(description.as_bytes());
         hasher.update(created_height.to_le_bytes());
         let proposal_id: [u8; 32] = hasher.finalize().into();
-        self.proposals.insert(proposal_id, Proposal {
+        self.proposals.insert(
             proposal_id,
-            proposer: *proposer,
-            description,
-            created_height,
-            expires_height,
-            executed: false,
-        });
+            Proposal {
+                proposal_id,
+                proposer: *proposer,
+                description,
+                created_height,
+                expires_height,
+                executed: false,
+            },
+        );
         Some(proposal_id)
     }
 
@@ -71,7 +80,9 @@ impl GovernanceExecution {
         if !self.proposals.contains_key(proposal_id) {
             return false;
         }
-        let weight = ledger.rights.values()
+        let weight = ledger
+            .rights
+            .values()
             .filter(|r| r.owner == *voter)
             .map(|r| r.voting_power)
             .sum();
@@ -91,8 +102,11 @@ impl GovernanceExecution {
         let (mut support, mut against) = (0u64, 0u64);
         for vote in &self.votes {
             if vote.proposal_id == *proposal_id {
-                if vote.support { support += vote.weight; }
-                else { against += vote.weight; }
+                if vote.support {
+                    support += vote.weight;
+                } else {
+                    against += vote.weight;
+                }
             }
         }
         (support, against)

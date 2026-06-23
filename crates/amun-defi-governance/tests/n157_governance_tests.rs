@@ -21,7 +21,10 @@ fn n157_governance_root_deterministic() {
     engine2.vote(&id2, [20u8; 32], true, 100);
     engine1.execute(&id1);
     engine2.execute(&id2);
-    assert_eq!(engine1.compute_governance_root(), engine2.compute_governance_root());
+    assert_eq!(
+        engine1.compute_governance_root(),
+        engine2.compute_governance_root()
+    );
 }
 
 #[test]

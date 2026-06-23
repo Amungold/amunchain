@@ -1,5 +1,5 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 /// Lock event: NFT is locked in source chain for bridging
@@ -38,7 +38,10 @@ pub struct BridgeLedger {
 
 impl BridgeLedger {
     pub fn new() -> Self {
-        Self { locks: BTreeMap::new(), records: Vec::new() }
+        Self {
+            locks: BTreeMap::new(),
+            records: Vec::new(),
+        }
     }
 
     /// Lock an NFT for cross-chain transfer

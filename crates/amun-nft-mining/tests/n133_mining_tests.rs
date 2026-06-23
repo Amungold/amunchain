@@ -1,9 +1,7 @@
+use amun_nft_mining::{evaluate_contribution, issue_mining_reward, ContributionType};
 use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
-use amun_nft_mining::{
-    evaluate_contribution, issue_mining_reward, ContributionType,
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
 };
 
 #[test]
@@ -28,7 +26,8 @@ fn n133_mining_reward_creates_nft() {
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [10u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let contributor = [5u8; 32];
     let reward_id = ResourceId([2u8; 32]);
@@ -39,7 +38,8 @@ fn n133_mining_reward_creates_nft() {
         &contributor,
         &col_id,
         ContributionType::ValidatorOperation,
-    ).unwrap();
+    )
+    .unwrap();
 
     // Verify the reward was consumed and NFT is active
     let reward = reg.get(&reward_id).unwrap();
@@ -62,7 +62,8 @@ fn n133_multiple_contributions_get_different_nfts() {
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [10u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let contributor1 = [5u8; 32];
     let contributor2 = [6u8; 32];
@@ -73,7 +74,8 @@ fn n133_multiple_contributions_get_different_nfts() {
         &contributor1,
         &col_id,
         ContributionType::BugDiscovery,
-    ).unwrap();
+    )
+    .unwrap();
 
     let id2 = issue_mining_reward(
         &mut reg,
@@ -81,7 +83,8 @@ fn n133_multiple_contributions_get_different_nfts() {
         &contributor2,
         &col_id,
         ContributionType::CodeContribution,
-    ).unwrap();
+    )
+    .unwrap();
 
     assert_ne!(id1, id2);
     assert_eq!(reg.get(&id1).unwrap().owner, contributor1);

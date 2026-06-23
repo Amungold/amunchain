@@ -1,8 +1,8 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry, RegistryError,
-};
 use amun_nft_core::NftMetadata;
+use amun_resource_core::{
+    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+    ResourceRegistry, ResourceState,
+};
 
 /// Types of contributions that earn NFT mining rewards.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -99,7 +99,7 @@ pub fn issue_mining_reward(
 }
 
 fn derive_nft_id(reward_id: &ResourceId) -> ResourceId {
-    use sha2::{Sha256, Digest};
+    use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
     hasher.update(reward_id.0);
     hasher.update(b"->nft");

@@ -7,7 +7,11 @@ fn n163_bench_wal_write_and_read() {
     let _ = std::fs::remove_file(path);
 
     let write_result = time_op("wal_write_1000_entries", || {
-        let mut file = std::fs::OpenOptions::new().create(true).append(true).open(path).unwrap();
+        let mut file = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+            .unwrap();
         for i in 0..1000u64 {
             let entry = format!("WAL_ENTRY_{}_DATA_{}\n", i, "A".repeat(100));
             file.write_all(entry.as_bytes()).unwrap();
@@ -21,7 +25,10 @@ fn n163_bench_wal_write_and_read() {
         assert_eq!(lines, 1000);
     });
 
-    println!("WAL write: {}ms, read: {}ms", write_result.duration_ms, read_result.duration_ms);
+    println!(
+        "WAL write: {}ms, read: {}ms",
+        write_result.duration_ms, read_result.duration_ms
+    );
     assert!(write_result.duration_ms < 500, "WAL write too slow");
     assert!(read_result.duration_ms < 200, "WAL read too slow");
 

@@ -1,10 +1,10 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_nft_marketplace::MarketplaceEngine;
-use amun_nft_stress::{run_stress_mint, run_stress_marketplace};
-use sha2::{Sha256, Digest};
+use amun_nft_stress::{run_stress_marketplace, run_stress_mint};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
+use sha2::{Digest, Sha256};
 
 fn token_id(seed: u8, salt: u64) -> [u8; 32] {
     let mut hasher = Sha256::new();
@@ -24,7 +24,8 @@ fn n146_stress_mint_1000_nfts() {
         lineage: ResourceLineage::genesis(ResourceId(col_id)),
         contract_id: [0u8; 32],
         owner: [0u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
     let result = run_stress_mint(&mut reg, col_id, 1000);
     assert_eq!(result.successful, 1000);
     assert_eq!(result.failed, 0);
@@ -42,24 +43,29 @@ fn n146_stress_marketplace_rapid_trades() {
         lineage: ResourceLineage::genesis(ResourceId(col_id)),
         contract_id: [0u8; 32],
         owner: [0u8; 32],
-    }).unwrap();
-    let tokens: Vec<[u8; 32]> = (0..10).map(|i| {
-        let tid = token_id(i as u8, i as u64);
-        let meta = ResourceMetadata {
-            resource_id: ResourceId(tid),
-            archetype: ResourceArchetype::NFTAsset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::single_ancestor(
-                ResourceId(tid), ResourceId(col_id),
-                reg.resource_hash(&ResourceId(col_id)).unwrap(),
-                reg.get(&ResourceId(col_id)).unwrap().lineage.version + 1,
-            ),
-            contract_id: [0u8; 32],
-            owner: [1u8; 32],
-        };
-        reg.derive_from_collection(&ResourceId(col_id), meta).unwrap();
-        tid
-    }).collect();
+    })
+    .unwrap();
+    let tokens: Vec<[u8; 32]> = (0..10)
+        .map(|i| {
+            let tid = token_id(i as u8, i as u64);
+            let meta = ResourceMetadata {
+                resource_id: ResourceId(tid),
+                archetype: ResourceArchetype::NFTAsset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::single_ancestor(
+                    ResourceId(tid),
+                    ResourceId(col_id),
+                    reg.resource_hash(&ResourceId(col_id)).unwrap(),
+                    reg.get(&ResourceId(col_id)).unwrap().lineage.version + 1,
+                ),
+                contract_id: [0u8; 32],
+                owner: [1u8; 32],
+            };
+            reg.derive_from_collection(&ResourceId(col_id), meta)
+                .unwrap();
+            tid
+        })
+        .collect();
     let mut mp = MarketplaceEngine::new();
     let result = run_stress_marketplace(&mut reg, &mut mp, &tokens, 100);
     assert!(result.successful > 0);
@@ -79,7 +85,8 @@ fn n146_stress_state_root_consistent_under_load() {
             lineage: ResourceLineage::genesis(ResourceId(col_id)),
             contract_id: [0u8; 32],
             owner: [0u8; 32],
-        }).unwrap();
+        })
+        .unwrap();
     }
     let result1 = run_stress_mint(&mut reg1, col_id, 500);
     let result2 = run_stress_mint(&mut reg2, col_id, 500);
@@ -89,17 +96,17 @@ fn n146_stress_state_root_consistent_under_load() {
 
 #[test]
 fn n147_full_constitutional_flow() {
-    use amun_resource_core::{
-        ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-        ResourceLineage, ResourceRegistry,
-    };
-    use amun_nft_marketplace::MarketplaceEngine;
-    use amun_nft_constitutional_registry::{NftConstitutionalRecord, ConstitutionalRegistry};
-    use amun_nft_royalty::RoyaltyPolicy;
-    use amun_nft_governance::{GovernanceRight, GovernanceLedger};
-    use amun_nft_bridge::{BridgeLock, BridgeLedger};
-    use amun_nft_royalty_accounting::RoyaltyLedger;
+    use amun_nft_bridge::{BridgeLedger, BridgeLock};
     use amun_nft_constitutional_enforcement::EnforcementEngine;
+    use amun_nft_constitutional_registry::{ConstitutionalRegistry, NftConstitutionalRecord};
+    use amun_nft_governance::{GovernanceLedger, GovernanceRight};
+    use amun_nft_marketplace::MarketplaceEngine;
+    use amun_nft_royalty::RoyaltyPolicy;
+    use amun_nft_royalty_accounting::RoyaltyLedger;
+    use amun_resource_core::{
+        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+        ResourceState,
+    };
 
     let mut reg = ResourceRegistry::new(1000);
     let mut marketplace = MarketplaceEngine::new();
@@ -122,47 +129,77 @@ fn n147_full_constitutional_flow() {
         lineage: ResourceLineage::genesis(ResourceId(col_id)),
         contract_id: [0u8; 32],
         owner: creator,
-    }).unwrap();
+    })
+    .unwrap();
 
     // 2. Mint NFT
     let parent_hash = reg.resource_hash(&ResourceId(col_id)).unwrap();
-    reg.derive_from_collection(&ResourceId(col_id), ResourceMetadata {
-        resource_id: ResourceId(token_id),
-        archetype: ResourceArchetype::NFTAsset,
-        state: ResourceState::Active,
-        lineage: ResourceLineage::single_ancestor(
-            ResourceId(token_id), ResourceId(col_id),
-            parent_hash,
-            reg.get(&ResourceId(col_id)).unwrap().lineage.version + 1,
-        ),
-        contract_id: [0u8; 32],
-        owner: minter,
-    }).unwrap();
+    reg.derive_from_collection(
+        &ResourceId(col_id),
+        ResourceMetadata {
+            resource_id: ResourceId(token_id),
+            archetype: ResourceArchetype::NFTAsset,
+            state: ResourceState::Active,
+            lineage: ResourceLineage::single_ancestor(
+                ResourceId(token_id),
+                ResourceId(col_id),
+                parent_hash,
+                reg.get(&ResourceId(col_id)).unwrap().lineage.version + 1,
+            ),
+            contract_id: [0u8; 32],
+            owner: minter,
+        },
+    )
+    .unwrap();
 
     // 3. Register constitutional record with royalty and governance
     constitutional.register(NftConstitutionalRecord {
-        token_id, owner: minter, collection_id: Some(col_id), creator,
+        token_id,
+        owner: minter,
+        collection_id: Some(col_id),
+        creator,
         mining_origin: Some("Validator".into()),
-        royalty_policy: Some(RoyaltyPolicy { creator, royalty_bps: 500 }),
+        royalty_policy: Some(RoyaltyPolicy {
+            creator,
+            royalty_bps: 500,
+        }),
         governance_right: Some(GovernanceRight {
-            token_id, owner: minter, can_propose: true, can_veto: false, voting_power: 100,
+            token_id,
+            owner: minter,
+            can_propose: true,
+            can_veto: false,
+            voting_power: 100,
         }),
         bridge_lock: None,
     });
     gov_ledger.set_rights(GovernanceRight {
-        token_id, owner: minter, can_propose: true, can_veto: false, voting_power: 100,
+        token_id,
+        owner: minter,
+        can_propose: true,
+        can_veto: false,
+        voting_power: 100,
     });
 
     let root_before_sale = constitutional.compute_constitutional_root();
 
     // 4. Marketplace sale
-    marketplace.list_nft(&reg, ResourceId(token_id), &minter, 1000, None).unwrap();
-    let _new_id = marketplace.buy_nft(&mut reg, &ResourceId(token_id), &buyer, 1, 1000).unwrap();
+    marketplace
+        .list_nft(&reg, ResourceId(token_id), &minter, 1000, None)
+        .unwrap();
+    let _new_id = marketplace
+        .buy_nft(&mut reg, &ResourceId(token_id), &buyer, 1, 1000)
+        .unwrap();
 
     // 5. Royalty settlement
-    let royalty_amount = EnforcementEngine::enforce_royalty(&constitutional, &token_id, 1000).unwrap();
+    let royalty_amount =
+        EnforcementEngine::enforce_royalty(&constitutional, &token_id, 1000).unwrap();
     royalty_ledger.settle(&amun_nft_royalty::RoyaltyRecord {
-        token_id, creator, payer: buyer, sale_price: 1000, royalty_amount, block_height: 1,
+        token_id,
+        creator,
+        payer: buyer,
+        sale_price: 1000,
+        royalty_amount,
+        block_height: 1,
     });
     assert_eq!(royalty_amount, 50);
     assert_eq!(royalty_ledger.balance_of(&creator), 50);
@@ -175,24 +212,39 @@ fn n147_full_constitutional_flow() {
 
     // 7. Bridge lock and unlock
     let lock = BridgeLock {
-        source_chain: 1, token_id, owner: buyer,
-        destination_chain: 2, destination_owner: [9u8; 32], lock_height: 100,
+        source_chain: 1,
+        token_id,
+        owner: buyer,
+        destination_chain: 2,
+        destination_owner: [9u8; 32],
+        lock_height: 100,
     };
     let lock_id = bridge_ledger.lock(lock);
     // Update registry with bridge lock
     let mut locked_record = updated.clone();
     locked_record.bridge_lock = Some(bridge_ledger.locks.get(&lock_id).unwrap().clone());
     constitutional.register(locked_record);
-    assert!(!EnforcementEngine::can_be_sold(&constitutional, &bridge_ledger, &token_id));
+    assert!(!EnforcementEngine::can_be_sold(
+        &constitutional,
+        &bridge_ledger,
+        &token_id
+    ));
 
     // Unlock
     bridge_ledger.unlock(amun_nft_bridge::BridgeUnlock {
-        lock_id, destination_chain: 2, new_owner: buyer, unlock_height: 200,
+        lock_id,
+        destination_chain: 2,
+        new_owner: buyer,
+        unlock_height: 200,
     });
     let mut unlocked_record = constitutional.get(&token_id).unwrap().clone();
     unlocked_record.bridge_lock = None;
     constitutional.register(unlocked_record);
-    assert!(EnforcementEngine::can_be_sold(&constitutional, &bridge_ledger, &token_id));
+    assert!(EnforcementEngine::can_be_sold(
+        &constitutional,
+        &bridge_ledger,
+        &token_id
+    ));
 
     // 8. Final constitutional root differs from start
     let root_after_all = constitutional.compute_constitutional_root();

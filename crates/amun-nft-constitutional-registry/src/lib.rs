@@ -1,9 +1,9 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
-use std::collections::BTreeMap;
-use amun_nft_royalty::RoyaltyPolicy;
-use amun_nft_governance::GovernanceRight;
 use amun_nft_bridge::BridgeLock;
+use amun_nft_governance::GovernanceRight;
+use amun_nft_royalty::RoyaltyPolicy;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 
 /// Unified record for an NFT's constitutional state
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -26,7 +26,9 @@ pub struct ConstitutionalRegistry {
 
 impl ConstitutionalRegistry {
     pub fn new() -> Self {
-        Self { records: BTreeMap::new() }
+        Self {
+            records: BTreeMap::new(),
+        }
     }
 
     /// Register or update an NFT constitutional record

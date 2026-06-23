@@ -1,9 +1,9 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_nft_marketplace::MarketplaceEngine;
-use sha2::{Sha256, Digest};
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
+use sha2::{Digest, Sha256};
 use std::time::Instant;
 
 fn unique_id(seed: u64) -> [u8; 32] {
@@ -23,25 +23,39 @@ fn n152_benchmark_mint_10k_nfts() {
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [0u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let start = Instant::now();
     for i in 0..10000u64 {
         let token = unique_id(i + 1);
         let parent_hash = reg.resource_hash(&col_id).unwrap();
         let version = reg.get(&col_id).unwrap().lineage.version + 1;
-        reg.derive_from_collection(&col_id, ResourceMetadata {
-            resource_id: ResourceId(token),
-            archetype: ResourceArchetype::NFTAsset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::single_ancestor(ResourceId(token), col_id, parent_hash, version),
-            contract_id: [0u8; 32],
-            owner: [1u8; 32],
-        }).unwrap();
+        reg.derive_from_collection(
+            &col_id,
+            ResourceMetadata {
+                resource_id: ResourceId(token),
+                archetype: ResourceArchetype::NFTAsset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::single_ancestor(
+                    ResourceId(token),
+                    col_id,
+                    parent_hash,
+                    version,
+                ),
+                contract_id: [0u8; 32],
+                owner: [1u8; 32],
+            },
+        )
+        .unwrap();
     }
     let elapsed = start.elapsed();
     println!("Mint 10k NFTs: {:?}", elapsed);
-    assert!(elapsed.as_secs() < 10, "Mint 10k NFTs took too long: {:?}", elapsed);
+    assert!(
+        elapsed.as_secs() < 10,
+        "Mint 10k NFTs took too long: {:?}",
+        elapsed
+    );
     assert_eq!(reg.total_active(), 10001);
 }
 
@@ -56,21 +70,31 @@ fn n152_benchmark_rapid_trades() {
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [0u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut tokens = Vec::new();
     for i in 0..100u64 {
         let token = unique_id(i + 1);
         let parent_hash = reg.resource_hash(&col_id).unwrap();
         let version = reg.get(&col_id).unwrap().lineage.version + 1;
-        reg.derive_from_collection(&col_id, ResourceMetadata {
-            resource_id: ResourceId(token),
-            archetype: ResourceArchetype::NFTAsset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::single_ancestor(ResourceId(token), col_id, parent_hash, version),
-            contract_id: [0u8; 32],
-            owner: [1u8; 32],
-        }).unwrap();
+        reg.derive_from_collection(
+            &col_id,
+            ResourceMetadata {
+                resource_id: ResourceId(token),
+                archetype: ResourceArchetype::NFTAsset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::single_ancestor(
+                    ResourceId(token),
+                    col_id,
+                    parent_hash,
+                    version,
+                ),
+                contract_id: [0u8; 32],
+                owner: [1u8; 32],
+            },
+        )
+        .unwrap();
         tokens.push(token);
     }
 
@@ -87,7 +111,11 @@ fn n152_benchmark_rapid_trades() {
     }
     let elapsed = start.elapsed();
     println!("500x100 trades: {:?}", elapsed);
-    assert!(elapsed.as_secs() < 30, "Rapid trades took too long: {:?}", elapsed);
+    assert!(
+        elapsed.as_secs() < 30,
+        "Rapid trades took too long: {:?}",
+        elapsed
+    );
 }
 
 #[test]
@@ -101,20 +129,30 @@ fn n152_benchmark_state_root_10k() {
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [0u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     for i in 0..10000u64 {
         let token = unique_id(i + 1);
         let parent_hash = reg.resource_hash(&col_id).unwrap();
         let version = reg.get(&col_id).unwrap().lineage.version + 1;
-        reg.derive_from_collection(&col_id, ResourceMetadata {
-            resource_id: ResourceId(token),
-            archetype: ResourceArchetype::NFTAsset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::single_ancestor(ResourceId(token), col_id, parent_hash, version),
-            contract_id: [0u8; 32],
-            owner: [1u8; 32],
-        }).unwrap();
+        reg.derive_from_collection(
+            &col_id,
+            ResourceMetadata {
+                resource_id: ResourceId(token),
+                archetype: ResourceArchetype::NFTAsset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::single_ancestor(
+                    ResourceId(token),
+                    col_id,
+                    parent_hash,
+                    version,
+                ),
+                contract_id: [0u8; 32],
+                owner: [1u8; 32],
+            },
+        )
+        .unwrap();
     }
 
     let start = Instant::now();
@@ -122,5 +160,9 @@ fn n152_benchmark_state_root_10k() {
     let elapsed = start.elapsed();
     println!("State root 10k NFTs: {:?}", elapsed);
     assert_ne!(root, [0u8; 32]);
-    assert!(elapsed.as_millis() < 500, "State root computation took too long: {:?}", elapsed);
+    assert!(
+        elapsed.as_millis() < 500,
+        "State root computation took too long: {:?}",
+        elapsed
+    );
 }

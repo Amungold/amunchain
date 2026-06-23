@@ -1,7 +1,7 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
 use amun_nft_royalty::RoyaltyRecord;
 use amun_nft_royalty_accounting::RoyaltyLedger;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 
 /// Settlement record for a royalty payout
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -20,7 +20,9 @@ pub struct SettlementEngine {
 
 impl SettlementEngine {
     pub fn new() -> Self {
-        Self { settlements: Vec::new() }
+        Self {
+            settlements: Vec::new(),
+        }
     }
 
     /// Settle outstanding royalties for a creator

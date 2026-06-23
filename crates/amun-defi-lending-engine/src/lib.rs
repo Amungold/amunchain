@@ -1,6 +1,6 @@
+use amun_defi_lending_core::{CollateralPosition, InterestModel, LoanPosition};
+use amun_resource_core::{RegistryError, ResourceId, ResourceRegistry};
 use sha2::Digest;
-use amun_resource_core::{ResourceId, ResourceRegistry, RegistryError};
-use amun_defi_lending_core::{LoanPosition, CollateralPosition, InterestModel};
 use std::collections::BTreeMap;
 
 pub struct LendingEngine {
@@ -17,7 +17,11 @@ impl Default for LendingEngine {
 
 impl LendingEngine {
     pub fn new() -> Self {
-        Self { loans: BTreeMap::new(), collaterals: BTreeMap::new(), next_loan_id: 0 }
+        Self {
+            loans: BTreeMap::new(),
+            collaterals: BTreeMap::new(),
+            next_loan_id: 0,
+        }
     }
 
     fn generate_loan_id(&mut self) -> ResourceId {
@@ -73,45 +77,78 @@ impl LendingEngine {
 
     pub fn accrue_interest(&mut self, loan_id: &[u8; 32], current_height: u64) -> Option<u64> {
         if let Some(loan) = self.loans.get_mut(loan_id) {
-            if !loan.active { return None; }
+            if !loan.active {
+                return None;
+            }
             let blocks_elapsed = current_height - loan.last_interest_height;
-            if blocks_elapsed == 0 { return Some(0); }
-            let interest = InterestModel::compute_interest(loan.outstanding, loan.interest_rate_bps, blocks_elapsed);
+            if blocks_elapsed == 0 {
+                return Some(0);
+            }
+            let interest = InterestModel::compute_interest(
+                loan.outstanding,
+                loan.interest_rate_bps,
+                blocks_elapsed,
+            );
             loan.outstanding += interest;
             loan.last_interest_height = current_height;
             Some(interest)
-        } else { None }
+        } else {
+            None
+        }
     }
 
     pub fn repay(&mut self, loan_id: &[u8; 32], amount: u64) -> Result<u64, &'static str> {
         if let Some(loan) = self.loans.get_mut(loan_id) {
-            if !loan.active { return Err("Loan not active"); }
+            if !loan.active {
+                return Err("Loan not active");
+            }
             let repay_amount = std::cmp::min(amount, loan.outstanding);
             loan.outstanding -= repay_amount;
-            if loan.outstanding == 0 { loan.active = false; }
+            if loan.outstanding == 0 {
+                loan.active = false;
+            }
             Ok(repay_amount)
-        } else { Err("Loan not found") }
+        } else {
+            Err("Loan not found")
+        }
     }
 
-    pub fn liquidate(&mut self, loan_id: &[u8; 32], _liquidator: [u8; 32], current_height: u64) -> Result<(u64, u64), &'static str> {
+    pub fn liquidate(
+        &mut self,
+        loan_id: &[u8; 32],
+        _liquidator: [u8; 32],
+        current_height: u64,
+    ) -> Result<(u64, u64), &'static str> {
         let health_factor = self.get_health_factor(loan_id, current_height);
-        if !InterestModel::is_liquidatable(health_factor) { return Err("Health factor too high"); }
+        if !InterestModel::is_liquidatable(health_factor) {
+            return Err("Health factor too high");
+        }
         if let Some(loan) = self.loans.get_mut(loan_id) {
-            if !loan.active { return Err("Loan not active"); }
+            if !loan.active {
+                return Err("Loan not active");
+            }
             let collateral = loan.collateral_locked;
             loan.collateral_locked = 0;
             loan.active = false;
             Ok((collateral, loan.outstanding))
-        } else { Err("Loan not found") }
+        } else {
+            Err("Loan not found")
+        }
     }
 
     pub fn get_health_factor(&self, loan_id: &[u8; 32], current_height: u64) -> u64 {
         if let Some(loan) = self.loans.get(loan_id) {
             let blocks_elapsed = current_height - loan.last_interest_height;
-            let pending_interest = InterestModel::compute_interest(loan.outstanding, loan.interest_rate_bps, blocks_elapsed);
+            let pending_interest = InterestModel::compute_interest(
+                loan.outstanding,
+                loan.interest_rate_bps,
+                blocks_elapsed,
+            );
             let total_debt = loan.outstanding + pending_interest;
             InterestModel::compute_health_factor(loan.collateral_locked, total_debt, 8000)
-        } else { 0 }
+        } else {
+            0
+        }
     }
 
     pub fn compute_lending_root(&self) -> [u8; 32] {

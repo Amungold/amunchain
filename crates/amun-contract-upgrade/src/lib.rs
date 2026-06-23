@@ -1,6 +1,6 @@
-use amun_resource_core::{ResourceId, ResourceRegistry, RegistryError};
 use amun_bytecode::{ConstitutionalProgram, OpCode};
-use amun_contract_registry::{ContractRegistry, ContractRecord};
+use amun_contract_registry::ContractRegistry;
+use amun_resource_core::{RegistryError, ResourceArchetype, ResourceId, ResourceRegistry};
 
 pub struct UpgradeRecord {
     pub contract_id: ResourceId,
@@ -19,28 +19,29 @@ impl ContractUpgrader {
         new_code: Vec<OpCode>,
         upgrade_height: u64,
     ) -> Result<UpgradeRecord, RegistryError> {
-        // Fetch the existing contract
-        let contract = contract_registry.get_contract(&contract_id)
-            .ok_or(RegistryError::NotFound(contract_id))?;
+        let (owner, old_code_hash) = {
+            let contract = contract_registry
+                .get_contract(&contract_id)
+                .ok_or(RegistryError::NotFound(contract_id))?;
 
-        // Verify the new code
-        let new_program = ConstitutionalProgram::new(1, 0, 0, new_code.clone());
+            (contract.owner, contract.code_hash)
+        };
+
+        let new_program = ConstitutionalProgram::new(1, 0, 0, new_code);
+
         if !new_program.verify() {
             return Err(RegistryError::IllegalTransformation {
-                src: amun_resource_core::ResourceArchetype::Asset,
-                tgt: amun_resource_core::ResourceArchetype::Asset,
+                src: ResourceArchetype::Asset,
+                tgt: ResourceArchetype::Asset,
             });
         }
 
-        let old_code_hash = contract.code_hash;
-        
-        // Update the contract directly in the registry
-        contract_registry.contracts.insert(contract_id, ContractRecord {
+        contract_registry.update_contract(
             contract_id,
-            owner: contract.owner,
-            code_hash: new_program.program_hash,
-            deployed_height: upgrade_height,
-        });
+            owner,
+            new_program.program_hash,
+            upgrade_height,
+        );
 
         Ok(UpgradeRecord {
             contract_id,

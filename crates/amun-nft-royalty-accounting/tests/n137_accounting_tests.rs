@@ -70,7 +70,10 @@ fn n137_deterministic_accounting_root() {
     };
     ledger1.settle(&record);
     ledger2.settle(&record);
-    assert_eq!(ledger1.compute_accounting_root(), ledger2.compute_accounting_root());
+    assert_eq!(
+        ledger1.compute_accounting_root(),
+        ledger2.compute_accounting_root()
+    );
 }
 
 #[test]

@@ -1,6 +1,6 @@
 use amun_nft_royalty::RoyaltyRecord;
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 /// Accumulated royalty balance for a creator

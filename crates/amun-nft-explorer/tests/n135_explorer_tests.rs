@@ -1,8 +1,8 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_nft_explorer::ExplorerEngine;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
 
 #[test]
 fn n135_query_collections() {
@@ -15,7 +15,8 @@ fn n135_query_collections() {
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [10u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let collections = ExplorerEngine::get_collections(&reg);
     assert_eq!(collections.len(), 1);
@@ -33,7 +34,8 @@ fn n135_query_nft_by_id() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: [5u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     let nft = ExplorerEngine::get_nft(&reg, &token_id).unwrap();
     assert_eq!(nft.owner, [5u8; 32]);
@@ -52,7 +54,8 @@ fn n135_query_owner_nfts() {
         lineage: ResourceLineage::genesis(id1),
         contract_id: [0u8; 32],
         owner,
-    }).unwrap();
+    })
+    .unwrap();
     reg.register_genesis(ResourceMetadata {
         resource_id: id2,
         archetype: ResourceArchetype::NFTAsset,
@@ -60,7 +63,8 @@ fn n135_query_owner_nfts() {
         lineage: ResourceLineage::genesis(id2),
         contract_id: [0u8; 32],
         owner,
-    }).unwrap();
+    })
+    .unwrap();
 
     let owner_data = ExplorerEngine::get_owner_nfts(&reg, &owner);
     assert_eq!(owner_data.nft_count, 2);

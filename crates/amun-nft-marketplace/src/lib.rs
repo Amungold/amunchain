@@ -1,6 +1,6 @@
 use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry, RegistryError,
+    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+    ResourceRegistry, ResourceState,
 };
 use std::collections::HashMap;
 
@@ -34,12 +34,35 @@ pub struct Bid {
 /// Marketplace event (for evidence)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MarketplaceEvent {
-    ListingCreated { token_id: ResourceId, seller: [u8; 32], price: u64 },
-    ListingCancelled { token_id: ResourceId },
-    SaleCompleted { token_id: ResourceId, seller: [u8; 32], buyer: [u8; 32], price: u64 },
-    AuctionStarted { token_id: ResourceId, seller: [u8; 32], end_time: u64 },
-    BidPlaced { token_id: ResourceId, bidder: [u8; 32], amount: u64 },
-    AuctionEnded { token_id: ResourceId, winner: [u8; 32], price: u64 },
+    ListingCreated {
+        token_id: ResourceId,
+        seller: [u8; 32],
+        price: u64,
+    },
+    ListingCancelled {
+        token_id: ResourceId,
+    },
+    SaleCompleted {
+        token_id: ResourceId,
+        seller: [u8; 32],
+        buyer: [u8; 32],
+        price: u64,
+    },
+    AuctionStarted {
+        token_id: ResourceId,
+        seller: [u8; 32],
+        end_time: u64,
+    },
+    BidPlaced {
+        token_id: ResourceId,
+        bidder: [u8; 32],
+        amount: u64,
+    },
+    AuctionEnded {
+        token_id: ResourceId,
+        winner: [u8; 32],
+        price: u64,
+    },
 }
 
 /// Marketplace engine with hardening
@@ -74,7 +97,8 @@ impl MarketplaceEngine {
         intended_buyer: Option<[u8; 32]>,
     ) -> Result<(), RegistryError> {
         // Verify token exists and seller owns it
-        let token = registry.get(&token_id)
+        let token = registry
+            .get(&token_id)
             .ok_or(RegistryError::NotFound(token_id))?;
         if token.owner != *seller {
             return Err(RegistryError::NotActive(token_id));
@@ -95,7 +119,11 @@ impl MarketplaceEngine {
             active: true,
         };
         self.listings.insert(token_id, listing);
-        self.event_log.push(MarketplaceEvent::ListingCreated { token_id, seller: *seller, price });
+        self.event_log.push(MarketplaceEvent::ListingCreated {
+            token_id,
+            seller: *seller,
+            price,
+        });
         Ok(())
     }
 
@@ -109,7 +137,9 @@ impl MarketplaceEngine {
         _timestamp: u64,
     ) -> Result<ResourceId, RegistryError> {
         // Check listing exists and is active
-        let listing = self.listings.get(token_id)
+        let listing = self
+            .listings
+            .get(token_id)
             .ok_or(RegistryError::NotFound(*token_id))?;
         if !listing.active {
             return Err(RegistryError::NotActive(*token_id));
@@ -125,7 +155,8 @@ impl MarketplaceEngine {
             }
         }
         // Verify token still exists and seller still owns it
-        let token = registry.get(token_id)
+        let token = registry
+            .get(token_id)
             .ok_or(RegistryError::NotFound(*token_id))?;
         if token.owner != listing.seller {
             return Err(RegistryError::NotActive(*token_id));
@@ -164,13 +195,17 @@ impl MarketplaceEngine {
 
     /// Cancel a listing
     pub fn cancel_listing(&mut self, token_id: &ResourceId) -> Result<(), RegistryError> {
-        let listing = self.listings.get_mut(token_id)
+        let listing = self
+            .listings
+            .get_mut(token_id)
             .ok_or(RegistryError::NotFound(*token_id))?;
         if !listing.active {
             return Err(RegistryError::NotActive(*token_id));
         }
         listing.active = false;
-        self.event_log.push(MarketplaceEvent::ListingCancelled { token_id: *token_id });
+        self.event_log.push(MarketplaceEvent::ListingCancelled {
+            token_id: *token_id,
+        });
         Ok(())
     }
 
@@ -182,7 +217,8 @@ impl MarketplaceEngine {
         seller: &[u8; 32],
         end_time: u64,
     ) -> Result<(), RegistryError> {
-        let token = registry.get(&token_id)
+        let token = registry
+            .get(&token_id)
             .ok_or(RegistryError::NotFound(token_id))?;
         if token.owner != *seller {
             return Err(RegistryError::NotActive(token_id));
@@ -200,7 +236,11 @@ impl MarketplaceEngine {
             ended: false,
         };
         self.auctions.insert(token_id, auction);
-        self.event_log.push(MarketplaceEvent::AuctionStarted { token_id, seller: *seller, end_time });
+        self.event_log.push(MarketplaceEvent::AuctionStarted {
+            token_id,
+            seller: *seller,
+            end_time,
+        });
         Ok(())
     }
 
@@ -212,17 +252,26 @@ impl MarketplaceEngine {
         amount: u64,
         current_time: u64,
     ) -> Result<(), RegistryError> {
-        let auction = self.auctions.get_mut(token_id)
+        let auction = self
+            .auctions
+            .get_mut(token_id)
             .ok_or(RegistryError::NotFound(*token_id))?;
         if auction.ended || current_time >= auction.end_time {
             return Err(RegistryError::NotActive(*token_id));
         }
         if amount <= auction.highest_bid {
-            return Err(RegistryError::VersionMismatch { expected: auction.highest_bid + 1, actual: amount });
+            return Err(RegistryError::VersionMismatch {
+                expected: auction.highest_bid + 1,
+                actual: amount,
+            });
         }
         auction.highest_bid = amount;
         auction.highest_bidder = Some(*bidder);
-        self.event_log.push(MarketplaceEvent::BidPlaced { token_id: *token_id, bidder: *bidder, amount });
+        self.event_log.push(MarketplaceEvent::BidPlaced {
+            token_id: *token_id,
+            bidder: *bidder,
+            amount,
+        });
         Ok(())
     }
 
@@ -235,16 +284,20 @@ impl MarketplaceEngine {
         _block_height: u64,
         _timestamp: u64,
     ) -> Result<ResourceId, RegistryError> {
-        let auction = self.auctions.get(token_id)
+        let auction = self
+            .auctions
+            .get(token_id)
             .ok_or(RegistryError::NotFound(*token_id))?;
         if auction.ended || current_time < auction.end_time {
             return Err(RegistryError::NotActive(*token_id));
         }
-        let winner = auction.highest_bidder
+        let winner = auction
+            .highest_bidder
             .ok_or(RegistryError::NotActive(*token_id))?;
         let price = auction.highest_bid;
 
-        let token = registry.get(token_id)
+        let token = registry
+            .get(token_id)
             .ok_or(RegistryError::NotFound(*token_id))?;
         let parent_hash = registry.resource_hash(token_id)?;
         let version = token.lineage.version + 1;
@@ -263,7 +316,11 @@ impl MarketplaceEngine {
             a.ended = true;
         }
 
-        self.event_log.push(MarketplaceEvent::AuctionEnded { token_id: *token_id, winner, price });
+        self.event_log.push(MarketplaceEvent::AuctionEnded {
+            token_id: *token_id,
+            winner,
+            price,
+        });
         Ok(new_id)
     }
 
@@ -274,7 +331,7 @@ impl MarketplaceEngine {
 
     /// Compute marketplace evidence root from event log
     pub fn compute_evidence_root(&self) -> [u8; 32] {
-        use sha2::{Sha256, Digest};
+        use sha2::{Digest, Sha256};
         let mut hasher = Sha256::new();
         hasher.update(b"AMUN_MARKETPLACE_EVIDENCE_V1");
         for event in &self.event_log {
@@ -286,7 +343,7 @@ impl MarketplaceEngine {
 }
 
 fn derive_transfer_id(old_id: &ResourceId, new_owner: &[u8; 32]) -> ResourceId {
-    use sha2::{Sha256, Digest};
+    use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
     hasher.update(old_id.0);
     hasher.update(new_owner);

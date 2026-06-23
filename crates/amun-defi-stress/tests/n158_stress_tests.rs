@@ -3,25 +3,45 @@ use amun_defi_stress::*;
 #[test]
 fn n158_stress_amm_swaps_1000() {
     let result = stress_amm_swaps(1000);
-    assert!(result.passed(), "AMM stress failed: {} failed, {} invariants broken", result.failed, result.invariants_broken);
+    assert!(
+        result.passed(),
+        "AMM stress failed: {} failed, {} invariants broken",
+        result.failed,
+        result.invariants_broken
+    );
 }
 
 #[test]
 fn n158_stress_lending_liquidations_500() {
     let result = stress_lending_liquidations(500);
-    assert!(result.passed(), "Lending stress failed: {} failed, {} invariants broken", result.failed, result.invariants_broken);
+    assert!(
+        result.passed(),
+        "Lending stress failed: {} failed, {} invariants broken",
+        result.failed,
+        result.invariants_broken
+    );
 }
 
 #[test]
 fn n158_stress_stablecoin_mint_burn_1000() {
     let result = stress_stablecoin_mint_burn(1000);
-    assert!(result.passed(), "Stablecoin stress failed: {} failed, {} invariants broken", result.failed, result.invariants_broken);
+    assert!(
+        result.passed(),
+        "Stablecoin stress failed: {} failed, {} invariants broken",
+        result.failed,
+        result.invariants_broken
+    );
 }
 
 #[test]
 fn n158_stress_nft_collateral_flow_100() {
     let result = stress_nft_collateral_flow(100);
-    assert!(result.passed(), "NFT Collateral stress failed: {} failed, {} invariants broken", result.failed, result.invariants_broken);
+    assert!(
+        result.passed(),
+        "NFT Collateral stress failed: {} failed, {} invariants broken",
+        result.failed,
+        result.invariants_broken
+    );
 }
 
 #[test]

@@ -1,11 +1,11 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
-use amun_nft_royalty_accounting::RoyaltyLedger;
-use amun_nft_governance::GovernanceLedger;
 use amun_nft_bridge::BridgeLedger;
-use sha2::{Sha256, Digest};
+use amun_nft_governance::GovernanceLedger;
+use amun_nft_royalty_accounting::RoyaltyLedger;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
+use sha2::{Digest, Sha256};
 
 fn unique_id(seed: u8) -> [u8; 32] {
     let mut hasher = Sha256::new();
@@ -13,7 +13,12 @@ fn unique_id(seed: u8) -> [u8; 32] {
     hasher.finalize().into()
 }
 
-fn build_full_state() -> (ResourceRegistry, RoyaltyLedger, GovernanceLedger, BridgeLedger) {
+fn build_full_state() -> (
+    ResourceRegistry,
+    RoyaltyLedger,
+    GovernanceLedger,
+    BridgeLedger,
+) {
     let mut reg = ResourceRegistry::new(1000);
     let mut royalty = RoyaltyLedger::new();
     let mut gov = GovernanceLedger::new();
@@ -27,34 +32,57 @@ fn build_full_state() -> (ResourceRegistry, RoyaltyLedger, GovernanceLedger, Bri
         lineage: ResourceLineage::genesis(col_id),
         contract_id: [0u8; 32],
         owner: [0u8; 32],
-    }).unwrap();
+    })
+    .unwrap();
 
     for i in 1..11u8 {
         let token = unique_id(i);
         let owner = unique_id(i + 100);
         let parent_hash = reg.resource_hash(&col_id).unwrap();
         let version = reg.get(&col_id).unwrap().lineage.version + 1;
-        reg.derive_from_collection(&col_id, ResourceMetadata {
-            resource_id: ResourceId(token),
-            archetype: ResourceArchetype::NFTAsset,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::single_ancestor(ResourceId(token), col_id, parent_hash, version),
-            contract_id: [0u8; 32],
-            owner,
-        }).unwrap();
+        reg.derive_from_collection(
+            &col_id,
+            ResourceMetadata {
+                resource_id: ResourceId(token),
+                archetype: ResourceArchetype::NFTAsset,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::single_ancestor(
+                    ResourceId(token),
+                    col_id,
+                    parent_hash,
+                    version,
+                ),
+                contract_id: [0u8; 32],
+                owner,
+            },
+        )
+        .unwrap();
 
         royalty.settle(&amun_nft_royalty::RoyaltyRecord {
-            token_id: token, creator: owner, payer: [0u8; 32], sale_price: 100, royalty_amount: 10, block_height: i as u64,
+            token_id: token,
+            creator: owner,
+            payer: [0u8; 32],
+            sale_price: 100,
+            royalty_amount: 10,
+            block_height: i as u64,
         });
 
         gov.set_rights(amun_nft_governance::GovernanceRight {
-            token_id: token, owner, can_propose: true, can_veto: false, voting_power: 10,
+            token_id: token,
+            owner,
+            can_propose: true,
+            can_veto: false,
+            voting_power: 10,
         });
     }
 
     bridge.lock(amun_nft_bridge::BridgeLock {
-        source_chain: 1, token_id: unique_id(1), owner: unique_id(101),
-        destination_chain: 2, destination_owner: unique_id(200), lock_height: 100,
+        source_chain: 1,
+        token_id: unique_id(1),
+        owner: unique_id(101),
+        destination_chain: 2,
+        destination_owner: unique_id(200),
+        lock_height: 100,
     });
 
     (reg, royalty, gov, bridge)

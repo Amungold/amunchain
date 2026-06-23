@@ -1,9 +1,9 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
-use amun_nft_constitutional_registry::{ConstitutionalRegistry};
 use amun_nft_bridge::BridgeLedger;
+use amun_nft_constitutional_registry::ConstitutionalRegistry;
 use amun_nft_governance::GovernanceLedger;
 use amun_nft_royalty::RoyaltyEngine;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RightsEnforcementResult {
@@ -27,16 +27,20 @@ impl RightsEnforcementEngine {
     ) -> RightsEnforcementResult {
         let record = match registry.get(token_id) {
             Some(r) => r,
-            None => return RightsEnforcementResult {
-                token_id: *token_id, allowed: false,
-                reason: Some("Token not registered".into()),
-                required_royalty: None,
-            },
+            None => {
+                return RightsEnforcementResult {
+                    token_id: *token_id,
+                    allowed: false,
+                    reason: Some("Token not registered".into()),
+                    required_royalty: None,
+                }
+            }
         };
 
         if record.owner != *seller {
             return RightsEnforcementResult {
-                token_id: *token_id, allowed: false,
+                token_id: *token_id,
+                allowed: false,
                 reason: Some("Seller is not constitutional owner".into()),
                 required_royalty: None,
             };
@@ -46,7 +50,8 @@ impl RightsEnforcementEngine {
             let lock_id = compute_lock_id(lock);
             if bridge_ledger.is_locked(&lock_id) {
                 return RightsEnforcementResult {
-                    token_id: *token_id, allowed: false,
+                    token_id: *token_id,
+                    allowed: false,
                     reason: Some("Token is locked in cross-chain bridge".into()),
                     required_royalty: None,
                 };
@@ -56,16 +61,18 @@ impl RightsEnforcementEngine {
         if let Some(ref gov) = record.governance_right {
             if !governance_ledger.can_propose(token_id, seller) && gov.voting_power > 0 {
                 return RightsEnforcementResult {
-                    token_id: *token_id, allowed: false,
+                    token_id: *token_id,
+                    allowed: false,
                     reason: Some("Seller lacks active governance rights".into()),
                     required_royalty: None,
                 };
             }
         }
 
-        let required_royalty = record.royalty_policy.as_ref().map(|policy| {
-            RoyaltyEngine::compute_royalty(sale_price, policy.royalty_bps)
-        });
+        let required_royalty = record
+            .royalty_policy
+            .as_ref()
+            .map(|policy| RoyaltyEngine::compute_royalty(sale_price, policy.royalty_bps));
 
         RightsEnforcementResult {
             token_id: *token_id,

@@ -1,6 +1,6 @@
 use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
 };
 use rand::Rng;
 
@@ -13,7 +13,12 @@ pub struct FuzzResult {
 
 impl FuzzResult {
     pub fn new(test_name: &str) -> Self {
-        Self { test_name: test_name.to_string(), iterations: 0, crashes: 0, state_invariants_broken: 0 }
+        Self {
+            test_name: test_name.to_string(),
+            iterations: 0,
+            crashes: 0,
+            state_invariants_broken: 0,
+        }
     }
 
     pub fn passed(&self) -> bool {
@@ -31,14 +36,17 @@ pub fn fuzz_mint(iterations: u64) -> FuzzResult {
         let col_id = ResourceId(rng.gen::<[u8; 32]>());
 
         // Register collection
-        if reg.register_genesis(ResourceMetadata {
-            resource_id: col_id,
-            archetype: ResourceArchetype::NFTCollection,
-            state: ResourceState::Active,
-            lineage: ResourceLineage::genesis(col_id),
-            contract_id: [0u8; 32],
-            owner: rng.gen::<[u8; 32]>(),
-        }).is_err() {
+        if reg
+            .register_genesis(ResourceMetadata {
+                resource_id: col_id,
+                archetype: ResourceArchetype::NFTCollection,
+                state: ResourceState::Active,
+                lineage: ResourceLineage::genesis(col_id),
+                contract_id: [0u8; 32],
+                owner: rng.gen::<[u8; 32]>(),
+            })
+            .is_err()
+        {
             result.iterations += 1;
             continue;
         }
@@ -52,14 +60,25 @@ pub fn fuzz_mint(iterations: u64) -> FuzzResult {
             let parent_hash = reg.resource_hash(&col_id).unwrap_or([0u8; 32]);
             let version = reg.get(&col_id).map(|m| m.lineage.version + 1).unwrap_or(1);
 
-            if reg.derive_from_collection(&col_id, ResourceMetadata {
-                resource_id: token_id,
-                archetype: ResourceArchetype::NFTAsset,
-                state: ResourceState::Active,
-                lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
-                contract_id: [0u8; 32],
-                owner: rng.gen::<[u8; 32]>(),
-            }).is_err() {
+            if reg
+                .derive_from_collection(
+                    &col_id,
+                    ResourceMetadata {
+                        resource_id: token_id,
+                        archetype: ResourceArchetype::NFTAsset,
+                        state: ResourceState::Active,
+                        lineage: ResourceLineage::single_ancestor(
+                            token_id,
+                            col_id,
+                            parent_hash,
+                            version,
+                        ),
+                        contract_id: [0u8; 32],
+                        owner: rng.gen::<[u8; 32]>(),
+                    },
+                )
+                .is_err()
+            {
                 result.crashes += 1;
             }
         }
@@ -100,25 +119,34 @@ pub fn fuzz_marketplace(iterations: u64) -> FuzzResult {
             lineage: ResourceLineage::genesis(token_id),
             contract_id: [0u8; 32],
             owner: seller,
-        }).ok();
+        })
+        .ok();
 
         // Random operations
         let ops = rng.gen_range(1..20);
         for _ in 0..ops {
             match rng.gen_range(0..4) {
-                0 => { mp.list_nft(&reg, token_id, &seller, rng.gen::<u64>(), None).ok(); }
+                0 => {
+                    mp.list_nft(&reg, token_id, &seller, rng.gen::<u64>(), None)
+                        .ok();
+                }
                 1 => {
                     let buyer = rng.gen::<[u8; 32]>();
                     if buyer != seller {
-                        mp.buy_nft(&mut reg, &token_id, &buyer, 1, rng.gen::<u64>()).ok();
+                        mp.buy_nft(&mut reg, &token_id, &buyer, 1, rng.gen::<u64>())
+                            .ok();
                     }
                 }
-                2 => { mp.cancel_listing(&token_id).ok(); }
+                2 => {
+                    mp.cancel_listing(&token_id).ok();
+                }
                 3 => {
-                    mp.start_auction(&reg, token_id, &seller, rng.gen::<u64>()).ok();
+                    mp.start_auction(&reg, token_id, &seller, rng.gen::<u64>())
+                        .ok();
                     let bidder = rng.gen::<[u8; 32]>();
                     if bidder != seller {
-                        mp.place_bid(&token_id, &bidder, rng.gen::<u64>(), rng.gen::<u64>()).ok();
+                        mp.place_bid(&token_id, &bidder, rng.gen::<u64>(), rng.gen::<u64>())
+                            .ok();
                     }
                 }
                 _ => {}
@@ -204,7 +232,11 @@ pub fn fuzz_bridge(iterations: u64) -> FuzzResult {
         let lock_id = ledger.lock(lock);
 
         // Random unlock with potentially wrong id
-        let unlock_id = if rng.gen::<bool>() { lock_id } else { rng.gen::<[u8; 32]>() };
+        let unlock_id = if rng.gen::<bool>() {
+            lock_id
+        } else {
+            rng.gen::<[u8; 32]>()
+        };
         ledger.unlock(amun_nft_bridge::BridgeUnlock {
             lock_id: unlock_id,
             destination_chain: rng.gen::<u32>(),

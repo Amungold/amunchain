@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
     let index: usize = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
-    let base_port: u16 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(9900);
+    let _base_port: u16 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(9900);
     let rpc_port: u16 = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(9070);
     let quorum: usize = args.get(4).and_then(|s| s.parse().ok()).unwrap_or(4);
 

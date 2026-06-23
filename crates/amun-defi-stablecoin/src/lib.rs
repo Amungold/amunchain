@@ -1,7 +1,5 @@
-use sha2::{Sha256, Digest};
-use amun_resource_core::{
-    ResourceId, ResourceRegistry, RegistryError,
-};
+use amun_resource_core::{RegistryError, ResourceId, ResourceRegistry};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 pub struct StablecoinPosition {
@@ -25,7 +23,10 @@ impl Default for StablecoinEngine {
 
 impl StablecoinEngine {
     pub fn new() -> Self {
-        Self { positions: BTreeMap::new(), total_supply: 0 }
+        Self {
+            positions: BTreeMap::new(),
+            total_supply: 0,
+        }
     }
 
     pub fn mint(
@@ -57,13 +58,21 @@ impl StablecoinEngine {
         burn_amount: u64,
     ) -> Result<u64, &'static str> {
         if let Some(position) = self.positions.get_mut(&position_id.0) {
-            if !position.active { return Err("Position not active"); }
-            if burn_amount > position.minted { return Err("Insufficient minted amount"); }
+            if !position.active {
+                return Err("Position not active");
+            }
+            if burn_amount > position.minted {
+                return Err("Insufficient minted amount");
+            }
             position.minted -= burn_amount;
             self.total_supply -= burn_amount;
-            if position.minted == 0 { position.active = false; }
+            if position.minted == 0 {
+                position.active = false;
+            }
             Ok(burn_amount)
-        } else { Err("Position not found") }
+        } else {
+            Err("Position not found")
+        }
     }
 
     pub fn compute_stablecoin_root(&self) -> [u8; 32] {

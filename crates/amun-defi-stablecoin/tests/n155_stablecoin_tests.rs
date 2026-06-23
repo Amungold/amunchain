@@ -1,5 +1,5 @@
-use amun_resource_core::ResourceRegistry;
 use amun_defi_stablecoin::StablecoinEngine;
+use amun_resource_core::ResourceRegistry;
 
 #[test]
 fn n155_mint_and_burn() {
@@ -28,5 +28,8 @@ fn n155_stablecoin_root_deterministic() {
     let mut engine2 = StablecoinEngine::new();
     engine1.mint(&mut reg1, [10u8; 32], 300, 200).unwrap();
     engine2.mint(&mut reg2, [10u8; 32], 300, 200).unwrap();
-    assert_eq!(engine1.compute_stablecoin_root(), engine2.compute_stablecoin_root());
+    assert_eq!(
+        engine1.compute_stablecoin_root(),
+        engine2.compute_stablecoin_root()
+    );
 }

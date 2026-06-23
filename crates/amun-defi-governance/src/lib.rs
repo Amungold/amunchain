@@ -1,4 +1,4 @@
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 pub struct DefiParameters {
@@ -52,34 +52,41 @@ impl GovernanceEngine {
         }
     }
 
-    pub fn propose(
-        &mut self,
-        proposer: [u8; 32],
-        parameter: String,
-        new_value: u64,
-    ) -> [u8; 32] {
+    pub fn propose(&mut self, proposer: [u8; 32], parameter: String, new_value: u64) -> [u8; 32] {
         self.next_proposal_id += 1;
         let mut hasher = Sha256::new();
         hasher.update(b"AMUN_GOVERNANCE_PROPOSAL_V1");
         hasher.update(proposer);
         hasher.update(self.next_proposal_id.to_le_bytes());
         let proposal_id: [u8; 32] = hasher.finalize().into();
-        self.proposals.insert(proposal_id, GovernanceProposal {
+        self.proposals.insert(
             proposal_id,
-            proposer,
-            parameter,
-            new_value,
-            votes_for: 0,
-            votes_against: 0,
-            executed: false,
-        });
+            GovernanceProposal {
+                proposal_id,
+                proposer,
+                parameter,
+                new_value,
+                votes_for: 0,
+                votes_against: 0,
+                executed: false,
+            },
+        );
         proposal_id
     }
 
-    pub fn vote(&mut self, proposal_id: &[u8; 32], _voter: [u8; 32], support: bool, weight: u64) -> bool {
+    pub fn vote(
+        &mut self,
+        proposal_id: &[u8; 32],
+        _voter: [u8; 32],
+        support: bool,
+        weight: u64,
+    ) -> bool {
         if let Some(p) = self.proposals.get_mut(proposal_id) {
-            if support { p.votes_for += weight; }
-            else { p.votes_against += weight; }
+            if support {
+                p.votes_for += weight;
+            } else {
+                p.votes_against += weight;
+            }
             return true;
         }
         false
@@ -92,7 +99,9 @@ impl GovernanceEngine {
             }
             match p.parameter.as_str() {
                 "amm_fee_bps" => self.parameters.amm_fee_bps = p.new_value,
-                "lending_interest_base_bps" => self.parameters.lending_interest_base_bps = p.new_value,
+                "lending_interest_base_bps" => {
+                    self.parameters.lending_interest_base_bps = p.new_value
+                }
                 "collateral_ratio_min" => self.parameters.collateral_ratio_min = p.new_value,
                 "liquidation_threshold" => self.parameters.liquidation_threshold = p.new_value,
                 "stablecoin_mint_ratio" => self.parameters.stablecoin_mint_ratio = p.new_value,

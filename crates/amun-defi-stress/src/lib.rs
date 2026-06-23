@@ -1,11 +1,11 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_defi_amm::AmmEngine;
 use amun_defi_lending_engine::LendingEngine;
 use amun_defi_stablecoin::StablecoinEngine;
 use amun_nft_collateral::NftCollateralEngine;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
 use rand::Rng;
 
 pub struct DefiStressResult {
@@ -23,7 +23,12 @@ impl Default for DefiStressResult {
 
 impl DefiStressResult {
     pub fn new() -> Self {
-        Self { total_operations: 0, successful: 0, failed: 0, invariants_broken: 0 }
+        Self {
+            total_operations: 0,
+            successful: 0,
+            failed: 0,
+            invariants_broken: 0,
+        }
     }
 
     pub fn passed(&self) -> bool {
@@ -70,12 +75,17 @@ pub fn stress_lending_liquidations(iterations: u64) -> DefiStressResult {
         let principal = rng.gen_range(100..10_000);
         let rate = rng.gen_range(100..2000);
         let collateral = rng.gen_range(50..500);
-        if let Ok((loan_id, _)) = engine.create_loan(&mut reg, borrower, principal, rate, collateral, [0u8; 32], 1) {
+        if let Ok((loan_id, _)) = engine.create_loan(
+            &mut reg, borrower, principal, rate, collateral, [0u8; 32], 1,
+        ) {
             engine.accrue_interest(&loan_id.0, rng.gen_range(1..5_000_000));
             let health = engine.get_health_factor(&loan_id.0, 5_000_000);
             result.total_operations += 1;
             if amun_defi_lending_core::InterestModel::is_liquidatable(health) {
-                if engine.liquidate(&loan_id.0, rng.gen::<[u8; 32]>(), 5_000_000).is_ok() {
+                if engine
+                    .liquidate(&loan_id.0, rng.gen::<[u8; 32]>(), 5_000_000)
+                    .is_ok()
+                {
                     result.successful += 1;
                 } else {
                     result.failed += 1;
@@ -120,14 +130,20 @@ pub fn stress_nft_collateral_flow(iterations: u64) -> DefiStressResult {
         let token_id = ResourceId(rng.gen::<[u8; 32]>());
         let owner = rng.gen::<[u8; 32]>();
         reg.register_genesis(ResourceMetadata {
-            resource_id: token_id, archetype: ResourceArchetype::NFTAsset,
-            state: ResourceState::Active, lineage: ResourceLineage::genesis(token_id),
-            contract_id: [0u8; 32], owner,
-        }).unwrap();
+            resource_id: token_id,
+            archetype: ResourceArchetype::NFTAsset,
+            state: ResourceState::Active,
+            lineage: ResourceLineage::genesis(token_id),
+            contract_id: [0u8; 32],
+            owner,
+        })
+        .unwrap();
         let mut engine = NftCollateralEngine::new();
         engine.lock_nft(&reg, token_id, &owner).unwrap();
         let loan_amount = rng.gen_range(100..1000);
-        if let Ok(loan_id) = engine.borrow_against_nft(&mut reg, token_id, owner, loan_amount, 500, 1) {
+        if let Ok(loan_id) =
+            engine.borrow_against_nft(&mut reg, token_id, owner, loan_amount, 500, 1)
+        {
             let repay = rng.gen_range(1..=loan_amount);
             let _ = engine.repay_and_unlock(&mut reg, &loan_id, token_id, repay);
             result.total_operations += 1;

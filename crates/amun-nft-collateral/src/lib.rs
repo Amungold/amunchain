@@ -1,8 +1,6 @@
-use sha2::{Sha256, Digest};
-use amun_resource_core::{
-    ResourceId, ResourceRegistry, RegistryError,
-};
 use amun_defi_lending_engine::LendingEngine;
+use amun_resource_core::{RegistryError, ResourceId, ResourceRegistry};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
@@ -25,7 +23,10 @@ impl Default for NftCollateralEngine {
 
 impl NftCollateralEngine {
     pub fn new() -> Self {
-        Self { locks: BTreeMap::new(), lending: LendingEngine::new() }
+        Self {
+            locks: BTreeMap::new(),
+            lending: LendingEngine::new(),
+        }
     }
 
     pub fn lock_nft(
@@ -34,19 +35,31 @@ impl NftCollateralEngine {
         token_id: ResourceId,
         owner: &[u8; 32],
     ) -> Result<(), RegistryError> {
-        let token = registry.get(&token_id).ok_or(RegistryError::NotFound(token_id))?;
+        let token = registry
+            .get(&token_id)
+            .ok_or(RegistryError::NotFound(token_id))?;
         if token.owner != *owner {
             return Err(RegistryError::NotActive(token_id));
         }
         if self.locks.contains_key(&token_id.0) {
             return Err(RegistryError::DuplicateId(token_id));
         }
-        self.locks.insert(token_id.0, CollateralLock { token_id, owner: *owner, locked: true });
+        self.locks.insert(
+            token_id.0,
+            CollateralLock {
+                token_id,
+                owner: *owner,
+                locked: true,
+            },
+        );
         Ok(())
     }
 
     pub fn is_locked(&self, token_id: &ResourceId) -> bool {
-        self.locks.get(&token_id.0).map(|l| l.locked).unwrap_or(false)
+        self.locks
+            .get(&token_id.0)
+            .map(|l| l.locked)
+            .unwrap_or(false)
     }
 
     pub fn borrow_against_nft(
@@ -101,7 +114,9 @@ impl NftCollateralEngine {
         liquidator: [u8; 32],
         current_height: u64,
     ) -> Result<(u64, u64), &'static str> {
-        let result = self.lending.liquidate(&loan_id.0, liquidator, current_height)?;
+        let result = self
+            .lending
+            .liquidate(&loan_id.0, liquidator, current_height)?;
         self.locks.remove(&token_id.0);
         Ok(result)
     }

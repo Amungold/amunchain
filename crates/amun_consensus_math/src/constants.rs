@@ -50,7 +50,7 @@ pub fn mod_floor(a: i64, b: i64) -> i64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_div_floor() {
         assert_eq!(div_floor(7, 3), 2);
@@ -58,7 +58,7 @@ mod tests {
         assert_eq!(div_floor(7, -3), -3);
         assert_eq!(div_floor(-7, -3), 2);
     }
-    
+
     #[test]
     fn test_mod_floor() {
         assert_eq!(mod_floor(7, 3), 1);

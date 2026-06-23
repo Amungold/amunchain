@@ -1,8 +1,8 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_nft_marketplace::MarketplaceEngine;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
 
 pub struct StressTestResult {
     pub total_operations: u64,
@@ -30,7 +30,10 @@ pub fn run_stress_mint(
                 token_id,
                 col_id,
                 registry.resource_hash(&col_id).unwrap_or([0u8; 32]),
-                registry.get(&col_id).map(|m| m.lineage.version + 1).unwrap_or(1),
+                registry
+                    .get(&col_id)
+                    .map(|m| m.lineage.version + 1)
+                    .unwrap_or(1),
             ),
             contract_id: [0u8; 32],
             owner: [0u8; 32],
@@ -62,8 +65,12 @@ pub fn run_stress_marketplace(
             let token = ResourceId(tid);
             let seller = [1u8; 32];
             let buyer = [2u8; 32];
-            if marketplace.list_nft(registry, token, &seller, 100, None).is_ok()
-                && marketplace.buy_nft(registry, &token, &buyer, 1, 1000).is_ok()
+            if marketplace
+                .list_nft(registry, token, &seller, 100, None)
+                .is_ok()
+                && marketplace
+                    .buy_nft(registry, &token, &buyer, 1, 1000)
+                    .is_ok()
             {
                 success += 1;
                 continue;
@@ -81,7 +88,7 @@ pub fn run_stress_marketplace(
 }
 
 fn stress_token_id(index: u64) -> [u8; 32] {
-    use sha2::{Sha256, Digest};
+    use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
     hasher.update(index.to_le_bytes());
     hasher.finalize().into()

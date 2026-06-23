@@ -1,9 +1,9 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_defi_amm::AmmEngine;
 use amun_defi_lending_engine::LendingEngine;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
 use rand::Rng;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -45,7 +45,8 @@ impl ValidatorSimulator {
                 lineage: ResourceLineage::genesis(col_id),
                 contract_id: [0u8; 32],
                 owner: [0u8; 32],
-            }).ok();
+            })
+            .ok();
         }
 
         while start.elapsed().as_secs() < duration_secs {
@@ -71,7 +72,12 @@ impl ValidatorSimulator {
                         resource_id: token_id,
                         archetype: ResourceArchetype::NFTAsset,
                         state: ResourceState::Active,
-                        lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+                        lineage: ResourceLineage::single_ancestor(
+                            token_id,
+                            col_id,
+                            parent_hash,
+                            version,
+                        ),
                         contract_id: [0u8; 32],
                         owner: rng.gen::<[u8; 32]>(),
                     };
@@ -91,7 +97,7 @@ impl ValidatorSimulator {
                         amm.create_pool(&mut reg, token_a, token_b, [0u8; 32]).ok();
                         amm.add_liquidity(&pool_id, 1000, 1000);
                     } else {
-                        let first_key = amm.pools.keys().next().unwrap().clone();
+                        let first_key = *amm.pools.keys().next().unwrap();
                         amm.swap(&first_key, rng.gen_range(1..100), true);
                     }
                     ops += 1;
@@ -100,15 +106,17 @@ impl ValidatorSimulator {
                     // Lending
                     let mut lending = self.lending.lock().unwrap();
                     let borrower = rng.gen::<[u8; 32]>();
-                    lending.create_loan(
-                        &mut self.registry.lock().unwrap(),
-                        borrower,
-                        rng.gen_range(100..1000),
-                        rng.gen_range(100..500),
-                        rng.gen_range(500..2000),
-                        [0u8; 32],
-                        1,
-                    ).ok();
+                    lending
+                        .create_loan(
+                            &mut self.registry.lock().unwrap(),
+                            borrower,
+                            rng.gen_range(100..1000),
+                            rng.gen_range(100..500),
+                            rng.gen_range(500..2000),
+                            [0u8; 32],
+                            1,
+                        )
+                        .ok();
                     ops += 1;
                 }
                 _ => {
@@ -165,5 +173,11 @@ pub struct SoakResult {
 impl SoakResult {
     pub fn passed(&self) -> bool {
         self.failures == 0 && self.operations > 0
+    }
+}
+
+impl Default for ValidatorSimulator {
+    fn default() -> Self {
+        Self::new()
     }
 }

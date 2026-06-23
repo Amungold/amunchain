@@ -1,13 +1,13 @@
-use std::sync::{Arc, Mutex};
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry, RegistryError,
-};
-use amun_nft_core::{NftMetadata, NftEvidence};
-use amun_nft_marketplace::MarketplaceEngine;
-use amun_nft_constitutional_registry::{ConstitutionalRegistry};
+use amun_nft_constitutional_registry::ConstitutionalRegistry;
+use amun_nft_core::{NftEvidence, NftMetadata};
 use amun_nft_indexer::NftIndexer;
-use sha2::{Sha256, Digest};
+use amun_nft_marketplace::MarketplaceEngine;
+use amun_resource_core::{
+    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+    ResourceRegistry, ResourceState,
+};
+use sha2::{Digest, Sha256};
+use std::sync::{Arc, Mutex};
 
 pub struct NftSdk {
     pub registry: Arc<Mutex<ResourceRegistry>>,
@@ -34,7 +34,11 @@ impl NftSdk {
         }
     }
 
-    pub fn register_collection(&self, id: [u8; 32], creator: [u8; 32]) -> Result<(), RegistryError> {
+    pub fn register_collection(
+        &self,
+        id: [u8; 32],
+        creator: [u8; 32],
+    ) -> Result<(), RegistryError> {
         let meta = ResourceMetadata {
             resource_id: ResourceId(id),
             archetype: ResourceArchetype::NFTCollection,
@@ -56,7 +60,15 @@ impl NftSdk {
         let col_id = ResourceId(collection_id);
         let tok_id = ResourceId(token_id);
         let parent_hash = self.registry.lock().unwrap().resource_hash(&col_id)?;
-        let version = self.registry.lock().unwrap().get(&col_id).unwrap().lineage.version + 1;
+        let version = self
+            .registry
+            .lock()
+            .unwrap()
+            .get(&col_id)
+            .unwrap()
+            .lineage
+            .version
+            + 1;
         let child = ResourceMetadata {
             resource_id: tok_id,
             archetype: ResourceArchetype::NFTAsset,
@@ -65,7 +77,10 @@ impl NftSdk {
             contract_id: [0u8; 32],
             owner,
         };
-        self.registry.lock().unwrap().derive_from_collection(&col_id, child)
+        self.registry
+            .lock()
+            .unwrap()
+            .derive_from_collection(&col_id, child)
     }
 
     pub fn transfer_nft(
@@ -74,7 +89,12 @@ impl NftSdk {
         new_owner: [u8; 32],
     ) -> Result<ResourceId, RegistryError> {
         let tid = ResourceId(token_id);
-        let parent = self.registry.lock().unwrap().get(&tid).cloned()
+        let parent = self
+            .registry
+            .lock()
+            .unwrap()
+            .get(&tid)
+            .cloned()
             .ok_or(RegistryError::NotFound(tid))?;
         let parent_hash = self.registry.lock().unwrap().resource_hash(&tid)?;
         let version = parent.lineage.version + 1;
@@ -87,13 +107,24 @@ impl NftSdk {
             contract_id: [0u8; 32],
             owner: new_owner,
         };
-        self.registry.lock().unwrap().consume_and_derive(&tid, child)
+        self.registry
+            .lock()
+            .unwrap()
+            .consume_and_derive(&tid, child)
     }
 
-    pub fn list_nft(&self, token_id: [u8; 32], seller: [u8; 32], price: u64) -> Result<(), RegistryError> {
+    pub fn list_nft(
+        &self,
+        token_id: [u8; 32],
+        seller: [u8; 32],
+        price: u64,
+    ) -> Result<(), RegistryError> {
         let tid = ResourceId(token_id);
         let reg = self.registry.lock().unwrap();
-        self.marketplace.lock().unwrap().list_nft(&reg, tid, &seller, price, None)
+        self.marketplace
+            .lock()
+            .unwrap()
+            .list_nft(&reg, tid, &seller, price, None)
     }
 
     pub fn buy_nft(
@@ -105,7 +136,10 @@ impl NftSdk {
     ) -> Result<ResourceId, RegistryError> {
         let tid = ResourceId(token_id);
         let mut reg = self.registry.lock().unwrap();
-        self.marketplace.lock().unwrap().buy_nft(&mut reg, &tid, &buyer, block_height, timestamp)
+        self.marketplace
+            .lock()
+            .unwrap()
+            .buy_nft(&mut reg, &tid, &buyer, block_height, timestamp)
     }
 
     pub fn start_auction(
@@ -116,7 +150,10 @@ impl NftSdk {
     ) -> Result<(), RegistryError> {
         let tid = ResourceId(token_id);
         let reg = self.registry.lock().unwrap();
-        self.marketplace.lock().unwrap().start_auction(&reg, tid, &seller, end_time)
+        self.marketplace
+            .lock()
+            .unwrap()
+            .start_auction(&reg, tid, &seller, end_time)
     }
 
     pub fn place_bid(
@@ -127,7 +164,10 @@ impl NftSdk {
         current_time: u64,
     ) -> Result<(), RegistryError> {
         let tid = ResourceId(token_id);
-        self.marketplace.lock().unwrap().place_bid(&tid, &bidder, amount, current_time)
+        self.marketplace
+            .lock()
+            .unwrap()
+            .place_bid(&tid, &bidder, amount, current_time)
     }
 
     pub fn end_auction(
@@ -139,7 +179,13 @@ impl NftSdk {
     ) -> Result<ResourceId, RegistryError> {
         let tid = ResourceId(token_id);
         let mut reg = self.registry.lock().unwrap();
-        self.marketplace.lock().unwrap().end_auction(&mut reg, &tid, current_time, block_height, timestamp)
+        self.marketplace.lock().unwrap().end_auction(
+            &mut reg,
+            &tid,
+            current_time,
+            block_height,
+            timestamp,
+        )
     }
 
     pub fn index_all(&self) {

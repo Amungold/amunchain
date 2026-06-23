@@ -1,11 +1,11 @@
-use axum::{Router, routing::get, Json, extract::State};
+use axum::http::Method;
+use axum::{extract::State, routing::get, Json, Router};
 use serde::Serialize;
 use std::sync::{Arc, Mutex};
-use tower_http::cors::{CorsLayer, Any};
-use axum::http::Method;
+use tower_http::cors::{Any, CorsLayer};
 
-use amun_consensus_network::engine::ConsensusEngine;
 use amun_chain_store::store::ChainStore;
+use amun_consensus_network::engine::ConsensusEngine;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -13,7 +13,6 @@ pub struct AppState {
     pub chain_store: Arc<Mutex<ChainStore>>,
 }
 
-// ===== API Response Types =====
 #[derive(Serialize)]
 struct StatusResponse {
     height: u64,
@@ -29,10 +28,9 @@ struct BlockResponse {
     evidence_root: String,
 }
 
-// ===== Route Handlers =====
 async fn api_status(State(state): State<Arc<AppState>>) -> Json<StatusResponse> {
     let consensus = state.consensus.lock().unwrap();
-    
+
     Json(StatusResponse {
         height: consensus.current_height,
         active_validators: consensus.active_validator_count(),
@@ -43,23 +41,22 @@ async fn api_status(State(state): State<Arc<AppState>>) -> Json<StatusResponse> 
 async fn api_blocks(State(state): State<Arc<AppState>>) -> Json<Vec<BlockResponse>> {
     let store = state.chain_store.lock().unwrap();
     let mut blocks = Vec::new();
-    
+
     if let Some(record) = store.load_tip() {
         blocks.push(BlockResponse {
             height: record.height,
-            hash: hex::encode(&record.block_hash),
-            state_root: hex::encode(&record.state_root),
-            evidence_root: hex::encode(&record.evidence_root),
+            hash: hex::encode(record.block_hash),
+            state_root: hex::encode(record.state_root),
+            evidence_root: hex::encode(record.evidence_root),
         });
     }
-    
+
     Json(blocks)
 }
 
-// ===== Server Startup =====
 pub async fn serve(state: AppState, port: u16) {
     let app_state = Arc::new(state);
-    
+
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods([Method::GET])
@@ -71,8 +68,11 @@ pub async fn serve(state: AppState, port: u16) {
         .layer(cors)
         .with_state(app_state);
 
-    let addr = format!("0.0.0.0:{}", port);
+    let addr = format!("0.0.0.0:{port}");
+
     println!("Constitutional Explorer API running on {}", addr);
+
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+
     axum::serve(listener, app).await.unwrap();
 }

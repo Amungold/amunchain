@@ -1,8 +1,5 @@
-use amun_resource_core::{
-    ResourceId, ResourceArchetype,
-    ResourceRegistry,
-};
-use amun_nft_core::{NftMetadata};
+use amun_nft_core::NftMetadata;
+use amun_resource_core::{ResourceArchetype, ResourceId, ResourceRegistry};
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
@@ -85,7 +82,10 @@ impl ExplorerEngine {
     }
 
     /// Get transfer history (from lineage) - simplified
-    pub fn get_transfer_history(registry: &ResourceRegistry, token_id: &ResourceId) -> Vec<ExplorerTransfer> {
+    pub fn get_transfer_history(
+        registry: &ResourceRegistry,
+        token_id: &ResourceId,
+    ) -> Vec<ExplorerTransfer> {
         let mut history = vec![];
         let mut current_id = *token_id;
         // Walk backwards through lineage until genesis
@@ -112,7 +112,7 @@ impl ExplorerEngine {
 /// Simple HTTP server to serve API and static pages.
 pub fn start_explorer_server(registry: Arc<Mutex<ResourceRegistry>>, bind_addr: &str) {
     use std::io::{Read, Write};
-    use std::net::{TcpListener};
+    use std::net::TcpListener;
 
     let listener = TcpListener::bind(bind_addr).expect("Failed to bind");
     println!("Explorer server running on http://{}", bind_addr);
@@ -125,8 +125,14 @@ pub fn start_explorer_server(registry: Arc<Mutex<ResourceRegistry>>, bind_addr: 
                 let request = String::from_utf8_lossy(&buf);
                 let path = if let Some(line) = request.lines().next() {
                     let parts: Vec<&str> = line.split_whitespace().collect();
-                    if parts.len() >= 2 { parts[1].to_string() } else { "/".into() }
-                } else { "/".into() };
+                    if parts.len() >= 2 {
+                        parts[1].to_string()
+                    } else {
+                        "/".into()
+                    }
+                } else {
+                    "/".into()
+                };
 
                 let response = handle_request(&path, &registry.lock().unwrap());
                 let _ = stream.write_all(response.as_bytes());
@@ -145,7 +151,9 @@ fn handle_request(path: &str, registry: &ResourceRegistry) -> String {
         }
         "/api/nfts" => {
             // Return all active NFTs
-            let nfts: Vec<ExplorerNft> = registry.active_resources().iter()
+            let nfts: Vec<ExplorerNft> = registry
+                .active_resources()
+                .iter()
                 .filter(|m| m.archetype == ResourceArchetype::NFTAsset)
                 .map(|m| ExplorerNft {
                     token_id: m.resource_id,

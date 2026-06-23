@@ -1,4 +1,4 @@
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 pub struct CachedCertificate {
@@ -23,7 +23,12 @@ pub struct ReplayCache {
 
 impl ReplayCache {
     pub fn new() -> Self {
-        Self { certificates: BTreeMap::new(), headers: BTreeMap::new(), hits: 0, misses: 0 }
+        Self {
+            certificates: BTreeMap::new(),
+            headers: BTreeMap::new(),
+            hits: 0,
+            misses: 0,
+        }
     }
 
     pub fn store_certificate(&mut self, cert: CachedCertificate) {
@@ -55,19 +60,26 @@ impl ReplayCache {
 
     pub fn hit_rate(&self) -> f64 {
         let total = self.hits + self.misses;
-        if total == 0 { 0.0 }
-        else { self.hits as f64 / total as f64 }
+        if total == 0 {
+            0.0
+        } else {
+            self.hits as f64 / total as f64
+        }
     }
 
     pub fn compute_cache_root(&self) -> [u8; 32] {
         let mut hasher = Sha256::new();
         hasher.update(b"AMUN_REPLAY_CACHE_V1");
-        hasher.update(&self.hits.to_le_bytes());
-        hasher.update(&self.misses.to_le_bytes());
+        hasher.update(self.hits.to_le_bytes());
+        hasher.update(self.misses.to_le_bytes());
         hasher.finalize().into()
     }
 
-    pub fn batch_verify_certificates(&mut self, cert_hashes: &[[u8; 32]], expected_valid: bool) -> u64 {
+    pub fn batch_verify_certificates(
+        &mut self,
+        cert_hashes: &[[u8; 32]],
+        expected_valid: bool,
+    ) -> u64 {
         let mut valid_count = 0u64;
         for cert_hash in cert_hashes {
             if self.check_certificate(cert_hash) == expected_valid {
@@ -75,5 +87,11 @@ impl ReplayCache {
             }
         }
         valid_count
+    }
+}
+
+impl Default for ReplayCache {
+    fn default() -> Self {
+        Self::new()
     }
 }

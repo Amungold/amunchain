@@ -1,8 +1,8 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
 use amun_nft_marketplace::MarketplaceEngine;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
 
 #[test]
 fn n134_list_and_buy_nft() {
@@ -18,13 +18,17 @@ fn n134_list_and_buy_nft() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: seller,
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut mp = MarketplaceEngine::new();
     mp.list_nft(&reg, token_id, &seller, 100, None).unwrap();
     let new_id = mp.buy_nft(&mut reg, &token_id, &buyer, 1, 1000).unwrap();
 
-    assert!(matches!(reg.get(&token_id).unwrap().state, ResourceState::Consumed { .. }));
+    assert!(matches!(
+        reg.get(&token_id).unwrap().state,
+        ResourceState::Consumed { .. }
+    ));
     assert_eq!(reg.get(&new_id).unwrap().owner, buyer);
     assert_eq!(mp.event_log().len(), 2); // Listing + Sale
 }
@@ -42,7 +46,8 @@ fn n134_cancel_listing() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: seller,
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut mp = MarketplaceEngine::new();
     mp.list_nft(&reg, token_id, &seller, 100, None).unwrap();
@@ -67,7 +72,8 @@ fn n134_auction_flow() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: seller,
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut mp = MarketplaceEngine::new();
     mp.start_auction(&reg, token_id, &seller, 1000).unwrap();
@@ -95,7 +101,8 @@ fn n134_1_prevent_double_buy() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: seller,
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut mp = MarketplaceEngine::new();
     mp.list_nft(&reg, token_id, &seller, 100, None).unwrap();
@@ -119,7 +126,8 @@ fn n134_1_prevent_self_purchase() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: seller,
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut mp = MarketplaceEngine::new();
     mp.list_nft(&reg, token_id, &seller, 100, None).unwrap();
@@ -141,7 +149,8 @@ fn n134_1_prevent_bid_below_highest() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: seller,
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut mp = MarketplaceEngine::new();
     mp.start_auction(&reg, token_id, &seller, 1000).unwrap();
@@ -164,7 +173,8 @@ fn n134_1_marketplace_evidence_root() {
         lineage: ResourceLineage::genesis(token_id),
         contract_id: [0u8; 32],
         owner: seller,
-    }).unwrap();
+    })
+    .unwrap();
 
     let mut mp = MarketplaceEngine::new();
     mp.list_nft(&reg, token_id, &seller, 100, None).unwrap();

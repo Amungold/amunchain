@@ -1,12 +1,12 @@
-use amun_resource_core::{
-    ResourceId, ResourceMetadata, ResourceArchetype, ResourceState,
-    ResourceLineage, ResourceRegistry,
-};
+use amun_bytecode::OpCode;
+use amun_contract_registry::ContractRegistry;
 use amun_defi_amm::AmmEngine;
 use amun_defi_lending_engine::LendingEngine;
 use amun_defi_stablecoin::StablecoinEngine;
-use amun_contract_registry::ContractRegistry;
-use amun_bytecode::OpCode;
+use amun_resource_core::{
+    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+    ResourceState,
+};
 use rand::Rng;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -61,7 +61,8 @@ impl SoakValidator {
             lineage: ResourceLineage::genesis(col_id),
             contract_id: [0u8; 32],
             owner: [0u8; 32],
-        }).ok();
+        })
+        .ok();
 
         Self {
             registry: reg,
@@ -91,77 +92,105 @@ impl SoakValidator {
             self.height += 1;
 
             // NFT Mint
-            if self.height % config.nft_mint_rate == 0 {
+            if self.height.is_multiple_of(config.nft_mint_rate) {
                 let col_id = ResourceId([1u8; 32]);
                 let token_id = ResourceId(rng.gen::<[u8; 32]>());
                 let parent_hash = self.registry.resource_hash(&col_id).unwrap_or([0u8; 32]);
-                let version = self.registry.get(&col_id).map(|m| m.lineage.version + 1).unwrap_or(1);
-                match self.registry.derive_from_collection(&col_id, ResourceMetadata {
-                    resource_id: token_id,
-                    archetype: ResourceArchetype::NFTAsset,
-                    state: ResourceState::Active,
-                    lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
-                    contract_id: [0u8; 32],
-                    owner: rng.gen::<[u8; 32]>(),
-                }) {
+                let version = self
+                    .registry
+                    .get(&col_id)
+                    .map(|m| m.lineage.version + 1)
+                    .unwrap_or(1);
+                match self.registry.derive_from_collection(
+                    &col_id,
+                    ResourceMetadata {
+                        resource_id: token_id,
+                        archetype: ResourceArchetype::NFTAsset,
+                        state: ResourceState::Active,
+                        lineage: ResourceLineage::single_ancestor(
+                            token_id,
+                            col_id,
+                            parent_hash,
+                            version,
+                        ),
+                        contract_id: [0u8; 32],
+                        owner: rng.gen::<[u8; 32]>(),
+                    },
+                ) {
                     Ok(_) => self.ops += 1,
                     Err(_) => self.failures += 1,
                 }
             }
 
             // AMM Swap
-            if self.height % config.amm_swap_rate == 0 {
+            if self.height.is_multiple_of(config.amm_swap_rate) {
                 if self.amm.pools.is_empty() {
                     let token_a = rng.gen::<[u8; 32]>();
                     let token_b = rng.gen::<[u8; 32]>();
                     let pool_id_bytes = amun_defi_core::DefiPool::compute_pool_id(token_a, token_b);
-                    self.amm.create_pool(&mut self.registry, token_a, token_b, [0u8; 32]).ok();
+                    self.amm
+                        .create_pool(&mut self.registry, token_a, token_b, [0u8; 32])
+                        .ok();
                     self.amm.add_liquidity(&pool_id_bytes, 10000, 10000);
                 } else {
-                    let first_key = self.amm.pools.keys().next().unwrap().clone();
-                    self.amm.swap(&first_key, rng.gen_range(1..100), rng.gen::<bool>());
+                    let first_key = *self.amm.pools.keys().next().unwrap();
+                    self.amm
+                        .swap(&first_key, rng.gen_range(1..100), rng.gen::<bool>());
                 }
                 self.ops += 1;
             }
 
             // Contract deploy
-            if self.height % config.contract_deploy_rate == 0 {
+            if self.height.is_multiple_of(config.contract_deploy_rate) {
                 let code = vec![OpCode::Push(rng.gen::<u64>()), OpCode::Halt];
                 let cid = ResourceId(rng.gen::<[u8; 32]>());
-                self.contracts.deploy(&mut self.registry, cid, rng.gen::<[u8; 32]>(), code, self.height).ok();
+                self.contracts
+                    .deploy(
+                        &mut self.registry,
+                        cid,
+                        rng.gen::<[u8; 32]>(),
+                        code,
+                        self.height,
+                    )
+                    .ok();
                 self.ops += 1;
             }
 
             // Lending
-            if self.height % 200 == 0 {
-                self.lending.create_loan(
-                    &mut self.registry,
-                    rng.gen::<[u8; 32]>(),
-                    rng.gen_range(100..1000),
-                    rng.gen_range(100..500),
-                    rng.gen_range(500..2000),
-                    [0u8; 32],
-                    self.height,
-                ).ok();
+            if self.height.is_multiple_of(200) {
+                self.lending
+                    .create_loan(
+                        &mut self.registry,
+                        rng.gen::<[u8; 32]>(),
+                        rng.gen_range(100..1000),
+                        rng.gen_range(100..500),
+                        rng.gen_range(500..2000),
+                        [0u8; 32],
+                        self.height,
+                    )
+                    .ok();
                 self.ops += 1;
             }
 
             // Stablecoin mint
-            if self.height % 300 == 0 {
-                self.stablecoin.mint(
-                    &mut self.registry,
-                    rng.gen::<[u8; 32]>(),
-                    rng.gen_range(300..1000),
-                    rng.gen_range(100..600),
-                ).ok();
+            if self.height.is_multiple_of(300) {
+                self.stablecoin
+                    .mint(
+                        &mut self.registry,
+                        rng.gen::<[u8; 32]>(),
+                        rng.gen_range(300..1000),
+                        rng.gen_range(100..600),
+                    )
+                    .ok();
                 self.ops += 1;
             }
 
             // State root snapshot
-            if self.height % config.snapshot_interval == 0 {
+            if self.height.is_multiple_of(config.snapshot_interval) {
                 let root = self.registry.compute_state_root();
                 self.state_roots.push(root);
-                self.memory_samples.push(std::mem::size_of_val(&self.registry));
+                self.memory_samples
+                    .push(std::mem::size_of_val(&self.registry));
             }
 
             // Adversarial events
@@ -175,7 +204,9 @@ impl SoakValidator {
                     1 => {
                         let root1 = self.registry.compute_state_root();
                         let root2 = self.registry.compute_state_root();
-                        if root1 != root2 { self.failures += 1; }
+                        if root1 != root2 {
+                            self.failures += 1;
+                        }
                     }
                     _ => {}
                 }
@@ -222,5 +253,11 @@ pub fn run_full_soak(config: FullSoakConfig) -> FullSoakResult {
         state_roots_consistent: roots_consistent,
         memory_samples: v.memory_samples.clone(),
         passed: v.failures == 0 && roots_consistent,
+    }
+}
+
+impl Default for SoakValidator {
+    fn default() -> Self {
+        Self::new()
     }
 }

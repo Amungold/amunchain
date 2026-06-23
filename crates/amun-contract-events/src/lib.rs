@@ -1,5 +1,5 @@
 use amun_resource_core::ResourceId;
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 pub struct ContractEvent {
@@ -17,7 +17,10 @@ pub struct ContractStorage {
 
 impl ContractStorage {
     pub fn new() -> Self {
-        Self { storage: BTreeMap::new(), events: Vec::new() }
+        Self {
+            storage: BTreeMap::new(),
+            events: Vec::new(),
+        }
     }
 
     pub fn store(&mut self, key: [u8; 32], value: Vec<u8>) {
@@ -37,10 +40,10 @@ impl ContractStorage {
     ) -> [u8; 32] {
         let mut hasher = Sha256::new();
         hasher.update(b"AMUN_CONTRACT_EVENT_V1");
-        hasher.update(&contract_id.0);
+        hasher.update(contract_id.0);
         hasher.update(event_name.as_bytes());
         hasher.update(&event_data);
-        hasher.update(&block_height.to_le_bytes());
+        hasher.update(block_height.to_le_bytes());
         let event_hash: [u8; 32] = hasher.finalize().into();
 
         self.events.push(ContractEvent {
@@ -55,15 +58,24 @@ impl ContractStorage {
     }
 
     pub fn get_events_by_contract(&self, contract_id: &ResourceId) -> Vec<&ContractEvent> {
-        self.events.iter().filter(|e| e.contract_id == *contract_id).collect()
+        self.events
+            .iter()
+            .filter(|e| e.contract_id == *contract_id)
+            .collect()
     }
 
     pub fn compute_events_root(&self) -> [u8; 32] {
         let mut hasher = Sha256::new();
         hasher.update(b"AMUN_CONTRACT_EVENTS_ROOT_V1");
         for event in &self.events {
-            hasher.update(&event.event_hash);
+            hasher.update(event.event_hash);
         }
         hasher.finalize().into()
+    }
+}
+
+impl Default for ContractStorage {
+    fn default() -> Self {
+        Self::new()
     }
 }

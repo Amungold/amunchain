@@ -1,9 +1,7 @@
-use amun_resource_core::{
-    ResourceId, ResourceRegistry,
-};
 use amun_bytecode::OpCode;
-use amun_contract_registry::ContractRegistry;
 use amun_contract_integration::ContractExecutor;
+use amun_contract_registry::ContractRegistry;
+use amun_resource_core::{ResourceId, ResourceRegistry};
 use rand::Rng;
 
 pub struct FuzzResult {
@@ -97,7 +95,14 @@ pub fn fuzz_contract_call(iterations: u64) -> FuzzResult {
         if cr.deploy(&mut reg, cid, owner, code.clone(), 1).is_ok() {
             let gas_limit = rng.gen_range(1..1000);
             match ContractExecutor::call(
-                &mut reg, cid, owner, code, vec![], 1, [0u8; 32], gas_limit,
+                &mut reg,
+                cid,
+                owner,
+                code,
+                vec![],
+                1,
+                [0u8; 32],
+                gas_limit,
             ) {
                 Ok(_) => result.successful_calls += 1,
                 Err(e) => {
@@ -139,7 +144,14 @@ pub fn fuzz_gas_limits(iterations: u64) -> FuzzResult {
         if cr.deploy(&mut reg, cid, owner, code.clone(), 1).is_ok() {
             let gas_limit = rng.gen_range(1..500);
             match ContractExecutor::call(
-                &mut reg, cid, owner, code, vec![], 1, [0u8; 32], gas_limit,
+                &mut reg,
+                cid,
+                owner,
+                code,
+                vec![],
+                1,
+                [0u8; 32],
+                gas_limit,
             ) {
                 Ok(_) => result.successful_calls += 1,
                 Err(e) => {
@@ -160,4 +172,10 @@ pub fn fuzz_gas_limits(iterations: u64) -> FuzzResult {
         result.iterations += 1;
     }
     result
+}
+
+impl Default for FuzzResult {
+    fn default() -> Self {
+        Self::new()
+    }
 }

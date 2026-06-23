@@ -1,8 +1,8 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
-use std::collections::BTreeMap;
 use amun_nft_constitutional_registry::ConstitutionalRegistry;
 use amun_nft_marketplace::MarketplaceEvent;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 
 /// Indexed NFT data for fast query
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -35,22 +35,32 @@ pub struct NftIndexer {
 
 impl NftIndexer {
     pub fn new() -> Self {
-        Self { nfts: BTreeMap::new(), events: Vec::new() }
+        Self {
+            nfts: BTreeMap::new(),
+            events: Vec::new(),
+        }
     }
 
     /// Index all NFTs from the constitutional registry
     pub fn index_registry(&mut self, registry: &ConstitutionalRegistry) {
         for (id, record) in &registry.records {
-            self.nfts.insert(*id, IndexedNft {
-                token_id: *id,
-                owner: record.owner,
-                collection_id: record.collection_id,
-                creator: record.creator,
-                royalty_bps: record.royalty_policy.as_ref().map(|p| p.royalty_bps),
-                governance_voting_power: record.governance_right.as_ref().map(|g| g.voting_power).unwrap_or(0),
-                bridge_locked: record.bridge_lock.is_some(),
-                mining_origin: record.mining_origin.clone(),
-            });
+            self.nfts.insert(
+                *id,
+                IndexedNft {
+                    token_id: *id,
+                    owner: record.owner,
+                    collection_id: record.collection_id,
+                    creator: record.creator,
+                    royalty_bps: record.royalty_policy.as_ref().map(|p| p.royalty_bps),
+                    governance_voting_power: record
+                        .governance_right
+                        .as_ref()
+                        .map(|g| g.voting_power)
+                        .unwrap_or(0),
+                    bridge_locked: record.bridge_lock.is_some(),
+                    mining_origin: record.mining_origin.clone(),
+                },
+            );
         }
     }
 
@@ -58,20 +68,62 @@ impl NftIndexer {
     pub fn index_marketplace_events(&mut self, events: &[MarketplaceEvent], block_height: u64) {
         for ev in events {
             let (token_id, event_type, data) = match ev {
-                MarketplaceEvent::ListingCreated { token_id, seller, price } =>
-                    (token_id.0, "ListingCreated", format!("seller={:?}, price={}", seller, price)),
-                MarketplaceEvent::ListingCancelled { token_id } =>
-                    (token_id.0, "ListingCancelled", String::new()),
-                MarketplaceEvent::SaleCompleted { token_id, seller, buyer, price } =>
-                    (token_id.0, "SaleCompleted", format!("seller={:?}, buyer={:?}, price={}", seller, buyer, price)),
-                MarketplaceEvent::AuctionStarted { token_id, seller, end_time } =>
-                    (token_id.0, "AuctionStarted", format!("seller={:?}, end_time={}", seller, end_time)),
-                MarketplaceEvent::BidPlaced { token_id, bidder, amount } =>
-                    (token_id.0, "BidPlaced", format!("bidder={:?}, amount={}", bidder, amount)),
-                MarketplaceEvent::AuctionEnded { token_id, winner, price } =>
-                    (token_id.0, "AuctionEnded", format!("winner={:?}, price={}", winner, price)),
+                MarketplaceEvent::ListingCreated {
+                    token_id,
+                    seller,
+                    price,
+                } => (
+                    token_id.0,
+                    "ListingCreated",
+                    format!("seller={:?}, price={}", seller, price),
+                ),
+                MarketplaceEvent::ListingCancelled { token_id } => {
+                    (token_id.0, "ListingCancelled", String::new())
+                }
+                MarketplaceEvent::SaleCompleted {
+                    token_id,
+                    seller,
+                    buyer,
+                    price,
+                } => (
+                    token_id.0,
+                    "SaleCompleted",
+                    format!("seller={:?}, buyer={:?}, price={}", seller, buyer, price),
+                ),
+                MarketplaceEvent::AuctionStarted {
+                    token_id,
+                    seller,
+                    end_time,
+                } => (
+                    token_id.0,
+                    "AuctionStarted",
+                    format!("seller={:?}, end_time={}", seller, end_time),
+                ),
+                MarketplaceEvent::BidPlaced {
+                    token_id,
+                    bidder,
+                    amount,
+                } => (
+                    token_id.0,
+                    "BidPlaced",
+                    format!("bidder={:?}, amount={}", bidder, amount),
+                ),
+                MarketplaceEvent::AuctionEnded {
+                    token_id,
+                    winner,
+                    price,
+                } => (
+                    token_id.0,
+                    "AuctionEnded",
+                    format!("winner={:?}, price={}", winner, price),
+                ),
             };
-            self.events.push(IndexedEvent { token_id, event_type: event_type.to_string(), data, block_height });
+            self.events.push(IndexedEvent {
+                token_id,
+                event_type: event_type.to_string(),
+                data,
+                block_height,
+            });
         }
     }
     /// Query NFT by token ID
@@ -86,7 +138,10 @@ impl NftIndexer {
 
     /// Query events for a token
     pub fn get_events_by_token(&self, token_id: &[u8; 32]) -> Vec<&IndexedEvent> {
-        self.events.iter().filter(|e| e.token_id == *token_id).collect()
+        self.events
+            .iter()
+            .filter(|e| e.token_id == *token_id)
+            .collect()
     }
 
     /// Compute deterministic index root

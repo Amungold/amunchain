@@ -11,4 +11,3 @@ pub struct ExecutionContext {
     pub pre_state_root: [u8; 32],
     pub authority: [u8; 32],
 }
-

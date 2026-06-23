@@ -1,5 +1,5 @@
 use amun_resource_core::ResourceId;
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 
 pub struct DefiPool {
     pub pool_id: ResourceId,
@@ -19,15 +19,24 @@ pub struct LiquidityToken {
 
 impl DefiPool {
     pub fn new(pool_id: ResourceId, token_a: ResourceId, token_b: ResourceId) -> Self {
-        Self { pool_id, token_a, token_b, reserve_a: 0, reserve_b: 0, total_liquidity: 0 }
+        Self {
+            pool_id,
+            token_a,
+            token_b,
+            reserve_a: 0,
+            reserve_b: 0,
+            total_liquidity: 0,
+        }
     }
 
     pub fn add_liquidity(&mut self, amount_a: u64, amount_b: u64) -> u64 {
         let liquidity = if self.total_liquidity == 0 {
             ((amount_a as u128 * amount_b as u128) as f64).sqrt() as u64
         } else {
-            let share_a = (amount_a as u128 * self.total_liquidity as u128) / self.reserve_a as u128;
-            let share_b = (amount_b as u128 * self.total_liquidity as u128) / self.reserve_b as u128;
+            let share_a =
+                (amount_a as u128 * self.total_liquidity as u128) / self.reserve_a as u128;
+            let share_b =
+                (amount_b as u128 * self.total_liquidity as u128) / self.reserve_b as u128;
             std::cmp::min(share_a, share_b) as u64
         };
         self.reserve_a += amount_a;
