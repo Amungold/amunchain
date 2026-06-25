@@ -6,6 +6,7 @@ use amun_authority_registry::ConstitutionalAuthority;
 use amun_block_builder::BlockBuilder;
 use amun_chain_store::record::FinalizedChainRecord;
 use amun_chain_store::store::ChainStore;
+use amun_tokenomics_ledger::EconomicLedger;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
 use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
@@ -64,6 +65,7 @@ pub struct LiveValidator {
     /// N129.3: Previous evidence root for chain continuity
     pub previous_evidence_root: Arc<Mutex<[u8; 32]>>,
     block_roots_map: Arc<Mutex<HashMap<u64, BlockRootsContext>>>,
+    pub economic_ledger: Arc<Mutex<EconomicLedger>>,
 }
 
 impl LiveValidator {
@@ -161,6 +163,7 @@ impl LiveValidator {
             constitutional_kernel: Arc::new(Mutex::new(ConstitutionalEnforcementKernel::new())),
             previous_evidence_root: Arc::new(Mutex::new([0u8; 32])),
             block_roots_map: Arc::new(Mutex::new(HashMap::new())),
+            economic_ledger: Arc::new(Mutex::new(EconomicLedger::new())),
             staking_adapter: Arc::new(Mutex::new(StakingAdapter::new(
                 amun_consensus_network::MisbehaviorRegistry::new(
                     amun_consensus_network::MisbehaviorThresholds::default(),
@@ -190,6 +193,7 @@ impl LiveValidator {
         let validator_id = self.validator_id;
         let my_index = self.config.validator_id[0];
         let block_roots_map = self.block_roots_map.clone();
+        let economic_ledger = self.economic_ledger.clone();
 
         // Listen thread
         let engine_listen = engine.clone();

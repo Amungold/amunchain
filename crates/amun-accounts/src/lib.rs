@@ -1,6 +1,7 @@
 use amun_constitutional_commitment::{
     ConstitutionalRoots, EconomicSnapshot, EndBlockPipeline, Hash32,
 };
+use amun_tokenomics_ledger::EconomicLedger;
 use blake3::Hasher;
 use std::collections::BTreeMap;
 
@@ -70,18 +71,34 @@ impl AccountStore {
         self.accounts.values().map(|a| a.balance).sum()
     }
 
-    /// Build an EconomicSnapshot from the current account state.
+    // =======================================================================
+    // N132.2 — EconomicSnapshot builders
+    // =======================================================================
+
+    /// (Compatibility layer) Build snapshot from local state (all zeros).
     pub fn build_economic_snapshot(&self) -> EconomicSnapshot {
+        let ledger = EconomicLedger::new();
+        self.build_economic_snapshot_with_ledger(&ledger)
+    }
+
+    /// Build snapshot from the real EconomicLedger (Single Source of Truth).
+    pub fn build_economic_snapshot_with_ledger(
+        &self,
+        ledger: &EconomicLedger,
+    ) -> EconomicSnapshot {
         let total_supply = self.total_supply();
         EconomicSnapshot {
             total_supply,
-            treasury_balance: 0,
-            validator_reward_pool: 0,
-            ecosystem_pool: 0,
-            burned_supply: 0,
-            issued_supply: total_supply,
-            staked_supply: 0,
-            circulating_supply: total_supply,
+            treasury_balance: ledger.treasury(),
+            validator_reward_pool: ledger.validator_pool(),
+            ecosystem_pool: ledger.ecosystem_pool(),
+            burned_supply: ledger.burned_supply(),
+            issued_supply: ledger.issued_supply(),
+            staked_supply: ledger.staked_supply(),
+            circulating_supply: total_supply
+                .saturating_sub(ledger.burned_supply())
+                .saturating_sub(ledger.staked_supply())
+                .saturating_sub(ledger.treasury()),
         }
     }
 
@@ -97,16 +114,30 @@ impl AccountStore {
         hasher.finalize().into()
     }
 
-    /// Compute the CCA-aware constitutional state root.
+    /// (Compatibility layer) Compute CCA-aware state root (uses empty ledger).
     pub fn state_root(&self) -> [u8; 32] {
-        self.constitutional_roots().state_root
+        let ledger = EconomicLedger::new();
+        self.state_root_with_ledger(&ledger)
     }
 
-    /// Compute all constitutional roots for the current account state.
-    /// This is the canonical CCA output used by the finalization pipeline.
+    /// Compute CCA-aware state root from a real EconomicLedger.
+    pub fn state_root_with_ledger(&self, ledger: &EconomicLedger) -> [u8; 32] {
+        self.constitutional_roots_with_ledger(ledger).state_root
+    }
+
+    /// (Compatibility layer) Compute constitutional roots (uses empty ledger).
     pub fn constitutional_roots(&self) -> ConstitutionalRoots {
+        let ledger = EconomicLedger::new();
+        self.constitutional_roots_with_ledger(&ledger)
+    }
+
+    /// Compute constitutional roots from a real EconomicLedger.
+    pub fn constitutional_roots_with_ledger(
+        &self,
+        ledger: &EconomicLedger,
+    ) -> ConstitutionalRoots {
         let raw_root = self.raw_state_root();
-        let snapshot = self.build_economic_snapshot();
+        let snapshot = self.build_economic_snapshot_with_ledger(ledger);
 
         let identity_root: Hash32 = [0u8; 32];
         let evidence_root: Hash32 = [0u8; 32];

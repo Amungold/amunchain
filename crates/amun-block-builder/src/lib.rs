@@ -150,6 +150,10 @@ impl BlockBuilder {
     pub fn account_store(&self) -> &AccountStore {
         &self.engine.state
     }
+
+    pub fn account_store_mut(&mut self) -> &mut AccountStore {
+        &mut self.engine.state
+    }
 }
 
 impl Default for BlockBuilder {

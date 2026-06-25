@@ -1,3 +1,4 @@
+use amun_tokenomics_ledger::EconomicLedger;
 use amun_accounts::AccountStore;
 use amun_transactions::{Transaction, TransactionPayload, TransactionReceipt};
 
@@ -5,12 +6,14 @@ use amun_transactions::{Transaction, TransactionPayload, TransactionReceipt};
 #[derive(Debug, Clone)]
 pub struct ExecutionEngine {
     pub state: AccountStore,
+    pub economic: EconomicLedger,
 }
 
 impl ExecutionEngine {
     pub fn new() -> Self {
         Self {
             state: AccountStore::new(),
+            economic: EconomicLedger::new(),
         }
     }
 

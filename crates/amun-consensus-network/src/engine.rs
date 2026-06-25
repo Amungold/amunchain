@@ -38,16 +38,29 @@ impl ConsensusRound {
 
     /// Proposer sets the block for this round.
     pub fn propose(&mut self, block_hash: [u8; 32], state_root: [u8; 32]) {
+        // N130.3: never overwrite an already established proposal
+        if self.proposed_block_hash.is_some() {
+            return;
+        }
+
         self.proposed_block_hash = Some(block_hash);
         self.proposed_state_root = Some(state_root);
     }
 
     /// Add a validator's vote. Rejects duplicate voters.
     pub fn add_vote(&mut self, vote: ConsensusVote) -> Result<(), String> {
+        // N130.3: recover proposal if vote arrives before proposal
         if self.proposed_block_hash.is_none() {
             self.proposed_block_hash = Some(vote.block_hash);
             self.proposed_state_root = Some(vote.state_root);
+
+            eprintln!(
+                "PROPOSAL_RECOVERED: h={} hash={:?}",
+                self.height,
+                &vote.block_hash[..4]
+            );
         }
+
         if vote.height != self.height {
             return Err(format!(
                 "Vote height {} != round height {}",
@@ -111,12 +124,18 @@ impl ConsensusRound {
         );
 
         eprintln!(
-            "QC_CHECK: approvals={} power={} total={} quorum={}",
+            "QC_CHECK: approvals={} votes={} power={} total={} quorum={} validators={}",
             approvals.len(),
+            self.votes.len(),
             approval_power,
             total_voting_power,
-            quorum_met
+            quorum_met,
+            validator_powers.len()
         );
+
+        for (vid, power) in validator_powers.iter() {
+            eprintln!("QC_VALIDATOR: id={:?} power={}", &vid[..4], power);
+        }
 
         if !quorum_met {
             return None;
@@ -276,6 +295,15 @@ impl ConsensusEngine {
             .register_identity(peer_id, validator_id, public_key);
         self.validator_powers.insert(validator_id, voting_power);
         self.total_voting_power += voting_power;
+
+        eprintln!(
+            "REGISTER_VALIDATOR: validator={:?} power={} total_power={} validators={} powers={}",
+            &validator_id[..4],
+            voting_power,
+            self.total_voting_power,
+            self.validator_ids.len(),
+            self.validator_powers.len()
+        );
     }
 
     pub fn start_round(&mut self, height: u64, proposer_id: [u8; 32]) {
@@ -292,14 +320,23 @@ impl ConsensusEngine {
     /// Process a vote for a round.
     pub fn process_vote(&mut self, vote: ConsensusVote) -> Result<(), String> {
         if self.is_suspended(&vote.voter_id) {
+            eprintln!("REJECT_SUSPENDED validator={:?}", &vote.voter_id[..4]);
             return Err(format!("Validator {:?} is suspended", &vote.voter_id[..4]));
         }
         // N105.3: Verify signature if registry populated
         if !self.validator_keys.is_empty() {
-            let pk = self
-                .validator_keys
-                .get(&vote.voter_id)
-                .ok_or_else(|| format!("Unknown validator {:?}", &vote.voter_id[..4]))?;
+            let pk = match self.validator_keys.get(&vote.voter_id) {
+                Some(pk) => pk,
+                None => {
+                    eprintln!(
+                        "REJECT_UNKNOWN_VALIDATOR validator={:?}",
+                        &vote.voter_id[..4]
+                    );
+                    return Err(format!("Unknown validator {:?}", &vote.voter_id[..4]));
+                }
+            };
+
+            eprintln!("VALIDATOR_FOUND validator={:?}", &vote.voter_id[..4]);
             let payload = amun_validator_identity::vote_signing_payload(
                 &vote.voter_id,
                 vote.height,
@@ -309,6 +346,11 @@ impl ConsensusEngine {
                 vote.timestamp,
             );
             if !amun_validator_identity::verify_ed25519(pk, &payload, &vote.signature) {
+                eprintln!(
+                    "REJECT_BAD_SIGNATURE validator={:?} height={}",
+                    &vote.voter_id[..4],
+                    vote.height
+                );
                 // N109.9: Vote binding enforcement — verify ExecutionCommitment
                 crate::vote_binding::verify_vote_binding(&vote)?;
                 return Err(format!(
@@ -319,6 +361,12 @@ impl ConsensusEngine {
         }
         let height = vote.height;
         if height <= self.current_height {
+            eprintln!(
+                "REJECT_STALE vote_h={} current_h={} validator={:?}",
+                height,
+                self.current_height,
+                &vote.voter_id[..4]
+            );
             // Check if the voter is far ahead of us — trigger catchup
             let _voter_height = height; // this is <= current, but we check other info
             eprintln!(
@@ -341,6 +389,13 @@ impl ConsensusEngine {
         }
         let future_window = std::cmp::max(5, self.current_height / 100); // N102: reduced for test, was 50
         if height > self.current_height + future_window {
+            eprintln!(
+                "REJECT_FUTURE vote_h={} current_h={} future_window={} validator={:?}",
+                height,
+                self.current_height,
+                future_window,
+                &vote.voter_id[..4]
+            );
             self.needs_catchup.store(true, Ordering::SeqCst);
             return Err(format!(
                 "Future vote height {} > current+{} {}",
@@ -693,5 +748,32 @@ mod tests {
             commitment: None,
         };
         assert!(engine.process_vote(vote_bad).is_err());
+    }
+}
+
+#[cfg(test)]
+mod n130_tests {
+    use super::*;
+
+    #[test]
+    fn n130_vote_before_proposal_is_recovered() {
+        let mut round = ConsensusRound::new(1, [1u8; 32]);
+
+        let vote = ConsensusVote {
+            voter_id: [1u8; 32],
+            height: 1,
+            block_hash: [0xAA; 32],
+            state_root: [0xBB; 32],
+            approve: true,
+            signature: [0u8; 64],
+            timestamp: 1,
+            commitment: None,
+        };
+
+        assert!(round.add_vote(vote).is_ok());
+
+        assert_eq!(round.proposed_block_hash, Some([0xAA; 32]));
+
+        assert_eq!(round.proposed_state_root, Some([0xBB; 32]));
     }
 }

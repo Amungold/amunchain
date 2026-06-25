@@ -42,10 +42,11 @@ pub struct EconomicTree;
 
 impl EconomicTree {
     pub fn root(snapshot: &EconomicSnapshot) -> Result<Hash32, EconomicError> {
-        let computed_circulating = snapshot.total_supply
-            - snapshot.burned_supply
-            - snapshot.staked_supply
-            - snapshot.treasury_balance;
+        let computed_circulating = snapshot
+            .total_supply
+            .saturating_sub(snapshot.burned_supply)
+            .saturating_sub(snapshot.staked_supply)
+            .saturating_sub(snapshot.treasury_balance);
 
         if computed_circulating != snapshot.circulating_supply {
             return Err(EconomicError::InvalidCirculatingSupply {
