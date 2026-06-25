@@ -1,3 +1,4 @@
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct EconomicSnapshot {
     pub total_supply: u64,
     pub treasury_balance: u64,
