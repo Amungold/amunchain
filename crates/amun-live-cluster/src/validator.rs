@@ -6,7 +6,6 @@ use amun_authority_registry::ConstitutionalAuthority;
 use amun_block_builder::BlockBuilder;
 use amun_chain_store::record::FinalizedChainRecord;
 use amun_chain_store::store::ChainStore;
-use amun_tokenomics_ledger::EconomicLedger;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
 use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
@@ -23,6 +22,7 @@ use amun_sync::catch_up::{append_missing_records, download_missing_records};
 use amun_sync::protocol::{
     MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE,
 };
+use amun_tokenomics_ledger::EconomicLedger;
 use amun_validator_identity::derive_validator_id;
 use amun_validator_identity::vote_signing_payload;
 use ed25519_dalek::{Signer, SigningKey};

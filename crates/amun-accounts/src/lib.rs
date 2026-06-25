@@ -1,6 +1,7 @@
 use amun_constitutional_commitment::{
     ConstitutionalRoots, EconomicSnapshot, EndBlockPipeline, Hash32,
 };
+use amun_snapshot_engine::ConstitutionalIdentity;
 use amun_tokenomics_ledger::EconomicLedger;
 use blake3::Hasher;
 use std::collections::BTreeMap;
@@ -82,10 +83,7 @@ impl AccountStore {
     }
 
     /// Build snapshot from the real EconomicLedger (Single Source of Truth).
-    pub fn build_economic_snapshot_with_ledger(
-        &self,
-        ledger: &EconomicLedger,
-    ) -> EconomicSnapshot {
+    pub fn build_economic_snapshot_with_ledger(&self, ledger: &EconomicLedger) -> EconomicSnapshot {
         let total_supply = self.total_supply();
         EconomicSnapshot {
             total_supply,
@@ -132,14 +130,12 @@ impl AccountStore {
     }
 
     /// Compute constitutional roots from a real EconomicLedger.
-    pub fn constitutional_roots_with_ledger(
-        &self,
-        ledger: &EconomicLedger,
-    ) -> ConstitutionalRoots {
+    pub fn constitutional_roots_with_ledger(&self, ledger: &EconomicLedger) -> ConstitutionalRoots {
         let raw_root = self.raw_state_root();
         let snapshot = self.build_economic_snapshot_with_ledger(ledger);
 
-        let identity_root: Hash32 = [0u8; 32];
+        let identity = ConstitutionalIdentity::new(raw_root);
+        let identity_root: Hash32 = identity.identity_hash;
         let evidence_root: Hash32 = [0u8; 32];
         let governance_root: Hash32 = [0u8; 32];
 

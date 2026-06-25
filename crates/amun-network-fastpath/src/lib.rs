@@ -87,14 +87,17 @@ pub fn benchmark_batching(message_count: u64, batch_size: usize) -> FastPathResu
         batches_created += 1;
     }
 
-    let elapsed_ms = start.elapsed().as_millis() as u64;
+    let elapsed = start.elapsed();
 
-    let throughput_kbps = if elapsed_ms > 0 {
-        (total_bytes as f64 / 1024.0) / (elapsed_ms as f64 / 1000.0)
+    let elapsed_secs = elapsed.as_secs_f64();
+
+    let throughput_kbps = if elapsed_secs > 0.0 {
+        (total_bytes as f64 / 1024.0) / elapsed_secs
     } else {
         f64::MAX
     };
 
+    let elapsed_ms = elapsed.as_millis() as u64;
     FastPathResult {
         messages_sent,
         batches_created,

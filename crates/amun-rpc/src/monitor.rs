@@ -15,7 +15,7 @@ pub struct ResourceStatus {
 }
 
 fn get_stat(key: &str) -> u64 {
-std::fs::read_to_string("/proc/self/status")
+    std::fs::read_to_string("/proc/self/status")
         .unwrap_or_default()
         .lines()
         .find(|l| l.starts_with(key))

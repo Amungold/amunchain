@@ -185,6 +185,9 @@ fn n32_certified_block_preserves_state_root() {
     // Block's state root must match the engine's current state
     assert_eq!(
         certified.block.state_root,
-        builder.engine.state.state_root()
+        builder
+            .engine
+            .state
+            .state_root_with_ledger(&builder.engine.economic)
     );
 }

@@ -36,7 +36,10 @@ fn n111_cca_state_root_preserved_through_block() {
         .unwrap();
 
     let block = builder.build_block(1, [0u8; 32], &mut mempool, 10, [0u8; 32], 1000);
-    let expected_state_root = builder.engine.state.state_root();
+    let expected_state_root = builder
+        .engine
+        .state
+        .state_root_with_ledger(&builder.engine.economic);
 
     assert_eq!(
         block.state_root, expected_state_root,

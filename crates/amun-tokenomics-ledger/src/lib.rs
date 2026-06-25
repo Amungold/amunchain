@@ -16,30 +16,20 @@ pub struct EconomicDelta {
     pub staked_delta: i64,
 }
 
-
-
 impl EconomicDelta {
     /// Merge another delta into this one using saturating arithmetic.
     pub fn merge(&mut self, other: &EconomicDelta) {
-        self.treasury_deposit = self
-            .treasury_deposit
-            .saturating_add(other.treasury_deposit);
+        self.treasury_deposit = self.treasury_deposit.saturating_add(other.treasury_deposit);
 
-        self.validator_reward = self
-            .validator_reward
-            .saturating_add(other.validator_reward);
+        self.validator_reward = self.validator_reward.saturating_add(other.validator_reward);
 
         self.ecosystem_deposit = self
             .ecosystem_deposit
             .saturating_add(other.ecosystem_deposit);
 
-        self.burn_amount = self
-            .burn_amount
-            .saturating_add(other.burn_amount);
+        self.burn_amount = self.burn_amount.saturating_add(other.burn_amount);
 
-        self.staked_delta = self
-            .staked_delta
-            .saturating_add(other.staked_delta);
+        self.staked_delta = self.staked_delta.saturating_add(other.staked_delta);
     }
 
     /// Convenience wrapper.
@@ -84,12 +74,24 @@ impl EconomicLedger {
     // -----------------------------------------------------------------------
     // Getters
     // -----------------------------------------------------------------------
-    pub fn treasury(&self) -> u64 { self.treasury_balance }
-    pub fn validator_pool(&self) -> u64 { self.validator_reward_pool }
-    pub fn ecosystem_pool(&self) -> u64 { self.ecosystem_reward_pool }
-    pub fn issued_supply(&self) -> u64 { self.total_issued_ntr }
-    pub fn burned_supply(&self) -> u64 { self.burned_supply }
-    pub fn staked_supply(&self) -> u64 { self.staked_supply }
+    pub fn treasury(&self) -> u64 {
+        self.treasury_balance
+    }
+    pub fn validator_pool(&self) -> u64 {
+        self.validator_reward_pool
+    }
+    pub fn ecosystem_pool(&self) -> u64 {
+        self.ecosystem_reward_pool
+    }
+    pub fn issued_supply(&self) -> u64 {
+        self.total_issued_ntr
+    }
+    pub fn burned_supply(&self) -> u64 {
+        self.burned_supply
+    }
+    pub fn staked_supply(&self) -> u64 {
+        self.staked_supply
+    }
 
     // -----------------------------------------------------------------------
     // Atomic mutations

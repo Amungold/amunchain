@@ -47,7 +47,8 @@ pub fn stress_amm_swaps(iterations: u64) -> DefiStressResult {
         if let Ok(pool_id) = amm.create_pool(&mut reg, token_a, token_b, [0u8; 32]) {
             let amount = rng.gen_range(1..1_000_000);
             amm.add_liquidity(&pool_id.0, amount, amount);
-            let swap_amount = rng.gen_range(1..amount / 10);
+            let max_swap = std::cmp::max(2, amount / 10);
+            let swap_amount = rng.gen_range(1..max_swap);
             let root_before = amm.compute_evidence_root();
             let out = amm.swap(&pool_id.0, swap_amount, rng.gen::<bool>());
             let root_after = amm.compute_evidence_root();
