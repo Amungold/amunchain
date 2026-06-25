@@ -130,7 +130,6 @@ impl BlockBuilder {
         let transactions = mempool.take_for_block(max_txs);
         let receipts = self.engine.execute_block(&transactions);
 let economic_snapshot = self.engine.finalize_block();
-let _economic_snapshot = self.engine.finalize_block();        
 let state_root = self.engine.state.state_root();
         let roots = self.engine.state.constitutional_roots();
 
