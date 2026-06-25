@@ -1,10 +1,10 @@
 use amun_accounts::AccountStore;
 use amun_consensus_network::SlashingCertificate;
+use amun_constitutional_commitment::EconomicSnapshot;
 use amun_execution::ExecutionEngine;
 use amun_mempool::Mempool;
 use amun_transactions::{Transaction, TransactionReceipt};
 use blake3::Hasher;
-use amun_constitutional_commitment::EconomicSnapshot;
 
 #[derive(Debug, Clone)]
 pub struct Block {
@@ -24,7 +24,6 @@ pub struct Block {
     pub governance_root: [u8; 32],
     pub economic_snapshot: EconomicSnapshot,
 }
-
 
 impl Block {
     pub fn verify_slashing_certificates(&self) -> Result<(), String> {
@@ -129,9 +128,13 @@ impl BlockBuilder {
     ) -> Block {
         let transactions = mempool.take_for_block(max_txs);
         let receipts = self.engine.execute_block(&transactions);
-let economic_snapshot = self.engine.finalize_block();
-let state_root = self.engine.state.state_root();
-        let roots = self.engine.state.constitutional_roots();
+        let economic_snapshot = self.engine.finalize_block();
+        let roots = self
+            .engine
+            .state
+            .constitutional_roots_with_ledger(&self.engine.economic);
+
+        let state_root = roots.state_root;
 
         Block {
             height,
