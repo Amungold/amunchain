@@ -1,6 +1,7 @@
 use amun_tokenomics_ledger::EconomicLedger;
 use amun_accounts::AccountStore;
 use amun_transactions::{Transaction, TransactionPayload, TransactionReceipt};
+use amun_constitutional_commitment::EconomicSnapshot;
 
 /// Constitutional execution engine that processes transactions against account state.
 #[derive(Debug, Clone)]
@@ -91,8 +92,16 @@ impl ExecutionEngine {
     pub fn execute_block(&mut self, txs: &[Transaction]) -> Vec<TransactionReceipt> {
         txs.iter().map(|tx| self.execute(tx)).collect()
     }
-}
 
+
+/// Build the canonical economic snapshot for the current block.
+    ///
+    /// This is the only supported way to expose the economic state
+    /// outside the execution engine.
+    pub fn finalize_block(&self) -> EconomicSnapshot {
+        self.state.build_economic_snapshot_with_ledger(&self.economic)
+    }
+ }
 impl Default for ExecutionEngine {
     fn default() -> Self {
         Self::new()

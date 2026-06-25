@@ -1,6 +1,6 @@
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
-use amun_rpc::{serve, AppState};
+use amun_rpc::{build_app, AppState};
 use std::sync::{Arc, Mutex};
 
 #[tokio::main]
@@ -32,5 +32,9 @@ async fn main() {
     };
 
     eprintln!("RPC server on port {}", rpc_port);
-    serve(state, rpc_port).await;
+    let app = build_app(state);
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", rpc_port))
+        .await
+        .unwrap();
+    axum::serve(listener, app).await.unwrap();
 }

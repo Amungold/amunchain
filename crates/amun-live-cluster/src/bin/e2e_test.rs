@@ -1,9 +1,11 @@
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
 use amun_rpc::client::RpcClient;
-use amun_rpc::{serve, AppState};
+use amun_rpc::{build_app, AppState};
+use axum::serve;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() {
@@ -19,7 +21,9 @@ async fn main() {
         faucet: Arc::new(Mutex::new(amun_rpc::faucet::FaucetState::default())),
         account_store: Arc::new(Mutex::new(amun_accounts::AccountStore::new())),
     };
-    tokio::spawn(async move { serve(state, 9070).await });
+    let app = build_app(state);
+    let listener = TcpListener::bind("0.0.0.0:9070").await.unwrap();
+    tokio::spawn(async move { serve(listener, app).await.unwrap() });
 
     // Wait for RPC to be ready
     let rpc = RpcClient::new("127.0.0.1", 9070);

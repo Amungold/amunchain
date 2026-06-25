@@ -193,7 +193,7 @@ impl LiveValidator {
         let validator_id = self.validator_id;
         let my_index = self.config.validator_id[0];
         let block_roots_map = self.block_roots_map.clone();
-        let economic_ledger = self.economic_ledger.clone();
+        let _economic_ledger = self.economic_ledger.clone();
 
         // Listen thread
         let engine_listen = engine.clone();
