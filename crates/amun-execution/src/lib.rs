@@ -1,8 +1,9 @@
-use amun_tokenomics_ledger::EconomicLedger;
 use amun_accounts::AccountStore;
-use amun_transactions::{Transaction, TransactionPayload, TransactionReceipt};
 use amun_constitutional_commitment::EconomicSnapshot;
-
+use amun_tokenomics::policy;
+use amun_tokenomics_ledger::EconomicDelta;
+use amun_tokenomics_ledger::EconomicLedger;
+use amun_transactions::{Transaction, TransactionPayload, TransactionReceipt};
 /// Constitutional execution engine that processes transactions against account state.
 #[derive(Debug, Clone)]
 pub struct ExecutionEngine {
@@ -74,6 +75,21 @@ impl ExecutionEngine {
                 }
                 self.state.credit(&transfer.to, transfer.amount);
                 self.state.increment_nonce(&tx.sender);
+                let fee = policy::MINIMUM_FEE_NTR;
+
+                let treasury = fee * policy::TREASURY_BPS as u64 / 10_000;
+                let validator = fee * policy::VALIDATOR_BPS as u64 / 10_000;
+                let ecosystem = fee * policy::ECOSYSTEM_BPS as u64 / 10_000;
+
+                let delta = EconomicDelta {
+                    treasury_deposit: treasury,
+                    validator_reward: validator,
+                    ecosystem_deposit: ecosystem,
+                    burn_amount: fee - treasury - validator - ecosystem,
+                    staked_delta: 0,
+                };
+
+                self.economic.apply_block_economics(&delta);
             }
         }
 
@@ -93,15 +109,15 @@ impl ExecutionEngine {
         txs.iter().map(|tx| self.execute(tx)).collect()
     }
 
-
-/// Build the canonical economic snapshot for the current block.
+    /// Build the canonical economic snapshot for the current block.
     ///
     /// This is the only supported way to expose the economic state
     /// outside the execution engine.
     pub fn finalize_block(&self) -> EconomicSnapshot {
-        self.state.build_economic_snapshot_with_ledger(&self.economic)
+        self.state
+            .build_economic_snapshot_with_ledger(&self.economic)
     }
- }
+}
 impl Default for ExecutionEngine {
     fn default() -> Self {
         Self::new()
