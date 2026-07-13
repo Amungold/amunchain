@@ -63,8 +63,8 @@ impl ConsensusEngine {
             return Err(format!("Validator {:?} is suspended", &vote.voter_id[..4]));
         }
         // N105.3: Verify signature if registry populated
-        if !self.validator_keys.is_empty() {
-            if self.validator_keys.get(&vote.voter_id).is_none() {
+        if self.validator_registry.is_some() || !self.validator_keys.is_empty() {
+            if self.get_validator_public_key(&vote.voter_id).is_none() {
                 eprintln!(
                     "REJECT_UNKNOWN_VALIDATOR validator={:?}",
                     &vote.voter_id[..4]
@@ -213,11 +213,12 @@ impl ConsensusEngine {
             "ADVANCE_DIAG: try_advance h={} active={}/{}",
             height, active, self.total_validators
         );
-        let validator_keys = &self.validator_keys;
+        let validator_keys = &self.validator_keys; // Keep for verify functions
+        let tvp = self.get_total_voting_power();
         let round = self.rounds.get_mut(&height)?;
 
         if round.qc.is_none() {
-            round.try_form_qc(active, &self.validator_powers, self.total_voting_power)?;
+        round.try_form_qc(active, &self.validator_powers, tvp)?;
         }
 
         let qc = round.qc.as_ref()?;
