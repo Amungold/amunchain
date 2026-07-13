@@ -213,7 +213,6 @@ mod tests {
 
     #[test]
     fn n131_duplicate_validator_in_qc_rejected() {
-        use std::collections::HashMap;
 
         let hash = [0xAA; 32];
 
@@ -244,7 +243,6 @@ mod tests {
     }
     #[test]
     fn n131_tampered_approval_power_rejected() {
-        use std::collections::HashMap;
 
         let hash = [0xAA; 32];
 
@@ -441,8 +439,6 @@ pub struct BlockProposal {
     pub timestamp: u64,
 }
 
-#[cfg(test)]
-use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
 mod n104_1_tests {
     use super::*;
 

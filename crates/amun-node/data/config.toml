@@ -1,10 +1,18 @@
-[validator]
-index = 0
-data_dir = "/tmp/amun-validator-0"
-listen_addr = "127.0.0.1:9000"
+[node]
+name = "validator-0"
+listen_host = "0.0.0.0"
+listen_port = 9050
+
+[identity]
+key_file = "data/identity.json"
 
 [peers]
-addresses = ["127.0.0.1:9000", "127.0.0.1:9001", "127.0.0.1:9002", "127.0.0.1:9003"]
+seed_peers = ["0.0.0.0:9050"]
 
 [genesis]
-authority_key = "0000000000000000000000000000000000000000000000000000000000000000"
+file = "/root/projects/amunchain/amunchain-clean/crates/amun-live-cluster/genesis/genesis_authority.json"
+
+[validator]
+validator_id = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+authority_public_key = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+data_dir = "/tmp/amun-validator-0"

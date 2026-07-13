@@ -15,6 +15,25 @@ impl ConsensusEngine {
         public_key: [u8; 32],
         voting_power: u64,
     ) {
+        // N136: Write to canonical registry when available
+        if let Some(ref mutex) = self.registry_mut {
+            if let Ok(mut reg) = mutex.lock() {
+                let record = amun_validator_registry::ValidatorRecord {
+                    validator_id: amun_validator_registry::ValidatorId(validator_id),
+                    peer_id: amun_validator_registry::PeerId(peer_id),
+                    public_key: amun_validator_registry::PublicKey(public_key),
+                    certificate_hash: [0u8; 32],
+                    stake: voting_power,
+                    voting_power,
+                    active: true,
+                    slash_count: 0,
+                    registered_at: 0,
+                };
+                let _ = reg.register_full(record);
+            }
+        }
+
+        // Legacy fallback: keep internal maps in sync
         if self.validator_powers.contains_key(&validator_id) {
             return;
         }

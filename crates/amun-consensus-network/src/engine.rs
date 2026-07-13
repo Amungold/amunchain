@@ -28,6 +28,7 @@ pub struct ConsensusEngine {
     pub validator_powers: HashMap<[u8; 32], u64>,
     pub total_voting_power: u64,
     pub validator_registry: Option<std::sync::Arc<dyn ValidatorRead + Send + Sync>>,
+    pub(crate) registry_mut: Option<std::sync::Arc<std::sync::Mutex<amun_validator_registry::ValidatorRegistry>>>, 
     finality_chain: Vec<FinalityCertificate>,
 }
 
@@ -51,6 +52,7 @@ impl ConsensusEngine {
             validator_powers: HashMap::new(),
             total_voting_power: 0,
             validator_registry: None,
+            registry_mut: None,
             finality_chain: Vec::new(),
         }
     }
@@ -545,8 +547,6 @@ mod tests {
     }
 }
 
-#[cfg(test)]
-use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
 mod n130_tests {
     use super::*;
 
