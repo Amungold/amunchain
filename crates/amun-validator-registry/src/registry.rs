@@ -1,6 +1,6 @@
-use std::collections::BTreeMap;
 use crate::ids::ValidatorId;
 use crate::record::ValidatorRecord;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct ValidatorRegistry {
@@ -140,5 +140,45 @@ impl ValidatorRead for ValidatorRegistry {
 
     fn validator_count(&self) -> usize {
         self.records.len()
+    }
+}
+
+// N135: Implement admin trait for write operations
+use crate::traits::ValidatorAdmin;
+
+impl ValidatorAdmin for ValidatorRegistry {
+    fn register(&mut self, record: crate::record::ValidatorRecord) -> Result<(), &'static str> {
+        if self.records.contains_key(&record.validator_id) {
+            return Err("validator already registered");
+        }
+        let short_id = u64::from_le_bytes(record.validator_id.0[..8].try_into().unwrap());
+        self.keys.insert(short_id, record.public_key.0);
+        self.records.insert(record.validator_id, record);
+        Ok(())
+    }
+
+    fn update_voting_power(&mut self, id: &ValidatorId, power: u64) -> Result<(), &'static str> {
+        if let Some(record) = self.records.get_mut(id) {
+            record.voting_power = power;
+            Ok(())
+        } else {
+            Err("validator not found")
+        }
+    }
+
+    fn deactivate(&mut self, id: &ValidatorId) -> Result<(), &'static str> {
+        if let Some(record) = self.records.get_mut(id) {
+            record.active = false;
+            Ok(())
+        } else {
+            Err("validator not found")
+        }
+    }
+
+    fn remove(&mut self, id: &ValidatorId) -> Result<(), &'static str> {
+        self.records
+            .remove(id)
+            .map(|_| ())
+            .ok_or("validator not found")
     }
 }

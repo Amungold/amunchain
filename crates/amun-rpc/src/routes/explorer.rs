@@ -39,7 +39,7 @@ async fn explorer_validators(State(state): State<AppState>) -> Json<serde_json::
         .validator_ids
         .iter()
         .map(|id| {
-            let power = engine.validator_powers.get(id).copied().unwrap_or(0);
+            let power = engine.get_validator_voting_power(id);
             serde_json::json!({
                 "id": hex::encode(id),
                 "voting_power": power,

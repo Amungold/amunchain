@@ -168,6 +168,7 @@ pub struct FinalityCertificate {
 }
 
 #[cfg(test)]
+use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
 mod tests {
     use super::*;
 
@@ -225,10 +226,21 @@ mod tests {
             total_voting_power: 2,
         };
 
-        let mut powers = HashMap::new();
-        powers.insert([1u8; 32], 1);
-
-        assert!(qc.verify_strict(&powers).is_err());
+        let mut registry = ValidatorRegistry::new();
+        registry
+            .register_full(ValidatorRecord {
+                validator_id: ValidatorId([1u8; 32]),
+                peer_id: PeerId([0u8; 32]),
+                public_key: PublicKey([0u8; 32]),
+                certificate_hash: [0u8; 32],
+                stake: 0,
+                voting_power: 1,
+                active: true,
+                slash_count: 0,
+                registered_at: 0,
+            })
+            .unwrap();
+        assert!(qc.verify_with_registry(&registry).is_err());
     }
     #[test]
     fn n131_tampered_approval_power_rejected() {
@@ -249,12 +261,23 @@ mod tests {
             total_voting_power: 3,
         };
 
-        let mut powers = HashMap::new();
-        powers.insert([1u8; 32], 1);
-        powers.insert([2u8; 32], 1);
-        powers.insert([3u8; 32], 1);
-
-        assert!(qc.verify_strict(&powers).is_err());
+        let mut registry = ValidatorRegistry::new();
+        for id in [1u8, 2u8, 3u8].iter() {
+            registry
+                .register_full(ValidatorRecord {
+                    validator_id: ValidatorId([*id; 32]),
+                    peer_id: PeerId([0u8; 32]),
+                    public_key: PublicKey([0u8; 32]),
+                    certificate_hash: [0u8; 32],
+                    stake: 0,
+                    voting_power: 1,
+                    active: true,
+                    slash_count: 0,
+                    registered_at: 0,
+                })
+                .unwrap();
+        }
+        assert!(qc.verify_with_registry(&registry).is_err());
     }
 
     #[test]
@@ -419,6 +442,7 @@ pub struct BlockProposal {
 }
 
 #[cfg(test)]
+use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
 mod n104_1_tests {
     use super::*;
 
@@ -564,11 +588,12 @@ pub struct N109ConsensusVote {
     pub commitment: ExecutionCommitment,
 }
 
-
-
 impl QuorumCertificate {
     /// Verify QC using ValidatorRead trait.
-    pub fn verify_with_registry(&self, registry: &dyn amun_validator_registry::ValidatorRead) -> Result<(), String> {
+    pub fn verify_with_registry(
+        &self,
+        registry: &dyn amun_validator_registry::ValidatorRead,
+    ) -> Result<(), String> {
         if !self.verify_consistency() {
             return Err("QC consistency failed".into());
         }
@@ -576,7 +601,10 @@ impl QuorumCertificate {
         let mut computed_power = 0u64;
         for vote in &self.votes {
             if !seen.insert(vote.voter_id) {
-                return Err(format!("Duplicate validator in QC {:?}", &vote.voter_id[..4]));
+                return Err(format!(
+                    "Duplicate validator in QC {:?}",
+                    &vote.voter_id[..4]
+                ));
             }
             let id = amun_validator_registry::ValidatorId(vote.voter_id);
             let power = registry.get_voting_power(&id);

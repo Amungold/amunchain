@@ -346,6 +346,7 @@ impl ConsensusEngine {
     }
 }
 #[cfg(test)]
+use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
 mod tests {
     use super::*;
 
@@ -402,10 +403,11 @@ mod tests {
                 .unwrap();
         }
 
+        let registry = ValidatorRegistry::new();
         let qc = engine
             .round_mut(1)
             .unwrap()
-            .try_form_qc(4, &HashMap::new(), 0);
+            .try_form_qc_with_registry(4, &registry);
         assert!(qc.is_none(), "Should not form QC with only 2/4 votes");
     }
 
@@ -544,6 +546,7 @@ mod tests {
 }
 
 #[cfg(test)]
+use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
 mod n130_tests {
     use super::*;
 

@@ -197,8 +197,6 @@ pub struct DoubleVoteEvidence {
     pub vote_b: crate::messages::ConsensusVote,
 }
 
-
-
 impl ConsensusRound {
     /// Try to form QC using ValidatorRead trait.
     pub fn try_form_qc_with_registry(

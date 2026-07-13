@@ -622,7 +622,7 @@ impl LiveValidator {
                         // N126.3: Finality supermajority from QC voting power
                         let finality_supermajority = {
                             let eng = engine_consensus.lock().unwrap();
-                            eng.total_voting_power > 0
+                            eng.get_total_voting_power() > 0
                         };
 
                         // Evidence validity: all certificates pass .verify()

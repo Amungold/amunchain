@@ -35,7 +35,10 @@ impl ConsensusEngine {
             let id = amun_validator_registry::ValidatorId(*validator_id);
             return reg.get_voting_power(&id);
         }
-        self.validator_powers.get(validator_id).copied().unwrap_or(0)
+        self.validator_powers
+            .get(validator_id)
+            .copied()
+            .unwrap_or(0)
     }
 
     /// Get total voting power, preferring the canonical registry.
