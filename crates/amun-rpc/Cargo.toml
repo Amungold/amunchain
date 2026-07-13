@@ -1,0 +1,29 @@
+[package]
+name = "amun-rpc"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Live RPC server for AmunChain validators"
+[dependencies]
+amun-wallet-management = { path = "../amun-wallet-management" }
+amun-accounts = { path = "../amun-accounts" }
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+amun-chain-store = { path = "../amun-chain-store" }
+amun-mempool = { path = "../amun-mempool" }
+amun-consensus-network = { path = "../amun-consensus-network" }
+axum = { version = "0.7", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hex = "0.4"
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors"] }
+
+amun-transactions = { path = "../amun-transactions" }
+blake3.workspace = true
+ed25519-dalek = "2.2.0"
+utoipa = { version = "5", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "8", features = ["axum"] }
+amun-tokenomics-ledger = { path = "../amun-tokenomics-ledger" }
+amun-authority-registry = { path = "../amun-authority-registry" }
+amun-constitutional-enforcement = { path = "../amun-constitutional-enforcement" }

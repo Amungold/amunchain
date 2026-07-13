@@ -1,0 +1,44 @@
+[package]
+name = "amun-node"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+edition = "2021"
+description = "AmunChain constitutional validator node"
+
+[[bin]]
+name = "amun-node"
+path = "src/main.rs"
+
+[dev-dependencies]
+tempfile = "3"
+
+[dependencies]
+bytes = "1"
+sha2 = "0.10"
+ed25519-dalek = "2"
+amun-orchestrator-genesis = { path = "../amun-orchestrator-genesis" }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+thiserror = "2"
+blake3 = "1"
+amun-networking = { path = "../amun-networking" }
+amun-consensus = { path = "../amun-consensus" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+hex = "0.4"
+amun-persistent-node = { path = "../amun-persistent-node" }
+amun-validator-runtime = { path = "../amun-validator-runtime" }
+amun-resource-core = { path = "../amun-resource-core" }
+amun-bytecode = { path = "../amun-bytecode" }
+amun-constitutional-runtime = { path = "../amun-constitutional-runtime" }
+amun-proof-archive = { path = "../amun-proof-archive" }
+amun-vm-kernel = { path = "../amun-vm-kernel" }
+amun-validator-networking = { path = "../amun-validator-networking" }
+amun-snapshot-engine-unified = { path = "../amun-snapshot-engine-unified" }
+amun-persistence = { path = "../amun-persistence" }
+amun-live-cluster = { path = "../amun-live-cluster" }
+
+[lib]
+name = "amun_node"
+path = "src/lib.rs"

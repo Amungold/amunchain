@@ -1,0 +1,27 @@
+[package]
+name = "amun-wallet-api"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "External access layer for AmunChain — Wallet API"
+
+[dependencies]
+amun-wallet-management = { path = "../amun-wallet-management" }
+amun-accounts = { path = "../amun-accounts" }
+amun-transactions = { path = "../amun-transactions" }
+amun-mempool = { path = "../amun-mempool" }
+amun-block-store = { path = "../amun-block-store" }
+amun-networking = { path = "../amun-networking" }
+amun-rpc = { path = "../amun-rpc" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+axum = "0.7"
+tower = "0.5"
+blake3 = "1"
+hex = "0.4"
+
+[[bin]]
+name = "amun-wallet-api"
+path = "src/main.rs"
+

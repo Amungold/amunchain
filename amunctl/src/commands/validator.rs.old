@@ -1,0 +1,134 @@
+use super::services::init_services;
+use amun_orchestrator_core::state::ServiceKind;
+
+fn bin_dir() -> String {
+    std::env::var("AMUN_BIN_DIR").unwrap_or_else(|_| "./target/debug".to_string())
+}
+
+pub async fn start(name: &str) {
+    ensure_genesis().await;
+
+    let v_dir = format!("./data/validators/{}", name);
+    let _ = std::fs::copy("./data/genesis.json", format!("{}/genesis.json", v_dir));
+    let cert_src = format!("./data/certificates/{}.crt", name);
+    let cert_dst = format!("{}/validator.crt", v_dir);
+    if Path::new(&cert_src).exists() && !Path::new(&cert_dst).exists() {
+        let _ = std::fs::copy(&cert_src, &cert_dst);
+    }
+
+    let services = init_services("./data", &bin_dir());
+    // استخدام المسار المباشر للثنائي الذي تم بناؤه بالفعل
+    let amun_node = format!("{}/amun-node", bin_dir());
+    let config = format!("{}/config.toml", v_dir);
+    match services
+        .service_manager
+        .start_service(
+            name,
+            ServiceKind::Other(name.to_string()),
+            &amun_node,
+            &["--config".to_string(), config],
+        )
+        .await
+    {
+        Ok(pid) => println!("  ✅ Started {} (PID: {})", name, pid),
+        Err(e) => eprintln!("  ❌ Failed to start {}: {}", name, e),
+    }
+}
+
+pub async fn start_all() {
+    ensure_genesis().await;
+    if let Ok(names) = discover_validators() {
+        for name in names {
+            start(&name).await;
+        }
+    }
+}
+
+pub async fn stop_all() {
+    let services = init_services("./data", &bin_dir());
+    if let Ok(names) = discover_validators() {
+        for name in names {
+            match services
+                .validator_factory
+                .stop_validator(&name, "shutdown")
+                .await
+            {
+                Ok(()) => println!("  ✅ Stopped {}", name),
+                Err(e) => eprintln!("  ❌ Failed to stop {}: {}", name, e),
+            }
+        }
+    }
+}
+
+pub async fn add(name: &str, port: u16, power: u64) {
+    let services = init_services("./data", &bin_dir());
+    println!(
+        "+ Creating validator: {} (port: {}, power: {})",
+        name, port, power
+    );
+    match services
+        .validator_factory
+        .add_validator(name, port, port + 500, power)
+        .await
+    {
+        Ok(result) => {
+            println!("  ✅ Validator created:");
+            println!("     Peer ID:      {}", result.peer_id);
+            println!("     Validator ID: {}", result.validator_id);
+            println!("     Config:       {}", result.config_path.display());
+            println!("     Certificate:  {}", result.cert_path.display());
+        }
+        Err(e) => eprintln!("  ❌ Failed: {}", e),
+    }
+}
+
+pub async fn remove(name: &str) {
+    let services = init_services("./data", &bin_dir());
+    match services.validator_factory.remove_validator(name).await {
+        Ok(()) => println!("  ✅ Removed validator: {}", name),
+        Err(e) => eprintln!("  ❌ Failed: {}", e),
+    }
+}
+
+pub async fn restart(name: &str) {
+    let services = init_services("./data", &bin_dir());
+    let _ = services
+        .validator_factory
+        .stop_validator(name, "restart")
+        .await;
+    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+
+    let v_dir = format!("./data/validators/{}", name);
+    let _ = std::fs::copy("./data/genesis.json", format!("{}/genesis.json", v_dir));
+    let amun_node = format!("{}/amun-node", bin_dir());
+    let config = format!("{}/config.toml", v_dir);
+    match services
+        .service_manager
+        .start_service(
+            name,
+            ServiceKind::Other(name.to_string()),
+            &amun_node,
+            &["--config".to_string(), config],
+        )
+        .await
+    {
+        Ok(pid) => println!("  ✅ Restarted {} (PID: {})", name, pid),
+        Err(e) => eprintln!("  ❌ Failed to restart {}: {}", name, e),
+    }
+}
+
+pub async fn list() {
+    println!("📋 Validators:");
+    match discover_validators() {
+        Ok(names) if names.is_empty() => println!("  (no validators found)"),
+        Ok(names) => {
+            for name in &names {
+                match find_process(name) {
+                    Some(pid) => println!("  {}: ✅ running (PID: {})", name, pid),
+                    None => println!("  {}: ❌ stopped", name),
+                }
+            }
+        }
+        Err(_) => println!("  ⚠️  Could not read validators directory"),
+    }
+}

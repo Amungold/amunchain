@@ -1,0 +1,1500 @@
+crates/amun-constitutional/src/schema_registry.rs-36-    pub const fn is_experimental(id: u16) -> bool {
+crates/amun-constitutional/src/schema_registry.rs-37-        id >= EXPERIMENTAL_START
+crates/amun-constitutional/src/schema_registry.rs-38-    }
+crates/amun-constitutional/src/schema_registry.rs-39-    pub const fn is_reserved(id: u16) -> bool {
+crates/amun-constitutional/src/schema_registry.rs-40-        is_core(id) || is_runtime(id) || is_experimental(id)
+crates/amun-constitutional/src/schema_registry.rs-41-    }
+crates/amun-constitutional/src/schema_registry.rs-42-}
+crates/amun-constitutional/src/schema_registry.rs-43-
+crates/amun-constitutional/src/schema_registry.rs:44:/// Constitutional core schema IDs — IMMUTABLE.
+crates/amun-constitutional/src/schema_registry.rs-45-///
+crates/amun-constitutional/src/schema_registry.rs-46-/// These IDs are part of the constitutional ABI.
+crates/amun-constitutional/src/schema_registry.rs-47-/// Any change requires a constitutional revision.
+crates/amun-constitutional/src/schema_registry.rs-48-pub mod core_schemas {
+crates/amun-constitutional/src/schema_registry.rs-49-    use super::schema_ranges;
+crates/amun-constitutional/src/schema_registry.rs-50-
+crates/amun-constitutional/src/schema_registry.rs:51:    /// ConstitutionalFailure
+crates/amun-constitutional/src/schema_registry.rs-52-    pub const CONSTITUTIONAL_FAILURE: u16 = 0x0004;
+crates/amun-constitutional/src/schema_registry.rs-53-    /// ExecutionLimits
+crates/amun-constitutional/src/schema_registry.rs-54-    pub const EXECUTION_LIMITS: u16 = 0x0005;
+crates/amun-constitutional/src/schema_registry.rs-55-    /// ExecutionContext
+crates/amun-constitutional/src/schema_registry.rs-56-    pub const EXECUTION_CONTEXT: u16 = 0x0006;
+crates/amun-constitutional/src/schema_registry.rs-57-    /// ExecutionBoundary
+crates/amun-constitutional/src/schema_registry.rs-58-    pub const EXECUTION_BOUNDARY: u16 = 0x0007;
+crates/amun-constitutional/src/schema_registry.rs-59-    /// ExecutionJournal
+crates/amun-constitutional/src/schema_registry.rs-60-    pub const EXECUTION_JOURNAL: u16 = 0x0008;
+crates/amun-constitutional/src/schema_registry.rs:61:    /// TransitionEvidence
+crates/amun-constitutional/src/schema_registry.rs-62-    pub const TRANSITION_EVIDENCE: u16 = 0x0009;
+crates/amun-constitutional/src/schema_registry.rs-63-    /// TransitionCommitment
+crates/amun-constitutional/src/schema_registry.rs-64-    pub const TRANSITION_COMMITMENT: u16 = 0x000A;
+crates/amun-constitutional/src/schema_registry.rs-65-    /// JournalEntry
+crates/amun-constitutional/src/schema_registry.rs-66-    pub const JOURNAL_ENTRY: u16 = 0x000B;
+crates/amun-constitutional/src/schema_registry.rs-67-    /// ExecutionReceipt
+crates/amun-constitutional/src/schema_registry.rs-68-    pub const EXECUTION_RECEIPT: u16 = 0x000C;
+crates/amun-constitutional/src/schema_registry.rs-69-    /// ReplayCertificate
+crates/amun-constitutional/src/schema_registry.rs-70-    pub const REPLAY_CERTIFICATE: u16 = 0x000D;
+crates/amun-constitutional/src/schema_registry.rs:71:    /// ConstitutionalStateAnchor
+crates/amun-constitutional/src/schema_registry.rs-72-    pub const STATE_ANCHOR: u16 = 0x000E;
+crates/amun-constitutional/src/schema_registry.rs:73:    /// ConstitutionalSnapshot
+crates/amun-constitutional/src/schema_registry.rs-74-    pub const SNAPSHOT: u16 = 0x000F;
+crates/amun-constitutional/src/schema_registry.rs-75-    /// RestorationPoint
+crates/amun-constitutional/src/schema_registry.rs-76-    pub const RESTORATION_POINT: u16 = 0x0010;
+crates/amun-constitutional/src/schema_registry.rs-77-    /// ContinuationChain
+crates/amun-constitutional/src/schema_registry.rs-78-    pub const CONTINUATION_CHAIN: u16 = 0x0011;
+crates/amun-constitutional/src/schema_registry.rs-79-    /// DivergencePoint
+crates/amun-constitutional/src/schema_registry.rs-80-    pub const DIVERGENCE_POINT: u16 = 0x0012;
+crates/amun-constitutional/src/schema_registry.rs-81-    /// DivergenceResolution
+crates/amun-constitutional/src/schema_registry.rs-82-    pub const DIVERGENCE_RESOLUTION: u16 = 0x0013;
+crates/amun-constitutional/src/schema_registry.rs:83:    /// CausalEdge — FIXED: was 0x0014 colliding with ConstitutionalWitness
+crates/amun-constitutional/src/schema_registry.rs-84-    pub const CAUSAL_EDGE: u16 = 0x0014;
+crates/amun-constitutional/src/schema_registry.rs:85:    /// ConstitutionalWitness — FIXED: now 0x0015 (was 0x0014)
+crates/amun-constitutional/src/schema_registry.rs-86-    pub const CONSTITUTIONAL_WITNESS: u16 = 0x0015;
+crates/amun-constitutional/src/schema_registry.rs-87-
+crates/amun-constitutional/src/schema_registry.rs-88-    /// Verify that all core schema IDs are unique.
+crates/amun-constitutional/src/schema_registry.rs-89-    pub const fn verify_uniqueness() -> bool {
+crates/amun-constitutional/src/schema_registry.rs-90-        let ids = [
+crates/amun-constitutional/src/schema_registry.rs-91-            CONSTITUTIONAL_FAILURE,
+crates/amun-constitutional/src/schema_registry.rs-92-            EXECUTION_LIMITS,
+crates/amun-constitutional/src/schema_registry.rs-93-            EXECUTION_CONTEXT,
+--
+crates/amun-constitutional/src/constitutional_failure.rs:1:use crate::constitutional_hasher::ConstitutionalHasher;
+crates/amun-constitutional/src/constitutional_failure.rs:2:use crate::kernel_types::ConstitutionalHash;
+crates/amun-constitutional/src/constitutional_failure.rs-3-use crate::prelude::*;
+crates/amun-constitutional/src/constitutional_failure.rs-4-
+crates/amun-constitutional/src/constitutional_failure.rs-5-pub mod severity {
+crates/amun-constitutional/src/constitutional_failure.rs-6-    pub const WARNING: u8 = 0x01;
+crates/amun-constitutional/src/constitutional_failure.rs-7-    pub const SOFT_FAILURE: u8 = 0x02;
+crates/amun-constitutional/src/constitutional_failure.rs-8-    pub const HARD_FAILURE: u8 = 0x03;
+crates/amun-constitutional/src/constitutional_failure.rs-9-    pub const FATAL_FAILURE: u8 = 0x04;
+crates/amun-constitutional/src/constitutional_failure.rs-10-}
+--
+crates/amun-constitutional/src/constitutional_failure.rs-27-    pub const BOUNDARY_VIOLATION: u16 = 0x06;
+crates/amun-constitutional/src/constitutional_failure.rs-28-    pub const INVARIANT_BROKEN: u16 = 0x07;
+crates/amun-constitutional/src/constitutional_failure.rs-29-    pub const PROVENANCE_INVALID: u16 = 0x08;
+crates/amun-constitutional/src/constitutional_failure.rs-30-    pub const ADMISSIBILITY_DENIED: u16 = 0x09;
+crates/amun-constitutional/src/constitutional_failure.rs-31-    pub const CROSS_CATEGORY_VIOLATION: u16 = 0x0A;
+crates/amun-constitutional/src/constitutional_failure.rs-32-}
+crates/amun-constitutional/src/constitutional_failure.rs-33-
+crates/amun-constitutional/src/constitutional_failure.rs-34-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/constitutional_failure.rs:35:pub struct ConstitutionalFailure {
+crates/amun-constitutional/src/constitutional_failure.rs-36-    pub schema_id: u16,
+crates/amun-constitutional/src/constitutional_failure.rs-37-    pub schema_version: u16,
+crates/amun-constitutional/src/constitutional_failure.rs-38-    pub constitutional_revision: u32,
+crates/amun-constitutional/src/constitutional_failure.rs-39-    pub replay_revision: u32,
+crates/amun-constitutional/src/constitutional_failure.rs-40-    pub failure_id: u64,
+crates/amun-constitutional/src/constitutional_failure.rs-41-    pub failure_type: u16,
+crates/amun-constitutional/src/constitutional_failure.rs:42:    pub failure_hash: ConstitutionalHash,
+crates/amun-constitutional/src/constitutional_failure.rs-43-    pub failure_domain: u8,
+crates/amun-constitutional/src/constitutional_failure.rs-44-    pub failure_severity: u8,
+crates/amun-constitutional/src/constitutional_failure.rs-45-    pub invariant_id: Option<u64>,
+crates/amun-constitutional/src/constitutional_failure.rs-46-    pub replay_domain: Option<u8>,
+crates/amun-constitutional/src/constitutional_failure.rs-47-    pub transcript_position: Option<u64>,
+crates/amun-constitutional/src/constitutional_failure.rs:48:    pub causal_parent_hash: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/constitutional_failure.rs:49:    pub execution_context_hash: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/constitutional_failure.rs-50-    pub observed_value: Option<Vec<u8>>,
+crates/amun-constitutional/src/constitutional_failure.rs-51-    pub expected_value: Option<Vec<u8>>,
+crates/amun-constitutional/src/constitutional_failure.rs-52-    pub description: Option<Vec<u8>>,
+crates/amun-constitutional/src/constitutional_failure.rs-53-    pub failure_revision: u32,
+crates/amun-constitutional/src/constitutional_failure.rs:54:    pub invariant_lineage_root: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/constitutional_failure.rs:55:    pub parent_failure_hash: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/constitutional_failure.rs-56-}
+crates/amun-constitutional/src/constitutional_failure.rs-57-
+crates/amun-constitutional/src/constitutional_failure.rs:58:impl ConstitutionalFailure {
+crates/amun-constitutional/src/constitutional_failure.rs-59-    pub fn new(
+crates/amun-constitutional/src/constitutional_failure.rs-60-        failure_id: u64,
+crates/amun-constitutional/src/constitutional_failure.rs-61-        failure_type: u16,
+crates/amun-constitutional/src/constitutional_failure.rs-62-        failure_domain: u8,
+crates/amun-constitutional/src/constitutional_failure.rs-63-        failure_severity: u8,
+crates/amun-constitutional/src/constitutional_failure.rs-64-        desc: &str,
+crates/amun-constitutional/src/constitutional_failure.rs-65-    ) -> Self {
+crates/amun-constitutional/src/constitutional_failure.rs-66-        let mut f = Self {
+--
+crates/amun-constitutional/src/constitutional_failure.rs-84-            failure_revision: 1,
+crates/amun-constitutional/src/constitutional_failure.rs-85-            invariant_lineage_root: None,
+crates/amun-constitutional/src/constitutional_failure.rs-86-            parent_failure_hash: None,
+crates/amun-constitutional/src/constitutional_failure.rs-87-        };
+crates/amun-constitutional/src/constitutional_failure.rs-88-        f.failure_hash = f.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs-89-        f
+crates/amun-constitutional/src/constitutional_failure.rs-90-    }
+crates/amun-constitutional/src/constitutional_failure.rs-91-
+crates/amun-constitutional/src/constitutional_failure.rs:92:    pub fn constitutional_hash(&self) -> ConstitutionalHash {
+crates/amun-constitutional/src/constitutional_failure.rs:93:        let mut h = ConstitutionalHasher::new(crate::hash_domains::DOMAIN_CONSTITUTIONAL_FAILURE);
+crates/amun-constitutional/src/constitutional_failure.rs-94-        h.update_schema(self.schema_id, self.schema_version)
+crates/amun-constitutional/src/constitutional_failure.rs-95-            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/constitutional_failure.rs-96-            .update_u64(self.failure_id)
+crates/amun-constitutional/src/constitutional_failure.rs-97-            .update_u16(self.failure_type)
+crates/amun-constitutional/src/constitutional_failure.rs-98-            .update_u32(self.failure_revision)
+crates/amun-constitutional/src/constitutional_failure.rs-99-            .update_u8(self.failure_domain)
+crates/amun-constitutional/src/constitutional_failure.rs-100-            .update_u8(self.failure_severity)
+crates/amun-constitutional/src/constitutional_failure.rs-101-            .update_optional_u64(self.invariant_id)
+--
+crates/amun-constitutional/src/constitutional_failure.rs-188-        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs-189-        self
+crates/amun-constitutional/src/constitutional_failure.rs-190-    }
+crates/amun-constitutional/src/constitutional_failure.rs-191-    pub fn with_transcript_position(mut self, p: u64) -> Self {
+crates/amun-constitutional/src/constitutional_failure.rs-192-        self.transcript_position = Some(p);
+crates/amun-constitutional/src/constitutional_failure.rs-193-        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs-194-        self
+crates/amun-constitutional/src/constitutional_failure.rs-195-    }
+crates/amun-constitutional/src/constitutional_failure.rs:196:    pub fn with_execution_context(mut self, h: ConstitutionalHash) -> Self {
+crates/amun-constitutional/src/constitutional_failure.rs-197-        self.execution_context_hash = Some(h);
+crates/amun-constitutional/src/constitutional_failure.rs-198-        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs-199-        self
+crates/amun-constitutional/src/constitutional_failure.rs-200-    }
+crates/amun-constitutional/src/constitutional_failure.rs:201:    pub fn with_causal_parent(mut self, h: ConstitutionalHash) -> Self {
+crates/amun-constitutional/src/constitutional_failure.rs-202-        self.causal_parent_hash = Some(h);
+crates/amun-constitutional/src/constitutional_failure.rs-203-        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs-204-        self
+crates/amun-constitutional/src/constitutional_failure.rs-205-    }
+crates/amun-constitutional/src/constitutional_failure.rs:206:    pub fn with_invariant(mut self, id: u64, lineage: ConstitutionalHash) -> Self {
+crates/amun-constitutional/src/constitutional_failure.rs-207-        self.invariant_id = Some(id);
+crates/amun-constitutional/src/constitutional_failure.rs-208-        self.invariant_lineage_root = Some(lineage);
+crates/amun-constitutional/src/constitutional_failure.rs-209-        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs-210-        self
+crates/amun-constitutional/src/constitutional_failure.rs-211-    }
+crates/amun-constitutional/src/constitutional_failure.rs:212:    pub fn with_parent(mut self, parent_hash: ConstitutionalHash) -> Self {
+crates/amun-constitutional/src/constitutional_failure.rs-213-        self.parent_failure_hash = Some(parent_hash);
+crates/amun-constitutional/src/constitutional_failure.rs-214-        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs-215-        self
+crates/amun-constitutional/src/constitutional_failure.rs-216-    }
+crates/amun-constitutional/src/constitutional_failure.rs-217-}
+crates/amun-constitutional/src/constitutional_failure.rs-218-
+crates/amun-constitutional/src/constitutional_failure.rs-219-#[cfg(test)]
+crates/amun-constitutional/src/constitutional_failure.rs-220-mod tests {
+crates/amun-constitutional/src/constitutional_failure.rs-221-    use super::*;
+crates/amun-constitutional/src/constitutional_failure.rs:222:    fn m() -> ConstitutionalFailure {
+crates/amun-constitutional/src/constitutional_failure.rs:223:        ConstitutionalFailure::new(
+crates/amun-constitutional/src/constitutional_failure.rs-224-            1,
+crates/amun-constitutional/src/constitutional_failure.rs-225-            failure_type::HASH_MISMATCH,
+crates/amun-constitutional/src/constitutional_failure.rs-226-            failure_domain::SEMANTIC,
+crates/amun-constitutional/src/constitutional_failure.rs-227-            severity::HARD_FAILURE,
+crates/amun-constitutional/src/constitutional_failure.rs-228-            "X",
+crates/amun-constitutional/src/constitutional_failure.rs-229-        )
+crates/amun-constitutional/src/constitutional_failure.rs-230-    }
+crates/amun-constitutional/src/constitutional_failure.rs-231-    #[test]
+--
+crates/amun-constitutional/src/constitutional_failure.rs-233-        assert!(m().verify().is_ok());
+crates/amun-constitutional/src/constitutional_failure.rs-234-    }
+crates/amun-constitutional/src/constitutional_failure.rs-235-    #[test]
+crates/amun-constitutional/src/constitutional_failure.rs-236-    fn t_hash() {
+crates/amun-constitutional/src/constitutional_failure.rs-237-        assert_eq!(m().failure_hash, m().failure_hash);
+crates/amun-constitutional/src/constitutional_failure.rs-238-    }
+crates/amun-constitutional/src/constitutional_failure.rs-239-    #[test]
+crates/amun-constitutional/src/constitutional_failure.rs-240-    fn t_desc_not_in_hash() {
+crates/amun-constitutional/src/constitutional_failure.rs:241:        let f1 = ConstitutionalFailure::new(
+crates/amun-constitutional/src/constitutional_failure.rs-242-            1,
+crates/amun-constitutional/src/constitutional_failure.rs-243-            failure_type::HASH_MISMATCH,
+crates/amun-constitutional/src/constitutional_failure.rs-244-            failure_domain::SEMANTIC,
+crates/amun-constitutional/src/constitutional_failure.rs-245-            severity::HARD_FAILURE,
+crates/amun-constitutional/src/constitutional_failure.rs-246-            "A",
+crates/amun-constitutional/src/constitutional_failure.rs-247-        );
+crates/amun-constitutional/src/constitutional_failure.rs:248:        let f2 = ConstitutionalFailure::new(
+crates/amun-constitutional/src/constitutional_failure.rs-249-            1,
+crates/amun-constitutional/src/constitutional_failure.rs-250-            failure_type::HASH_MISMATCH,
+crates/amun-constitutional/src/constitutional_failure.rs-251-            failure_domain::SEMANTIC,
+crates/amun-constitutional/src/constitutional_failure.rs-252-            severity::HARD_FAILURE,
+crates/amun-constitutional/src/constitutional_failure.rs-253-            "B",
+crates/amun-constitutional/src/constitutional_failure.rs-254-        );
+crates/amun-constitutional/src/constitutional_failure.rs-255-        assert_eq!(f1.failure_hash, f2.failure_hash);
+crates/amun-constitutional/src/constitutional_failure.rs-256-    }
+--
+crates/amun-constitutional/src/execution_boundary.rs-1-use crate::constitutional_failure::{
+crates/amun-constitutional/src/execution_boundary.rs:2:    failure_domain, failure_type, severity, ConstitutionalFailure,
+crates/amun-constitutional/src/execution_boundary.rs-3-};
+crates/amun-constitutional/src/execution_boundary.rs:4:use crate::constitutional_hasher::ConstitutionalHasher;
+crates/amun-constitutional/src/execution_boundary.rs:5:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/execution_boundary.rs-6-use crate::execution_limits::ExecutionLimits;
+crates/amun-constitutional/src/execution_boundary.rs-7-
+crates/amun-constitutional/src/execution_boundary.rs-8-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/execution_boundary.rs-9-pub struct ExecutionBoundary {
+crates/amun-constitutional/src/execution_boundary.rs-10-    pub schema_id: u16,
+crates/amun-constitutional/src/execution_boundary.rs-11-    pub schema_version: u16,
+crates/amun-constitutional/src/execution_boundary.rs-12-    pub constitutional_revision: u32,
+crates/amun-constitutional/src/execution_boundary.rs-13-    pub replay_revision: u32,
+--
+crates/amun-constitutional/src/execution_boundary.rs-21-    pub cross_domain_allowed: bool,
+crates/amun-constitutional/src/execution_boundary.rs-22-    pub transcript_span_at_creation: u64,
+crates/amun-constitutional/src/execution_boundary.rs-23-    pub parent_boundary_hash: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_boundary.rs-24-    pub boundary_sequence: u64,
+crates/amun-constitutional/src/execution_boundary.rs-25-    pub activation_transcript_position: u64,
+crates/amun-constitutional/src/execution_boundary.rs-26-    pub expiration_transcript_position: Option<u64>,
+crates/amun-constitutional/src/execution_boundary.rs-27-}
+crates/amun-constitutional/src/execution_boundary.rs-28-
+crates/amun-constitutional/src/execution_boundary.rs:29:impl ConstitutionalIdentity for ExecutionBoundary {
+crates/amun-constitutional/src/execution_boundary.rs-30-    fn schema_id(&self) -> u16 {
+crates/amun-constitutional/src/execution_boundary.rs-31-        self.schema_id
+crates/amun-constitutional/src/execution_boundary.rs-32-    }
+crates/amun-constitutional/src/execution_boundary.rs-33-    fn schema_version(&self) -> u16 {
+crates/amun-constitutional/src/execution_boundary.rs-34-        self.schema_version
+crates/amun-constitutional/src/execution_boundary.rs-35-    }
+crates/amun-constitutional/src/execution_boundary.rs-36-    fn constitutional_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_boundary.rs-37-        self.constitutional_revision
+crates/amun-constitutional/src/execution_boundary.rs-38-    }
+crates/amun-constitutional/src/execution_boundary.rs-39-    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_boundary.rs-40-        self.replay_revision
+crates/amun-constitutional/src/execution_boundary.rs-41-    }
+crates/amun-constitutional/src/execution_boundary.rs-42-}
+crates/amun-constitutional/src/execution_boundary.rs-43-
+crates/amun-constitutional/src/execution_boundary.rs:44:impl ConstitutionalObject for ExecutionBoundary {
+crates/amun-constitutional/src/execution_boundary.rs-45-    fn constitutional_hash(&self) -> [u8; 32] {
+crates/amun-constitutional/src/execution_boundary.rs:46:        let mut h = ConstitutionalHasher::new(crate::hash_domains::DOMAIN_EXECUTION_BOUNDARY);
+crates/amun-constitutional/src/execution_boundary.rs-47-        h.update_schema(self.schema_id, self.schema_version)
+crates/amun-constitutional/src/execution_boundary.rs-48-            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_boundary.rs-49-            .update_u64(self.boundary_id)
+crates/amun-constitutional/src/execution_boundary.rs-50-            .update_bytes(&self.limits_hash)
+crates/amun-constitutional/src/execution_boundary.rs-51-            .update_bytes(&self.context_hash)
+crates/amun-constitutional/src/execution_boundary.rs-52-            .update_bytes(&self.governance_domain_hash)
+crates/amun-constitutional/src/execution_boundary.rs-53-            .update_u64(self.max_events)
+crates/amun-constitutional/src/execution_boundary.rs-54-            .update_u64(self.max_transitions)
+crates/amun-constitutional/src/execution_boundary.rs-55-            .update_u8(self.cross_domain_allowed as u8)
+crates/amun-constitutional/src/execution_boundary.rs-56-            .update_u64(self.transcript_span_at_creation)
+crates/amun-constitutional/src/execution_boundary.rs-57-            .update_optional_hash(self.parent_boundary_hash.as_ref())
+crates/amun-constitutional/src/execution_boundary.rs-58-            .update_u64(self.boundary_sequence)
+crates/amun-constitutional/src/execution_boundary.rs-59-            .update_u64(self.activation_transcript_position)
+crates/amun-constitutional/src/execution_boundary.rs-60-            .update_optional_u64(self.expiration_transcript_position);
+crates/amun-constitutional/src/execution_boundary.rs-61-        h.finalize()
+crates/amun-constitutional/src/execution_boundary.rs-62-    }
+crates/amun-constitutional/src/execution_boundary.rs:63:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_boundary.rs-64-        if self.schema_id != 0x0007 || self.schema_version == 0 {
+crates/amun-constitutional/src/execution_boundary.rs:65:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_boundary.rs-66-                self.boundary_id,
+crates/amun-constitutional/src/execution_boundary.rs-67-                failure_type::INVALID_SCHEMA,
+crates/amun-constitutional/src/execution_boundary.rs-68-                failure_domain::STRUCTURAL,
+crates/amun-constitutional/src/execution_boundary.rs-69-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_boundary.rs-70-                "Invalid boundary",
+crates/amun-constitutional/src/execution_boundary.rs-71-            ));
+crates/amun-constitutional/src/execution_boundary.rs-72-        }
+crates/amun-constitutional/src/execution_boundary.rs-73-        if self.max_events == 0 || self.max_transitions == 0 {
+crates/amun-constitutional/src/execution_boundary.rs:74:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_boundary.rs-75-                self.boundary_id,
+crates/amun-constitutional/src/execution_boundary.rs-76-                failure_type::ZERO_LIMIT,
+crates/amun-constitutional/src/execution_boundary.rs-77-                failure_domain::BOUNDARY,
+crates/amun-constitutional/src/execution_boundary.rs-78-                severity::FATAL_FAILURE,
+crates/amun-constitutional/src/execution_boundary.rs-79-                "Zero limits",
+crates/amun-constitutional/src/execution_boundary.rs-80-            ));
+crates/amun-constitutional/src/execution_boundary.rs-81-        }
+crates/amun-constitutional/src/execution_boundary.rs-82-        if let Some(exp) = self.expiration_transcript_position {
+crates/amun-constitutional/src/execution_boundary.rs-83-            if exp <= self.activation_transcript_position {
+crates/amun-constitutional/src/execution_boundary.rs:84:                return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_boundary.rs-85-                    self.boundary_id,
+crates/amun-constitutional/src/execution_boundary.rs-86-                    failure_type::BOUNDARY_VIOLATION,
+crates/amun-constitutional/src/execution_boundary.rs-87-                    failure_domain::BOUNDARY,
+crates/amun-constitutional/src/execution_boundary.rs-88-                    severity::FATAL_FAILURE,
+crates/amun-constitutional/src/execution_boundary.rs-89-                    "Exp before act",
+crates/amun-constitutional/src/execution_boundary.rs-90-                ));
+crates/amun-constitutional/src/execution_boundary.rs-91-            }
+crates/amun-constitutional/src/execution_boundary.rs-92-        }
+crates/amun-constitutional/src/execution_boundary.rs-93-        Ok(())
+crates/amun-constitutional/src/execution_boundary.rs-94-    }
+crates/amun-constitutional/src/execution_boundary.rs:95:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_boundary.rs-96-        if self.boundary_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_boundary.rs:97:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_boundary.rs-98-                self.boundary_id,
+crates/amun-constitutional/src/execution_boundary.rs-99-                failure_type::HASH_MISMATCH,
+crates/amun-constitutional/src/execution_boundary.rs-100-                failure_domain::SEMANTIC,
+crates/amun-constitutional/src/execution_boundary.rs-101-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_boundary.rs-102-                "Hash mismatch",
+crates/amun-constitutional/src/execution_boundary.rs-103-            ));
+crates/amun-constitutional/src/execution_boundary.rs-104-        }
+crates/amun-constitutional/src/execution_boundary.rs-105-        Ok(())
+crates/amun-constitutional/src/execution_boundary.rs-106-    }
+crates/amun-constitutional/src/execution_boundary.rs:107:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_boundary.rs-108-        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_boundary.rs:109:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_boundary.rs-110-                self.boundary_id,
+crates/amun-constitutional/src/execution_boundary.rs-111-                failure_type::PROVENANCE_INVALID,
+crates/amun-constitutional/src/execution_boundary.rs-112-                failure_domain::PROVENANCE,
+crates/amun-constitutional/src/execution_boundary.rs-113-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_boundary.rs-114-                "Missing revision",
+crates/amun-constitutional/src/execution_boundary.rs-115-            ));
+crates/amun-constitutional/src/execution_boundary.rs-116-        }
+crates/amun-constitutional/src/execution_boundary.rs-117-        Ok(())
+--
+crates/amun-constitutional/src/kernel_types.rs-1-//! Kernel types — foundational constitutional primitives.
+crates/amun-constitutional/src/kernel_types.rs-2-
+crates/amun-constitutional/src/kernel_types.rs:3:pub type ConstitutionalHash = [u8; 32];
+crates/amun-constitutional/src/kernel_types.rs-4-
+crates/amun-constitutional/src/kernel_types.rs-5-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+crates/amun-constitutional/src/kernel_types.rs-6-pub enum ReplayDomain {
+crates/amun-constitutional/src/kernel_types.rs-7-    Canonical = 0x01,
+crates/amun-constitutional/src/kernel_types.rs-8-    Governance = 0x02,
+crates/amun-constitutional/src/kernel_types.rs-9-    Bridge = 0x03,
+crates/amun-constitutional/src/kernel_types.rs-10-    System = 0x04,
+crates/amun-constitutional/src/kernel_types.rs-11-}
+crates/amun-constitutional/src/kernel_types.rs-12-
+crates/amun-constitutional/src/kernel_types.rs-13-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/kernel_types.rs-14-pub struct ReplayFailure {
+crates/amun-constitutional/src/kernel_types.rs:15:    pub failure_hash: ConstitutionalHash,
+crates/amun-constitutional/src/kernel_types.rs-16-    pub domain: ReplayDomain,
+crates/amun-constitutional/src/kernel_types.rs-17-    pub transcript_position: u64,
+crates/amun-constitutional/src/kernel_types.rs-18-}
+crates/amun-constitutional/src/kernel_types.rs-19-
+crates/amun-constitutional/src/kernel_types.rs-20-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/kernel_types.rs-21-pub struct ReplayPolicy {
+crates/amun-constitutional/src/kernel_types.rs-22-    pub allow_cross_domain: bool,
+crates/amun-constitutional/src/kernel_types.rs-23-    pub max_divergences: u64,
+--
+crates/amun-constitutional/src/kernel_types.rs-31-            max_divergences: 0,
+crates/amun-constitutional/src/kernel_types.rs-32-            halt_on_first_divergence: true,
+crates/amun-constitutional/src/kernel_types.rs-33-        }
+crates/amun-constitutional/src/kernel_types.rs-34-    }
+crates/amun-constitutional/src/kernel_types.rs-35-}
+crates/amun-constitutional/src/kernel_types.rs-36-
+crates/amun-constitutional/src/kernel_types.rs-37-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/kernel_types.rs-38-pub struct TranscriptEntry {
+crates/amun-constitutional/src/kernel_types.rs:39:    pub entry_hash: ConstitutionalHash,
+crates/amun-constitutional/src/kernel_types.rs-40-    pub sequence: u64,
+crates/amun-constitutional/src/kernel_types.rs-41-    pub domain: ReplayDomain,
+crates/amun-constitutional/src/kernel_types.rs-42-}
+--
+crates/amun-constitutional/src/execution_journal.rs-1-use crate::constitutional_failure::{
+crates/amun-constitutional/src/execution_journal.rs:2:    failure_domain, failure_type, severity, ConstitutionalFailure,
+crates/amun-constitutional/src/execution_journal.rs-3-};
+crates/amun-constitutional/src/execution_journal.rs:4:use crate::constitutional_hasher::ConstitutionalHasher;
+crates/amun-constitutional/src/execution_journal.rs:5:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/execution_journal.rs-6-use crate::prelude::*;
+crates/amun-constitutional/src/execution_journal.rs-7-
+crates/amun-constitutional/src/execution_journal.rs-8-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/execution_journal.rs-9-pub struct JournalEntry {
+crates/amun-constitutional/src/execution_journal.rs-10-    pub schema_id: u16,
+crates/amun-constitutional/src/execution_journal.rs-11-    pub schema_version: u16,
+crates/amun-constitutional/src/execution_journal.rs-12-    pub constitutional_revision: u32,
+crates/amun-constitutional/src/execution_journal.rs-13-    pub replay_revision: u32,
+--
+crates/amun-constitutional/src/execution_journal.rs-17-    pub event_digest: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_journal.rs-18-    pub event_data: Option<Vec<u8>>,
+crates/amun-constitutional/src/execution_journal.rs-19-    pub context_hash: [u8; 32],
+crates/amun-constitutional/src/execution_journal.rs-20-    pub previous_entry_hash: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_journal.rs-21-    pub sequence_number: u64,
+crates/amun-constitutional/src/execution_journal.rs-22-    pub active_boundary_hash: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_journal.rs-23-}
+crates/amun-constitutional/src/execution_journal.rs-24-
+crates/amun-constitutional/src/execution_journal.rs:25:impl ConstitutionalIdentity for JournalEntry {
+crates/amun-constitutional/src/execution_journal.rs-26-    fn schema_id(&self) -> u16 {
+crates/amun-constitutional/src/execution_journal.rs-27-        self.schema_id
+crates/amun-constitutional/src/execution_journal.rs-28-    }
+crates/amun-constitutional/src/execution_journal.rs-29-    fn schema_version(&self) -> u16 {
+crates/amun-constitutional/src/execution_journal.rs-30-        self.schema_version
+crates/amun-constitutional/src/execution_journal.rs-31-    }
+crates/amun-constitutional/src/execution_journal.rs-32-    fn constitutional_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_journal.rs-33-        self.constitutional_revision
+crates/amun-constitutional/src/execution_journal.rs-34-    }
+crates/amun-constitutional/src/execution_journal.rs-35-    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_journal.rs-36-        self.replay_revision
+crates/amun-constitutional/src/execution_journal.rs-37-    }
+crates/amun-constitutional/src/execution_journal.rs-38-}
+crates/amun-constitutional/src/execution_journal.rs-39-
+crates/amun-constitutional/src/execution_journal.rs:40:impl ConstitutionalObject for JournalEntry {
+crates/amun-constitutional/src/execution_journal.rs-41-    fn constitutional_hash(&self) -> [u8; 32] {
+crates/amun-constitutional/src/execution_journal.rs:42:        let mut h = ConstitutionalHasher::new(crate::hash_domains::DOMAIN_JOURNAL_ENTRY);
+crates/amun-constitutional/src/execution_journal.rs-43-        h.update_schema(self.schema_id, self.schema_version)
+crates/amun-constitutional/src/execution_journal.rs-44-            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_journal.rs-45-            .update_u64(self.entry_id)
+crates/amun-constitutional/src/execution_journal.rs-46-            .update_optional_u64(self.event_schema_id.map(|x| x as u64))
+crates/amun-constitutional/src/execution_journal.rs-47-            .update_optional_hash(self.event_digest.as_ref())
+crates/amun-constitutional/src/execution_journal.rs-48-            .update_bytes(&self.context_hash)
+crates/amun-constitutional/src/execution_journal.rs-49-            .update_optional_hash(self.previous_entry_hash.as_ref())
+crates/amun-constitutional/src/execution_journal.rs-50-            .update_u64(self.sequence_number)
+crates/amun-constitutional/src/execution_journal.rs-51-            .update_optional_hash(self.active_boundary_hash.as_ref());
+crates/amun-constitutional/src/execution_journal.rs-52-        h.finalize()
+crates/amun-constitutional/src/execution_journal.rs-53-    }
+crates/amun-constitutional/src/execution_journal.rs:54:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs-55-        if self.schema_id != 0x000B || self.schema_version == 0 {
+crates/amun-constitutional/src/execution_journal.rs:56:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-57-                self.entry_id,
+crates/amun-constitutional/src/execution_journal.rs-58-                failure_type::INVALID_SCHEMA,
+crates/amun-constitutional/src/execution_journal.rs-59-                failure_domain::STRUCTURAL,
+crates/amun-constitutional/src/execution_journal.rs-60-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-61-                "Invalid entry",
+crates/amun-constitutional/src/execution_journal.rs-62-            ));
+crates/amun-constitutional/src/execution_journal.rs-63-        }
+crates/amun-constitutional/src/execution_journal.rs-64-        Ok(())
+crates/amun-constitutional/src/execution_journal.rs-65-    }
+crates/amun-constitutional/src/execution_journal.rs:66:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs-67-        if self.entry_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_journal.rs:68:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-69-                self.entry_id,
+crates/amun-constitutional/src/execution_journal.rs-70-                failure_type::HASH_MISMATCH,
+crates/amun-constitutional/src/execution_journal.rs-71-                failure_domain::SEMANTIC,
+crates/amun-constitutional/src/execution_journal.rs-72-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-73-                "Hash mismatch",
+crates/amun-constitutional/src/execution_journal.rs-74-            ));
+crates/amun-constitutional/src/execution_journal.rs-75-        }
+crates/amun-constitutional/src/execution_journal.rs-76-        Ok(())
+crates/amun-constitutional/src/execution_journal.rs-77-    }
+crates/amun-constitutional/src/execution_journal.rs:78:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs-79-        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_journal.rs:80:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-81-                self.entry_id,
+crates/amun-constitutional/src/execution_journal.rs-82-                failure_type::PROVENANCE_INVALID,
+crates/amun-constitutional/src/execution_journal.rs-83-                failure_domain::PROVENANCE,
+crates/amun-constitutional/src/execution_journal.rs-84-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-85-                "Missing revision",
+crates/amun-constitutional/src/execution_journal.rs-86-            ));
+crates/amun-constitutional/src/execution_journal.rs-87-        }
+crates/amun-constitutional/src/execution_journal.rs-88-        Ok(())
+--
+crates/amun-constitutional/src/execution_journal.rs-139-    pub journal_id: u64,
+crates/amun-constitutional/src/execution_journal.rs-140-    pub journal_hash: [u8; 32],
+crates/amun-constitutional/src/execution_journal.rs-141-    pub context_hash: [u8; 32],
+crates/amun-constitutional/src/execution_journal.rs-142-    pub entry_count: u64,
+crates/amun-constitutional/src/execution_journal.rs-143-    pub last_entry_hash: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_journal.rs-144-    pub entries_root: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_journal.rs-145-}
+crates/amun-constitutional/src/execution_journal.rs-146-
+crates/amun-constitutional/src/execution_journal.rs:147:impl ConstitutionalIdentity for ExecutionJournal {
+crates/amun-constitutional/src/execution_journal.rs-148-    fn schema_id(&self) -> u16 {
+crates/amun-constitutional/src/execution_journal.rs-149-        self.schema_id
+crates/amun-constitutional/src/execution_journal.rs-150-    }
+crates/amun-constitutional/src/execution_journal.rs-151-    fn schema_version(&self) -> u16 {
+crates/amun-constitutional/src/execution_journal.rs-152-        self.schema_version
+crates/amun-constitutional/src/execution_journal.rs-153-    }
+crates/amun-constitutional/src/execution_journal.rs-154-    fn constitutional_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_journal.rs-155-        self.constitutional_revision
+crates/amun-constitutional/src/execution_journal.rs-156-    }
+crates/amun-constitutional/src/execution_journal.rs-157-    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_journal.rs-158-        self.replay_revision
+crates/amun-constitutional/src/execution_journal.rs-159-    }
+crates/amun-constitutional/src/execution_journal.rs-160-}
+crates/amun-constitutional/src/execution_journal.rs-161-
+crates/amun-constitutional/src/execution_journal.rs:162:impl ConstitutionalObject for ExecutionJournal {
+crates/amun-constitutional/src/execution_journal.rs-163-    fn constitutional_hash(&self) -> [u8; 32] {
+crates/amun-constitutional/src/execution_journal.rs:164:        let mut h = ConstitutionalHasher::new(crate::hash_domains::DOMAIN_EXECUTION_JOURNAL);
+crates/amun-constitutional/src/execution_journal.rs-165-        h.update_schema(self.schema_id, self.schema_version)
+crates/amun-constitutional/src/execution_journal.rs-166-            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_journal.rs-167-            .update_u64(self.journal_id)
+crates/amun-constitutional/src/execution_journal.rs-168-            .update_bytes(&self.context_hash)
+crates/amun-constitutional/src/execution_journal.rs-169-            .update_u64(self.entry_count)
+crates/amun-constitutional/src/execution_journal.rs-170-            .update_optional_hash(self.last_entry_hash.as_ref())
+crates/amun-constitutional/src/execution_journal.rs-171-            .update_optional_hash(self.entries_root.as_ref());
+crates/amun-constitutional/src/execution_journal.rs-172-        h.finalize()
+crates/amun-constitutional/src/execution_journal.rs-173-    }
+crates/amun-constitutional/src/execution_journal.rs:174:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs-175-        if self.schema_id != 0x0008 || self.schema_version == 0 {
+crates/amun-constitutional/src/execution_journal.rs:176:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-177-                self.journal_id,
+crates/amun-constitutional/src/execution_journal.rs-178-                failure_type::INVALID_SCHEMA,
+crates/amun-constitutional/src/execution_journal.rs-179-                failure_domain::STRUCTURAL,
+crates/amun-constitutional/src/execution_journal.rs-180-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-181-                "Invalid journal",
+crates/amun-constitutional/src/execution_journal.rs-182-            ));
+crates/amun-constitutional/src/execution_journal.rs-183-        }
+crates/amun-constitutional/src/execution_journal.rs-184-        Ok(())
+crates/amun-constitutional/src/execution_journal.rs-185-    }
+crates/amun-constitutional/src/execution_journal.rs:186:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs-187-        if self.journal_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_journal.rs:188:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-189-                self.journal_id,
+crates/amun-constitutional/src/execution_journal.rs-190-                failure_type::HASH_MISMATCH,
+crates/amun-constitutional/src/execution_journal.rs-191-                failure_domain::SEMANTIC,
+crates/amun-constitutional/src/execution_journal.rs-192-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-193-                "Hash mismatch",
+crates/amun-constitutional/src/execution_journal.rs-194-            ));
+crates/amun-constitutional/src/execution_journal.rs-195-        }
+crates/amun-constitutional/src/execution_journal.rs-196-        Ok(())
+crates/amun-constitutional/src/execution_journal.rs-197-    }
+crates/amun-constitutional/src/execution_journal.rs:198:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs-199-        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_journal.rs:200:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-201-                self.journal_id,
+crates/amun-constitutional/src/execution_journal.rs-202-                failure_type::PROVENANCE_INVALID,
+crates/amun-constitutional/src/execution_journal.rs-203-                failure_domain::PROVENANCE,
+crates/amun-constitutional/src/execution_journal.rs-204-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-205-                "Missing revision",
+crates/amun-constitutional/src/execution_journal.rs-206-            ));
+crates/amun-constitutional/src/execution_journal.rs-207-        }
+crates/amun-constitutional/src/execution_journal.rs-208-        Ok(())
+--
+crates/amun-constitutional/src/execution_journal.rs-222-            entry_count: 0,
+crates/amun-constitutional/src/execution_journal.rs-223-            last_entry_hash: None,
+crates/amun-constitutional/src/execution_journal.rs-224-            entries_root: None,
+crates/amun-constitutional/src/execution_journal.rs-225-        };
+crates/amun-constitutional/src/execution_journal.rs-226-        j.journal_hash = j.constitutional_hash();
+crates/amun-constitutional/src/execution_journal.rs-227-        j
+crates/amun-constitutional/src/execution_journal.rs-228-    }
+crates/amun-constitutional/src/execution_journal.rs-229-
+crates/amun-constitutional/src/execution_journal.rs:230:    pub fn append(&self, entry: &JournalEntry) -> Result<Self, ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs-231-        entry.verify()?;
+crates/amun-constitutional/src/execution_journal.rs-232-        if entry.constitutional_revision != self.constitutional_revision {
+crates/amun-constitutional/src/execution_journal.rs:233:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-234-                self.journal_id,
+crates/amun-constitutional/src/execution_journal.rs-235-                failure_type::PROVENANCE_INVALID,
+crates/amun-constitutional/src/execution_journal.rs-236-                failure_domain::REPLAY,
+crates/amun-constitutional/src/execution_journal.rs-237-                severity::FATAL_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs:238:                "Constitutional revision mismatch",
+crates/amun-constitutional/src/execution_journal.rs-239-            ));
+crates/amun-constitutional/src/execution_journal.rs-240-        }
+crates/amun-constitutional/src/execution_journal.rs-241-        if entry.replay_revision != self.replay_revision {
+crates/amun-constitutional/src/execution_journal.rs:242:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-243-                self.journal_id,
+crates/amun-constitutional/src/execution_journal.rs-244-                failure_type::PROVENANCE_INVALID,
+crates/amun-constitutional/src/execution_journal.rs-245-                failure_domain::REPLAY,
+crates/amun-constitutional/src/execution_journal.rs-246-                severity::FATAL_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-247-                "Replay revision mismatch",
+crates/amun-constitutional/src/execution_journal.rs-248-            ));
+crates/amun-constitutional/src/execution_journal.rs-249-        }
+crates/amun-constitutional/src/execution_journal.rs-250-        match (self.last_entry_hash, entry.previous_entry_hash) {
+crates/amun-constitutional/src/execution_journal.rs-251-            (None, None) => {}
+crates/amun-constitutional/src/execution_journal.rs-252-            (Some(last), Some(prev)) if last == prev => {}
+crates/amun-constitutional/src/execution_journal.rs-253-            _ => {
+crates/amun-constitutional/src/execution_journal.rs:254:                return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-255-                    self.journal_id,
+crates/amun-constitutional/src/execution_journal.rs-256-                    failure_type::REPLAY_DIVERGENCE,
+crates/amun-constitutional/src/execution_journal.rs-257-                    failure_domain::REPLAY,
+crates/amun-constitutional/src/execution_journal.rs-258-                    severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-259-                    "Linearity violation",
+crates/amun-constitutional/src/execution_journal.rs-260-                ))
+crates/amun-constitutional/src/execution_journal.rs-261-            }
+crates/amun-constitutional/src/execution_journal.rs-262-        }
+crates/amun-constitutional/src/execution_journal.rs-263-        if entry.sequence_number != self.entry_count {
+crates/amun-constitutional/src/execution_journal.rs:264:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_journal.rs-265-                self.journal_id,
+crates/amun-constitutional/src/execution_journal.rs-266-                failure_type::REPLAY_DIVERGENCE,
+crates/amun-constitutional/src/execution_journal.rs-267-                failure_domain::REPLAY,
+crates/amun-constitutional/src/execution_journal.rs-268-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_journal.rs-269-                "Sequence gap",
+crates/amun-constitutional/src/execution_journal.rs-270-            ));
+crates/amun-constitutional/src/execution_journal.rs-271-        }
+crates/amun-constitutional/src/execution_journal.rs-272-        let mut updated = self.clone();
+--
+crates/amun-constitutional/src/state_anchor.rs:1://! ConstitutionalStateAnchor — immutable, replay-derived state attestation.
+crates/amun-constitutional/src/state_anchor.rs-2-//!
+crates/amun-constitutional/src/state_anchor.rs-3-//! ARCHITECTURAL PRINCIPLE:
+crates/amun-constitutional/src/state_anchor.rs-4-//!   State anchoring is constitutional attestation, NOT runtime state management.
+crates/amun-constitutional/src/state_anchor.rs-5-//!
+crates/amun-constitutional/src/state_anchor.rs-6-//! A StateAnchor attests that a specific replay lineage, within a specific
+crates/amun-constitutional/src/state_anchor.rs-7-//! transcript span, under specific constitutional revisions, deterministically
+crates/amun-constitutional/src/state_anchor.rs-8-//! produced a specific state root.
+crates/amun-constitutional/src/state_anchor.rs-9-//!
+crates/amun-constitutional/src/state_anchor.rs-10-//! The anchor is CONTENT-ADDRESSED: its identity IS its hash.
+crates/amun-constitutional/src/state_anchor.rs-11-//! It is REPLAY-DERIVED: the state root is an output of replay, not storage.
+crates/amun-constitutional/src/state_anchor.rs-12-//!
+crates/amun-constitutional/src/state_anchor.rs-13-//! INVARIANT (Replay-Derived State Identity):
+crates/amun-constitutional/src/state_anchor.rs:14://!   Constitutional state identity is derived exclusively from deterministic
+crates/amun-constitutional/src/state_anchor.rs-15-//!   replay lineage and attested transcript scope, never from mutable storage
+crates/amun-constitutional/src/state_anchor.rs-16-//!   state or runtime execution environment.
+crates/amun-constitutional/src/state_anchor.rs-17-
+crates/amun-constitutional/src/state_anchor.rs-18-use crate::constitutional_failure::{
+crates/amun-constitutional/src/state_anchor.rs:19:    failure_domain, failure_type, severity, ConstitutionalFailure,
+crates/amun-constitutional/src/state_anchor.rs-20-};
+crates/amun-constitutional/src/state_anchor.rs:21:use crate::constitutional_hasher::ConstitutionalHasher;
+crates/amun-constitutional/src/state_anchor.rs:22:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/state_anchor.rs-23-use crate::hash_domains;
+crates/amun-constitutional/src/state_anchor.rs:24:use crate::kernel_types::ConstitutionalHash;
+crates/amun-constitutional/src/state_anchor.rs-25-use crate::prelude::*;
+crates/amun-constitutional/src/state_anchor.rs-26-use crate::state_anchor_scope::StateAnchorScope;
+crates/amun-constitutional/src/state_anchor.rs-27-
+crates/amun-constitutional/src/state_anchor.rs-28-/// An immutable constitutional attestation of replay-derived state.
+crates/amun-constitutional/src/state_anchor.rs-29-///
+crates/amun-constitutional/src/state_anchor.rs-30-/// The anchor says: "Within this scope, replay produced this state root."
+crates/amun-constitutional/src/state_anchor.rs-31-/// It does NOT say: "This is the current network state."
+crates/amun-constitutional/src/state_anchor.rs-32-/// It does NOT contain: accounts, balances, trie nodes, or mutable data.
+crates/amun-constitutional/src/state_anchor.rs-33-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/state_anchor.rs:34:pub struct ConstitutionalStateAnchor {
+crates/amun-constitutional/src/state_anchor.rs-35-    pub schema_id: u16,
+crates/amun-constitutional/src/state_anchor.rs-36-    pub schema_version: u16,
+crates/amun-constitutional/src/state_anchor.rs-37-    pub constitutional_revision: u32,
+crates/amun-constitutional/src/state_anchor.rs-38-    pub replay_revision: u32,
+crates/amun-constitutional/src/state_anchor.rs-39-
+crates/amun-constitutional/src/state_anchor.rs-40-    pub anchor_id: u64,
+crates/amun-constitutional/src/state_anchor.rs:41:    pub anchor_hash: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs-42-
+crates/amun-constitutional/src/state_anchor.rs-43-    /// The scope this anchor attests to.
+crates/amun-constitutional/src/state_anchor.rs-44-    pub scope: StateAnchorScope,
+crates/amun-constitutional/src/state_anchor.rs-45-
+crates/amun-constitutional/src/state_anchor.rs-46-    /// Certificate that attests to the admissibility of this state.
+crates/amun-constitutional/src/state_anchor.rs:47:    pub certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs-48-
+crates/amun-constitutional/src/state_anchor.rs-49-    /// Journal root at the end of the attested span.
+crates/amun-constitutional/src/state_anchor.rs:50:    pub journal_root: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs-51-
+crates/amun-constitutional/src/state_anchor.rs-52-    /// Previous anchor in this context's lineage.
+crates/amun-constitutional/src/state_anchor.rs:53:    pub parent_anchor_hash: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/state_anchor.rs-54-
+crates/amun-constitutional/src/state_anchor.rs-55-    /// Informational note (CIR-001) — not in constitutional hash.
+crates/amun-constitutional/src/state_anchor.rs-56-    pub attestation_note: Option<Vec<u8>>,
+crates/amun-constitutional/src/state_anchor.rs-57-}
+crates/amun-constitutional/src/state_anchor.rs-58-
+crates/amun-constitutional/src/state_anchor.rs:59:impl ConstitutionalIdentity for ConstitutionalStateAnchor {
+crates/amun-constitutional/src/state_anchor.rs-60-    fn schema_id(&self) -> u16 {
+crates/amun-constitutional/src/state_anchor.rs-61-        self.schema_id
+crates/amun-constitutional/src/state_anchor.rs-62-    }
+crates/amun-constitutional/src/state_anchor.rs-63-    fn schema_version(&self) -> u16 {
+crates/amun-constitutional/src/state_anchor.rs-64-        self.schema_version
+crates/amun-constitutional/src/state_anchor.rs-65-    }
+crates/amun-constitutional/src/state_anchor.rs-66-    fn constitutional_revision(&self) -> u32 {
+crates/amun-constitutional/src/state_anchor.rs-67-        self.constitutional_revision
+crates/amun-constitutional/src/state_anchor.rs-68-    }
+crates/amun-constitutional/src/state_anchor.rs-69-    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/state_anchor.rs-70-        self.replay_revision
+crates/amun-constitutional/src/state_anchor.rs-71-    }
+crates/amun-constitutional/src/state_anchor.rs-72-}
+crates/amun-constitutional/src/state_anchor.rs-73-
+crates/amun-constitutional/src/state_anchor.rs:74:impl ConstitutionalObject for ConstitutionalStateAnchor {
+crates/amun-constitutional/src/state_anchor.rs:75:    fn constitutional_hash(&self) -> ConstitutionalHash {
+crates/amun-constitutional/src/state_anchor.rs:76:        let mut h = ConstitutionalHasher::new(hash_domains::DOMAIN_REPLAY_CERTIFICATE);
+crates/amun-constitutional/src/state_anchor.rs-77-        h.update_bytes(b"STATE_ANCHOR")
+crates/amun-constitutional/src/state_anchor.rs-78-            .update_schema(self.schema_id, self.schema_version)
+crates/amun-constitutional/src/state_anchor.rs-79-            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/state_anchor.rs-80-            .update_u64(self.anchor_id)
+crates/amun-constitutional/src/state_anchor.rs-81-            // Scope fields
+crates/amun-constitutional/src/state_anchor.rs-82-            .update_u64(self.scope.transcript_start)
+crates/amun-constitutional/src/state_anchor.rs-83-            .update_u64(self.scope.transcript_end)
+crates/amun-constitutional/src/state_anchor.rs-84-            .update_bytes(&self.scope.state_root)
+--
+crates/amun-constitutional/src/state_anchor.rs-90-            .update_bytes(&self.certificate_hash)
+crates/amun-constitutional/src/state_anchor.rs-91-            .update_bytes(&self.journal_root)
+crates/amun-constitutional/src/state_anchor.rs-92-            // Lineage
+crates/amun-constitutional/src/state_anchor.rs-93-            .update_optional_hash(self.parent_anchor_hash.as_ref());
+crates/amun-constitutional/src/state_anchor.rs-94-        // attestation_note excluded per CIR-001
+crates/amun-constitutional/src/state_anchor.rs-95-        h.finalize()
+crates/amun-constitutional/src/state_anchor.rs-96-    }
+crates/amun-constitutional/src/state_anchor.rs-97-
+crates/amun-constitutional/src/state_anchor.rs:98:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs-99-        if self.schema_id != 0x000E || self.schema_version == 0 {
+crates/amun-constitutional/src/state_anchor.rs:100:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/state_anchor.rs-101-                self.anchor_id,
+crates/amun-constitutional/src/state_anchor.rs-102-                failure_type::INVALID_SCHEMA,
+crates/amun-constitutional/src/state_anchor.rs-103-                failure_domain::STRUCTURAL,
+crates/amun-constitutional/src/state_anchor.rs-104-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/state_anchor.rs-105-                "Invalid state anchor schema",
+crates/amun-constitutional/src/state_anchor.rs-106-            ));
+crates/amun-constitutional/src/state_anchor.rs-107-        }
+crates/amun-constitutional/src/state_anchor.rs-108-        if self.scope.transcript_end < self.scope.transcript_start {
+crates/amun-constitutional/src/state_anchor.rs:109:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/state_anchor.rs-110-                self.anchor_id,
+crates/amun-constitutional/src/state_anchor.rs-111-                failure_type::BOUNDARY_VIOLATION,
+crates/amun-constitutional/src/state_anchor.rs-112-                failure_domain::BOUNDARY,
+crates/amun-constitutional/src/state_anchor.rs-113-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/state_anchor.rs-114-                "Anchor scope end before start",
+crates/amun-constitutional/src/state_anchor.rs-115-            ));
+crates/amun-constitutional/src/state_anchor.rs-116-        }
+crates/amun-constitutional/src/state_anchor.rs-117-        Ok(())
+crates/amun-constitutional/src/state_anchor.rs-118-    }
+crates/amun-constitutional/src/state_anchor.rs-119-
+crates/amun-constitutional/src/state_anchor.rs:120:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs-121-        if self.anchor_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/state_anchor.rs:122:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/state_anchor.rs-123-                self.anchor_id,
+crates/amun-constitutional/src/state_anchor.rs-124-                failure_type::HASH_MISMATCH,
+crates/amun-constitutional/src/state_anchor.rs-125-                failure_domain::SEMANTIC,
+crates/amun-constitutional/src/state_anchor.rs-126-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/state_anchor.rs-127-                "Anchor hash mismatch",
+crates/amun-constitutional/src/state_anchor.rs-128-            ));
+crates/amun-constitutional/src/state_anchor.rs-129-        }
+crates/amun-constitutional/src/state_anchor.rs-130-        Ok(())
+crates/amun-constitutional/src/state_anchor.rs-131-    }
+crates/amun-constitutional/src/state_anchor.rs-132-
+crates/amun-constitutional/src/state_anchor.rs:133:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs-134-        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/state_anchor.rs:135:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/state_anchor.rs-136-                self.anchor_id,
+crates/amun-constitutional/src/state_anchor.rs-137-                failure_type::PROVENANCE_INVALID,
+crates/amun-constitutional/src/state_anchor.rs-138-                failure_domain::PROVENANCE,
+crates/amun-constitutional/src/state_anchor.rs-139-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/state_anchor.rs-140-                "Missing revision lineage",
+crates/amun-constitutional/src/state_anchor.rs-141-            ));
+crates/amun-constitutional/src/state_anchor.rs-142-        }
+crates/amun-constitutional/src/state_anchor.rs-143-        Ok(())
+crates/amun-constitutional/src/state_anchor.rs-144-    }
+crates/amun-constitutional/src/state_anchor.rs-145-
+crates/amun-constitutional/src/state_anchor.rs:146:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs-147-        if self.scope.constitutional_revision != self.constitutional_revision
+crates/amun-constitutional/src/state_anchor.rs-148-            || self.scope.replay_revision != self.replay_revision
+crates/amun-constitutional/src/state_anchor.rs-149-        {
+crates/amun-constitutional/src/state_anchor.rs:150:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/state_anchor.rs-151-                self.anchor_id,
+crates/amun-constitutional/src/state_anchor.rs-152-                failure_type::PROVENANCE_INVALID,
+crates/amun-constitutional/src/state_anchor.rs-153-                failure_domain::CONSTITUTIONAL,
+crates/amun-constitutional/src/state_anchor.rs-154-                severity::FATAL_FAILURE,
+crates/amun-constitutional/src/state_anchor.rs-155-                "Scope revision mismatch",
+crates/amun-constitutional/src/state_anchor.rs-156-            ));
+crates/amun-constitutional/src/state_anchor.rs-157-        }
+crates/amun-constitutional/src/state_anchor.rs-158-        Ok(())
+crates/amun-constitutional/src/state_anchor.rs-159-    }
+crates/amun-constitutional/src/state_anchor.rs-160-}
+crates/amun-constitutional/src/state_anchor.rs-161-
+crates/amun-constitutional/src/state_anchor.rs:162:impl ConstitutionalStateAnchor {
+crates/amun-constitutional/src/state_anchor.rs-163-    pub fn new(
+crates/amun-constitutional/src/state_anchor.rs-164-        anchor_id: u64,
+crates/amun-constitutional/src/state_anchor.rs-165-        constitutional_revision: u32,
+crates/amun-constitutional/src/state_anchor.rs-166-        replay_revision: u32,
+crates/amun-constitutional/src/state_anchor.rs-167-        transcript_start: u64,
+crates/amun-constitutional/src/state_anchor.rs-168-        transcript_end: u64,
+crates/amun-constitutional/src/state_anchor.rs:169:        state_root: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs:170:        context_hash: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs:171:        boundary_hash: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs:172:        certificate_hash: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs:173:        journal_root: ConstitutionalHash,
+crates/amun-constitutional/src/state_anchor.rs:174:        parent_anchor_hash: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/state_anchor.rs-175-    ) -> Self {
+crates/amun-constitutional/src/state_anchor.rs-176-        let scope = StateAnchorScope {
+crates/amun-constitutional/src/state_anchor.rs-177-            transcript_start,
+crates/amun-constitutional/src/state_anchor.rs-178-            transcript_end,
+crates/amun-constitutional/src/state_anchor.rs-179-            state_root,
+crates/amun-constitutional/src/state_anchor.rs-180-            context_hash,
+crates/amun-constitutional/src/state_anchor.rs-181-            constitutional_revision,
+crates/amun-constitutional/src/state_anchor.rs-182-            replay_revision,
+--
+crates/amun-constitutional/src/state_anchor.rs-195-            parent_anchor_hash,
+crates/amun-constitutional/src/state_anchor.rs-196-            attestation_note: None,
+crates/amun-constitutional/src/state_anchor.rs-197-        };
+crates/amun-constitutional/src/state_anchor.rs-198-        a.anchor_hash = a.constitutional_hash();
+crates/amun-constitutional/src/state_anchor.rs-199-        a
+crates/amun-constitutional/src/state_anchor.rs-200-    }
+crates/amun-constitutional/src/state_anchor.rs-201-
+crates/amun-constitutional/src/state_anchor.rs-202-    /// The state root this anchor attests to.
+crates/amun-constitutional/src/state_anchor.rs:203:    pub fn state_root(&self) -> ConstitutionalHash {
+crates/amun-constitutional/src/state_anchor.rs-204-        self.scope.state_root
+crates/amun-constitutional/src/state_anchor.rs-205-    }
+crates/amun-constitutional/src/state_anchor.rs-206-
+crates/amun-constitutional/src/state_anchor.rs-207-    /// Verify anchor monotonicity against a parent anchor.
+crates/amun-constitutional/src/state_anchor.rs-208-    pub fn verify_against_parent(
+crates/amun-constitutional/src/state_anchor.rs-209-        &self,
+crates/amun-constitutional/src/state_anchor.rs:210:        parent: &ConstitutionalStateAnchor,
+crates/amun-constitutional/src/state_anchor.rs:211:    ) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs-212-        match self.scope.verify_against_parent(&parent.scope) {
+crates/amun-constitutional/src/state_anchor.rs-213-            Ok(_) => Ok(()),
+crates/amun-constitutional/src/state_anchor.rs:214:            Err(_) => Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/state_anchor.rs-215-                self.anchor_id,
+crates/amun-constitutional/src/state_anchor.rs-216-                failure_type::BOUNDARY_VIOLATION,
+crates/amun-constitutional/src/state_anchor.rs-217-                failure_domain::CONSTITUTIONAL,
+crates/amun-constitutional/src/state_anchor.rs-218-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/state_anchor.rs-219-                "Anchor monotonicity violation",
+crates/amun-constitutional/src/state_anchor.rs-220-            )),
+crates/amun-constitutional/src/state_anchor.rs-221-        }
+crates/amun-constitutional/src/state_anchor.rs-222-    }
+--
+crates/amun-constitutional/src/state_anchor.rs-226-mod tests {
+crates/amun-constitutional/src/state_anchor.rs-227-    use super::*;
+crates/amun-constitutional/src/state_anchor.rs-228-
+crates/amun-constitutional/src/state_anchor.rs-229-    fn ma(
+crates/amun-constitutional/src/state_anchor.rs-230-        id: u64,
+crates/amun-constitutional/src/state_anchor.rs-231-        start: u64,
+crates/amun-constitutional/src/state_anchor.rs-232-        end: u64,
+crates/amun-constitutional/src/state_anchor.rs-233-        root: [u8; 32],
+crates/amun-constitutional/src/state_anchor.rs:234:        parent: Option<ConstitutionalHash>,
+crates/amun-constitutional/src/state_anchor.rs:235:    ) -> ConstitutionalStateAnchor {
+crates/amun-constitutional/src/state_anchor.rs:236:        ConstitutionalStateAnchor::new(
+crates/amun-constitutional/src/state_anchor.rs-237-            id, 1, 1, start, end, root, [0xAB; 32], [0xBC; 32], [0xCD; 32], [0xDE; 32], parent,
+crates/amun-constitutional/src/state_anchor.rs-238-        )
+crates/amun-constitutional/src/state_anchor.rs-239-    }
+crates/amun-constitutional/src/state_anchor.rs-240-
+crates/amun-constitutional/src/state_anchor.rs-241-    #[test]
+crates/amun-constitutional/src/state_anchor.rs-242-    fn test_anchor_verifies() {
+crates/amun-constitutional/src/state_anchor.rs-243-        assert!(ma(1, 0, 99, [0x11; 32], None).verify().is_ok());
+crates/amun-constitutional/src/state_anchor.rs-244-    }
+--
+crates/amun-constitutional/src/state_anchor.rs-273-    fn test_state_transition_ok() {
+crates/amun-constitutional/src/state_anchor.rs-274-        let p = ma(1, 0, 99, [0x11; 32], None);
+crates/amun-constitutional/src/state_anchor.rs-275-        let c = ma(2, 0, 49, [0x22; 32], Some(p.anchor_hash));
+crates/amun-constitutional/src/state_anchor.rs-276-        assert!(c.verify_against_parent(&p).is_ok());
+crates/amun-constitutional/src/state_anchor.rs-277-    }
+crates/amun-constitutional/src/state_anchor.rs-278-    #[test]
+crates/amun-constitutional/src/state_anchor.rs-279-    fn test_monotonicity_violated() {
+crates/amun-constitutional/src/state_anchor.rs-280-        let p = ma(1, 0, 99, [0x11; 32], None);
+crates/amun-constitutional/src/state_anchor.rs:281:        let c = ConstitutionalStateAnchor::new(
+crates/amun-constitutional/src/state_anchor.rs-282-            2,
+crates/amun-constitutional/src/state_anchor.rs-283-            1,
+crates/amun-constitutional/src/state_anchor.rs-284-            1,
+crates/amun-constitutional/src/state_anchor.rs-285-            0,
+crates/amun-constitutional/src/state_anchor.rs-286-            49,
+crates/amun-constitutional/src/state_anchor.rs-287-            [0x11; 32],
+crates/amun-constitutional/src/state_anchor.rs-288-            [0xCD; 32],
+crates/amun-constitutional/src/state_anchor.rs-289-            [0xBC; 32],
+--
+crates/amun-constitutional/src/execution_context.rs-1-use crate::constitutional_failure::{
+crates/amun-constitutional/src/execution_context.rs:2:    failure_domain, failure_type, severity, ConstitutionalFailure,
+crates/amun-constitutional/src/execution_context.rs-3-};
+crates/amun-constitutional/src/execution_context.rs:4:use crate::constitutional_hasher::ConstitutionalHasher;
+crates/amun-constitutional/src/execution_context.rs:5:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/execution_context.rs-6-
+crates/amun-constitutional/src/execution_context.rs-7-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/execution_context.rs-8-pub struct ExecutionContext {
+crates/amun-constitutional/src/execution_context.rs-9-    pub schema_id: u16,
+crates/amun-constitutional/src/execution_context.rs-10-    pub schema_version: u16,
+crates/amun-constitutional/src/execution_context.rs-11-    pub constitutional_revision: u32,
+crates/amun-constitutional/src/execution_context.rs-12-    pub replay_revision: u32,
+crates/amun-constitutional/src/execution_context.rs-13-    pub context_id: u64,
+crates/amun-constitutional/src/execution_context.rs-14-    pub context_hash: [u8; 32],
+crates/amun-constitutional/src/execution_context.rs-15-    pub governance_domain_hash: [u8; 32],
+crates/amun-constitutional/src/execution_context.rs-16-    pub replay_lineage_hash: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_context.rs-17-    pub parent_context_hash: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_context.rs-18-    pub boundary_hash: Option<[u8; 32]>,
+crates/amun-constitutional/src/execution_context.rs-19-    pub sequence_in_lineage: u64,
+crates/amun-constitutional/src/execution_context.rs-20-}
+crates/amun-constitutional/src/execution_context.rs-21-
+crates/amun-constitutional/src/execution_context.rs:22:impl ConstitutionalIdentity for ExecutionContext {
+crates/amun-constitutional/src/execution_context.rs-23-    fn schema_id(&self) -> u16 {
+crates/amun-constitutional/src/execution_context.rs-24-        self.schema_id
+crates/amun-constitutional/src/execution_context.rs-25-    }
+crates/amun-constitutional/src/execution_context.rs-26-    fn schema_version(&self) -> u16 {
+crates/amun-constitutional/src/execution_context.rs-27-        self.schema_version
+crates/amun-constitutional/src/execution_context.rs-28-    }
+crates/amun-constitutional/src/execution_context.rs-29-    fn constitutional_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_context.rs-30-        self.constitutional_revision
+crates/amun-constitutional/src/execution_context.rs-31-    }
+crates/amun-constitutional/src/execution_context.rs-32-    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_context.rs-33-        self.replay_revision
+crates/amun-constitutional/src/execution_context.rs-34-    }
+crates/amun-constitutional/src/execution_context.rs-35-}
+crates/amun-constitutional/src/execution_context.rs-36-
+crates/amun-constitutional/src/execution_context.rs:37:impl ConstitutionalObject for ExecutionContext {
+crates/amun-constitutional/src/execution_context.rs-38-    fn constitutional_hash(&self) -> [u8; 32] {
+crates/amun-constitutional/src/execution_context.rs:39:        let mut h = ConstitutionalHasher::new(crate::hash_domains::DOMAIN_EXECUTION_CONTEXT);
+crates/amun-constitutional/src/execution_context.rs-40-        h.update_schema(self.schema_id, self.schema_version)
+crates/amun-constitutional/src/execution_context.rs-41-            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_context.rs-42-            .update_u64(self.context_id)
+crates/amun-constitutional/src/execution_context.rs-43-            .update_bytes(&self.governance_domain_hash)
+crates/amun-constitutional/src/execution_context.rs-44-            .update_optional_hash(self.replay_lineage_hash.as_ref())
+crates/amun-constitutional/src/execution_context.rs-45-            .update_optional_hash(self.parent_context_hash.as_ref())
+crates/amun-constitutional/src/execution_context.rs-46-            .update_optional_hash(self.boundary_hash.as_ref())
+crates/amun-constitutional/src/execution_context.rs-47-            .update_u64(self.sequence_in_lineage);
+crates/amun-constitutional/src/execution_context.rs-48-        h.finalize()
+crates/amun-constitutional/src/execution_context.rs-49-    }
+crates/amun-constitutional/src/execution_context.rs:50:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_context.rs-51-        if self.schema_id != 0x0006 || self.schema_version == 0 {
+crates/amun-constitutional/src/execution_context.rs:52:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_context.rs-53-                self.context_id,
+crates/amun-constitutional/src/execution_context.rs-54-                failure_type::INVALID_SCHEMA,
+crates/amun-constitutional/src/execution_context.rs-55-                failure_domain::STRUCTURAL,
+crates/amun-constitutional/src/execution_context.rs-56-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_context.rs-57-                "Invalid context",
+crates/amun-constitutional/src/execution_context.rs-58-            ));
+crates/amun-constitutional/src/execution_context.rs-59-        }
+crates/amun-constitutional/src/execution_context.rs-60-        Ok(())
+crates/amun-constitutional/src/execution_context.rs-61-    }
+crates/amun-constitutional/src/execution_context.rs:62:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_context.rs-63-        if self.context_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_context.rs:64:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_context.rs-65-                self.context_id,
+crates/amun-constitutional/src/execution_context.rs-66-                failure_type::HASH_MISMATCH,
+crates/amun-constitutional/src/execution_context.rs-67-                failure_domain::SEMANTIC,
+crates/amun-constitutional/src/execution_context.rs-68-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_context.rs-69-                "Hash mismatch",
+crates/amun-constitutional/src/execution_context.rs-70-            ));
+crates/amun-constitutional/src/execution_context.rs-71-        }
+crates/amun-constitutional/src/execution_context.rs-72-        Ok(())
+crates/amun-constitutional/src/execution_context.rs-73-    }
+crates/amun-constitutional/src/execution_context.rs:74:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_context.rs-75-        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_context.rs:76:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/execution_context.rs-77-                self.context_id,
+crates/amun-constitutional/src/execution_context.rs-78-                failure_type::PROVENANCE_INVALID,
+crates/amun-constitutional/src/execution_context.rs-79-                failure_domain::PROVENANCE,
+crates/amun-constitutional/src/execution_context.rs-80-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/execution_context.rs-81-                "Missing revision",
+crates/amun-constitutional/src/execution_context.rs-82-            ));
+crates/amun-constitutional/src/execution_context.rs-83-        }
+crates/amun-constitutional/src/execution_context.rs-84-        Ok(())
+--
+crates/amun-constitutional/src/artifact_graph.rs-7-//! This module provides EDGE VERIFICATION only:
+crates/amun-constitutional/src/artifact_graph.rs-8-//! given two artifact hashes, can we verify that the edge
+crates/amun-constitutional/src/artifact_graph.rs-9-//! between them is constitutionally valid?
+crates/amun-constitutional/src/artifact_graph.rs-10-//!
+crates/amun-constitutional/src/artifact_graph.rs-11-//! DESIGN: Every edge is independently verifiable.
+crates/amun-constitutional/src/artifact_graph.rs-12-//! No global state, no runtime environment, no storage lookups.
+crates/amun-constitutional/src/artifact_graph.rs-13-
+crates/amun-constitutional/src/artifact_graph.rs-14-use crate::constitutional_failure::{
+crates/amun-constitutional/src/artifact_graph.rs:15:    failure_domain, failure_type, severity, ConstitutionalFailure,
+crates/amun-constitutional/src/artifact_graph.rs-16-};
+crates/amun-constitutional/src/artifact_graph.rs:17:use crate::kernel_types::ConstitutionalHash;
+crates/amun-constitutional/src/artifact_graph.rs-18-use crate::prelude::*;
+crates/amun-constitutional/src/artifact_graph.rs-19-
+crates/amun-constitutional/src/artifact_graph.rs-20-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+crates/amun-constitutional/src/artifact_graph.rs-21-pub enum ArtifactEdgeType {
+crates/amun-constitutional/src/artifact_graph.rs:22:    EvidenceToCommitment,
+crates/amun-constitutional/src/artifact_graph.rs-23-    CommitmentToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-24-    ReceiptToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-25-    ContextToBoundary,
+crates/amun-constitutional/src/artifact_graph.rs:26:    JournalToEvidence,
+crates/amun-constitutional/src/artifact_graph.rs-27-    BoundaryToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-28-    CertificateToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-29-}
+crates/amun-constitutional/src/artifact_graph.rs-30-
+crates/amun-constitutional/src/artifact_graph.rs-31-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/artifact_graph.rs-32-pub enum EdgeVerification {
+crates/amun-constitutional/src/artifact_graph.rs-33-    Valid,
+crates/amun-constitutional/src/artifact_graph.rs-34-    HashMismatch {
+crates/amun-constitutional/src/artifact_graph.rs:35:        expected: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs:36:        found: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs-37-    },
+crates/amun-constitutional/src/artifact_graph.rs-38-    ContextMismatch {
+crates/amun-constitutional/src/artifact_graph.rs:39:        source_context: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs:40:        target_context: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs-41-    },
+crates/amun-constitutional/src/artifact_graph.rs-42-    RevisionMismatch {
+crates/amun-constitutional/src/artifact_graph.rs-43-        source_revision: u32,
+crates/amun-constitutional/src/artifact_graph.rs-44-        target_revision: u32,
+crates/amun-constitutional/src/artifact_graph.rs-45-    },
+crates/amun-constitutional/src/artifact_graph.rs-46-    InvalidEdgeType,
+crates/amun-constitutional/src/artifact_graph.rs-47-}
+crates/amun-constitutional/src/artifact_graph.rs-48-
+--
+crates/amun-constitutional/src/artifact_graph.rs-53-    pub fn is_invalid(&self) -> bool {
+crates/amun-constitutional/src/artifact_graph.rs-54-        !self.is_valid()
+crates/amun-constitutional/src/artifact_graph.rs-55-    }
+crates/amun-constitutional/src/artifact_graph.rs-56-}
+crates/amun-constitutional/src/artifact_graph.rs-57-
+crates/amun-constitutional/src/artifact_graph.rs-58-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-constitutional/src/artifact_graph.rs-59-pub struct ArtifactEdge {
+crates/amun-constitutional/src/artifact_graph.rs-60-    pub edge_type: ArtifactEdgeType,
+crates/amun-constitutional/src/artifact_graph.rs:61:    pub source_hash: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs:62:    pub target_hash: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs-63-    pub verification: EdgeVerification,
+crates/amun-constitutional/src/artifact_graph.rs-64-}
+crates/amun-constitutional/src/artifact_graph.rs-65-
+crates/amun-constitutional/src/artifact_graph.rs-66-impl ArtifactEdge {
+crates/amun-constitutional/src/artifact_graph.rs-67-    pub fn new(
+crates/amun-constitutional/src/artifact_graph.rs-68-        edge_type: ArtifactEdgeType,
+crates/amun-constitutional/src/artifact_graph.rs:69:        source_hash: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs:70:        target_hash: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs-71-        verification: EdgeVerification,
+crates/amun-constitutional/src/artifact_graph.rs-72-    ) -> Self {
+crates/amun-constitutional/src/artifact_graph.rs-73-        Self {
+crates/amun-constitutional/src/artifact_graph.rs-74-            edge_type,
+crates/amun-constitutional/src/artifact_graph.rs-75-            source_hash,
+crates/amun-constitutional/src/artifact_graph.rs-76-            target_hash,
+crates/amun-constitutional/src/artifact_graph.rs-77-            verification,
+crates/amun-constitutional/src/artifact_graph.rs-78-        }
+crates/amun-constitutional/src/artifact_graph.rs-79-    }
+crates/amun-constitutional/src/artifact_graph.rs-80-
+crates/amun-constitutional/src/artifact_graph.rs-81-    pub fn valid(
+crates/amun-constitutional/src/artifact_graph.rs-82-        edge_type: ArtifactEdgeType,
+crates/amun-constitutional/src/artifact_graph.rs:83:        source_hash: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs:84:        target_hash: ConstitutionalHash,
+crates/amun-constitutional/src/artifact_graph.rs-85-    ) -> Self {
+crates/amun-constitutional/src/artifact_graph.rs-86-        Self::new(edge_type, source_hash, target_hash, EdgeVerification::Valid)
+crates/amun-constitutional/src/artifact_graph.rs-87-    }
+crates/amun-constitutional/src/artifact_graph.rs-88-
+crates/amun-constitutional/src/artifact_graph.rs-89-    pub fn is_valid(&self) -> bool {
+crates/amun-constitutional/src/artifact_graph.rs-90-        self.verification.is_valid()
+crates/amun-constitutional/src/artifact_graph.rs-91-    }
+crates/amun-constitutional/src/artifact_graph.rs-92-    pub fn is_invalid(&self) -> bool {
+--
+crates/amun-constitutional/src/artifact_graph.rs-99-    edges: Vec<ArtifactEdge>,
+crates/amun-constitutional/src/artifact_graph.rs-100-}
+crates/amun-constitutional/src/artifact_graph.rs-101-
+crates/amun-constitutional/src/artifact_graph.rs-102-impl ArtifactGraph {
+crates/amun-constitutional/src/artifact_graph.rs-103-    pub fn new() -> Self {
+crates/amun-constitutional/src/artifact_graph.rs-104-        Self { edges: Vec::new() }
+crates/amun-constitutional/src/artifact_graph.rs-105-    }
+crates/amun-constitutional/src/artifact_graph.rs-106-
+crates/amun-constitutional/src/artifact_graph.rs:107:    pub fn add_edge(&mut self, edge: ArtifactEdge) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/artifact_graph.rs-108-        if edge.is_invalid() {
+crates/amun-constitutional/src/artifact_graph.rs:109:            return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/artifact_graph.rs-110-                0,
+crates/amun-constitutional/src/artifact_graph.rs-111-                failure_type::INVARIANT_BROKEN,
+crates/amun-constitutional/src/artifact_graph.rs-112-                failure_domain::CONSTITUTIONAL,
+crates/amun-constitutional/src/artifact_graph.rs-113-                severity::HARD_FAILURE,
+crates/amun-constitutional/src/artifact_graph.rs-114-                "Cannot add invalid edge to artifact graph",
+crates/amun-constitutional/src/artifact_graph.rs-115-            ));
+crates/amun-constitutional/src/artifact_graph.rs-116-        }
+crates/amun-constitutional/src/artifact_graph.rs-117-        self.edges.push(edge);
+--
+crates/amun-constitutional/src/artifact_graph.rs-124-
+crates/amun-constitutional/src/artifact_graph.rs-125-    pub fn edges_of_type(&self, edge_type: ArtifactEdgeType) -> Vec<&ArtifactEdge> {
+crates/amun-constitutional/src/artifact_graph.rs-126-        self.edges
+crates/amun-constitutional/src/artifact_graph.rs-127-            .iter()
+crates/amun-constitutional/src/artifact_graph.rs-128-            .filter(|e| e.edge_type == edge_type)
+crates/amun-constitutional/src/artifact_graph.rs-129-            .collect()
+crates/amun-constitutional/src/artifact_graph.rs-130-    }
+crates/amun-constitutional/src/artifact_graph.rs-131-
+crates/amun-constitutional/src/artifact_graph.rs:132:    pub fn verify_all_edges(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/artifact_graph.rs-133-        for edge in &self.edges {
+crates/amun-constitutional/src/artifact_graph.rs-134-            if edge.is_invalid() {
+crates/amun-constitutional/src/artifact_graph.rs:135:                return Err(ConstitutionalFailure::new(
+crates/amun-constitutional/src/artifact_graph.rs-136-                    0,
+crates/amun-constitutional/src/artifact_graph.rs-137-                    failure_type::INVARIANT_BROKEN,
+crates/amun-constitutional/src/artifact_graph.rs-138-                    failure_domain::CONSTITUTIONAL,
+crates/amun-constitutional/src/artifact_graph.rs-139-                    severity::HARD_FAILURE,
+crates/amun-constitutional/src/artifact_graph.rs-140-                    "Artifact graph contains invalid edge",
+crates/amun-constitutional/src/artifact_graph.rs-141-                ));
+crates/amun-constitutional/src/artifact_graph.rs-142-            }
+crates/amun-constitutional/src/artifact_graph.rs-143-        }
+--
+crates/amun-constitutional/src/artifact_graph.rs-155-        assert!(g.verify_all_edges().is_ok());
+crates/amun-constitutional/src/artifact_graph.rs-156-        assert_eq!(g.edge_count(), 0);
+crates/amun-constitutional/src/artifact_graph.rs-157-    }
+crates/amun-constitutional/src/artifact_graph.rs-158-    #[test]
+crates/amun-constitutional/src/artifact_graph.rs-159-    fn test_add_valid() {
+crates/amun-constitutional/src/artifact_graph.rs-160-        let mut g = ArtifactGraph::new();
+crates/amun-constitutional/src/artifact_graph.rs-161-        assert!(g
+crates/amun-constitutional/src/artifact_graph.rs-162-            .add_edge(ArtifactEdge::valid(
+crates/amun-constitutional/src/artifact_graph.rs:163:                ArtifactEdgeType::EvidenceToCommitment,
+crates/amun-constitutional/src/artifact_graph.rs-164-                [0xAA; 32],
+crates/amun-constitutional/src/artifact_graph.rs-165-                [0xBB; 32]
+crates/amun-constitutional/src/artifact_graph.rs-166-            ))
+crates/amun-constitutional/src/artifact_graph.rs-167-            .is_ok());
+crates/amun-constitutional/src/artifact_graph.rs-168-        assert_eq!(g.edge_count(), 1);
+crates/amun-constitutional/src/artifact_graph.rs-169-    }
+crates/amun-constitutional/src/artifact_graph.rs-170-    #[test]
+crates/amun-constitutional/src/artifact_graph.rs-171-    fn test_reject_invalid() {
+--
+crates/amun-constitutional/src/artifact_graph.rs-180-            },
+crates/amun-constitutional/src/artifact_graph.rs-181-        );
+crates/amun-constitutional/src/artifact_graph.rs-182-        assert!(g.add_edge(e).is_err());
+crates/amun-constitutional/src/artifact_graph.rs-183-    }
+crates/amun-constitutional/src/artifact_graph.rs-184-    #[test]
+crates/amun-constitutional/src/artifact_graph.rs-185-    fn test_filter_by_type() {
+crates/amun-constitutional/src/artifact_graph.rs-186-        let mut g = ArtifactGraph::new();
+crates/amun-constitutional/src/artifact_graph.rs-187-        g.add_edge(ArtifactEdge::valid(
+crates/amun-constitutional/src/artifact_graph.rs:188:            ArtifactEdgeType::EvidenceToCommitment,
+crates/amun-constitutional/src/artifact_graph.rs-189-            [0x01; 32],
+crates/amun-constitutional/src/artifact_graph.rs-190-            [0x02; 32],
+crates/amun-constitutional/src/artifact_graph.rs-191-        ))
+crates/amun-constitutional/src/artifact_graph.rs-192-        .unwrap();
+crates/amun-constitutional/src/artifact_graph.rs-193-        g.add_edge(ArtifactEdge::valid(
+crates/amun-constitutional/src/artifact_graph.rs-194-            ArtifactEdgeType::ReceiptToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-195-            [0x03; 32],
+crates/amun-constitutional/src/artifact_graph.rs-196-            [0x04; 32],
+crates/amun-constitutional/src/artifact_graph.rs-197-        ))
+crates/amun-constitutional/src/artifact_graph.rs-198-        .unwrap();
+crates/amun-constitutional/src/artifact_graph.rs-199-        g.add_edge(ArtifactEdge::valid(
+crates/amun-constitutional/src/artifact_graph.rs:200:            ArtifactEdgeType::EvidenceToCommitment,
+crates/amun-constitutional/src/artifact_graph.rs-201-            [0x05; 32],
+crates/amun-constitutional/src/artifact_graph.rs-202-            [0x06; 32],
+crates/amun-constitutional/src/artifact_graph.rs-203-        ))
+crates/amun-constitutional/src/artifact_graph.rs-204-        .unwrap();
+crates/amun-constitutional/src/artifact_graph.rs-205-        assert_eq!(
+crates/amun-constitutional/src/artifact_graph.rs:206:            g.edges_of_type(ArtifactEdgeType::EvidenceToCommitment)
+crates/amun-constitutional/src/artifact_graph.rs-207-                .len(),
+crates/amun-constitutional/src/artifact_graph.rs-208-            2
+crates/amun-constitutional/src/artifact_graph.rs-209-        );
+crates/amun-constitutional/src/artifact_graph.rs-210-        assert_eq!(g.edges_of_type(ArtifactEdgeType::ReceiptToReceipt).len(), 1);
+crates/amun-constitutional/src/artifact_graph.rs-211-    }
+crates/amun-constitutional/src/artifact_graph.rs-212-    #[test]
+crates/amun-constitutional/src/artifact_graph.rs-213-    fn test_edge_types_distinct() {
+crates/amun-constitutional/src/artifact_graph.rs-214-        let types = [
+crates/amun-constitutional/src/artifact_graph.rs:215:            ArtifactEdgeType::EvidenceToCommitment,
+crates/amun-constitutional/src/artifact_graph.rs-216-            ArtifactEdgeType::CommitmentToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-217-            ArtifactEdgeType::ReceiptToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-218-            ArtifactEdgeType::ContextToBoundary,
+crates/amun-constitutional/src/artifact_graph.rs:219:            ArtifactEdgeType::JournalToEvidence,
+crates/amun-constitutional/src/artifact_graph.rs-220-            ArtifactEdgeType::BoundaryToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-221-            ArtifactEdgeType::CertificateToReceipt,
+crates/amun-constitutional/src/artifact_graph.rs-222-        ];
+crates/amun-constitutional/src/artifact_graph.rs-223-        for i in 0..types.len() {
+crates/amun-constitutional/src/artifact_graph.rs-224-            for j in (i + 1)..types.len() {
+crates/amun-constitutional/src/artifact_graph.rs-225-                assert_ne!(types[i], types[j]);
+crates/amun-constitutional/src/artifact_graph.rs-226-            }
+crates/amun-constitutional/src/artifact_graph.rs-227-        }
+crates/amun-constitutional/src/artifact_graph.rs-228-    }
+crates/amun-constitutional/src/artifact_graph.rs-229-    #[test]
+crates/amun-constitutional/src/artifact_graph.rs-230-    fn test_edge_is_invalid_delegates() {
+crates/amun-constitutional/src/artifact_graph.rs-231-        let e = ArtifactEdge::new(
+crates/amun-constitutional/src/artifact_graph.rs:232:            ArtifactEdgeType::EvidenceToCommitment,
+crates/amun-constitutional/src/artifact_graph.rs-233-            [0; 32],
+crates/amun-constitutional/src/artifact_graph.rs-234-            [0; 32],
+crates/amun-constitutional/src/artifact_graph.rs-235-            EdgeVerification::Valid,
+crates/amun-constitutional/src/artifact_graph.rs-236-        );
+crates/amun-constitutional/src/artifact_graph.rs-237-        assert!(e.is_valid());
+crates/amun-constitutional/src/artifact_graph.rs-238-        assert!(!e.is_invalid());
+crates/amun-constitutional/src/artifact_graph.rs-239-    }
+crates/amun-constitutional/src/artifact_graph.rs-240-}
+--
+crates/amun-consensus-integration/src/consensus_integrator.rs:1:use amun_bytecode::program::ConstitutionalProgram;
+crates/amun-consensus-integration/src/consensus_integrator.rs:2:use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
+crates/amun-consensus-integration/src/consensus_integrator.rs-3-use amun_proof_archive::hot_store::HotProofStore;
+crates/amun-consensus-integration/src/consensus_integrator.rs-4-use amun_proof_archive::proof_archive::ProofArchive;
+crates/amun-consensus-integration/src/consensus_integrator.rs-5-use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-consensus-integration/src/consensus_integrator.rs-6-use amun_vm_kernel::execution_context::ExecutionContext;
+crates/amun-consensus-integration/src/consensus_integrator.rs-7-
+crates/amun-consensus-integration/src/consensus_integrator.rs-8-use crate::consensus_types::{
+crates/amun-consensus-integration/src/consensus_integrator.rs:9:    ConstitutionalBlock, ConstitutionalFinalityCertificate, ConstitutionalQC,
+crates/amun-consensus-integration/src/consensus_integrator.rs-10-};
+crates/amun-consensus-integration/src/consensus_integrator.rs-11-
+crates/amun-consensus-integration/src/consensus_integrator.rs-12-pub struct ConsensusIntegrator;
+crates/amun-consensus-integration/src/consensus_integrator.rs-13-
+crates/amun-consensus-integration/src/consensus_integrator.rs-14-impl ConsensusIntegrator {
+crates/amun-consensus-integration/src/consensus_integrator.rs-15-    pub fn execute_block(
+crates/amun-consensus-integration/src/consensus_integrator.rs:16:        programs: &[(ConstitutionalProgram, ExecutionContext)],
+crates/amun-consensus-integration/src/consensus_integrator.rs-17-        registry: &mut ResourceRegistry,
+crates/amun-consensus-integration/src/consensus_integrator.rs-18-        block_height: u64,
+crates/amun-consensus-integration/src/consensus_integrator.rs-19-        parent_hash: [u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-20-        proposer: ResourceId,
+crates/amun-consensus-integration/src/consensus_integrator.rs:21:    ) -> Result<ConstitutionalBlock, String> {
+crates/amun-consensus-integration/src/consensus_integrator.rs-22-        let mut hot = HotProofStore::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs-23-        let mut archive = ProofArchive::new();
+crates/amun-consensus-integration/src/consensus_integrator.rs-24-        let mut transitions = Vec::new();
+crates/amun-consensus-integration/src/consensus_integrator.rs-25-
+crates/amun-consensus-integration/src/consensus_integrator.rs-26-        for (program, ctx) in programs {
+crates/amun-consensus-integration/src/consensus_integrator.rs:27:            let result = ConstitutionalRuntime::execute(
+crates/amun-consensus-integration/src/consensus_integrator.rs-28-                program,
+crates/amun-consensus-integration/src/consensus_integrator.rs-29-                ctx,
+crates/amun-consensus-integration/src/consensus_integrator.rs-30-                registry,
+crates/amun-consensus-integration/src/consensus_integrator.rs-31-                &[],
+crates/amun-consensus-integration/src/consensus_integrator.rs-32-                100_000,
+crates/amun-consensus-integration/src/consensus_integrator.rs-33-                &mut hot,
+crates/amun-consensus-integration/src/consensus_integrator.rs-34-                &mut archive,
+crates/amun-consensus-integration/src/consensus_integrator.rs-35-            )
+--
+crates/amun-consensus-integration/src/consensus_integrator.rs-43-                    transition_proof, ..
+crates/amun-consensus-integration/src/consensus_integrator.rs-44-                } => {
+crates/amun-consensus-integration/src/consensus_integrator.rs-45-                    transitions.push(transition_proof);
+crates/amun-consensus-integration/src/consensus_integrator.rs-46-                }
+crates/amun-consensus-integration/src/consensus_integrator.rs-47-            }
+crates/amun-consensus-integration/src/consensus_integrator.rs-48-        }
+crates/amun-consensus-integration/src/consensus_integrator.rs-49-
+crates/amun-consensus-integration/src/consensus_integrator.rs-50-        let state_root = registry.compute_state_root();
+crates/amun-consensus-integration/src/consensus_integrator.rs:51:        let mut block = ConstitutionalBlock {
+crates/amun-consensus-integration/src/consensus_integrator.rs-52-            block_height,
+crates/amun-consensus-integration/src/consensus_integrator.rs-53-            block_hash: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-54-            parent_hash,
+crates/amun-consensus-integration/src/consensus_integrator.rs-55-            state_root,
+crates/amun-consensus-integration/src/consensus_integrator.rs-56-            proof_root: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-57-            transitions,
+crates/amun-consensus-integration/src/consensus_integrator.rs-58-            proposer,
+crates/amun-consensus-integration/src/consensus_integrator.rs-59-            timestamp: 0,
+--
+crates/amun-consensus-integration/src/consensus_integrator.rs-71-        let mut bh = [0u8; 32];
+crates/amun-consensus-integration/src/consensus_integrator.rs-72-        bh.copy_from_slice(hash_bytes);
+crates/amun-consensus-integration/src/consensus_integrator.rs-73-        block.block_hash = bh;
+crates/amun-consensus-integration/src/consensus_integrator.rs-74-
+crates/amun-consensus-integration/src/consensus_integrator.rs-75-        Ok(block)
+crates/amun-consensus-integration/src/consensus_integrator.rs-76-    }
+crates/amun-consensus-integration/src/consensus_integrator.rs-77-
+crates/amun-consensus-integration/src/consensus_integrator.rs-78-    pub fn form_consensus(
+crates/amun-consensus-integration/src/consensus_integrator.rs:79:        block: &ConstitutionalBlock,
+crates/amun-consensus-integration/src/consensus_integrator.rs-80-        quorum_size: usize,
+crates/amun-consensus-integration/src/consensus_integrator.rs-81-        signatures: Vec<Vec<u8>>,
+crates/amun-consensus-integration/src/consensus_integrator.rs:82:    ) -> Result<ConstitutionalFinalityCertificate, String> {
+crates/amun-consensus-integration/src/consensus_integrator.rs-83-        if !block.verify_all_proofs() {
+crates/amun-consensus-integration/src/consensus_integrator.rs-84-            return Err("Block proof verification failed".into());
+crates/amun-consensus-integration/src/consensus_integrator.rs-85-        }
+crates/amun-consensus-integration/src/consensus_integrator.rs:86:        let mut qc = ConstitutionalQC::for_block(block, quorum_size);
+crates/amun-consensus-integration/src/consensus_integrator.rs-87-        for sig in signatures {
+crates/amun-consensus-integration/src/consensus_integrator.rs-88-            qc.add_signature(sig);
+crates/amun-consensus-integration/src/consensus_integrator.rs-89-        }
+crates/amun-consensus-integration/src/consensus_integrator.rs-90-        if !qc.is_valid() {
+crates/amun-consensus-integration/src/consensus_integrator.rs-91-            return Err(format!(
+crates/amun-consensus-integration/src/consensus_integrator.rs-92-                "Insufficient signatures: {}/{}",
+crates/amun-consensus-integration/src/consensus_integrator.rs-93-                qc.signer_count, quorum_size
+crates/amun-consensus-integration/src/consensus_integrator.rs-94-            ));
+crates/amun-consensus-integration/src/consensus_integrator.rs-95-        }
+crates/amun-consensus-integration/src/consensus_integrator.rs:96:        Ok(ConstitutionalFinalityCertificate::issue(block, qc))
+crates/amun-consensus-integration/src/consensus_integrator.rs-97-    }
+crates/amun-consensus-integration/src/consensus_integrator.rs-98-}
+crates/amun-consensus-integration/src/consensus_integrator.rs-99-
+crates/amun-consensus-integration/src/consensus_integrator.rs-100-#[cfg(test)]
+crates/amun-consensus-integration/src/consensus_integrator.rs-101-mod tests {
+crates/amun-consensus-integration/src/consensus_integrator.rs-102-    use super::*;
+crates/amun-consensus-integration/src/consensus_integrator.rs-103-    use amun_bytecode::opcodes::OpCode;
+crates/amun-consensus-integration/src/consensus_integrator.rs-104-    use amun_resource_core::ResourceId;
+--
+crates/amun-consensus-integration/src/consensus_integrator.rs-107-        let mut h = [0u8; 32];
+crates/amun-consensus-integration/src/consensus_integrator.rs-108-        h[0] = seed;
+crates/amun-consensus-integration/src/consensus_integrator.rs-109-        ResourceId(h)
+crates/amun-consensus-integration/src/consensus_integrator.rs-110-    }
+crates/amun-consensus-integration/src/consensus_integrator.rs-111-
+crates/amun-consensus-integration/src/consensus_integrator.rs-112-    #[test]
+crates/amun-consensus-integration/src/consensus_integrator.rs-113-    fn w17_execute_block_with_proofs() {
+crates/amun-consensus-integration/src/consensus_integrator.rs-114-        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:115:        let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
+crates/amun-consensus-integration/src/consensus_integrator.rs-116-        let ctx = ExecutionContext {
+crates/amun-consensus-integration/src/consensus_integrator.rs-117-            contract_id: make_id(1),
+crates/amun-consensus-integration/src/consensus_integrator.rs-118-            caller: [1u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-119-            block_height: 1,
+crates/amun-consensus-integration/src/consensus_integrator.rs-120-            block_hash: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-121-            transaction_hash: [0xaa; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-122-            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs-123-            authority: [2u8; 32],
+--
+crates/amun-consensus-integration/src/consensus_integrator.rs-133-        assert_eq!(block.transitions.len(), 1);
+crates/amun-consensus-integration/src/consensus_integrator.rs-134-        assert!(block.verify_all_proofs());
+crates/amun-consensus-integration/src/consensus_integrator.rs-135-        assert_ne!(block.proof_root, [0u8; 32]);
+crates/amun-consensus-integration/src/consensus_integrator.rs-136-    }
+crates/amun-consensus-integration/src/consensus_integrator.rs-137-
+crates/amun-consensus-integration/src/consensus_integrator.rs-138-    #[test]
+crates/amun-consensus-integration/src/consensus_integrator.rs-139-    fn w17_form_consensus_with_quorum() {
+crates/amun-consensus-integration/src/consensus_integrator.rs-140-        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:141:        let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
+crates/amun-consensus-integration/src/consensus_integrator.rs-142-        let ctx = ExecutionContext {
+crates/amun-consensus-integration/src/consensus_integrator.rs-143-            contract_id: make_id(1),
+crates/amun-consensus-integration/src/consensus_integrator.rs-144-            caller: [1u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-145-            block_height: 1,
+crates/amun-consensus-integration/src/consensus_integrator.rs-146-            block_hash: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-147-            transaction_hash: [0xaa; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-148-            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs-149-            authority: [2u8; 32],
+--
+crates/amun-consensus-integration/src/consensus_integrator.rs-160-        let cert = ConsensusIntegrator::form_consensus(&block, 5, sigs).unwrap();
+crates/amun-consensus-integration/src/consensus_integrator.rs-161-        assert!(cert.verify());
+crates/amun-consensus-integration/src/consensus_integrator.rs-162-        assert_eq!(cert.qc.signer_count, 5);
+crates/amun-consensus-integration/src/consensus_integrator.rs-163-    }
+crates/amun-consensus-integration/src/consensus_integrator.rs-164-
+crates/amun-consensus-integration/src/consensus_integrator.rs-165-    #[test]
+crates/amun-consensus-integration/src/consensus_integrator.rs-166-    fn w17_reject_insufficient_quorum() {
+crates/amun-consensus-integration/src/consensus_integrator.rs-167-        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:168:        let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
+crates/amun-consensus-integration/src/consensus_integrator.rs-169-        let ctx = ExecutionContext {
+crates/amun-consensus-integration/src/consensus_integrator.rs-170-            contract_id: make_id(1),
+crates/amun-consensus-integration/src/consensus_integrator.rs-171-            caller: [1u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-172-            block_height: 1,
+crates/amun-consensus-integration/src/consensus_integrator.rs-173-            block_hash: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-174-            transaction_hash: [0xaa; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-175-            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs-176-            authority: [2u8; 32],
+--
+crates/amun-consensus-integration/src/consensus_integrator.rs-185-        .unwrap();
+crates/amun-consensus-integration/src/consensus_integrator.rs-186-        let sigs: Vec<Vec<u8>> = (0..2).map(|_| vec![0u8; 64]).collect();
+crates/amun-consensus-integration/src/consensus_integrator.rs-187-        assert!(ConsensusIntegrator::form_consensus(&block, 5, sigs).is_err());
+crates/amun-consensus-integration/src/consensus_integrator.rs-188-    }
+crates/amun-consensus-integration/src/consensus_integrator.rs-189-
+crates/amun-consensus-integration/src/consensus_integrator.rs-190-    #[test]
+crates/amun-consensus-integration/src/consensus_integrator.rs-191-    fn w17_finality_certificate_deterministic() {
+crates/amun-consensus-integration/src/consensus_integrator.rs-192-        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:193:        let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
+crates/amun-consensus-integration/src/consensus_integrator.rs-194-        let ctx = ExecutionContext {
+crates/amun-consensus-integration/src/consensus_integrator.rs-195-            contract_id: make_id(1),
+crates/amun-consensus-integration/src/consensus_integrator.rs-196-            caller: [1u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-197-            block_height: 1,
+crates/amun-consensus-integration/src/consensus_integrator.rs-198-            block_hash: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-199-            transaction_hash: [0xaa; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-200-            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs-201-            authority: [2u8; 32],
+--
+crates/amun-consensus-integration/src/consensus_integrator.rs-212-        let cert1 = ConsensusIntegrator::form_consensus(&block, 5, sigs.clone()).unwrap();
+crates/amun-consensus-integration/src/consensus_integrator.rs-213-        let cert2 = ConsensusIntegrator::form_consensus(&block, 5, sigs).unwrap();
+crates/amun-consensus-integration/src/consensus_integrator.rs-214-        assert_eq!(cert1.certificate_hash, cert2.certificate_hash);
+crates/amun-consensus-integration/src/consensus_integrator.rs-215-    }
+crates/amun-consensus-integration/src/consensus_integrator.rs-216-
+crates/amun-consensus-integration/src/consensus_integrator.rs-217-    #[test]
+crates/amun-consensus-integration/src/consensus_integrator.rs-218-    fn w17_block_links_proofs_to_state() {
+crates/amun-consensus-integration/src/consensus_integrator.rs-219-        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:220:        let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
+crates/amun-consensus-integration/src/consensus_integrator.rs-221-        let ctx = ExecutionContext {
+crates/amun-consensus-integration/src/consensus_integrator.rs-222-            contract_id: make_id(1),
+crates/amun-consensus-integration/src/consensus_integrator.rs-223-            caller: [1u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-224-            block_height: 1,
+crates/amun-consensus-integration/src/consensus_integrator.rs-225-            block_hash: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-226-            transaction_hash: [0xaa; 32],
+crates/amun-consensus-integration/src/consensus_integrator.rs-227-            pre_state_root: registry.compute_state_root(),
+crates/amun-consensus-integration/src/consensus_integrator.rs-228-            authority: [2u8; 32],
+--
+crates/amun-consensus-integration/src/consensus_types.rs-1-use amun_resource_core::ResourceId;
+crates/amun-consensus-integration/src/consensus_types.rs:2:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-consensus-integration/src/consensus_types.rs-3-use serde::{Deserialize, Serialize};
+crates/amun-consensus-integration/src/consensus_types.rs-4-
+crates/amun-consensus-integration/src/consensus_types.rs-5-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+crates/amun-consensus-integration/src/consensus_types.rs:6:pub struct ConstitutionalBlock {
+crates/amun-consensus-integration/src/consensus_types.rs-7-    pub block_height: u64,
+crates/amun-consensus-integration/src/consensus_types.rs-8-    pub block_hash: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-9-    pub parent_hash: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-10-    pub state_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-11-    pub proof_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs:12:    pub transitions: Vec<TransitionProof>,
+crates/amun-consensus-integration/src/consensus_types.rs-13-    pub proposer: ResourceId,
+crates/amun-consensus-integration/src/consensus_types.rs-14-    pub timestamp: u64,
+crates/amun-consensus-integration/src/consensus_types.rs-15-}
+crates/amun-consensus-integration/src/consensus_types.rs-16-
+crates/amun-consensus-integration/src/consensus_types.rs:17:impl ConstitutionalBlock {
+crates/amun-consensus-integration/src/consensus_types.rs-18-    pub fn compute_proof_root(&self) -> [u8; 32] {
+crates/amun-consensus-integration/src/consensus_types.rs-19-        let mut hasher = blake3::Hasher::new();
+crates/amun-consensus-integration/src/consensus_types.rs-20-        hasher.update(b"AMUN_PROOF_ROOT_V1");
+crates/amun-consensus-integration/src/consensus_types.rs-21-        for proof in &self.transitions {
+crates/amun-consensus-integration/src/consensus_types.rs-22-            hasher.update(&proof.proof_hash);
+crates/amun-consensus-integration/src/consensus_types.rs-23-        }
+crates/amun-consensus-integration/src/consensus_types.rs-24-        let hash = hasher.finalize();
+crates/amun-consensus-integration/src/consensus_types.rs-25-        let mut root = [0u8; 32];
+--
+crates/amun-consensus-integration/src/consensus_types.rs-36-                return false;
+crates/amun-consensus-integration/src/consensus_types.rs-37-            }
+crates/amun-consensus-integration/src/consensus_types.rs-38-        }
+crates/amun-consensus-integration/src/consensus_types.rs-39-        self.proof_root == self.compute_proof_root()
+crates/amun-consensus-integration/src/consensus_types.rs-40-    }
+crates/amun-consensus-integration/src/consensus_types.rs-41-}
+crates/amun-consensus-integration/src/consensus_types.rs-42-
+crates/amun-consensus-integration/src/consensus_types.rs-43-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+crates/amun-consensus-integration/src/consensus_types.rs:44:pub struct ConstitutionalQC {
+crates/amun-consensus-integration/src/consensus_types.rs-45-    pub block_hash: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-46-    pub block_height: u64,
+crates/amun-consensus-integration/src/consensus_types.rs-47-    pub state_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-48-    pub proof_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-49-    pub signatures: Vec<Vec<u8>>,
+crates/amun-consensus-integration/src/consensus_types.rs-50-    pub signer_count: usize,
+crates/amun-consensus-integration/src/consensus_types.rs-51-    pub quorum_threshold: usize,
+crates/amun-consensus-integration/src/consensus_types.rs-52-}
+crates/amun-consensus-integration/src/consensus_types.rs-53-
+crates/amun-consensus-integration/src/consensus_types.rs:54:impl ConstitutionalQC {
+crates/amun-consensus-integration/src/consensus_types.rs-55-    pub fn is_valid(&self) -> bool {
+crates/amun-consensus-integration/src/consensus_types.rs-56-        self.signer_count >= self.quorum_threshold
+crates/amun-consensus-integration/src/consensus_types.rs-57-    }
+crates/amun-consensus-integration/src/consensus_types.rs-58-
+crates/amun-consensus-integration/src/consensus_types.rs:59:    pub fn for_block(block: &ConstitutionalBlock, threshold: usize) -> Self {
+crates/amun-consensus-integration/src/consensus_types.rs-60-        Self {
+crates/amun-consensus-integration/src/consensus_types.rs-61-            block_hash: block.block_hash,
+crates/amun-consensus-integration/src/consensus_types.rs-62-            block_height: block.block_height,
+crates/amun-consensus-integration/src/consensus_types.rs-63-            state_root: block.state_root,
+crates/amun-consensus-integration/src/consensus_types.rs-64-            proof_root: block.proof_root,
+crates/amun-consensus-integration/src/consensus_types.rs-65-            signatures: Vec::new(),
+crates/amun-consensus-integration/src/consensus_types.rs-66-            signer_count: 0,
+crates/amun-consensus-integration/src/consensus_types.rs-67-            quorum_threshold: threshold,
+--
+crates/amun-consensus-integration/src/consensus_types.rs-70-
+crates/amun-consensus-integration/src/consensus_types.rs-71-    pub fn add_signature(&mut self, sig: Vec<u8>) {
+crates/amun-consensus-integration/src/consensus_types.rs-72-        self.signatures.push(sig);
+crates/amun-consensus-integration/src/consensus_types.rs-73-        self.signer_count = self.signatures.len();
+crates/amun-consensus-integration/src/consensus_types.rs-74-    }
+crates/amun-consensus-integration/src/consensus_types.rs-75-}
+crates/amun-consensus-integration/src/consensus_types.rs-76-
+crates/amun-consensus-integration/src/consensus_types.rs-77-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+crates/amun-consensus-integration/src/consensus_types.rs:78:pub struct ConstitutionalFinalityCertificate {
+crates/amun-consensus-integration/src/consensus_types.rs-79-    pub block_height: u64,
+crates/amun-consensus-integration/src/consensus_types.rs-80-    pub block_hash: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-81-    pub state_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-82-    pub proof_root: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs:83:    pub qc: ConstitutionalQC,
+crates/amun-consensus-integration/src/consensus_types.rs-84-    pub certificate_hash: [u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-85-}
+crates/amun-consensus-integration/src/consensus_types.rs-86-
+crates/amun-consensus-integration/src/consensus_types.rs:87:impl ConstitutionalFinalityCertificate {
+crates/amun-consensus-integration/src/consensus_types.rs:88:    pub fn issue(block: &ConstitutionalBlock, qc: ConstitutionalQC) -> Self {
+crates/amun-consensus-integration/src/consensus_types.rs-89-        let mut cert = Self {
+crates/amun-consensus-integration/src/consensus_types.rs-90-            block_height: block.block_height,
+crates/amun-consensus-integration/src/consensus_types.rs-91-            block_hash: block.block_hash,
+crates/amun-consensus-integration/src/consensus_types.rs-92-            state_root: block.state_root,
+crates/amun-consensus-integration/src/consensus_types.rs-93-            proof_root: block.proof_root,
+crates/amun-consensus-integration/src/consensus_types.rs-94-            qc,
+crates/amun-consensus-integration/src/consensus_types.rs-95-            certificate_hash: [0u8; 32],
+crates/amun-consensus-integration/src/consensus_types.rs-96-        };
+--
+crates/amun-runtime/src/overlay.rs-23-        } else {
+crates/amun-runtime/src/overlay.rs-24-            self.entries
+crates/amun-runtime/src/overlay.rs-25-                .push(OverlayEntry {
+crates/amun-runtime/src/overlay.rs-26-                    key,
+crates/amun-runtime/src/overlay.rs-27-                    value: Some(value),
+crates/amun-runtime/src/overlay.rs-28-                })
+crates/amun-runtime/src/overlay.rs-29-                .map_err(|_| {
+crates/amun-runtime/src/overlay.rs-30-                    amun_failure::FailureContext::new(
+crates/amun-runtime/src/overlay.rs:31:                        amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/overlay.rs-32-                        0x0010,
+crates/amun-runtime/src/overlay.rs-33-                        0x0001,
+crates/amun-runtime/src/overlay.rs-34-                    )
+crates/amun-runtime/src/overlay.rs-35-                })?;
+crates/amun-runtime/src/overlay.rs-36-        }
+crates/amun-runtime/src/overlay.rs-37-        Ok(())
+crates/amun-runtime/src/overlay.rs-38-    }
+crates/amun-runtime/src/overlay.rs-39-
+crates/amun-runtime/src/overlay.rs-40-    pub fn delete(&mut self, key: Vec<u8, 32>) -> AmunResult<()> {
+crates/amun-runtime/src/overlay.rs-41-        if let Some(entry) = self.entries.iter_mut().find(|e| e.key == key) {
+crates/amun-runtime/src/overlay.rs-42-            entry.value = None;
+crates/amun-runtime/src/overlay.rs-43-        } else {
+crates/amun-runtime/src/overlay.rs-44-            self.entries
+crates/amun-runtime/src/overlay.rs-45-                .push(OverlayEntry { key, value: None })
+crates/amun-runtime/src/overlay.rs-46-                .map_err(|_| {
+crates/amun-runtime/src/overlay.rs-47-                    amun_failure::FailureContext::new(
+crates/amun-runtime/src/overlay.rs:48:                        amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/overlay.rs-49-                        0x0010,
+crates/amun-runtime/src/overlay.rs-50-                        0x0002,
+crates/amun-runtime/src/overlay.rs-51-                    )
+crates/amun-runtime/src/overlay.rs-52-                })?;
+crates/amun-runtime/src/overlay.rs-53-        }
+crates/amun-runtime/src/overlay.rs-54-        Ok(())
+crates/amun-runtime/src/overlay.rs-55-    }
+crates/amun-runtime/src/overlay.rs-56-
+--
+crates/amun-runtime/src/journal.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-runtime/src/journal.rs-2-use amun_kernel_types::PublicHash32;
+crates/amun-runtime/src/journal.rs-3-use heapless::Vec;
+crates/amun-runtime/src/journal.rs-4-
+crates/amun-runtime/src/journal.rs-5-#[derive(Clone, Debug, PartialEq, Eq)]
+crates/amun-runtime/src/journal.rs-6-pub enum JournalEntry {
+crates/amun-runtime/src/journal.rs-7-    Set {
+crates/amun-runtime/src/journal.rs-8-        key: Vec<u8, 32>,
+crates/amun-runtime/src/journal.rs-9-        value: Vec<u8, 64>,
+--
+crates/amun-runtime/src/journal.rs-26-    pub fn new() -> Self {
+crates/amun-runtime/src/journal.rs-27-        Self {
+crates/amun-runtime/src/journal.rs-28-            entries: Vec::new(),
+crates/amun-runtime/src/journal.rs-29-        }
+crates/amun-runtime/src/journal.rs-30-    }
+crates/amun-runtime/src/journal.rs-31-    pub fn record_set(&mut self, key: &[u8], value: &[u8]) -> Result<(), FailureContext> {
+crates/amun-runtime/src/journal.rs-32-        let mut k = Vec::new();
+crates/amun-runtime/src/journal.rs-33-        k.extend_from_slice(key).map_err(|_| {
+crates/amun-runtime/src/journal.rs:34:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0020)
+crates/amun-runtime/src/journal.rs-35-        })?;
+crates/amun-runtime/src/journal.rs-36-        let mut v = Vec::new();
+crates/amun-runtime/src/journal.rs-37-        v.extend_from_slice(value).map_err(|_| {
+crates/amun-runtime/src/journal.rs:38:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0021)
+crates/amun-runtime/src/journal.rs-39-        })?;
+crates/amun-runtime/src/journal.rs-40-        if self.entries.is_full() {
+crates/amun-runtime/src/journal.rs-41-            return Err(FailureContext::new(
+crates/amun-runtime/src/journal.rs:42:                ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/journal.rs-43-                0x000A,
+crates/amun-runtime/src/journal.rs-44-                0x0022,
+crates/amun-runtime/src/journal.rs-45-            ));
+crates/amun-runtime/src/journal.rs-46-        }
+crates/amun-runtime/src/journal.rs-47-        self.entries
+crates/amun-runtime/src/journal.rs-48-            .push(JournalEntry::Set { key: k, value: v })
+crates/amun-runtime/src/journal.rs-49-            .map_err(|_| {
+crates/amun-runtime/src/journal.rs:50:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0023)
+crates/amun-runtime/src/journal.rs-51-            })?;
+crates/amun-runtime/src/journal.rs-52-        Ok(())
+crates/amun-runtime/src/journal.rs-53-    }
+crates/amun-runtime/src/journal.rs-54-    pub fn record_receipt(
+crates/amun-runtime/src/journal.rs-55-        &mut self,
+crates/amun-runtime/src/journal.rs-56-        tx_hash: PublicHash32,
+crates/amun-runtime/src/journal.rs-57-        gas_used: u64,
+crates/amun-runtime/src/journal.rs-58-        return_code: u8,
+crates/amun-runtime/src/journal.rs-59-    ) -> Result<(), FailureContext> {
+crates/amun-runtime/src/journal.rs-60-        if self.entries.is_full() {
+crates/amun-runtime/src/journal.rs-61-            return Err(FailureContext::new(
+crates/amun-runtime/src/journal.rs:62:                ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/journal.rs-63-                0x000A,
+crates/amun-runtime/src/journal.rs-64-                0x0027,
+crates/amun-runtime/src/journal.rs-65-            ));
+crates/amun-runtime/src/journal.rs-66-        }
+crates/amun-runtime/src/journal.rs-67-        self.entries
+crates/amun-runtime/src/journal.rs-68-            .push(JournalEntry::Receipt {
+crates/amun-runtime/src/journal.rs-69-                tx_hash,
+crates/amun-runtime/src/journal.rs-70-                gas_used,
+crates/amun-runtime/src/journal.rs-71-                return_code,
+crates/amun-runtime/src/journal.rs-72-            })
+crates/amun-runtime/src/journal.rs-73-            .map_err(|_| {
+crates/amun-runtime/src/journal.rs:74:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0028)
+crates/amun-runtime/src/journal.rs-75-            })?;
+crates/amun-runtime/src/journal.rs-76-        Ok(())
+crates/amun-runtime/src/journal.rs-77-    }
+crates/amun-runtime/src/journal.rs-78-    pub fn is_empty(&self) -> bool {
+crates/amun-runtime/src/journal.rs-79-        self.len() == 0
+crates/amun-runtime/src/journal.rs-80-    }
+crates/amun-runtime/src/journal.rs-81-
+crates/amun-runtime/src/journal.rs-82-    pub fn len(&self) -> usize {
+--
+crates/amun-runtime/src/account.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-runtime/src/account.rs-2-use amun_kernel_types::{Amount, Nonce, PublicHash32};
+crates/amun-runtime/src/account.rs-3-
+crates/amun-runtime/src/account.rs-4-#[derive(Clone, Debug, PartialEq, Eq)]
+crates/amun-runtime/src/account.rs-5-pub struct AccountState {
+crates/amun-runtime/src/account.rs-6-    pub nonce: Nonce,
+crates/amun-runtime/src/account.rs-7-    pub balance: Amount,
+crates/amun-runtime/src/account.rs-8-    pub storage_root: PublicHash32,
+crates/amun-runtime/src/account.rs-9-    pub code_hash: PublicHash32,
+--
+crates/amun-runtime/src/account.rs-19-            code_hash: PublicHash32::default(),
+crates/amun-runtime/src/account.rs-20-            flags: 0,
+crates/amun-runtime/src/account.rs-21-        }
+crates/amun-runtime/src/account.rs-22-    }
+crates/amun-runtime/src/account.rs-23-
+crates/amun-runtime/src/account.rs-24-    pub fn nonce_key(account: &[u8]) -> Result<heapless::Vec<u8, 32>, FailureContext> {
+crates/amun-runtime/src/account.rs-25-        let mut key = heapless::Vec::new();
+crates/amun-runtime/src/account.rs-26-        key.extend_from_slice(b"NONCE:").map_err(|_| {
+crates/amun-runtime/src/account.rs:27:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0050)
+crates/amun-runtime/src/account.rs-28-        })?;
+crates/amun-runtime/src/account.rs-29-        key.extend_from_slice(account).map_err(|_| {
+crates/amun-runtime/src/account.rs:30:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0051)
+crates/amun-runtime/src/account.rs-31-        })?;
+crates/amun-runtime/src/account.rs-32-        Ok(key)
+crates/amun-runtime/src/account.rs-33-    }
+crates/amun-runtime/src/account.rs-34-
+crates/amun-runtime/src/account.rs-35-    pub fn balance_key(account: &[u8]) -> Result<heapless::Vec<u8, 32>, FailureContext> {
+crates/amun-runtime/src/account.rs-36-        let mut key = heapless::Vec::new();
+crates/amun-runtime/src/account.rs-37-        key.extend_from_slice(b"BALANCE:").map_err(|_| {
+crates/amun-runtime/src/account.rs:38:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0052)
+crates/amun-runtime/src/account.rs-39-        })?;
+crates/amun-runtime/src/account.rs-40-        key.extend_from_slice(account).map_err(|_| {
+crates/amun-runtime/src/account.rs:41:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0053)
+crates/amun-runtime/src/account.rs-42-        })?;
+crates/amun-runtime/src/account.rs-43-        Ok(key)
+crates/amun-runtime/src/account.rs-44-    }

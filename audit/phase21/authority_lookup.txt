@@ -1,0 +1,27 @@
+================ issuer() usages ================
+crates/amun-node/src/peer_handshake.rs:61:println!("issuer key ?  : {:?}", self.certificate.issuer());
+crates/amun-networking/src/validator_registry.rs:25:            .get_key(&certificate.issuer())
+
+================ TrustAnchorRegistry ================
+crates/amun-networking/src/trust_anchor.rs:9:pub struct TrustAnchorRegistry {
+crates/amun-networking/src/trust_anchor.rs:34:    pub fn get_key(&self, peer_id: &PeerId) -> Option<&[u8; 32]> {
+
+================ verify(
+crates/amun-evolution/src/executor.rs:14:        if !certificate.verify() {
+crates/amun-evolution/src/validator.rs:18:            && certificate.verify()
+crates/amun-replay-semantics/src/lib.rs:71:impl ReplayCheckpoint { pub fn verify(&self, boundary: &ReplayBoundary) -> bool { self.sequence >= boundary.finalized_sequence && self.certificate.verify() && self.certificate.boundary.boundary_chain_hash == boundary.boundary_chain_hash } }
+crates/amun-node/src/peer_handshake.rs.bak:59:        if !self.certificate.verify(&self.public_key) {
+crates/amun-node/src/peer_handshake.rs:63:if !self.certificate.verify(&self.public_key) {
+crates/amun-networking/src/validator_registry.rs:28:        if !certificate.verify(authority_key) {
+crates/amun-networking/src/validator_registry.rs.bak:28:        if !certificate.verify(authority_key) {
+crates/amun-state-sync/src/lib.rs:68:    fn n56_snapshot_certificate_verify() {
+
+================ validator registry ================
+crates/amun-peer-identity/tests/peer_identity_tests.rs:43:    reg.register(cert);
+crates/amun-networking/src/validator_registry.rs:80:        assert!(registry.register(cert, &trust_anchors).is_ok());
+crates/amun-networking/src/validator_registry.rs:101:        assert!(registry.register(cert, &trust_anchors).is_err());
+crates/amun-networking/src/validator_registry.rs.bak:80:        assert!(registry.register(cert, &trust_anchors).is_ok());
+crates/amun-networking/src/validator_registry.rs.bak:101:        assert!(registry.register(cert, &trust_anchors).is_err());
+crates/amun-verification-kernel/src/lib.rs:220:        assert!(registry.register(cert).is_ok());
+crates/amun-verification-kernel/src/lib.rs:235:        assert!(registry.register(cert).is_err());
+crates/amun-verification-kernel/src/lib.rs:248:        registry.register(cert).unwrap();

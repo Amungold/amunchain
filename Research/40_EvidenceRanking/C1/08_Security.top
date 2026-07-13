@@ -1,0 +1,200 @@
+      1 docs/protocol/replay_physics_v1.md:13:### 2.2 Ordering Invariant
+      1 docs/protocol/FREEZE_CERTIFICATE_v1.md:29:### Constitutional Invariants (FROZEN)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:33:12. Consensus Invariants
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:308:| III | Constitutional Security | Constitutional proof system, identity and evidence roots |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:307:| II | Consensus Hardening | Slashing framework, evidence system, recovery and snapshots |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:266:**Invariant 5:** Given identical state transition inputs (same genesis, same transactions up to height N), all validators must compute identical values for all roots defined in this specification.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:264:**Invariant 4:** The `AppHash` MUST commit to `state_root`. For CCA v1.0, this is defined as `AppHash = state_root`. Future versions may introduce additional roots (such as `execution_root` or `receipt_root`) into the `AppHash` computation, in which case the invariant will be updated to reflect the new hash composition while preserving the requirement that `state_root` remains a committed input.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:262:**Invariant 3:** `state_root` must include `constitutional_commitment_root` as a leaf in its Merkle tree computation.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:260:**Invariant 2:** `constitutional_commitment_root == BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || CanonicalSerialization(ConstitutionalCommitment))`
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:258:**Invariant 1:** `constitutional_root == BLAKE3("AMUN_CONSTITUTIONAL_ROOT_V1" || identity_root || evidence_root || governance_root || economic_root)`
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:254:## 12. Consensus Invariants
+      1 docs/federation/TRUST_GRAPH.md:51:## Invariant
+      1 docs/federation/FEDERATION_ARCHITECTURE.md:53:## Invariant
+      1 docs/constitutional/phase84_freeze.md:2:## Frozen Invariants for Sovereign State Replication
+      1 docs/constitutional-mathematics/README.md:34:First Lemma            ✅
+      1 docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:111:Recognition Stability Theorem
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:93:Recognition Existence Lemma
+      1 docs/consensus/origin.md:3:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/constitution.md:127:- Byzantine fault tolerance: 2f + 1 where f = floor((N-1)/3)
+      1 docs/consensus/I4_drift.md:21:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I3_reframing.md:22:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I2_extension.md:12:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I1_translation.md:12:## Semantic Invariants (from CSA-6)
+      1 docs/audit/THREAT_MODEL.md:14:| Execution | Forged TransitionProof | Proof hash verification (Theorem 1) |
+      1 docs/audit/SECURITY_INVARIANTS.md:9:| R3 | Child requires consumed parent | ResourceRegistry::consume_and_derive | WitnessBuilder |
+      1 docs/audit/SECURITY_INVARIANTS.md:8:| R2 | Consumed resources cannot be used | VMKernel::verify | ReplayVerifier |
+      1 docs/audit/SECURITY_INVARIANTS.md:7:| R1 | No duplicate active resource IDs | ResourceRegistry::register_genesis | PCCVVerifier |
+      1 docs/audit/SECURITY_INVARIANTS.md:5:| ID | Invariant | Enforcement | Verification |
+      1 docs/audit/SECURITY_INVARIANTS.md:40:| K3 | Anti-replay protection | AntiReplayGuard::check_and_record |
+      1 docs/audit/SECURITY_INVARIANTS.md:3:## Resource Invariants (R1–R6 + X1)
+      1 docs/audit/SECURITY_INVARIANTS.md:36:| ID | Invariant | Enforcement |
+      1 docs/audit/SECURITY_INVARIANTS.md:34:## Cryptographic Invariants
+      1 docs/audit/SECURITY_INVARIANTS.md:32:| C4 | No conflicting finality | Theorem 5 (Replay-Backed Safety) |
+      1 docs/audit/SECURITY_INVARIANTS.md:31:| C3 | Five-root binding | ConstitutionalFinalityCertificate::verify |
+      1 docs/audit/SECURITY_INVARIANTS.md:29:| C1 | Replay before vote | ReplayBackedConsensus::form_consensus |
+      1 docs/audit/SECURITY_INVARIANTS.md:27:| ID | Invariant | Enforcement |
+      1 docs/audit/SECURITY_INVARIANTS.md:25:## Consensus Invariants
+      1 docs/audit/SECURITY_INVARIANTS.md:1:# AmunChain Security Invariants Catalog
+      1 docs/audit/SECURITY_INVARIANTS.md:17:| ID | Invariant | Enforcement |
+      1 docs/audit/SECURITY_INVARIANTS.md:15:## Execution Invariants
+      1 docs/audit/SECURITY_INVARIANTS.md:13:| X1 | Transfer proof single-use | TransferProofRegistry | N47 Verdict Engine |
+      1 docs/audit/SECURITY_INVARIANTS.md:12:| R6 | Version monotonicity | ResourceRegistry::consume_and_derive | WitnessBuilder |
+      1 docs/audit/SECURITY_INVARIANTS.md:11:| R5 | Cross-contract uniqueness | TransferProofRegistry::consume | StatelessVerifier |
+      1 docs/audit/SECURITY_INVARIANTS.md:10:| R4 | Certificates are terminal | TransformationMatrix::is_terminal | PCCVVerifier |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:80:| Invariant Engine | amun-invariant-engine | 5 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:5:| Invariant | Description | Test ID | Crate | Status |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:55:| A4 | Partial synchrony (GST exists) | Standard distributed systems model |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:41:| Proof replay attack | byz_010 | ✅ Rejected |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:3:## 1. Invariant-to-Test Traceability
+      1 docs/architecture/PHASE_49_COMPLETE.md:89:### Constitutional Laws Enforced
+      1 docs/architecture/PHASE_49_COMPLETE.md:110:5. **Byzantine Evidence System** — canonical proof generation
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:67:**Law Async.3**: Optional async deps require constitutional review.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:66:**Law Async.2**: Async runtimes MUST NOT alter deterministic protocol behavior.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:65:**Law Async.1**: tokio/hyper MAY exist outside Layer 4 ONLY behind deterministic interfaces.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:63:## Article II: Async Runtime Laws
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:61:**Law 6.1**: No production crate MAY depend on a test crate.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:56:**Law 5.1**: Transitions MUST be replay-deterministic.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:51:**Law 4.1**: Primary host for tokio/hyper. MUST NOT contain consensus logic.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:46:**Law 3.1**: MUST NOT depend on consensus logic.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:41:**Law 2.1**: MUST be deterministic and replayable.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:36:**Law 1.1**: MUST NOT import `amun-runtime`, `amun-storage`, `amun-mempool`.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:30:**Law I.5**: NO async runtime dependencies.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:29:**Law I.4**: `Send + Sync` MUST be documented with `@constitutional-runtime-contract`.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:28:**Law I.3**: Service impls (Tcp, Http, Ws, Network, Store, Runtime, Tokio) FORBIDDEN.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:27:**Law I.2**: Std/core impls (Debug, Display, Error, From, Clone) permitted.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:26:**Law I.1**: Traits ONLY. No concrete service implementations.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:21:**Law 0.5.2**: Governance semantics are NOT kernel primitives.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:20:**Law 0.5.1**: MAY import Layer 0. MUST NOT import Layers 1-4.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:15:**Law 0.3**: Single source of canonical encoding truth.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:14:**Law 0.2**: Only cryptographic, serialization, and constant-time utility crates.
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:13:**Law 0.1**: Layer 0 MUST NOT import any amun-* crate.
+      1 docs/VALIDATOR_ORDERING.md:9:- Slashing evidence
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:94:**Comparability Theorem:**
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:92:## 4. The Central Theorem
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:128:| Closure (C1-C3) | Theorem |
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:127:| Single History (SH1) | Theorem |
+      1 docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:55:**Constitutional Closure Theorem (Final Version):**
+      1 docs/V7_008_CONSTITUTIONAL_CLOSURE.md:99:2. By C3, at most one canonical context exists.
+      1 docs/V7_008_CONSTITUTIONAL_CLOSURE.md:98:1. By C2, at least one canonical context exists.
+      1 docs/V7_008_CONSTITUTIONAL_CLOSURE.md:84:For any system satisfying D1-D2, E1-E4, and C1-C3, there exists
+      1 docs/V7_008_CONSTITUTIONAL_CLOSURE.md:82:**Constitutional Closure Theorem:**
+      1 docs/V7_008_CONSTITUTIONAL_CLOSURE.md:80:## 3. The Central Theorem
+      1 docs/V7_008_CONSTITUTIONAL_CLOSURE.md:59:There exists at least one derivable, non-excluded, final context.
+      1 docs/V7_008_CONSTITUTIONAL_CLOSURE.md:116:  rejected (excluded). No permanent ambiguity exists.
+      1 docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:125:**Constitutional Completeness Theorem:**
+      1 docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:75:If the exclusion relation `⇍_C` satisfies E1-E5, then there exists
+      1 docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:73:**Constitutional Exclusion Theorem:**
+      1 docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:71:## 3. The Central Theorem
+      1 docs/V7_005_CONSTITUTIONAL_PRUNING.md:79:**Constitutional Pruning Theorem:**
+      1 docs/V7_005_CONSTITUTIONAL_PRUNING.md:77:## 3. The Central Theorem
+      1 docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:63:**Constitutional Church-Rosser Theorem:**
+      1 docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:61:## 2. The Central Theorem
+      1 docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:47:If `C ⇒*_C A` and `C ⇒*_C B`, then there exists `N` such that
+      1 docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:69:If `C₁ ⊢_C C₂` and `C₁ ≠ C₂`, then there exists verifiable evidence `E`
+      1 docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:147:- There exists exactly one final authority `Λ`.
+      1 docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:144:**Constitutional Completeness Theorem:**
+      1 docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:142:## 6. The Final Theorem
+      1 docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:104:derivability closure. Axiom D5 guarantees this exists.
+      1 docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:73:constitutional resolution policy `R ∈ ℜ_C`, there exists exactly one
+      1 docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:70:**Constitutional Finality Theorem:**
+      1 docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:68:## 4. The Central Theorem
+      1 docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:41:unless there exists constitutional evidence that overrides continuity.
+      1 docs/V6_009_CONSTITUTIONAL_META_RESOLUTION.md:64:constitutional possibility graph `G` rooted at `P₀`, there exists
+      1 docs/V6_009_CONSTITUTIONAL_META_RESOLUTION.md:61:**Constitutional Meta-Resolution Theorem:**
+      1 docs/V6_009_CONSTITUTIONAL_META_RESOLUTION.md:59:## 3. The Meta-Theorem
+      1 docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:85:**Constitutional Resolution Theorem:**
+      1 docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:83:## 4. The Central Theorem
+      1 docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:50:**Constitutional Preference Theorem:**
+      1 docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:48:## 3. The Core Theorem (Conjecture)
+      1 docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:26:For any set of conflicting legitimate paths, there exists a total
+      1 docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:54:**Constitutional Convergence Theorem:**
+      1 docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:52:## 3. The Central Theorem (Conjecture)
+      1 docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:29:For any two legitimate paths `π₁`, `π₂`, there exists a legitimate path
+      1 docs/V6_005_CONTINUITY_ORDERING.md:81:**Constitutional Authority Theorem (Order Version):**
+      1 docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:45:exists **exactly one** path `Λ` that maximizes constitutional continuity.
+      1 docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:42:**Constitutional Authority Theorem:**
+      1 docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:40:## 2. The Key Theorem (Conjecture)
+      1 docs/V6_003_CANONICALIZATION.md:78:For any constitutional possibility graph, there exists exactly one
+      1 docs/V6_002_PATHS_NOT_POINTS.md:106:but because there exists a verifiable constitutional history leading to
+      1 docs/V6_001_GEOMETRY_OF_AUTHORITY.md:51:`P₁ ≤ P₂` iff there exists a finite chain of legitimate constitutional
+      1 docs/V4_002_003_CCS_THEORY_NUCLEUS.md:99:   Whenever constitutional evidence exists, it is always possible to
+      1 docs/V4_002_003_CCS_THEORY_NUCLEUS.md:38:  exists iff there is cryptographic evidence `E` that justifies it:
+      1 docs/V4_002_003_CCS_THEORY_NUCLEUS.md:106:`C₁ ≤ C₂` iff there exists a constitutional morphism `τ : C₁ → C₂`.
+      1 docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:7:| Attack | Detection | Consensus | Result |
+      1 docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:6:## Attacks Tested
+      1 docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:1:# V3-006: Byzantine Constitutional Attacks – All Rejected
+      1 docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:15:detects and rejects all three classes of Byzantine attacks while preserving
+      1 docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:11:| V3-006C Stale Certificate Attack | 13 rejections | 27/27 committed | ✅ |
+      1 docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:10:| V3-006B Conflicting QC Attack | 40 conflicts | 27/27 committed | ✅ |
+      1 docs/V3_005D_QC_CRYPTOGRAPHIC_PROOF.md:28:V3-006: Byzantine Constitutional Attacks – now that QCs carry real crypto,
+      1 docs/V2_026_ADVERSARIAL_RECONCILIATION.md:20:## Constitutional Rules Validated
+      1 docs/V2_026_ADVERSARIAL_RECONCILIATION.md:1:# V2-026: Adversarial Reconciliation – Constitutional State Arbitration
+      1 docs/V0_3_COMPLETION.md:8:constitutional membership, rejects Byzantine attacks, and supports constitutional
+      1 docs/SECURITY_MODEL.md:59:# Constitutional Security Principle
+      1 docs/REPOSITORY_LAYOUT.md:351:No subsystem exists without explicit constitutional placement.
+      1 docs/PROJECT_INDEX.md:72:| constitution/PHASE6_NETWORK_LAYER_AND_BYZANTINE_HARDENING.md | Byzantine networking rules |
+      1 docs/N126_FINAL_BASELINE.md:30:5.  SlashingEvidenceBinding   = all certs have non-empty evidence_ids  REAL
+      1 docs/N126_FINAL_BASELINE.md:24:Constitutional Laws Status
+      1 docs/N106_N107_CONSTITUTIONAL_AUTHORITY_AND_GOVERNANCE.md:275:The amun-authority-registry crate exists and all 52 tests pass. The
+      1 docs/N106_N107_CONSTITUTIONAL_AUTHORITY_AND_GOVERNANCE.md:199:## Security Considerations
+      1 docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:49:Vote acceptance now requires that votes from registered validators carry a valid signature. Unsigned or incorrectly signed votes are rejected with an error. Quorum counting is unchanged and uses the same active_validator_count logic, now operating over the registered validator identifiers. Proposer selection is unchanged and still uses round-robin selection over the registered identifiers. Equivocation detection remains functional, as it compares voter_id and block hashes. Signature validation adds an additional layer of evidence, because an equivocating validator must still sign both conflicting votes, making the proof of misbehavior cryptographically stronger. The performance impact is one Ed25519 verification per vote, which is a constant-time operation taking microseconds. There is no measurable impact on consensus throughput in test clusters.
+      1 docs/DOCS_INDEX.md:371:    v3.006: Byzantine constitutional attacks.
+      1 docs/DOCS_INDEX.md:147:    Security invariants checklist.
+      1 docs/CONSTITUTIONAL_AUDIT.md:25:| **Formal Verification** | ❌ Not implemented | TLA+ specification exists in docs but not machine-checked |
+      1 docs/CONSTITUTIONAL_AUDIT.md:22:| **Constitutional Comparability (CC)** | ✅ Partially implemented | Evidence ordering exists but not formalized as standalone module |
+      1 docs/CCS_Core_Specification_v1.1.md:80:For every valid constitutional context, there exists exactly one authority
+      1 docs/CCS_Core_Specification_v1.0.md:82:For every valid constitutional context, there exists exactly one authority
+      1 docs/CCS_Core_Specification_v1.0.md:160:For any valid constitutional context `C`, there exists exactly one legitimate
+      1 docs/CCS_Core_Specification_v1.0.md:158:**Constitutional Authority Uniqueness Theorem:**
+      1 docs/CANONICAL_SERIALIZATION.md:3:## Constitutional Law
+      1 crates/constitutional-linter/src/main.rs:41:struct Law {
+      1 crates/constitutional-linter/src/main.rs:37:    laws: Vec<Law>,
+      1 crates/constitutional-linter/src/main.rs:223:                                    check(&format!("Law {}", law.id), false,
+      1 crates/constitutional-linter/src/main.rs:207:                                    check(&format!("Law {}", law.id), false,
+      1 crates/amun-vm-kernel/src/pending_buffer.rs:30:    InvariantViolation {
+      1 crates/amun-transaction/src/tx.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+      1 crates/amun-transaction/src/tx.rs:177:                ConstitutionalFault::InvalidInput,
+      1 crates/amun-transaction/src/tx.rs:170:                ConstitutionalFault::InvalidInput,
+      1 crates/amun-transaction/src/tx.rs:163:                ConstitutionalFault::InvalidInput,
+      1 crates/amun-transaction/src/tx.rs:144:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000E, 0x0003)
+      1 crates/amun-transaction/src/tx.rs:136:                ConstitutionalFault::InvalidInput,
+      1 crates/amun-transaction/src/tx.rs:129:                ConstitutionalFault::InvalidInput,
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:9:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:7:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:44:fn n60_network_partition_no_double_finality() {
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:3:use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:39:    ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt])
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:38:fn make_program() -> ConstitutionalProgram {
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:2:use amun_bytecode::program::ConstitutionalProgram;
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:29:            lineage: ResourceLineage::genesis(make_id(i)),
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:23:    let mut reg = ResourceRegistry::new((count * 2) as usize);
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:22:fn build_registry(count: u64) -> ResourceRegistry {
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:212:                let replay = ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:209:                                                    // Actually, ReplayVerifier::replay calls execute() which starts
+      1 crates/amun-testnet-sim/tests/adversarial_tests.rs:190:        let result = ConstitutionalRuntime::execute(
+      1 crates/amun-survival-console/src/dashboard.rs:6:use amun_invariants::registry::{InvariantHealth, InvariantRegistry};
+      1 crates/amun-survival-console/src/dashboard.rs:59:        let invariants_hold = health == InvariantHealth::AllInvariantsHold;
+      1 crates/amun-survival-console/src/dashboard.rs:27:        invariant_registry: InvariantRegistry,
+      1 crates/amun-survival-console/src/dashboard.rs:10:    invariant_registry: InvariantRegistry,
+      1 crates/amun-storage-kernel/tests/specification_compliance.rs:67:    // THEOREM 4: Proof Depth Invariant
+      1 crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:98:| ByzantineEvidence | Permanent | Never released |
+      1 crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:73:| Equivocation Evidence | Permanent Ban + Slash |
+      1 crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:51:| EquivocationDetected | Two different states at same sequence | Slash validator, broadcast evidence |
+      1 crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:48:### Level 4: ByzantineEvidence (Malicious Behavior Detected)
+      1 crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:71:Proves (key, value) exists within snapshot without full download.
+      1 crates/amun-storage-kernel/CONSTITUTION.md:85:**Section 5.1: Uniqueness Invariant**
+      1 crates/amun-storage-kernel/CONSTITUTION.md:49:- Inclusion: Proves (key, value) exists in state
+      1 crates/amun-storage-kernel/CONSTITUTION.md:33:root R exists. The root SHALL be identical regardless of insertion order.
+      1 crates/amun-storage-kernel/CONSTITUTION.md:31:**Section 1.4: Order Independence (Law 0)**
+      1 crates/amun-storage-kernel/CONSTITUTION.md:2:## Supreme Authority - Immutable Laws of State
+      1 crates/amun-storage-kernel/CONSTITUTION.md:108:Ratified upon verification of all 10 Constitutional Theorems.
+      1 crates/amun-storage-kernel/ATOMIC_SNAPSHOT_CONSTITUTION.md:32:Within a single snapshot, exactly one freeze point exists.
+      1 crates/amun-stf/src/transition.rs:5:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+      1 crates/amun-stf/src/transition.rs:34:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0100)
+      1 crates/amun-stf/src/transition.rs:21:                    ConstitutionalFault::CryptoBudgetExceeded,
+      1 crates/amun-stf/src/stf.rs:37:                amun_failure::ConstitutionalFault::CapacityExceeded,
+      1 crates/amun-stf/src/stf.rs:25:                amun_failure::ConstitutionalFault::CapacityExceeded,
+      1 crates/amun-stf/src/state.rs:98:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0002)
+      1 crates/amun-stf/src/state.rs:94:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0001)
+      1 crates/amun-stf/src/state.rs:58:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0003)

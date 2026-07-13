@@ -1,0 +1,163 @@
+==================================================================
+FILE: crates/amun-node/src/peer_handshake.rs
+==================================================================
+     1	#![allow(dead_code)]
+     2	use amun_networking::crypto_identity::PeerKeyPair;
+     3	use amun_networking::peer_identity::PeerId;
+     4	use amun_networking::validator_certificate::ValidatorCertificate;
+     5	use serde::{Deserialize, Serialize};
+     6	
+     7	/// Handshake message sent when two nodes establish a connection.
+     8	#[derive(Debug, Clone, Serialize, Deserialize)]
+     9	pub struct HandshakeMessage {
+    10	    pub peer_id: PeerId,
+    11	    pub public_key: [u8; 32],
+    12	    pub certificate: ValidatorCertificate,
+    13	    pub genesis_hash: [u8; 32],
+    14	    pub protocol_version: u32,
+    15	    pub node_name: String,
+    16	    pub listen_port: u16,
+    17	}
+    18	
+    19	impl HandshakeMessage {
+    20	    pub fn new(
+    21	        keypair: &PeerKeyPair,
+    22	        certificate: &ValidatorCertificate,
+    23	        genesis_hash: [u8; 32],
+    24	        node_name: &str,
+    25	        listen_port: u16,
+    26	    ) -> Self {
+    27	        Self {
+    28	            peer_id: keypair.peer_id(),
+    29	            public_key: keypair.verifying_key.to_bytes(),
+    30	            certificate: certificate.clone(),
+    31	            genesis_hash,
+    32	            protocol_version: 1,
+    33	            node_name: node_name.to_string(),
+    34	            listen_port,
+    35	        }
+    36	    }
+    37	
+    38	    /// Verify the handshake message against our genesis and certificate expectations.
+    39	    pub fn verify(&self, our_genesis_hash: &[u8; 32]) -> Result<(), String> {
+    40	        // Verify genesis hash matches
+    41	        if self.genesis_hash != *our_genesis_hash {
+    42	            return Err(format!(
+    43	                "Genesis hash mismatch: peer has {} but we have {}",
+    44	                hex::encode(self.genesis_hash),
+    45	                hex::encode(*our_genesis_hash)
+    46	            ));
+    47	        }
+    48	
+    49	        // Verify certificate is self-consistent
+    50	        if self.certificate.validator_id != self.peer_id {
+    51	            return Err("Certificate validator_id does not match peer_id".into());
+    52	        }
+    53	
+    54	        if self.certificate.public_key != self.public_key {
+    55	            return Err("Certificate public_key does not match handshake public_key".into());
+    56	        }
+    57	
+    58	        // Verify certificate signature
+    59	        if !self.certificate.verify(&self.public_key) {
+    60	            return Err("Certificate signature verification failed".into());
+    61	        }
+    62	
+    63	        Ok(())
+    64	    }
+    65	}
+    66	
+    67	/// Result of a successful peer handshake.
+    68	#[derive(Debug, Clone)]
+    69	pub struct AuthenticatedPeer {
+    70	    pub peer_id: PeerId,
+    71	    pub public_key: [u8; 32],
+    72	    pub node_name: String,
+    73	    pub listen_port: u16,
+    74	    pub protocol_version: u32,
+    75	}
+    76	
+    77	impl AuthenticatedPeer {
+    78	    pub fn from_handshake(handshake: &HandshakeMessage) -> Self {
+    79	        Self {
+    80	            peer_id: handshake.peer_id,
+    81	            public_key: handshake.public_key,
+    82	            node_name: handshake.node_name.clone(),
+    83	            listen_port: handshake.listen_port,
+    84	            protocol_version: handshake.protocol_version,
+    85	        }
+    86	    }
+    87	}
+    88	
+    89	#[cfg(test)]
+    90	mod tests {
+    91	    use super::*;
+    92	    use amun_networking::crypto_identity::PeerKeyPair;
+    93	
+    94	    fn create_test_handshake() -> (HandshakeMessage, [u8; 32]) {
+    95	        let keypair = PeerKeyPair::generate();
+    96	        let genesis_hash = [0x42u8; 32];
+    97	        let cert = ValidatorCertificate::issue(
+    98	            keypair.peer_id(),
+    99	            keypair.verifying_key.to_bytes(),
+   100	            &keypair,
+   101	            0,
+   102	            0,
+   103	        );
+   104	        let handshake = HandshakeMessage::new(&keypair, &cert, genesis_hash, "test-node", 4001);
+   105	        (handshake, genesis_hash)
+   106	    }
+   107	
+   108	    #[test]
+   109	    fn n22_5_valid_handshake_accepted() {
+   110	        let (handshake, genesis_hash) = create_test_handshake();
+   111	        assert!(handshake.verify(&genesis_hash).is_ok());
+   112	    }
+   113	
+   114	    #[test]
+   115	    fn n22_5_genesis_mismatch_rejected() {
+   116	        let (handshake, _) = create_test_handshake();
+   117	        let wrong_genesis = [0x99u8; 32];
+   118	        assert!(handshake.verify(&wrong_genesis).is_err());
+   119	    }
+   120	
+   121	    #[test]
+   122	    fn n22_5_tampered_certificate_rejected() {
+   123	        let (mut handshake, genesis_hash) = create_test_handshake();
+   124	        handshake.certificate.valid_from = 99999;
+   125	        assert!(handshake.verify(&genesis_hash).is_err());
+   126	    }
+   127	
+   128	    #[test]
+   129	    fn n22_5_authenticated_peer_creation() {
+   130	        let (handshake, genesis_hash) = create_test_handshake();
+   131	        handshake.verify(&genesis_hash).unwrap();
+   132	        let peer = AuthenticatedPeer::from_handshake(&handshake);
+   133	        assert_eq!(peer.peer_id, handshake.peer_id);
+   134	        assert_eq!(peer.node_name, "test-node");
+   135	    }
+   136	}
+
+==================================================================
+ValidatorCertificate usages
+==================================================================
+4:use amun_networking::validator_certificate::ValidatorCertificate;
+12:    pub certificate: ValidatorCertificate,
+22:        certificate: &ValidatorCertificate,
+97:        let cert = ValidatorCertificate::issue(
+
+50:        if self.certificate.validator_id != self.peer_id {
+
+54:        if self.certificate.public_key != self.public_key {
+59:        if !self.certificate.verify(&self.public_key) {
+81:            public_key: handshake.public_key,
+
+
+59:        if !self.certificate.verify(&self.public_key) {
+111:        assert!(handshake.verify(&genesis_hash).is_ok());
+118:        assert!(handshake.verify(&wrong_genesis).is_err());
+125:        assert!(handshake.verify(&genesis_hash).is_err());
+131:        handshake.verify(&genesis_hash).unwrap();
+
+124:        handshake.certificate.valid_from = 99999;
+

@@ -1,0 +1,23 @@
+[package]
+name = "amun-orchestrator-ha"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Distributed Orchestrator — leader election, state replication, HA failover"
+
+[dependencies]
+amun-orchestrator-core = { path = "../amun-orchestrator-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tracing = "0.1"
+tokio = { version = "1", features = ["sync", "time", "net"] }
+async-trait = "0.1"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10"
+hex = "0.4"
+rand = "0.8"
+
+[dev-dependencies]
+tempfile = "3"

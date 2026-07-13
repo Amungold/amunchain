@@ -1,0 +1,31 @@
+pub mod engine;
+pub mod report;
+pub mod diagnostics;
+pub mod stage;
+pub mod category;
+pub mod state_reader;
+pub mod invariant;
+pub mod registry;
+pub mod config;
+pub mod priority;
+pub mod types;
+pub mod context;
+pub mod result;
+pub mod error;
+
+pub mod economics;
+
+pub use engine::InvariantEngine;
+pub use report::{VerificationReport, VerificationStatus, VerificationValue};
+pub use diagnostics::{Diagnostic, Severity};
+pub use stage::VerificationStage;
+pub use category::VerificationCategory;
+pub use state_reader::StateReader;
+pub use invariant::Invariant;
+pub use registry::InvariantRegistry;
+pub use config::VerificationConfig;
+pub use priority::VerificationPriority;
+pub use types::{SupplyComponent, SupplyBreakdown};
+pub use context::VerificationContext;
+pub use result::VerificationResult;
+pub use error::FormalError;

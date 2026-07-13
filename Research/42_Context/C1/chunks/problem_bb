@@ -1,0 +1,647 @@
+docs/DOCS_INDEX.md-428-APPENDIX_A_FORMAL_DEFINITIONS_AND_PROOFS.md
+docs/DOCS_INDEX.md-429-    Appendix A: Formal definitions and proofs.
+docs/DOCS_INDEX.md-430-SECTION7_FINAL.md
+docs/DOCS_INDEX.md-431-    Section 7 final.
+docs/DOCS_INDEX.md-432-SECTION8_FINAL.md
+docs/DOCS_INDEX.md-433-    Section 8 final.
+--
+docs/DOCS_INDEX.md-472-
+docs/DOCS_INDEX.md-473-----------------------------------------------------------------
+docs/DOCS_INDEX.md-474-RFCs
+docs/DOCS_INDEX.md-475-----------------------------------------------------------------
+docs/DOCS_INDEX.md-476-docs/rfcs/README.md
+docs/DOCS_INDEX.md-477-    RFC index and process.
+docs/DOCS_INDEX.md-478-
+docs/DOCS_INDEX.md-479-----------------------------------------------------------------
+docs/DOCS_INDEX.md:480:Proof & Evidence Templates
+docs/DOCS_INDEX.md-481-----------------------------------------------------------------
+docs/DOCS_INDEX.md-482-validation/evidence/MANIFEST_TEMPLATE.md
+docs/DOCS_INDEX.md-483-    Manifest template for validation evidence.
+docs/DOCS_INDEX.md-484-validation/reports/CERTIFICATION_TEMPLATE.md
+docs/DOCS_INDEX.md-485-    Certification report template.
+--
+docs/SECURITY_MODEL.md-51-Prevented through:
+docs/SECURITY_MODEL.md-52-
+docs/SECURITY_MODEL.md-53-- manifest verification
+docs/SECURITY_MODEL.md-54-- replay reconstruction
+docs/SECURITY_MODEL.md-55-- state root validation
+docs/SECURITY_MODEL.md-56-
+docs/SECURITY_MODEL.md-57----
+docs/SECURITY_MODEL.md-58-
+docs/SECURITY_MODEL.md:59:# Constitutional Security Principle
+docs/SECURITY_MODEL.md-60-
+docs/SECURITY_MODEL.md-61-Invalid constitutional state must never be accepted.
+--
+docs/CCS_Core_Specification_v1.0.md:1:# Constitutional Computational Systems (CCS)
+docs/CCS_Core_Specification_v1.0.md-2-## Core Specification v1.0
+docs/CCS_Core_Specification_v1.0.md-3-
+docs/CCS_Core_Specification_v1.0.md-4-**Date:** 2026-05-31
+docs/CCS_Core_Specification_v1.0.md-5-**Status:** Theory Nucleus – Independent of AmunChain
+docs/CCS_Core_Specification_v1.0.md-6-
+docs/CCS_Core_Specification_v1.0.md-7----
+docs/CCS_Core_Specification_v1.0.md-8-
+docs/CCS_Core_Specification_v1.0.md-9-## 1. Purpose and Scope
+docs/CCS_Core_Specification_v1.0.md-10-
+docs/CCS_Core_Specification_v1.0.md:11:This document defines the core mathematical framework of Constitutional
+docs/CCS_Core_Specification_v1.0.md-12-Computational Systems (CCS). CCS is a theory of computational authority.
+docs/CCS_Core_Specification_v1.0.md-13-
+docs/CCS_Core_Specification_v1.0.md-14-A CCS is a distributed system in which the authority to perform state
+docs/CCS_Core_Specification_v1.0.md-15-transitions is not derived from consensus alone, but from a deterministic
+docs/CCS_Core_Specification_v1.0.md-16-function of a **constitutional context**. Consensus serves as a mechanism
+docs/CCS_Core_Specification_v1.0.md-17-to produce verifiable **evidence** of that context.
+docs/CCS_Core_Specification_v1.0.md-18-
+docs/CCS_Core_Specification_v1.0.md-19-This specification defines CCS without reference to any specific
+docs/CCS_Core_Specification_v1.0.md-20-implementation, consensus protocol, or cryptographic primitive.
+docs/CCS_Core_Specification_v1.0.md-21-
+docs/CCS_Core_Specification_v1.0.md-22----
+docs/CCS_Core_Specification_v1.0.md-23-
+docs/CCS_Core_Specification_v1.0.md-24-## 2. Ontology (What Exists)
+docs/CCS_Core_Specification_v1.0.md-25-
+docs/CCS_Core_Specification_v1.0.md:26:### 2.1 Constitutional Context
+docs/CCS_Core_Specification_v1.0.md-27-A **constitutional context** `C` is the fundamental entity of CCS.
+docs/CCS_Core_Specification_v1.0.md-28-
+docs/CCS_Core_Specification_v1.0.md-29-`C = (E, V, H, A)`
+docs/CCS_Core_Specification_v1.0.md-30-
+docs/CCS_Core_Specification_v1.0.md-31-where:
+docs/CCS_Core_Specification_v1.0.md-32-- `E` (Epoch): A totally ordered value representing constitutional time.
+docs/CCS_Core_Specification_v1.0.md-33-- `V` (Validator Set): A finite set of participants authorized to produce evidence.
+docs/CCS_Core_Specification_v1.0.md-34-- `H` (Finalized State Hash): A cryptographic commitment to the current state.
+--
+docs/CCS_Core_Specification_v1.0.md-39-### 2.2 Authority Object
+docs/CCS_Core_Specification_v1.0.md-40-An **authority object** `A` encapsulates the right to authorize state
+docs/CCS_Core_Specification_v1.0.md-41-transitions within a constitutional context.
+docs/CCS_Core_Specification_v1.0.md-42-
+docs/CCS_Core_Specification_v1.0.md-43-`A = (E, V, Q, H)`
+docs/CCS_Core_Specification_v1.0.md-44-
+docs/CCS_Core_Specification_v1.0.md-45-where:
+docs/CCS_Core_Specification_v1.0.md-46-- `E`, `V`, `H` are as defined in the context.
+docs/CCS_Core_Specification_v1.0.md:47:- `Q` (Quorum Evidence): A verifiable proof that at least a threshold number
+docs/CCS_Core_Specification_v1.0.md-48-  of members of `V` have witnessed and attested to `H`.
+docs/CCS_Core_Specification_v1.0.md-49-
+docs/CCS_Core_Specification_v1.0.md-50-The function `Authority : ℂ → A` maps each valid constitutional context
+docs/CCS_Core_Specification_v1.0.md-51-to its unique authority object.
+docs/CCS_Core_Specification_v1.0.md-52-
+docs/CCS_Core_Specification_v1.0.md:53:### 2.3 Constitutional Evidence
+docs/CCS_Core_Specification_v1.0.md:54:**Constitutional evidence** `E` is a verifiable proof that:
+docs/CCS_Core_Specification_v1.0.md-55-1. A specific set of validators `V` has attested to a state `H`.
+docs/CCS_Core_Specification_v1.0.md-56-2. The attestation was produced within epoch `E`.
+docs/CCS_Core_Specification_v1.0.md-57-3. The attestation meets the quorum threshold defined for `V`.
+docs/CCS_Core_Specification_v1.0.md-58-
+docs/CCS_Core_Specification_v1.0.md:59:Evidence is the mechanism through which consensus contributes to CCS,
+docs/CCS_Core_Specification_v1.0.md-60-but it does not constitute authority in itself.
+docs/CCS_Core_Specification_v1.0.md-61-
+docs/CCS_Core_Specification_v1.0.md:62:### 2.4 Constitutional Transition
+docs/CCS_Core_Specification_v1.0.md-63-A **constitutional transition** `τ : C₁ → C₂` is a morphism that maps one
+docs/CCS_Core_Specification_v1.0.md-64-constitutional context to another. A transition is legitimate iff it is
+docs/CCS_Core_Specification_v1.0.md-65-justified by constitutional evidence:
+docs/CCS_Core_Specification_v1.0.md-66-
+docs/CCS_Core_Specification_v1.0.md-67-`∃ evidence : Justifies(evidence, τ)`
+docs/CCS_Core_Specification_v1.0.md-68-
+docs/CCS_Core_Specification_v1.0.md-69----
+docs/CCS_Core_Specification_v1.0.md-70-
+docs/CCS_Core_Specification_v1.0.md-71-## 3. Axioms
+docs/CCS_Core_Specification_v1.0.md-72-
+docs/CCS_Core_Specification_v1.0.md-73-### Axiom 1: Context Dominance
+docs/CCS_Core_Specification_v1.0.md:74:`∀ Q, C : ValidEvidence(Q) ⇏ Authority(Q, C)`
+docs/CCS_Core_Specification_v1.0.md-75-
+docs/CCS_Core_Specification_v1.0.md-76-Cryptographic validity of evidence is necessary but not sufficient for
+docs/CCS_Core_Specification_v1.0.md-77-authority. Authority requires a valid constitutional context.
+docs/CCS_Core_Specification_v1.0.md-78-
+docs/CCS_Core_Specification_v1.0.md:79:### Axiom 2: Constitutional Determinism
+docs/CCS_Core_Specification_v1.0.md-80-`∀ C : ValidContext(C) ⇒ ∃! A = Authority(C)`
+docs/CCS_Core_Specification_v1.0.md-81-
+docs/CCS_Core_Specification_v1.0.md-82-For every valid constitutional context, there exists exactly one authority
+docs/CCS_Core_Specification_v1.0.md-83-object. Authority is not selected from alternatives; it is determined.
+docs/CCS_Core_Specification_v1.0.md-84-
+docs/CCS_Core_Specification_v1.0.md-85-### Axiom 3: Authority Uniqueness
+docs/CCS_Core_Specification_v1.0.md-86-`∀ C : ¬∃ A₁, A₂ : A₁ ≠ A₂ ∧ Legitimate(A₁, C) ∧ Legitimate(A₂, C)`
+docs/CCS_Core_Specification_v1.0.md-87-
+docs/CCS_Core_Specification_v1.0.md-88-Within the same constitutional context, at most one authority can be
+docs/CCS_Core_Specification_v1.0.md-89-legitimate. Dual authority is impossible by construction.
+docs/CCS_Core_Specification_v1.0.md-90-
+docs/CCS_Core_Specification_v1.0.md:91:### Axiom 4: Constitutional Recoverability
+docs/CCS_Core_Specification_v1.0.md:92:`∃ F : F(Evidence, Context) = Authority`
+docs/CCS_Core_Specification_v1.0.md-93-
+docs/CCS_Core_Specification_v1.0.md-94-Authority can be reconstructed from constitutional evidence and context.
+docs/CCS_Core_Specification_v1.0.md-95-It is not stored locally; it is derived.
+docs/CCS_Core_Specification_v1.0.md-96-
+docs/CCS_Core_Specification_v1.0.md-97----
+docs/CCS_Core_Specification_v1.0.md-98-
+docs/CCS_Core_Specification_v1.0.md-99-## 4. Dynamics (How the System Evolves)
+docs/CCS_Core_Specification_v1.0.md-100-
+docs/CCS_Core_Specification_v1.0.md:101:### 4.1 Constitutional Context Validity
+docs/CCS_Core_Specification_v1.0.md-102-A context `C = (E, V, H, A)` is valid iff:
+docs/CCS_Core_Specification_v1.0.md-103-
+docs/CCS_Core_Specification_v1.0.md:104:`ValidContext(C) iff ValidEpoch(E) ∧ ValidValidatorSet(V) ∧ ValidEvidence(Q) ∧ ConsistentState(H)`
+docs/CCS_Core_Specification_v1.0.md-105-
+docs/CCS_Core_Specification_v1.0.md-106-where:
+docs/CCS_Core_Specification_v1.0.md-107-- `ValidEpoch(E)`: `E` is the successor of a previously valid epoch.
+docs/CCS_Core_Specification_v1.0.md-108-- `ValidValidatorSet(V)`: `V` is a non-empty finite set.
+docs/CCS_Core_Specification_v1.0.md:109:- `ValidEvidence(Q)`: `Q` meets the quorum threshold for `V`.
+docs/CCS_Core_Specification_v1.0.md-110-- `ConsistentState(H)`: `H` is a fixed point of the state transition
+docs/CCS_Core_Specification_v1.0.md-111-  function authorized by `A`.
+docs/CCS_Core_Specification_v1.0.md-112-
+docs/CCS_Core_Specification_v1.0.md-113-### 4.2 Legitimacy
+docs/CCS_Core_Specification_v1.0.md-114-A claimed authority `A` is **legitimate** in context `C` iff:
+docs/CCS_Core_Specification_v1.0.md-115-
+docs/CCS_Core_Specification_v1.0.md-116-`Legitimate(A, C) iff A = Authority(C) ∧ ValidContext(C)`
+docs/CCS_Core_Specification_v1.0.md-117-
+docs/CCS_Core_Specification_v1.0.md-118-Legitimacy is not a matter of voting. It is a matter of identity with the
+docs/CCS_Core_Specification_v1.0.md-119-canonical authority determined by the context.
+docs/CCS_Core_Specification_v1.0.md-120-
+docs/CCS_Core_Specification_v1.0.md:121:### 4.3 Constitutional Transition Rules
+docs/CCS_Core_Specification_v1.0.md-122-The following are legitimate constitutional transitions:
+docs/CCS_Core_Specification_v1.0.md-123-
+docs/CCS_Core_Specification_v1.0.md-124-1. **Epoch Transition:** `C₁ → C₂` where `Epoch(C₂) > Epoch(C₁)` and
+docs/CCS_Core_Specification_v1.0.md-125-   evidence for `C₂` is attested by `ValidatorSet(C₁)`.
+docs/CCS_Core_Specification_v1.0.md-126-
+docs/CCS_Core_Specification_v1.0.md-127-2. **Validator Set Amendment:** `C₁ → C₂` where `ValidatorSet(C₂) ≠ ValidatorSet(C₁)`
+docs/CCS_Core_Specification_v1.0.md-128-   and the amendment is attested by `ValidatorSet(C₁)`.
+docs/CCS_Core_Specification_v1.0.md-129-
+docs/CCS_Core_Specification_v1.0.md-130-3. **State Advancement:** `C₁ → C₂` where `StateHash(C₂) ≠ StateHash(C₁)`
+docs/CCS_Core_Specification_v1.0.md-131-   and `StateHash(C₂)` is attested by `ValidatorSet(C₁)`.
+docs/CCS_Core_Specification_v1.0.md-132-
+docs/CCS_Core_Specification_v1.0.md-133-4. **Authority Recovery:** `C₁ → C₁` (identity morphism) where evidence
+docs/CCS_Core_Specification_v1.0.md-134-   exists to reconstruct `Authority(C₁)`.
+docs/CCS_Core_Specification_v1.0.md-135-
+docs/CCS_Core_Specification_v1.0.md:136:### 4.4 Constitutional Monotonicity
+docs/CCS_Core_Specification_v1.0.md-137-`C₁ → C₂ ⇒ Authority(C₁) ≤ Authority(C₂)`
+docs/CCS_Core_Specification_v1.0.md-138-
+docs/CCS_Core_Specification_v1.0.md:139:Constitutional authority does not regress across legitimate transitions.
+docs/CCS_Core_Specification_v1.0.md-140-The ordering `≤` reflects epoch ordering and state advancement.
+docs/CCS_Core_Specification_v1.0.md-141-
+docs/CCS_Core_Specification_v1.0.md:142:### 4.5 Constitutional Conservation
+docs/CCS_Core_Specification_v1.0.md-143-For every legitimate transition `τ : C₁ → C₂`, there exists a conserved
+docs/CCS_Core_Specification_v1.0.md:144:quantity: **Constitutional Continuity**.
+docs/CCS_Core_Specification_v1.0.md-145-
+docs/CCS_Core_Specification_v1.0.md-146-Every legitimate context must be reachable from the initial constitutional
+docs/CCS_Core_Specification_v1.0.md-147-context `C₀` through a finite chain of legitimate transitions.
+docs/CCS_Core_Specification_v1.0.md-148-
+docs/CCS_Core_Specification_v1.0.md-149-`∃ C₀, τ₁, ..., τₙ : C₀ → ... → Cₙ = C`
+docs/CCS_Core_Specification_v1.0.md-150-
+docs/CCS_Core_Specification_v1.0.md:151:Constitutional authority cannot appear spontaneously; it must have a
+docs/CCS_Core_Specification_v1.0.md-152-traceable constitutional origin.
+docs/CCS_Core_Specification_v1.0.md-153-
+docs/CCS_Core_Specification_v1.0.md-154----
+docs/CCS_Core_Specification_v1.0.md-155-
+docs/CCS_Core_Specification_v1.0.md-156-## 5. The Central Theorem
+docs/CCS_Core_Specification_v1.0.md-157-
+docs/CCS_Core_Specification_v1.0.md:158:**Constitutional Authority Uniqueness Theorem:**
+docs/CCS_Core_Specification_v1.0.md-159-
+docs/CCS_Core_Specification_v1.0.md-160-For any valid constitutional context `C`, there exists exactly one legitimate
+docs/CCS_Core_Specification_v1.0.md-161-authority `A = Authority(C)`, and all other claimed authorities are illegitimate
+docs/CCS_Core_Specification_v1.0.md-162-with respect to `C`.
+docs/CCS_Core_Specification_v1.0.md-163-
+docs/CCS_Core_Specification_v1.0.md-164-`∀ C : ValidContext(C) ⇒ (∃! A = Authority(C) ∧ ∀ A' ≠ A : ¬Legitimate(A', C))`
+docs/CCS_Core_Specification_v1.0.md-165-
+docs/CCS_Core_Specification_v1.0.md-166----
+docs/CCS_Core_Specification_v1.0.md-167-
+docs/CCS_Core_Specification_v1.0.md-168-## 6. Relationship to Instantiations
+docs/CCS_Core_Specification_v1.0.md-169-
+docs/CCS_Core_Specification_v1.0.md-170-This specification defines CCS independently of any particular system.
+docs/CCS_Core_Specification_v1.0.md-171-A CCS-compliant system is one that:
+docs/CCS_Core_Specification_v1.0.md-172-
+docs/CCS_Core_Specification_v1.0.md:173:1. Provides concrete implementations of `Context`, `Authority`, `Evidence`,
+docs/CCS_Core_Specification_v1.0.md-174-   and `Transition`.
+docs/CCS_Core_Specification_v1.0.md-175-2. Satisfies all four axioms and the theorem.
+docs/CCS_Core_Specification_v1.0.md:176:3. Maintains Constitutional Monotonicity and Constitutional Conservation.
+docs/CCS_Core_Specification_v1.0.md-177-
+docs/CCS_Core_Specification_v1.0.md-178-One such instantiation is the AmunChain protocol, which implements CCS using
+docs/CCS_Core_Specification_v1.0.md-179-BLS signatures for evidence, a round-based BFT algorithm for consensus, and
+docs/CCS_Core_Specification_v1.0.md-180-epoch-based validator set management for constitutional transitions.
+docs/CCS_Core_Specification_v1.0.md-181-
+docs/CCS_Core_Specification_v1.0.md-182-Other instantiations are possible and may use different cryptographic
+docs/CCS_Core_Specification_v1.0.md-183-primitives, consensus algorithms, or governance mechanisms, provided they
+docs/CCS_Core_Specification_v1.0.md-184-satisfy the CCS axioms.
+--
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:1:# V3-006: Byzantine Constitutional Attacks – All Rejected
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md-2-
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md-3-**Date:** 2026-05-31
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md-4-**Status:** Closed
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md-5-
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md-6-## Attacks Tested
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md-7-| Attack | Detection | Consensus | Result |
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md-8-|--------|-----------|-----------|--------|
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md-9-| V3-006A Identity Impersonation | 40 rejections | 27/27 committed | ✅ |
+--
+docs/V3_006D_FOREIGN_AUTHORITY.md-18-| Attack | Detection | Consensus | Status |
+docs/V3_006D_FOREIGN_AUTHORITY.md-19-|--------|-----------|-----------|--------|
+docs/V3_006D_FOREIGN_AUTHORITY.md-20-| V3-006A Identity Impersonation | ✅ 40 rejections | ✅ 27/27 | Closed |
+docs/V3_006D_FOREIGN_AUTHORITY.md-21-| V3-006B Conflicting QC Attack | ✅ 40 conflicts | ✅ 27/27 | Closed |
+docs/V3_006D_FOREIGN_AUTHORITY.md-22-| V3-006C Stale Certificate Attack | ✅ 13 rejections | ✅ 27/27 | Closed |
+docs/V3_006D_FOREIGN_AUTHORITY.md-23-| V3-006D Foreign Validator Set | ✅ 52 rejections | ✅ 27/27 | Closed |
+docs/V3_006D_FOREIGN_AUTHORITY.md-24-
+docs/V3_006D_FOREIGN_AUTHORITY.md-25-## Architectural Principle
+docs/V3_006D_FOREIGN_AUTHORITY.md:26:**Authority = Cryptography + Constitutional Membership + Epoch + Validator Set Binding**
+docs/V3_006D_FOREIGN_AUTHORITY.md-27-
+docs/V3_006D_FOREIGN_AUTHORITY.md-28-Not just cryptography. Not just signatures. Full constitutional context.
+docs/V3_006D_FOREIGN_AUTHORITY.md-29-
+docs/V3_006D_FOREIGN_AUTHORITY.md:30:## Next Phase: V3-007 Constitutional Governance
+docs/V3_006D_FOREIGN_AUTHORITY.md-31-- Validator set updates
+docs/V3_006D_FOREIGN_AUTHORITY.md:32:- Constitutional voting
+docs/V3_006D_FOREIGN_AUTHORITY.md-33-- Epoch transitions
+docs/V3_006D_FOREIGN_AUTHORITY.md-34-- Authority recovery
+--
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-8-Classical distributed consensus protocols (Paxos, Raft, PBFT, HotStuff) model the
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-9-system as:
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-10-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-11-> **State × Input → State'**
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-12-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-13-The core entity is the *state machine*, and the protocol ensures that all correct
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-14-replicas transition through the same sequence of states.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-15-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:16:**Constitutional Computational Systems (CCS)** introduce a new primitive: the
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:17:**Constitutional Context**. The transition function becomes:
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-18-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:19:> **(Context, State) × Evidence → AuthorizedTransitions**
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-20-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-21-This shift means CCS is not merely a new consensus algorithm, but a
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-22-redefinition of computational authority itself. A transition is not valid
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-23-simply because a quorum of nodes agreed; it is valid because the agreement
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-24-occurred within a specific constitutional context that authorizes that
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-25-transition.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-26-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:27:## 2. The Constitutional Space (ℂ)
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-28-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-29-We define the constitutional space `ℂ` as a **preorder category** where:
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-30-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:31:- **Objects** are `ConstitutionalContext` tuples: `C = (E, V, Q, H)`
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-32-  - `E`: Epoch
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-33-  - `V`: Validator set with public keys
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-34-  - `Q`: A valid Quorum Certificate for the current finalized state
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-35-  - `H`: The finalized state hash
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-36-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-37-- **Morphisms** `τ : C₁ → C₂` represent constitutional transitions. A morphism
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-38-  exists iff there is cryptographic evidence `E` that justifies it:
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-39-  
+--
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-50-`∀ Q, C : ValidCrypto(Q) ⇏ Authority(Q, C)`
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-51-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-52-Cryptographic validity is necessary but not sufficient. Authority requires
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-53-constitutional membership, correct epoch, and proper context.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-54-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-55-*Empirical support:* V3-006A (Impersonation), V3-006C (Stale), V3-006D (Foreign).
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-56-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-57-### Axiom 2: Contextual Recoverability
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:58:`∃ F : F(Evidence, Context) = Authority`
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-59-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-60-Authority can be reconstructed from constitutional evidence and the current
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-61-context. It is not stored; it is derived.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-62-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-63-*Empirical support:* V3-007D (Authority Recovery).
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-64-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-65-### Axiom 3: Authority Uniqueness
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-66-`∀ C ∈ ℂ, ¬∃ A1, A2 : A1 ≠ A2 ∧ Valid(A1, C) ∧ Valid(A2, C)`
+--
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-68-Within the same constitutional context, authority is unique. There cannot be
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-69-two conflicting authorized state transitions.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-70-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-71-*Empirical support:* V3-006B (Conflicting QC).
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-72-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-73-### Axiom 4: Epoch Supremacy
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-74-`Epoch(C₂) > Epoch(C₁) ⇒ Authority(C₁) < Authority(C₂)`
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-75-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:76:Constitutional authority is partially ordered by epoch. Evidence from an
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-77-earlier epoch is invalid in a later epoch, even if cryptographically valid.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-78-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-79-*Empirical support:* V3-007B, V3-007C (Stale rejection after transition).
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-80-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:81:## 4. Constitutional Temporal Logic
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-82-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-83-To reason about CCS properties formally, we introduce a temporal logic where
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-84-the fundamental modality is not "eventually" or "always", but:
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-85-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-86-**`Authorized(τ, C)`** — transition `τ` is authorized in context `C`.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-87-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-88-Key theorems expressible in this logic:
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-89-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-90-1. **Safety:** `□(Authorized(τ, C) → Unique(τ, C))`
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-91-   At all times, if a transition is authorized, it is the unique authorized
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-92-   transition for that context.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-93-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:94:2. **Liveness:** `◇(Evidence(Q, V) → Authorized(commit, C))`
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-95-   Eventually, if a valid quorum certificate exists for the current validator
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-96-   set, a commit transition is authorized.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-97-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:98:3. **Recovery:** `□(Evidence(Q, C) → ◇Authorized(recover, C))`
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-99-   Whenever constitutional evidence exists, it is always possible to
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-100-   eventually authorize a recovery transition.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-101-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-102-## 5. Authority Ordering Theory
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-103-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-104-We define a partial order `≤` on `ℂ`:
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-105-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-106-`C₁ ≤ C₂` iff there exists a constitutional morphism `τ : C₁ → C₂`.
+--
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-112-  that advance this ordering.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-113-- Stale or foreign evidence cannot create valid morphisms, preserving the
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-114-  integrity of the authority chain.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-115-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-116-## 6. Next Steps
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-117-
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-118-- **V4-005:** Formal TLA+ specification of the CCS model.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-119-- **V4-006:** Mechanized proof of the Authority Uniqueness Theorem.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:120:- **V4-007:** Paper draft: "A Mathematical Framework for Constitutional
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md-121-  Authority in Distributed Computational Systems."
+--
+docs/VALIDATOR_ORDERING.md-1-# AmunChain Validator Ordering Law
+docs/VALIDATOR_ORDERING.md-2-
+docs/VALIDATOR_ORDERING.md:3:## Constitutional Principle
+docs/VALIDATOR_ORDERING.md-4-
+docs/VALIDATOR_ORDERING.md-5-Validators are ordered by their ID for all consensus-critical operations:
+docs/VALIDATOR_ORDERING.md-6-
+docs/VALIDATOR_ORDERING.md-7-- Vote aggregation
+docs/VALIDATOR_ORDERING.md-8-- Quorum calculation
+docs/VALIDATOR_ORDERING.md-9-- Slashing evidence
+docs/VALIDATOR_ORDERING.md-10-- Epoch transitions
+docs/VALIDATOR_ORDERING.md-11-- Snapshot generation
+--
+docs/BUILD_REPRODUCIBILITY.md-55-
+docs/BUILD_REPRODUCIBILITY.md-56-- compiler drift
+docs/BUILD_REPRODUCIBILITY.md-57-- dependency mutation
+docs/BUILD_REPRODUCIBILITY.md-58-- feature drift
+docs/BUILD_REPRODUCIBILITY.md-59-- environment leakage
+docs/BUILD_REPRODUCIBILITY.md-60-
+docs/BUILD_REPRODUCIBILITY.md-61----
+docs/BUILD_REPRODUCIBILITY.md-62-
+docs/BUILD_REPRODUCIBILITY.md:63:# Constitutional Principle
+docs/BUILD_REPRODUCIBILITY.md-64-
+docs/BUILD_REPRODUCIBILITY.md-65-Reproducible builds are constitutional infrastructure.
+--
+docs/constitutional_layers.md:1:# Amun Constitutional Architecture — Layer Stratification
+docs/constitutional_layers.md-2-
+docs/constitutional_layers.md:3:## Layer 0: Constitutional Kernel
+docs/constitutional_layers.md-4-**Responsibility**: Determinism, canonical encoding, domain separation, protocol versioning.
+docs/constitutional_layers.md-5-- `amun-kernel`
+docs/constitutional_layers.md-6-
+docs/constitutional_layers.md:7:## Layer 1: Truth & Evidence
+docs/constitutional_layers.md-8-**Responsibility**: State roots, execution receipts, replay proofs, snapshot sealing.
+docs/constitutional_layers.md-9-- `amun-state-root`
+docs/constitutional_layers.md-10-- `amun-execution-receipt`
+docs/constitutional_layers.md-11-
+docs/constitutional_layers.md-12-## Layer 2: Deterministic Execution
+docs/constitutional_layers.md-13-**Responsibility**: State transition function, deterministic scheduling, execution semantics.
+docs/constitutional_layers.md-14-- `amun-stf`
+docs/constitutional_layers.md-15-- `amun-execution`
+--
+docs/constitutional/phase84_freeze.md-1-# AMUNCHAIN PHASE 84 - CONSTITUTIONAL FREEZE v1.0
+docs/constitutional/phase84_freeze.md:2:## Frozen Invariants for Sovereign State Replication
+docs/constitutional/phase84_freeze.md-3-
+docs/constitutional/phase84_freeze.md-4----
+docs/constitutional/phase84_freeze.md-5-
+docs/constitutional/phase84_freeze.md-6-## 1. CANONICAL GEOMETRY (FROZEN)
+docs/constitutional/phase84_freeze.md-7-- MAX_DEPTH: 256 (constitutional constant)
+docs/constitutional/phase84_freeze.md-8-- Tree structure: Full explicit binary, no compression
+docs/constitutional/phase84_freeze.md-9-- Empty ladder: Precomputed, terminal = [0u8; 32]
+docs/constitutional/phase84_freeze.md-10-- Proof geometry: Exactly 256 ProofStep entries per proof
+--
+docs/constitutional/phase84_freeze.md-17-## 3. SNAPSHOT FORMAT (FROZEN)
+docs/constitutional/phase84_freeze.md-18-- Magic: "AMSN" (4 bytes)
+docs/constitutional/phase84_freeze.md-19-- Version: SNAPSHOT_VERSION_V1 = 1
+docs/constitutional/phase84_freeze.md-20-- Max chunk size: 16MB constitutional constant
+docs/constitutional/phase84_freeze.md-21-- Chunk Merkle domain: AMUN_CHUNK_MERKLE_V1
+docs/constitutional/phase84_freeze.md-22-
+docs/constitutional/phase84_freeze.md-23-## 4. COMPATIBILITY LAW (FROZEN)
+docs/constitutional/phase84_freeze.md-24-- Levels: FullyCompatible > ReplayCompatible > SnapshotCompatible > ReadOnlyCompatible > Incompatible
+docs/constitutional/phase84_freeze.md:25:- Constitutional mismatch + same SMT universe = ReadOnlyCompatible
+docs/constitutional/phase84_freeze.md-26-- Different empty roots = Incompatible (structural universe mismatch)
+docs/constitutional/phase84_freeze.md-27-
+docs/constitutional/phase84_freeze.md-28-## 5. PROOF LAW (FROZEN)
+docs/constitutional/phase84_freeze.md-29-- Each chunk carries independent Merkle inclusion proof
+docs/constitutional/phase84_freeze.md-30-- Proof generation uses positional pair tracking (pair_idx * 2)
+docs/constitutional/phase84_freeze.md-31-- Proof verification rebuilds Merkle root from chunk hash + siblings
+docs/constitutional/phase84_freeze.md-32-
+docs/constitutional/phase84_freeze.md-33-## 6. BYZANTINE SYNC LAW (FROZEN)
+--
+docs/constitutional/phase84_freeze.md-46-
+docs/constitutional/phase84_freeze.md-47-## 9. TEMPORAL ATOMICITY (FROZEN)
+docs/constitutional/phase84_freeze.md-48-- Every snapshot belongs to a single constitutional instant
+docs/constitutional/phase84_freeze.md-49-- snapshot_cutoff_sequence + snapshot_cutoff_root bind to exact WAL boundary
+docs/constitutional/phase84_freeze.md-50-- Atomic freeze: no in-flight writes during snapshot generation
+docs/constitutional/phase84_freeze.md-51-
+docs/constitutional/phase84_freeze.md-52-## 10. REPLAY CONTINUITY (FROZEN)
+docs/constitutional/phase84_freeze.md-53-- THEOREM 11: snapshot + WAL replay == full replay
+docs/constitutional/phase84_freeze.md:54:- ReplayVerifier checks every frame's state_root against reconstructed state
+docs/constitutional/phase84_freeze.md-55-- Epoch/generation monotonicity enforced
+docs/constitutional/phase84_freeze.md-56-
+docs/constitutional/phase84_freeze.md-57----
+docs/constitutional/phase84_freeze.md-58-
+docs/constitutional/phase84_freeze.md-59-## AMENDMENT PROCESS
+docs/constitutional/phase84_freeze.md-60-These invariants are FROZEN for protocol version 1.
+docs/constitutional/phase84_freeze.md-61-Changes require:
+docs/constitutional/phase84_freeze.md:62:1. Constitutional amendment proposal
+docs/constitutional/phase84_freeze.md-63-2. New PROOF_VERSION constant
+docs/constitutional/phase84_freeze.md-64-3. Explicit migration path
+docs/constitutional/phase84_freeze.md:65:4. Constitutional court ratification
+docs/constitutional/phase84_freeze.md-66-
+docs/constitutional/phase84_freeze.md-67-## SIGNATORIES
+docs/constitutional/phase84_freeze.md:68:Ratified by the AmunChain Constitutional Assembly
+docs/constitutional/phase84_freeze.md:69:Phase 84 - Constitutionally Complete
+docs/constitutional/phase84_freeze.md:70:Date: Constitutional Era 1, Epoch 0
+docs/constitutional/phase84_freeze.md-71-
+docs/constitutional/phase84_freeze.md-72-## 11. HASH STABILITY LAW (FROZEN)
+docs/constitutional/phase84_freeze.md-73-For protocol version 1:
+docs/constitutional/phase84_freeze.md-74-- Identical logical state MUST always produce identical:
+docs/constitutional/phase84_freeze.md-75-  - node hashes
+docs/constitutional/phase84_freeze.md-76-  - chunk hashes
+docs/constitutional/phase84_freeze.md-77-  - manifest hashes
+docs/constitutional/phase84_freeze.md-78-  - constitutional identity hashes
+--
+docs/constitutional/topology.md:1:# Constitutional Topology: Core Definitions
+docs/constitutional/topology.md:2:## AmunChain Constitutional Consensus Protocol v1.0
+docs/constitutional/topology.md-3-
+docs/constitutional/topology.md-4-## 1. Authority Root (`authority_root`)
+docs/constitutional/topology.md-5-
+docs/constitutional/topology.md-6-### Definition
+docs/constitutional/topology.md-7-A cryptographic commitment (Blake3) representing **who constrains constitutional authority**, not which node claims authority.
+docs/constitutional/topology.md-8-
+docs/constitutional/topology.md-9-### Properties
+docs/constitutional/topology.md-10-- **Topology-centric**: Different nodes with identical authority dependencies produce the SAME `authority_root`
+docs/constitutional/topology.md-11-- **Pure constraint hash**: Excludes node identity, includes only authority relationships
+docs/constitutional/topology.md-12-- **Deterministic**: Canonical encoding + sorted dependencies prevents ordering attacks
+docs/constitutional/topology.md-13-
+docs/constitutional/topology.md:14:### Constitutional Meaning
+docs/constitutional/topology.md:15:- `authority_root == origin_root` → Constitutional topology unchanged
+docs/constitutional/topology.md-16-- `authority_root != origin_root` but `origin_present` → Shadowing
+docs/constitutional/topology.md-17-- `origin_present == false` → Suffocation
+docs/constitutional/topology.md-18-
+docs/constitutional/topology.md-19-## 2. Lineage Root (`lineage_root`)
+docs/constitutional/topology.md-20-
+docs/constitutional/topology.md-21-### Definition
+docs/constitutional/topology.md-22-A cryptographic commitment representing the **interpretive derivation chain**: `lineage = blake3(parent_lineage || semantic_root)`
+docs/constitutional/topology.md-23-
+--
+docs/constitutional/phase85_seal.md-9-1. Canonical tags for all constitutional enums (no as u8)
+docs/constitutional/phase85_seal.md-10-2. Deterministic byte ordering for merger parents
+docs/constitutional/phase85_seal.md-11-3. Cycle prevention in civilization lineage DAG
+docs/constitutional/phase85_seal.md-12-4. Self-reference prevention (child != parent)
+docs/constitutional/phase85_seal.md-13-5. Non-reflexive ancestor checking
+docs/constitutional/phase85_seal.md-14-6. Multi-parent DAG support (HashSet<CivilizationId>)
+docs/constitutional/phase85_seal.md-15-7. EvolutionMode: Superseding/Parallel/Experimental/Merger
+docs/constitutional/phase85_seal.md-16-8. Graded guarantees: Replay/Snapshot/Proof/Governance/Continuity
+docs/constitutional/phase85_seal.md:17:9. ConstitutionalPhysicsProof embedded in certificates
+docs/constitutional/phase85_seal.md-18-10. Certificate lineage binding (parent_lineage_id, parent_certificate_hash, head_set_hash)
+docs/constitutional/phase85_seal.md-19-11. Signature domain separation (AMENDMENT/RATIFICATION/ACTIVATION)
+docs/constitutional/phase85_seal.md-20-12. Freeze boundary runtime enforcement (FreezeBoundaryValidator)
+docs/constitutional/phase85_seal.md:21:13. Constitutional checkpoints with state transition integration
+docs/constitutional/phase85_seal.md-22-14. Aggregated signatures with quorum verification
+docs/constitutional/phase85_seal.md:23:15. ConstitutionalEncode trait (serialization lock interface)
+docs/constitutional/phase85_seal.md-24-
+docs/constitutional/phase85_seal.md-25-### PHASE 86 DEBT (Production Hardening)
+docs/constitutional/phase85_seal.md-26-1. Compile-time canonical encoding enforcement (procedural macro)
+docs/constitutional/phase85_seal.md-27-2. Cryptographic signature verification (key registry, BLS/Ed25519)
+docs/constitutional/phase85_seal.md-28-3. Checkpoint chain binding (previous_checkpoint_hash)
+docs/constitutional/phase85_seal.md:29:4. ConstitutionalField enum (replace string-based field names)
+docs/constitutional/phase85_seal.md:30:5. Formal ConstitutionalStateMachine (allowed/forbidden transitions)
+docs/constitutional/phase85_seal.md-31-6. Adversarial evolution simulation
+docs/constitutional/phase85_seal.md-32-7. Deterministic replay across constitutional versions
+docs/constitutional/phase85_seal.md-33-8. Governance deadlock resolution
+docs/constitutional/phase85_seal.md-34-
+docs/constitutional/phase85_seal.md-35-### ARCHITECTURAL ACHIEVEMENT
+docs/constitutional/phase85_seal.md-36-AmunChain has transitioned from "blockchain implementation" to
+docs/constitutional/phase85_seal.md-37-"constitutional distributed system kernel" with:
+docs/constitutional/phase85_seal.md-38-- Deterministic state physics (frozen)
+docs/constitutional/phase85_seal.md-39-- Sovereign snapshot replication (frozen)
+docs/constitutional/phase85_seal.md:40:- Constitutional evolution layer (sealed)
+docs/constitutional/phase85_seal.md-41-- Civilization lineage DAG (operational)
+docs/constitutional/phase85_seal.md-42-- Freeze boundary enforcement (runtime-active)
+docs/constitutional/phase85_seal.md-43-- Signature domain separation (defined)
+docs/constitutional/phase85_seal.md-44-
+docs/constitutional/phase85_seal.md-45-Phase 86 will focus on production hardening, cryptographic enforcement,
+docs/constitutional/phase85_seal.md-46-and formal state machine completion.
+--
+docs/DEVELOPER_GUIDE.md-59-Place integration tests inside:
+docs/DEVELOPER_GUIDE.md-60-
+docs/DEVELOPER_GUIDE.md-61-```text
+docs/DEVELOPER_GUIDE.md-62-tests/
+docs/DEVELOPER_GUIDE.md-63-```
+docs/DEVELOPER_GUIDE.md-64-
+docs/DEVELOPER_GUIDE.md-65----
+docs/DEVELOPER_GUIDE.md-66-
+docs/DEVELOPER_GUIDE.md:67:# Constitutional Rules
+docs/DEVELOPER_GUIDE.md-68-
+docs/DEVELOPER_GUIDE.md-69-All code must obey:
+docs/DEVELOPER_GUIDE.md-70-
+docs/DEVELOPER_GUIDE.md-71-- deterministic execution
+docs/DEVELOPER_GUIDE.md-72-- replay equivalence
+docs/DEVELOPER_GUIDE.md-73-- canonical serialization
+docs/DEVELOPER_GUIDE.md-74-- stable hashing
+docs/DEVELOPER_GUIDE.md-75-- explicit invariants
+--
+docs/DEVELOPER_GUIDE.md-120-
+docs/DEVELOPER_GUIDE.md-121-# Tooling
+docs/DEVELOPER_GUIDE.md-122-
+docs/DEVELOPER_GUIDE.md-123-Useful scripts:
+docs/DEVELOPER_GUIDE.md-124-
+docs/DEVELOPER_GUIDE.md-125-| Script | Purpose |
+docs/DEVELOPER_GUIDE.md-126-|---|---|
+docs/DEVELOPER_GUIDE.md-127-| tools/verify.sh | Full verification |
+docs/DEVELOPER_GUIDE.md:128:| tools/check_constitution.sh | Constitutional verification |
+docs/DEVELOPER_GUIDE.md-129-| tools/firewall.sh | Dependency firewall |
+docs/DEVELOPER_GUIDE.md-130-| tools/audit-deps.sh | Dependency audit |
+docs/DEVELOPER_GUIDE.md-131-
+docs/DEVELOPER_GUIDE.md-132----
+docs/DEVELOPER_GUIDE.md-133-
+docs/DEVELOPER_GUIDE.md-134-# Philosophy
+docs/DEVELOPER_GUIDE.md-135-
+docs/DEVELOPER_GUIDE.md-136-AmunChain treats software engineering as constitutional engineering.
+--
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-1-# CCS v0.5 – Complete Research Program (Final)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-2-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-3-**Date:** 2026-05-31
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-4-**Status:** Foundational – Complete
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-5-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-6-## 1. Core Hypothesis (Carried from v0.4)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:7:**Constitutional Determinism:**
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:8:Constitutional authority is not produced by consensus; it is uniquely determined
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-9-by constitutional context. Consensus serves as the mechanism that produces
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-10-verifiable evidence of that context.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-11-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-12-## 2. Theoretical Architecture (Three Layers)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-13-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-14-### Layer 1: Ontology (What exists?)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:15:- **Constitutional Context** `C ∈ ℂ`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-16-- **Authority Object** `A = Authority(C)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:17:- **Constitutional Evidence** `E`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:18:- **Constitutional Transition** `τ : C₁ → C₂`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-19-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-20-### Layer 2: Axioms (What rules govern?)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-21-- **Context Dominance:** `ValidCrypto(Q) ⇏ Authority(Q, C)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-22-- **Authority Uniqueness:** `∀ C : ¬∃ A₁,A₂ : A₁ ≠ A₂ ∧ Valid(A₁,C) ∧ Valid(A₂,C)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-23-- **Epoch Supremacy:** `Epoch(C₂) > Epoch(C₁) ⇒ Authority(C₁) < Authority(C₂)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:24:- **Constitutional Determinism:** `∀ C : ∃! A = Authority(C)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:25:- **Recoverability:** `∃ F : F(Evidence, Context) = Authority`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-26-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-27-### Layer 3: Dynamics (How does it evolve?)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-28-- **Conservation:** `∀ τ : C₁ → C₂, ∃ conserved quantity across τ`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-29-- **Monotonicity:** `C₁ → C₂ ⇒ Authority(C₁) ≤ Authority(C₂)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:30:- **Context Validity:** `ValidContext(C) iff ValidEpoch(C) ∧ ValidValidatorSet(C) ∧ ValidEvidence(C) ∧ ConsistentState(C)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:31:- **Category Morphisms:** Constitutional transitions as category arrows
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-32-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-33-## 3. Research Program (v0.5)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-34-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-35-### V5-001: Independence Proof
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-36-**Goal:** Prove that CCS does not logically depend on AmunChain.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-37-- Abstract CCS from QC, BLS, and AmunChain-specific types
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-38-- Show AmunChain is ONE instance of CCS
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-39-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:40:### V5-002: Constitutional Conservation
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-41-**Goal:** Define a conserved quantity across all legitimate transitions.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:42:- Hypothesis: The conserved quantity is **Constitutional Continuity** – every
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-43-  legitimate context must be derivable from a prior legitimate context.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-44-- This may become the first "Conservation Law" of CCS.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-45-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:46:### V5-003: Constitutional Monotonicity
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-47-**Goal:** Prove that authority does not regress.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-48-`C₁ → C₂ ⇒ Authority(C₁) ≤ Authority(C₂)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-49-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-50-### V5-004: Category-Theoretic Formulation
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-51-**Goal:** Model CCS as a category.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:52:- Objects: Constitutional Contexts
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:53:- Morphisms: Constitutional Transitions
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-54-- Prove composition and identity laws.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-55-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:56:### V5-005: Constitutional Context Validity
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-57-**Goal:** Define when a context itself is valid.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:58:`ValidContext(C) iff ValidEpoch(C) ∧ ValidValidatorSet(C) ∧ ValidEvidence(C) ∧ ConsistentState(C)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:59:With this, Constitutional Determinism becomes:
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-60-`∀ C : ValidContext(C) ⇒ ∃! A = Authority(C)`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-61-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-62-### V5-006: Falsifiability Program (NEW)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-63-**Goal:** Define conditions under which CCS theory would be falsified.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-64-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:65:What would falsify Constitutional Determinism?
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-66-- Finding a valid context `C` where `Authority(C)` is not unique
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-67-- Finding `Authority(C₁) = Authority(C₂)` where `C₁ ≠ C₂`
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-68-- Finding a legitimate transition that violates Conservation or Monotonicity
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-69-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-70-A strong theory needs clear falsification conditions.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-71-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-72-## 4. The Central Question
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-73-
+--
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-78-it marks the transition from engineering a system to founding a theory.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-79-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-80-## 5. From AmunChain to CCS: The Evolution
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-81-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-82-| Version | Focus |
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-83-|---------|-------|
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-84-| v0.1    | Engineering Prototype |
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-85-| v0.2    | Consensus Core |
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:86:| v0.3    | Constitutional Authority Layer |
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-87-| v0.4    | Foundational Hypothesis |
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-88-| v0.5    | Independent Theory – Theory of Computational Authority |
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-89-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-90-## 6. Deliverables
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-91-1. Formal CCS specification (independent of AmunChain)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-92-2. TLA+ or Coq model with mechanized proofs for V5-002, V5-003, V5-005
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-93-3. Category-theoretic paper draft
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:94:4. Academic publication: "Constitutional Computational Systems: A Mathematical
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-95-   Framework for Authority in Distributed Systems"
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-96-
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-97-## 7. Relationship to AmunChain
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-98-AmunChain is the experimental vehicle for CCS.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-99-CCS is the theoretical framework that AmunChain instantiates.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-100-Future AmunChain versions (v0.6+) implement CCS-derived features,
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-101-not the other way around.
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md-102-

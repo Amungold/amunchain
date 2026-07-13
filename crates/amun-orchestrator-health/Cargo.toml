@@ -1,0 +1,20 @@
+[package]
+name = "amun-orchestrator-health"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Health Supervisor — continuous monitoring, auto-recovery, alerting"
+
+[dependencies]
+amun-orchestrator-core = { path = "../amun-orchestrator-core" }
+amun-orchestrator-service = { path = "../amun-orchestrator-service" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tracing = "0.1"
+tokio = { version = "1", features = ["time", "sync", "net"] }
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+tempfile = "3"

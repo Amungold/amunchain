@@ -1,0 +1,1500 @@
+crates/amun-proof-archive/src/hot_store.rs-71-            [0u8; 32],
+crates/amun-proof-archive/src/hot_store.rs-72-            [0x01; 32],
+crates/amun-proof-archive/src/hot_store.rs-73-            [0x02; 32],
+crates/amun-proof-archive/src/hot_store.rs-74-            vec![],
+crates/amun-proof-archive/src/hot_store.rs-75-            vec![],
+--
+crates/amun-proof-archive/src/proof_archive.rs-1-use crate::hot_store::HotProofStore;
+crates/amun-proof-archive/src/proof_archive.rs:2:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-proof-archive/src/proof_archive.rs:3:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-proof-archive/src/proof_archive.rs-4-use std::collections::HashMap;
+crates/amun-proof-archive/src/proof_archive.rs-5-
+crates/amun-proof-archive/src/proof_archive.rs-6-#[derive(Debug, Clone, Default)]
+crates/amun-proof-archive/src/proof_archive.rs-7-pub struct ProofArchive {
+crates/amun-proof-archive/src/proof_archive.rs:8:    permanent: HashMap<[u8; 32], TransitionProof>,
+crates/amun-proof-archive/src/proof_archive.rs:9:    evidence: Vec<ConstitutionalEvidence>,
+crates/amun-proof-archive/src/proof_archive.rs-10-}
+crates/amun-proof-archive/src/proof_archive.rs-11-
+crates/amun-proof-archive/src/proof_archive.rs-12-impl ProofArchive {
+crates/amun-proof-archive/src/proof_archive.rs-13-    pub fn new() -> Self {
+crates/amun-proof-archive/src/proof_archive.rs-14-        Self::default()
+crates/amun-proof-archive/src/proof_archive.rs-15-    }
+crates/amun-proof-archive/src/proof_archive.rs-16-
+crates/amun-proof-archive/src/proof_archive.rs:17:    pub fn archive_permanent(&mut self, proof: TransitionProof) {
+crates/amun-proof-archive/src/proof_archive.rs-18-        self.permanent.insert(proof.proof_hash, proof);
+crates/amun-proof-archive/src/proof_archive.rs-19-    }
+crates/amun-proof-archive/src/proof_archive.rs-20-
+crates/amun-proof-archive/src/proof_archive.rs:21:    pub fn archive_evidence(&mut self, evidence: ConstitutionalEvidence) {
+crates/amun-proof-archive/src/proof_archive.rs-22-        self.evidence.push(evidence);
+crates/amun-proof-archive/src/proof_archive.rs-23-    }
+crates/amun-proof-archive/src/proof_archive.rs-24-
+crates/amun-proof-archive/src/proof_archive.rs:25:    pub fn get_permanent(&self, proof_hash: &[u8; 32]) -> Option<&TransitionProof> {
+crates/amun-proof-archive/src/proof_archive.rs-26-        self.permanent.get(proof_hash)
+crates/amun-proof-archive/src/proof_archive.rs-27-    }
+crates/amun-proof-archive/src/proof_archive.rs-28-
+crates/amun-proof-archive/src/proof_archive.rs-29-    pub fn total_permanent(&self) -> usize {
+crates/amun-proof-archive/src/proof_archive.rs-30-        self.permanent.len()
+crates/amun-proof-archive/src/proof_archive.rs-31-    }
+crates/amun-proof-archive/src/proof_archive.rs-32-    pub fn total_evidence(&self) -> usize {
+crates/amun-proof-archive/src/proof_archive.rs-33-        self.evidence.len()
+--
+crates/amun-proof-archive/src/proof_archive.rs-53-    use amun_resource_core::ResourceId;
+crates/amun-proof-archive/src/proof_archive.rs-54-
+crates/amun-proof-archive/src/proof_archive.rs-55-    fn make_id(seed: u8) -> ResourceId {
+crates/amun-proof-archive/src/proof_archive.rs-56-        let mut h = [0u8; 32];
+crates/amun-proof-archive/src/proof_archive.rs-57-        h[0] = seed;
+crates/amun-proof-archive/src/proof_archive.rs-58-        ResourceId(h)
+crates/amun-proof-archive/src/proof_archive.rs-59-    }
+crates/amun-proof-archive/src/proof_archive.rs-60-
+crates/amun-proof-archive/src/proof_archive.rs:61:    fn make_proof(tx_hash: [u8; 32]) -> TransitionProof {
+crates/amun-proof-archive/src/proof_archive.rs:62:        TransitionProof::new(
+crates/amun-proof-archive/src/proof_archive.rs-63-            tx_hash,
+crates/amun-proof-archive/src/proof_archive.rs-64-            make_id(1),
+crates/amun-proof-archive/src/proof_archive.rs-65-            1,
+crates/amun-proof-archive/src/proof_archive.rs-66-            [0u8; 32],
+crates/amun-proof-archive/src/proof_archive.rs-67-            [0x01; 32],
+crates/amun-proof-archive/src/proof_archive.rs-68-            [0x02; 32],
+crates/amun-proof-archive/src/proof_archive.rs-69-            vec![],
+crates/amun-proof-archive/src/proof_archive.rs-70-            vec![],
+--
+crates/amun-proof-archive/src/proof_archive.rs-82-        archive.archive_permanent(proof);
+crates/amun-proof-archive/src/proof_archive.rs-83-        assert_eq!(archive.total_permanent(), 1);
+crates/amun-proof-archive/src/proof_archive.rs-84-        assert!(archive.get_permanent(&hash).is_some());
+crates/amun-proof-archive/src/proof_archive.rs-85-    }
+crates/amun-proof-archive/src/proof_archive.rs-86-
+crates/amun-proof-archive/src/proof_archive.rs-87-    #[test]
+crates/amun-proof-archive/src/proof_archive.rs-88-    fn w12_archive_evidence() {
+crates/amun-proof-archive/src/proof_archive.rs-89-        let mut archive = ProofArchive::new();
+crates/amun-proof-archive/src/proof_archive.rs:90:        let ev = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-proof-archive/src/proof_archive.rs-91-            reason: "test".into(),
+crates/amun-proof-archive/src/proof_archive.rs-92-            contract_id: make_id(1),
+crates/amun-proof-archive/src/proof_archive.rs-93-            block_height: 1,
+crates/amun-proof-archive/src/proof_archive.rs-94-            transaction_hash: [0xee; 32],
+crates/amun-proof-archive/src/proof_archive.rs-95-            gas_consumed: 0,
+crates/amun-proof-archive/src/proof_archive.rs-96-        };
+crates/amun-proof-archive/src/proof_archive.rs-97-        archive.archive_evidence(ev);
+crates/amun-proof-archive/src/proof_archive.rs-98-        assert_eq!(archive.total_evidence(), 1);
+--
+crates/amun_state_machine/src/transition.rs-1-#![forbid(unsafe_code)]
+crates/amun_state_machine/src/transition.rs-2-
+crates/amun_state_machine/src/transition.rs-3-use amun_consensus_math::Fixed;
+crates/amun_state_machine/src/transition.rs-4-use crate::event::{Event, EventType};
+crates/amun_state_machine/src/transition.rs:5:use crate::state::{ConstitutionalState, Account};
+crates/amun_state_machine/src/transition.rs-6-use crate::receipt::{ExecutionReceipt, ErrorCode};
+crates/amun_state_machine/src/transition.rs-7-
+crates/amun_state_machine/src/transition.rs-8-const TRANSITION_VERSION: u32 = 1;
+crates/amun_state_machine/src/transition.rs-9-
+crates/amun_state_machine/src/transition.rs-10-pub struct TransitionResult {
+crates/amun_state_machine/src/transition.rs-11-    pub success: bool,
+crates/amun_state_machine/src/transition.rs-12-    pub error_message: Option<String>,
+crates/amun_state_machine/src/transition.rs-13-    pub error_code: ErrorCode,
+--
+crates/amun_state_machine/src/transition.rs-44-        return Err(ErrorCode::InvalidAmount);
+crates/amun_state_machine/src/transition.rs-45-    }
+crates/amun_state_machine/src/transition.rs-46-    Ok(Fixed::from_raw(amount_raw))
+crates/amun_state_machine/src/transition.rs-47-}
+crates/amun_state_machine/src/transition.rs-48-
+crates/amun_state_machine/src/transition.rs-49-pub struct TransitionEngine;
+crates/amun_state_machine/src/transition.rs-50-
+crates/amun_state_machine/src/transition.rs-51-impl TransitionEngine {
+crates/amun_state_machine/src/transition.rs:52:    pub fn apply(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs-53-        let pre_hash = state.hash();
+crates/amun_state_machine/src/transition.rs-54-        
+crates/amun_state_machine/src/transition.rs-55-        let result = match event.event_type {
+crates/amun_state_machine/src/transition.rs-56-            EventType::Transfer => Self::handle_transfer(state, event),
+crates/amun_state_machine/src/transition.rs-57-            EventType::Mint => Self::handle_mint(state, event),
+crates/amun_state_machine/src/transition.rs-58-            EventType::Burn => Self::handle_burn(state, event),
+crates/amun_state_machine/src/transition.rs-59-            EventType::Delegate => Self::handle_delegate(state, event),
+crates/amun_state_machine/src/transition.rs-60-            EventType::Undelegate => Self::handle_undelegate(state, event),
+--
+crates/amun_state_machine/src/transition.rs-84-            success: result.success,
+crates/amun_state_machine/src/transition.rs-85-            error_message: result.error_message,
+crates/amun_state_machine/src/transition.rs-86-            error_code: result.error_code,
+crates/amun_state_machine/src/transition.rs-87-            receipt: Some(receipt),
+crates/amun_state_machine/src/transition.rs-88-            state_unchanged: !result.success,
+crates/amun_state_machine/src/transition.rs-89-        }
+crates/amun_state_machine/src/transition.rs-90-    }
+crates/amun_state_machine/src/transition.rs-91-    
+crates/amun_state_machine/src/transition.rs:92:    fn handle_transfer(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs-93-        let amount = match validate_amount(event.amount) {
+crates/amun_state_machine/src/transition.rs-94-            Ok(v) => v,
+crates/amun_state_machine/src/transition.rs-95-            Err(e) => return TransitionResult::failure(e, "Invalid amount", true),
+crates/amun_state_machine/src/transition.rs-96-        };
+crates/amun_state_machine/src/transition.rs-97-        
+crates/amun_state_machine/src/transition.rs-98-        let source_balance = match state.get_account(event.source) {
+crates/amun_state_machine/src/transition.rs-99-            Some(acc) => acc.balance,
+crates/amun_state_machine/src/transition.rs-100-            None => return TransitionResult::failure(ErrorCode::AccountNotFound, "Source account not found", true),
+--
+crates/amun_state_machine/src/transition.rs-113-        }
+crates/amun_state_machine/src/transition.rs-114-        if let Some(target) = state.get_account_mut(event.target) {
+crates/amun_state_machine/src/transition.rs-115-            target.balance = target.balance + amount;
+crates/amun_state_machine/src/transition.rs-116-        }
+crates/amun_state_machine/src/transition.rs-117-        
+crates/amun_state_machine/src/transition.rs-118-        TransitionResult::success()
+crates/amun_state_machine/src/transition.rs-119-    }
+crates/amun_state_machine/src/transition.rs-120-    
+crates/amun_state_machine/src/transition.rs:121:    fn handle_mint(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs-122-        let amount = match validate_amount(event.amount) {
+crates/amun_state_machine/src/transition.rs-123-            Ok(v) => v,
+crates/amun_state_machine/src/transition.rs-124-            Err(e) => return TransitionResult::failure(e, "Invalid amount", true),
+crates/amun_state_machine/src/transition.rs-125-        };
+crates/amun_state_machine/src/transition.rs-126-        
+crates/amun_state_machine/src/transition.rs-127-        if !state.accounts.contains_key(&event.target) {
+crates/amun_state_machine/src/transition.rs-128-            state.accounts.insert(event.target, Account::new(Fixed::ZERO));
+crates/amun_state_machine/src/transition.rs-129-        }
+--
+crates/amun_state_machine/src/transition.rs-131-        if let Some(target) = state.get_account_mut(event.target) {
+crates/amun_state_machine/src/transition.rs-132-            target.balance = target.balance + amount;
+crates/amun_state_machine/src/transition.rs-133-        }
+crates/amun_state_machine/src/transition.rs-134-        state.total_supply = state.total_supply + amount;
+crates/amun_state_machine/src/transition.rs-135-        
+crates/amun_state_machine/src/transition.rs-136-        TransitionResult::success()
+crates/amun_state_machine/src/transition.rs-137-    }
+crates/amun_state_machine/src/transition.rs-138-    
+crates/amun_state_machine/src/transition.rs:139:    fn handle_burn(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs-140-        let amount = match validate_amount(event.amount) {
+crates/amun_state_machine/src/transition.rs-141-            Ok(v) => v,
+crates/amun_state_machine/src/transition.rs-142-            Err(e) => return TransitionResult::failure(e, "Invalid amount", true),
+crates/amun_state_machine/src/transition.rs-143-        };
+crates/amun_state_machine/src/transition.rs-144-        
+crates/amun_state_machine/src/transition.rs-145-        let source_balance = match state.get_account(event.source) {
+crates/amun_state_machine/src/transition.rs-146-            Some(acc) => acc.balance,
+crates/amun_state_machine/src/transition.rs-147-            None => return TransitionResult::failure(ErrorCode::AccountNotFound, "Source account not found", true),
+--
+crates/amun_state_machine/src/transition.rs-154-        if let Some(source) = state.get_account_mut(event.source) {
+crates/amun_state_machine/src/transition.rs-155-            source.balance = source.balance - amount;
+crates/amun_state_machine/src/transition.rs-156-        }
+crates/amun_state_machine/src/transition.rs-157-        state.total_supply = state.total_supply - amount;
+crates/amun_state_machine/src/transition.rs-158-        
+crates/amun_state_machine/src/transition.rs-159-        TransitionResult::success()
+crates/amun_state_machine/src/transition.rs-160-    }
+crates/amun_state_machine/src/transition.rs-161-    
+crates/amun_state_machine/src/transition.rs:162:    fn handle_delegate(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs-163-        let amount = match validate_amount(event.amount) {
+crates/amun_state_machine/src/transition.rs-164-            Ok(v) => v,
+crates/amun_state_machine/src/transition.rs-165-            Err(e) => return TransitionResult::failure(e, "Invalid amount", true),
+crates/amun_state_machine/src/transition.rs-166-        };
+crates/amun_state_machine/src/transition.rs-167-        
+crates/amun_state_machine/src/transition.rs-168-        let source_balance = match state.get_account(event.source) {
+crates/amun_state_machine/src/transition.rs-169-            Some(acc) => acc.balance,
+crates/amun_state_machine/src/transition.rs-170-            None => return TransitionResult::failure(ErrorCode::AccountNotFound, "Source account not found", true),
+--
+crates/amun_state_machine/src/transition.rs-182-        
+crates/amun_state_machine/src/transition.rs-183-        if let Some(target) = state.get_account_mut(event.target) {
+crates/amun_state_machine/src/transition.rs-184-            target.balance = target.balance + amount;
+crates/amun_state_machine/src/transition.rs-185-        }
+crates/amun_state_machine/src/transition.rs-186-        
+crates/amun_state_machine/src/transition.rs-187-        TransitionResult::success()
+crates/amun_state_machine/src/transition.rs-188-    }
+crates/amun_state_machine/src/transition.rs-189-    
+crates/amun_state_machine/src/transition.rs:190:    fn handle_undelegate(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs-191-        let source = match state.get_account(event.source) {
+crates/amun_state_machine/src/transition.rs-192-            Some(acc) => acc,
+crates/amun_state_machine/src/transition.rs-193-            None => return TransitionResult::failure(ErrorCode::AccountNotFound, "Source account not found", true),
+crates/amun_state_machine/src/transition.rs-194-        };
+crates/amun_state_machine/src/transition.rs-195-        
+crates/amun_state_machine/src/transition.rs-196-        let amount = source.delegation_amount;
+crates/amun_state_machine/src/transition.rs-197-        let target = match source.delegated_to {
+crates/amun_state_machine/src/transition.rs-198-            Some(t) => t,
+--
+crates/amun_state_machine/src/transition.rs-207-        
+crates/amun_state_machine/src/transition.rs-208-        if let Some(target_acc) = state.get_account_mut(target) {
+crates/amun_state_machine/src/transition.rs-209-            target_acc.balance = target_acc.balance - amount;
+crates/amun_state_machine/src/transition.rs-210-        }
+crates/amun_state_machine/src/transition.rs-211-        
+crates/amun_state_machine/src/transition.rs-212-        TransitionResult::success()
+crates/amun_state_machine/src/transition.rs-213-    }
+crates/amun_state_machine/src/transition.rs-214-    
+crates/amun_state_machine/src/transition.rs:215:    fn handle_slash(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs-216-        let amount = match validate_amount(event.amount) {
+crates/amun_state_machine/src/transition.rs-217-            Ok(v) => v,
+crates/amun_state_machine/src/transition.rs-218-            Err(e) => return TransitionResult::failure(e, "Invalid amount", true),
+crates/amun_state_machine/src/transition.rs-219-        };
+crates/amun_state_machine/src/transition.rs-220-        
+crates/amun_state_machine/src/transition.rs-221-        let source_balance = match state.get_account(event.source) {
+crates/amun_state_machine/src/transition.rs-222-            Some(acc) => acc.balance,
+crates/amun_state_machine/src/transition.rs-223-            None => return TransitionResult::failure(ErrorCode::AccountNotFound, "Source account not found", true),
+--
+crates/amun_state_machine/src/transition.rs-228-        if let Some(source) = state.get_account_mut(event.source) {
+crates/amun_state_machine/src/transition.rs-229-            source.balance = source.balance - slashed;
+crates/amun_state_machine/src/transition.rs-230-        }
+crates/amun_state_machine/src/transition.rs-231-        state.total_supply = state.total_supply - slashed;
+crates/amun_state_machine/src/transition.rs-232-        
+crates/amun_state_machine/src/transition.rs-233-        TransitionResult::success()
+crates/amun_state_machine/src/transition.rs-234-    }
+crates/amun_state_machine/src/transition.rs-235-    
+crates/amun_state_machine/src/transition.rs:236:    fn handle_reward(state: &mut ConstitutionalState, event: &Event) -> TransitionResult {
+crates/amun_state_machine/src/transition.rs-237-        let amount = match validate_amount(event.amount) {
+crates/amun_state_machine/src/transition.rs-238-            Ok(v) => v,
+crates/amun_state_machine/src/transition.rs-239-            Err(e) => return TransitionResult::failure(e, "Invalid amount", true),
+crates/amun_state_machine/src/transition.rs-240-        };
+crates/amun_state_machine/src/transition.rs-241-        
+crates/amun_state_machine/src/transition.rs-242-        if !state.accounts.contains_key(&event.target) {
+crates/amun_state_machine/src/transition.rs-243-            state.accounts.insert(event.target, Account::new(Fixed::ZERO));
+crates/amun_state_machine/src/transition.rs-244-        }
+--
+crates/amun_state_machine/src/transition.rs-250-        
+crates/amun_state_machine/src/transition.rs-251-        TransitionResult::success()
+crates/amun_state_machine/src/transition.rs-252-    }
+crates/amun_state_machine/src/transition.rs-253-}
+crates/amun_state_machine/src/transition.rs-254-
+crates/amun_state_machine/src/transition.rs-255-#[cfg(test)]
+crates/amun_state_machine/src/transition.rs-256-mod tests {
+crates/amun_state_machine/src/transition.rs-257-    use super::*;
+crates/amun_state_machine/src/transition.rs:258:    use crate::state::ConstitutionalState;
+crates/amun_state_machine/src/transition.rs-259-    
+crates/amun_state_machine/src/transition.rs-260-    #[test]
+crates/amun_state_machine/src/transition.rs-261-    fn test_failed_transition_state_unchanged() {
+crates/amun_state_machine/src/transition.rs:262:        let mut state = ConstitutionalState::new();
+crates/amun_state_machine/src/transition.rs-263-        state.add_account(1, Fixed::from_int(100));
+crates/amun_state_machine/src/transition.rs-264-        let pre_hash = state.hash();
+crates/amun_state_machine/src/transition.rs-265-        
+crates/amun_state_machine/src/transition.rs-266-        let event = Event::new(EventType::Transfer, 1, 2, Fixed::from_int(10000).raw(), 0);
+crates/amun_state_machine/src/transition.rs-267-        let result = TransitionEngine::apply(&mut state, &event);
+crates/amun_state_machine/src/transition.rs-268-        
+crates/amun_state_machine/src/transition.rs-269-        assert!(!result.success);
+crates/amun_state_machine/src/transition.rs-270-        assert!(result.state_unchanged);
+crates/amun_state_machine/src/transition.rs-271-        assert_eq!(state.hash(), pre_hash);
+crates/amun_state_machine/src/transition.rs-272-    }
+crates/amun_state_machine/src/transition.rs-273-    
+crates/amun_state_machine/src/transition.rs-274-    #[test]
+crates/amun_state_machine/src/transition.rs-275-    fn test_invalid_amount_rejected() {
+crates/amun_state_machine/src/transition.rs:276:        let mut state = ConstitutionalState::new();
+crates/amun_state_machine/src/transition.rs-277-        state.add_account(1, Fixed::from_int(100));
+crates/amun_state_machine/src/transition.rs-278-        
+crates/amun_state_machine/src/transition.rs-279-        let event = Event::new(EventType::Transfer, 1, 2, 10_000_000_000_000_001, 0);
+crates/amun_state_machine/src/transition.rs-280-        let result = TransitionEngine::apply(&mut state, &event);
+crates/amun_state_machine/src/transition.rs-281-        
+crates/amun_state_machine/src/transition.rs-282-        assert!(!result.success);
+crates/amun_state_machine/src/transition.rs-283-        assert_eq!(result.error_code, ErrorCode::InvalidAmount);
+crates/amun_state_machine/src/transition.rs-284-    }
+--
+crates/amun_state_machine/src/certification/mod.rs-1-#![forbid(unsafe_code)]
+crates/amun_state_machine/src/certification/mod.rs-2-
+crates/amun_state_machine/src/certification/mod.rs-3-use sha2::{Sha256, Digest};
+crates/amun_state_machine/src/certification/mod.rs:4:use crate::state::ConstitutionalState;
+crates/amun_state_machine/src/certification/mod.rs-5-use crate::receipt::ExecutionReceipts;
+crates/amun_state_machine/src/certification/mod.rs-6-
+crates/amun_state_machine/src/certification/mod.rs-7-#[derive(Debug, Clone)]
+crates/amun_state_machine/src/certification/mod.rs-8-pub struct ExecutionCertificate {
+crates/amun_state_machine/src/certification/mod.rs-9-    pub block_height: u64,
+crates/amun_state_machine/src/certification/mod.rs-10-    pub pre_state_hash: [u8; 32],
+crates/amun_state_machine/src/certification/mod.rs-11-    pub post_state_hash: [u8; 32],
+crates/amun_state_machine/src/certification/mod.rs-12-    pub receipts_accumulator: [u8; 32],
+crates/amun_state_machine/src/certification/mod.rs-13-    pub trace_root: [u8; 32],
+crates/amun_state_machine/src/certification/mod.rs-14-    pub validator_signature: Option<[u8; 64]>,
+crates/amun_state_machine/src/certification/mod.rs-15-}
+crates/amun_state_machine/src/certification/mod.rs-16-
+crates/amun_state_machine/src/certification/mod.rs-17-impl ExecutionCertificate {
+crates/amun_state_machine/src/certification/mod.rs-18-    pub fn new(
+crates/amun_state_machine/src/certification/mod.rs-19-        block_height: u64,
+crates/amun_state_machine/src/certification/mod.rs:20:        pre_state: &ConstitutionalState,
+crates/amun_state_machine/src/certification/mod.rs:21:        post_state: &ConstitutionalState,
+crates/amun_state_machine/src/certification/mod.rs-22-        receipts: &ExecutionReceipts,
+crates/amun_state_machine/src/certification/mod.rs-23-        trace_root: [u8; 32],
+crates/amun_state_machine/src/certification/mod.rs-24-    ) -> Self {
+crates/amun_state_machine/src/certification/mod.rs-25-        Self {
+crates/amun_state_machine/src/certification/mod.rs-26-            block_height,
+crates/amun_state_machine/src/certification/mod.rs-27-            pre_state_hash: pre_state.hash(),
+crates/amun_state_machine/src/certification/mod.rs-28-            post_state_hash: post_state.hash(),
+crates/amun_state_machine/src/certification/mod.rs-29-            receipts_accumulator: receipts.accumulator_hash,
+--
+crates/amun_state_machine/src/certification/mod.rs-66-    pub execution_count: u64,
+crates/amun_state_machine/src/certification/mod.rs-67-    pub execution_fingerprint: [u8; 32],
+crates/amun_state_machine/src/certification/mod.rs-68-}
+crates/amun_state_machine/src/certification/mod.rs-69-
+crates/amun_state_machine/src/certification/mod.rs-70-impl ReplayCertificate {
+crates/amun_state_machine/src/certification/mod.rs-71-    pub fn new(
+crates/amun_state_machine/src/certification/mod.rs-72-        block_height: u64,
+crates/amun_state_machine/src/certification/mod.rs-73-        transcript_hash: [u8; 32],
+crates/amun_state_machine/src/certification/mod.rs:74:        final_state: &ConstitutionalState,
+crates/amun_state_machine/src/certification/mod.rs-75-        receipts: &ExecutionReceipts,
+crates/amun_state_machine/src/certification/mod.rs-76-        execution_count: u64,
+crates/amun_state_machine/src/certification/mod.rs-77-        execution_fingerprint: [u8; 32],
+crates/amun_state_machine/src/certification/mod.rs-78-    ) -> Self {
+crates/amun_state_machine/src/certification/mod.rs-79-        Self {
+crates/amun_state_machine/src/certification/mod.rs-80-            block_height,
+crates/amun_state_machine/src/certification/mod.rs-81-            transcript_hash,
+crates/amun_state_machine/src/certification/mod.rs-82-            final_state_hash: final_state.hash(),
+--
+crates/amun_state_machine/src/lib.rs-10-pub mod certification;
+crates/amun_state_machine/src/lib.rs-11-pub mod ordering;
+crates/amun_state_machine/src/lib.rs-12-
+crates/amun_state_machine/src/lib.rs-13-pub const TRANSITION_VERSION: u32 = 1;
+crates/amun_state_machine/src/lib.rs-14-pub const STATE_LAYOUT_VERSION: u32 = 1;
+crates/amun_state_machine/src/lib.rs-15-pub const RECEIPT_LAYOUT_VERSION: u32 = 1;
+crates/amun_state_machine/src/lib.rs-16-
+crates/amun_state_machine/src/lib.rs-17-pub use event::{Event, EventType};
+crates/amun_state_machine/src/lib.rs:18:pub use state::{ConstitutionalState, Account};
+crates/amun_state_machine/src/lib.rs-19-pub use transition::{TransitionEngine, TransitionResult};
+crates/amun_state_machine/src/lib.rs-20-pub use scheduler::DeterministicScheduler;
+crates/amun_state_machine/src/lib.rs-21-pub use log::{CausalLog, LogEntry};
+crates/amun_state_machine/src/lib.rs-22-pub use snapshot::{StateSnapshot, SnapshotManager};
+crates/amun_state_machine/src/lib.rs-23-pub use receipt::{ExecutionReceipt, ExecutionReceipts, ErrorCode};
+crates/amun_state_machine/src/lib.rs-24-pub use certification::{ExecutionCertificate, ReplayCertificate, compute_execution_fingerprint};
+crates/amun_state_machine/src/lib.rs-25-pub use ordering::CanonicalOrdering;
+--
+crates/amun_state_machine/src/event.rs-1-#![forbid(unsafe_code)]
+crates/amun_state_machine/src/event.rs-2-
+crates/amun_state_machine/src/event.rs-3-use sha2::{Sha256, Digest};
+crates/amun_state_machine/src/event.rs-4-
+crates/amun_state_machine/src/event.rs:5:/// Constitutional event types
+crates/amun_state_machine/src/event.rs-6-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+crates/amun_state_machine/src/event.rs-7-#[repr(u8)]
+crates/amun_state_machine/src/event.rs-8-pub enum EventType {
+crates/amun_state_machine/src/event.rs-9-    Transfer = 1,
+crates/amun_state_machine/src/event.rs-10-    Mint = 2,
+crates/amun_state_machine/src/event.rs-11-    Burn = 3,
+crates/amun_state_machine/src/event.rs-12-    Delegate = 4,
+crates/amun_state_machine/src/event.rs-13-    Undelegate = 5,
+--
+crates/amun_state_machine/src/event.rs-29-            5 => Some(Self::Undelegate),
+crates/amun_state_machine/src/event.rs-30-            6 => Some(Self::Slash),
+crates/amun_state_machine/src/event.rs-31-            7 => Some(Self::Reward),
+crates/amun_state_machine/src/event.rs-32-            _ => None,
+crates/amun_state_machine/src/event.rs-33-        }
+crates/amun_state_machine/src/event.rs-34-    }
+crates/amun_state_machine/src/event.rs-35-}
+crates/amun_state_machine/src/event.rs-36-
+crates/amun_state_machine/src/event.rs:37:/// Constitutional event with deterministic serialization
+crates/amun_state_machine/src/event.rs-38-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun_state_machine/src/event.rs-39-pub struct Event {
+crates/amun_state_machine/src/event.rs-40-    pub event_type: EventType,
+crates/amun_state_machine/src/event.rs-41-    pub source: u64,
+crates/amun_state_machine/src/event.rs-42-    pub target: u64,
+crates/amun_state_machine/src/event.rs-43-    pub amount: i64,
+crates/amun_state_machine/src/event.rs-44-    pub nonce: u64,
+crates/amun_state_machine/src/event.rs-45-}
+--
+crates/amun_state_machine/src/state.rs-1-#![forbid(unsafe_code)]
+crates/amun_state_machine/src/state.rs-2-
+crates/amun_state_machine/src/state.rs-3-use std::collections::BTreeMap;
+crates/amun_state_machine/src/state.rs-4-use sha2::{Sha256, Digest};
+crates/amun_state_machine/src/state.rs-5-use amun_consensus_math::Fixed;
+crates/amun_state_machine/src/state.rs-6-
+crates/amun_state_machine/src/state.rs:7:/// Constitutional account state
+crates/amun_state_machine/src/state.rs-8-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun_state_machine/src/state.rs-9-pub struct Account {
+crates/amun_state_machine/src/state.rs-10-    pub balance: Fixed,
+crates/amun_state_machine/src/state.rs-11-    pub delegated_to: Option<u64>,
+crates/amun_state_machine/src/state.rs-12-    pub delegation_amount: Fixed,
+crates/amun_state_machine/src/state.rs-13-    pub nonce: u64,
+crates/amun_state_machine/src/state.rs-14-}
+crates/amun_state_machine/src/state.rs-15-
+--
+crates/amun_state_machine/src/state.rs-31-            bytes.extend_from_slice(&to.to_be_bytes());
+crates/amun_state_machine/src/state.rs-32-        }
+crates/amun_state_machine/src/state.rs-33-        bytes.extend_from_slice(&self.delegation_amount.raw().to_be_bytes());
+crates/amun_state_machine/src/state.rs-34-        bytes.extend_from_slice(&self.nonce.to_be_bytes());
+crates/amun_state_machine/src/state.rs-35-        bytes
+crates/amun_state_machine/src/state.rs-36-    }
+crates/amun_state_machine/src/state.rs-37-}
+crates/amun_state_machine/src/state.rs-38-
+crates/amun_state_machine/src/state.rs:39:/// Constitutional state machine state
+crates/amun_state_machine/src/state.rs-40-#[derive(Debug, Clone)]
+crates/amun_state_machine/src/state.rs:41:pub struct ConstitutionalState {
+crates/amun_state_machine/src/state.rs-42-    pub accounts: BTreeMap<u64, Account>,
+crates/amun_state_machine/src/state.rs-43-    pub total_supply: Fixed,
+crates/amun_state_machine/src/state.rs-44-    pub height: u64,
+crates/amun_state_machine/src/state.rs-45-    pub state_hash: [u8; 32],
+crates/amun_state_machine/src/state.rs-46-}
+crates/amun_state_machine/src/state.rs-47-
+crates/amun_state_machine/src/state.rs:48:impl ConstitutionalState {
+crates/amun_state_machine/src/state.rs-49-    pub fn new() -> Self {
+crates/amun_state_machine/src/state.rs-50-        let mut state = Self {
+crates/amun_state_machine/src/state.rs-51-            accounts: BTreeMap::new(),
+crates/amun_state_machine/src/state.rs-52-            total_supply: Fixed::ZERO,
+crates/amun_state_machine/src/state.rs-53-            height: 0,
+crates/amun_state_machine/src/state.rs-54-            state_hash: [0; 32],
+crates/amun_state_machine/src/state.rs-55-        };
+crates/amun_state_machine/src/state.rs-56-        state.recompute_hash();
+--
+crates/amun_state_machine/src/state.rs-90-        self.state_hash = hasher.finalize().into();
+crates/amun_state_machine/src/state.rs-91-    }
+crates/amun_state_machine/src/state.rs-92-    
+crates/amun_state_machine/src/state.rs-93-    pub fn hash(&self) -> [u8; 32] {
+crates/amun_state_machine/src/state.rs-94-        self.state_hash
+crates/amun_state_machine/src/state.rs-95-    }
+crates/amun_state_machine/src/state.rs-96-}
+crates/amun_state_machine/src/state.rs-97-
+crates/amun_state_machine/src/state.rs:98:impl Default for ConstitutionalState {
+crates/amun_state_machine/src/state.rs-99-    fn default() -> Self {
+crates/amun_state_machine/src/state.rs-100-        Self::new()
+crates/amun_state_machine/src/state.rs-101-    }
+crates/amun_state_machine/src/state.rs-102-}
+crates/amun_state_machine/src/state.rs-103-
+crates/amun_state_machine/src/state.rs-104-#[cfg(test)]
+crates/amun_state_machine/src/state.rs-105-mod tests {
+crates/amun_state_machine/src/state.rs-106-    use super::*;
+crates/amun_state_machine/src/state.rs-107-    
+crates/amun_state_machine/src/state.rs-108-    #[test]
+crates/amun_state_machine/src/state.rs-109-    fn test_state_hash_deterministic() {
+crates/amun_state_machine/src/state.rs:110:        let mut state1 = ConstitutionalState::new();
+crates/amun_state_machine/src/state.rs-111-        state1.add_account(1, Fixed::ONE);
+crates/amun_state_machine/src/state.rs-112-        state1.add_account(2, Fixed::ONE);
+crates/amun_state_machine/src/state.rs-113-        let hash1 = state1.hash();
+crates/amun_state_machine/src/state.rs-114-        
+crates/amun_state_machine/src/state.rs:115:        let mut state2 = ConstitutionalState::new();
+crates/amun_state_machine/src/state.rs-116-        state2.add_account(1, Fixed::ONE);
+crates/amun_state_machine/src/state.rs-117-        state2.add_account(2, Fixed::ONE);
+crates/amun_state_machine/src/state.rs-118-        let hash2 = state2.hash();
+crates/amun_state_machine/src/state.rs-119-        
+crates/amun_state_machine/src/state.rs-120-        assert_eq!(hash1, hash2);
+crates/amun_state_machine/src/state.rs-121-    }
+crates/amun_state_machine/src/state.rs-122-}
+--
+crates/amun_state_machine/src/snapshot.rs-1-#![forbid(unsafe_code)]
+crates/amun_state_machine/src/snapshot.rs-2-
+crates/amun_state_machine/src/snapshot.rs-3-use sha2::{Sha256, Digest};
+crates/amun_state_machine/src/snapshot.rs:4:use crate::state::ConstitutionalState;
+crates/amun_state_machine/src/snapshot.rs-5-
+crates/amun_state_machine/src/snapshot.rs-6-/// Deterministic state snapshot
+crates/amun_state_machine/src/snapshot.rs-7-#[derive(Debug, Clone)]
+crates/amun_state_machine/src/snapshot.rs-8-pub struct StateSnapshot {
+crates/amun_state_machine/src/snapshot.rs-9-    pub height: u64,
+crates/amun_state_machine/src/snapshot.rs-10-    pub state_hash: [u8; 32],
+crates/amun_state_machine/src/snapshot.rs-11-    pub parent_snapshot_hash: [u8; 32],
+crates/amun_state_machine/src/snapshot.rs-12-    pub event_count: u64,
+crates/amun_state_machine/src/snapshot.rs-13-}
+crates/amun_state_machine/src/snapshot.rs-14-
+crates/amun_state_machine/src/snapshot.rs-15-impl StateSnapshot {
+crates/amun_state_machine/src/snapshot.rs:16:    pub fn new(state: &ConstitutionalState, parent_hash: [u8; 32], event_count: u64) -> Self {
+crates/amun_state_machine/src/snapshot.rs-17-        Self {
+crates/amun_state_machine/src/snapshot.rs-18-            height: state.height,
+crates/amun_state_machine/src/snapshot.rs-19-            state_hash: state.hash(),
+crates/amun_state_machine/src/snapshot.rs-20-            parent_snapshot_hash: parent_hash,
+crates/amun_state_machine/src/snapshot.rs-21-            event_count,
+crates/amun_state_machine/src/snapshot.rs-22-        }
+crates/amun_state_machine/src/snapshot.rs-23-    }
+crates/amun_state_machine/src/snapshot.rs-24-    
+--
+crates/amun_state_machine/src/snapshot.rs-44-
+crates/amun_state_machine/src/snapshot.rs-45-impl SnapshotManager {
+crates/amun_state_machine/src/snapshot.rs-46-    pub fn new() -> Self {
+crates/amun_state_machine/src/snapshot.rs-47-        Self {
+crates/amun_state_machine/src/snapshot.rs-48-            snapshots: Vec::new(),
+crates/amun_state_machine/src/snapshot.rs-49-        }
+crates/amun_state_machine/src/snapshot.rs-50-    }
+crates/amun_state_machine/src/snapshot.rs-51-    
+crates/amun_state_machine/src/snapshot.rs:52:    pub fn take_snapshot(&mut self, state: &ConstitutionalState, event_count: u64) -> StateSnapshot {
+crates/amun_state_machine/src/snapshot.rs-53-        let parent_hash = self.snapshots.last().map_or([0; 32], |s| s.snapshot_hash());
+crates/amun_state_machine/src/snapshot.rs-54-        let snapshot = StateSnapshot::new(state, parent_hash, event_count);
+crates/amun_state_machine/src/snapshot.rs-55-        self.snapshots.push(snapshot.clone());
+crates/amun_state_machine/src/snapshot.rs-56-        snapshot
+crates/amun_state_machine/src/snapshot.rs-57-    }
+crates/amun_state_machine/src/snapshot.rs-58-    
+crates/amun_state_machine/src/snapshot.rs-59-    pub fn get_snapshot(&self, height: u64) -> Option<&StateSnapshot> {
+crates/amun_state_machine/src/snapshot.rs-60-        self.snapshots.iter().find(|s| s.height == height)
+--
+crates/amun_state_machine/src/snapshot.rs-86-    fn default() -> Self {
+crates/amun_state_machine/src/snapshot.rs-87-        Self::new()
+crates/amun_state_machine/src/snapshot.rs-88-    }
+crates/amun_state_machine/src/snapshot.rs-89-}
+crates/amun_state_machine/src/snapshot.rs-90-
+crates/amun_state_machine/src/snapshot.rs-91-#[cfg(test)]
+crates/amun_state_machine/src/snapshot.rs-92-mod tests {
+crates/amun_state_machine/src/snapshot.rs-93-    use super::*;
+crates/amun_state_machine/src/snapshot.rs:94:    use crate::state::ConstitutionalState;
+crates/amun_state_machine/src/snapshot.rs-95-    
+crates/amun_state_machine/src/snapshot.rs-96-    #[test]
+crates/amun_state_machine/src/snapshot.rs-97-    fn test_snapshot_chain() {
+crates/amun_state_machine/src/snapshot.rs-98-        let mut manager = SnapshotManager::new();
+crates/amun_state_machine/src/snapshot.rs:99:        let state = ConstitutionalState::new();
+crates/amun_state_machine/src/snapshot.rs-100-        
+crates/amun_state_machine/src/snapshot.rs-101-        let snap1 = manager.take_snapshot(&state, 0);
+crates/amun_state_machine/src/snapshot.rs-102-        let snap2 = manager.take_snapshot(&state, 10);
+crates/amun_state_machine/src/snapshot.rs-103-        
+crates/amun_state_machine/src/snapshot.rs-104-        assert!(snap2.verify_chain(&snap1));
+crates/amun_state_machine/src/snapshot.rs-105-        assert!(manager.verify_all());
+crates/amun_state_machine/src/snapshot.rs-106-    }
+crates/amun_state_machine/src/snapshot.rs-107-}
+--
+crates/amun_state_machine/src/scheduler.rs-1-#![forbid(unsafe_code)]
+crates/amun_state_machine/src/scheduler.rs-2-
+crates/amun_state_machine/src/scheduler.rs-3-use std::collections::VecDeque;
+crates/amun_state_machine/src/scheduler.rs-4-use sha2::{Sha256, Digest};
+crates/amun_state_machine/src/scheduler.rs-5-use crate::event::Event;
+crates/amun_state_machine/src/scheduler.rs:6:use crate::state::ConstitutionalState;
+crates/amun_state_machine/src/scheduler.rs-7-use crate::transition::TransitionEngine;
+crates/amun_state_machine/src/scheduler.rs-8-
+crates/amun_state_machine/src/scheduler.rs-9-/// Deterministic event scheduler
+crates/amun_state_machine/src/scheduler.rs-10-pub struct DeterministicScheduler {
+crates/amun_state_machine/src/scheduler.rs-11-    queue: VecDeque<Event>,
+crates/amun_state_machine/src/scheduler.rs-12-    executed_hashes: Vec<[u8; 32]>,
+crates/amun_state_machine/src/scheduler.rs-13-}
+crates/amun_state_machine/src/scheduler.rs-14-
+--
+crates/amun_state_machine/src/scheduler.rs-25-    }
+crates/amun_state_machine/src/scheduler.rs-26-    
+crates/amun_state_machine/src/scheduler.rs-27-    pub fn push_many(&mut self, events: Vec<Event>) {
+crates/amun_state_machine/src/scheduler.rs-28-        for event in events {
+crates/amun_state_machine/src/scheduler.rs-29-            self.queue.push_back(event);
+crates/amun_state_machine/src/scheduler.rs-30-        }
+crates/amun_state_machine/src/scheduler.rs-31-    }
+crates/amun_state_machine/src/scheduler.rs-32-    
+crates/amun_state_machine/src/scheduler.rs:33:    pub fn execute_next(&mut self, state: &mut ConstitutionalState) -> Option<[u8; 32]> {
+crates/amun_state_machine/src/scheduler.rs-34-        let event = self.queue.pop_front()?;
+crates/amun_state_machine/src/scheduler.rs-35-        let pre_hash = state.hash();
+crates/amun_state_machine/src/scheduler.rs-36-        let result = TransitionEngine::apply(state, &event);
+crates/amun_state_machine/src/scheduler.rs-37-        
+crates/amun_state_machine/src/scheduler.rs-38-        if result.success {
+crates/amun_state_machine/src/scheduler.rs-39-            let post_hash = state.hash();
+crates/amun_state_machine/src/scheduler.rs-40-            self.executed_hashes.push(post_hash);
+crates/amun_state_machine/src/scheduler.rs-41-            self._log_execution(&event, pre_hash, post_hash, true);
+crates/amun_state_machine/src/scheduler.rs-42-            Some(post_hash)
+crates/amun_state_machine/src/scheduler.rs-43-        } else {
+crates/amun_state_machine/src/scheduler.rs-44-            self._log_execution(&event, pre_hash, state.hash(), false);
+crates/amun_state_machine/src/scheduler.rs-45-            None
+crates/amun_state_machine/src/scheduler.rs-46-        }
+crates/amun_state_machine/src/scheduler.rs-47-    }
+crates/amun_state_machine/src/scheduler.rs-48-    
+crates/amun_state_machine/src/scheduler.rs:49:    pub fn execute_all(&mut self, state: &mut ConstitutionalState) -> usize {
+crates/amun_state_machine/src/scheduler.rs-50-        let mut count = 0;
+crates/amun_state_machine/src/scheduler.rs-51-        while self.execute_next(state).is_some() {
+crates/amun_state_machine/src/scheduler.rs-52-            count += 1;
+crates/amun_state_machine/src/scheduler.rs-53-        }
+crates/amun_state_machine/src/scheduler.rs-54-        count
+crates/amun_state_machine/src/scheduler.rs-55-    }
+crates/amun_state_machine/src/scheduler.rs-56-    
+crates/amun_state_machine/src/scheduler.rs-57-    pub fn execution_trace_hash(&self) -> [u8; 32] {
+--
+crates/amun_state_machine/src/scheduler.rs-90-#[cfg(test)]
+crates/amun_state_machine/src/scheduler.rs-91-mod tests {
+crates/amun_state_machine/src/scheduler.rs-92-    use super::*;
+crates/amun_state_machine/src/scheduler.rs-93-    use amun_consensus_math::Fixed;
+crates/amun_state_machine/src/scheduler.rs-94-    use crate::event::EventType;
+crates/amun_state_machine/src/scheduler.rs-95-    
+crates/amun_state_machine/src/scheduler.rs-96-    #[test]
+crates/amun_state_machine/src/scheduler.rs-97-    fn test_scheduler_deterministic() {
+crates/amun_state_machine/src/scheduler.rs:98:        let mut state1 = ConstitutionalState::new();
+crates/amun_state_machine/src/scheduler.rs-99-        state1.add_account(1, Fixed::from_int(100));
+crates/amun_state_machine/src/scheduler.rs-100-        state1.add_account(2, Fixed::from_int(0));
+crates/amun_state_machine/src/scheduler.rs-101-        
+crates/amun_state_machine/src/scheduler.rs-102-        let mut scheduler1 = DeterministicScheduler::new();
+crates/amun_state_machine/src/scheduler.rs-103-        scheduler1.push(Event::new(EventType::Transfer, 1, 2, Fixed::from_int(30).raw(), 0));
+crates/amun_state_machine/src/scheduler.rs-104-        scheduler1.execute_all(&mut state1);
+crates/amun_state_machine/src/scheduler.rs-105-        
+crates/amun_state_machine/src/scheduler.rs:106:        let mut state2 = ConstitutionalState::new();
+crates/amun_state_machine/src/scheduler.rs-107-        state2.add_account(1, Fixed::from_int(100));
+crates/amun_state_machine/src/scheduler.rs-108-        state2.add_account(2, Fixed::from_int(0));
+crates/amun_state_machine/src/scheduler.rs-109-        
+crates/amun_state_machine/src/scheduler.rs-110-        let mut scheduler2 = DeterministicScheduler::new();
+crates/amun_state_machine/src/scheduler.rs-111-        scheduler2.push(Event::new(EventType::Transfer, 1, 2, Fixed::from_int(30).raw(), 0));
+crates/amun_state_machine/src/scheduler.rs-112-        scheduler2.execute_all(&mut state2);
+crates/amun_state_machine/src/scheduler.rs-113-        
+crates/amun_state_machine/src/scheduler.rs-114-        assert_eq!(state1.hash(), state2.hash());
+--
+crates/amun_state_machine/src/ordering.rs-1-#![forbid(unsafe_code)]
+crates/amun_state_machine/src/ordering.rs-2-
+crates/amun_state_machine/src/ordering.rs:3://! Canonical Ordering Constitution
+crates/amun_state_machine/src/ordering.rs-4-//! 
+crates/amun_state_machine/src/ordering.rs-5-//! Defines deterministic ordering for all events in a block.
+crates/amun_state_machine/src/ordering.rs-6-//! Without this, identical block contents can produce different state roots.
+crates/amun_state_machine/src/ordering.rs-7-
+crates/amun_state_machine/src/ordering.rs-8-use crate::event::Event;
+crates/amun_state_machine/src/ordering.rs-9-use crate::event::EventType;
+crates/amun_state_machine/src/ordering.rs-10-
+crates/amun_state_machine/src/ordering.rs-11-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+--
+crates/amun-handle-resolver/src/handle_resolver.rs:1:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-handle-resolver/src/handle_resolver.rs-2-use amun_resource_core::{ResourceId, ResourceState};
+crates/amun-handle-resolver/src/handle_resolver.rs-3-use amun_vm_kernel::pending_buffer::{Handle, PendingBuffer};
+crates/amun-handle-resolver/src/handle_resolver.rs-4-use std::collections::HashSet;
+crates/amun-handle-resolver/src/handle_resolver.rs-5-
+crates/amun-handle-resolver/src/handle_resolver.rs-6-/// Resolves handles to ResourceIds and validates reachability.
+crates/amun-handle-resolver/src/handle_resolver.rs-7-/// Implements the reachability rule from N48.5-E Section 5.3.
+crates/amun-handle-resolver/src/handle_resolver.rs-8-pub struct HandleResolver;
+crates/amun-handle-resolver/src/handle_resolver.rs-9-
+crates/amun-handle-resolver/src/handle_resolver.rs-10-impl HandleResolver {
+crates/amun-handle-resolver/src/handle_resolver.rs-11-    /// Validate that every produced resource is reachable from at least
+crates/amun-handle-resolver/src/handle_resolver.rs-12-    /// one entry point.  Returns evidence for unreachable resources.
+crates/amun-handle-resolver/src/handle_resolver.rs-13-    pub fn detect_leaks(
+crates/amun-handle-resolver/src/handle_resolver.rs-14-        buffer: &PendingBuffer,
+crates/amun-handle-resolver/src/handle_resolver.rs-15-        contract_id: ResourceId,
+crates/amun-handle-resolver/src/handle_resolver.rs-16-        block_height: u64,
+crates/amun-handle-resolver/src/handle_resolver.rs-17-        transaction_hash: [u8; 32],
+crates/amun-handle-resolver/src/handle_resolver.rs:18:    ) -> (bool, Vec<ConstitutionalEvidence>) {
+crates/amun-handle-resolver/src/handle_resolver.rs-19-        let produced = buffer.produced_resources();
+crates/amun-handle-resolver/src/handle_resolver.rs-20-        let consumed = buffer.consumed_handles();
+crates/amun-handle-resolver/src/handle_resolver.rs-21-
+crates/amun-handle-resolver/src/handle_resolver.rs-22-        let active_set: HashSet<ResourceId> = produced
+crates/amun-handle-resolver/src/handle_resolver.rs-23-            .iter()
+crates/amun-handle-resolver/src/handle_resolver.rs-24-            .filter(|m| matches!(m.state, ResourceState::Active))
+crates/amun-handle-resolver/src/handle_resolver.rs-25-            .map(|m| m.resource_id)
+crates/amun-handle-resolver/src/handle_resolver.rs-26-            .collect();
+--
+crates/amun-handle-resolver/src/handle_resolver.rs-50-            let id = meta.resource_id;
+crates/amun-handle-resolver/src/handle_resolver.rs-51-            let reachable = active_set.contains(&id)
+crates/amun-handle-resolver/src/handle_resolver.rs-52-                || archived_set.contains(&id)
+crates/amun-handle-resolver/src/handle_resolver.rs-53-                || revoked_set.contains(&id)
+crates/amun-handle-resolver/src/handle_resolver.rs-54-                || transferred_set.contains(&id)
+crates/amun-handle-resolver/src/handle_resolver.rs-55-                || consumed_ids.contains(&id);
+crates/amun-handle-resolver/src/handle_resolver.rs-56-
+crates/amun-handle-resolver/src/handle_resolver.rs-57-            if !reachable {
+crates/amun-handle-resolver/src/handle_resolver.rs:58:                leaks.push(ConstitutionalEvidence::ExecutionFailure {
+crates/amun-handle-resolver/src/handle_resolver.rs-59-                    reason: format!("unreachable resource: {}", id),
+crates/amun-handle-resolver/src/handle_resolver.rs-60-                    contract_id,
+crates/amun-handle-resolver/src/handle_resolver.rs-61-                    block_height,
+crates/amun-handle-resolver/src/handle_resolver.rs-62-                    transaction_hash,
+crates/amun-handle-resolver/src/handle_resolver.rs-63-                    gas_consumed: 0,
+crates/amun-handle-resolver/src/handle_resolver.rs-64-                });
+crates/amun-handle-resolver/src/handle_resolver.rs-65-            }
+crates/amun-handle-resolver/src/handle_resolver.rs-66-        }
+--
+crates/amun-handle-resolver/src/handle_resolver.rs-72-    /// as an INPUT to an operation) must not be used as an INPUT again
+crates/amun-handle-resolver/src/handle_resolver.rs-73-    /// in any later operation.  Output handles are tracked as they are
+crates/amun-handle-resolver/src/handle_resolver.rs-74-    /// produced by operations and may be consumed by subsequent ones.
+crates/amun-handle-resolver/src/handle_resolver.rs-75-    pub fn validate_handle_safety(
+crates/amun-handle-resolver/src/handle_resolver.rs-76-        buffer: &PendingBuffer,
+crates/amun-handle-resolver/src/handle_resolver.rs-77-        contract_id: ResourceId,
+crates/amun-handle-resolver/src/handle_resolver.rs-78-        block_height: u64,
+crates/amun-handle-resolver/src/handle_resolver.rs-79-        transaction_hash: [u8; 32],
+crates/amun-handle-resolver/src/handle_resolver.rs:80:    ) -> (bool, Vec<ConstitutionalEvidence>) {
+crates/amun-handle-resolver/src/handle_resolver.rs-81-        let operations = buffer.operation_log();
+crates/amun-handle-resolver/src/handle_resolver.rs-82-        // Track handles that have been consumed (used as input) — cannot
+crates/amun-handle-resolver/src/handle_resolver.rs-83-        // appear as input again.
+crates/amun-handle-resolver/src/handle_resolver.rs-84-        let mut consumed_inputs: HashSet<Handle> = HashSet::new();
+crates/amun-handle-resolver/src/handle_resolver.rs-85-        // Track handles that exist (pre-state or produced) — can be used
+crates/amun-handle-resolver/src/handle_resolver.rs-86-        // as input if not already consumed.
+crates/amun-handle-resolver/src/handle_resolver.rs-87-        let mut available_outputs: HashSet<Handle> = HashSet::new();
+crates/amun-handle-resolver/src/handle_resolver.rs-88-        // Pre-state handles 0..N are available
+--
+crates/amun-handle-resolver/src/handle_resolver.rs-90-        // Actually, simpler: all handles from 0 to first_produced-1 are pre-state.
+crates/amun-handle-resolver/src/handle_resolver.rs-91-        // Let's just track produced outputs and allow pre-state handles.
+crates/amun-handle-resolver/src/handle_resolver.rs-92-        let mut violations = Vec::new();
+crates/amun-handle-resolver/src/handle_resolver.rs-93-
+crates/amun-handle-resolver/src/handle_resolver.rs-94-        for op in &operations {
+crates/amun-handle-resolver/src/handle_resolver.rs-95-            // Check inputs: must not have been consumed before
+crates/amun-handle-resolver/src/handle_resolver.rs-96-            for input in &op.inputs {
+crates/amun-handle-resolver/src/handle_resolver.rs-97-                if consumed_inputs.contains(input) {
+crates/amun-handle-resolver/src/handle_resolver.rs:98:                    violations.push(ConstitutionalEvidence::ExecutionFailure {
+crates/amun-handle-resolver/src/handle_resolver.rs-99-                        reason: format!(
+crates/amun-handle-resolver/src/handle_resolver.rs-100-                            "invalid handle usage: handle {} already consumed before operation {}",
+crates/amun-handle-resolver/src/handle_resolver.rs-101-                            input, op.opcode
+crates/amun-handle-resolver/src/handle_resolver.rs-102-                        ),
+crates/amun-handle-resolver/src/handle_resolver.rs-103-                        contract_id,
+crates/amun-handle-resolver/src/handle_resolver.rs-104-                        block_height,
+crates/amun-handle-resolver/src/handle_resolver.rs-105-                        transaction_hash,
+crates/amun-handle-resolver/src/handle_resolver.rs-106-                        gas_consumed: 0,
+--
+crates/amun-handle-resolver/src/handle_resolver.rs-175-        buffer.record_operation("OP_TRANSFORM", vec![0], vec![1]);
+crates/amun-handle-resolver/src/handle_resolver.rs-176-        // Op 2: tries to consume handle 0 again — already consumed
+crates/amun-handle-resolver/src/handle_resolver.rs-177-        buffer.record_operation("OP_TRANSFORM", vec![0], vec![2]);
+crates/amun-handle-resolver/src/handle_resolver.rs-178-        let (safe, violations) =
+crates/amun-handle-resolver/src/handle_resolver.rs-179-            HandleResolver::validate_handle_safety(&buffer, make_id(99), 1, [0xdd; 32]);
+crates/amun-handle-resolver/src/handle_resolver.rs-180-        assert!(!safe, "Expected violation, but got safe");
+crates/amun-handle-resolver/src/handle_resolver.rs-181-        assert_eq!(violations.len(), 1);
+crates/amun-handle-resolver/src/handle_resolver.rs-182-        match &violations[0] {
+crates/amun-handle-resolver/src/handle_resolver.rs:183:            ConstitutionalEvidence::ExecutionFailure { reason, .. } => {
+crates/amun-handle-resolver/src/handle_resolver.rs-184-                assert!(reason.contains("already consumed"));
+crates/amun-handle-resolver/src/handle_resolver.rs-185-            }
+crates/amun-handle-resolver/src/handle_resolver.rs-186-            _ => panic!("Expected ExecutionFailure"),
+crates/amun-handle-resolver/src/handle_resolver.rs-187-        }
+crates/amun-handle-resolver/src/handle_resolver.rs-188-    }
+crates/amun-handle-resolver/src/handle_resolver.rs-189-
+crates/amun-handle-resolver/src/handle_resolver.rs-190-    #[test]
+crates/amun-handle-resolver/src/handle_resolver.rs-191-    fn w9_empty_buffer_no_violations() {
+--
+crates/amun-codec/src/writer.rs-1-// Panic-free canonical writer. ALL methods return WriteResult.
+crates/amun-codec/src/writer.rs-2-// ShadowBufferWriter provides transactional writes with rollback.
+crates/amun-codec/src/writer.rs-3-
+crates/amun-codec/src/writer.rs:4:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/writer.rs-5-
+crates/amun-codec/src/writer.rs-6-pub type WriteResult = AmunResult<()>;
+crates/amun-codec/src/writer.rs-7-
+crates/amun-codec/src/writer.rs-8-pub trait CanonicalWriter {
+crates/amun-codec/src/writer.rs-9-    fn write_bytes(&mut self, bytes: &[u8]) -> WriteResult;
+crates/amun-codec/src/writer.rs-10-    fn position(&self) -> usize;
+crates/amun-codec/src/writer.rs-11-}
+crates/amun-codec/src/writer.rs-12-
+--
+crates/amun-codec/src/writer.rs-36-        &mut self.buf[..self.pos]
+crates/amun-codec/src/writer.rs-37-    }
+crates/amun-codec/src/writer.rs-38-}
+crates/amun-codec/src/writer.rs-39-
+crates/amun-codec/src/writer.rs-40-impl<'a> CanonicalWriter for BufferWriter<'a> {
+crates/amun-codec/src/writer.rs-41-    fn write_bytes(&mut self, bytes: &[u8]) -> WriteResult {
+crates/amun-codec/src/writer.rs-42-        let end = self.pos.checked_add(bytes.len()).ok_or_else(|| {
+crates/amun-codec/src/writer.rs-43-            FailureContext::new(
+crates/amun-codec/src/writer.rs:44:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-codec/src/writer.rs-45-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/writer.rs-46-                operation_ids::BUFFER_WRITE,
+crates/amun-codec/src/writer.rs-47-            )
+crates/amun-codec/src/writer.rs-48-        })?;
+crates/amun-codec/src/writer.rs-49-        if end > self.buf.len() {
+crates/amun-codec/src/writer.rs-50-            return Err(FailureContext::new(
+crates/amun-codec/src/writer.rs:51:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs-52-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/writer.rs-53-                operation_ids::BUFFER_WRITE,
+crates/amun-codec/src/writer.rs-54-            ));
+crates/amun-codec/src/writer.rs-55-        }
+crates/amun-codec/src/writer.rs-56-        self.buf[self.pos..end].copy_from_slice(bytes);
+crates/amun-codec/src/writer.rs-57-        self.pos = end;
+crates/amun-codec/src/writer.rs-58-        Ok(())
+crates/amun-codec/src/writer.rs-59-    }
+--
+crates/amun-codec/src/writer.rs-73-    }
+crates/amun-codec/src/writer.rs-74-}
+crates/amun-codec/src/writer.rs-75-
+crates/amun-codec/src/writer.rs-76-impl<'a> CanonicalWriter for HasherWriter<'a> {
+crates/amun-codec/src/writer.rs-77-    fn write_bytes(&mut self, bytes: &[u8]) -> WriteResult {
+crates/amun-codec/src/writer.rs-78-        self.hasher.update(bytes);
+crates/amun-codec/src/writer.rs-79-        self.pos = self.pos.checked_add(bytes.len()).ok_or_else(|| {
+crates/amun-codec/src/writer.rs-80-            FailureContext::new(
+crates/amun-codec/src/writer.rs:81:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-codec/src/writer.rs-82-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/writer.rs-83-                operation_ids::HASHER_WRITE,
+crates/amun-codec/src/writer.rs-84-            )
+crates/amun-codec/src/writer.rs-85-        })?;
+crates/amun-codec/src/writer.rs-86-        Ok(())
+crates/amun-codec/src/writer.rs-87-    }
+crates/amun-codec/src/writer.rs-88-    fn position(&self) -> usize {
+crates/amun-codec/src/writer.rs-89-        self.pos
+--
+crates/amun-codec/src/writer.rs-107-            shadow_pos: 0,
+crates/amun-codec/src/writer.rs-108-            in_transaction: false,
+crates/amun-codec/src/writer.rs-109-        }
+crates/amun-codec/src/writer.rs-110-    }
+crates/amun-codec/src/writer.rs-111-
+crates/amun-codec/src/writer.rs-112-    pub fn begin_transaction(&mut self) -> WriteResult {
+crates/amun-codec/src/writer.rs-113-        if self.in_transaction {
+crates/amun-codec/src/writer.rs-114-            return Err(FailureContext::new(
+crates/amun-codec/src/writer.rs:115:                ConstitutionalFault::InvalidStateTransition,
+crates/amun-codec/src/writer.rs-116-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/writer.rs-117-                operation_ids::TRANSACTION_BEGIN,
+crates/amun-codec/src/writer.rs-118-            ));
+crates/amun-codec/src/writer.rs-119-        }
+crates/amun-codec/src/writer.rs-120-        self.in_transaction = true;
+crates/amun-codec/src/writer.rs-121-        self.shadow_pos = 0;
+crates/amun-codec/src/writer.rs-122-        Ok(())
+crates/amun-codec/src/writer.rs-123-    }
+crates/amun-codec/src/writer.rs-124-
+crates/amun-codec/src/writer.rs-125-    pub fn commit_transaction(&mut self) -> WriteResult {
+crates/amun-codec/src/writer.rs-126-        if !self.in_transaction {
+crates/amun-codec/src/writer.rs-127-            return Err(FailureContext::new(
+crates/amun-codec/src/writer.rs:128:                ConstitutionalFault::InvalidStateTransition,
+crates/amun-codec/src/writer.rs-129-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/writer.rs-130-                operation_ids::TRANSACTION_COMMIT,
+crates/amun-codec/src/writer.rs-131-            ));
+crates/amun-codec/src/writer.rs-132-        }
+crates/amun-codec/src/writer.rs-133-        let end = self.main_pos + self.shadow_pos;
+crates/amun-codec/src/writer.rs-134-        if end > self.main.len() {
+crates/amun-codec/src/writer.rs-135-            return Err(FailureContext::new(
+crates/amun-codec/src/writer.rs:136:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs-137-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/writer.rs-138-                operation_ids::TRANSACTION_COMMIT,
+crates/amun-codec/src/writer.rs-139-            ));
+crates/amun-codec/src/writer.rs-140-        }
+crates/amun-codec/src/writer.rs-141-        self.main[self.main_pos..end].copy_from_slice(&self.shadow[..self.shadow_pos]);
+crates/amun-codec/src/writer.rs-142-        self.main_pos = end;
+crates/amun-codec/src/writer.rs-143-        self.in_transaction = false;
+crates/amun-codec/src/writer.rs-144-        self.shadow[..self.shadow_pos].fill(0);
+--
+crates/amun-codec/src/writer.rs-158-}
+crates/amun-codec/src/writer.rs-159-
+crates/amun-codec/src/writer.rs-160-impl<'a> CanonicalWriter for ShadowBufferWriter<'a> {
+crates/amun-codec/src/writer.rs-161-    fn write_bytes(&mut self, bytes: &[u8]) -> WriteResult {
+crates/amun-codec/src/writer.rs-162-        if self.in_transaction {
+crates/amun-codec/src/writer.rs-163-            let end = self.shadow_pos + bytes.len();
+crates/amun-codec/src/writer.rs-164-            if end > self.shadow.len() {
+crates/amun-codec/src/writer.rs-165-                return Err(FailureContext::new(
+crates/amun-codec/src/writer.rs:166:                    ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs-167-                    module_ids::AMUN_CODEC,
+crates/amun-codec/src/writer.rs-168-                    operation_ids::SHADOW_WRITE,
+crates/amun-codec/src/writer.rs-169-                ));
+crates/amun-codec/src/writer.rs-170-            }
+crates/amun-codec/src/writer.rs-171-            self.shadow[self.shadow_pos..end].copy_from_slice(bytes);
+crates/amun-codec/src/writer.rs-172-            self.shadow_pos = end;
+crates/amun-codec/src/writer.rs-173-        } else {
+crates/amun-codec/src/writer.rs-174-            let end = self.main_pos + bytes.len();
+crates/amun-codec/src/writer.rs-175-            if end > self.main.len() {
+crates/amun-codec/src/writer.rs-176-                return Err(FailureContext::new(
+crates/amun-codec/src/writer.rs:177:                    ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs-178-                    module_ids::AMUN_CODEC,
+crates/amun-codec/src/writer.rs-179-                    operation_ids::BUFFER_WRITE,
+crates/amun-codec/src/writer.rs-180-                ));
+crates/amun-codec/src/writer.rs-181-            }
+crates/amun-codec/src/writer.rs-182-            self.main[self.main_pos..end].copy_from_slice(bytes);
+crates/amun-codec/src/writer.rs-183-            self.main_pos = end;
+crates/amun-codec/src/writer.rs-184-        }
+crates/amun-codec/src/writer.rs-185-        Ok(())
+--
+crates/amun-codec/src/decode.rs:1:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/decode.rs-2-use amun_kernel_types::{
+crates/amun-codec/src/decode.rs-3-    Amount, BlockHeight, ChainId, Epoch, Gas, Nonce, PublicKey, Round, Signature, ValidatorId,
+crates/amun-codec/src/decode.rs-4-};
+crates/amun-codec/src/decode.rs-5-
+crates/amun-codec/src/decode.rs-6-pub trait CanonicalDecode: Sized {
+crates/amun-codec/src/decode.rs-7-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)>;
+crates/amun-codec/src/decode.rs-8-
+crates/amun-codec/src/decode.rs-9-    fn decode_exact(input: &[u8]) -> AmunResult<Self> {
+crates/amun-codec/src/decode.rs-10-        let (value, consumed) = Self::decode(input)?;
+crates/amun-codec/src/decode.rs-11-        if consumed != input.len() {
+crates/amun-codec/src/decode.rs-12-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:13:                ConstitutionalFault::TrailingBytesDetected,
+crates/amun-codec/src/decode.rs-14-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-15-                operation_ids::DECODE_EXACT,
+crates/amun-codec/src/decode.rs-16-            ));
+crates/amun-codec/src/decode.rs-17-        }
+crates/amun-codec/src/decode.rs-18-        Ok(value)
+crates/amun-codec/src/decode.rs-19-    }
+crates/amun-codec/src/decode.rs-20-}
+crates/amun-codec/src/decode.rs-21-
+crates/amun-codec/src/decode.rs-22-impl CanonicalDecode for u8 {
+crates/amun-codec/src/decode.rs-23-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-24-        if input.is_empty() {
+crates/amun-codec/src/decode.rs-25-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:26:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-27-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-28-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-29-            ));
+crates/amun-codec/src/decode.rs-30-        }
+crates/amun-codec/src/decode.rs-31-        Ok((input[0], 1))
+crates/amun-codec/src/decode.rs-32-    }
+crates/amun-codec/src/decode.rs-33-}
+crates/amun-codec/src/decode.rs-34-
+crates/amun-codec/src/decode.rs-35-impl CanonicalDecode for u16 {
+crates/amun-codec/src/decode.rs-36-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-37-        if input.len() < 2 {
+crates/amun-codec/src/decode.rs-38-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:39:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-40-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-41-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-42-            ));
+crates/amun-codec/src/decode.rs-43-        }
+crates/amun-codec/src/decode.rs-44-        Ok((u16::from_le_bytes([input[0], input[1]]), 2))
+crates/amun-codec/src/decode.rs-45-    }
+crates/amun-codec/src/decode.rs-46-}
+crates/amun-codec/src/decode.rs-47-
+crates/amun-codec/src/decode.rs-48-impl CanonicalDecode for u32 {
+crates/amun-codec/src/decode.rs-49-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-50-        if input.len() < 4 {
+crates/amun-codec/src/decode.rs-51-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:52:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-53-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-54-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-55-            ));
+crates/amun-codec/src/decode.rs-56-        }
+crates/amun-codec/src/decode.rs-57-        let mut bytes = [0u8; 4];
+crates/amun-codec/src/decode.rs-58-        bytes.copy_from_slice(&input[..4]);
+crates/amun-codec/src/decode.rs-59-        Ok((u32::from_le_bytes(bytes), 4))
+crates/amun-codec/src/decode.rs-60-    }
+crates/amun-codec/src/decode.rs-61-}
+crates/amun-codec/src/decode.rs-62-
+crates/amun-codec/src/decode.rs-63-impl CanonicalDecode for u64 {
+crates/amun-codec/src/decode.rs-64-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-65-        if input.len() < 8 {
+crates/amun-codec/src/decode.rs-66-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:67:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-68-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-69-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-70-            ));
+crates/amun-codec/src/decode.rs-71-        }
+crates/amun-codec/src/decode.rs-72-        let mut bytes = [0u8; 8];
+crates/amun-codec/src/decode.rs-73-        bytes.copy_from_slice(&input[..8]);
+crates/amun-codec/src/decode.rs-74-        Ok((u64::from_le_bytes(bytes), 8))
+crates/amun-codec/src/decode.rs-75-    }
+crates/amun-codec/src/decode.rs-76-}
+crates/amun-codec/src/decode.rs-77-
+crates/amun-codec/src/decode.rs-78-impl CanonicalDecode for u128 {
+crates/amun-codec/src/decode.rs-79-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-80-        if input.len() < 16 {
+crates/amun-codec/src/decode.rs-81-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:82:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-83-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-84-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-85-            ));
+crates/amun-codec/src/decode.rs-86-        }
+crates/amun-codec/src/decode.rs-87-        let mut bytes = [0u8; 16];
+crates/amun-codec/src/decode.rs-88-        bytes.copy_from_slice(&input[..16]);
+crates/amun-codec/src/decode.rs-89-        Ok((u128::from_le_bytes(bytes), 16))
+crates/amun-codec/src/decode.rs-90-    }
+crates/amun-codec/src/decode.rs-91-}
+crates/amun-codec/src/decode.rs-92-
+crates/amun-codec/src/decode.rs-93-impl CanonicalDecode for [u8; 32] {
+crates/amun-codec/src/decode.rs-94-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-95-        if input.len() < 32 {
+crates/amun-codec/src/decode.rs-96-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:97:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-98-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-99-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-100-            ));
+crates/amun-codec/src/decode.rs-101-        }
+crates/amun-codec/src/decode.rs-102-        let mut bytes = [0u8; 32];
+crates/amun-codec/src/decode.rs-103-        bytes.copy_from_slice(&input[..32]);
+crates/amun-codec/src/decode.rs-104-        Ok((bytes, 32))
+crates/amun-codec/src/decode.rs-105-    }
+crates/amun-codec/src/decode.rs-106-}
+crates/amun-codec/src/decode.rs-107-
+crates/amun-codec/src/decode.rs-108-impl CanonicalDecode for [u8; 48] {
+crates/amun-codec/src/decode.rs-109-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-110-        if input.len() < 48 {
+crates/amun-codec/src/decode.rs-111-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:112:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-113-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-114-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-115-            ));
+crates/amun-codec/src/decode.rs-116-        }
+crates/amun-codec/src/decode.rs-117-        let mut bytes = [0u8; 48];
+crates/amun-codec/src/decode.rs-118-        bytes.copy_from_slice(&input[..48]);
+crates/amun-codec/src/decode.rs-119-        Ok((bytes, 48))
+crates/amun-codec/src/decode.rs-120-    }
+crates/amun-codec/src/decode.rs-121-}
+crates/amun-codec/src/decode.rs-122-
+crates/amun-codec/src/decode.rs-123-impl CanonicalDecode for [u8; 96] {
+crates/amun-codec/src/decode.rs-124-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-125-        if input.len() < 96 {
+crates/amun-codec/src/decode.rs-126-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:127:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-128-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-129-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-130-            ));
+crates/amun-codec/src/decode.rs-131-        }
+crates/amun-codec/src/decode.rs-132-        let mut bytes = [0u8; 96];
+crates/amun-codec/src/decode.rs-133-        bytes.copy_from_slice(&input[..96]);
+crates/amun-codec/src/decode.rs-134-        Ok((bytes, 96))
+crates/amun-codec/src/decode.rs-135-    }
+--
+crates/amun-codec/src/decode.rs-157-impl_decode_newtype!(PublicKey, [u8; 48]);
+crates/amun-codec/src/decode.rs-158-impl_decode_newtype!(Signature, [u8; 96]);
+crates/amun-codec/src/decode.rs-159-
+crates/amun-codec/src/decode.rs-160-// Domain-typed Hash decoding
+crates/amun-codec/src/decode.rs-161-impl<D> CanonicalDecode for amun_kernel_types::Hash<D> {
+crates/amun-codec/src/decode.rs-162-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-163-        if input.len() < 32 {
+crates/amun-codec/src/decode.rs-164-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:165:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-166-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-167-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-168-            ));
+crates/amun-codec/src/decode.rs-169-        }
+crates/amun-codec/src/decode.rs-170-        let mut bytes = [0u8; 32];
+crates/amun-codec/src/decode.rs-171-        bytes.copy_from_slice(&input[..32]);
+crates/amun-codec/src/decode.rs-172-        Ok((amun_kernel_types::Hash::new(bytes), 32))
+crates/amun-codec/src/decode.rs-173-    }
+crates/amun-codec/src/decode.rs-174-}
+crates/amun-codec/src/decode.rs-175-
+crates/amun-codec/src/decode.rs-176-impl CanonicalDecode for amun_kernel_types::PublicHash32 {
+crates/amun-codec/src/decode.rs-177-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-178-        if input.len() < 32 {
+crates/amun-codec/src/decode.rs-179-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:180:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-181-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-182-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-183-            ));
+crates/amun-codec/src/decode.rs-184-        }
+crates/amun-codec/src/decode.rs-185-        let mut bytes = [0u8; 32];
+crates/amun-codec/src/decode.rs-186-        bytes.copy_from_slice(&input[..32]);
+crates/amun-codec/src/decode.rs-187-        Ok((amun_kernel_types::PublicHash32::new(bytes), 32))
+crates/amun-codec/src/decode.rs-188-    }
+crates/amun-codec/src/decode.rs-189-}
+crates/amun-codec/src/decode.rs-190-
+crates/amun-codec/src/decode.rs-191-impl CanonicalDecode for amun_kernel_types::CommitmentHash32 {
+crates/amun-codec/src/decode.rs-192-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/decode.rs-193-        if input.len() < 32 {
+crates/amun-codec/src/decode.rs-194-            return Err(FailureContext::new(
+crates/amun-codec/src/decode.rs:195:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs-196-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/decode.rs-197-                operation_ids::DECODE,
+crates/amun-codec/src/decode.rs-198-            ));
+crates/amun-codec/src/decode.rs-199-        }
+crates/amun-codec/src/decode.rs-200-        let mut bytes = [0u8; 32];
+crates/amun-codec/src/decode.rs-201-        bytes.copy_from_slice(&input[..32]);
+crates/amun-codec/src/decode.rs-202-        Ok((amun_kernel_types::CommitmentHash32::new(bytes), 32))
+crates/amun-codec/src/decode.rs-203-    }
+--
+crates/amun-codec/src/containers.rs-1-// Canonical container encoding: sequences, sets, and maps.
+crates/amun-codec/src/containers.rs-2-
+crates/amun-codec/src/containers.rs-3-use crate::encode::CanonicalEncode;
+crates/amun-codec/src/containers.rs-4-use crate::writer::{CanonicalWriter, WriteResult};
+crates/amun-codec/src/containers.rs:5:use amun_failure::{module_ids, operation_ids, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/containers.rs-6-use heapless::Vec;
+crates/amun-codec/src/containers.rs-7-
+crates/amun-codec/src/containers.rs-8-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+crates/amun-codec/src/containers.rs-9-#[repr(u8)]
+crates/amun-codec/src/containers.rs-10-pub enum DuplicatePolicy {
+crates/amun-codec/src/containers.rs-11-    FirstWins = 0,
+crates/amun-codec/src/containers.rs-12-    LastWins = 1,
+crates/amun-codec/src/containers.rs-13-    Reject = 2,
+--
+crates/amun-codec/src/containers.rs-44-
+crates/amun-codec/src/containers.rs-45-pub fn encode_sequence<T: CanonicalEncode>(
+crates/amun-codec/src/containers.rs-46-    items: &[T],
+crates/amun-codec/src/containers.rs-47-    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/containers.rs-48-) -> WriteResult {
+crates/amun-codec/src/containers.rs-49-    let len = items.len();
+crates/amun-codec/src/containers.rs-50-    if len > u32::MAX as usize {
+crates/amun-codec/src/containers.rs-51-        return Err(FailureContext::new(
+crates/amun-codec/src/containers.rs:52:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs-53-            module_ids::AMUN_CODEC,
+crates/amun-codec/src/containers.rs-54-            operation_ids::ENCODE_SEQUENCE,
+crates/amun-codec/src/containers.rs-55-        ));
+crates/amun-codec/src/containers.rs-56-    }
+crates/amun-codec/src/containers.rs-57-    (len as u32).encode_to_writer(writer)?;
+crates/amun-codec/src/containers.rs-58-    for item in items {
+crates/amun-codec/src/containers.rs-59-        item.encode_to_writer(writer)?;
+crates/amun-codec/src/containers.rs-60-    }
+--
+crates/amun-codec/src/containers.rs-64-pub fn encode_set<T: CanonicalEncode + Ord>(
+crates/amun-codec/src/containers.rs-65-    items: &[T],
+crates/amun-codec/src/containers.rs-66-    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/containers.rs-67-) -> WriteResult {
+crates/amun-codec/src/containers.rs-68-    let mut sorted: Vec<&T, 256> = Vec::new();
+crates/amun-codec/src/containers.rs-69-    for item in items {
+crates/amun-codec/src/containers.rs-70-        sorted.push(item).map_err(|_| {
+crates/amun-codec/src/containers.rs-71-            FailureContext::new(
+crates/amun-codec/src/containers.rs:72:                ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs-73-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/containers.rs-74-                operation_ids::ENCODE_SET,
+crates/amun-codec/src/containers.rs-75-            )
+crates/amun-codec/src/containers.rs-76-        })?;
+crates/amun-codec/src/containers.rs-77-    }
+crates/amun-codec/src/containers.rs-78-    sort_heapless_vec(&mut sorted);
+crates/amun-codec/src/containers.rs-79-
+crates/amun-codec/src/containers.rs-80-    let len = sorted.len();
+crates/amun-codec/src/containers.rs-81-    if len > u32::MAX as usize {
+crates/amun-codec/src/containers.rs-82-        return Err(FailureContext::new(
+crates/amun-codec/src/containers.rs:83:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs-84-            module_ids::AMUN_CODEC,
+crates/amun-codec/src/containers.rs-85-            operation_ids::ENCODE_SET,
+crates/amun-codec/src/containers.rs-86-        ));
+crates/amun-codec/src/containers.rs-87-    }
+crates/amun-codec/src/containers.rs-88-    (len as u32).encode_to_writer(writer)?;
+crates/amun-codec/src/containers.rs-89-    for item in sorted {
+crates/amun-codec/src/containers.rs-90-        item.encode_to_writer(writer)?;
+crates/amun-codec/src/containers.rs-91-    }
+--
+crates/amun-codec/src/containers.rs-95-pub fn encode_map<K: CanonicalEncode + Ord, V: CanonicalEncode>(
+crates/amun-codec/src/containers.rs-96-    entries: &[(K, V)],
+crates/amun-codec/src/containers.rs-97-    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/containers.rs-98-) -> WriteResult {
+crates/amun-codec/src/containers.rs-99-    let mut sorted: Vec<&(K, V), 256> = Vec::new();
+crates/amun-codec/src/containers.rs-100-    for entry in entries {
+crates/amun-codec/src/containers.rs-101-        sorted.push(entry).map_err(|_| {
+crates/amun-codec/src/containers.rs-102-            FailureContext::new(
+crates/amun-codec/src/containers.rs:103:                ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs-104-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/containers.rs-105-                operation_ids::ENCODE_MAP,
+crates/amun-codec/src/containers.rs-106-            )
+crates/amun-codec/src/containers.rs-107-        })?;
+crates/amun-codec/src/containers.rs-108-    }
+crates/amun-codec/src/containers.rs-109-    sort_heapless_vec_by(&mut sorted, |a, b| a.0.cmp(&b.0));
+crates/amun-codec/src/containers.rs-110-
+crates/amun-codec/src/containers.rs-111-    let len = sorted.len();
+crates/amun-codec/src/containers.rs-112-    if len > u32::MAX as usize {
+crates/amun-codec/src/containers.rs-113-        return Err(FailureContext::new(
+crates/amun-codec/src/containers.rs:114:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs-115-            module_ids::AMUN_CODEC,
+crates/amun-codec/src/containers.rs-116-            operation_ids::ENCODE_MAP,
+crates/amun-codec/src/containers.rs-117-        ));
+crates/amun-codec/src/containers.rs-118-    }
+crates/amun-codec/src/containers.rs-119-    (len as u32).encode_to_writer(writer)?;
+crates/amun-codec/src/containers.rs-120-    for (k, v) in sorted {
+crates/amun-codec/src/containers.rs-121-        k.encode_to_writer(writer)?;
+crates/amun-codec/src/containers.rs-122-        v.encode_to_writer(writer)?;
+--
+crates/amun-codec/src/versioned.rs-1-use crate::domain::HashDomain;
+crates/amun-codec/src/versioned.rs-2-use crate::writer::{CanonicalWriter, WriteResult};
+crates/amun-codec/src/versioned.rs:3:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/versioned.rs-4-use amun_kernel_types::{ChainId, Epoch, PublicHash32};
+crates/amun-codec/src/versioned.rs-5-
+crates/amun-codec/src/versioned.rs-6-pub const CURRENT_ENCODING_VERSION: u8 = 1;
+crates/amun-codec/src/versioned.rs-7-
+crates/amun-codec/src/versioned.rs-8-#[derive(Clone, Copy, Debug)]
+crates/amun-codec/src/versioned.rs-9-pub struct ProtocolHeader {
+crates/amun-codec/src/versioned.rs-10-    pub encoding_version: u8,
+crates/amun-codec/src/versioned.rs-11-    pub domain: HashDomain,
+--
+crates/amun-codec/src/versioned.rs-43-
+crates/amun-codec/src/versioned.rs-44-    pub fn read(
+crates/amun-codec/src/versioned.rs-45-        input: &[u8],
+crates/amun-codec/src/versioned.rs-46-        _expected_domain: HashDomain,
+crates/amun-codec/src/versioned.rs-47-        expected_chain: ChainId,
+crates/amun-codec/src/versioned.rs-48-    ) -> AmunResult<(Self, usize)> {
+crates/amun-codec/src/versioned.rs-49-        if input.len() < Self::HEADER_SIZE {
+crates/amun-codec/src/versioned.rs-50-            return Err(FailureContext::new(
+crates/amun-codec/src/versioned.rs:51:                ConstitutionalFault::MalformedEncoding,
+crates/amun-codec/src/versioned.rs-52-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/versioned.rs-53-                operation_ids::DECODE_HEADER,
+crates/amun-codec/src/versioned.rs-54-            ));
+crates/amun-codec/src/versioned.rs-55-        }
+crates/amun-codec/src/versioned.rs-56-
+crates/amun-codec/src/versioned.rs-57-        let version = input[0];
+crates/amun-codec/src/versioned.rs-58-        if version != CURRENT_ENCODING_VERSION {
+crates/amun-codec/src/versioned.rs-59-            return Err(FailureContext::new(
+crates/amun-codec/src/versioned.rs:60:                ConstitutionalFault::EncodingVersionMismatch,
+crates/amun-codec/src/versioned.rs-61-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/versioned.rs-62-                operation_ids::DECODE_HEADER,
+crates/amun-codec/src/versioned.rs-63-            ));
+crates/amun-codec/src/versioned.rs-64-        }
+crates/amun-codec/src/versioned.rs-65-
+crates/amun-codec/src/versioned.rs-66-        let domain = HashDomain::from_byte(input[1]).ok_or_else(|| {
+crates/amun-codec/src/versioned.rs-67-            FailureContext::new(
+crates/amun-codec/src/versioned.rs:68:                ConstitutionalFault::MalformedEncoding,
+crates/amun-codec/src/versioned.rs-69-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/versioned.rs-70-                operation_ids::DECODE_HEADER,
+crates/amun-codec/src/versioned.rs-71-            )
+crates/amun-codec/src/versioned.rs-72-        })?;
+crates/amun-codec/src/versioned.rs-73-
+crates/amun-codec/src/versioned.rs-74-        let mut chain_bytes = [0u8; 8];
+crates/amun-codec/src/versioned.rs-75-        chain_bytes.copy_from_slice(&input[2..10]);
+crates/amun-codec/src/versioned.rs-76-        let chain_id = ChainId(u64::from_le_bytes(chain_bytes));
+crates/amun-codec/src/versioned.rs-77-        if chain_id != expected_chain {
+crates/amun-codec/src/versioned.rs-78-            return Err(FailureContext::new(
+crates/amun-codec/src/versioned.rs:79:                ConstitutionalFault::ReplayViolation,
+crates/amun-codec/src/versioned.rs-80-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/versioned.rs-81-                operation_ids::DECODE_HEADER,
+crates/amun-codec/src/versioned.rs-82-            ));
+crates/amun-codec/src/versioned.rs-83-        }
+crates/amun-codec/src/versioned.rs-84-
+crates/amun-codec/src/versioned.rs-85-        let mut epoch_bytes = [0u8; 8];
+crates/amun-codec/src/versioned.rs-86-        epoch_bytes.copy_from_slice(&input[10..18]);
+crates/amun-codec/src/versioned.rs-87-        let protocol_epoch = Epoch(u64::from_le_bytes(epoch_bytes));
+--
+crates/amun-codec/src/budget.rs-1-// Decode budget for resource accounting during deserialization.
+crates/amun-codec/src/budget.rs-2-
+crates/amun-codec/src/budget.rs:3:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/budget.rs-4-
+crates/amun-codec/src/budget.rs-5-#[derive(Clone, Debug)]
+crates/amun-codec/src/budget.rs-6-pub struct DecodeBudget {
+crates/amun-codec/src/budget.rs-7-    bytes_remaining: u32,
+crates/amun-codec/src/budget.rs-8-    objects_remaining: u32,
+crates/amun-codec/src/budget.rs-9-    depth_remaining: u8,
+crates/amun-codec/src/budget.rs-10-}
+crates/amun-codec/src/budget.rs-11-
+--
+crates/amun-codec/src/budget.rs-16-            objects_remaining: max_objects,
+crates/amun-codec/src/budget.rs-17-            depth_remaining: max_depth,
+crates/amun-codec/src/budget.rs-18-        }
+crates/amun-codec/src/budget.rs-19-    }
+crates/amun-codec/src/budget.rs-20-
+crates/amun-codec/src/budget.rs-21-    pub fn consume_bytes(&mut self, count: u32) -> AmunResult<()> {
+crates/amun-codec/src/budget.rs-22-        self.bytes_remaining = self.bytes_remaining.checked_sub(count).ok_or_else(|| {
+crates/amun-codec/src/budget.rs-23-            FailureContext::new(
+crates/amun-codec/src/budget.rs:24:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-codec/src/budget.rs-25-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/budget.rs-26-                operation_ids::BUDGET_BYTES,
+crates/amun-codec/src/budget.rs-27-            )
+crates/amun-codec/src/budget.rs-28-        })?;
+crates/amun-codec/src/budget.rs-29-        Ok(())
+crates/amun-codec/src/budget.rs-30-    }
+crates/amun-codec/src/budget.rs-31-
+crates/amun-codec/src/budget.rs-32-    pub fn consume_object(&mut self) -> AmunResult<()> {
+crates/amun-codec/src/budget.rs-33-        self.objects_remaining = self.objects_remaining.checked_sub(1).ok_or_else(|| {
+crates/amun-codec/src/budget.rs-34-            FailureContext::new(
+crates/amun-codec/src/budget.rs:35:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-codec/src/budget.rs-36-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/budget.rs-37-                operation_ids::BUDGET_OBJECT,
+crates/amun-codec/src/budget.rs-38-            )
+crates/amun-codec/src/budget.rs-39-        })?;
+crates/amun-codec/src/budget.rs-40-        Ok(())
+crates/amun-codec/src/budget.rs-41-    }
+crates/amun-codec/src/budget.rs-42-
+crates/amun-codec/src/budget.rs-43-    pub fn enter_nested(&mut self) -> AmunResult<NestingGuard<'_>> {
+crates/amun-codec/src/budget.rs-44-        self.depth_remaining = self.depth_remaining.checked_sub(1).ok_or_else(|| {
+crates/amun-codec/src/budget.rs-45-            FailureContext::new(
+crates/amun-codec/src/budget.rs:46:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-codec/src/budget.rs-47-                module_ids::AMUN_CODEC,
+crates/amun-codec/src/budget.rs-48-                operation_ids::BUDGET_DEPTH,
+crates/amun-codec/src/budget.rs-49-            )
+crates/amun-codec/src/budget.rs-50-        })?;
+crates/amun-codec/src/budget.rs-51-        Ok(NestingGuard { budget: self })
+crates/amun-codec/src/budget.rs-52-    }
+crates/amun-codec/src/budget.rs-53-}
+crates/amun-codec/src/budget.rs-54-
+--
+crates/amun-replay-semantics/src/lib.rs-1-//! Replay Semantics — formal constitutional model for replay.
+crates/amun-replay-semantics/src/lib.rs:2://! Layer 0.75 — Constitutional Replay Theory.
+crates/amun-replay-semantics/src/lib.rs-3-//! Defines WHAT replay IS, not HOW to implement it.
+crates/amun-replay-semantics/src/lib.rs-4-
+crates/amun-replay-semantics/src/lib.rs-5-extern crate alloc;
+crates/amun-replay-semantics/src/lib.rs-6-use alloc::vec::Vec;
+crates/amun-replay-semantics/src/lib.rs-7-use sha2::{Sha256, Digest};
+crates/amun-replay-semantics/src/lib.rs-8-
+crates/amun-replay-semantics/src/lib.rs-9-#[derive(Debug, Clone, Copy, PartialEq, Eq)] pub enum ReplayDomain { Consensus, Execution, FullSystem, Governance, Transcript }
+crates/amun-replay-semantics/src/lib.rs-10-
+--
+crates/amun-replay-semantics/src/lib.rs-56-    StateDivergence { expected_root: [u8; 32], actual_root: [u8; 32] },
+crates/amun-replay-semantics/src/lib.rs-57-    OrderingViolation { expected_sequence: u64, actual_sequence: u64 },
+crates/amun-replay-semantics/src/lib.rs-58-    EpochBoundaryViolation { expected_epoch: Box<ReplayEpoch>, actual_epoch: Box<ReplayEpoch> },
+crates/amun-replay-semantics/src/lib.rs-59-    VersionMismatch { expected_version: u32, actual_version: u32 },
+crates/amun-replay-semantics/src/lib.rs-60-    BoundaryViolation { expected_boundary: Box<ReplayBoundary>, actual_boundary: Box<ReplayBoundary> },
+crates/amun-replay-semantics/src/lib.rs-61-    ReplayResourceExhaustion { limit: usize, attempted: usize },
+crates/amun-replay-semantics/src/lib.rs-62-}
+crates/amun-replay-semantics/src/lib.rs-63-
+crates/amun-replay-semantics/src/lib.rs:64:#[derive(Debug, Clone, Copy, PartialEq, Eq)] pub enum ReplayAuthority { SelfVerification, ValidatorQuorum { required_signatures: u64 }, ConstitutionalCourt, PublicVerification }
+crates/amun-replay-semantics/src/lib.rs-65-
+crates/amun-replay-semantics/src/lib.rs-66-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-semantics/src/lib.rs:67:pub struct ReplayWitness { pub start_sequence: u64, pub end_sequence: u64, pub pre_state_root: [u8; 32], pub post_state_root: [u8; 32], pub transcript_fragment_hash: [u8; 32], pub witness_data: Vec<u8> }
+crates/amun-replay-semantics/src/lib.rs-68-
+crates/amun-replay-semantics/src/lib.rs-69-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-semantics/src/lib.rs-70-pub struct ReplayCheckpoint { pub sequence: u64, pub state_root: [u8; 32], pub transcript_chain_hash: [u8; 32], pub certificate: ReplayCertificate }
+crates/amun-replay-semantics/src/lib.rs-71-impl ReplayCheckpoint { pub fn verify(&self, boundary: &ReplayBoundary) -> bool { self.sequence >= boundary.finalized_sequence && self.certificate.verify() && self.certificate.boundary.boundary_chain_hash == boundary.boundary_chain_hash } }
+crates/amun-replay-semantics/src/lib.rs-72-
+crates/amun-replay-semantics/src/lib.rs-73-pub mod laws {
+crates/amun-replay-semantics/src/lib.rs-74-    use super::*;
+crates/amun-replay-semantics/src/lib.rs-75-    pub fn replay_determinism(a: &ReplayCertificate, b: &ReplayCertificate) -> Result<(), ReplayFailure> {
+--
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-1-# AMUNCHAIN SNAPSHOT CONSTITUTION v1.0
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:2:## Constitutional framework for distributed state snapshots
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-3-
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-4----
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-5-
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-6-### ARTICLE I: SNAPSHOT AUTHORITY
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-7-
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-8-**Section 1.1: Definition**
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-9-A snapshot is a cryptographically verifiable, self-contained representation
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-10-of the complete state at a specific lineage point.
+--
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-150-the snapshot is constitutionally invalid and SHALL be rejected.
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-151-
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-152----
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-153-
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-154-### ARTICLE IX: CONSTITUTIONAL COMPLIANCE
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-155-
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-156-**Section 9.1: Proof Geometry**
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-157-All proofs within snapshots SHALL comply with Article II of
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:158:the Storage Constitution (fixed 256-step geometry).
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-159-
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-160-**Section 9.2: NodeHash Uniqueness**
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-161-All nodes within snapshots SHALL satisfy Article V of the
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:162:Storage Constitution (NodeHash uniquely determines content).
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-163-
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-164-**Section 9.3: Empty Root**
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-165-The canonical empty root within snapshots SHALL match the
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md-166-protocol constant defined in Article I, Section 1.3.
+--
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-3-### DEBT-001: Reachability GC (Phase 85) [CRITICAL]
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-4-Immutable OrdMap accumulates nodes indefinitely. GC must preserve canonical
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-5-determinism: nodes reachable from active lineage retained, abandoned forks collected.
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-6-
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-7-### DEBT-002: Physical Compression (Phase 85) [HIGH]
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-8-Full 256-depth creates ~256 branches per leaf. Physical compression below
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-9-canonical layer required. Must not alter roots, proofs, or replay.
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-10-
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md:11:### DEBT-003: Snapshot Format Constitution (Phase 84) [HIGH]
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-12-Chunk ordering, hashing, proof-carrying snapshots, deterministic serialization.
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-13-
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-14-### DEBT-004: Concurrency Model (Phase 84) [MEDIUM]
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-15-Locking strategy, read/write isolation, snapshot consistency for sync/replay/GC.
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-16-
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-17-### DEBT-005: Fork-Aware Lineage (Phase 84) [MEDIUM]
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-18-Competing branches, rollback semantics, finalized root tracking.
+crates/amun-storage-kernel/CONSTITUTIONAL_DEBT.md-19-
+--
+crates/amun-storage-kernel/tests/replay_equivalence.rs-1-#[cfg(test)]
+crates/amun-storage-kernel/tests/replay_equivalence.rs-2-mod tests {
+crates/amun-storage-kernel/tests/replay_equivalence.rs-3-    use amun_storage_kernel::{
+crates/amun-storage-kernel/tests/replay_equivalence.rs:4:        persistence::wal::{ReplayVerifier, WalEntry},
+crates/amun-storage-kernel/tests/replay_equivalence.rs-5-        Key256, SparseMerkleTree,
+crates/amun-storage-kernel/tests/replay_equivalence.rs-6-    };
+crates/amun-storage-kernel/tests/replay_equivalence.rs-7-    use std::fs::OpenOptions;
+crates/amun-storage-kernel/tests/replay_equivalence.rs-8-    use std::io::Write;
+crates/amun-storage-kernel/tests/replay_equivalence.rs-9-    use tempfile::tempdir;
+crates/amun-storage-kernel/tests/replay_equivalence.rs-10-
+crates/amun-storage-kernel/tests/replay_equivalence.rs-11-    fn create_test_wal(path: &str, entries: &[WalEntry]) -> std::io::Result<()> {
+crates/amun-storage-kernel/tests/replay_equivalence.rs-12-        let mut file = OpenOptions::new()
+--
+crates/amun-storage-kernel/tests/replay_equivalence.rs-46-            0,
+crates/amun-storage-kernel/tests/replay_equivalence.rs-47-            root.0,
+crates/amun-storage-kernel/tests/replay_equivalence.rs-48-            [0u8; 32],
+crates/amun-storage-kernel/tests/replay_equivalence.rs-49-        );
+crates/amun-storage-kernel/tests/replay_equivalence.rs-50-
+crates/amun-storage-kernel/tests/replay_equivalence.rs-51-        create_test_wal(wal_path.to_str().unwrap(), &[entry]).unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-52-
+crates/amun-storage-kernel/tests/replay_equivalence.rs-53-        let (replayed_root, count) =
+crates/amun-storage-kernel/tests/replay_equivalence.rs:54:            ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap()).unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-55-
+crates/amun-storage-kernel/tests/replay_equivalence.rs-56-        assert_eq!(count, 1);
+crates/amun-storage-kernel/tests/replay_equivalence.rs-57-        assert_eq!(replayed_root, root.0);
+crates/amun-storage-kernel/tests/replay_equivalence.rs-58-    }
+crates/amun-storage-kernel/tests/replay_equivalence.rs-59-
+crates/amun-storage-kernel/tests/replay_equivalence.rs-60-    #[test]
+crates/amun-storage-kernel/tests/replay_equivalence.rs-61-    fn replay_detects_divergence() {
+crates/amun-storage-kernel/tests/replay_equivalence.rs-62-        let dir = tempdir().unwrap();
+--
+crates/amun-storage-kernel/tests/replay_equivalence.rs-86-            .open(&wal_path)
+crates/amun-storage-kernel/tests/replay_equivalence.rs-87-            .unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-88-        let bytes = entry.encode();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-89-        let len = (bytes.len() as u32).to_le_bytes();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-90-        file.write_all(&len).unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-91-        file.write_all(&bytes).unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-92-        file.sync_all().unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-93-
+crates/amun-storage-kernel/tests/replay_equivalence.rs:94:        let result = ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap());
+crates/amun-storage-kernel/tests/replay_equivalence.rs-95-        assert!(result.is_err());
+crates/amun-storage-kernel/tests/replay_equivalence.rs-96-        assert!(result.unwrap_err().contains("replay divergence"));
+crates/amun-storage-kernel/tests/replay_equivalence.rs-97-    }
+crates/amun-storage-kernel/tests/replay_equivalence.rs-98-
+crates/amun-storage-kernel/tests/replay_equivalence.rs-99-    #[test]
+crates/amun-storage-kernel/tests/replay_equivalence.rs-100-    fn replay_detects_epoch_regression() {
+crates/amun-storage-kernel/tests/replay_equivalence.rs-101-        let dir = tempdir().unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-102-        let wal_path = dir.path().join("test_epoch.wal");
+--
+crates/amun-storage-kernel/tests/replay_equivalence.rs-128-            value.to_vec(),
+crates/amun-storage-kernel/tests/replay_equivalence.rs-129-            0,
+crates/amun-storage-kernel/tests/replay_equivalence.rs-130-            root.0,
+crates/amun-storage-kernel/tests/replay_equivalence.rs-131-            e1.entry_hash,
+crates/amun-storage-kernel/tests/replay_equivalence.rs-132-        );
+crates/amun-storage-kernel/tests/replay_equivalence.rs-133-
+crates/amun-storage-kernel/tests/replay_equivalence.rs-134-        create_test_wal(wal_path.to_str().unwrap(), &[e1, e2]).unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs-135-
+crates/amun-storage-kernel/tests/replay_equivalence.rs:136:        let result = ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap());
+crates/amun-storage-kernel/tests/replay_equivalence.rs-137-        assert!(result.is_err());
+crates/amun-storage-kernel/tests/replay_equivalence.rs-138-        assert!(result.unwrap_err().contains("epoch regression"));
+crates/amun-storage-kernel/tests/replay_equivalence.rs-139-    }
+crates/amun-storage-kernel/tests/replay_equivalence.rs-140-}
+--
+crates/amun-storage-kernel/tests/specification_compliance.rs-59-        assert_eq!(
+crates/amun-storage-kernel/tests/specification_compliance.rs-60-            result.root().0,
+crates/amun-storage-kernel/tests/specification_compliance.rs-61-            CANONICAL_EMPTY_ROOT_V1,
+crates/amun-storage-kernel/tests/specification_compliance.rs-62-            "Theorem 3 violated: empty identity"
+crates/amun-storage-kernel/tests/specification_compliance.rs-63-        );
+crates/amun-storage-kernel/tests/specification_compliance.rs-64-    }
+crates/amun-storage-kernel/tests/specification_compliance.rs-65-
+crates/amun-storage-kernel/tests/specification_compliance.rs-66-    // ============================================================
+crates/amun-storage-kernel/tests/specification_compliance.rs:67:    // THEOREM 4: Proof Depth Invariant
+crates/amun-storage-kernel/tests/specification_compliance.rs-68-    // ============================================================
+crates/amun-storage-kernel/tests/specification_compliance.rs-69-    #[test]
+crates/amun-storage-kernel/tests/specification_compliance.rs-70-    fn theorem_proof_depth() {
+crates/amun-storage-kernel/tests/specification_compliance.rs-71-        let k = Key256([33u8; 32]);
+crates/amun-storage-kernel/tests/specification_compliance.rs-72-        let v = [66u8; 32];
+crates/amun-storage-kernel/tests/specification_compliance.rs-73-        let tree = SparseMerkleTree::empty().insert(&k, &v, 0);
+crates/amun-storage-kernel/tests/specification_compliance.rs-74-
+crates/amun-storage-kernel/tests/specification_compliance.rs-75-        let proof = tree.generate_inclusion_proof(&k).unwrap();
+--
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-4----
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-5-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-6-## ARTICLE I: VALIDITY LEVELS
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-7-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-8-| Level | Name | Description |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-9-|-------|------|-------------|
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-10-| 1 | CryptographicallyValid | Hash correctness verified |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-11-| 2 | StateValid | Deterministic replay verified |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:12:| 3 | ConstitutionallyValid | Epoch/generation/lineage compliance |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-13-| 4 | SemanticallyValid | Interpretation consistency |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-14-| 5 | SovereignlyValid | Civilization continuity |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-15-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-16-State SHALL be accepted only at or above the required level for the operation.
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:17:Consensus operations require ConstitutionallyValid or higher.
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-18-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-19----
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-20-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-21-## ARTICLE II: FAILURE TAXONOMY
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-22-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-23-### Level 1: Healable (Local Recovery Possible)
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-24-| Failure | Detection | Recovery |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-25-|---------|-----------|----------|
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-26-| MissingValue | ValueStore lookup fails | Request from peers |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-27-| StaleCache | LRU returns outdated entry | Invalidate and reload |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-28-| TempFileLeftover | *.tmp files from crashed writes | Remove and retry |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-29-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-30-### Level 2: QuarantineRequired (Isolate and Resync)
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-31-| Failure | Detection | Recovery |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-32-|---------|-----------|----------|
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:33:| StateRootMismatch | ReplayVerifier divergence | Quarantine state, resync from trusted peer |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-34-| WalChainBreak | Entry hash verification fails | Quarantine WAL, request missing frames |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-35-| WalSequenceGap | Sequence non-monotonic | Quarantine WAL, resync |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-36-| NonCanonicalStructure | Canonical invariant check fails | Reconstruct from lineage |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-37-| SnapshotEpochMismatch | Snapshot root != lineage root | Reject snapshot, request valid one |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-38-| IncompleteSnapshot | Missing required nodes | Request missing chunks |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-39-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-40-### Level 3: FullReconstructionRequired (Rebuild from Genesis)
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-41-| Failure | Detection | Recovery |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-42-|---------|-----------|----------|
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-43-| ManifestChainBreak | Manifest prev_hash mismatch | Full state reconstruction from genesis |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-44-| EpochSealInvalid | Epoch seal verification fails | Rebuild lineage from WAL |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-45-| ReplayDivergence | Replay produces different root | Investigate, rebuild from trusted source |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-46-| NodeHashMismatch | Node content != hash expectation | Full reconstruction |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-47-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:48:### Level 4: ByzantineEvidence (Malicious Behavior Detected)
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-49-| Failure | Detection | Recovery |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-50-|---------|-----------|----------|
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-51-| EquivocationDetected | Two different states at same sequence | Slash validator, broadcast evidence |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-52-| UnauthorizedStateInjection | State from unauthorized source | Reject state, ban peer, report |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-53-| SealedEpochMutation | Attempt to modify sealed epoch | Reject, slash, permanent ban |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-54-| SignedButUnavailable | Availability cert without data | Slash 100%, jail forever |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-55-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:56:### Level 5: ConstitutionalCrisis (System Halt Required)
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-57-| Failure | Detection | Recovery |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-58-|---------|-----------|----------|
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-59-| HashCollision | Two different nodes produce same NodeHash | HALT SYSTEM, human intervention required |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-60-| ExcessiveCompression | Compression exceeds MAX_COMPRESSED_SKIP | HALT, constitutional review |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-61-| WalFrameCorrupted | Frame fails all validation | HALT if no clean peer available |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-62-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-63----
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-64-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-65-## ARTICLE III: PEER TRUST DEGRADATION
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-66-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-67-| Violation | Trust Penalty |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-68-|-----------|---------------|
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-69-| Provided Invalid Proof | Downgrade to Unknown |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-70-| Stale Data (> staleness threshold) | Downgrade to Unknown |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-71-| Inconsistent State | Downgrade to Unknown |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-72-| Failed Challenge (> 3 failures) | Downgrade to Unknown |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:73:| Equivocation Evidence | Permanent Ban + Slash |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-74-| Unauthorized Injection | Permanent Ban + Slash |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-75-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-76----
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-77-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-78-## ARTICLE IV: REPLAY FALLBACK POLICY
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-79-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-80-| Scenario | Action |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-81-|----------|--------|
+--
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-90-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-91-## ARTICLE V: QUARANTINE POLICY
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-92-
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-93-| Violation Severity | Quarantine Duration | Release Condition |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-94-|--------------------|---------------------|-------------------|
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-95-| Healable | None | Auto-healed |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-96-| QuarantineRequired | Until resync complete | Verified clean state |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md-97-| FullReconstruction | Until rebuild complete | Verified root match |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:98:| ByzantineEvidence | Permanent | Never released |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:99:| ConstitutionalCrisis | Until human resolution | Constitutional court ruling |
+--
+crates/amun-storage-kernel/src/smt/tree.rs-8-pub const MAX_DEPTH: usize = 256;
+crates/amun-storage-kernel/src/smt/tree.rs-9-
+crates/amun-storage-kernel/src/smt/tree.rs-10-pub struct SparseMerkleTree {
+crates/amun-storage-kernel/src/smt/tree.rs-11-    pub nodes: Arc<NodeMap>,
+crates/amun-storage-kernel/src/smt/tree.rs-12-    pub root: NodeHash,
+crates/amun-storage-kernel/src/smt/tree.rs-13-    pub empty_ladder: Arc<Vec<NodeHash>>,
+crates/amun-storage-kernel/src/smt/tree.rs-14-}
+crates/amun-storage-kernel/src/smt/tree.rs-15-
+crates/amun-storage-kernel/src/smt/tree.rs:16:pub struct WitnessLeaf {
+crates/amun-storage-kernel/src/smt/tree.rs-17-    pub key_hash: [u8; 32],
+crates/amun-storage-kernel/src/smt/tree.rs-18-    pub value_hash: [u8; 32],
+crates/amun-storage-kernel/src/smt/tree.rs-19-    pub version: u64,
+crates/amun-storage-kernel/src/smt/tree.rs-20-}
+crates/amun-storage-kernel/src/smt/tree.rs-21-
+crates/amun-storage-kernel/src/smt/tree.rs-22-impl SparseMerkleTree {
+crates/amun-storage-kernel/src/smt/tree.rs-23-    fn build_empty_ladder() -> Vec<NodeHash> {
+crates/amun-storage-kernel/src/smt/tree.rs-24-        let mut ladder = vec![NodeHash::ZERO; 257];
+--
+crates/amun-storage-kernel/src/smt/tree.rs-456-        }
+crates/amun-storage-kernel/src/smt/tree.rs-457-    }
+crates/amun-storage-kernel/src/smt/tree.rs-458-
+crates/amun-storage-kernel/src/smt/tree.rs-459-    fn find_absence_witness(
+crates/amun-storage-kernel/src/smt/tree.rs-460-        &self,
+crates/amun-storage-kernel/src/smt/tree.rs-461-        depth: usize,
+crates/amun-storage-kernel/src/smt/tree.rs-462-        current: NodeHash,
+crates/amun-storage-kernel/src/smt/tree.rs-463-        key_hash: &[u8; 32],
+crates/amun-storage-kernel/src/smt/tree.rs:464:    ) -> Option<WitnessLeaf> {
+crates/amun-storage-kernel/src/smt/tree.rs-465-        if depth >= MAX_DEPTH {
+crates/amun-storage-kernel/src/smt/tree.rs-466-            if let Some(node) = self.nodes.get(&current) {
+crates/amun-storage-kernel/src/smt/tree.rs-467-                if let Node::Leaf {
+crates/amun-storage-kernel/src/smt/tree.rs-468-                    key_hash: leaf_key,
+crates/amun-storage-kernel/src/smt/tree.rs-469-                    value_hash,
+crates/amun-storage-kernel/src/smt/tree.rs-470-                    version,
+crates/amun-storage-kernel/src/smt/tree.rs-471-                } = &**node
+crates/amun-storage-kernel/src/smt/tree.rs-472-                {
+crates/amun-storage-kernel/src/smt/tree.rs-473-                    if leaf_key == key_hash {
+crates/amun-storage-kernel/src/smt/tree.rs-474-                        return None;
+crates/amun-storage-kernel/src/smt/tree.rs-475-                    }
+crates/amun-storage-kernel/src/smt/tree.rs:476:                    return Some(WitnessLeaf {
+crates/amun-storage-kernel/src/smt/tree.rs-477-                        key_hash: *leaf_key,
+crates/amun-storage-kernel/src/smt/tree.rs-478-                        value_hash: *value_hash,
+crates/amun-storage-kernel/src/smt/tree.rs-479-                        version: *version,
+crates/amun-storage-kernel/src/smt/tree.rs-480-                    });
+crates/amun-storage-kernel/src/smt/tree.rs-481-                }
+crates/amun-storage-kernel/src/smt/tree.rs-482-            }

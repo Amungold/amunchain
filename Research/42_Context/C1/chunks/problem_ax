@@ -1,0 +1,1500 @@
+crates/amun-state-machine/src/delta_laws.rs-27-            ) => DeltaLaw::Composable(a.clone(), b.clone()),
+crates/amun-state-machine/src/delta_laws.rs-28-            (
+crates/amun-state-machine/src/delta_laws.rs:29:                ConstitutionalDelta::IdentityDelta { .. },
+crates/amun-state-machine/src/delta_laws.rs:30:                ConstitutionalDelta::IdentityDelta { .. },
+crates/amun-state-machine/src/delta_laws.rs-31-            ) => DeltaLaw::Conflicting(a.clone(), b.clone()),
+crates/amun-state-machine/src/delta_laws.rs-32-            (
+crates/amun-state-machine/src/delta_laws.rs:33:                ConstitutionalDelta::ReplayDelta {
+crates/amun-state-machine/src/delta_laws.rs-34-                    old_guarantee_rank: _,
+crates/amun-state-machine/src/delta_laws.rs-35-                    new_guarantee_rank: na,
+crates/amun-state-machine/src/delta_laws.rs-36-                },
+crates/amun-state-machine/src/delta_laws.rs:37:                ConstitutionalDelta::ReplayDelta {
+crates/amun-state-machine/src/delta_laws.rs-38-                    old_guarantee_rank: _,
+crates/amun-state-machine/src/delta_laws.rs-39-                    new_guarantee_rank: nb,
+crates/amun-state-machine/src/delta_laws.rs-40-                },
+crates/amun-state-machine/src/delta_laws.rs-41-            ) => {
+crates/amun-state-machine/src/delta_laws.rs-42-                if na >= nb {
+crates/amun-state-machine/src/delta_laws.rs-43-                    DeltaLaw::Dominates(a.clone(), b.clone())
+crates/amun-state-machine/src/delta_laws.rs-44-                } else {
+crates/amun-state-machine/src/delta_laws.rs-45-                    DeltaLaw::Dominates(b.clone(), a.clone())
+--
+crates/amun-state-machine/src/lib.rs-21-pub mod reconciliation;
+crates/amun-state-machine/src/lib.rs-22-pub mod replay_log;
+crates/amun-state-machine/src/lib.rs-23-pub mod stability;
+crates/amun-state-machine/src/lib.rs-24-pub mod states;
+crates/amun-state-machine/src/lib.rs-25-pub mod thermodynamics;
+crates/amun-state-machine/src/lib.rs-26-pub mod transitions;
+crates/amun-state-machine/src/lib.rs-27-pub mod verifier;
+crates/amun-state-machine/src/lib.rs-28-
+crates/amun-state-machine/src/lib.rs:29:pub use absolute_invariants::AbsoluteInvariant;
+crates/amun-state-machine/src/lib.rs:30:pub use axioms::{AxiomVerification, ConstitutionalAxiom, ConstitutionalAxiomEngine};
+crates/amun-state-machine/src/lib.rs-31-pub use causality::{CausalHeight, CausalityMetadata, LamportTime, VectorClock};
+crates/amun-state-machine/src/lib.rs:32:pub use delta_algebra::ConstitutionalDelta;
+crates/amun-state-machine/src/lib.rs-33-pub use delta_laws::DeltaLaw;
+crates/amun-state-machine/src/lib.rs-34-pub use derivation::{ConsistencyProof, Derivation, DerivationStep, InferenceRule, Theorem};
+crates/amun-state-machine/src/lib.rs-35-pub use engine::{
+crates/amun-state-machine/src/lib.rs:36:    ConstitutionalExecutionEngine, ConstitutionalPolicyEngine, ConstitutionalProofEngine,
+crates/amun-state-machine/src/lib.rs-37-};
+crates/amun-state-machine/src/lib.rs-38-pub use fork_merge::{ForkDeclaration, ForkType, MergeDeclaration, MergeType};
+crates/amun-state-machine/src/lib.rs-39-pub use formal_entropy::{
+crates/amun-state-machine/src/lib.rs-40-    EntropyCollapseThreshold, EntropyConservationLaws, EntropySink, EntropySinkType, FormalEntropy,
+crates/amun-state-machine/src/lib.rs-41-};
+crates/amun-state-machine/src/lib.rs:42:pub use historical_invariants::{HistoricalInvariant, HistoricalInvariantEngine};
+crates/amun-state-machine/src/lib.rs-43-pub use impossibility::ImpossibilityProof;
+crates/amun-state-machine/src/lib.rs:44:pub use invariants::ConstitutionalInvariant;
+crates/amun-state-machine/src/lib.rs-45-pub use merge_math::{MergeConflictResolver, MergeResolution};
+crates/amun-state-machine/src/lib.rs-46-pub use meta_amendment::{MetaAmendmentEngine, MetaAmendmentLaw, MetaAmendmentScope, MetaQuorum};
+crates/amun-state-machine/src/lib.rs-47-pub use postconditions::Postcondition;
+crates/amun-state-machine/src/lib.rs-48-pub use preconditions::Precondition;
+crates/amun-state-machine/src/lib.rs-49-pub use reconciliation::{ReconciliationEngine, ReconciliationStrategy};
+crates/amun-state-machine/src/lib.rs:50:pub use replay_log::{ConstitutionalReplayDAG, ReplayLogEntry};
+crates/amun-state-machine/src/lib.rs:51:pub use stability::ConstitutionalStabilityMetrics;
+crates/amun-state-machine/src/lib.rs:52:pub use states::{ConstitutionalState, StateTag};
+crates/amun-state-machine/src/lib.rs:53:pub use thermodynamics::{ConstitutionalEntropy, StabilityEquations};
+crates/amun-state-machine/src/lib.rs-54-pub use transitions::{
+crates/amun-state-machine/src/lib.rs:55:    Transition, TransitionAlgebra, TransitionId, TransitionProof, TransitionType,
+crates/amun-state-machine/src/lib.rs-56-};
+crates/amun-state-machine/src/lib.rs-57-pub use verifier::TransitionVerifier;
+--
+crates/amun-state-machine/src/reconciliation.rs:1:use super::delta_algebra::ConstitutionalDelta;
+crates/amun-state-machine/src/reconciliation.rs-2-use super::delta_laws::DeltaLaw;
+crates/amun-state-machine/src/reconciliation.rs-3-
+crates/amun-state-machine/src/reconciliation.rs:4:/// Constitutional Reconciliation Calculus.
+crates/amun-state-machine/src/reconciliation.rs-5-/// Resolves conflicts between diverged constitutional realities.
+crates/amun-state-machine/src/reconciliation.rs-6-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/reconciliation.rs-7-pub enum ReconciliationStrategy {
+crates/amun-state-machine/src/reconciliation.rs-8-    /// Both deltas are preserved (additive reconciliation)
+crates/amun-state-machine/src/reconciliation.rs-9-    Additive,
+crates/amun-state-machine/src/reconciliation.rs-10-    /// One delta supersedes the other (winner-takes-all)
+crates/amun-state-machine/src/reconciliation.rs-11-    Supersede { winner: Box<ReconciliationStrategy> },
+crates/amun-state-machine/src/reconciliation.rs-12-    /// Deltas are interleaved by epoch
+crates/amun-state-machine/src/reconciliation.rs-13-    TemporalInterleave,
+crates/amun-state-machine/src/reconciliation.rs-14-    /// A new delta is synthesized from both
+crates/amun-state-machine/src/reconciliation.rs:15:    Synthesize { new_delta: ConstitutionalDelta },
+crates/amun-state-machine/src/reconciliation.rs-16-    /// Reconciliation is impossible - the realities are incompatible
+crates/amun-state-machine/src/reconciliation.rs-17-    Impossible { reason: String },
+crates/amun-state-machine/src/reconciliation.rs-18-}
+crates/amun-state-machine/src/reconciliation.rs-19-
+crates/amun-state-machine/src/reconciliation.rs:20:/// The Constitutional Reconciliation Engine.
+crates/amun-state-machine/src/reconciliation.rs-21-pub struct ReconciliationEngine;
+crates/amun-state-machine/src/reconciliation.rs-22-
+crates/amun-state-machine/src/reconciliation.rs-23-impl ReconciliationEngine {
+crates/amun-state-machine/src/reconciliation.rs-24-    /// Determine the reconciliation strategy for two conflicting deltas.
+crates/amun-state-machine/src/reconciliation.rs:25:    pub fn reconcile(a: &ConstitutionalDelta, b: &ConstitutionalDelta) -> ReconciliationStrategy {
+crates/amun-state-machine/src/reconciliation.rs-26-        let law = DeltaLaw::relate(a, b);
+crates/amun-state-machine/src/reconciliation.rs-27-        match law {
+crates/amun-state-machine/src/reconciliation.rs-28-            DeltaLaw::Composable(_, _) => ReconciliationStrategy::Additive,
+crates/amun-state-machine/src/reconciliation.rs-29-            DeltaLaw::Commutative(_, _) => ReconciliationStrategy::TemporalInterleave,
+crates/amun-state-machine/src/reconciliation.rs-30-            DeltaLaw::Dominates(winner, _) => ReconciliationStrategy::Supersede {
+crates/amun-state-machine/src/reconciliation.rs-31-                winner: Box::new(ReconciliationStrategy::Synthesize { new_delta: winner }),
+crates/amun-state-machine/src/reconciliation.rs-32-            },
+crates/amun-state-machine/src/reconciliation.rs-33-            DeltaLaw::Conflicting(_, _) => ReconciliationStrategy::Impossible {
+--
+crates/amun-state-machine/src/replay_log.rs-38-            h.update(p);
+crates/amun-state-machine/src/replay_log.rs-39-        }
+crates/amun-state-machine/src/replay_log.rs-40-        h.update(&self.epoch.to_le_bytes());
+crates/amun-state-machine/src/replay_log.rs-41-        h.update(&self.generation.to_le_bytes());
+crates/amun-state-machine/src/replay_log.rs-42-        h.finalize()
+crates/amun-state-machine/src/replay_log.rs-43-    }
+crates/amun-state-machine/src/replay_log.rs-44-}
+crates/amun-state-machine/src/replay_log.rs-45-
+crates/amun-state-machine/src/replay_log.rs:46:/// Constitutional Replay DAG - branching constitutional history.
+crates/amun-state-machine/src/replay_log.rs-47-#[derive(Debug, Clone)]
+crates/amun-state-machine/src/replay_log.rs:48:pub struct ConstitutionalReplayDAG {
+crates/amun-state-machine/src/replay_log.rs-49-    pub entries: HashMap<[u8; 32], ReplayLogEntry>,
+crates/amun-state-machine/src/replay_log.rs-50-    pub heads: Vec<[u8; 32]>,
+crates/amun-state-machine/src/replay_log.rs-51-    pub next_sequence: u64,
+crates/amun-state-machine/src/replay_log.rs-52-}
+crates/amun-state-machine/src/replay_log.rs-53-
+crates/amun-state-machine/src/replay_log.rs:54:impl Default for ConstitutionalReplayDAG {
+crates/amun-state-machine/src/replay_log.rs-55-    fn default() -> Self {
+crates/amun-state-machine/src/replay_log.rs-56-        Self::new()
+crates/amun-state-machine/src/replay_log.rs-57-    }
+crates/amun-state-machine/src/replay_log.rs-58-}
+crates/amun-state-machine/src/replay_log.rs-59-
+crates/amun-state-machine/src/replay_log.rs:60:impl ConstitutionalReplayDAG {
+crates/amun-state-machine/src/replay_log.rs-61-    pub fn new() -> Self {
+crates/amun-state-machine/src/replay_log.rs-62-        Self {
+crates/amun-state-machine/src/replay_log.rs-63-            entries: HashMap::new(),
+crates/amun-state-machine/src/replay_log.rs-64-            heads: Vec::new(),
+crates/amun-state-machine/src/replay_log.rs-65-            next_sequence: 0,
+crates/amun-state-machine/src/replay_log.rs-66-        }
+crates/amun-state-machine/src/replay_log.rs-67-    }
+crates/amun-state-machine/src/replay_log.rs-68-
+--
+crates/amun-state-machine/src/postconditions.rs:1:use super::states::ConstitutionalState;
+crates/amun-state-machine/src/postconditions.rs-2-
+crates/amun-state-machine/src/postconditions.rs-3-/// A postcondition that must be satisfied after a transition completes.
+crates/amun-state-machine/src/postconditions.rs-4-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/postconditions.rs-5-pub enum Postcondition {
+crates/amun-state-machine/src/postconditions.rs-6-    /// The resulting state must match the expected target state.
+crates/amun-state-machine/src/postconditions.rs-7-    StateMatches {
+crates/amun-state-machine/src/postconditions.rs:8:        expected: ConstitutionalState,
+crates/amun-state-machine/src/postconditions.rs:9:        actual: ConstitutionalState,
+crates/amun-state-machine/src/postconditions.rs-10-    },
+crates/amun-state-machine/src/postconditions.rs-11-    /// The state hash must be valid after the transition.
+crates/amun-state-machine/src/postconditions.rs-12-    StateHashValid,
+crates/amun-state-machine/src/postconditions.rs-13-    /// The transition must have produced a valid transition ID.
+crates/amun-state-machine/src/postconditions.rs-14-    TransitionIdValid,
+crates/amun-state-machine/src/postconditions.rs:15:    /// Constitutional invariants must still hold.
+crates/amun-state-machine/src/postconditions.rs:16:    InvariantsPreserved,
+crates/amun-state-machine/src/postconditions.rs-17-}
+--
+crates/amun-state-machine/src/derivation.rs:1:use super::axioms::ConstitutionalAxiom;
+crates/amun-state-machine/src/derivation.rs-2-
+crates/amun-state-machine/src/derivation.rs-3-/// A theorem derived from constitutional axioms.
+crates/amun-state-machine/src/derivation.rs-4-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/derivation.rs-5-pub struct Theorem {
+crates/amun-state-machine/src/derivation.rs-6-    pub name: String,
+crates/amun-state-machine/src/derivation.rs-7-    pub statement: String,
+crates/amun-state-machine/src/derivation.rs:8:    pub depends_on: Vec<ConstitutionalAxiom>,
+crates/amun-state-machine/src/derivation.rs-9-    pub derived_at: u64,
+crates/amun-state-machine/src/derivation.rs-10-    pub theorem_hash: [u8; 32],
+crates/amun-state-machine/src/derivation.rs-11-}
+crates/amun-state-machine/src/derivation.rs-12-
+crates/amun-state-machine/src/derivation.rs-13-/// An inference rule for deriving new theorems.
+crates/amun-state-machine/src/derivation.rs-14-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/derivation.rs-15-pub enum InferenceRule {
+crates/amun-state-machine/src/derivation.rs-16-    /// If A implies B and B implies C, then A implies C
+--
+crates/amun-state-machine/src/derivation.rs-27-#[derive(Debug, Clone)]
+crates/amun-state-machine/src/derivation.rs-28-pub struct Derivation {
+crates/amun-state-machine/src/derivation.rs-29-    pub theorem: Theorem,
+crates/amun-state-machine/src/derivation.rs-30-    pub proof_steps: Vec<DerivationStep>,
+crates/amun-state-machine/src/derivation.rs-31-}
+crates/amun-state-machine/src/derivation.rs-32-
+crates/amun-state-machine/src/derivation.rs-33-#[derive(Debug, Clone)]
+crates/amun-state-machine/src/derivation.rs-34-pub enum DerivationStep {
+crates/amun-state-machine/src/derivation.rs:35:    Axiom(ConstitutionalAxiom),
+crates/amun-state-machine/src/derivation.rs-36-    Inference(InferenceRule, Vec<usize>),
+crates/amun-state-machine/src/derivation.rs-37-    TheoremApplication(usize),
+crates/amun-state-machine/src/derivation.rs-38-}
+crates/amun-state-machine/src/derivation.rs-39-
+crates/amun-state-machine/src/derivation.rs-40-/// Consistency proof: proves that axioms do not contradict each other.
+crates/amun-state-machine/src/derivation.rs-41-#[derive(Debug, Clone)]
+crates/amun-state-machine/src/derivation.rs-42-pub struct ConsistencyProof {
+crates/amun-state-machine/src/derivation.rs:43:    pub axioms_checked: Vec<ConstitutionalAxiom>,
+crates/amun-state-machine/src/derivation.rs-44-    pub is_consistent: bool,
+crates/amun-state-machine/src/derivation.rs-45-    pub proof_hash: [u8; 32],
+crates/amun-state-machine/src/derivation.rs-46-}
+--
+crates/amun-state-machine/src/stability.rs-1-/// Metrics for constitutional stability over time.
+crates/amun-state-machine/src/stability.rs-2-#[derive(Debug, Clone)]
+crates/amun-state-machine/src/stability.rs:3:pub struct ConstitutionalStabilityMetrics {
+crates/amun-state-machine/src/stability.rs-4-    pub amendment_velocity: f64,
+crates/amun-state-machine/src/stability.rs-5-    pub governance_coherence: f64,
+crates/amun-state-machine/src/stability.rs-6-    pub replay_integrity_score: f64,
+crates/amun-state-machine/src/stability.rs-7-    pub lineage_fragmentation_index: f64,
+crates/amun-state-machine/src/stability.rs-8-    pub civilization_continuity_score: f64,
+crates/amun-state-machine/src/stability.rs-9-    pub total_transitions: u64,
+crates/amun-state-machine/src/stability.rs-10-    pub total_forks: u64,
+crates/amun-state-machine/src/stability.rs-11-    pub total_mergers: u64,
+crates/amun-state-machine/src/stability.rs-12-    pub active_amendments: u64,
+crates/amun-state-machine/src/stability.rs-13-}
+crates/amun-state-machine/src/stability.rs-14-
+crates/amun-state-machine/src/stability.rs:15:impl Default for ConstitutionalStabilityMetrics {
+crates/amun-state-machine/src/stability.rs-16-    fn default() -> Self {
+crates/amun-state-machine/src/stability.rs-17-        Self::new()
+crates/amun-state-machine/src/stability.rs-18-    }
+crates/amun-state-machine/src/stability.rs-19-}
+crates/amun-state-machine/src/stability.rs-20-
+crates/amun-state-machine/src/stability.rs:21:impl ConstitutionalStabilityMetrics {
+crates/amun-state-machine/src/stability.rs-22-    pub fn new() -> Self {
+crates/amun-state-machine/src/stability.rs-23-        Self {
+crates/amun-state-machine/src/stability.rs-24-            amendment_velocity: 0.0,
+crates/amun-state-machine/src/stability.rs-25-            governance_coherence: 1.0,
+crates/amun-state-machine/src/stability.rs-26-            replay_integrity_score: 1.0,
+crates/amun-state-machine/src/stability.rs-27-            lineage_fragmentation_index: 0.0,
+crates/amun-state-machine/src/stability.rs-28-            civilization_continuity_score: 1.0,
+crates/amun-state-machine/src/stability.rs-29-            total_transitions: 0,
+--
+crates/amun-state-machine/src/preconditions.rs:1:use super::states::{ConstitutionalState, StateTag};
+crates/amun-state-machine/src/preconditions.rs-2-use super::transitions::{TransitionAlgebra, TransitionType};
+crates/amun-state-machine/src/preconditions.rs-3-
+crates/amun-state-machine/src/preconditions.rs-4-/// A precondition that must be satisfied before a transition can occur.
+crates/amun-state-machine/src/preconditions.rs-5-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/preconditions.rs-6-pub enum Precondition {
+crates/amun-state-machine/src/preconditions.rs-7-    /// The current state must allow this transition type.
+crates/amun-state-machine/src/preconditions.rs-8-    LegalTransition { from: StateTag, to: TransitionType },
+crates/amun-state-machine/src/preconditions.rs-9-    /// Required quorum must be met for governance actions.
+crates/amun-state-machine/src/preconditions.rs-10-    QuorumMet { required: u64, actual: u64 },
+crates/amun-state-machine/src/preconditions.rs-11-    /// Evolution proof must be valid for amendments.
+crates/amun-state-machine/src/preconditions.rs-12-    EvolutionProofValid { proof_hash: [u8; 32] },
+crates/amun-state-machine/src/preconditions.rs-13-    /// Freeze boundary check must pass for any state change.
+crates/amun-state-machine/src/preconditions.rs-14-    FreezeBoundariesIntact,
+crates/amun-state-machine/src/preconditions.rs-15-    /// Replay continuity must be preserved.
+crates/amun-state-machine/src/preconditions.rs-16-    ReplayContinuityPreserved,
+crates/amun-state-machine/src/preconditions.rs:17:    /// Constitutional identity must remain unchanged unless amendment.
+crates/amun-state-machine/src/preconditions.rs-18-    IdentityPreserved,
+crates/amun-state-machine/src/preconditions.rs-19-}
+crates/amun-state-machine/src/preconditions.rs-20-
+crates/amun-state-machine/src/preconditions.rs-21-impl Precondition {
+crates/amun-state-machine/src/preconditions.rs-22-    /// Verify that the transition is legal from the current state.
+crates/amun-state-machine/src/preconditions.rs-23-    pub fn verify_legal(
+crates/amun-state-machine/src/preconditions.rs:24:        from: &ConstitutionalState,
+crates/amun-state-machine/src/preconditions.rs-25-        transition: TransitionType,
+crates/amun-state-machine/src/preconditions.rs-26-    ) -> Result<(), String> {
+crates/amun-state-machine/src/preconditions.rs-27-        let legal = TransitionAlgebra::legal_transitions(from.state_tag);
+crates/amun-state-machine/src/preconditions.rs-28-        if !legal.contains(&transition) {
+crates/amun-state-machine/src/preconditions.rs-29-            return Err(format!(
+crates/amun-state-machine/src/preconditions.rs-30-                "Illegal transition: {:?} -> {:?}. Legal: {:?}",
+crates/amun-state-machine/src/preconditions.rs-31-                from.state_tag, transition, legal
+crates/amun-state-machine/src/preconditions.rs-32-            ));
+crates/amun-state-machine/src/preconditions.rs-33-        }
+crates/amun-state-machine/src/preconditions.rs-34-        Ok(())
+crates/amun-state-machine/src/preconditions.rs-35-    }
+crates/amun-state-machine/src/preconditions.rs-36-
+crates/amun-state-machine/src/preconditions.rs-37-    /// Verify all preconditions for a transition.
+crates/amun-state-machine/src/preconditions.rs-38-    pub fn verify_all(
+crates/amun-state-machine/src/preconditions.rs:39:        from: &ConstitutionalState,
+crates/amun-state-machine/src/preconditions.rs-40-        transition: TransitionType,
+crates/amun-state-machine/src/preconditions.rs-41-        preconditions: &[Precondition],
+crates/amun-state-machine/src/preconditions.rs-42-    ) -> Result<(), Vec<String>> {
+crates/amun-state-machine/src/preconditions.rs-43-        let mut errors = Vec::new();
+crates/amun-state-machine/src/preconditions.rs-44-        for pc in preconditions {
+crates/amun-state-machine/src/preconditions.rs-45-            if let Err(e) = match pc {
+crates/amun-state-machine/src/preconditions.rs-46-                Precondition::LegalTransition { .. } => Self::verify_legal(from, transition),
+crates/amun-state-machine/src/preconditions.rs-47-                _ => Ok(()),
+--
+crates/amun-state-machine/src/engine.rs:1:use super::historical_invariants::HistoricalInvariantEngine;
+crates/amun-state-machine/src/engine.rs:2:use super::invariants::ConstitutionalInvariant;
+crates/amun-state-machine/src/engine.rs-3-use super::preconditions::Precondition;
+crates/amun-state-machine/src/engine.rs:4:use super::replay_log::ConstitutionalReplayDAG;
+crates/amun-state-machine/src/engine.rs:5:use super::states::{ConstitutionalState, StateTag};
+crates/amun-state-machine/src/engine.rs-6-use super::transitions::{Transition, TransitionAlgebra, TransitionType};
+crates/amun-state-machine/src/engine.rs-7-
+crates/amun-state-machine/src/engine.rs:8:/// ConstitutionalPolicyEngine: determines WHAT is legal.
+crates/amun-state-machine/src/engine.rs-9-/// Separated from execution to prevent hidden sovereign authority.
+crates/amun-state-machine/src/engine.rs:10:pub struct ConstitutionalPolicyEngine;
+crates/amun-state-machine/src/engine.rs-11-
+crates/amun-state-machine/src/engine.rs:12:impl ConstitutionalPolicyEngine {
+crates/amun-state-machine/src/engine.rs-13-    pub fn is_legal(from: StateTag, transition: TransitionType) -> bool {
+crates/amun-state-machine/src/engine.rs-14-        TransitionAlgebra::resolve(from, transition).is_some()
+crates/amun-state-machine/src/engine.rs-15-    }
+crates/amun-state-machine/src/engine.rs-16-
+crates/amun-state-machine/src/engine.rs-17-    pub fn forbidden(from: StateTag) -> Vec<TransitionType> {
+crates/amun-state-machine/src/engine.rs-18-        TransitionAlgebra::forbidden_transitions(from)
+crates/amun-state-machine/src/engine.rs-19-    }
+crates/amun-state-machine/src/engine.rs-20-}
+crates/amun-state-machine/src/engine.rs-21-
+crates/amun-state-machine/src/engine.rs:22:/// ConstitutionalExecutionEngine: determines HOW to execute.
+crates/amun-state-machine/src/engine.rs:23:pub struct ConstitutionalExecutionEngine {
+crates/amun-state-machine/src/engine.rs:24:    pub history: HistoricalInvariantEngine,
+crates/amun-state-machine/src/engine.rs:25:    pub replay_log: ConstitutionalReplayDAG,
+crates/amun-state-machine/src/engine.rs-26-}
+crates/amun-state-machine/src/engine.rs-27-
+crates/amun-state-machine/src/engine.rs:28:impl Default for ConstitutionalExecutionEngine {
+crates/amun-state-machine/src/engine.rs-29-    fn default() -> Self {
+crates/amun-state-machine/src/engine.rs-30-        Self::new()
+crates/amun-state-machine/src/engine.rs-31-    }
+crates/amun-state-machine/src/engine.rs-32-}
+crates/amun-state-machine/src/engine.rs-33-
+crates/amun-state-machine/src/engine.rs:34:impl ConstitutionalExecutionEngine {
+crates/amun-state-machine/src/engine.rs-35-    pub fn new() -> Self {
+crates/amun-state-machine/src/engine.rs-36-        Self {
+crates/amun-state-machine/src/engine.rs:37:            history: HistoricalInvariantEngine::new(),
+crates/amun-state-machine/src/engine.rs:38:            replay_log: ConstitutionalReplayDAG::new(),
+crates/amun-state-machine/src/engine.rs-39-        }
+crates/amun-state-machine/src/engine.rs-40-    }
+crates/amun-state-machine/src/engine.rs-41-
+crates/amun-state-machine/src/engine.rs-42-    #[allow(clippy::too_many_arguments)]
+crates/amun-state-machine/src/engine.rs-43-    pub fn execute(
+crates/amun-state-machine/src/engine.rs-44-        &mut self,
+crates/amun-state-machine/src/engine.rs:45:        from: &ConstitutionalState,
+crates/amun-state-machine/src/engine.rs-46-        transition_type: TransitionType,
+crates/amun-state-machine/src/engine.rs-47-        preconditions: &[Precondition],
+crates/amun-state-machine/src/engine.rs-48-        epoch: u64,
+crates/amun-state-machine/src/engine.rs-49-        generation: u64,
+crates/amun-state-machine/src/engine.rs-50-        civilization_id: [u8; 32],
+crates/amun-state-machine/src/engine.rs-51-        constitution_hash: [u8; 32],
+crates/amun-state-machine/src/engine.rs-52-        previous_transition_hash: Option<[u8; 32]>,
+crates/amun-state-machine/src/engine.rs-53-        checkpoint_root: [u8; 32],
+crates/amun-state-machine/src/engine.rs-54-        lineage_head_hash: [u8; 32],
+crates/amun-state-machine/src/engine.rs-55-        constitutional_delta_hash: [u8; 32],
+crates/amun-state-machine/src/engine.rs-56-        causal_transition_hash: Option<[u8; 32]>,
+crates/amun-state-machine/src/engine.rs:57:    ) -> Result<(ConstitutionalState, Transition), Vec<String>> {
+crates/amun-state-machine/src/engine.rs:58:        if !ConstitutionalPolicyEngine::is_legal(from.state_tag, transition_type) {
+crates/amun-state-machine/src/engine.rs-59-            return Err(vec![format!(
+crates/amun-state-machine/src/engine.rs-60-                "Illegal transition: {:?} -> {:?}",
+crates/amun-state-machine/src/engine.rs-61-                from.state_tag, transition_type
+crates/amun-state-machine/src/engine.rs-62-            )]);
+crates/amun-state-machine/src/engine.rs-63-        }
+crates/amun-state-machine/src/engine.rs-64-
+crates/amun-state-machine/src/engine.rs-65-        Precondition::verify_all(from, transition_type, preconditions)?;
+crates/amun-state-machine/src/engine.rs-66-
+--
+crates/amun-state-machine/src/engine.rs-77-            constitutional_delta_hash,
+crates/amun-state-machine/src/engine.rs-78-            causal_transition_hash,
+crates/amun-state-machine/src/engine.rs-79-        );
+crates/amun-state-machine/src/engine.rs-80-
+crates/amun-state-machine/src/engine.rs-81-        if let Err(e) = transition.verify_monotonicity() {
+crates/amun-state-machine/src/engine.rs-82-            return Err(vec![e]);
+crates/amun-state-machine/src/engine.rs-83-        }
+crates/amun-state-machine/src/engine.rs-84-
+crates/amun-state-machine/src/engine.rs:85:        let new_state = ConstitutionalState::new(
+crates/amun-state-machine/src/engine.rs-86-            to_tag,
+crates/amun-state-machine/src/engine.rs-87-            civilization_id,
+crates/amun-state-machine/src/engine.rs-88-            constitution_hash,
+crates/amun-state-machine/src/engine.rs-89-            epoch,
+crates/amun-state-machine/src/engine.rs-90-            generation,
+crates/amun-state-machine/src/engine.rs-91-            Some(from.state_tag),
+crates/amun-state-machine/src/engine.rs-92-            Some(transition.transition_id),
+crates/amun-state-machine/src/engine.rs-93-        );
+--
+crates/amun-state-machine/src/engine.rs-109-        // Append to replay log
+crates/amun-state-machine/src/engine.rs-110-        self.replay_log
+crates/amun-state-machine/src/engine.rs-111-            .append(&transition, vec![transition.transition_id]);
+crates/amun-state-machine/src/engine.rs-112-
+crates/amun-state-machine/src/engine.rs-113-        Ok((new_state, transition))
+crates/amun-state-machine/src/engine.rs-114-    }
+crates/amun-state-machine/src/engine.rs-115-}
+crates/amun-state-machine/src/engine.rs-116-
+crates/amun-state-machine/src/engine.rs:117:/// ConstitutionalProofEngine: determines WHY a transition is valid.
+crates/amun-state-machine/src/engine.rs:118:pub struct ConstitutionalProofEngine;
+crates/amun-state-machine/src/engine.rs-119-
+crates/amun-state-machine/src/engine.rs:120:impl ConstitutionalProofEngine {
+crates/amun-state-machine/src/engine.rs-121-    pub fn prove_transition(
+crates/amun-state-machine/src/engine.rs-122-        transition: &Transition,
+crates/amun-state-machine/src/engine.rs:123:        invariants: &[ConstitutionalInvariant],
+crates/amun-state-machine/src/engine.rs:124:        old_state: &ConstitutionalState,
+crates/amun-state-machine/src/engine.rs:125:        new_state: &ConstitutionalState,
+crates/amun-state-machine/src/engine.rs-126-    ) -> Result<[u8; 32], Vec<String>> {
+crates/amun-state-machine/src/engine.rs-127-        let mut errors = Vec::new();
+crates/amun-state-machine/src/engine.rs-128-        for inv in invariants {
+crates/amun-state-machine/src/engine.rs-129-            match inv {
+crates/amun-state-machine/src/engine.rs:130:                ConstitutionalInvariant::NoImpossibleState => {
+crates/amun-state-machine/src/engine.rs-131-                    if new_state.state_tag == StateTag::Extinct
+crates/amun-state-machine/src/engine.rs-132-                        && old_state.state_tag == StateTag::Genesis
+crates/amun-state-machine/src/engine.rs-133-                    {
+crates/amun-state-machine/src/engine.rs-134-                        errors.push("Cannot go from Genesis directly to Extinct".to_string());
+crates/amun-state-machine/src/engine.rs-135-                    }
+crates/amun-state-machine/src/engine.rs-136-                }
+crates/amun-state-machine/src/engine.rs:137:                ConstitutionalInvariant::TransitionHistoryAcyclic => {
+crates/amun-state-machine/src/engine.rs-138-                    if old_state.state_hash == new_state.state_hash {
+crates/amun-state-machine/src/engine.rs-139-                        errors.push("Self-loop detected".to_string());
+crates/amun-state-machine/src/engine.rs-140-                    }
+crates/amun-state-machine/src/engine.rs-141-                }
+crates/amun-state-machine/src/engine.rs:142:                ConstitutionalInvariant::LineageIntact
+crates/amun-state-machine/src/engine.rs-143-                    if new_state.civilization_id != old_state.civilization_id =>
+crates/amun-state-machine/src/engine.rs-144-                {
+crates/amun-state-machine/src/engine.rs-145-                    errors.push("Civilization ID changed".to_string());
+crates/amun-state-machine/src/engine.rs-146-                }
+crates/amun-state-machine/src/engine.rs-147-                _ => {}
+crates/amun-state-machine/src/engine.rs-148-            }
+crates/amun-state-machine/src/engine.rs-149-        }
+crates/amun-state-machine/src/engine.rs-150-        if errors.is_empty() {
+--
+crates/amun-state-machine/src/invariants.rs:1:/// Constitutional invariants that must be preserved across ALL transitions.
+crates/amun-state-machine/src/invariants.rs-2-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/invariants.rs:3:pub enum ConstitutionalInvariant {
+crates/amun-state-machine/src/invariants.rs-4-    /// The civilization must have a valid lineage.
+crates/amun-state-machine/src/invariants.rs-5-    LineageIntact,
+crates/amun-state-machine/src/invariants.rs-6-    /// The constitution must be self-consistent.
+crates/amun-state-machine/src/invariants.rs:7:    ConstitutionConsistent,
+crates/amun-state-machine/src/invariants.rs-8-    /// Freeze boundaries must not have been violated.
+crates/amun-state-machine/src/invariants.rs-9-    FreezeBoundariesIntact,
+crates/amun-state-machine/src/invariants.rs-10-    /// Replay determinism must be preserved.
+crates/amun-state-machine/src/invariants.rs-11-    ReplayDeterminismPreserved,
+crates/amun-state-machine/src/invariants.rs-12-    /// The state machine must not be in an impossible configuration.
+crates/amun-state-machine/src/invariants.rs-13-    NoImpossibleState,
+crates/amun-state-machine/src/invariants.rs-14-    /// The transition history must be acyclic (no state loops).
+crates/amun-state-machine/src/invariants.rs-15-    TransitionHistoryAcyclic,
+crates/amun-state-machine/src/invariants.rs:16:    /// Constitutional identity must not have been silently mutated.
+crates/amun-state-machine/src/invariants.rs-17-    IdentityNotSilentlyMutated,
+crates/amun-state-machine/src/invariants.rs-18-}
+--
+crates/amun-state-machine/src/historical_invariants.rs-1-/// Historical invariants that span multiple transitions.
+crates/amun-state-machine/src/historical_invariants.rs-2-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/historical_invariants.rs:3:pub enum HistoricalInvariant {
+crates/amun-state-machine/src/historical_invariants.rs-4-    /// No freeze/unfreeze oscillation (max N cycles per epoch)
+crates/amun-state-machine/src/historical_invariants.rs-5-    MaxFreezeUnfreezeCycles {
+crates/amun-state-machine/src/historical_invariants.rs-6-        max_per_epoch: u64,
+crates/amun-state-machine/src/historical_invariants.rs-7-        current_count: u64,
+crates/amun-state-machine/src/historical_invariants.rs-8-    },
+crates/amun-state-machine/src/historical_invariants.rs-9-    /// No amendment oscillation (max N active amendments per epoch)
+crates/amun-state-machine/src/historical_invariants.rs-10-    MaxAmendmentsPerEpoch {
+crates/amun-state-machine/src/historical_invariants.rs-11-        max_per_epoch: u64,
+--
+crates/amun-state-machine/src/historical_invariants.rs-15-    MaxReplayDivergence {
+crates/amun-state-machine/src/historical_invariants.rs-16-        max_cumulative_bytes: u64,
+crates/amun-state-machine/src/historical_invariants.rs-17-        current: u64,
+crates/amun-state-machine/src/historical_invariants.rs-18-    },
+crates/amun-state-machine/src/historical_invariants.rs-19-    /// Governance must not degrade below minimum compatibility
+crates/amun-state-machine/src/historical_invariants.rs-20-    MinGovernanceCompatibility { min_rank: u8, current_rank: u8 },
+crates/amun-state-machine/src/historical_invariants.rs-21-}
+crates/amun-state-machine/src/historical_invariants.rs-22-
+crates/amun-state-machine/src/historical_invariants.rs:23:impl HistoricalInvariant {
+crates/amun-state-machine/src/historical_invariants.rs-24-    pub fn check(&self) -> Result<(), String> {
+crates/amun-state-machine/src/historical_invariants.rs-25-        match self {
+crates/amun-state-machine/src/historical_invariants.rs:26:            HistoricalInvariant::MaxFreezeUnfreezeCycles {
+crates/amun-state-machine/src/historical_invariants.rs-27-                max_per_epoch,
+crates/amun-state-machine/src/historical_invariants.rs-28-                current_count,
+crates/amun-state-machine/src/historical_invariants.rs-29-            } => {
+crates/amun-state-machine/src/historical_invariants.rs-30-                if current_count > max_per_epoch {
+crates/amun-state-machine/src/historical_invariants.rs-31-                    return Err(format!(
+crates/amun-state-machine/src/historical_invariants.rs-32-                        "Freeze/unfreeze cycle limit exceeded: {} > {}",
+crates/amun-state-machine/src/historical_invariants.rs-33-                        current_count, max_per_epoch
+crates/amun-state-machine/src/historical_invariants.rs-34-                    ));
+crates/amun-state-machine/src/historical_invariants.rs-35-                }
+crates/amun-state-machine/src/historical_invariants.rs-36-            }
+crates/amun-state-machine/src/historical_invariants.rs:37:            HistoricalInvariant::MaxAmendmentsPerEpoch {
+crates/amun-state-machine/src/historical_invariants.rs-38-                max_per_epoch,
+crates/amun-state-machine/src/historical_invariants.rs-39-                current_count,
+crates/amun-state-machine/src/historical_invariants.rs-40-            } => {
+crates/amun-state-machine/src/historical_invariants.rs-41-                if current_count > max_per_epoch {
+crates/amun-state-machine/src/historical_invariants.rs-42-                    return Err(format!(
+crates/amun-state-machine/src/historical_invariants.rs-43-                        "Amendment limit exceeded: {} > {}",
+crates/amun-state-machine/src/historical_invariants.rs-44-                        current_count, max_per_epoch
+crates/amun-state-machine/src/historical_invariants.rs-45-                    ));
+crates/amun-state-machine/src/historical_invariants.rs-46-                }
+crates/amun-state-machine/src/historical_invariants.rs-47-            }
+crates/amun-state-machine/src/historical_invariants.rs:48:            HistoricalInvariant::MaxReplayDivergence {
+crates/amun-state-machine/src/historical_invariants.rs-49-                max_cumulative_bytes,
+crates/amun-state-machine/src/historical_invariants.rs-50-                current,
+crates/amun-state-machine/src/historical_invariants.rs-51-            } => {
+crates/amun-state-machine/src/historical_invariants.rs-52-                if current > max_cumulative_bytes {
+crates/amun-state-machine/src/historical_invariants.rs-53-                    return Err(format!(
+crates/amun-state-machine/src/historical_invariants.rs-54-                        "Replay divergence accumulation exceeded: {} > {}",
+crates/amun-state-machine/src/historical_invariants.rs-55-                        current, max_cumulative_bytes
+crates/amun-state-machine/src/historical_invariants.rs-56-                    ));
+crates/amun-state-machine/src/historical_invariants.rs-57-                }
+crates/amun-state-machine/src/historical_invariants.rs-58-            }
+crates/amun-state-machine/src/historical_invariants.rs:59:            HistoricalInvariant::MinGovernanceCompatibility {
+crates/amun-state-machine/src/historical_invariants.rs-60-                min_rank,
+crates/amun-state-machine/src/historical_invariants.rs-61-                current_rank,
+crates/amun-state-machine/src/historical_invariants.rs-62-            } => {
+crates/amun-state-machine/src/historical_invariants.rs-63-                if current_rank < min_rank {
+crates/amun-state-machine/src/historical_invariants.rs-64-                    return Err(format!(
+crates/amun-state-machine/src/historical_invariants.rs-65-                        "Governance compatibility degraded: {} < {}",
+crates/amun-state-machine/src/historical_invariants.rs-66-                        current_rank, min_rank
+crates/amun-state-machine/src/historical_invariants.rs-67-                    ));
+--
+crates/amun-state-machine/src/historical_invariants.rs-69-            }
+crates/amun-state-machine/src/historical_invariants.rs-70-        }
+crates/amun-state-machine/src/historical_invariants.rs-71-        Ok(())
+crates/amun-state-machine/src/historical_invariants.rs-72-    }
+crates/amun-state-machine/src/historical_invariants.rs-73-}
+crates/amun-state-machine/src/historical_invariants.rs-74-
+crates/amun-state-machine/src/historical_invariants.rs-75-/// Engine that tracks historical invariants across multiple transitions.
+crates/amun-state-machine/src/historical_invariants.rs-76-#[derive(Debug, Clone)]
+crates/amun-state-machine/src/historical_invariants.rs:77:pub struct HistoricalInvariantEngine {
+crates/amun-state-machine/src/historical_invariants.rs-78-    pub freeze_unfreeze_count: u64,
+crates/amun-state-machine/src/historical_invariants.rs-79-    pub amendments_this_epoch: u64,
+crates/amun-state-machine/src/historical_invariants.rs-80-    pub cumulative_replay_divergence: u64,
+crates/amun-state-machine/src/historical_invariants.rs-81-    pub governance_compatibility_rank: u8,
+crates/amun-state-machine/src/historical_invariants.rs-82-    pub current_epoch: u64,
+crates/amun-state-machine/src/historical_invariants.rs-83-}
+crates/amun-state-machine/src/historical_invariants.rs-84-
+crates/amun-state-machine/src/historical_invariants.rs:85:impl Default for HistoricalInvariantEngine {
+crates/amun-state-machine/src/historical_invariants.rs-86-    fn default() -> Self {
+crates/amun-state-machine/src/historical_invariants.rs-87-        Self::new()
+crates/amun-state-machine/src/historical_invariants.rs-88-    }
+crates/amun-state-machine/src/historical_invariants.rs-89-}
+crates/amun-state-machine/src/historical_invariants.rs-90-
+crates/amun-state-machine/src/historical_invariants.rs:91:impl HistoricalInvariantEngine {
+crates/amun-state-machine/src/historical_invariants.rs-92-    pub fn new() -> Self {
+crates/amun-state-machine/src/historical_invariants.rs-93-        Self {
+crates/amun-state-machine/src/historical_invariants.rs-94-            freeze_unfreeze_count: 0,
+crates/amun-state-machine/src/historical_invariants.rs-95-            amendments_this_epoch: 0,
+crates/amun-state-machine/src/historical_invariants.rs-96-            cumulative_replay_divergence: 0,
+crates/amun-state-machine/src/historical_invariants.rs-97-            governance_compatibility_rank: 5,
+crates/amun-state-machine/src/historical_invariants.rs-98-            current_epoch: 0,
+crates/amun-state-machine/src/historical_invariants.rs-99-        }
+--
+crates/amun-state-machine/src/historical_invariants.rs-117-            self.current_epoch = epoch;
+crates/amun-state-machine/src/historical_invariants.rs-118-            self.freeze_unfreeze_count = 0;
+crates/amun-state-machine/src/historical_invariants.rs-119-            self.amendments_this_epoch = 0;
+crates/amun-state-machine/src/historical_invariants.rs-120-        }
+crates/amun-state-machine/src/historical_invariants.rs-121-    }
+crates/amun-state-machine/src/historical_invariants.rs-122-
+crates/amun-state-machine/src/historical_invariants.rs-123-    pub fn check_all(&self) -> Result<(), Vec<String>> {
+crates/amun-state-machine/src/historical_invariants.rs-124-        let invariants = vec![
+crates/amun-state-machine/src/historical_invariants.rs:125:            HistoricalInvariant::MaxFreezeUnfreezeCycles {
+crates/amun-state-machine/src/historical_invariants.rs-126-                max_per_epoch: 3,
+crates/amun-state-machine/src/historical_invariants.rs-127-                current_count: self.freeze_unfreeze_count,
+crates/amun-state-machine/src/historical_invariants.rs-128-            },
+crates/amun-state-machine/src/historical_invariants.rs:129:            HistoricalInvariant::MaxAmendmentsPerEpoch {
+crates/amun-state-machine/src/historical_invariants.rs-130-                max_per_epoch: 5,
+crates/amun-state-machine/src/historical_invariants.rs-131-                current_count: self.amendments_this_epoch,
+crates/amun-state-machine/src/historical_invariants.rs-132-            },
+crates/amun-state-machine/src/historical_invariants.rs:133:            HistoricalInvariant::MaxReplayDivergence {
+crates/amun-state-machine/src/historical_invariants.rs-134-                max_cumulative_bytes: 1024,
+crates/amun-state-machine/src/historical_invariants.rs-135-                current: self.cumulative_replay_divergence,
+crates/amun-state-machine/src/historical_invariants.rs-136-            },
+crates/amun-state-machine/src/historical_invariants.rs:137:            HistoricalInvariant::MinGovernanceCompatibility {
+crates/amun-state-machine/src/historical_invariants.rs-138-                min_rank: 2,
+crates/amun-state-machine/src/historical_invariants.rs-139-                current_rank: self.governance_compatibility_rank,
+crates/amun-state-machine/src/historical_invariants.rs-140-            },
+crates/amun-state-machine/src/historical_invariants.rs-141-        ];
+crates/amun-state-machine/src/historical_invariants.rs-142-        let mut errors = Vec::new();
+crates/amun-state-machine/src/historical_invariants.rs-143-        for inv in &invariants {
+crates/amun-state-machine/src/historical_invariants.rs-144-            if let Err(e) = inv.check() {
+crates/amun-state-machine/src/historical_invariants.rs-145-                errors.push(e);
+--
+crates/amun-state-machine/src/formal_entropy.rs-21-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/formal_entropy.rs-22-pub enum EntropySinkType {
+crates/amun-state-machine/src/formal_entropy.rs-23-    /// A successful merger absorbs entropy
+crates/amun-state-machine/src/formal_entropy.rs-24-    Merger,
+crates/amun-state-machine/src/formal_entropy.rs-25-    /// A freeze absorbs entropy
+crates/amun-state-machine/src/formal_entropy.rs-26-    Freeze,
+crates/amun-state-machine/src/formal_entropy.rs-27-    /// Replay convergence absorbs entropy
+crates/amun-state-machine/src/formal_entropy.rs-28-    ReplayConvergence,
+crates/amun-state-machine/src/formal_entropy.rs:29:    /// Constitutional court ruling absorbs entropy
+crates/amun-state-machine/src/formal_entropy.rs-30-    CourtRuling,
+crates/amun-state-machine/src/formal_entropy.rs-31-}
+crates/amun-state-machine/src/formal_entropy.rs-32-
+crates/amun-state-machine/src/formal_entropy.rs-33-/// Entropy conservation laws.
+crates/amun-state-machine/src/formal_entropy.rs-34-#[derive(Debug, Clone)]
+crates/amun-state-machine/src/formal_entropy.rs-35-pub struct EntropyConservationLaws;
+crates/amun-state-machine/src/formal_entropy.rs-36-
+crates/amun-state-machine/src/formal_entropy.rs-37-impl EntropyConservationLaws {
+--
+crates/amun-state-machine/src/delta_algebra.rs-1-use amun_canonical_codec::CanonicalHasher;
+crates/amun-state-machine/src/delta_algebra.rs-2-
+crates/amun-state-machine/src/delta_algebra.rs-3-/// Formal constitutional delta types.
+crates/amun-state-machine/src/delta_algebra.rs-4-/// Each delta represents a specific semantic change to the constitution.
+crates/amun-state-machine/src/delta_algebra.rs-5-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-state-machine/src/delta_algebra.rs:6:pub enum ConstitutionalDelta {
+crates/amun-state-machine/src/delta_algebra.rs-7-    GovernanceDelta {
+crates/amun-state-machine/src/delta_algebra.rs-8-        old_quorum: u64,
+crates/amun-state-machine/src/delta_algebra.rs-9-        new_quorum: u64,
+crates/amun-state-machine/src/delta_algebra.rs-10-    },
+crates/amun-state-machine/src/delta_algebra.rs-11-    ReplayDelta {
+crates/amun-state-machine/src/delta_algebra.rs-12-        old_guarantee_rank: u8,
+crates/amun-state-machine/src/delta_algebra.rs-13-        new_guarantee_rank: u8,
+crates/amun-state-machine/src/delta_algebra.rs-14-    },
+--
+crates/amun-state-machine/src/delta_algebra.rs-31-    },
+crates/amun-state-machine/src/delta_algebra.rs-32-    SnapshotFormatDelta {
+crates/amun-state-machine/src/delta_algebra.rs-33-        old_snapshot_version: u32,
+crates/amun-state-machine/src/delta_algebra.rs-34-        new_snapshot_version: u32,
+crates/amun-state-machine/src/delta_algebra.rs-35-    },
+crates/amun-state-machine/src/delta_algebra.rs-36-    Noop,
+crates/amun-state-machine/src/delta_algebra.rs-37-}
+crates/amun-state-machine/src/delta_algebra.rs-38-
+crates/amun-state-machine/src/delta_algebra.rs:39:impl ConstitutionalDelta {
+crates/amun-state-machine/src/delta_algebra.rs-40-    pub fn canonical_tag(&self) -> u8 {
+crates/amun-state-machine/src/delta_algebra.rs-41-        match self {
+crates/amun-state-machine/src/delta_algebra.rs-42-            Self::GovernanceDelta { .. } => 0x01,
+crates/amun-state-machine/src/delta_algebra.rs-43-            Self::ReplayDelta { .. } => 0x02,
+crates/amun-state-machine/src/delta_algebra.rs-44-            Self::ProofSystemDelta { .. } => 0x03,
+crates/amun-state-machine/src/delta_algebra.rs-45-            Self::FreezeBoundaryDelta { .. } => 0x04,
+crates/amun-state-machine/src/delta_algebra.rs-46-            Self::IdentityDelta { .. } => 0x05,
+crates/amun-state-machine/src/delta_algebra.rs-47-            Self::CompatibilityDelta { .. } => 0x06,
+--
+crates/amun-authority-registry/src/executor.rs:1:use crate::authority::ConstitutionalAuthority;
+crates/amun-authority-registry/src/executor.rs-2-use crate::governance::{GovernanceAction, GovernanceProposal};
+crates/amun-authority-registry/src/executor.rs-3-use crate::registry::{AuthorityRegistry, AuthorityTransition};
+crates/amun-authority-registry/src/executor.rs-4-use crate::voting::ProposalVotes;
+crates/amun-authority-registry/src/executor.rs-5-use serde::{Deserialize, Serialize};
+crates/amun-authority-registry/src/executor.rs-6-use std::collections::BTreeSet;
+crates/amun-authority-registry/src/executor.rs-7-
+crates/amun-authority-registry/src/executor.rs-8-/// Errors that can occur during governance execution.
+crates/amun-authority-registry/src/executor.rs-9-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+--
+crates/amun-authority-registry/src/executor.rs-58-    }
+crates/amun-authority-registry/src/executor.rs-59-
+crates/amun-authority-registry/src/executor.rs-60-    // Execute the action
+crates/amun-authority-registry/src/executor.rs-61-    match &proposal.action {
+crates/amun-authority-registry/src/executor.rs-62-        GovernanceAction::AddAuthority {
+crates/amun-authority-registry/src/executor.rs-63-            authority_public_key,
+crates/amun-authority-registry/src/executor.rs-64-            authority_version,
+crates/amun-authority-registry/src/executor.rs-65-        } => {
+crates/amun-authority-registry/src/executor.rs:66:            let authority = ConstitutionalAuthority::new(
+crates/amun-authority-registry/src/executor.rs-67-                *authority_public_key,
+crates/amun-authority-registry/src/executor.rs-68-                *authority_version,
+crates/amun-authority-registry/src/executor.rs-69-                proposal.created_height,
+crates/amun-authority-registry/src/executor.rs-70-            );
+crates/amun-authority-registry/src/executor.rs-71-            registry.register(authority);
+crates/amun-authority-registry/src/executor.rs-72-        }
+crates/amun-authority-registry/src/executor.rs-73-        GovernanceAction::ScheduleTransition {
+crates/amun-authority-registry/src/executor.rs-74-            from_version,
+--
+crates/amun-authority-registry/src/executor.rs-116-#[cfg(test)]
+crates/amun-authority-registry/src/executor.rs-117-mod tests {
+crates/amun-authority-registry/src/executor.rs-118-    use super::*;
+crates/amun-authority-registry/src/executor.rs-119-    use crate::governance::{GovernanceAction, GovernanceProposal};
+crates/amun-authority-registry/src/executor.rs-120-    use crate::voting::GovernanceVote;
+crates/amun-authority-registry/src/executor.rs-121-
+crates/amun-authority-registry/src/executor.rs-122-    fn setup_registry_with_two_authorities() -> AuthorityRegistry {
+crates/amun-authority-registry/src/executor.rs-123-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/executor.rs:124:        reg.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/executor.rs:125:        reg.register(ConstitutionalAuthority::new([2u8; 32], 2, 0));
+crates/amun-authority-registry/src/executor.rs-126-        reg
+crates/amun-authority-registry/src/executor.rs-127-    }
+crates/amun-authority-registry/src/executor.rs-128-
+crates/amun-authority-registry/src/executor.rs-129-    #[test]
+crates/amun-authority-registry/src/executor.rs-130-    fn n107_7c_execute_add_authority() {
+crates/amun-authority-registry/src/executor.rs-131-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/executor.rs-132-        let action = GovernanceAction::AddAuthority {
+crates/amun-authority-registry/src/executor.rs-133-            authority_public_key: [3u8; 32],
+--
+crates/amun-authority-registry/src/lib.rs-27-#![allow(clippy::doc_markdown)]
+crates/amun-authority-registry/src/lib.rs-28-#![allow(clippy::new_without_default)]
+crates/amun-authority-registry/src/lib.rs-29-#![allow(clippy::collapsible_if)]
+crates/amun-authority-registry/src/lib.rs-30-#![allow(clippy::manual_map)]
+crates/amun-authority-registry/src/lib.rs-31-#![allow(clippy::needless_borrows_for_generic_args)]
+crates/amun-authority-registry/src/lib.rs-32-pub mod authority;
+crates/amun-authority-registry/src/lib.rs-33-pub mod registry;
+crates/amun-authority-registry/src/lib.rs-34-
+crates/amun-authority-registry/src/lib.rs:35:pub use authority::ConstitutionalAuthority;
+crates/amun-authority-registry/src/lib.rs-36-pub use registry::AuthorityRegistry;
+crates/amun-authority-registry/src/lib.rs-37-pub mod executor;
+crates/amun-authority-registry/src/lib.rs-38-pub mod governance;
+crates/amun-authority-registry/src/lib.rs-39-pub mod recovery;
+crates/amun-authority-registry/src/lib.rs-40-pub mod transaction;
+crates/amun-authority-registry/src/lib.rs-41-pub mod voting;
+crates/amun-authority-registry/src/lib.rs-42-pub mod wal;
+--
+crates/amun-authority-registry/src/transaction.rs-87-        postcard::from_bytes(bytes)
+crates/amun-authority-registry/src/transaction.rs-88-            .map_err(|e| format!("GovernanceState deserialization failed: {}", e))
+crates/amun-authority-registry/src/transaction.rs-89-    }
+crates/amun-authority-registry/src/transaction.rs-90-}
+crates/amun-authority-registry/src/transaction.rs-91-
+crates/amun-authority-registry/src/transaction.rs-92-#[cfg(test)]
+crates/amun-authority-registry/src/transaction.rs-93-mod tests {
+crates/amun-authority-registry/src/transaction.rs-94-    use super::*;
+crates/amun-authority-registry/src/transaction.rs:95:    use crate::authority::ConstitutionalAuthority;
+crates/amun-authority-registry/src/transaction.rs-96-    use crate::governance::{GovernanceAction, GovernanceProposal};
+crates/amun-authority-registry/src/transaction.rs-97-    use crate::voting::GovernanceVote;
+crates/amun-authority-registry/src/transaction.rs-98-
+crates/amun-authority-registry/src/transaction.rs-99-    #[test]
+crates/amun-authority-registry/src/transaction.rs-100-    fn n107_7d_submit_proposal_transaction() {
+crates/amun-authority-registry/src/transaction.rs-101-        let mut state = GovernanceState::new();
+crates/amun-authority-registry/src/transaction.rs-102-        let action = GovernanceAction::AddAuthority {
+crates/amun-authority-registry/src/transaction.rs-103-            authority_public_key: [3u8; 32],
+--
+crates/amun-authority-registry/src/transaction.rs-133-            1
+crates/amun-authority-registry/src/transaction.rs-134-        );
+crates/amun-authority-registry/src/transaction.rs-135-    }
+crates/amun-authority-registry/src/transaction.rs-136-
+crates/amun-authority-registry/src/transaction.rs-137-    #[test]
+crates/amun-authority-registry/src/transaction.rs-138-    fn n107_7d_finalize_block_executes_governance() {
+crates/amun-authority-registry/src/transaction.rs-139-        let mut state = GovernanceState::new();
+crates/amun-authority-registry/src/transaction.rs-140-        let mut registry = crate::registry::AuthorityRegistry::new();
+crates/amun-authority-registry/src/transaction.rs:141:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/transaction.rs-142-
+crates/amun-authority-registry/src/transaction.rs-143-        let action = GovernanceAction::AddAuthority {
+crates/amun-authority-registry/src/transaction.rs-144-            authority_public_key: [2u8; 32],
+crates/amun-authority-registry/src/transaction.rs-145-            authority_version: 2,
+crates/amun-authority-registry/src/transaction.rs-146-        };
+crates/amun-authority-registry/src/transaction.rs-147-        let proposal = GovernanceProposal::new([0xAA; 32], action, 100);
+crates/amun-authority-registry/src/transaction.rs-148-        state.apply_transaction(&GovernanceTransaction::SubmitProposal(proposal.clone()));
+crates/amun-authority-registry/src/transaction.rs-149-
+--
+crates/amun-authority-registry/src/transaction.rs-211-        let restored = GovernanceState::restore(&bytes).unwrap();
+crates/amun-authority-registry/src/transaction.rs-212-        assert_eq!(restored.proposals.len(), 3);
+crates/amun-authority-registry/src/transaction.rs-213-    }
+crates/amun-authority-registry/src/transaction.rs-214-
+crates/amun-authority-registry/src/transaction.rs-215-    #[test]
+crates/amun-authority-registry/src/transaction.rs-216-    fn n107_8a_executed_proposals_survive_snapshot() {
+crates/amun-authority-registry/src/transaction.rs-217-        let mut state = GovernanceState::new();
+crates/amun-authority-registry/src/transaction.rs-218-        let mut registry = crate::registry::AuthorityRegistry::new();
+crates/amun-authority-registry/src/transaction.rs:219:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/transaction.rs-220-
+crates/amun-authority-registry/src/transaction.rs-221-        let action = GovernanceAction::AddAuthority {
+crates/amun-authority-registry/src/transaction.rs-222-            authority_public_key: [2u8; 32],
+crates/amun-authority-registry/src/transaction.rs-223-            authority_version: 2,
+crates/amun-authority-registry/src/transaction.rs-224-        };
+crates/amun-authority-registry/src/transaction.rs-225-        let proposal = GovernanceProposal::new([0xAA; 32], action, 100);
+crates/amun-authority-registry/src/transaction.rs-226-        state.apply_transaction(&GovernanceTransaction::SubmitProposal(proposal.clone()));
+crates/amun-authority-registry/src/transaction.rs-227-        for id in 1..=3u8 {
+--
+crates/amun-authority-registry/src/wal.rs-121-                    proposal_id: proposal.proposal_id,
+crates/amun-authority-registry/src/wal.rs-122-                    validator_id: [id; 32],
+crates/amun-authority-registry/src/wal.rs-123-                    vote: GovernanceVote::Approve,
+crates/amun-authority-registry/src/wal.rs-124-                },
+crates/amun-authority-registry/src/wal.rs-125-            );
+crates/amun-authority-registry/src/wal.rs-126-        }
+crates/amun-authority-registry/src/wal.rs-127-
+crates/amun-authority-registry/src/wal.rs-128-        let mut registry = crate::registry::AuthorityRegistry::new();
+crates/amun-authority-registry/src/wal.rs:129:        registry.register(crate::authority::ConstitutionalAuthority::new(
+crates/amun-authority-registry/src/wal.rs-130-            [1u8; 32], 1, 0,
+crates/amun-authority-registry/src/wal.rs-131-        ));
+crates/amun-authority-registry/src/wal.rs-132-
+crates/amun-authority-registry/src/wal.rs-133-        let restored = wal.replay_and_finalize(4, &mut registry).unwrap();
+crates/amun-authority-registry/src/wal.rs-134-        assert!(restored.journal.is_executed(&proposal.proposal_id));
+crates/amun-authority-registry/src/wal.rs-135-        assert!(registry.by_version(3).is_some());
+crates/amun-authority-registry/src/wal.rs-136-    }
+crates/amun-authority-registry/src/wal.rs-137-
+--
+crates/amun-authority-registry/src/registry.rs:1:use crate::authority::ConstitutionalAuthority;
+crates/amun-authority-registry/src/registry.rs-2-use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs-3-use serde::{Deserialize, Serialize};
+crates/amun-authority-registry/src/registry.rs-4-use std::collections::BTreeMap;
+crates/amun-authority-registry/src/registry.rs-5-
+crates/amun-authority-registry/src/registry.rs-6-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+crates/amun-authority-registry/src/registry.rs-7-pub struct AuthorityRegistry {
+crates/amun-authority-registry/src/registry.rs:8:    authorities: BTreeMap<u64, ConstitutionalAuthority>,
+crates/amun-authority-registry/src/registry.rs-9-    active_version: u64,
+crates/amun-authority-registry/src/registry.rs-10-    pub transition: Option<AuthorityTransition>,
+crates/amun-authority-registry/src/registry.rs-11-}
+crates/amun-authority-registry/src/registry.rs-12-
+crates/amun-authority-registry/src/registry.rs-13-/// Describes a scheduled transition from one authority version to another.
+crates/amun-authority-registry/src/registry.rs-14-#[derive(Debug, Clone, Serialize, Deserialize)]
+crates/amun-authority-registry/src/registry.rs-15-pub struct AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-16-    pub from_version: u64,
+--
+crates/amun-authority-registry/src/registry.rs-19-    pub grace_period_blocks: u64,
+crates/amun-authority-registry/src/registry.rs-20-}
+crates/amun-authority-registry/src/registry.rs-21-
+crates/amun-authority-registry/src/registry.rs-22-impl AuthorityRegistry {
+crates/amun-authority-registry/src/registry.rs-23-    pub fn new() -> Self {
+crates/amun-authority-registry/src/registry.rs-24-        Self::default()
+crates/amun-authority-registry/src/registry.rs-25-    }
+crates/amun-authority-registry/src/registry.rs-26-
+crates/amun-authority-registry/src/registry.rs:27:    pub fn active(&self) -> Option<&ConstitutionalAuthority> {
+crates/amun-authority-registry/src/registry.rs-28-        self.authorities.get(&self.active_version)
+crates/amun-authority-registry/src/registry.rs-29-    }
+crates/amun-authority-registry/src/registry.rs-30-
+crates/amun-authority-registry/src/registry.rs:31:    pub fn by_version(&self, version: u64) -> Option<&ConstitutionalAuthority> {
+crates/amun-authority-registry/src/registry.rs-32-        self.authorities.get(&version)
+crates/amun-authority-registry/src/registry.rs-33-    }
+crates/amun-authority-registry/src/registry.rs-34-
+crates/amun-authority-registry/src/registry.rs:35:    pub fn register(&mut self, authority: ConstitutionalAuthority) {
+crates/amun-authority-registry/src/registry.rs-36-        let version = authority.authority_version;
+crates/amun-authority-registry/src/registry.rs-37-        self.authorities.insert(version, authority);
+crates/amun-authority-registry/src/registry.rs-38-        if version > self.active_version {
+crates/amun-authority-registry/src/registry.rs-39-            self.active_version = version;
+crates/amun-authority-registry/src/registry.rs-40-        }
+crates/amun-authority-registry/src/registry.rs-41-    }
+crates/amun-authority-registry/src/registry.rs-42-
+crates/amun-authority-registry/src/registry.rs-43-    pub fn revoke(&mut self, version: u64) {
+crates/amun-authority-registry/src/registry.rs-44-        if let Some(auth) = self.authorities.get_mut(&version) {
+crates/amun-authority-registry/src/registry.rs-45-            auth.revoked = true;
+crates/amun-authority-registry/src/registry.rs-46-        }
+crates/amun-authority-registry/src/registry.rs-47-    }
+crates/amun-authority-registry/src/registry.rs-48-
+crates/amun-authority-registry/src/registry.rs-49-    /// Create a registry pre-populated with a single genesis authority.
+crates/amun-authority-registry/src/registry.rs:50:    pub fn from_genesis(authority: ConstitutionalAuthority) -> Self {
+crates/amun-authority-registry/src/registry.rs-51-        let mut registry = Self::new();
+crates/amun-authority-registry/src/registry.rs-52-        registry.register(authority);
+crates/amun-authority-registry/src/registry.rs-53-        registry
+crates/amun-authority-registry/src/registry.rs-54-    }
+crates/amun-authority-registry/src/registry.rs-55-
+crates/amun-authority-registry/src/registry.rs-56-    pub fn is_revoked(&self, version: u64) -> bool {
+crates/amun-authority-registry/src/registry.rs-57-        self.authorities.get(&version).is_some_and(|a| a.revoked)
+crates/amun-authority-registry/src/registry.rs-58-    }
+crates/amun-authority-registry/src/registry.rs-59-
+crates/amun-authority-registry/src/registry.rs-60-    /// Activate a new authority, making it the active one.
+crates/amun-authority-registry/src/registry.rs:61:    pub fn activate(&mut self, authority: ConstitutionalAuthority) {
+crates/amun-authority-registry/src/registry.rs-62-        let version = authority.authority_version;
+crates/amun-authority-registry/src/registry.rs-63-        self.authorities.insert(version, authority);
+crates/amun-authority-registry/src/registry.rs-64-        self.active_version = version;
+crates/amun-authority-registry/src/registry.rs-65-    }
+crates/amun-authority-registry/src/registry.rs-66-
+crates/amun-authority-registry/src/registry.rs-67-    /// Retire an authority so it can no longer issue new certificates.
+crates/amun-authority-registry/src/registry.rs-68-    pub fn retire(&mut self, authority_version: u64, height: u64) {
+crates/amun-authority-registry/src/registry.rs-69-        if let Some(auth) = self.authorities.get_mut(&authority_version) {
+--
+crates/amun-authority-registry/src/registry.rs-73-    }
+crates/amun-authority-registry/src/registry.rs-74-
+crates/amun-authority-registry/src/registry.rs-75-    /// Schedule a transition to a new authority version.
+crates/amun-authority-registry/src/registry.rs-76-    pub fn schedule_transition(&mut self, transition: AuthorityTransition) {
+crates/amun-authority-registry/src/registry.rs-77-        self.transition = Some(transition);
+crates/amun-authority-registry/src/registry.rs-78-    }
+crates/amun-authority-registry/src/registry.rs-79-
+crates/amun-authority-registry/src/registry.rs-80-    /// Return the authority (or authorities) valid at a given block height.
+crates/amun-authority-registry/src/registry.rs:81:    pub fn valid_authorities_at(&self, height: u64) -> Vec<&ConstitutionalAuthority> {
+crates/amun-authority-registry/src/registry.rs-82-        let mut result = Vec::new();
+crates/amun-authority-registry/src/registry.rs-83-        if let Some(ref t) = self.transition {
+crates/amun-authority-registry/src/registry.rs-84-            if height < t.activation_height {
+crates/amun-authority-registry/src/registry.rs-85-                // Pre-activation: only the old authority is valid
+crates/amun-authority-registry/src/registry.rs-86-                if let Some(a) = self.by_version(t.from_version) {
+crates/amun-authority-registry/src/registry.rs-87-                    result.push(a);
+crates/amun-authority-registry/src/registry.rs-88-                }
+crates/amun-authority-registry/src/registry.rs-89-            } else if height < t.activation_height + t.grace_period_blocks {
+--
+crates/amun-authority-registry/src/registry.rs-167-
+crates/amun-authority-registry/src/registry.rs-168-#[cfg(test)]
+crates/amun-authority-registry/src/registry.rs-169-mod tests {
+crates/amun-authority-registry/src/registry.rs-170-    use super::*;
+crates/amun-authority-registry/src/registry.rs-171-
+crates/amun-authority-registry/src/registry.rs-172-    #[test]
+crates/amun-authority-registry/src/registry.rs-173-    fn n107_2_register_and_activate() {
+crates/amun-authority-registry/src/registry.rs-174-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:175:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs-176-        reg.register(a1.clone());
+crates/amun-authority-registry/src/registry.rs-177-        assert_eq!(reg.active().unwrap().authority_version, 1);
+crates/amun-authority-registry/src/registry.rs-178-    }
+crates/amun-authority-registry/src/registry.rs-179-
+crates/amun-authority-registry/src/registry.rs-180-    #[test]
+crates/amun-authority-registry/src/registry.rs-181-    fn n107_2_revoke() {
+crates/amun-authority-registry/src/registry.rs-182-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:183:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs-184-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-185-        reg.revoke(1);
+crates/amun-authority-registry/src/registry.rs-186-        assert!(reg.is_revoked(1));
+crates/amun-authority-registry/src/registry.rs-187-    }
+crates/amun-authority-registry/src/registry.rs-188-
+crates/amun-authority-registry/src/registry.rs-189-    #[test]
+crates/amun-authority-registry/src/registry.rs-190-    fn n107_2_active_tracks_latest() {
+crates/amun-authority-registry/src/registry.rs-191-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:192:        reg.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/registry.rs:193:        reg.register(ConstitutionalAuthority::new([2u8; 32], 2, 100));
+crates/amun-authority-registry/src/registry.rs-194-        assert_eq!(reg.active().unwrap().authority_version, 2);
+crates/amun-authority-registry/src/registry.rs-195-    }
+crates/amun-authority-registry/src/registry.rs-196-
+crates/amun-authority-registry/src/registry.rs-197-    #[test]
+crates/amun-authority-registry/src/registry.rs-198-    fn n107_3_registry_bootstrap() {
+crates/amun-authority-registry/src/registry.rs:199:        let authority = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs-200-        let registry = AuthorityRegistry::from_genesis(authority);
+crates/amun-authority-registry/src/registry.rs-201-        assert_eq!(registry.active().unwrap().authority_version, 1);
+crates/amun-authority-registry/src/registry.rs-202-    }
+crates/amun-authority-registry/src/registry.rs-203-
+crates/amun-authority-registry/src/registry.rs-204-    #[test]
+crates/amun-authority-registry/src/registry.rs-205-    fn n107_5_activate_new_authority() {
+crates/amun-authority-registry/src/registry.rs-206-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:207:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs-208-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs:209:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 100);
+crates/amun-authority-registry/src/registry.rs-210-        reg.activate(a2);
+crates/amun-authority-registry/src/registry.rs-211-        assert_eq!(reg.active().unwrap().authority_version, 2);
+crates/amun-authority-registry/src/registry.rs-212-        assert!(reg.by_version(1).is_some());
+crates/amun-authority-registry/src/registry.rs-213-        assert!(reg.by_version(2).is_some());
+crates/amun-authority-registry/src/registry.rs-214-    }
+crates/amun-authority-registry/src/registry.rs-215-
+crates/amun-authority-registry/src/registry.rs-216-    #[test]
+crates/amun-authority-registry/src/registry.rs-217-    fn n107_5_retire_authority() {
+crates/amun-authority-registry/src/registry.rs-218-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:219:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs-220-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-221-        reg.retire(1, 1000);
+crates/amun-authority-registry/src/registry.rs-222-        assert!(reg.is_revoked(1));
+crates/amun-authority-registry/src/registry.rs-223-        assert!(reg.by_version(1).is_some());
+crates/amun-authority-registry/src/registry.rs-224-    }
+crates/amun-authority-registry/src/registry.rs-225-
+crates/amun-authority-registry/src/registry.rs-226-    #[test]
+crates/amun-authority-registry/src/registry.rs-227-    fn n107_5_multi_version_registry() {
+crates/amun-authority-registry/src/registry.rs-228-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:229:        reg.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/registry.rs:230:        reg.register(ConstitutionalAuthority::new([2u8; 32], 2, 100));
+crates/amun-authority-registry/src/registry.rs:231:        reg.register(ConstitutionalAuthority::new([3u8; 32], 3, 200));
+crates/amun-authority-registry/src/registry.rs-232-        assert_eq!(reg.active().unwrap().authority_version, 3);
+crates/amun-authority-registry/src/registry.rs-233-        assert!(reg.by_version(1).is_some());
+crates/amun-authority-registry/src/registry.rs-234-        assert!(reg.by_version(2).is_some());
+crates/amun-authority-registry/src/registry.rs-235-        assert!(reg.by_version(3).is_some());
+crates/amun-authority-registry/src/registry.rs-236-    }
+crates/amun-authority-registry/src/registry.rs-237-
+crates/amun-authority-registry/src/registry.rs-238-    #[test]
+crates/amun-authority-registry/src/registry.rs-239-    fn n107_5_cross_epoch_verification() {
+crates/amun-authority-registry/src/registry.rs-240-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:241:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs:242:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 100);
+crates/amun-authority-registry/src/registry.rs-243-        reg.register(a1.clone());
+crates/amun-authority-registry/src/registry.rs-244-        reg.register(a2.clone());
+crates/amun-authority-registry/src/registry.rs-245-        let cert_v1_key = reg.by_version(1).unwrap().authority_public_key;
+crates/amun-authority-registry/src/registry.rs-246-        let cert_v2_key = reg.by_version(2).unwrap().authority_public_key;
+crates/amun-authority-registry/src/registry.rs-247-        assert_eq!(cert_v1_key, a1.authority_public_key);
+crates/amun-authority-registry/src/registry.rs-248-        assert_eq!(cert_v2_key, a2.authority_public_key);
+crates/amun-authority-registry/src/registry.rs-249-    }
+crates/amun-authority-registry/src/registry.rs-250-
+crates/amun-authority-registry/src/registry.rs-251-    #[test]
+crates/amun-authority-registry/src/registry.rs-252-    fn n107_5_sunset_rejection() {
+crates/amun-authority-registry/src/registry.rs-253-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:254:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs-255-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-256-        reg.retire(1, 1000);
+crates/amun-authority-registry/src/registry.rs-257-        assert!(reg.is_revoked(1));
+crates/amun-authority-registry/src/registry.rs-258-        assert!(reg.by_version(1).is_some());
+crates/amun-authority-registry/src/registry.rs-259-    }
+crates/amun-authority-registry/src/registry.rs-260-
+crates/amun-authority-registry/src/registry.rs-261-    #[test]
+crates/amun-authority-registry/src/registry.rs-262-    fn n107_6_schedule_transition() {
+crates/amun-authority-registry/src/registry.rs-263-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:264:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs:265:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+crates/amun-authority-registry/src/registry.rs-266-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-267-        reg.register(a2);
+crates/amun-authority-registry/src/registry.rs-268-        let t = AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-269-            from_version: 1,
+crates/amun-authority-registry/src/registry.rs-270-            to_version: 2,
+crates/amun-authority-registry/src/registry.rs-271-            activation_height: 100,
+crates/amun-authority-registry/src/registry.rs-272-            grace_period_blocks: 50,
+crates/amun-authority-registry/src/registry.rs-273-        };
+crates/amun-authority-registry/src/registry.rs-274-        reg.schedule_transition(t);
+crates/amun-authority-registry/src/registry.rs-275-        assert!(reg.transition.is_some());
+crates/amun-authority-registry/src/registry.rs-276-    }
+crates/amun-authority-registry/src/registry.rs-277-
+crates/amun-authority-registry/src/registry.rs-278-    #[test]
+crates/amun-authority-registry/src/registry.rs-279-    fn n107_6_pre_activation() {
+crates/amun-authority-registry/src/registry.rs-280-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:281:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs:282:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+crates/amun-authority-registry/src/registry.rs-283-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-284-        reg.register(a2);
+crates/amun-authority-registry/src/registry.rs-285-        reg.schedule_transition(AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-286-            from_version: 1,
+crates/amun-authority-registry/src/registry.rs-287-            to_version: 2,
+crates/amun-authority-registry/src/registry.rs-288-            activation_height: 100,
+crates/amun-authority-registry/src/registry.rs-289-            grace_period_blocks: 50,
+crates/amun-authority-registry/src/registry.rs-290-        });
+--
+crates/amun-authority-registry/src/registry.rs-297-    fn n108_3b_accept_v1_before_grace_end() {
+crates/amun-authority-registry/src/registry.rs-298-        use amun_networking::crypto_identity::PeerKeyPair;
+crates/amun-authority-registry/src/registry.rs-299-        use amun_networking::peer_identity::PeerId;
+crates/amun-authority-registry/src/registry.rs-300-        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs-301-
+crates/amun-authority-registry/src/registry.rs-302-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs-303-        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+crates/amun-authority-registry/src/registry.rs-304-        let v1_pk = v1_kp.verifying_key.to_bytes();
+crates/amun-authority-registry/src/registry.rs:305:        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+crates/amun-authority-registry/src/registry.rs-306-        let v1_id = v1.authority_id;
+crates/amun-authority-registry/src/registry.rs-307-        reg.register(v1);
+crates/amun-authority-registry/src/registry.rs-308-
+crates/amun-authority-registry/src/registry.rs-309-        let v2_kp = PeerKeyPair::from_seed([0x43; 32]);
+crates/amun-authority-registry/src/registry.rs-310-        let v2_pk = v2_kp.verifying_key.to_bytes();
+crates/amun-authority-registry/src/registry.rs:311:        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+crates/amun-authority-registry/src/registry.rs-312-        reg.register(v2);
+crates/amun-authority-registry/src/registry.rs-313-
+crates/amun-authority-registry/src/registry.rs-314-        reg.schedule_transition(AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-315-            from_version: 1,
+crates/amun-authority-registry/src/registry.rs-316-            to_version: 2,
+crates/amun-authority-registry/src/registry.rs-317-            activation_height: 500,
+crates/amun-authority-registry/src/registry.rs-318-            grace_period_blocks: 100,
+crates/amun-authority-registry/src/registry.rs-319-        });
+--
+crates/amun-authority-registry/src/registry.rs-338-    fn n108_3b_reject_v1_after_grace_end() {
+crates/amun-authority-registry/src/registry.rs-339-        use amun_networking::crypto_identity::PeerKeyPair;
+crates/amun-authority-registry/src/registry.rs-340-        use amun_networking::peer_identity::PeerId;
+crates/amun-authority-registry/src/registry.rs-341-        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs-342-
+crates/amun-authority-registry/src/registry.rs-343-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs-344-        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+crates/amun-authority-registry/src/registry.rs-345-        let v1_pk = v1_kp.verifying_key.to_bytes();
+crates/amun-authority-registry/src/registry.rs:346:        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+crates/amun-authority-registry/src/registry.rs-347-        let v1_id = v1.authority_id;
+crates/amun-authority-registry/src/registry.rs-348-        reg.register(v1);
+crates/amun-authority-registry/src/registry.rs-349-
+crates/amun-authority-registry/src/registry.rs-350-        let v2_kp = PeerKeyPair::from_seed([0x43; 32]);
+crates/amun-authority-registry/src/registry.rs-351-        let v2_pk = v2_kp.verifying_key.to_bytes();
+crates/amun-authority-registry/src/registry.rs:352:        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+crates/amun-authority-registry/src/registry.rs-353-        reg.register(v2);
+crates/amun-authority-registry/src/registry.rs-354-
+crates/amun-authority-registry/src/registry.rs-355-        reg.schedule_transition(AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-356-            from_version: 1,
+crates/amun-authority-registry/src/registry.rs-357-            to_version: 2,
+crates/amun-authority-registry/src/registry.rs-358-            activation_height: 500,
+crates/amun-authority-registry/src/registry.rs-359-            grace_period_blocks: 100,
+crates/amun-authority-registry/src/registry.rs-360-        });
+--
+crates/amun-authority-registry/src/registry.rs-377-    #[test]
+crates/amun-authority-registry/src/registry.rs-378-    fn n108_3b_accept_v2_after_activation() {
+crates/amun-authority-registry/src/registry.rs-379-        use amun_networking::crypto_identity::PeerKeyPair;
+crates/amun-authority-registry/src/registry.rs-380-        use amun_networking::peer_identity::PeerId;
+crates/amun-authority-registry/src/registry.rs-381-        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs-382-
+crates/amun-authority-registry/src/registry.rs-383-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs-384-        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+crates/amun-authority-registry/src/registry.rs:385:        let v1 = ConstitutionalAuthority::new(v1_kp.verifying_key.to_bytes(), 1, 0);
+crates/amun-authority-registry/src/registry.rs-386-        reg.register(v1);
+crates/amun-authority-registry/src/registry.rs-387-
+crates/amun-authority-registry/src/registry.rs-388-        let v2_kp = PeerKeyPair::from_seed([0x43; 32]);
+crates/amun-authority-registry/src/registry.rs-389-        let v2_pk = v2_kp.verifying_key.to_bytes();
+crates/amun-authority-registry/src/registry.rs:390:        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+crates/amun-authority-registry/src/registry.rs-391-        let v2_id = v2.authority_id;
+crates/amun-authority-registry/src/registry.rs-392-        reg.register(v2);
+crates/amun-authority-registry/src/registry.rs-393-
+crates/amun-authority-registry/src/registry.rs-394-        reg.schedule_transition(AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-395-            from_version: 1,
+crates/amun-authority-registry/src/registry.rs-396-            to_version: 2,
+crates/amun-authority-registry/src/registry.rs-397-            activation_height: 500,
+crates/amun-authority-registry/src/registry.rs-398-            grace_period_blocks: 100,
+--
+crates/amun-authority-registry/src/registry.rs-417-    fn n108_3b_reject_revoked_authority() {
+crates/amun-authority-registry/src/registry.rs-418-        use amun_networking::crypto_identity::PeerKeyPair;
+crates/amun-authority-registry/src/registry.rs-419-        use amun_networking::peer_identity::PeerId;
+crates/amun-authority-registry/src/registry.rs-420-        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs-421-
+crates/amun-authority-registry/src/registry.rs-422-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs-423-        let v1_kp = PeerKeyPair::from_seed([0x42; 32]);
+crates/amun-authority-registry/src/registry.rs-424-        let v1_pk = v1_kp.verifying_key.to_bytes();
+crates/amun-authority-registry/src/registry.rs:425:        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+crates/amun-authority-registry/src/registry.rs-426-        let v1_id = v1.authority_id;
+crates/amun-authority-registry/src/registry.rs-427-        reg.register(v1);
+crates/amun-authority-registry/src/registry.rs-428-        reg.retire(1, 500);
+crates/amun-authority-registry/src/registry.rs-429-
+crates/amun-authority-registry/src/registry.rs-430-        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs-431-            PeerId::from_bytes([1u8; 32]),
+crates/amun-authority-registry/src/registry.rs-432-            [1u8; 32],
+crates/amun-authority-registry/src/registry.rs-433-            1,
+--
+crates/amun-authority-registry/src/registry.rs-440-            !reg.verify_certificate_at(&cert, 600),
+crates/amun-authority-registry/src/registry.rs-441-            "revoked authority cert should be rejected"
+crates/amun-authority-registry/src/registry.rs-442-        );
+crates/amun-authority-registry/src/registry.rs-443-    }
+crates/amun-authority-registry/src/registry.rs-444-
+crates/amun-authority-registry/src/registry.rs-445-    #[test]
+crates/amun-authority-registry/src/registry.rs-446-    fn n107_6_dual_validation_window() {
+crates/amun-authority-registry/src/registry.rs-447-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:448:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs:449:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+crates/amun-authority-registry/src/registry.rs-450-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-451-        reg.register(a2);
+crates/amun-authority-registry/src/registry.rs-452-        reg.schedule_transition(AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-453-            from_version: 1,
+crates/amun-authority-registry/src/registry.rs-454-            to_version: 2,
+crates/amun-authority-registry/src/registry.rs-455-            activation_height: 100,
+crates/amun-authority-registry/src/registry.rs-456-            grace_period_blocks: 50,
+crates/amun-authority-registry/src/registry.rs-457-        });
+crates/amun-authority-registry/src/registry.rs-458-        let valid = reg.valid_authorities_at(120);
+crates/amun-authority-registry/src/registry.rs-459-        assert_eq!(valid.len(), 2);
+crates/amun-authority-registry/src/registry.rs-460-    }
+crates/amun-authority-registry/src/registry.rs-461-
+crates/amun-authority-registry/src/registry.rs-462-    #[test]
+crates/amun-authority-registry/src/registry.rs-463-    fn n107_6_post_grace_period() {
+crates/amun-authority-registry/src/registry.rs-464-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:465:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs:466:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+crates/amun-authority-registry/src/registry.rs-467-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-468-        reg.register(a2);
+crates/amun-authority-registry/src/registry.rs-469-        reg.schedule_transition(AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-470-            from_version: 1,
+crates/amun-authority-registry/src/registry.rs-471-            to_version: 2,
+crates/amun-authority-registry/src/registry.rs-472-            activation_height: 100,
+crates/amun-authority-registry/src/registry.rs-473-            grace_period_blocks: 50,
+crates/amun-authority-registry/src/registry.rs-474-        });
+crates/amun-authority-registry/src/registry.rs-475-        let valid = reg.valid_authorities_at(200);
+crates/amun-authority-registry/src/registry.rs-476-        assert_eq!(valid.len(), 1);
+crates/amun-authority-registry/src/registry.rs-477-        assert_eq!(valid[0].authority_version, 2);
+crates/amun-authority-registry/src/registry.rs-478-    }
+crates/amun-authority-registry/src/registry.rs-479-
+crates/amun-authority-registry/src/registry.rs-480-    #[test]
+crates/amun-authority-registry/src/registry.rs-481-    fn n107_6_old_authority_cannot_issue_after_activation() {
+crates/amun-authority-registry/src/registry.rs-482-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:483:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs:484:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+crates/amun-authority-registry/src/registry.rs-485-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-486-        reg.register(a2);
+crates/amun-authority-registry/src/registry.rs-487-        reg.schedule_transition(AuthorityTransition {
+crates/amun-authority-registry/src/registry.rs-488-            from_version: 1,
+crates/amun-authority-registry/src/registry.rs-489-            to_version: 2,
+crates/amun-authority-registry/src/registry.rs-490-            activation_height: 100,
+crates/amun-authority-registry/src/registry.rs-491-            grace_period_blocks: 50,
+crates/amun-authority-registry/src/registry.rs-492-        });
+crates/amun-authority-registry/src/registry.rs-493-        assert!(!reg.can_issue_at(1, 150));
+crates/amun-authority-registry/src/registry.rs-494-        assert!(reg.can_issue_at(2, 150));
+crates/amun-authority-registry/src/registry.rs-495-    }
+crates/amun-authority-registry/src/registry.rs-496-
+crates/amun-authority-registry/src/registry.rs-497-    #[test]
+crates/amun-authority-registry/src/registry.rs-498-    fn n107_6_historical_certificates_survive() {
+crates/amun-authority-registry/src/registry.rs-499-        let mut reg = AuthorityRegistry::new();
+crates/amun-authority-registry/src/registry.rs:500:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/registry.rs-501-        reg.register(a1);
+crates/amun-authority-registry/src/registry.rs-502-        reg.retire(1, 1000);
+crates/amun-authority-registry/src/registry.rs-503-        // Retired authority can still be looked up for verification
+crates/amun-authority-registry/src/registry.rs-504-        assert!(reg.by_version(1).is_some());
+crates/amun-authority-registry/src/registry.rs-505-    }
+crates/amun-authority-registry/src/registry.rs-506-}
+--
+crates/amun-authority-registry/src/authority.rs-1-use serde::{Deserialize, Serialize};
+crates/amun-authority-registry/src/authority.rs-2-
+crates/amun-authority-registry/src/authority.rs-3-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+crates/amun-authority-registry/src/authority.rs:4:pub struct ConstitutionalAuthority {
+crates/amun-authority-registry/src/authority.rs-5-    pub authority_id: [u8; 32],
+crates/amun-authority-registry/src/authority.rs-6-    pub authority_public_key: [u8; 32],
+crates/amun-authority-registry/src/authority.rs-7-    pub authority_version: u64,
+crates/amun-authority-registry/src/authority.rs-8-    pub activated_at_height: u64,
+crates/amun-authority-registry/src/authority.rs-9-    pub revoked: bool,
+crates/amun-authority-registry/src/authority.rs-10-    pub revoked_at_height: Option<u64>,
+crates/amun-authority-registry/src/authority.rs-11-}
+crates/amun-authority-registry/src/authority.rs-12-
+crates/amun-authority-registry/src/authority.rs:13:impl ConstitutionalAuthority {
+crates/amun-authority-registry/src/authority.rs-14-    pub fn new(public_key: [u8; 32], version: u64, activated_at_height: u64) -> Self {
+crates/amun-authority-registry/src/authority.rs-15-        let mut hasher = blake3::Hasher::new();
+crates/amun-authority-registry/src/authority.rs-16-        hasher.update(b"AMUN_AUTHORITY_ID_V1");
+crates/amun-authority-registry/src/authority.rs-17-        hasher.update(&public_key);
+crates/amun-authority-registry/src/authority.rs-18-        let id = *hasher.finalize().as_bytes();
+crates/amun-authority-registry/src/authority.rs-19-        Self {
+crates/amun-authority-registry/src/authority.rs-20-            authority_id: id,
+crates/amun-authority-registry/src/authority.rs-21-            authority_public_key: public_key,
+--
+crates/amun-authority-registry/src/authority.rs-29-
+crates/amun-authority-registry/src/authority.rs-30-#[cfg(test)]
+crates/amun-authority-registry/src/authority.rs-31-mod tests {
+crates/amun-authority-registry/src/authority.rs-32-    use super::*;
+crates/amun-authority-registry/src/authority.rs-33-
+crates/amun-authority-registry/src/authority.rs-34-    #[test]
+crates/amun-authority-registry/src/authority.rs-35-    fn n107_1_authority_id_deterministic() {
+crates/amun-authority-registry/src/authority.rs-36-        let pk = [0x42u8; 32];
+crates/amun-authority-registry/src/authority.rs:37:        let a1 = ConstitutionalAuthority::new(pk, 1, 0);
+crates/amun-authority-registry/src/authority.rs:38:        let a2 = ConstitutionalAuthority::new(pk, 1, 0);
+crates/amun-authority-registry/src/authority.rs-39-        assert_eq!(a1.authority_id, a2.authority_id);
+crates/amun-authority-registry/src/authority.rs-40-    }
+crates/amun-authority-registry/src/authority.rs-41-
+crates/amun-authority-registry/src/authority.rs-42-    #[test]
+crates/amun-authority-registry/src/authority.rs-43-    fn n107_1_different_keys_different_ids() {
+crates/amun-authority-registry/src/authority.rs:44:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+crates/amun-authority-registry/src/authority.rs:45:        let a2 = ConstitutionalAuthority::new([2u8; 32], 1, 0);
+crates/amun-authority-registry/src/authority.rs-46-        assert_ne!(a1.authority_id, a2.authority_id);
+crates/amun-authority-registry/src/authority.rs-47-    }
+crates/amun-authority-registry/src/authority.rs-48-}
+--
+crates/amun-authority-registry/src/recovery.rs-30-
+crates/amun-authority-registry/src/recovery.rs-31-        Ok(state)
+crates/amun-authority-registry/src/recovery.rs-32-    }
+crates/amun-authority-registry/src/recovery.rs-33-}
+crates/amun-authority-registry/src/recovery.rs-34-
+crates/amun-authority-registry/src/recovery.rs-35-#[cfg(test)]
+crates/amun-authority-registry/src/recovery.rs-36-mod tests {
+crates/amun-authority-registry/src/recovery.rs-37-    use super::*;
+crates/amun-authority-registry/src/recovery.rs:38:    use crate::authority::ConstitutionalAuthority;
+crates/amun-authority-registry/src/recovery.rs-39-    use crate::governance::{GovernanceAction, GovernanceProposal};
+crates/amun-authority-registry/src/recovery.rs-40-    use crate::transaction::GovernanceTransaction;
+crates/amun-authority-registry/src/recovery.rs-41-    use crate::voting::GovernanceVote;
+crates/amun-authority-registry/src/recovery.rs-42-
+crates/amun-authority-registry/src/recovery.rs-43-    fn build_base_snapshot() -> (Vec<u8>, u64, [u8; 32]) {
+crates/amun-authority-registry/src/recovery.rs-44-        let mut state = GovernanceState::new();
+crates/amun-authority-registry/src/recovery.rs-45-        let action = GovernanceAction::AddAuthority {
+crates/amun-authority-registry/src/recovery.rs-46-            authority_public_key: [1u8; 32],
+--
+crates/amun-authority-registry/src/recovery.rs-68-            GovernanceTransaction::CastVote {
+crates/amun-authority-registry/src/recovery.rs-69-                proposal_id: proposal.proposal_id,
+crates/amun-authority-registry/src/recovery.rs-70-                validator_id: [1u8; 32],
+crates/amun-authority-registry/src/recovery.rs-71-                vote: GovernanceVote::Approve,
+crates/amun-authority-registry/src/recovery.rs-72-            },
+crates/amun-authority-registry/src/recovery.rs-73-        );
+crates/amun-authority-registry/src/recovery.rs-74-
+crates/amun-authority-registry/src/recovery.rs-75-        let mut registry = crate::registry::AuthorityRegistry::new();
+crates/amun-authority-registry/src/recovery.rs:76:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/recovery.rs-77-
+crates/amun-authority-registry/src/recovery.rs-78-        let recovered =
+crates/amun-authority-registry/src/recovery.rs-79-            GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+crates/amun-authority-registry/src/recovery.rs-80-                .unwrap();
+crates/amun-authority-registry/src/recovery.rs-81-
+crates/amun-authority-registry/src/recovery.rs-82-        // The new proposal should be present
+crates/amun-authority-registry/src/recovery.rs-83-        assert!(recovered.proposals.contains_key(&proposal.proposal_id));
+crates/amun-authority-registry/src/recovery.rs-84-        // The original proposal from the snapshot should still be present
+--
+crates/amun-authority-registry/src/recovery.rs-106-        let new_action = GovernanceAction::RetireAuthority {
+crates/amun-authority-registry/src/recovery.rs-107-            authority_version: 1,
+crates/amun-authority-registry/src/recovery.rs-108-        };
+crates/amun-authority-registry/src/recovery.rs-109-        let new_proposal = GovernanceProposal::new([0xCC; 32], new_action, 200);
+crates/amun-authority-registry/src/recovery.rs-110-        let new_proposal_id = new_proposal.proposal_id;
+crates/amun-authority-registry/src/recovery.rs-111-        wal.append(200, GovernanceTransaction::SubmitProposal(new_proposal));
+crates/amun-authority-registry/src/recovery.rs-112-
+crates/amun-authority-registry/src/recovery.rs-113-        let mut registry = crate::registry::AuthorityRegistry::new();
+crates/amun-authority-registry/src/recovery.rs:114:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/recovery.rs-115-
+crates/amun-authority-registry/src/recovery.rs-116-        let recovered =
+crates/amun-authority-registry/src/recovery.rs-117-            GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+crates/amun-authority-registry/src/recovery.rs-118-                .unwrap();
+crates/amun-authority-registry/src/recovery.rs-119-
+crates/amun-authority-registry/src/recovery.rs-120-        // Only the entry after snapshot should be present (plus the snapshot's entry)
+crates/amun-authority-registry/src/recovery.rs-121-        assert_eq!(recovered.proposals.len(), 2);
+crates/amun-authority-registry/src/recovery.rs-122-        assert!(
+--
+crates/amun-authority-registry/src/recovery.rs-148-                    proposal_id: proposal.proposal_id,
+crates/amun-authority-registry/src/recovery.rs-149-                    validator_id: [id; 32],
+crates/amun-authority-registry/src/recovery.rs-150-                    vote: GovernanceVote::Approve,
+crates/amun-authority-registry/src/recovery.rs-151-                },
+crates/amun-authority-registry/src/recovery.rs-152-            );
+crates/amun-authority-registry/src/recovery.rs-153-        }
+crates/amun-authority-registry/src/recovery.rs-154-
+crates/amun-authority-registry/src/recovery.rs-155-        let mut registry = crate::registry::AuthorityRegistry::new();
+crates/amun-authority-registry/src/recovery.rs:156:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/recovery.rs-157-
+crates/amun-authority-registry/src/recovery.rs-158-        let recovered =
+crates/amun-authority-registry/src/recovery.rs-159-            GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+crates/amun-authority-registry/src/recovery.rs-160-                .unwrap();
+crates/amun-authority-registry/src/recovery.rs-161-
+crates/amun-authority-registry/src/recovery.rs-162-        // The executed proposal should be in the journal
+crates/amun-authority-registry/src/recovery.rs-163-        assert!(recovered.journal.is_executed(&proposal.proposal_id));
+crates/amun-authority-registry/src/recovery.rs-164-        // The new authority should be registered
+--
+crates/amun-authority-registry/src/recovery.rs-188-            GovernanceTransaction::CastVote {
+crates/amun-authority-registry/src/recovery.rs-189-                proposal_id: proposal.proposal_id,
+crates/amun-authority-registry/src/recovery.rs-190-                validator_id: [2u8; 32],
+crates/amun-authority-registry/src/recovery.rs-191-                vote: GovernanceVote::Reject,
+crates/amun-authority-registry/src/recovery.rs-192-            },
+crates/amun-authority-registry/src/recovery.rs-193-        );
+crates/amun-authority-registry/src/recovery.rs-194-
+crates/amun-authority-registry/src/recovery.rs-195-        let mut registry = crate::registry::AuthorityRegistry::new();
+crates/amun-authority-registry/src/recovery.rs:196:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/recovery.rs-197-
+crates/amun-authority-registry/src/recovery.rs-198-        let recovered =
+crates/amun-authority-registry/src/recovery.rs-199-            GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+crates/amun-authority-registry/src/recovery.rs-200-                .unwrap();
+crates/amun-authority-registry/src/recovery.rs-201-
+crates/amun-authority-registry/src/recovery.rs-202-        let votes = recovered.votes.get(&proposal.proposal_id).unwrap();
+crates/amun-authority-registry/src/recovery.rs-203-        assert_eq!(votes.total_votes(), 2);
+crates/amun-authority-registry/src/recovery.rs-204-        let tally = votes.tally();
+--
+crates/amun-authority-registry/src/recovery.rs-225-                        proposal_id: proposal.proposal_id,
+crates/amun-authority-registry/src/recovery.rs-226-                        validator_id: [id; 32],
+crates/amun-authority-registry/src/recovery.rs-227-                        vote: GovernanceVote::Approve,
+crates/amun-authority-registry/src/recovery.rs-228-                    },
+crates/amun-authority-registry/src/recovery.rs-229-                );
+crates/amun-authority-registry/src/recovery.rs-230-            }
+crates/amun-authority-registry/src/recovery.rs-231-
+crates/amun-authority-registry/src/recovery.rs-232-            let mut registry = crate::registry::AuthorityRegistry::new();
+crates/amun-authority-registry/src/recovery.rs:233:            registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+crates/amun-authority-registry/src/recovery.rs-234-
+crates/amun-authority-registry/src/recovery.rs-235-            let recovered =
+crates/amun-authority-registry/src/recovery.rs-236-                GovernanceRecoveryEngine::recover(&snapshot, snap_height, &wal, 4, &mut registry)
+crates/amun-authority-registry/src/recovery.rs-237-                    .unwrap();
+crates/amun-authority-registry/src/recovery.rs-238-            recovered.snapshot()
+crates/amun-authority-registry/src/recovery.rs-239-        };
+crates/amun-authority-registry/src/recovery.rs-240-
+crates/amun-authority-registry/src/recovery.rs-241-        let bytes1 = run_recovery();
+--
+crates/amun-consensus-types/src/vote.rs-52-        Ok(())
+crates/amun-consensus-types/src/vote.rs-53-    }
+crates/amun-consensus-types/src/vote.rs-54-}
+crates/amun-consensus-types/src/vote.rs-55-
+crates/amun-consensus-types/src/vote.rs-56-impl CanonicalDecode for Vote {
+crates/amun-consensus-types/src/vote.rs-57-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-consensus-types/src/vote.rs-58-        if input.is_empty() {
+crates/amun-consensus-types/src/vote.rs-59-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/vote.rs:60:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/vote.rs-61-                0x0006,
+crates/amun-consensus-types/src/vote.rs-62-                0x0201,
+crates/amun-consensus-types/src/vote.rs-63-            ));
+crates/amun-consensus-types/src/vote.rs-64-        }
+crates/amun-consensus-types/src/vote.rs-65-        let (phase, _) = ConsensusPhase::decode(&input[0..1])?;
+crates/amun-consensus-types/src/vote.rs-66-        if !phase.is_vote() {
+crates/amun-consensus-types/src/vote.rs-67-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/vote.rs:68:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-consensus-types/src/vote.rs-69-                0x0006,
+crates/amun-consensus-types/src/vote.rs-70-                0x0203,
+crates/amun-consensus-types/src/vote.rs-71-            ));
+crates/amun-consensus-types/src/vote.rs-72-        }
+crates/amun-consensus-types/src/vote.rs-73-        let (epoch, len1) = Epoch::decode(&input[1..])?;
+crates/amun-consensus-types/src/vote.rs-74-        let (round, len2) = ConsensusRound::decode(&input[1 + len1..])?;
+crates/amun-consensus-types/src/vote.rs-75-        let pos = 1 + len1 + len2;
+crates/amun-consensus-types/src/vote.rs-76-        let (block_hash, len3) = BlockHash::decode(&input[pos..])?;
+--
+crates/amun-consensus-types/src/errors.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-consensus-types/src/errors.rs-2-
+crates/amun-consensus-types/src/errors.rs-3-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+crates/amun-consensus-types/src/errors.rs-4-#[repr(u16)]
+crates/amun-consensus-types/src/errors.rs-5-pub enum ConsensusError {
+crates/amun-consensus-types/src/errors.rs-6-    InvalidPhase = 0x1001,
+crates/amun-consensus-types/src/errors.rs-7-    InvalidRound = 0x1002,
+crates/amun-consensus-types/src/errors.rs-8-    DuplicateVote = 0x1003,
+crates/amun-consensus-types/src/errors.rs-9-    EquivocationDetected = 0x1004,
+--
+crates/amun-consensus-types/src/errors.rs-11-    InsufficientSigners = 0x1006,
+crates/amun-consensus-types/src/errors.rs-12-    InvalidBlockHash = 0x1007,
+crates/amun-consensus-types/src/errors.rs-13-    EpochMismatch = 0x1008,
+crates/amun-consensus-types/src/errors.rs-14-}
+crates/amun-consensus-types/src/errors.rs-15-
+crates/amun-consensus-types/src/errors.rs-16-impl ConsensusError {
+crates/amun-consensus-types/src/errors.rs-17-    pub fn to_failure_context(self) -> FailureContext {
+crates/amun-consensus-types/src/errors.rs-18-        FailureContext::new(
+crates/amun-consensus-types/src/errors.rs:19:            ConstitutionalFault::InvalidStateTransition,
+crates/amun-consensus-types/src/errors.rs-20-            0x0006,
+crates/amun-consensus-types/src/errors.rs-21-            self as u16,
+crates/amun-consensus-types/src/errors.rs-22-        )
+crates/amun-consensus-types/src/errors.rs-23-    }
+crates/amun-consensus-types/src/errors.rs-24-}
+--
+crates/amun-consensus-types/src/phase.rs-58-        writer.write_bytes(&[self.as_byte()])
+crates/amun-consensus-types/src/phase.rs-59-    }
+crates/amun-consensus-types/src/phase.rs-60-}
+crates/amun-consensus-types/src/phase.rs-61-
+crates/amun-consensus-types/src/phase.rs-62-impl CanonicalDecode for ConsensusPhase {
+crates/amun-consensus-types/src/phase.rs-63-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-consensus-types/src/phase.rs-64-        if input.is_empty() {
+crates/amun-consensus-types/src/phase.rs-65-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/phase.rs:66:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/phase.rs-67-                0x0006,
+crates/amun-consensus-types/src/phase.rs-68-                0x0101,
+crates/amun-consensus-types/src/phase.rs-69-            ));
+crates/amun-consensus-types/src/phase.rs-70-        }
+crates/amun-consensus-types/src/phase.rs-71-        Self::from_byte(input[0]).map(|p| (p, 1)).ok_or_else(|| {
+crates/amun-consensus-types/src/phase.rs-72-            amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/phase.rs:73:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-consensus-types/src/phase.rs-74-                0x0006,
+crates/amun-consensus-types/src/phase.rs-75-                0x0102,
+crates/amun-consensus-types/src/phase.rs-76-            )
+crates/amun-consensus-types/src/phase.rs-77-        })
+crates/amun-consensus-types/src/phase.rs-78-    }
+crates/amun-consensus-types/src/phase.rs-79-}
+--
+crates/amun-consensus-types/src/message.rs-73-        let pos = pos + 1;
+crates/amun-consensus-types/src/message.rs-74-        let (constitution_hash, len3) = PublicHash32::decode(&input[pos..])?;
+crates/amun-consensus-types/src/message.rs-75-        let pos = pos + len3;
+crates/amun-consensus-types/src/message.rs-76-        let (payload_len, len4) = u16::decode(&input[pos..pos + 2])?;
+crates/amun-consensus-types/src/message.rs-77-        let pos = pos + len4;
+crates/amun-consensus-types/src/message.rs-78-        let payload_len = payload_len as usize;
+crates/amun-consensus-types/src/message.rs-79-        if payload_len > MAX_PAYLOAD_SIZE {
+crates/amun-consensus-types/src/message.rs-80-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/message.rs:81:                amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-consensus-types/src/message.rs-82-                0x0006,
+crates/amun-consensus-types/src/message.rs-83-                0x0502,
+crates/amun-consensus-types/src/message.rs-84-            ));
+crates/amun-consensus-types/src/message.rs-85-        }
+crates/amun-consensus-types/src/message.rs-86-        if input.len() < pos + payload_len {
+crates/amun-consensus-types/src/message.rs-87-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/message.rs:88:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/message.rs-89-                0x0006,
+crates/amun-consensus-types/src/message.rs-90-                0x0503,
+crates/amun-consensus-types/src/message.rs-91-            ));
+crates/amun-consensus-types/src/message.rs-92-        }
+crates/amun-consensus-types/src/message.rs-93-        let mut payload = heapless::Vec::new();
+crates/amun-consensus-types/src/message.rs-94-        payload
+crates/amun-consensus-types/src/message.rs-95-            .extend_from_slice(&input[pos..pos + payload_len])
+crates/amun-consensus-types/src/message.rs-96-            .map_err(|_| {
+crates/amun-consensus-types/src/message.rs-97-                amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/message.rs:98:                    amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-consensus-types/src/message.rs-99-                    0x0006,
+crates/amun-consensus-types/src/message.rs-100-                    0x0504,
+crates/amun-consensus-types/src/message.rs-101-                )
+crates/amun-consensus-types/src/message.rs-102-            })?;
+crates/amun-consensus-types/src/message.rs-103-        let total = pos + payload_len;
+crates/amun-consensus-types/src/message.rs-104-        Ok((
+crates/amun-consensus-types/src/message.rs-105-            Self {
+crates/amun-consensus-types/src/message.rs-106-                protocol_version,
+--
+crates/amun-consensus-types/src/qc.rs-34-        Ok(())
+crates/amun-consensus-types/src/qc.rs-35-    }
+crates/amun-consensus-types/src/qc.rs-36-}
+crates/amun-consensus-types/src/qc.rs-37-
+crates/amun-consensus-types/src/qc.rs-38-impl CanonicalDecode for QuorumCertificate {
+crates/amun-consensus-types/src/qc.rs-39-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-consensus-types/src/qc.rs-40-        if input.is_empty() {
+crates/amun-consensus-types/src/qc.rs-41-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/qc.rs:42:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/qc.rs-43-                0x0006,
+crates/amun-consensus-types/src/qc.rs-44-                0x0301,
+crates/amun-consensus-types/src/qc.rs-45-            ));
+crates/amun-consensus-types/src/qc.rs-46-        }
+crates/amun-consensus-types/src/qc.rs-47-        let (qc_type, _) = ConsensusPhase::decode(&input[0..1])?;
+crates/amun-consensus-types/src/qc.rs-48-        if !qc_type.is_qc_type() {
+crates/amun-consensus-types/src/qc.rs-49-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/qc.rs:50:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-consensus-types/src/qc.rs-51-                0x0006,
+crates/amun-consensus-types/src/qc.rs-52-                0x0303,
+crates/amun-consensus-types/src/qc.rs-53-            ));
+crates/amun-consensus-types/src/qc.rs-54-        }
+crates/amun-consensus-types/src/qc.rs-55-        let (epoch, len1) = Epoch::decode(&input[1..])?;
+crates/amun-consensus-types/src/qc.rs-56-        let (round, len2) = ConsensusRound::decode(&input[1 + len1..])?;
+crates/amun-consensus-types/src/qc.rs-57-        let pos = 1 + len1 + len2;
+crates/amun-consensus-types/src/qc.rs-58-        let (block_hash, len3) = BlockHash::decode(&input[pos..])?;
+crates/amun-consensus-types/src/qc.rs-59-        let pos = pos + len3;
+crates/amun-consensus-types/src/qc.rs-60-        let (signer_bitmap, len4) = SignerBitmap::decode(&input[pos..])?;
+crates/amun-consensus-types/src/qc.rs-61-        let pos = pos + len4;
+crates/amun-consensus-types/src/qc.rs-62-        if input.len() < pos + 96 {
+crates/amun-consensus-types/src/qc.rs-63-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/qc.rs:64:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/qc.rs-65-                0x0006,
+crates/amun-consensus-types/src/qc.rs-66-                0x0302,
+crates/amun-consensus-types/src/qc.rs-67-            ));
+crates/amun-consensus-types/src/qc.rs-68-        }
+crates/amun-consensus-types/src/qc.rs-69-        let mut aggregate_signature = [0u8; 96];
+crates/amun-consensus-types/src/qc.rs-70-        aggregate_signature.copy_from_slice(&input[pos..pos + 96]);
+crates/amun-consensus-types/src/qc.rs-71-        let total = pos + 96;
+crates/amun-consensus-types/src/qc.rs-72-        Ok((
+--
+crates/amun-consensus-types/src/bitmap.rs-39-        writer.write_bytes(&self.0)
+crates/amun-consensus-types/src/bitmap.rs-40-    }
+crates/amun-consensus-types/src/bitmap.rs-41-}
+crates/amun-consensus-types/src/bitmap.rs-42-
+crates/amun-consensus-types/src/bitmap.rs-43-impl CanonicalDecode for SignerBitmap {
+crates/amun-consensus-types/src/bitmap.rs-44-    fn decode(input: &[u8]) -> AmunResult<(Self, usize)> {
+crates/amun-consensus-types/src/bitmap.rs-45-        if input.len() < 32 {
+crates/amun-consensus-types/src/bitmap.rs-46-            return Err(amun_failure::FailureContext::new(
+crates/amun-consensus-types/src/bitmap.rs:47:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/bitmap.rs-48-                0x0006,
+crates/amun-consensus-types/src/bitmap.rs-49-                0x0401,
+crates/amun-consensus-types/src/bitmap.rs-50-            ));
+crates/amun-consensus-types/src/bitmap.rs-51-        }
+crates/amun-consensus-types/src/bitmap.rs-52-        let mut bytes = [0u8; 32];
+crates/amun-consensus-types/src/bitmap.rs-53-        bytes.copy_from_slice(&input[..32]);
+crates/amun-consensus-types/src/bitmap.rs-54-        Ok((Self(bytes), 32))
+crates/amun-consensus-types/src/bitmap.rs-55-    }
+--
+docs/CANONICAL_SERIALIZATION.md-1-# AmunChain Canonical Serialization
+docs/CANONICAL_SERIALIZATION.md-2-
+docs/CANONICAL_SERIALIZATION.md:3:## Constitutional Law
+docs/CANONICAL_SERIALIZATION.md-4-
+docs/CANONICAL_SERIALIZATION.md-5-**All consensus-critical data MUST be serialized using these rules.**
+docs/CANONICAL_SERIALIZATION.md-6-
+docs/CANONICAL_SERIALIZATION.md-7-### Endianness
+docs/CANONICAL_SERIALIZATION.md-8-
+docs/CANONICAL_SERIALIZATION.md-9-**Little-endian forever.** This is a constitutional law that never changes.
+docs/CANONICAL_SERIALIZATION.md-10-
+docs/CANONICAL_SERIALIZATION.md-11-### Fixed-Width Primitives
+--
+docs/CANONICAL_SERIALIZATION.md-18-| [u8; 32] | 33 | Length byte (0x20) + 32 bytes |
+docs/CANONICAL_SERIALIZATION.md-19-
+docs/CANONICAL_SERIALIZATION.md-20-### Variable-Length Data
+docs/CANONICAL_SERIALIZATION.md-21-
+docs/CANONICAL_SERIALIZATION.md-22-| Type | Encoding |
+docs/CANONICAL_SERIALIZATION.md-23-|------|----------|
+docs/CANONICAL_SERIALIZATION.md-24-| Vec<u8> | Length (u64 LE) + bytes |
+docs/CANONICAL_SERIALIZATION.md-25-
+docs/CANONICAL_SERIALIZATION.md:26:### Constitutional Limits
+docs/CANONICAL_SERIALIZATION.md-27-
+docs/CANONICAL_SERIALIZATION.md-28-- Maximum `Vec<u8>` length: 16,777,216 bytes (16 MB)
+docs/CANONICAL_SERIALIZATION.md-29-- Maximum transitions per witness: 1,000,000
+docs/CANONICAL_SERIALIZATION.md-30-
+docs/CANONICAL_SERIALIZATION.md-31-### Rationale
+docs/CANONICAL_SERIALIZATION.md-32-
+docs/CANONICAL_SERIALIZATION.md-33-- Fixed-width primitives have no length prefix (efficient, deterministic)
+docs/CANONICAL_SERIALIZATION.md-34-- Variable-length data has length prefix (previents ambiguity)
+--
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md:1:# V2-026: Adversarial Reconciliation – Constitutional State Arbitration
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-2-
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-3-**Date:** 2026-05-31
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-4-**Status:** Closed
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-5-
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-6-## Summary
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-7-AmunChain's constitutional state transfer protocol successfully rejects adversarial
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-8-states (fake QCs, old QCs, invalid QCs with missing certificates) and only adopts
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-9-legitimate certified states from the majority.
+--
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-12-| Adversarial State | Result |
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-13-|-------------------|--------|
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-14-| Fake QC (height=0 with commit_qc) | REJECTED (verify failed) |
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-15-| Old QC (height=0 with commit_qc) | REJECTED (verify failed) |
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-16-| Invalid QC (height=5, no commit_qc) | REJECTED (verify failed) |
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-17-| Legitimate state (height=1 with commit_qc) | ADOPTED |
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-18-| Final convergence | 40/40 validators at height=1 |
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-19-
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md:20:## Constitutional Rules Validated
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-21-1. A state without a commit certificate is invalid and rejected.
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-22-2. A state with commit certificate but height=0 is invalid and rejected.
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-23-3. A state with higher height but no commit certificate is rejected (height alone is not authority).
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-24-4. Only a state with valid commit certificate and height > current is adopted.
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-25-5. Equal or lower states are never adopted (prevents downgrade).
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-26-
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-27-## Conclusion
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md-28-The constitutional arbitration layer correctly distinguishes between legitimate
+--
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-29-CCS may follow the same path. The fundamental entity may not be
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-30-`Authority(C)`, but rather `Authority(C₁) → Authority(C₂)` — the
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-31-constitutional relationship between two authority positions.
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-32-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-33----
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-34-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-35-## 2. Definitions
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-36-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:37:### 2.1 Constitutional Space (ℙ)
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-38-`ℙ` is a set of **authority positions**. Each position `P ∈ ℙ` represents
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-39-the right to authorize specific state transitions.
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-40-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-41-### 2.2 Coordinates of a Position
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-42-Each position `P` has coordinates:
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-43-`P = (E, V, H)`
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-44-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-45-where:
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:46:- `E` (Epoch): Constitutional time
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-47-- `V` (Validator Set): Participants authorized to produce evidence
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-48-- `H` (State Hash): The finalized state authorized by this position
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-49-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-50-### 2.3 Authority Ordering (≤)
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-51-`P₁ ≤ P₂` iff there exists a finite chain of legitimate constitutional
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-52-transitions from `P₁` to `P₂`.
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-53-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:54:This ordering is called **Constitutional Reachability**.
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-55-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-56----
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-57-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:58:## 3. Axioms of Constitutional Space
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-59-
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-60-### Axiom 1: Partial Order
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-61-`(ℙ, ≤)` is a partially ordered set:
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-62-- **Reflexive:** `P ≤ P` (empty transition chain)
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md-63-- **Transitive:** `P₁ ≤ P₂ ∧ P₂ ≤ P₃ ⇒ P₁ ≤ P₃`

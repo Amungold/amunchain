@@ -1,0 +1,520 @@
+========== FORMAL STRUCTURE ==========
+
+===== FILE TREE =====
+crates/amun-formal/Cargo.toml
+crates/amun-formal/src/invariants.rs
+crates/amun-formal/src/lib.rs
+
+===== LIB =====
+pub mod invariants;
+pub use invariants::FormalInvariants;
+
+===== INVARIANTS =====
+pub struct FormalInvariants;
+
+impl FormalInvariants {
+    pub fn supply_conservation(minted: u64, burned: u64, initial: u64, current: u64) -> bool {
+        initial.checked_add(minted).unwrap_or(0) == current.checked_add(burned).unwrap_or(0)
+    }
+
+    pub fn nonce_monotonicity(prev_nonce: u64, new_nonce: u64) -> bool {
+        new_nonce > prev_nonce
+    }
+
+    pub fn stake_consistency(total_staked: u64, validator_stakes: &[u64]) -> bool {
+        total_staked == validator_stakes.iter().sum()
+    }
+
+    pub fn quorum_safety(votes: u64, total: u64, threshold_bps: u16) -> bool {
+        if total == 0 {
+            return false;
+        }
+        votes.checked_mul(10000).unwrap_or(0)
+            >= total.checked_mul(threshold_bps as u64).unwrap_or(0)
+    }
+
+    pub fn no_overflow_in_supply(a: u64, b: u64) -> bool {
+        a.checked_add(b).is_some()
+    }
+}
+
+===== SEARCH: FormalInvariants =====
+./crates/amun-formal/src/lib.rs:2:pub use invariants::FormalInvariants;
+./crates/amun-formal/src/invariants.rs:1:pub struct FormalInvariants;
+./crates/amun-formal/src/invariants.rs:3:impl FormalInvariants {
+
+===== SEARCH: supply_conservation =====
+./crates/amun-formal/src/invariants.rs:4:    pub fn supply_conservation(minted: u64, burned: u64, initial: u64, current: u64) -> bool {
+
+===== SEARCH: nonce_monotonicity =====
+./crates/amun-formal/src/invariants.rs:8:    pub fn nonce_monotonicity(prev_nonce: u64, new_nonce: u64) -> bool {
+
+===== SEARCH: stake_consistency =====
+./crates/amun-formal/src/invariants.rs:12:    pub fn stake_consistency(total_staked: u64, validator_stakes: &[u64]) -> bool {
+
+===== SEARCH: quorum_safety =====
+./crates/amun-formal/src/invariants.rs:16:    pub fn quorum_safety(votes: u64, total: u64, threshold_bps: u16) -> bool {
+
+===== SEARCH: ConstitutionalFault =====
+crates/amun-codec/src/writer.rs:4:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/writer.rs:44:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-codec/src/writer.rs:51:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs:81:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-codec/src/writer.rs:115:                ConstitutionalFault::InvalidStateTransition,
+crates/amun-codec/src/writer.rs:128:                ConstitutionalFault::InvalidStateTransition,
+crates/amun-codec/src/writer.rs:136:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs:166:                    ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs:177:                    ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:1:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/decode.rs:13:                ConstitutionalFault::TrailingBytesDetected,
+crates/amun-codec/src/decode.rs:26:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:39:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:52:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:67:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:82:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:97:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:112:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:127:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:165:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:180:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:195:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/containers.rs:5:use amun_failure::{module_ids, operation_ids, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/containers.rs:52:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs:72:                ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs:83:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs:103:                ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs:114:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/versioned.rs:3:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/versioned.rs:51:                ConstitutionalFault::MalformedEncoding,
+crates/amun-codec/src/versioned.rs:60:                ConstitutionalFault::EncodingVersionMismatch,
+crates/amun-codec/src/versioned.rs:68:                ConstitutionalFault::MalformedEncoding,
+crates/amun-codec/src/versioned.rs:79:                ConstitutionalFault::ReplayViolation,
+crates/amun-codec/src/budget.rs:3:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/budget.rs:24:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-codec/src/budget.rs:35:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-codec/src/budget.rs:46:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-merkle/src/proof.rs:81:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-merkle/src/proof.rs:90:                amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-merkle/src/proof.rs:102:                    amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-merkle/src/proof.rs:112:                    amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-merkle/src/proof.rs:122:                        amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-merkle/src/proof.rs:130:                    amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/overlay.rs:31:                        amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/overlay.rs:48:                        amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/journal.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-runtime/src/journal.rs:34:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0020)
+crates/amun-runtime/src/journal.rs:38:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0021)
+crates/amun-runtime/src/journal.rs:42:                ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/journal.rs:50:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0023)
+crates/amun-runtime/src/journal.rs:62:                ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/journal.rs:74:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0028)
+crates/amun-runtime/src/account.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-runtime/src/account.rs:27:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0050)
+crates/amun-runtime/src/account.rs:30:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0051)
+crates/amun-runtime/src/account.rs:38:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0052)
+crates/amun-runtime/src/account.rs:41:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0053)
+crates/amun-bls/src/aggregate.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-bls/src/aggregate.rs:8:        return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0011, 0x0001));
+crates/amun-bls/src/aggregate.rs:23:        return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0011, 0x0002));
+crates/amun-ntr/src/charity.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/charity.rs:29:                ConstitutionalFault::InvalidInput,
+crates/amun-ntr/src/charity.rs:38:                FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0011)
+crates/amun-ntr/src/treasury.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/treasury.rs:31:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0020)
+crates/amun-ntr/src/treasury.rs:34:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0021)
+crates/amun-ntr/src/treasury.rs:42:                ConstitutionalFault::InvalidInput,
+crates/amun-ntr/src/treasury.rs:58:                ConstitutionalFault::InvalidInput,
+crates/amun-ntr/src/token.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/token.rs:7:        if a == 0 || self.balance < a { return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0020, 0x0001)); }
+crates/amun-ntr/src/token.rs:14:        if a < NTR_MIN_STAKE_AMOUNT || self.balance < a { return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0020, 0x0004)); }
+crates/amun-kernel-types/src/round.rs:1:use amun_failure::{module_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-kernel-types/src/round.rs:16:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-kernel-types/src/epoch.rs:1:use amun_failure::{module_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-kernel-types/src/epoch.rs:16:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-failure/src/tests.rs:8:    assert!(ConstitutionalFault::EquivocationDetected.should_halt());
+crates/amun-failure/src/tests.rs:9:    assert!(ConstitutionalFault::UnsafeContractViolation.should_halt());
+crates/amun-failure/src/tests.rs:10:    assert!(ConstitutionalFault::ConstitutionalViolation.should_halt());
+crates/amun-failure/src/tests.rs:11:    assert!(ConstitutionalFault::InvalidQuorum.should_halt());
+crates/amun-failure/src/tests.rs:12:    assert!(ConstitutionalFault::SignatureInvalid.should_halt());
+crates/amun-failure/src/tests.rs:13:    assert!(ConstitutionalFault::MerkleProofInvalid.should_halt());
+crates/amun-failure/src/tests.rs:14:    assert!(ConstitutionalFault::DurabilityViolation.should_halt());
+crates/amun-failure/src/tests.rs:15:    assert!(ConstitutionalFault::JournalHashMismatch.should_halt());
+crates/amun-failure/src/tests.rs:16:    assert!(ConstitutionalFault::ArithmeticOverflow.should_halt());
+crates/amun-failure/src/tests.rs:17:    assert!(ConstitutionalFault::ArithmeticUnderflow.should_halt());
+crates/amun-failure/src/tests.rs:18:    assert!(ConstitutionalFault::DecodeBudgetExceeded.should_halt());
+crates/amun-failure/src/tests.rs:19:    assert!(ConstitutionalFault::CryptoBudgetExceeded.should_halt());
+crates/amun-failure/src/tests.rs:24:    assert!(!ConstitutionalFault::BufferTooSmall.should_halt());
+crates/amun-failure/src/tests.rs:25:    assert!(!ConstitutionalFault::CapacityExceeded.should_halt());
+crates/amun-failure/src/tests.rs:26:    assert!(!ConstitutionalFault::TableFull.should_halt());
+crates/amun-failure/src/tests.rs:27:    assert!(!ConstitutionalFault::MemoryBudgetExhausted.should_halt());
+crates/amun-failure/src/tests.rs:32:    assert!(!ConstitutionalFault::InvalidStateTransition.should_halt());
+crates/amun-failure/src/tests.rs:33:    assert!(!ConstitutionalFault::UninitializedAccess.should_halt());
+crates/amun-failure/src/tests.rs:34:    assert!(!ConstitutionalFault::DoubleInitialization.should_halt());
+crates/amun-failure/src/tests.rs:35:    assert!(!ConstitutionalFault::TemporalViolation.should_halt());
+crates/amun-failure/src/tests.rs:36:    assert!(!ConstitutionalFault::ReplayViolation.should_halt());
+crates/amun-failure/src/tests.rs:37:    assert!(!ConstitutionalFault::SequenceMismatch.should_halt());
+crates/amun-failure/src/tests.rs:43:        ConstitutionalFault::CapacityExceeded,
+crates/amun-failure/src/tests.rs:47:    assert_eq!(ctx.fault, ConstitutionalFault::CapacityExceeded);
+crates/amun-failure/src/tests.rs:55:        ConstitutionalFault::EquivocationDetected,
+crates/amun-failure/src/tests.rs:70:    let health = KernelHealth::healthy().poison(ConstitutionalFault::UnsafeContractViolation, 1, 5);
+crates/amun-failure/src/tests.rs:77:        .poison(ConstitutionalFault::EquivocationDetected, 1, 3)
+crates/amun-failure/src/tests.rs:78:        .poison(ConstitutionalFault::InvalidQuorum, 2, 7);
+crates/amun-failure/src/tests.rs:83:        assert_eq!(fault, ConstitutionalFault::EquivocationDetected);
+crates/amun-failure/src/tests.rs:92:    let health = KernelHealth::healthy().poison(ConstitutionalFault::UnsafeContractViolation, 1, 0);
+crates/amun-failure/src/tests.rs:110:        ConstitutionalFault::UnsafeContractViolation,
+crates/amun-failure/src/lib.rs:11:    module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext, FaultSeverity,
+crates/amun-failure/src/taxonomy.rs:5:pub enum ConstitutionalFault {
+crates/amun-failure/src/taxonomy.rs:44:impl ConstitutionalFault {
+crates/amun-failure/src/taxonomy.rs:136:    pub fault: ConstitutionalFault,
+crates/amun-failure/src/taxonomy.rs:142:    pub const fn new(fault: ConstitutionalFault, module_id: u16, operation_id: u16) -> Self {
+crates/amun-failure/src/kernel_state.rs:4:use crate::taxonomy::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-failure/src/kernel_state.rs:10:        fault: ConstitutionalFault,
+crates/amun-failure/src/kernel_state.rs:21:    pub fn poison(self, fault: ConstitutionalFault, epoch: u64, round: u64) -> Self {
+crates/amun-failure/src/kernel_state.rs:56:    pub evidence_fault: Option<ConstitutionalFault>,
+crates/amun-execution/src/executor.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-staking/src/delegation.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-staking/src/delegation.rs:11:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0013, 0x0010)
+crates/amun-staking/src/validator.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-staking/src/validator.rs:37:                ConstitutionalFault::CapacityExceeded,
+crates/amun-staking/src/validator.rs:43:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0013, 0x0002)
+crates/amun-staking/src/validator.rs:62:            ConstitutionalFault::InvalidInput,
+crates/amun-constitution/src/replay.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-constitution/src/replay.rs:65:                ConstitutionalFault::BufferTooSmall,
+crates/amun-constitution/src/replay.rs:71:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B01)
+crates/amun-constitution/src/replay.rs:74:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B02)
+crates/amun-constitution/src/replay.rs:79:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B03)
+crates/amun-constitution/src/replay.rs:82:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B04)
+crates/amun-constitution/src/replay.rs:85:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B05)
+crates/amun-constitution/src/replay.rs:88:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B06)
+crates/amun-constitution/src/economics.rs:3:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-constitution/src/economics.rs:28:                ConstitutionalFault::CryptoBudgetExceeded,
+crates/amun-constitution/src/economics.rs:40:                    ConstitutionalFault::CryptoBudgetExceeded,
+crates/amun-economics/src/treasury.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-economics/src/treasury.rs:11:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0020)
+crates/amun-economics/src/treasury.rs:18:                ConstitutionalFault::InvalidInput,
+crates/amun-economics/src/token.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-economics/src/token.rs:28:                ConstitutionalFault::InvalidInput,
+crates/amun-economics/src/token.rs:34:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0003)
+crates/amun-economics/src/token.rs:42:                ConstitutionalFault::InvalidInput,
+crates/amun-economics/src/token.rs:48:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0006)
+crates/amun-economics/src/token.rs:51:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0007)
+crates/amun-economics/src/fee.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-economics/src/fee.rs:12:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0010)
+crates/amun-transaction/src/tx.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-transaction/src/tx.rs:129:                ConstitutionalFault::InvalidInput,
+crates/amun-transaction/src/tx.rs:136:                ConstitutionalFault::InvalidInput,
+crates/amun-transaction/src/tx.rs:144:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000E, 0x0003)
+crates/amun-transaction/src/tx.rs:163:                ConstitutionalFault::InvalidInput,
+crates/amun-transaction/src/tx.rs:170:                ConstitutionalFault::InvalidInput,
+crates/amun-transaction/src/tx.rs:177:                ConstitutionalFault::InvalidInput,
+crates/amun-consensus-types/src/vote.rs:60:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/vote.rs:68:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-consensus-types/src/errors.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-consensus-types/src/errors.rs:19:            ConstitutionalFault::InvalidStateTransition,
+crates/amun-consensus-types/src/phase.rs:66:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/phase.rs:73:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-consensus-types/src/message.rs:81:                amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-consensus-types/src/message.rs:88:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/message.rs:98:                    amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-consensus-types/src/qc.rs:42:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/qc.rs:50:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-consensus-types/src/qc.rs:64:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/bitmap.rs:47:                amun_failure::ConstitutionalFault::BufferTooSmall,
+
+===== SEARCH: VerificationReport =====
+crates/amun-header-gossip/src/observer.rs:4:pub struct VerificationReport {
+crates/amun-header-gossip/src/observer.rs:14:    pub fn observe(&mut self, _msg: &GossipMessage) -> Result<VerificationReport, String> {
+crates/amun-header-gossip/src/observer.rs:17:        Ok(VerificationReport {
+crates/amun-verifier-node/src/verifier.rs:1:use crate::report::VerificationReport;
+crates/amun-verifier-node/src/verifier.rs:12:    ) -> VerificationReport {
+crates/amun-verifier-node/src/verifier.rs:13:        let mut report = VerificationReport::new(block.block_height, block.block_hash.clone());
+crates/amun-verifier-node/src/verifier.rs:63:    ) -> Vec<VerificationReport> {
+crates/amun-verifier-node/src/lib.rs:4:pub use report::VerificationReport;
+crates/amun-verifier-node/src/report.rs:4:pub struct VerificationReport {
+crates/amun-verifier-node/src/report.rs:15:impl VerificationReport {
+
+===== SEARCH: StateReader =====
+
+===== SEARCH: ProvableState =====
+
+===== SEARCH: StateStore =====
+
+===== SEARCH: ExecutionReceipt =====
+crates/amun-proof-carrying/tests/proof_tests.rs:3:use amun_constitutional_kernel::receipt::ExecutionReceipt;
+crates/amun-proof-carrying/tests/proof_tests.rs:6:fn dummy_receipt(id: &str) -> ExecutionReceipt {
+crates/amun-proof-carrying/tests/proof_tests.rs:7:    ExecutionReceipt::new(id.into(), "s".into(), 0, 1, "t".into())
+crates/amun-proof-carrying/src/receipt.rs:6:use amun_constitutional_kernel::receipt::ExecutionReceipt;
+crates/amun-proof-carrying/src/receipt.rs:15:    pub receipt: ExecutionReceipt,
+crates/amun-proof-carrying/src/receipt.rs:33:        receipt: ExecutionReceipt,
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:26:// N109.7A — ExecutionReceipt
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:29:struct ExecutionReceipt {
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:54:) -> Result<ExecutionReceipt, String>
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:70:    Ok(ExecutionReceipt {
+crates/amun-consensus-network/src/re_executor.rs:3:use crate::execution_receipt::ExecutionReceipt;
+crates/amun-consensus-network/src/re_executor.rs:10:) -> Result<ExecutionReceipt, String>
+crates/amun-consensus-network/src/re_executor.rs:26:    Ok(ExecutionReceipt {
+crates/amun-consensus-network/src/lib.rs:48:pub use execution_receipt::ExecutionReceipt;
+crates/amun-consensus-network/src/execution_receipt.rs:5:pub struct ExecutionReceipt {
+crates/amun-execution-receipt/src/lib.rs:40:pub struct ExecutionReceipt {
+crates/amun-execution-receipt/src/lib.rs:51:impl CanonicalEncode for ExecutionReceipt {
+crates/amun-execution-receipt/src/lib.rs:63:impl ExecutionReceipt {
+crates/amun-execution-receipt/src/lib.rs:107:    pub receipts: Vec<ExecutionReceipt>,
+crates/amun-execution-receipt/src/lib.rs:133:    pub fn add_receipt(&mut self, receipt: ExecutionReceipt) {
+crates/amun_state_machine/src/transition.rs:6:use crate::receipt::{ExecutionReceipt, ErrorCode};
+crates/amun_state_machine/src/transition.rs:14:    pub receipt: Option<ExecutionReceipt>,
+crates/amun_state_machine/src/transition.rs:73:        let receipt = ExecutionReceipt::new(
+crates/amun_state_machine/src/lib.rs:23:pub use receipt::{ExecutionReceipt, ExecutionReceipts, ErrorCode};
+crates/amun_state_machine/src/receipt/mod.rs:40:pub struct ExecutionReceipt {
+crates/amun_state_machine/src/receipt/mod.rs:50:impl ExecutionReceipt {
+crates/amun_state_machine/src/receipt/mod.rs:92:    pub receipts: Vec<ExecutionReceipt>,
+crates/amun_state_machine/src/receipt/mod.rs:104:    pub fn push(&mut self, receipt: ExecutionReceipt) {
+crates/amun_state_machine/src/receipt/mod.rs:125:    pub fn get(&self, index: usize) -> Option<&ExecutionReceipt> {
+crates/amun-constitutional-kernel/src/lib.rs:26:pub use receipt::ExecutionReceipt;
+crates/amun-constitutional-kernel/src/state_machine.rs:6:use crate::receipt::ExecutionReceipt;
+crates/amun-constitutional-kernel/src/state_machine.rs:62:    ) -> Result<(u64, ExecutionReceipt), String> {
+crates/amun-constitutional-kernel/src/state_machine.rs:69:        let receipt = ExecutionReceipt::new(
+crates/amun-constitutional-kernel/src/receipt.rs:11:pub struct ExecutionReceipt {
+crates/amun-constitutional-kernel/src/receipt.rs:20:impl ArtifactDigest for ExecutionReceipt {
+crates/amun-constitutional-kernel/src/receipt.rs:26:impl ExecutionReceipt {
+crates/amun-constitutional-kernel/src/receipt.rs:61:impl CanonicalSerialize for ExecutionReceipt {
+crates/amun-constitutional/src/hash_domains.rs:42:/// Domain: ExecutionReceipt objects
+crates/amun-constitutional/src/lib.rs:117:pub use execution_receipt::ExecutionReceipt;
+crates/amun-constitutional/src/execution_receipt.rs:1://! ExecutionReceipt — terminal constitutional witness.
+crates/amun-constitutional/src/execution_receipt.rs:47:pub struct ExecutionReceipt {
+crates/amun-constitutional/src/execution_receipt.rs:87:impl ConstitutionalIdentity for ExecutionReceipt {
+crates/amun-constitutional/src/execution_receipt.rs:102:impl ConstitutionalObject for ExecutionReceipt {
+crates/amun-constitutional/src/execution_receipt.rs:168:impl ExecutionReceipt {
+crates/amun-constitutional/src/execution_receipt.rs:224:    ) -> ExecutionReceipt {
+crates/amun-constitutional/src/execution_receipt.rs:225:        ExecutionReceipt::new(
+crates/amun-constitutional/src/execution_receipt.rs:267:        let r1 = ExecutionReceipt::new(
+crates/amun-constitutional/src/execution_receipt.rs:281:        let r2 = ExecutionReceipt::new(
+crates/amun-constitutional/src/schema_registry.rs:67:    /// ExecutionReceipt
+crates/amun-constitutional-block/tests/block_tests.rs:3:use amun_constitutional_kernel::receipt::ExecutionReceipt;
+crates/amun-constitutional-block/tests/block_tests.rs:5:fn dummy_receipt(id: &str) -> ExecutionReceipt {
+crates/amun-constitutional-block/tests/block_tests.rs:6:    ExecutionReceipt::new(id.into(), "s".into(), 0, 1, "t".into())
+crates/amun-constitutional-block/src/block.rs:2:use amun_constitutional_kernel::receipt::ExecutionReceipt;
+crates/amun-constitutional-block/src/block.rs:12:    pub execution_receipts: Vec<ExecutionReceipt>,
+crates/amun-constitutional-block/src/block.rs:28:        execution_receipts: Vec<ExecutionReceipt>,
+crates/amun-constitutional-block/src/block.rs:78:        execution_receipts: Vec<ExecutionReceipt>,
+crates/amun-state-transition/src/lib.rs:7:pub use receipt::ExecutionReceipt;
+crates/amun-state-transition/src/state.rs:1:use crate::receipt::ExecutionReceipt;
+crates/amun-state-transition/src/state.rs:64:    pub receipt: ExecutionReceipt,
+crates/amun-state-transition/src/state.rs:93:    ) -> (ExecutionReceipt, StateOverlay) {
+crates/amun-state-transition/src/state.rs:102:                ExecutionReceipt::failed(position, from_root, from_root, gas_limit, 1),
+crates/amun-state-transition/src/state.rs:122:            ExecutionReceipt::success(position, from_root, new_root, gas_used, write_set),
+crates/amun-state-transition/src/state.rs:133:    ) -> (ExecutionReceipt, StateOverlay) {
+crates/amun-state-transition/src/journal.rs:1:use crate::receipt::ExecutionReceipt;
+crates/amun-state-transition/src/journal.rs:15:    pub receipt: ExecutionReceipt,
+crates/amun-state-transition/src/journal.rs:43:    pub fn append(&mut self, receipt: ExecutionReceipt) -> Result<(), JournalError> {
+crates/amun-state-transition/src/receipt.rs:6:pub struct ExecutionReceipt {
+crates/amun-state-transition/src/receipt.rs:14:impl ExecutionReceipt {
+
+===== SEARCH: finalize_block =====
+crates/amun-block-builder/src/lib.rs:131:        let economic_snapshot = self.engine.finalize_block();
+crates/amun-execution/src/lib.rs:116:    pub fn finalize_block(&self) -> EconomicSnapshot {
+crates/amun-live-cluster/src/validator.rs:580:                    let _ = gov.finalize_block(4, &mut reg);
+crates/amun-live-cluster/src/validator.rs:889:            let executed = gov.finalize_block(4, &mut reg).unwrap();
+crates/amun-live-cluster/src/validator.rs:913:            let executed = gov.finalize_block(4, &mut reg).unwrap();
+crates/amun-live-cluster/src/validator.rs:961:            let executed = gov.finalize_block(4, &mut reg).unwrap();
+crates/amun-live-cluster/src/validator.rs:993:            let executed = gov.finalize_block(4, &mut reg).unwrap();
+crates/amun-live-cluster/src/validator.rs:1048:            let executed = gov.finalize_block(4, &mut reg).unwrap();
+crates/amun-live-cluster/src/validator.rs:1118:            gov.finalize_block(4, &mut reg).unwrap();
+crates/amun-live-cluster/src/validator.rs:1144:            gov.finalize_block(4, &mut reg).unwrap();
+crates/amun-live-cluster/src/validator.rs:1195:            gov.finalize_block(4, &mut reg).unwrap();
+crates/amun-authority-registry/src/transaction.rs:56:    pub fn finalize_block(
+crates/amun-authority-registry/src/transaction.rs:159:        let executed = state.finalize_block(4, &mut registry).unwrap();
+crates/amun-authority-registry/src/transaction.rs:234:        state.finalize_block(4, &mut registry).unwrap();
+crates/amun-authority-registry/src/wal.rs:47:        state.finalize_block(total_validators, registry)?;
+crates/amun-authority-registry/src/recovery.rs:29:        state.finalize_block(total_validators, registry)?;
+
+===== SEARCH: apply_block =====
+
+===== SEARCH: commit_block =====
+crates/amun-consensus-execution/src/block_dag.rs:178:    pub fn commit_block(&mut self, hash: &[u8; 32]) {
+crates/amun-consensus-execution/src/persistent_state.rs:217:                self.dag.commit_block(&bh);
+
+===== SEARCH: pre_commit =====
+
+===== SEARCH: replay =====
+crates/amun-constitutional-integration/src/lib.rs:48:            ObligationId::new(ObligationNamespace::Replay, 1),
+crates/amun-constitutional-integration/src/lib.rs:58:            ObligationId::new(ObligationNamespace::Replay, 2),
+crates/amun-constitutional-integration/src/lib.rs:60:            "Replay execution is deterministic",
+crates/amun-constitutional-integration/src/lib.rs:61:            "forall b : Replay(b, t1) = Replay(b, t2)",
+crates/amun-constitutional-integration/src/lib.rs:162:                "Replay results must match finalized state",
+crates/amun-constitutional-integration/src/lib.rs:163:                "forall b in Finalized : state_root(Replay(b)) = state_root(b)",
+crates/amun-constitutional-integration/src/lib.rs:167:            .with_dependency(ObligationId::new(ObligationNamespace::Replay, 2))
+crates/amun-constitutional-integration/src/lib.rs:174:                ObligationId::new(ObligationNamespace::Replay, 3),
+crates/amun-constitutional-integration/src/lib.rs:176:                "Replay certificates are unique",
+crates/amun-constitutional-integration/src/lib.rs:181:            .with_dependency(ObligationId::new(ObligationNamespace::Replay, 2)),
+crates/amun-constitutional-integration/src/lib.rs:187:                ObligationId::new(ObligationNamespace::Replay, 4),
+crates/amun-constitutional-integration/src/lib.rs:189:                "Replay chain is continuous",
+crates/amun-constitutional-integration/src/lib.rs:194:            .with_dependency(ObligationId::new(ObligationNamespace::Replay, 1)),
+crates/amun-constitutional-integration/src/lib.rs:242:                "Finalized = Replay Verified = Evidence Certified",
+crates/amun-constitutional-integration/src/lib.rs:248:            .with_dependency(ObligationId::new(ObligationNamespace::Replay, 1))
+crates/amun-transcript-semantics/src/lib.rs:25:// ─── Replay Class ──────────────────────────────────────────
+crates/amun-nft-evidence/src/lib.rs:67:    /// Law 4: Replay Protection — check nonce or timestamp ordering
+crates/amun-audit/tests/audit_layer06_replay.rs:25:    // CONST-REPLAY-001: Replay produces identical state
+crates/amun-audit/tests/audit_layer06_replay.rs:63:            Err(e) => panic!("CONST-REPLAY-001: Replay failed: {}", e),
+crates/amun-audit/tests/audit_layer06_replay.rs:67:    // CONST-REPLAY-002: Replay detects state root divergence
+crates/amun-audit/tests/audit_layer06_replay.rs:98:    // CONST-REPLAY-003: Replay detects epoch regression
+crates/amun-audit/tests/audit_layer15_temporal.rs:58:                    "CONST-TEMP-001 VIOLATION: Replay twice produces different roots"
+crates/amun-audit/tests/audit_layer15_temporal.rs:62:            (Err(e), _) | (_, Err(e)) => panic!("CONST-TEMP-001: Replay failed: {}", e),
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:31:    /// Replay curvature becomes infinite
+crates/amun-constitutional-geometry/src/metrics.rs:90:        // Replay distance: can replay be preserved?
+crates/amun-constitutional-geometry/src/horizons.rs:15:    /// Replay horizon: replay divergence has made reconciliation impossible
+crates/amun-constitutional-geometry/src/stability.rs:49:    /// Replay determinism creates a stable attractor
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:65:                    total[1] += strength; // Replay dimension
+crates/amun-constitutional-geometry/src/curvature.rs:22:/// Replay curvature measures deformation in the causal geometry
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:1:// N121.2 — Deterministic Replay of Slashing State
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:92:/// N121.2: Replay from empty always produces zero root
+crates/amun-consensus-network/src/slashing_ledger.rs:1:// N119 — Deterministic Slashing Ledger & Replay Protection
+crates/amun-consensus-network/src/slashing_ledger.rs:69:        // N119.2: Replay protection
+crates/amun-consensus-network/src/execution_commitment.rs:13://   - Replay of commitments across heights
+crates/amun-constitution-builder/src/treaty.rs:64:        lines.push("Replay Boundaries:".to_string());
+crates/amun-constitution-builder/src/federation.rs:51:            "Replay isolation preserved".into(),
+crates/amun-constitution-builder/src/federation.rs:89:        lines.push(format!("Replay Boundary: {}", self.replay_boundary));
+crates/amun-experimental-framework/src/main.rs:229:// ── Experiment 2: Replay vs Execution (all workloads) ───────
+crates/amun-experimental-framework/src/main.rs:231:    println!("\n=== Experiment 2: Replay vs Execution ===");
+crates/amun-replay-semantics/src/lib.rs:1://! Replay Semantics — formal constitutional model for replay.
+crates/amun-replay-semantics/src/lib.rs:2://! Layer 0.75 — Constitutional Replay Theory.
+crates/amun-constitutional-kernel/tests/kernel_tests.rs:67:    // Replay must produce identical result
+crates/amun-constitutional-kernel/src/lib.rs:14://! - Replay-safe receipts: every transition leaves a verifiable proof.
+crates/amun-snapshot-engine/src/replay_continuity.rs:1:// Replay Continuity Engine
+crates/amun-snapshot-engine/src/replay_continuity.rs:41:        // Step 2: Replay WAL from snapshot checkpoint forward
+crates/amun-node/src/bin/test_replay_determinism.rs:52:    // Phase 2: Replay on 4 independent stores
+crates/amun-node/src/bin/test_replay_determinism.rs:72:        println!("Replay {} root: {}", v, hex::encode(replay_root));
+crates/amun-node/src/bin/test_replay_determinism.rs:79:        println!("\nPASS: Replay determinism verified across all validators");
+crates/amun-node/src/bin/test_replay_determinism.rs:82:        println!("\nFAIL: Replay determinism violation");
+crates/amun-node/src/bin/test_replay_determinism.rs:85:                "Replay {} root: {} (match: {})",
+crates/amun-node/src/bin/test_replay_stress.rs:89:    // Phase 2: Replay on 4 independent stores from scratch
+crates/amun-node/src/bin/test_replay_stress.rs:132:            .expect("Replay execution failed");
+crates/amun-node/src/bin/test_replay_stress.rs:135:                .expect("Replay advance failed");
+crates/amun-node/src/bin/test_replay_stress.rs:138:        println!("Replay {} final root: {}", v, hex::encode(replay_root));
+crates/amun-node/src/bin/test_replay_stress.rs:145:        println!("\nPASS: Replay stress test passed ({} blocks)", block_count);
+crates/amun-node/src/bin/test_replay_stress.rs:148:        println!("\nFAIL: Replay divergence detected");
+crates/amun-node/src/bin/test_replay_stress.rs:151:                "Replay {} root: {} (match: {})",
+crates/amun-constitutional-enforcement/src/state_transition.rs:54:        // N126.2: Replay must produce identical state root
+crates/amun-constitutional-enforcement/src/state_transition.rs:59:                    "Replay divergence: execution={:02x?} replay={:02x?}",
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:113:// N127A.3 — Replay Evidence Adapter
+crates/amun-constitutional-enforcement/src/lib.rs:171:                "Replay divergence",
+crates/amun-constitutional-enforcement/src/proof_engine.rs:170:        // Replay Determinism
+crates/amun-constitutional-enforcement/src/proof_engine.rs:174:                description: "Replay produced different state root".into(),
+crates/amun-constitutional/src/architectural_invariants.rs:103:/// INVARIANT 7: Replay-Derived State Identity
+crates/amun-constitutional/src/certificate_scope.rs:59:    /// Replay revision this certificate was issued under.
+crates/amun-constitutional/src/state_anchor_scope.rs:50:    /// Replay revision active for this scope.
+crates/amun-constitutional/src/snapshot.rs:11://!   Replay → StateAnchor → Snapshot
+crates/amun-constitutional/src/snapshot_scope.rs:79:    /// Replay revision active for this scope.
+crates/amun-constitutional/src/execution_journal.rs:247:                "Replay revision mismatch",
+crates/amun-constitutional/src/state_anchor.rs:13://! INVARIANT (Replay-Derived State Identity):
+crates/amun-entropy-transcript/src/source.rs:10:    Replay,
+crates/amun-constitutional-block/src/lib.rs:81:///   Block → Certificate → Journal → Replay → StateRoot → Accept/Reject
+crates/amun-replay-engine/src/version.rs:1:/// Replay protocol version - FROZEN for protocol v1.
+crates/amun-networking/src/sovereignty.rs:16:/// Multi-phase: Identity -> Physics -> Replay -> Lineage -> Temporal -> Sync
+crates/amun-constitutional-semantics/src/lib.rs:61:// ─── Replay Policy ─────────────────────────────────────────
+crates/amun-recovery/src/lib.rs:69:            return Err("Replay chain verification failed".into());
+crates/amun-state-root/src/snapshot.rs:17:    /// Replay equivalence proof.
+crates/amun-live-cluster/src/validator.rs:609:                        // N126.3: Replay determinism from ExecutionEngine
+crates/amun-live-cluster/src/validator.rs:762:                            // N110.4c.1: Replay protection
+crates/amun-evidence-root/src/lib.rs:8:/// - Replay certificate (replay verification proof)
+crates/amun-constitutional-state/src/lib.rs:82:    /// Replay a journal to reconstruct the state.
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:14:/// Replay-Backed Consensus Engine.
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:54:            // Replay verification
+crates/amun-testnet-sim/tests/adversarial_tests.rs:206:                // Replay against a registry initialized to the proof's pre-state
+crates/amun-chain-checkpoint/src/lib.rs:60:    /// Replay certificate merkle root at end_height.
+crates/amun-constitutional-proof/src/lib.rs:122:        let id = ObligationId::new(ObligationNamespace::Replay, 4);
+crates/amun-constitutional-proof/src/lib.rs:123:        assert_eq!(id.namespace(), ObligationNamespace::Replay);
+crates/amun-constitutional-proof/src/lib.rs:151:            ObligationNamespace::Replay,
+crates/amun-constitutional-proof/src/lib.rs:232:            ObligationId::new(ObligationNamespace::Replay, 2),
+crates/amun-constitutional-proof/src/lib.rs:234:            "Replay determinism",
+crates/amun-constitutional-proof/src/lib.rs:235:            "forall b : Replay(b, t1) = Replay(b, t2)",
+crates/amun-constitutional-proof/src/lib.rs:239:        .with_dependency(ObligationId::new(ObligationNamespace::Replay, 1));
+crates/amun-constitutional-proof/src/lib.rs:395:        let missing_dep = make_id(ObligationNamespace::Replay, 99);
+crates/amun-constitutional-proof/src/lib.rs:546:        let id = ObligationId::new(ObligationNamespace::Replay, 1);
+crates/amun-constitutional-proof/src/lib.rs:620:                ObligationId::new(ObligationNamespace::Replay, 1),
+crates/amun-constitutional-proof/src/lib.rs:624:                ObligationId::new(ObligationNamespace::Replay, 2),
+crates/amun-constitutional-proof/src/lib.rs:629:                ObligationId::new(ObligationNamespace::Replay, 3),
+crates/amun-constitutional-proof/src/lib.rs:639:            VerdictResult::ConditionalPass(vec!["Replay-2 failed".into()]),
+crates/amun-constitutional-proof/src/lib.rs:773:            ObligationId::new(ObligationNamespace::Replay, 1),
+crates/amun-constitutional-proof/src/lib.rs:777:            ObligationId::new(ObligationNamespace::Replay, 2),
+crates/amun-constitutional-proof/src/lib.rs:983:        let id = ObligationId::new(ObligationNamespace::Replay, 1);
+crates/amun-constitutional-proof/src/lib.rs:1096:        let obl = ObligationId::new(ObligationNamespace::Replay, 1);
+crates/amun-constitutional-proof/src/lib.rs:1310:        let obl = ObligationId::new(ObligationNamespace::Replay, 1);
+crates/amun-constitutional-proof/src/lib.rs:1496:            ObligationId::new(ObligationNamespace::Replay, 1),
+crates/amun-constitutional-proof/src/obligation_namespace.rs:10:    Replay,
+crates/amun-constitutional-proof/src/obligation_namespace.rs:29:            Self::Replay => "REPLAY",
+crates/amun-constitutional-proof/src/obligation_namespace.rs:47:            "REPLAY" => Ok(Self::Replay),
+crates/amun-state-machine/src/axioms.rs:12:    /// Replay determinism is preserved across all legal transitions
+crates/amun-state-machine/src/axioms.rs:39:                "Replay must remain deterministic across all transitions"
+crates/amun-state-machine/src/absolute_invariants.rs:13:    /// Replay determinism must be preserved across ALL amendments
+crates/amun-state-machine/src/replay_log.rs:46:/// Constitutional Replay DAG - branching constitutional history.
+crates/amun-state-machine/src/preconditions.rs:15:    /// Replay continuity must be preserved.
+crates/amun-state-machine/src/invariants.rs:10:    /// Replay determinism must be preserved.
+crates/amun-state-machine/src/historical_invariants.rs:14:    /// Replay divergence must not accumulate over lineage
+crates/amun-state-machine/src/historical_invariants.rs:54:                        "Replay divergence accumulation exceeded: {} > {}",
+crates/amun-state-machine/src/formal_entropy.rs:27:    /// Replay convergence absorbs entropy
+crates/amun-state-machine/src/merge_math.rs:10:    /// Replay histories are interleaved by epoch
+crates/amun-authority-registry/src/wal.rs:31:    /// Replay all entries in order against a fresh GovernanceState.
+crates/amun-authority-registry/src/wal.rs:40:    /// Replay and then finalize all approved proposals.
+crates/amun-authority-registry/src/recovery.rs:22:        // 2. Replay only WAL entries after the snapshot height
+
+===== SEARCH: snapshot =====
+crates/amun-constitutional-integration/src/lib.rs:297:                "Snapshot restores full evidence chain",
+crates/amun-sync/src/bin/bootstrap.rs:20:    // Phase 1: Snapshot
+crates/amun-sync/src/bin/bootstrap.rs:31:        "Snapshot created: height={}, hash={}",
+crates/amun-sync/src/bin/bootstrap.rs:38:    verify_snapshot(&snap_dir).expect("Snapshot verification failed");
+crates/amun-sync/src/bin/bootstrap.rs:39:    eprintln!("Snapshot verified.");
+crates/amun-sync/src/bin/snapshot-server.rs:16:    eprintln!("Snapshot server listening on {}", bind_addr);
+crates/amun-audit/tests/audit_layer03_snapshot.rs:8:    // CONST-SNAP-001: Snapshot magic bytes are correct
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:1:// N121.5 — Snapshot Commitment
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:30:/// N121.5: Snapshot root matches the state root
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:41:    // Snapshot the root
+crates/amun_state_machine/src/snapshot.rs:40:/// Snapshot manager for deterministic checkpointing
+crates/amun-snapshot-engine/src/verifier.rs:1:// Snapshot Verifier - Constitutional verification of snapshots
+crates/amun-snapshot-engine/src/verifier.rs:60:    /// THEOREM 11: Snapshot Roundtrip
+crates/amun-snapshot-engine/src/verifier.rs:70:                "Snapshot roundtrip theorem violated: original {:?} != reconstructed {:?}",
+crates/amun-snapshot-engine/src/manifest.rs:1:// Snapshot Manifest v1.1 - Constitutional Document for State Transfer
+crates/amun-snapshot-engine/src/replay_continuity.rs:37:            .map_err(|e| format!("Snapshot restore failed: {}", e))?;
+crates/amun-constitutional/src/architectural_invariants.rs:118:/// Snapshot restoration validity is derived from replay lineage,
+crates/amun-constitutional/src/lib.rs:56:// Receipt + Certificate + State Anchor + Snapshot
+crates/amun-constitutional/src/snapshot.rs:7://! Snapshot identity is REPLAY-DERIVED, not storage-derived.
+crates/amun-constitutional/src/snapshot.rs:8://! Snapshot restoration validity is LINEAGE-DERIVED, not storage-derived.
+crates/amun-constitutional/src/snapshot.rs:11://!   Replay → StateAnchor → Snapshot
+crates/amun-constitutional/src/snapshot.rs:12://!   NOT: Database → Snapshot → Recovery
+crates/amun-constitutional/src/snapshot.rs:120:                "Snapshot scope end before start",
+crates/amun-constitutional/src/snapshot.rs:133:                "Snapshot hash mismatch",
+crates/amun-constitutional/src/snapshot.rs:236:                "Snapshot monotonicity violation",
+crates/amun-constitutional/src/snapshot_scope.rs:7://! Snapshot ≠ Backup: A snapshot is a constitutionally restorable
+crates/amun-constitutional/src/snapshot_scope.rs:10://! INVARIANT (Snapshot Monotonicity):
+crates/amun-constitutional/src/snapshot_scope.rs:40:    /// Snapshot is admissible for restoration.
+crates/amun-constitutional/src/snapshot_scope.rs:42:    /// Snapshot is from a divergent replay lineage.
+crates/amun-constitutional/src/snapshot_scope.rs:44:    /// Snapshot scope violates boundary constraints.
+crates/amun-constitutional/src/snapshot_scope.rs:46:    /// Snapshot is superseded by a newer constitutional revision.
+crates/amun-kernel/src/governance.rs:220:    pub snapshot: Snapshot,
+crates/amun-kernel/src/governance.rs:240:// ─── Snapshot ──────────────────────────────────────────────
+crates/amun-kernel/src/governance.rs:244:pub struct Snapshot {
+crates/amun-kernel/src/governance.rs:256:impl Snapshot {
+crates/amun-kernel/src/governance.rs:287:impl CanonicalEncode for Snapshot {
+crates/amun-replay-engine/src/execution_vertex.rs:25:    Snapshot,
+crates/amun-recovery/src/lib.rs:61:                    "Snapshot height mismatch: snapshot={}, state={}",
+crates/amun-constitutional-treaties/src/treaty.rs:18:    /// Snapshot exchange permitted
+crates/amun-bench/tests/n162_snapshot_bench.rs:46:        "Snapshot clone active resources: {}ms",
+crates/amun-bench/tests/n162_snapshot_bench.rs:49:    assert!(snapshot_result.duration_ms < 200, "Snapshot clone too slow");
+crates/amun-chain-store/examples/snapshot_builder_test.rs:45:    println!("N99.1 Snapshot Builder Test: PASS");
+crates/amun-chain-store/examples/snapshot_verification_test.rs:66:    println!("N99.2 Snapshot Verification: ALL PASS");
+crates/amun-chain-store/examples/snapshot_restore_test.rs:38:    println!("Snapshot created at height {}", manifest.snapshot_height);
+crates/amun-chain-store/examples/snapshot_restore_test.rs:44:        "Snapshot restored at height {}",
+crates/amun-chain-store/examples/snapshot_restore_test.rs:59:    println!("N99.3 Snapshot Restore Test: PASS");
+crates/amun-chain-store/examples/create_live_snapshot.rs:18:    println!("Snapshot created at height {}", manifest.snapshot_height);
+crates/amun-chain-store/examples/create_live_snapshot.rs:19:    println!("Snapshot hash: {}", hex::encode(manifest.snapshot_hash));
+crates/amun-snapshot-engine-unified/src/lib.rs:8:pub struct Snapshot {
+crates/amun-snapshot-engine-unified/src/lib.rs:16:impl Snapshot {
+crates/amun-snapshot-engine-unified/src/lib.rs:42:        let snapshot = Snapshot::from_persistent_state(state);
+crates/amun-snapshot-engine-unified/src/lib.rs:51:    pub fn load(&self) -> Result<Snapshot, String> {
+crates/amun-snapshot-engine-unified/src/lib.rs:53:            return Err("Snapshot file not found".into());
+crates/amun-snapshot-engine-unified/src/lib.rs:56:        let snapshot: Snapshot = serde_json::from_str(&json).map_err(|e| e.to_string())?;
+crates/amun-amendments/src/proposal.rs:36:    Snapshot,
+crates/amun-amendments/src/proposal.rs:75:            AmendmentType::SnapshotEvolution => AmendmentClass::Snapshot,
+crates/amun-amendments/src/proposal.rs:96:                    AmendmentClass::Snapshot => 1,
+crates/amun-state-sync/src/stateless_verifier.rs:32:                reason: "Snapshot certificate verification failed".into(),
+crates/amun-consensus-execution/src/persistent_state.rs:139:                "Snapshot sequence {} not found in WAL with matching chain hash",
+crates/amun-authority-registry/src/recovery.rs:124:            "Snapshot proposal missing"

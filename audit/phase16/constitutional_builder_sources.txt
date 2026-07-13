@@ -1,0 +1,26 @@
+================ ConstitutionalCertificate::new ================
+crates/amun-constitutional-kernel/tests/kernel_tests.rs:18:    let root_cert = ConstitutionalCertificate::new_root(
+crates/amun-constitutional-authority/tests/authority_tests.rs:8:    ConstitutionalCertificate::new_root(
+crates/amun-constitutional-authority/tests/authority_tests.rs:21:    ConstitutionalCertificate::new_child(
+crates/amun-constitutional-authority/tests/authority_tests.rs:102:    let cert = ConstitutionalCertificate::new_child(
+
+================ SignedArtifact::new ================
+
+================ sign_artifact ================
+
+================ SignedArtifact<ConstitutionalCertificate> ================
+crates/amun-networking/src/validator_certificate.rs:64:    pub constitutional: Option<SignedArtifact<ConstitutionalCertificate>>,
+crates/amun-networking/src/validator_certificate.rs:76:        constitutional: SignedArtifact<ConstitutionalCertificate>,
+crates/amun-networking/src/validator_certificate.rs:245:    pub fn constitutional(&self) -> Option<&SignedArtifact<ConstitutionalCertificate>> {
+crates/amun-networking/src/validator_certificate.rs:251:    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+crates/amun-constitutional-authority/src/rotation.rs:19:        new_signed_cert: &SignedArtifact<ConstitutionalCertificate>,
+crates/amun-constitutional-authority/src/chain.rs:11:    pub certificates: Vec<SignedArtifact<ConstitutionalCertificate>>,
+crates/amun-constitutional-authority/src/chain.rs:15:    pub fn new(root: SignedArtifact<ConstitutionalCertificate>) -> Self {
+crates/amun-constitutional-authority/src/chain.rs:24:        cert: SignedArtifact<ConstitutionalCertificate>,
+crates/amun-constitutional-authority/src/trust.rs:11:    pub signed_cert: SignedArtifact<ConstitutionalCertificate>,
+crates/amun-constitutional-authority/src/trust.rs:18:        signed_cert: SignedArtifact<ConstitutionalCertificate>,
+
+================ artifact.sign ================
+crates/amun-constitutional-proof/src/lib.rs:1482:        pkg.sign(
+crates/amun-constitutional-signing/src/signed_artifact.rs:16:        let sig = keypair.sign(&digest);
+crates/amun-constitutional-signing/src/keys.rs:28:        self.signing_key.sign(digest)

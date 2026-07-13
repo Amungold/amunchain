@@ -1,0 +1,200 @@
+      1 docs/rfcs/README.md:4:Any change to the Dependency Constitution, layer assignments, or architectural
+      1 docs/rfcs/README.md:1:# AmunChain Constitutional RFC System
+      1 docs/rfcs/README.md:11:4. After acceptance, update the Constitution and fingerprint
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:45:5B.0 — ConstitutionalRoots Struct
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:2:CCA-IMPL-5B Final Report: Constitutional Root Persistence Layer
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:228:marks the completion of the Constitutional Root Persistence Layer.
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:192:- ConstitutionalRoots abstraction
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:164:- FinalityCertificate
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:154:3. Replayable Constitutional State
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:150:2. Deterministic Constitutional Commitments
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:146:1. Historical Constitutional Audit Trail
+      1 docs/reports/CCA_IMPL_5A_REPORT.md:171:- Constitutional audit dashboards
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:78:Constitutional commitments became part of consensus state.
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:54:→ ConstitutionalCommitment
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:46:- commitment_root = Constitutional Commitment Architecture root
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:241:The Constitutional Commitment Architecture is now integrated into the consensus-critical execution path of AmunChain and forms part of the chain's cryptographic identity.
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:193:Constitutional commitments can no longer be bypassed, ignored, or detached from finalized chain history.
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:184:The Constitutional Commitment Architecture is now consensus-critical.
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:13:CCA-IMPL-4 integrates the Constitutional Commitment Architecture (CCA) directly into the consensus-critical state root path.
+      1 docs/protocol/replay_physics_v1.md:6:All ConstitutionalHash values are raw 32-byte blobs. No length prefix. No type tag. Fixed-width canonical encoding.
+      1 docs/protocol/replay_physics_v1.md:28:These laws are FROZEN for protocol v1. Amendment requires: 1. Constitutional amendment proposal, 2. New protocol version identifier, 3. Migration proof for all existing state, 4. Golden value regeneration.
+      1 docs/protocol/replay_physics_v1.md:13:### 2.2 Ordering Invariant
+      1 docs/protocol/lineage_law_v1.md:17:State migration from parent to child protocol must produce a MigrationWitness
+      1 docs/protocol/lineage_law_v1.md:16:### 2.1 Migration Witness
+      1 docs/protocol/FREEZE_CERTIFICATE_v1.md:45:Ratified by the Amun Constitutional Assembly.
+      1 docs/protocol/FREEZE_CERTIFICATE_v1.md:38:1. Constitutional amendment proposal
+      1 docs/protocol/FREEZE_CERTIFICATE_v1.md:29:### Constitutional Invariants (FROZEN)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:70:| Evidence Internal Node | `AMUN_EV_NODE_V1` |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:69:| Evidence Leaf | `AMUN_EV_LEAF_V1` |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:46:| `governance_root` | Governance Subsystem (Constitutional Proof) |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:33:12. Consensus Invariants
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:310:| V | Constitutional Consensus Architecture | CCA v1.0 specification, root commitment, Merkle proofs |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:308:| III | Constitutional Security | Constitutional proof system, identity and evidence roots |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:296:- Cross-Node Proof Reports (evidence that multiple nodes converge on identical state)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:286:**AmunChain Constitutional Audit Package v1.0**
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:26:5. Constitutional Commitment Structure & Serialization
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:266:**Invariant 5:** Given identical state transition inputs (same genesis, same transactions up to height N), all validators must compute identical values for all roots defined in this specification.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:264:**Invariant 4:** The `AppHash` MUST commit to `state_root`. For CCA v1.0, this is defined as `AppHash = state_root`. Future versions may introduce additional roots (such as `execution_root` or `receipt_root`) into the `AppHash` computation, in which case the invariant will be updated to reflect the new hash composition while preserving the requirement that `state_root` remains a committed input.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:262:**Invariant 3:** `state_root` must include `constitutional_commitment_root` as a leaf in its Merkle tree computation.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:260:**Invariant 2:** `constitutional_commitment_root == BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || CanonicalSerialization(ConstitutionalCommitment))`
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:25:4. Constitutional Root Construction
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:258:**Invariant 1:** `constitutional_root == BLAKE3("AMUN_CONSTITUTIONAL_ROOT_V1" || identity_root || evidence_root || governance_root || economic_root)`
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:254:## 12. Consensus Invariants
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:247:- `ConstitutionalCommitment.version` is part of the consensus state.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:225:- Add a new evidence record to the Evidence Module.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:223:### Test B: Evidence State Change
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:1:# Constitutional Consensus Architecture (CCA) v1.0
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:179:    ConstitutionalCommitment (V1)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:176:    ConstitutionalRoot = BLAKE3(DOMAIN || identity || evidence || governance || economic)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:155:- `governance_root`: The constitutional proof root of governance, included inside `ConstitutionalCommitment` and contributing to `constitutional_root`.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:147:    serialized_bytes = CanonicalSerialization(ConstitutionalCommitment)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:125:    struct ConstitutionalCommitment {
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:121:## 5. Constitutional Commitment Structure & Serialization
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:109:## 4. Constitutional Root Construction
+      1 docs/federation/TRUST_GRAPH.md:51:## Invariant
+      1 docs/federation/FEDERATION_ARCHITECTURE.md:53:## Invariant
+      1 docs/economics/ECONOMIC_LAYER_REVIEW.md:30:| ConstitutionalRoot from economic_root | YES | CCA spec v1.0 |
+      1 docs/economics/ECONOMIC_LAYER_REVIEW.md:110:### Phase V: Constitutional Economy
+      1 docs/constitutional_layers.md:7:## Layer 1: Truth & Evidence
+      1 docs/constitutional_layers.md:3:## Layer 0: Constitutional Kernel
+      1 docs/constitutional_layers.md:1:# Amun Constitutional Architecture — Layer Stratification
+      1 docs/constitutional_layers.md:18:## Layer 3: Consensus & Finality
+      1 docs/constitutional/topology.md:2:## AmunChain Constitutional Consensus Protocol v1.0
+      1 docs/constitutional/topology.md:1:# Constitutional Topology: Core Definitions
+      1 docs/constitutional/topology.md:15:- `authority_root == origin_root` → Constitutional topology unchanged
+      1 docs/constitutional/topology.md:14:### Constitutional Meaning
+      1 docs/constitutional/phase85_seal.md:40:- Constitutional evolution layer (sealed)
+      1 docs/constitutional/phase85_seal.md:30:5. Formal ConstitutionalStateMachine (allowed/forbidden transitions)
+      1 docs/constitutional/phase85_seal.md:29:4. ConstitutionalField enum (replace string-based field names)
+      1 docs/constitutional/phase85_seal.md:23:15. ConstitutionalEncode trait (serialization lock interface)
+      1 docs/constitutional/phase85_seal.md:21:13. Constitutional checkpoints with state transition integration
+      1 docs/constitutional/phase85_seal.md:17:9. ConstitutionalPhysicsProof embedded in certificates
+      1 docs/constitutional/phase85_seal.md:16:8. Graded guarantees: Replay/Snapshot/Proof/Governance/Continuity
+      1 docs/constitutional/phase84_freeze.md:70:Date: Constitutional Era 1, Epoch 0
+      1 docs/constitutional/phase84_freeze.md:69:Phase 84 - Constitutionally Complete
+      1 docs/constitutional/phase84_freeze.md:68:Ratified by the AmunChain Constitutional Assembly
+      1 docs/constitutional/phase84_freeze.md:65:4. Constitutional court ratification
+      1 docs/constitutional/phase84_freeze.md:63:2. New PROOF_VERSION constant
+      1 docs/constitutional/phase84_freeze.md:62:1. Constitutional amendment proposal
+      1 docs/constitutional/phase84_freeze.md:54:- ReplayVerifier checks every frame's state_root against reconstructed state
+      1 docs/constitutional/phase84_freeze.md:31:- Proof verification rebuilds Merkle root from chunk hash + siblings
+      1 docs/constitutional/phase84_freeze.md:30:- Proof generation uses positional pair tracking (pair_idx * 2)
+      1 docs/constitutional/phase84_freeze.md:2:## Frozen Invariants for Sovereign State Replication
+      1 docs/constitutional/phase84_freeze.md:25:- Constitutional mismatch + same SMT universe = ReadOnlyCompatible
+      1 docs/constitutional/phase84_freeze.md:24:- Levels: FullyCompatible > ReplayCompatible > SnapshotCompatible > ReadOnlyCompatible > Incompatible
+      1 docs/constitutional/phase84_freeze.md:10:- Proof geometry: Exactly 256 ProofStep entries per proof
+      1 docs/constitutional-mathematics/README.md:3:Formal Science of Computable Legitimacy Dynamics Under Scoped Sovereignty Constraints
+      1 docs/constitutional-mathematics/README.md:34:First Lemma            ✅
+      1 docs/constitutional-mathematics/README.md:30:Axioms                 ✅
+      1 docs/constitutional-mathematics/README.md:28:Formal Semantics       ✅
+      1 docs/constitutional-mathematics/README.md:1:# Constitutional Mathematics
+      1 docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:3:# Phase 112 — Constitutional Simulation Engine v1
+      1 docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:1:# Constitutional Mathematics
+      1 docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:141:Formal Research Framework
+      1 docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:139:Phase 112 transitions Constitutional Mathematics from:
+      1 docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:11:Transform Constitutional Mathematics into an experimental computational theory.
+      1 docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:111:Recognition Stability Theorem
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:93:Recognition Existence Lemma
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:91:### 6. First Formal Result
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:61:### 4. Axiom Set v1
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:49:f1 = Witness Validity
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:1:# Constitutional Mathematics
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:11:Transition Constitutional Mathematics from conceptual framework to formal research framework.
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:109:- Axioms
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:108:- Formal Semantics
+      1 docs/consensus/origin.md:3:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/origin.md:1:# Constitutional Origin: Consensus Constitution v1.0
+      1 docs/consensus/constitution.md:88:## Article V: Block Constitution
+      1 docs/consensus/constitution.md:7:## Article I: Arithmetic Constitution
+      1 docs/consensus/constitution.md:69:## Article IV: Execution Constitution
+      1 docs/consensus/constitution.md:51:## Article III: Event Ordering Constitution
+      1 docs/consensus/constitution.md:32:## Article II: State Constitution
+      1 docs/consensus/constitution.md:1:# AmunChain Consensus Constitution v1.0
+      1 docs/consensus/constitution.md:111:### Section 6.1: Execution Replay
+      1 docs/consensus/constitution.md:109:## Article VI: Validator Constitution
+      1 docs/consensus/I4_drift.md:38:## Constitutional Notes
+      1 docs/consensus/I4_drift.md:21:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I4_drift.md:10:# AmunChain Consensus Constitution v1.0 (Drifted)
+      1 docs/consensus/I3_reframing.md:37:## Constitutional Notes
+      1 docs/consensus/I3_reframing.md:22:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I3_reframing.md:10:# AmunChain Consensus Constitution v1.0 (Reframed)
+      1 docs/consensus/I2_extension.md:30:## Constitutional Notes
+      1 docs/consensus/I2_extension.md:12:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I2_extension.md:10:# AmunChain Consensus Constitution v1.0 (Extended)
+      1 docs/consensus/I1_translation.md:26:## Constitutional Notes
+      1 docs/consensus/I1_translation.md:1:# I1: English Translation of Consensus Constitution v1.0
+      1 docs/consensus/I1_translation.md:12:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I1_translation.md:10:# AmunChain Consensus Constitution v1.0
+      1 docs/audit/THREAT_MODEL.md:14:| Execution | Forged TransitionProof | Proof hash verification (Theorem 1) |
+      1 docs/audit/SECURITY_INVARIANTS.md:9:| R3 | Child requires consumed parent | ResourceRegistry::consume_and_derive | WitnessBuilder |
+      1 docs/audit/SECURITY_INVARIANTS.md:8:| R2 | Consumed resources cannot be used | VMKernel::verify | ReplayVerifier |
+      1 docs/audit/SECURITY_INVARIANTS.md:7:| R1 | No duplicate active resource IDs | ResourceRegistry::register_genesis | PCCVVerifier |
+      1 docs/audit/SECURITY_INVARIANTS.md:5:| ID | Invariant | Enforcement | Verification |
+      1 docs/audit/SECURITY_INVARIANTS.md:40:| K3 | Anti-replay protection | AntiReplayGuard::check_and_record |
+      1 docs/audit/SECURITY_INVARIANTS.md:3:## Resource Invariants (R1–R6 + X1)
+      1 docs/audit/SECURITY_INVARIANTS.md:36:| ID | Invariant | Enforcement |
+      1 docs/audit/SECURITY_INVARIANTS.md:34:## Cryptographic Invariants
+      1 docs/audit/SECURITY_INVARIANTS.md:32:| C4 | No conflicting finality | Theorem 5 (Replay-Backed Safety) |
+      1 docs/audit/SECURITY_INVARIANTS.md:31:| C3 | Five-root binding | ConstitutionalFinalityCertificate::verify |
+      1 docs/audit/SECURITY_INVARIANTS.md:29:| C1 | Replay before vote | ReplayBackedConsensus::form_consensus |
+      1 docs/audit/SECURITY_INVARIANTS.md:27:| ID | Invariant | Enforcement |
+      1 docs/audit/SECURITY_INVARIANTS.md:25:## Consensus Invariants
+      1 docs/audit/SECURITY_INVARIANTS.md:1:# AmunChain Security Invariants Catalog
+      1 docs/audit/SECURITY_INVARIANTS.md:17:| ID | Invariant | Enforcement |
+      1 docs/audit/SECURITY_INVARIANTS.md:15:## Execution Invariants
+      1 docs/audit/SECURITY_INVARIANTS.md:13:| X1 | Transfer proof single-use | TransferProofRegistry | N47 Verdict Engine |
+      1 docs/audit/SECURITY_INVARIANTS.md:12:| R6 | Version monotonicity | ResourceRegistry::consume_and_derive | WitnessBuilder |
+      1 docs/audit/SECURITY_INVARIANTS.md:11:| R5 | Cross-contract uniqueness | TransferProofRegistry::consume | StatelessVerifier |
+      1 docs/audit/SECURITY_INVARIANTS.md:10:| R4 | Certificates are terminal | TransformationMatrix::is_terminal | PCCVVerifier |
+      1 docs/audit/N103_MAINNET_READINESS_AUDIT.md:14:| A5 | State | Constitutional root determinism (cross-node) | ✅ | 107+ CCA tests pass |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:96:| Constitution | amun-constitutional | 157 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:83:| Proof Archive | amun-proof-archive | 6 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:80:| Invariant Engine | amun-invariant-engine | 5 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:77:| Transition Proof | amun-transition-proof | 5 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:5:| Invariant | Description | Test ID | Crate | Status |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:41:| Proof replay attack | byz_010 | ✅ Rejected |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:40:| Proof tampering | byz_009 | ✅ Rejected |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:3:## 1. Invariant-to-Test Traceability
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:32:| Forged TransitionProof | byz_001 | ✅ Rejected |
+      1 docs/architecture/PHASE_49_COMPLETE.md:89:### Constitutional Laws Enforced
+      1 docs/architecture/PHASE_49_COMPLETE.md:85:- **Constitutional violations**: 0
+      1 docs/architecture/PHASE_49_COMPLETE.md:47:9. **Constitutional Linter**: Interface law enforcement via cargo metadata
+      1 docs/architecture/PHASE_49_COMPLETE.md:37:### Constitutional Achievements
+      1 docs/architecture/PHASE_49_COMPLETE.md:21:| 0.5 | Constitutional Semantics | amun-constitution, amun-invariants, interfaces | ✅ Pure |
+      1 docs/architecture/PHASE_49_COMPLETE.md:1:# AmunChain Phase 49: Constitutional Interface Sovereignty
+      1 docs/architecture/PHASE_49_COMPLETE.md:121:- Constitutional interface sovereignty with enforceable boundaries
+      1 docs/architecture/PHASE_49_COMPLETE.md:111:6. **Constitutional Graph Compiler** — YAML → enforced topology
+      1 docs/architecture/PHASE_49_COMPLETE.md:110:5. **Byzantine Evidence System** — canonical proof generation
+      1 docs/architecture/DEPENDENCY_RULES.md:8:- Layer 2 (Constitution) can depend on Layers 0-1
+      1 docs/architecture/DEPENDENCY_RULES.md:18:- Core ← Crypto ← Consensus ← Constitution ← Execution ← Storage ← Network ← Test
+      1 docs/architecture/DEPENDENCY_RULES.md:14:- Storage → Constitution (storage must not know about constitution)
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:1:# AmunChain Dependency Constitution v2.1
+      1 docs/architecture/DEPENDENCY_CONSTITUTION.md:17:### Layer 0.5 — Constitutional Semantics
+      1 docs/architecture/CRATE_CLASSIFICATION.md:16:- amun-constitution-core - Constitutional axioms
+      1 docs/architecture/CRATE_CLASSIFICATION.md:15:## Constitution Layer (Layer 2)
+      1 docs/VALIDATOR_ORDERING.md:3:## Constitutional Principle
+      1 docs/V8_RESEARCH_PROPOSAL.md:71:3. **V8-003B: Constitutional Model Theory**
+      1 docs/V8_RESEARCH_PROPOSAL.md:62:     Monotonicity, Constitutional Comparability
+      1 docs/V8_RESEARCH_PROPOSAL.md:17:- **SH1**: Single Constitutional History (plurality is impossible)
+      1 docs/V8_RESEARCH_PROPOSAL.md:16:- **⇍_C**: Constitutional exclusion (what must be eliminated)
+      1 docs/V8_RESEARCH_PROPOSAL.md:15:- **⊢_C**: Constitutional derivability (what can be built)
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:94:**Comparability Theorem:**
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:92:## 4. The Central Theorem
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:48:**Axiom CC: Constitutional Comparability**
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:46:## 2. The Comparability Axiom (CC)
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:37:**Constitutional Comparability:**
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:29:## 1. The Constitutional Comparability Hypothesis
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:1:# CCS v0.8 – V8-002: Constitutional Comparability Hypothesis
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:154:CCS is a theory of **Constitutional Comparability.**
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:142:- **Evidence strength:** If A and B conflict, the one with stronger
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:128:| Closure (C1-C3) | Theorem |
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:127:| Single History (SH1) | Theorem |
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:126:| Constitutional Comparability (CC) | Axiom |
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:125:| Exclusion (⇍_C) | Axiom |
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:124:| Derivability (⊢_C) | Axiom |
+      1 docs/V8_001_INDEPENDENCE_OF_SH1.md:147:  Supremacy, Constitutional Decidability.
+      1 docs/V8_001_INDEPENDENCE_OF_SH1.md:10:> Does SH1 (Single Constitutional History) follow from
+      1 docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:94:The Single Constitutional History Principle is the final
+      1 docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:55:**Constitutional Closure Theorem (Final Version):**
+      1 docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:26:**Single Constitutional History Principle:**

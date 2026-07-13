@@ -1,0 +1,200 @@
+      1 docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:154:3. Replayable Constitutional State
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:78:Constitutional commitments became part of consensus state.
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:241:The Constitutional Commitment Architecture is now integrated into the consensus-critical execution path of AmunChain and forms part of the chain's cryptographic identity.
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:184:The Constitutional Commitment Architecture is now consensus-critical.
+      1 docs/reports/CCA_IMPL_4_FINAL_REPORT.md:13:CCA-IMPL-4 integrates the Constitutional Commitment Architecture (CCA) directly into the consensus-critical state root path.
+      1 docs/protocol/replay_physics_v1.md:6:All ConstitutionalHash values are raw 32-byte blobs. No length prefix. No type tag. Fixed-width canonical encoding.
+      1 docs/protocol/replay_physics_v1.md:28:These laws are FROZEN for protocol v1. Amendment requires: 1. Constitutional amendment proposal, 2. New protocol version identifier, 3. Migration proof for all existing state, 4. Golden value regeneration.
+      1 docs/protocol/replay_physics_v1.md:13:### 2.2 Ordering Invariant
+      1 docs/protocol/lineage_law_v1.md:17:State migration from parent to child protocol must produce a MigrationWitness
+      1 docs/protocol/lineage_law_v1.md:16:### 2.1 Migration Witness
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:70:| Evidence Internal Node | `AMUN_EV_NODE_V1` |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:69:| Evidence Leaf | `AMUN_EV_LEAF_V1` |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:46:| `governance_root` | Governance Subsystem (Constitutional Proof) |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:33:12. Consensus Invariants
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:310:| V | Constitutional Consensus Architecture | CCA v1.0 specification, root commitment, Merkle proofs |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:308:| III | Constitutional Security | Constitutional proof system, identity and evidence roots |
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:296:- Cross-Node Proof Reports (evidence that multiple nodes converge on identical state)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:286:**AmunChain Constitutional Audit Package v1.0**
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:26:5. Constitutional Commitment Structure & Serialization
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:266:**Invariant 5:** Given identical state transition inputs (same genesis, same transactions up to height N), all validators must compute identical values for all roots defined in this specification.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:264:**Invariant 4:** The `AppHash` MUST commit to `state_root`. For CCA v1.0, this is defined as `AppHash = state_root`. Future versions may introduce additional roots (such as `execution_root` or `receipt_root`) into the `AppHash` computation, in which case the invariant will be updated to reflect the new hash composition while preserving the requirement that `state_root` remains a committed input.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:262:**Invariant 3:** `state_root` must include `constitutional_commitment_root` as a leaf in its Merkle tree computation.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:260:**Invariant 2:** `constitutional_commitment_root == BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || CanonicalSerialization(ConstitutionalCommitment))`
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:25:4. Constitutional Root Construction
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:258:**Invariant 1:** `constitutional_root == BLAKE3("AMUN_CONSTITUTIONAL_ROOT_V1" || identity_root || evidence_root || governance_root || economic_root)`
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:254:## 12. Consensus Invariants
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:247:- `ConstitutionalCommitment.version` is part of the consensus state.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:225:- Add a new evidence record to the Evidence Module.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:223:### Test B: Evidence State Change
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:1:# Constitutional Consensus Architecture (CCA) v1.0
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:179:    ConstitutionalCommitment (V1)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:176:    ConstitutionalRoot = BLAKE3(DOMAIN || identity || evidence || governance || economic)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:155:- `governance_root`: The constitutional proof root of governance, included inside `ConstitutionalCommitment` and contributing to `constitutional_root`.
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:147:    serialized_bytes = CanonicalSerialization(ConstitutionalCommitment)
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:125:    struct ConstitutionalCommitment {
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:121:## 5. Constitutional Commitment Structure & Serialization
+      1 docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:109:## 4. Constitutional Root Construction
+      1 docs/constitutional_layers.md:7:## Layer 1: Truth & Evidence
+      1 docs/constitutional_layers.md:18:## Layer 3: Consensus & Finality
+      1 docs/constitutional/topology.md:2:## AmunChain Constitutional Consensus Protocol v1.0
+      1 docs/constitutional/phase85_seal.md:16:8. Graded guarantees: Replay/Snapshot/Proof/Governance/Continuity
+      1 docs/constitutional/phase84_freeze.md:54:- ReplayVerifier checks every frame's state_root against reconstructed state
+      1 docs/constitutional/phase84_freeze.md:24:- Levels: FullyCompatible > ReplayCompatible > SnapshotCompatible > ReadOnlyCompatible > Incompatible
+      1 docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:3:# Phase 112 — Constitutional Simulation Engine v1
+      1 docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:49:f1 = Witness Validity
+      1 docs/consensus/origin.md:3:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/origin.md:1:# Constitutional Origin: Consensus Constitution v1.0
+      1 docs/consensus/constitution.md:88:## Article V: Block Constitution
+      1 docs/consensus/constitution.md:7:## Article I: Arithmetic Constitution
+      1 docs/consensus/constitution.md:69:## Article IV: Execution Constitution
+      1 docs/consensus/constitution.md:51:## Article III: Event Ordering Constitution
+      1 docs/consensus/constitution.md:32:## Article II: State Constitution
+      1 docs/consensus/constitution.md:1:# AmunChain Consensus Constitution v1.0
+      1 docs/consensus/constitution.md:111:### Section 6.1: Execution Replay
+      1 docs/consensus/constitution.md:109:## Article VI: Validator Constitution
+      1 docs/consensus/I4_drift.md:38:## Constitutional Notes
+      1 docs/consensus/I4_drift.md:21:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I4_drift.md:10:# AmunChain Consensus Constitution v1.0 (Drifted)
+      1 docs/consensus/I3_reframing.md:37:## Constitutional Notes
+      1 docs/consensus/I3_reframing.md:22:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I3_reframing.md:10:# AmunChain Consensus Constitution v1.0 (Reframed)
+      1 docs/consensus/I2_extension.md:30:## Constitutional Notes
+      1 docs/consensus/I2_extension.md:12:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I2_extension.md:10:# AmunChain Consensus Constitution v1.0 (Extended)
+      1 docs/consensus/I1_translation.md:26:## Constitutional Notes
+      1 docs/consensus/I1_translation.md:1:# I1: English Translation of Consensus Constitution v1.0
+      1 docs/consensus/I1_translation.md:12:## Semantic Invariants (from CSA-6)
+      1 docs/consensus/I1_translation.md:10:# AmunChain Consensus Constitution v1.0
+      1 docs/audit/TRACEABILITY_MATRIX.md:8:| N48.5-W4 Evidence | amun-evidence-engine | 5 tests | ✅ |
+      1 docs/audit/TRACEABILITY_MATRIX.md:13:| N48.5-W19 Finality | amun-evidence-finality | 3 tests | ✅ |
+      1 docs/audit/SECURITY_INVARIANTS.md:9:| R3 | Child requires consumed parent | ResourceRegistry::consume_and_derive | WitnessBuilder |
+      1 docs/audit/SECURITY_INVARIANTS.md:8:| R2 | Consumed resources cannot be used | VMKernel::verify | ReplayVerifier |
+      1 docs/audit/SECURITY_INVARIANTS.md:7:| R1 | No duplicate active resource IDs | ResourceRegistry::register_genesis | PCCVVerifier |
+      1 docs/audit/SECURITY_INVARIANTS.md:40:| K3 | Anti-replay protection | AntiReplayGuard::check_and_record |
+      1 docs/audit/SECURITY_INVARIANTS.md:32:| C4 | No conflicting finality | Theorem 5 (Replay-Backed Safety) |
+      1 docs/audit/SECURITY_INVARIANTS.md:29:| C1 | Replay before vote | ReplayBackedConsensus::form_consensus |
+      1 docs/audit/SECURITY_INVARIANTS.md:25:## Consensus Invariants
+      1 docs/audit/SECURITY_INVARIANTS.md:13:| X1 | Transfer proof single-use | TransferProofRegistry | N47 Verdict Engine |
+      1 docs/audit/SECURITY_INVARIANTS.md:12:| R6 | Version monotonicity | ResourceRegistry::consume_and_derive | WitnessBuilder |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:96:| Constitution | amun-constitutional | 157 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:88:| PCCV | amun-pccv | 11 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:87:| Finality | amun-evidence-finality | 3 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:85:| Replay | amun-replay-verifier | 3 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:83:| Proof Archive | amun-proof-archive | 6 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:80:| Invariant Engine | amun-invariant-engine | 5 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:77:| Transition Proof | amun-transition-proof | 5 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:76:| Evidence | amun-evidence-engine | 5 | ✅ |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:5:| Invariant | Description | Test ID | Crate | Status |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:41:| Proof replay attack | byz_010 | ✅ Rejected |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:40:| Proof tampering | byz_009 | ✅ Rejected |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:3:## 1. Invariant-to-Test Traceability
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:32:| Forged TransitionProof | byz_001 | ✅ Rejected |
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:1:# AmunChain Audit Evidence Bundle
+      1 docs/audit/AUDIT_EVIDENCE_BUNDLE.md:19:| C1 | Replay before vote | w18_reject_if_replay_fails | amun-replay-consensus | ✅ |
+      1 docs/architecture/PHASE_49_COMPLETE.md:110:5. **Byzantine Evidence System** — canonical proof generation
+      1 docs/architecture/DEPENDENCY_RULES.md:18:- Core ← Crypto ← Consensus ← Constitution ← Execution ← Storage ← Network ← Test
+      1 docs/architecture/DEPENDENCY_RULES.md:14:- Storage → Constitution (storage must not know about constitution)
+      1 docs/VALIDATOR_ORDERING.md:3:## Constitutional Principle
+      1 docs/V8_RESEARCH_PROPOSAL.md:61:   - Investigate: Well-foundedness, Finite Branching, Evidence
+      1 docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:142:- **Evidence strength:** If A and B conflict, the one with stronger
+      1 docs/V8_001_INDEPENDENCE_OF_SH1.md:146:- Candidates: Comparability, Evidence Monotonicity, Epoch
+      1 docs/V7_009_WHY_CLOSURE.md:90:## 4. Experimental Evidence
+      1 docs/V7_009_WHY_CLOSURE.md:61:- **Evidence Monotonicity** ensures that competing paths cannot
+      1 docs/V7_009_WHY_CLOSURE.md:42:Evidence only grows along derivability chains.
+      1 docs/V7_009_WHY_CLOSURE.md:41:If `C₁ ⊢_C C₂`, then `Evidence(C₂) ≥ Evidence(C₁)`.
+      1 docs/V7_009_WHY_CLOSURE.md:40:### Property S3: Evidence Monotonicity
+      1 docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:93:- **Evidence Exclusion:** `Evidence(C₂) > Evidence(C₁) ⇒ C₂ ⇍_C C₁`
+      1 docs/V7_005_CONSTITUTIONAL_PRUNING.md:66:### Axiom P5: Pruning by Evidence
+      1 docs/V7_005_CONSTITUTIONAL_PRUNING.md:114:- **Evidence Pruning:** `C₁, C₂ ∈ L_t`, `Evidence(C₂) > Evidence(C₁) ⇒ C₁ ∉ L_{t+1}`
+      1 docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:68:### Axiom D4: Evidence-Backed
+      1 docs/V6_009_CONSTITUTIONAL_META_RESOLUTION.md:93:- Evidence strength
+      1 docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:53:   `Evidence(π₁)` is stronger (larger quorum, more valid signatures).
+      1 docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:52:2. **Evidence Rule:** If epochs are equal, `π₁` dominates `π₂` if
+      1 docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:74:### Axiom P3: Evidence Priority
+      1 docs/V6_005_CONTINUITY_ORDERING.md:58:### Axiom C3: Evidence Consistency
+      1 docs/V5_CCS_RESEARCH_PROGRAM.md:8:Constitutional authority is not produced by consensus; it is uniquely determined
+      1 docs/V5_CCS_RESEARCH_PROGRAM.md:72:`ValidContext(C) iff ValidEpoch(C) ∧ ValidValidatorSet(C) ∧ ValidEvidence(C) ∧ ConsistentState(C)`
+      1 docs/V5_CCS_RESEARCH_PROGRAM.md:56:- Morphisms are Constitutional Transitions (justified by evidence)
+      1 docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:8:Constitutional authority is not produced by consensus; it is uniquely determined
+      1 docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:58:`ValidContext(C) iff ValidEpoch(C) ∧ ValidValidatorSet(C) ∧ ValidEvidence(C) ∧ ConsistentState(C)`
+      1 docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:30:- **Context Validity:** `ValidContext(C) iff ValidEpoch(C) ∧ ValidValidatorSet(C) ∧ ValidEvidence(C) ∧ ConsistentState(C)`
+      1 docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:25:- **Recoverability:** `∃ F : F(Evidence, Context) = Authority`
+      1 docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:17:- **Constitutional Evidence** `E`
+      1 docs/V4_002_003_CCS_THEORY_NUCLEUS.md:98:3. **Recovery:** `□(Evidence(Q, C) → ◇Authorized(recover, C))`
+      1 docs/V4_002_003_CCS_THEORY_NUCLEUS.md:94:2. **Liveness:** `◇(Evidence(Q, V) → Authorized(commit, C))`
+      1 docs/V4_002_003_CCS_THEORY_NUCLEUS.md:76:Constitutional authority is partially ordered by epoch. Evidence from an
+      1 docs/V4_002_003_CCS_THEORY_NUCLEUS.md:58:`∃ F : F(Evidence, Context) = Authority`
+      1 docs/V4_002_003_CCS_THEORY_NUCLEUS.md:19:> **(Context, State) × Evidence → AuthorizedTransitions**
+      1 docs/V3_006D_FOREIGN_AUTHORITY.md:26:**Authority = Cryptography + Constitutional Membership + Epoch + Validator Set Binding**
+      1 docs/V3_005D_QC_CRYPTOGRAPHIC_PROOF.md:24:- Constitutional evidence can verify the proof mathematically.
+      1 docs/V3_005D_QC_CRYPTOGRAPHIC_PROOF.md:20:- Constitutional evidence relied on structural checks.
+      1 docs/V2_027_FORMAL_CONSTITUTIONAL_STATE.md:16:| Level | Evidence | Authority |
+      1 docs/V2_027_FORMAL_CONSTITUTIONAL_STATE.md:12:- **Formal evidence transfer:** All 40 nodes converged on height=1.
+      1 docs/V0_3_COMPLETION.md:22:**Authority = Cryptographic Proof + Validator Set Binding + Epoch Context + Constitutional Legitimacy**
+      1 docs/V0_3_COMPLETION.md:19:| 6. Constitutional Governance | Validator set updates, epoch transitions, authority recovery | ✅ |
+      1 docs/V0_3_COMPLETION.md:16:| 3. Constitutional Evidence | QC verification, validator set binding | ✅ |
+      1 docs/REPLAY_MODEL.md:72:Replay is constitutional historical reconstruction.
+      1 docs/REPLAY_MODEL.md:5:Replay is a constitutional guarantee.
+      1 docs/REPLAY_LAW.md:73:Transcript = Vec<VerifiedTransitionWitness>
+      1 docs/REPLAY_LAW.md:54:- Constitutional Rules
+      1 docs/REPLAY_LAW.md:3:## Phase 81 — Deterministic Replay Constitution
+      1 docs/REPLAY_LAW.md:334:Replay is the constitutional heart of AmunChain.
+      1 docs/REPLAY_LAW.md:157:        Witness3
+      1 docs/REPLAY_LAW.md:156:        Witness2 ||
+      1 docs/REPLAY_LAW.md:155:        Witness1 ||
+      1 docs/PROJECT_INDEX.md:86:| constitution/consensus/REPLAY_DETERMINISM_LAW.md | Replay guarantees |
+      1 docs/PHASE_84_UNIFICATION.md:30:- **Before:** CCS theory spoke of `Context` and `Evidence`, while the runtime used `Epoch`, `ValidatorSet`, and `QC` independently.
+      1 docs/PHASE_84_UNIFICATION.md:25:  3. **Evidence Strength (Comparability `CC`)**: Ensures quorum, preventing conflicting authorities.
+      1 docs/PHASE_84_UNIFICATION.md:24:  2. **Constitutional Membership (Exclusion `⇍_C`)**: Rejects foreign evidence.
+      1 docs/PHASE_84_UNIFICATION.md:17:### 2. Constitutional Evidence (`ConstitutionalEvidence`)
+      1 docs/N126_FINAL_BASELINE.md:45:1. ReplayVerifier integration (ReplayDeterminism)
+      1 docs/N126_FINAL_BASELINE.md:41:Constitution CONSUMES verified evidence from execution layer.
+      1 docs/N126_FINAL_BASELINE.md:35:10. EvidenceValidity          = all certs pass .verify()               REAL
+      1 docs/N126_FINAL_BASELINE.md:30:5.  SlashingEvidenceBinding   = all certs have non-empty evidence_ids  REAL
+      1 docs/N126_FINAL_BASELINE.md:1:N126 — Evidence-Based Constitutional Enforcement Baseline
+      1 docs/N110_COMPLETE.md:87:N109.10            Evidence store ........................ 11
+      1 docs/N110_COMPLETE.md:52:  EvidenceRecord stored in EvidenceStore .................. N109.10
+      1 docs/N110_COMPLETE.md:153:   that references unknown evidence IDs.  Evidence
+      1 docs/N110_COMPLETE.md:150:3. The system does not yet have evidence gossip.  Evidence
+      1 docs/DOCS_INDEX.md:480:Proof & Evidence Templates
+      1 docs/DOCS_INDEX.md:275:    N48.5E: Constitutional runtime.
+      1 docs/DOCS_INDEX.md:158:Validation Evidence (NV-01 through NV-08)
+      1 docs/DOCS_INDEX.md:153:    Evidence bundle specification for audits.
+      1 docs/CONSTITUTIONAL_MODEL.md:66:## Freeze Witnesses
+      1 docs/CONSTITUTIONAL_MODEL.md:109:Replay is constitutional infrastructure.
+      1 docs/CONSTITUTIONAL_MODEL.md:105:# Replayability
+      1 docs/CONSTITUTIONAL_AUDIT.md:44:**Begin with Constitutional Evidence Module.**
+      1 docs/CONSTITUTIONAL_AUDIT.md:37:5. **Comparability Formalization** – Evidence ordering implicit; should be explicit
+      1 docs/CONSTITUTIONAL_AUDIT.md:36:4. **Constitutional Evidence Module** – QC verification scattered; should be dedicated module
+      1 docs/CONSTITUTIONAL_AUDIT.md:33:3. **Constitutional Governance** – Only validator amendments; needs proposal/voting framework
+      1 docs/CONSTITUTIONAL_AUDIT.md:26:| **Constitutional Governance** | ⚠️ Minimal | Validator set updates only; no on-chain voting or proposals |
+      1 docs/CONSTITUTIONAL_AUDIT.md:24:| **Constitutional Pruning** | ✅ Implemented | Dead branches eliminated by epoch/evidence/conflict rules |
+      1 docs/CONSTITUTIONAL_AUDIT.md:22:| **Constitutional Comparability (CC)** | ✅ Partially implemented | Evidence ordering exists but not formalized as standalone module |
+      1 docs/CONSTITUTIONAL_AUDIT.md:20:| **Validator Amendment** | ✅ Implemented | V3-007A: Constitutional validator set update via consensus |
+      1 docs/CONSTITUTIONAL_AUDIT.md:16:| **Constitutional Evidence** | ✅ Implemented | QC structure with BLS aggregated signatures (V3-005D) |
+      1 docs/CONSTITUTIONAL_AUDIT.md:12:| CCS Concept | Implementation Status | Evidence |
+      1 docs/CCS_RUNTIME_MAPPING.md:25:3. No standalone `ConstitutionalEvidence` module – logic scattered across
+      1 docs/CCS_RUNTIME_MAPPING.md:20:| CC (Comparability) | Evidence ordering | QC weight, epoch priority |
+      1 docs/CCS_RUNTIME_MAPPING.md:19:| SH1 | Finality rules | One canonical chain survives |
+      1 docs/CCS_RUNTIME_MAPPING.md:18:| Authority | `ConstitutionalCertificate` | Chain of trust from genesis |
+      1 docs/CCS_RUNTIME_MAPPING.md:15:| Evidence `E` | `QuorumCertificate` | Carries position, votes, signatures |
+      1 docs/CCS_Core_Specification_v1.1.md:87:`∃ F : F(Evidence, Context) = Authority`
+      1 docs/CCS_Core_Specification_v1.1.md:72:`∀ Q, C : ValidEvidence(Q) ⇏ Authority(Q, C)`
+      1 docs/CCS_Core_Specification_v1.1.md:57:Evidence is the mechanism through which consensus contributes to CCS,
+      1 docs/CCS_Core_Specification_v1.1.md:52:**Constitutional evidence** is a verifiable proof that:
+      1 docs/CCS_Core_Specification_v1.1.md:51:### 2.3 Constitutional Evidence
+      1 docs/CCS_Core_Specification_v1.1.md:43:where `E`, `V`, `H` are as defined in the context, and `Q` (Quorum Evidence)
+      1 docs/CCS_Core_Specification_v1.1.md:150:1. Provide concrete implementations of `Context`, `Authority`, `Evidence`,
+      1 docs/CCS_Core_Specification_v1.0.md:92:`∃ F : F(Evidence, Context) = Authority`
+      1 docs/CCS_Core_Specification_v1.0.md:74:`∀ Q, C : ValidEvidence(Q) ⇏ Authority(Q, C)`
+      1 docs/CCS_Core_Specification_v1.0.md:59:Evidence is the mechanism through which consensus contributes to CCS,
+      1 docs/CCS_Core_Specification_v1.0.md:54:**Constitutional evidence** `E` is a verifiable proof that:
+      1 docs/CCS_Core_Specification_v1.0.md:53:### 2.3 Constitutional Evidence
+      1 docs/CCS_Core_Specification_v1.0.md:47:- `Q` (Quorum Evidence): A verifiable proof that at least a threshold number
+      1 docs/CCS_Core_Specification_v1.0.md:173:1. Provides concrete implementations of `Context`, `Authority`, `Evidence`,
+      1 docs/CCS_Core_Specification_v1.0.md:109:- `ValidEvidence(Q)`: `Q` meets the quorum threshold for `V`.
+      1 docs/CCS_Core_Specification_v1.0.md:104:`ValidContext(C) iff ValidEpoch(E) ∧ ValidValidatorSet(V) ∧ ValidEvidence(Q) ∧ ConsistentState(H)`
+      1 crates/constitutional-linter/src/main.rs:69:enum Layer { Kernel, Constitutional, Interface, Consensus, Execution, Persistence, Network, Governance, Testing, Unknown }
+      1 crates/constitutional-linter/src/main.rs:191:    println!("   Non-constitutional (optional/dev/build): {}", optional_edges);
+      1 crates/constitutional-linter/src/main.rs:190:    println!("   Constitutional (runtime): {}", runtime_edges);

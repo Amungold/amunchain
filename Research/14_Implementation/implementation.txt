@@ -1,0 +1,1460 @@
+crates/amun-accounts/src/lib.rs:16:impl Account {
+crates/amun-accounts/src/lib.rs:28:impl AccountStore {
+crates/amun-amendments/src/proposal.rs:71:impl AmendmentType {
+crates/amun-amendments/src/proposal.rs:119:impl Amendment {
+crates/amun-attack-lab/src/network.rs:8:impl NetworkConditions {
+crates/amun-attack-lab/src/simulator.rs:60:impl AttackSimulator {
+crates/amun-attack-lab/src/simulator.rs:182:impl Default for AttackSimulator {
+crates/amun-attestation/src/validator.rs:10:impl ValidatorAttestation {
+crates/amun-audit-trail/src/lib.rs:17:impl AuditRecord {
+crates/amun-audit-trail/src/lib.rs:37:impl AuditTrail {
+crates/amun-authority-registry/src/authority.rs:13:impl ConstitutionalAuthority {
+crates/amun-authority-registry/src/executor.rs:23:impl ExecutionJournal {
+crates/amun-authority-registry/src/governance.rs:31:impl GovernanceProposal {
+crates/amun-authority-registry/src/recovery.rs:8:impl GovernanceRecoveryEngine {
+crates/amun-authority-registry/src/registry.rs:22:impl AuthorityRegistry {
+crates/amun-authority-registry/src/transaction.rs:27:impl GovernanceState {
+crates/amun-authority-registry/src/voting.rs:27:impl ProposalVotes {
+crates/amun-authority-registry/src/wal.rs:18:impl GovernanceWal {
+crates/amun-binary-codec/src/codec.rs:14:impl CanonicalEncoder {
+crates/amun-binary-codec/src/codec.rs:54:impl<'a> CanonicalDecoder<'a> {
+crates/amun-binary-codec/src/codec.rs:114:impl Default for CanonicalEncoder {
+crates/amun-block-builder/src/lib.rs:28:impl Block {
+crates/amun-block-builder/src/lib.rs:91:impl BlockBuilder {
+crates/amun-block-builder/src/lib.rs:167:impl Default for BlockBuilder {
+crates/amun-block-builder/tests/n32_certified_block.rs:14:impl CertifiedBlock {
+crates/amun-block-store/src/lib.rs:20:impl BlockStore {
+crates/amun-block/src/block.rs:31:impl Block {
+crates/amun-block/src/body.rs:17:impl BlockBody {
+crates/amun-block/src/body.rs:56:impl CanonicalEncode for BlockBody {
+crates/amun-block/src/body.rs:59:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-block/src/body.rs:68:impl CanonicalDecode for BlockBody {
+crates/amun-block/src/body.rs:106:impl Default for BlockBody {
+crates/amun-block/src/chain.rs:11:impl Blockchain {
+crates/amun-block/src/header.rs:21:impl BlockHeader {
+crates/amun-block/src/header.rs:51:impl CanonicalEncode for BlockHeader {
+crates/amun-block/src/header.rs:53:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-block/src/header.rs:68:impl CanonicalDecode for BlockHeader {
+crates/amun-block/src/limits.rs:14:impl BlockLimits {
+crates/amun-bls/src/keygen.rs:15:impl KeyPair {
+crates/amun-bytecode/src/interpreter.rs:35:impl Interpreter {
+crates/amun-bytecode/src/opcodes.rs:30:impl OpCode {
+crates/amun-bytecode/src/program.rs:20:impl ConstitutionalProgram {
+crates/amun-byzantine-harness/src/harness.rs:8:impl ByzantineHarness {
+crates/amun-byzantine-harness/src/scenarios.rs:11:impl ByzantineScenario {
+crates/amun-canonical-codec/src/hasher.rs:5:impl Default for CanonicalHasher {
+crates/amun-canonical-codec/src/hasher.rs:11:impl CanonicalHasher {
+crates/amun-canonical-codec/src/reader.rs:8:impl<'a> CanonicalReader<'a> {
+crates/amun-canonical-codec/src/writer.rs:5:impl Default for CanonicalWriter {
+crates/amun-canonical-codec/src/writer.rs:11:impl CanonicalWriter {
+crates/amun-canonical-collections/src/lib.rs:47:impl<T: Ord> CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:62:    pub fn iter(&self) -> impl Iterator<Item = &T> { self.inner.iter() }
+crates/amun-canonical-collections/src/lib.rs:63:    pub fn retain(&mut self, f: impl Fn(&T) -> bool) { self.inner.retain(f); }
+crates/amun-canonical-collections/src/lib.rs:67:impl<T: Ord> DeterministicCollection for CanonicalSet<T> {}
+crates/amun-canonical-collections/src/lib.rs:68:impl<T: Ord> BoundedCollection for CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:72:impl<T: Ord + CanonicalEncode> ReplaySafe for CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:79:impl<T: Ord + CanonicalEncode> CanonicalEncode for CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:82:impl<T: Ord> Default for CanonicalSet<T> { fn default() -> Self { Self::new() } }
+crates/amun-canonical-collections/src/lib.rs:83:impl<T: Ord> IntoIterator for CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:92:impl<K: Ord, V> CanonicalMap<K, V> {
+crates/amun-canonical-collections/src/lib.rs:108:    pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> { self.inner.iter() }
+crates/amun-canonical-collections/src/lib.rs:109:    pub fn keys(&self) -> impl Iterator<Item = &K> { self.inner.keys() }
+crates/amun-canonical-collections/src/lib.rs:110:    pub fn values(&self) -> impl Iterator<Item = &V> { self.inner.values() }
+crates/amun-canonical-collections/src/lib.rs:111:    pub fn retain(&mut self, f: impl Fn(&K, &mut V) -> bool) { self.inner.retain(f); }
+crates/amun-canonical-collections/src/lib.rs:115:impl<K: Ord, V> DeterministicCollection for CanonicalMap<K, V> {}
+crates/amun-canonical-collections/src/lib.rs:116:impl<K: Ord, V> BoundedCollection for CanonicalMap<K, V> {
+crates/amun-canonical-collections/src/lib.rs:120:impl<K: Ord + CanonicalEncode, V: CanonicalEncode> ReplaySafe for CanonicalMap<K, V> {
+crates/amun-canonical-collections/src/lib.rs:127:impl<K: Ord + CanonicalEncode, V: CanonicalEncode> CanonicalEncode for CanonicalMap<K, V> {
+crates/amun-canonical-collections/src/lib.rs:130:impl<K: Ord, V> Default for CanonicalMap<K, V> { fn default() -> Self { Self::new() } }
+crates/amun-canonical-collections/src/lib.rs:136:impl<T> CanonicalDeque<T> {
+crates/amun-canonical-collections/src/lib.rs:151:    pub fn iter(&self) -> impl Iterator<Item = &T> { self.inner.iter() }
+crates/amun-canonical-collections/src/lib.rs:155:impl<T> DeterministicCollection for CanonicalDeque<T> {}
+crates/amun-canonical-collections/src/lib.rs:156:impl<T> BoundedCollection for CanonicalDeque<T> {
+crates/amun-canonical-collections/src/lib.rs:160:impl<T: CanonicalEncode> ReplaySafe for CanonicalDeque<T> {
+crates/amun-canonical-collections/src/lib.rs:167:impl<T: CanonicalEncode> CanonicalEncode for CanonicalDeque<T> {
+crates/amun-canonical-collections/src/lib.rs:170:impl<T> Default for CanonicalDeque<T> { fn default() -> Self { Self::new() } }
+crates/amun-canonical/src/decoder.rs:8:impl<'a> CanonicalDecoder<'a> {
+crates/amun-canonical/src/encoder.rs:9:impl CanonicalEncoder {
+crates/amun-canonical/src/enum_registry.rs:11:impl EnumRegistry {
+crates/amun-canonical/src/enum_registry.rs:42:impl Default for EnumRegistry {
+crates/amun-canonical/src/float_ban.rs:3:impl FloatBan {
+crates/amun-canonical/src/schema.rs:6:impl SchemaVersion {
+crates/amun-canonical/src/sorter.rs:5:impl CanonicalSorter {
+crates/amun-certificate-network/src/distribution.rs:21:impl CertificateMessage {
+crates/amun-certificate-network/src/distribution.rs:53:impl LightClientProofBundle {
+crates/amun-certificate-network/src/distribution.rs:101:impl BundleBuilder {
+crates/amun-certificate-network/src/gossip.rs:83:impl PeerCertificateCache {
+crates/amun-chain-checkpoint/src/bootstrap.rs:10:impl BootstrapSession {
+crates/amun-chain-checkpoint/src/chain.rs:11:impl RecursiveCheckpointProof {
+crates/amun-chain-checkpoint/src/inclusion.rs:46:impl CheckpointInclusionProof {
+crates/amun-chain-checkpoint/src/inclusion.rs:62:impl CheckpointBundle {
+crates/amun-chain-checkpoint/src/lib.rs:66:impl CheckpointCertificate {
+crates/amun-chain-checkpoint/src/lib.rs:182:impl CheckpointStore {
+crates/amun-chain-checkpoint/src/lib.rs:219:impl CheckpointCertificate {
+crates/amun-chain-context/src/lib.rs:12:impl ChainContext {
+crates/amun-chain-position/src/lib.rs:19:impl EpochSeal {
+crates/amun-chain-position/src/lib.rs:55:impl ChainPosition {
+crates/amun-chain-store/src/record.rs:30:impl FinalizedChainRecord {
+crates/amun-chain-store/src/store.rs:15:impl std::fmt::Display for StoreError {
+crates/amun-chain-store/src/store.rs:32:impl ChainStore {
+crates/amun-chain-store/src/sync.rs:13:impl SyncServer {
+crates/amun-chain-store/src/sync.rs:72:impl SyncClient {
+crates/amun-chunked-snapshot/src/chunk.rs:14:impl SnapshotChunk {
+crates/amun-chunked-snapshot/src/manifest.rs:14:impl ChunkManifest {
+crates/amun-civilizational-relations/src/relation.rs:37:impl CivilizationalRelation {
+crates/amun-civilizational-relations/src/topology.rs:17:impl CivilizationalTopology {
+crates/amun-codec/src/budget.rs:12:impl DecodeBudget {
+crates/amun-codec/src/budget.rs:59:impl<'a> Drop for NestingGuard<'a> {
+crates/amun-codec/src/canonical_sort.rs:7:    fn write_sort_key(&self, writer: &mut impl CanonicalWriter) -> WriteResult;
+crates/amun-codec/src/canonical_sort.rs:10:impl<T: CanonicalEncode> CanonicalSortKey for T {
+crates/amun-codec/src/canonical_sort.rs:11:    fn write_sort_key(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/containers.rs:47:    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/containers.rs:66:    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/containers.rs:97:    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/decode.rs:22:impl CanonicalDecode for u8 {
+crates/amun-codec/src/decode.rs:35:impl CanonicalDecode for u16 {
+crates/amun-codec/src/decode.rs:48:impl CanonicalDecode for u32 {
+crates/amun-codec/src/decode.rs:63:impl CanonicalDecode for u64 {
+crates/amun-codec/src/decode.rs:78:impl CanonicalDecode for u128 {
+crates/amun-codec/src/decode.rs:93:impl CanonicalDecode for [u8; 32] {
+crates/amun-codec/src/decode.rs:108:impl CanonicalDecode for [u8; 48] {
+crates/amun-codec/src/decode.rs:123:impl CanonicalDecode for [u8; 96] {
+crates/amun-codec/src/decode.rs:140:        impl CanonicalDecode for $t {
+crates/amun-codec/src/decode.rs:161:impl<D> CanonicalDecode for amun_kernel_types::Hash<D> {
+crates/amun-codec/src/decode.rs:176:impl CanonicalDecode for amun_kernel_types::PublicHash32 {
+crates/amun-codec/src/decode.rs:191:impl CanonicalDecode for amun_kernel_types::CommitmentHash32 {
+crates/amun-codec/src/domain.rs:18:impl HashDomain {
+crates/amun-codec/src/encode.rs:15:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult;
+crates/amun-codec/src/encode.rs:29:impl CanonicalEncode for u8 {
+crates/amun-codec/src/encode.rs:31:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:36:impl CanonicalEncode for u16 {
+crates/amun-codec/src/encode.rs:38:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:43:impl CanonicalEncode for u32 {
+crates/amun-codec/src/encode.rs:45:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:50:impl CanonicalEncode for u64 {
+crates/amun-codec/src/encode.rs:52:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:57:impl CanonicalEncode for u128 {
+crates/amun-codec/src/encode.rs:59:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:64:impl CanonicalEncode for [u8; 32] {
+crates/amun-codec/src/encode.rs:66:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:71:impl CanonicalEncode for [u8; 48] {
+crates/amun-codec/src/encode.rs:73:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:78:impl CanonicalEncode for [u8; 96] {
+crates/amun-codec/src/encode.rs:80:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:87:        impl CanonicalEncode for $t {
+crates/amun-codec/src/encode.rs:89:            fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:103:impl CanonicalEncode for Amount {
+crates/amun-codec/src/encode.rs:105:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:110:impl CanonicalEncode for ValidatorId {
+crates/amun-codec/src/encode.rs:112:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:117:impl CanonicalEncode for PublicKey {
+crates/amun-codec/src/encode.rs:119:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:124:impl CanonicalEncode for Signature {
+crates/amun-codec/src/encode.rs:126:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:133:impl<D> CanonicalEncode for amun_kernel_types::Hash<D> {
+crates/amun-codec/src/encode.rs:135:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:140:impl CanonicalEncode for amun_kernel_types::PublicHash32 {
+crates/amun-codec/src/encode.rs:142:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:147:impl CanonicalEncode for amun_kernel_types::CommitmentHash32 {
+crates/amun-codec/src/encode.rs:149:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/hash.rs:11:impl<T: CanonicalEncode> CanonicalHash for T {
+crates/amun-codec/src/transducer.rs:10:impl CanonicalTransducer {
+crates/amun-codec/src/transducer.rs:34:impl U64Cursor {
+crates/amun-codec/src/transducer.rs:40:impl CanonicalCursor for U64Cursor {
+crates/amun-codec/src/transducer.rs:56:impl<'a> SliceCursor<'a> {
+crates/amun-codec/src/transducer.rs:62:impl<'a> CanonicalCursor for SliceCursor<'a> {
+crates/amun-codec/src/versioned.rs:17:impl ProtocolHeader {
+crates/amun-codec/src/versioned.rs:35:    pub fn write(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/writer.rs:19:impl<'a> BufferWriter<'a> {
+crates/amun-codec/src/writer.rs:40:impl<'a> CanonicalWriter for BufferWriter<'a> {
+crates/amun-codec/src/writer.rs:70:impl<'a> HasherWriter<'a> {
+crates/amun-codec/src/writer.rs:76:impl<'a> CanonicalWriter for HasherWriter<'a> {
+crates/amun-codec/src/writer.rs:101:impl<'a> ShadowBufferWriter<'a> {
+crates/amun-codec/src/writer.rs:160:impl<'a> CanonicalWriter for ShadowBufferWriter<'a> {
+crates/amun-compatibility/src/matrix.rs:13:impl CompatibilityDimensions {
+crates/amun-compatibility/src/matrix.rs:43:impl CompatibilityMatrix {
+crates/amun-complexity-budget/src/budget.rs:9:impl ComplexityBudget {
+crates/amun-complexity-budget/src/metrics.rs:11:impl ComplexityMetrics {
+crates/amun-consensus-execution/src/block_dag.rs:19:impl BlockNode {
+crates/amun-consensus-execution/src/block_dag.rs:93:impl BlockDAG {
+crates/amun-consensus-execution/src/commit.rs:30:impl CommitRule {
+crates/amun-consensus-execution/src/commit.rs:161:impl Default for CommitRule {
+crates/amun-consensus-execution/src/fork_choice.rs:17:impl ForkChoice {
+crates/amun-consensus-execution/src/fork_choice.rs:206:impl Default for ForkChoice {
+crates/amun-consensus-execution/src/leader.rs:8:impl LeaderSchedule {
+crates/amun-consensus-execution/src/leader_schedule.rs:11:impl LeaderSchedule {
+crates/amun-consensus-execution/src/pacemaker.rs:12:impl Pacemaker {
+crates/amun-consensus-execution/src/pacemaker.rs:58:impl Default for Pacemaker {
+crates/amun-consensus-execution/src/persistent_state.rs:71:impl PersistentConsensusState {
+crates/amun-consensus-execution/src/proposal.rs:16:impl BlockProposal {
+crates/amun-consensus-execution/src/proposer.rs:16:impl BlockProposal {
+crates/amun-consensus-execution/src/qc_store.rs:10:impl QCStore {
+crates/amun-consensus-execution/src/qc_store.rs:48:impl Default for QCStore {
+crates/amun-consensus-execution/src/voter.rs:27:impl VoteAggregator {
+crates/amun-consensus-integration/src/consensus_integrator.rs:14:impl ConsensusIntegrator {
+crates/amun-consensus-integration/src/consensus_types.rs:17:impl ConstitutionalBlock {
+crates/amun-consensus-integration/src/consensus_types.rs:54:impl ConstitutionalQC {
+crates/amun-consensus-integration/src/consensus_types.rs:87:impl ConstitutionalFinalityCertificate {
+crates/amun-consensus-law/src/finality.rs:5:impl FinalityLaw {
+crates/amun-consensus-law/src/invariants.rs:5:impl ConsensusInvariants {
+crates/amun-consensus-law/src/safety.rs:3:impl SafetyAxioms {
+crates/amun-consensus-law/src/transitions.rs:11:impl TransitionLaw {
+crates/amun-consensus-law/src/validator.rs:11:impl ValidatorObligations {
+crates/amun-consensus-messages/src/lib.rs:25:impl ConsensusVote {
+crates/amun-consensus-messages/src/message.rs:22:impl ConsensusMessage {
+crates/amun-consensus-messages/src/proposal.rs:14:impl BlockProposal {
+crates/amun-consensus-messages/src/vote.rs:10:impl ConsensusVote {
+crates/amun-consensus-network/src/certificate_gossip.rs:16:impl CertificateGossip {
+crates/amun-consensus-network/src/certificate_gossip.rs:63:impl Default for CertificateGossip {
+crates/amun-consensus-network/src/engine.rs:24:impl ConsensusRound {
+crates/amun-consensus-network/src/engine.rs:198:impl ConsensusMetrics {
+crates/amun-consensus-network/src/engine.rs:255:impl ConsensusEngine {
+crates/amun-consensus-network/src/evidence_gossip.rs:40:impl EvidenceGossip {
+crates/amun-consensus-network/src/evidence_gossip.rs:106:impl Default for EvidenceGossip {
+crates/amun-consensus-network/src/evidence_push.rs:22:impl Default for EvidencePushConfig {
+crates/amun-consensus-network/src/evidence_push.rs:39:impl EvidencePush {
+crates/amun-consensus-network/src/evidence_push.rs:102:impl Default for EvidencePush {
+crates/amun-consensus-network/src/evidence_store.rs:48:impl EvidenceRecord {
+crates/amun-consensus-network/src/evidence_store.rs:138:impl EvidenceStore {
+crates/amun-consensus-network/src/evidence_store.rs:247:impl Default for EvidenceStore {
+crates/amun-consensus-network/src/execution_commitment.rs:56:impl ExecutionCommitment {
+crates/amun-consensus-network/src/integrated_slashing.rs:53:impl IntegratedSlashingPipeline {
+crates/amun-consensus-network/src/integrated_slashing.rs:156:impl Default for IntegratedSlashingPipeline {
+crates/amun-consensus-network/src/messages.rs:43:impl EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:80:impl QuorumCertificate {
+crates/amun-consensus-network/src/metrics.rs:23:impl ConsensusMetrics {
+crates/amun-consensus-network/src/misbehavior.rs:28:impl MisbehaviorRegistry {
+crates/amun-consensus-network/src/misbehavior.rs:120:impl Default for MisbehaviorRegistry {
+crates/amun-consensus-network/src/misbehavior_registry.rs:34:impl Default for MisbehaviorThresholds {
+crates/amun-consensus-network/src/misbehavior_registry.rs:85:impl MisbehaviorRecord {
+crates/amun-consensus-network/src/misbehavior_registry.rs:106:impl MisbehaviorRegistry {
+crates/amun-consensus-network/src/misbehavior_registry.rs:177:    /// because the compiler sees it only called within the same impl block.
+crates/amun-consensus-network/src/misbehavior_registry.rs:249:impl Default for MisbehaviorRegistry {
+crates/amun-consensus-network/src/multi_signer_certificate.rs:12:impl MultiSignerCertificate {
+crates/amun-consensus-network/src/network_consensus.rs:15:impl NetworkConsensus {
+crates/amun-consensus-network/src/real_staking_adapter.rs:17:impl RealStakingExecutor {
+crates/amun-consensus-network/src/real_staking_adapter.rs:51:impl SlashingExecutor for RealStakingExecutor {
+crates/amun-consensus-network/src/slashing_certificate.rs:93:impl SlashingCertificate {
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:17:impl SlashingCertificateBuilder {
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:90:impl Default for SlashingCertificateBuilder {
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:36:impl SlashingFraudProof {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:30:impl SlashingInclusionProof {
+crates/amun-consensus-network/src/slashing_ledger.rs:48:impl SlashingLedger {
+crates/amun-consensus-network/src/slashing_ledger.rs:109:impl Default for SlashingLedger {
+crates/amun-consensus-network/src/slashing_state.rs:18:impl SlashingState {
+crates/amun-consensus-network/src/slashing_state.rs:61:impl Default for SlashingState {
+crates/amun-consensus-network/src/staking_adapter.rs:44:impl<E: SlashingExecutor> StakingAdapter<E> {
+crates/amun-consensus-network/src/staking_adapter.rs:165:    impl SimulatedStaking {
+crates/amun-consensus-network/src/staking_adapter.rs:177:    impl SlashingExecutor for SimulatedStaking {
+crates/amun-consensus-network/src/validation.rs:4:impl N109BlockProposal {
+crates/amun-consensus-network/src/validator_identity.rs:40:impl ValidatorIdentity {
+crates/amun-consensus-network/src/validator_identity.rs:92:impl ValidatorIdentityRegistry {
+crates/amun-consensus-network/src/validator_identity.rs:150:impl Default for ValidatorIdentityRegistry {
+crates/amun-consensus-network/src/validator_status.rs:14:impl ValidatorStatusRegistry {
+crates/amun-consensus-network/src/validator_status.rs:22:impl Default for ValidatorStatusRegistry {
+crates/amun-consensus-network/src/validator_status.rs:28:impl ValidatorStatusRegistry {}
+crates/amun-consensus-network/src/validator_status.rs:30:impl ValidatorStatusRegistry {
+crates/amun-consensus-proof/src/liveness.rs:3:impl LivenessProof {
+crates/amun-consensus-proof/src/safety.rs:3:impl SafetyProof {
+crates/amun-consensus-reactor/src/reactor.rs:17:impl ConsensusReactor {
+crates/amun-consensus-signatures/src/domain.rs:13:impl SignatureDomain {
+crates/amun-consensus-types/src/bitmap.rs:8:impl SignerBitmap {
+crates/amun-consensus-types/src/bitmap.rs:30:impl Default for SignerBitmap {
+crates/amun-consensus-types/src/bitmap.rs:36:impl CanonicalEncode for SignerBitmap {
+crates/amun-consensus-types/src/bitmap.rs:38:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/bitmap.rs:43:impl CanonicalDecode for SignerBitmap {
+crates/amun-consensus-types/src/errors.rs:16:impl ConsensusError {
+crates/amun-consensus-types/src/message.rs:18:impl ConsensusMessage {
+crates/amun-consensus-types/src/message.rs:52:impl CanonicalEncode for ConsensusMessage {
+crates/amun-consensus-types/src/message.rs:54:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/message.rs:66:impl CanonicalDecode for ConsensusMessage {
+crates/amun-consensus-types/src/phase.rs:15:impl ConsensusPhase {
+crates/amun-consensus-types/src/phase.rs:55:impl CanonicalEncode for ConsensusPhase {
+crates/amun-consensus-types/src/phase.rs:57:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/phase.rs:62:impl CanonicalDecode for ConsensusPhase {
+crates/amun-consensus-types/src/qc.rs:18:impl QuorumCertificate {
+crates/amun-consensus-types/src/qc.rs:25:impl CanonicalEncode for QuorumCertificate {
+crates/amun-consensus-types/src/qc.rs:27:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/qc.rs:38:impl CanonicalDecode for QuorumCertificate {
+crates/amun-consensus-types/src/round.rs:9:impl ConsensusRound {
+crates/amun-consensus-types/src/round.rs:21:impl Default for ConsensusRound {
+crates/amun-consensus-types/src/round.rs:27:impl CanonicalEncode for ConsensusRound {
+crates/amun-consensus-types/src/round.rs:29:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/round.rs:34:impl CanonicalDecode for ConsensusRound {
+crates/amun-consensus-types/src/validator.rs:8:impl ValidatorIndex {
+crates/amun-consensus-types/src/validator.rs:17:impl CanonicalEncode for ValidatorIndex {
+crates/amun-consensus-types/src/validator.rs:19:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/validator.rs:24:impl CanonicalDecode for ValidatorIndex {
+crates/amun-consensus-types/src/vote.rs:18:impl Vote {
+crates/amun-consensus-types/src/vote.rs:43:impl CanonicalEncode for Vote {
+crates/amun-consensus-types/src/vote.rs:45:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/vote.rs:56:impl CanonicalDecode for Vote {
+crates/amun-consensus/amun_consensus/src/block/mod.rs:12:impl BlockVersion {
+crates/amun-consensus/amun_consensus/src/block/mod.rs:32:impl BlockHeader {
+crates/amun-consensus/amun_consensus/src/block/mod.rs:84:impl BlockBody {
+crates/amun-consensus/amun_consensus/src/block/mod.rs:119:impl Block {
+crates/amun-consensus/src/action.rs:25:impl ActionRecord {
+crates/amun-consensus/src/action.rs:51:impl ActionLog {
+crates/amun-consensus/src/action.rs:136:impl EvidenceProof {
+crates/amun-consensus/src/pacemaker.rs:10:impl FixedMultiplier {
+crates/amun-consensus/src/pacemaker.rs:37:impl Default for PacemakerConfig {
+crates/amun-consensus/src/pacemaker.rs:54:impl Pacemaker {
+crates/amun-consensus/src/proposal_manager.rs:10:impl LeaderSelector for RoundRobinSelector {
+crates/amun-consensus/src/proposal_manager.rs:25:impl ProposalManager {
+crates/amun-consensus/src/proposal_manager.rs:73:impl Default for ProposalManager {
+crates/amun-consensus/src/round_state_machine.rs:22:impl RoundStateMachine {
+crates/amun-consensus/src/state.rs:22:impl ConsensusState {
+crates/amun-consensus/src/validator.rs:21:impl ValidatorSet {
+crates/amun-consensus/src/vote_collector.rs:12:impl VoteKey {
+crates/amun-consensus/src/vote_collector.rs:27:impl VoteCollector {
+crates/amun-consensus/src/vote_collector.rs:69:impl Default for VoteCollector {
+crates/amun-constitution-builder/src/certificate.rs:23:impl ArtifactDigest for FreezeCertificate {
+crates/amun-constitution-builder/src/certificate.rs:29:impl FreezeCertificate {
+crates/amun-constitution-builder/src/certificate.rs:59:impl CanonicalEmit for FreezeCertificate {
+crates/amun-constitution-builder/src/certificate.rs:81:impl CanonicalSerialize for FreezeCertificate {
+crates/amun-constitution-builder/src/federation.rs:28:impl ArtifactDigest for FederationArtifact {
+crates/amun-constitution-builder/src/federation.rs:34:impl FederationArtifact {
+crates/amun-constitution-builder/src/federation.rs:70:impl CanonicalEmit for FederationArtifact {
+crates/amun-constitution-builder/src/federation.rs:105:impl CanonicalSerialize for FederationArtifact {
+crates/amun-constitution-builder/src/manifest.rs:27:impl ArtifactDigest for ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs:33:impl ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs:51:impl CanonicalEmit for ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs:82:impl CanonicalSerialize for ConstitutionalManifest {
+crates/amun-constitution-builder/src/normalize.rs:7:impl DeterministicNormalizer {
+crates/amun-constitution-builder/src/treaty.rs:24:impl ArtifactDigest for TreatyArtifact {
+crates/amun-constitution-builder/src/treaty.rs:30:impl TreatyArtifact {
+crates/amun-constitution-builder/src/treaty.rs:49:impl CanonicalEmit for TreatyArtifact {
+crates/amun-constitution-builder/src/treaty.rs:82:impl CanonicalSerialize for TreatyArtifact {
+crates/amun-constitution-builder/src/verify.rs:9:impl VerificationEngine {
+crates/amun-constitution-core/src/phase.rs:9:impl ConstitutionalPhase {
+crates/amun-constitution/src/activation.rs:20:impl ActivationSchedule {
+crates/amun-constitution/src/adaptive_adversary.rs:12:impl AdaptiveCorruptionConstraints {
+crates/amun-constitution/src/adaptive_adversary.rs:35:impl ValidatorCorruptionState {
+crates/amun-constitution/src/canonical_form.rs:23:impl ConstitutionalCanonicalForm {
+crates/amun-constitution/src/capacity.rs:14:impl ProtocolCapacities {
+crates/amun-constitution/src/deterministic_execution.rs:6:impl DeterministicExecution for u8 {}
+crates/amun-constitution/src/deterministic_execution.rs:7:impl DeterministicExecution for u16 {}
+crates/amun-constitution/src/deterministic_execution.rs:8:impl DeterministicExecution for u32 {}
+crates/amun-constitution/src/deterministic_execution.rs:9:impl DeterministicExecution for u64 {}
+crates/amun-constitution/src/deterministic_execution.rs:10:impl DeterministicExecution for [u8; 32] {}
+crates/amun-constitution/src/deterministic_execution.rs:11:impl DeterministicExecution for [u8; 64] {}
+crates/amun-constitution/src/economics.rs:16:impl ConsensusResourceBudget {
+crates/amun-constitution/src/economics.rs:49:impl Default for ConsensusResourceBudget {
+crates/amun-constitution/src/execution_semantics.rs:44:impl Block {
+crates/amun-constitution/src/fork_choice.rs:21:impl BlockDAG {
+crates/amun-constitution/src/fork_choice.rs:32:impl ForkChoiceFunction {
+crates/amun-constitution/src/freeze_map.rs:45:impl ConstitutionalFreezeMap {
+crates/amun-constitution/src/freeze_validator.rs:27:impl FreezeBoundaryValidator {
+crates/amun-constitution/src/gas.rs:13:impl GasMeter {
+crates/amun-constitution/src/hash_domains.rs:14:impl HashDomain {
+crates/amun-constitution/src/liveness.rs:12:impl LogicalLivenessParameters {
+crates/amun-constitution/src/liveness.rs:41:impl TimeoutCertificate {
+crates/amun-constitution/src/quorum_transition.rs:10:impl QuorumTransitionParameters {
+crates/amun-constitution/src/replay.rs:16:impl ReplayContext {
+crates/amun-constitution/src/replay.rs:53:impl CanonicalEncode for ReplayContext {
+crates/amun-constitution/src/replay.rs:55:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-constitution/src/replay.rs:61:impl CanonicalDecode for ReplayContext {
+crates/amun-constitution/src/stake_quorum.rs:22:impl WeightedValidatorSet {
+crates/amun-constitution/src/stake_quorum.rs:79:impl Default for WeightedValidatorSet {
+crates/amun-constitution/src/storage.rs:22:impl WALEntry {
+crates/amun-constitution/src/synchrony.rs:22:impl SynchronyProof {
+crates/amun-constitutional-authority-semantics/src/capability.rs:17:impl ArtifactDigest for AuthorityCapability {
+crates/amun-constitutional-authority-semantics/src/capability.rs:23:impl AuthorityCapability {
+crates/amun-constitutional-authority-semantics/src/capability.rs:60:impl CanonicalSerialize for AuthorityCapability {
+crates/amun-constitutional-authority-semantics/src/delegation.rs:9:impl DelegationChain {
+crates/amun-constitutional-authority-semantics/src/revocation.rs:18:impl RevocationRegistry {
+crates/amun-constitutional-authority/src/certificate.rs:28:impl ArtifactDigest for ConstitutionalCertificate {
+crates/amun-constitutional-authority/src/certificate.rs:41:impl ConstitutionalCertificate {
+crates/amun-constitutional-authority/src/certificate.rs:141:impl CanonicalSerialize for ConstitutionalCertificate {
+crates/amun-constitutional-authority/src/chain.rs:14:impl CertificateChain {
+crates/amun-constitutional-authority/src/revocation.rs:17:impl RevocationRegistry {
+crates/amun-constitutional-authority/src/rotation.rs:11:impl KeyRotationLaw {
+crates/amun-constitutional-authority/src/trust.rs:16:impl TrustAnchor {
+crates/amun-constitutional-block/src/block.rs:21:impl ConstitutionalBlock {
+crates/amun-constitutional-block/src/block.rs:71:impl BlockBuilder {
+crates/amun-constitutional-block/src/chain.rs:12:impl Blockchain {
+crates/amun-constitutional-block/src/chain.rs:59:impl Blockchain {
+crates/amun-constitutional-block/src/finalizer.rs:18:impl BlockFinalizer {
+crates/amun-constitutional-commitment/src/apphash.rs:7:impl AppHashPipeline {
+crates/amun-constitutional-commitment/src/economic_tree.rs:43:impl EconomicTree {
+crates/amun-constitutional-commitment/src/endblock.rs:9:impl EndBlockPipeline {
+crates/amun-constitutional-commitment/src/roots_bundle.rs:16:impl ConstitutionalRoots {
+crates/amun-constitutional-commitment/src/rpc.rs:21:impl ConstitutionalStatus {
+crates/amun-constitutional-commitment/src/state.rs:8:impl ConstitutionalState {
+crates/amun-constitutional-commitment/src/verify.rs:17:impl Verifier {
+crates/amun-constitutional-commitments/src/smt.rs:32:impl SparseMerkleTree {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:34:impl ConstitutionalEvidence {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:146:impl ConstitutionalEvidenceBuilder {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:13:impl ExecutionEvidenceProvider {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:40:impl ReplayEvidenceProvider {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:56:impl GovernanceEvidenceProvider {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:67:impl QcEvidenceProvider {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:19:impl SignatureEvidence {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:40:impl DoubleSpendEvidence {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:62:impl GovernanceEvidence {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:85:impl ReplayEvidence {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:121:impl ConstitutionalEvidenceRecord {
+crates/amun-constitutional-enforcement/src/lib.rs:77:impl ConstitutionalEnforcementKernel {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:11:impl ConstitutionalProofEngine {
+crates/amun-constitutional-enforcement/src/state_transition.rs:26:impl StateTransitionResult {
+crates/amun-constitutional-geometry/src/curvature.rs:11:impl LegitimacyCurvature {
+crates/amun-constitutional-geometry/src/curvature.rs:31:impl ReplayCurvature {
+crates/amun-constitutional-geometry/src/curvature.rs:64:impl CausalCurvature {
+crates/amun-constitutional-geometry/src/directed_metric.rs:28:impl DirectedMetric {
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:37:impl EmergentHorizon {
+crates/amun-constitutional-geometry/src/fields.rs:28:impl LegitimacyGradient {
+crates/amun-constitutional-geometry/src/fields.rs:62:impl EntropyField {
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:40:impl ConstitutionalFlow {
+crates/amun-constitutional-geometry/src/geodesics.rs:16:impl ConstitutionalGeodesic {
+crates/amun-constitutional-geometry/src/horizons.rs:27:impl CausalHorizon {
+crates/amun-constitutional-geometry/src/metric_tensor.rs:20:impl MetricTensorField {
+crates/amun-constitutional-geometry/src/metrics.rs:25:impl Default for DistanceTensor {
+crates/amun-constitutional-geometry/src/metrics.rs:31:impl DistanceTensor {
+crates/amun-constitutional-geometry/src/metrics.rs:74:impl ConstitutionalDistance {
+crates/amun-constitutional-geometry/src/stability.rs:12:impl StabilityBasin {
+crates/amun-constitutional-geometry/src/stability.rs:59:impl StabilityAttractor {
+crates/amun-constitutional-geometry/src/trajectories.rs:17:impl EvolutionaryTrajectory {
+crates/amun-constitutional-governance/src/amendment.rs:22:impl AmendmentLifecycle {
+crates/amun-constitutional-governance/src/capability.rs:21:impl ArtifactDigest for Capability {
+crates/amun-constitutional-governance/src/capability.rs:34:impl Capability {
+crates/amun-constitutional-governance/src/capability.rs:72:impl CanonicalSerialize for Capability {
+crates/amun-constitutional-governance/src/quorum.rs:18:impl QuorumPolicy {
+crates/amun-constitutional-governance/src/voting.rs:23:impl ArtifactDigest for Proposal {
+crates/amun-constitutional-governance/src/voting.rs:29:impl Proposal {
+crates/amun-constitutional-governance/src/voting.rs:64:impl CanonicalSerialize for Proposal {
+crates/amun-constitutional-governance/src/voting.rs:88:impl Tally {
+crates/amun-constitutional-integration/src/lib.rs:12:impl ConstitutionalBridge {
+crates/amun-constitutional-kernel/src/amendment.rs:16:impl AmendmentActivator {
+crates/amun-constitutional-kernel/src/context.rs:20:impl ExecutionContext {
+crates/amun-constitutional-kernel/src/enforcer.rs:12:impl CapabilityEnforcer {
+crates/amun-constitutional-kernel/src/receipt.rs:20:impl ArtifactDigest for ExecutionReceipt {
+crates/amun-constitutional-kernel/src/receipt.rs:26:impl ExecutionReceipt {
+crates/amun-constitutional-kernel/src/receipt.rs:61:impl CanonicalSerialize for ExecutionReceipt {
+crates/amun-constitutional-kernel/src/state_machine.rs:18:impl ConstitutionalState {
+crates/amun-constitutional-kernel/src/state_machine.rs:38:impl Default for ConstitutionalState {
+crates/amun-constitutional-kernel/src/state_machine.rs:48:impl ConstitutionalStateMachine {
+crates/amun-constitutional-kernel/src/state_machine.rs:81:impl Default for ConstitutionalStateMachine {
+crates/amun-constitutional-proof/src/article_i_certificate.rs:28:impl ArticleICertificate {
+crates/amun-constitutional-proof/src/article_iii_certificate.rs:22:impl ArticleIIICertificate {
+crates/amun-constitutional-proof/src/certification.rs:34:impl CertificationEvaluator {
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:37:impl ConstitutionalVerdict {
+crates/amun-constitutional-proof/src/dependency_graph.rs:12:impl DependencyGraph {
+crates/amun-constitutional-proof/src/evidence_archive.rs:18:impl EvidenceArchive {
+crates/amun-constitutional-proof/src/evidence_lineage.rs:11:impl EvidenceLineage {
+crates/amun-constitutional-proof/src/evidence_record.rs:23:impl EvidenceRecord {
+crates/amun-constitutional-proof/src/failure_reason.rs:12:impl FailureReason {
+crates/amun-constitutional-proof/src/failure_reason.rs:13:    pub fn new(code: impl Into<String>, description: impl Into<String>) -> Self {
+crates/amun-constitutional-proof/src/obligation_id.rs:15:impl ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:32:impl std::fmt::Display for ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:38:impl Serialize for ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:44:impl<'de> Deserialize<'de> for ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:51:impl FromStr for ObligationId {
+crates/amun-constitutional-proof/src/obligation_namespace.rs:25:impl std::fmt::Display for ObligationNamespace {
+crates/amun-constitutional-proof/src/obligation_namespace.rs:41:impl TryFrom<&str> for ObligationNamespace {
+crates/amun-constitutional-proof/src/obligation_registry.rs:15:impl ObligationRegistry {
+crates/amun-constitutional-proof/src/obligation_registry.rs:76:    pub fn all_obligations(&self) -> impl Iterator<Item = &ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:128:impl Default for ObligationRegistry {
+crates/amun-constitutional-proof/src/obligation_result.rs:20:impl ObligationResult {
+crates/amun-constitutional-proof/src/proof_obligation.rs:24:impl ProofObligation {
+crates/amun-constitutional-proof/src/proof_obligation.rs:29:        description: impl Into<String>,
+crates/amun-constitutional-proof/src/proof_obligation.rs:30:        formal_statement: impl Into<String>,
+crates/amun-constitutional-proof/src/proof_obligation.rs:32:        phase: impl Into<String>,
+crates/amun-constitutional-proof/src/publication_package.rs:49:impl PublicationPackage {
+crates/amun-constitutional-proof/src/report_generator.rs:22:impl ReportGenerator {
+crates/amun-constitutional-proof/src/reproducibility.rs:11:impl Reproducibility {
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:17:impl VerdictEvaluator {
+crates/amun-constitutional-quarantine/src/pipeline.rs:10:impl QuarantinePipeline {
+crates/amun-constitutional-quarantine/src/rehabilitation.rs:22:impl RehabilitationPath {
+crates/amun-constitutional-runtime/src/block_validator.rs:26:impl ConstitutionalBlockValidator {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:10:impl CertificateChain {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:22:impl ConstitutionalFinalityCertificate {
+crates/amun-constitutional-runtime/src/history_root.rs:17:impl ConstitutionalHistoryRoot {
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:33:impl ConstitutionalRuntime {
+crates/amun-constitutional-semantics/src/lib.rs:14:impl TranscriptCommitment {
+crates/amun-constitutional-semantics/src/lib.rs:28:impl EventFinality {
+crates/amun-constitutional-semantics/src/lib.rs:33:impl FinalizedEvent {
+crates/amun-constitutional-semantics/src/lib.rs:42:impl AuthorityBinding {
+crates/amun-constitutional-semantics/src/lib.rs:50:impl WitnessNormalization {
+crates/amun-constitutional-semantics/src/lib.rs:63:impl ReplayPolicy {
+crates/amun-constitutional-signing/src/keys.rs:10:impl ConstitutionalKeyPair {
+crates/amun-constitutional-signing/src/signature.rs:13:impl ConstitutionalSignature {
+crates/amun-constitutional-signing/src/signature.rs:35:impl serde::Serialize for ConstitutionalSignature {
+crates/amun-constitutional-signing/src/signature.rs:49:impl<'de> serde::Deserialize<'de> for ConstitutionalSignature {
+crates/amun-constitutional-signing/src/signature.rs:77:impl ConstitutionalSignature {
+crates/amun-constitutional-signing/src/signed_artifact.rs:13:impl<T: ArtifactDigest> SignedArtifact<T> {
+crates/amun-constitutional-signing/src/signed_artifact.rs:41:impl<T: ArtifactDigest + PartialEq> PartialEq for SignedArtifact<T> {
+crates/amun-constitutional-signing/src/signed_artifact.rs:49:impl<T: ArtifactDigest + std::fmt::Debug> std::fmt::Debug for SignedArtifact<T> {
+crates/amun-constitutional-sim/src/divergence.rs:5:impl DivergenceEngine {
+crates/amun-constitutional-sim/src/effectiveness.rs:6:impl EffectivenessEngine {
+crates/amun-constitutional-sim/src/evolution.rs:9:impl EvolutionOperator {
+crates/amun-constitutional-sim/src/observables.rs:5:impl Observables {
+crates/amun-constitutional-sim/src/runner.rs:21:impl SimulationRunner {
+crates/amun-constitutional-sim/src/state.rs:33:impl SimulationState {
+crates/amun-constitutional-sim/src/types.rs:19:impl Jurisdiction {
+crates/amun-constitutional-state/src/lib.rs:26:impl ConstitutionalStateRuntime {
+crates/amun-constitutional-state/src/lib.rs:92:impl Default for ConstitutionalStateRuntime {
+crates/amun-constitutional-state/src/lib.rs:205:impl ConstitutionalStateRuntime {
+crates/amun-constitutional-state/src/lib.rs:234:impl ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:277:impl ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:356:impl ConstitutionalStateRuntime {
+crates/amun-constitutional-state/src/lib.rs:414:impl ConstitutionalStateRuntime {
+crates/amun-constitutional-state/src/lib.rs:440:impl CertificateInclusionProof {
+crates/amun-constitutional-verifier/src/lib.rs:11:impl Default for ConstitutionalVerifier {
+crates/amun-constitutional-verifier/src/lib.rs:17:impl ConstitutionalVerifier {
+crates/amun-constitutional-verifier/src/result.rs:25:impl VerificationResult {
+crates/amun-constitutional/src/artifact_graph.rs:49:impl EdgeVerification {
+crates/amun-constitutional/src/artifact_graph.rs:66:impl ArtifactEdge {
+crates/amun-constitutional/src/artifact_graph.rs:102:impl ArtifactGraph {
+crates/amun-constitutional/src/causal_edge.rs:46:impl ConstitutionalIdentity for CausalEdge {
+crates/amun-constitutional/src/causal_edge.rs:61:impl ConstitutionalObject for CausalEdge {
+crates/amun-constitutional/src/causal_edge.rs:124:impl CausalEdge {
+crates/amun-constitutional/src/causality_chain.rs:46:impl ConstitutionalIdentity for CausalityChain {
+crates/amun-constitutional/src/causality_chain.rs:61:impl ConstitutionalObject for CausalityChain {
+crates/amun-constitutional/src/causality_chain.rs:158:impl CausalityChain {
+crates/amun-constitutional/src/causality_type.rs:57:impl CausalityType {
+crates/amun-constitutional/src/certificate_scope.rs:69:impl CertificateScope {
+crates/amun-constitutional/src/constitutional_failure.rs:58:impl ConstitutionalFailure {
+crates/amun-constitutional/src/constitutional_hasher.rs:10:impl ConstitutionalHasher {
+crates/amun-constitutional/src/constitutional_witness.rs:31:impl WitnessEntry {
+crates/amun-constitutional/src/constitutional_witness.rs:91:impl ConstitutionalIdentity for ConstitutionalWitness {
+crates/amun-constitutional/src/constitutional_witness.rs:106:impl ConstitutionalObject for ConstitutionalWitness {
+crates/amun-constitutional/src/constitutional_witness.rs:198:impl ConstitutionalWitness {
+crates/amun-constitutional/src/continuation_chain.rs:59:impl ConstitutionalIdentity for ContinuationChain {
+crates/amun-constitutional/src/continuation_chain.rs:74:impl ConstitutionalObject for ContinuationChain {
+crates/amun-constitutional/src/continuation_chain.rs:130:impl ContinuationChain {
+crates/amun-constitutional/src/cycle_detection.rs:23:impl CycleDetectionResult {
+crates/amun-constitutional/src/divergence_point.rs:59:impl ConstitutionalIdentity for DivergencePoint {
+crates/amun-constitutional/src/divergence_point.rs:74:impl ConstitutionalObject for DivergencePoint {
+crates/amun-constitutional/src/divergence_point.rs:133:impl DivergencePoint {
+crates/amun-constitutional/src/divergence_resolution.rs:27:impl ResolutionType {
+crates/amun-constitutional/src/divergence_resolution.rs:68:impl ConstitutionalIdentity for DivergenceResolution {
+crates/amun-constitutional/src/divergence_resolution.rs:83:impl ConstitutionalObject for DivergenceResolution {
+crates/amun-constitutional/src/divergence_resolution.rs:140:impl DivergenceResolution {
+crates/amun-constitutional/src/divergence_type.rs:39:impl DivergenceType {
+crates/amun-constitutional/src/execution_boundary.rs:29:impl ConstitutionalIdentity for ExecutionBoundary {
+crates/amun-constitutional/src/execution_boundary.rs:44:impl ConstitutionalObject for ExecutionBoundary {
+crates/amun-constitutional/src/execution_boundary.rs:121:impl ExecutionBoundary {
+crates/amun-constitutional/src/execution_context.rs:22:impl ConstitutionalIdentity for ExecutionContext {
+crates/amun-constitutional/src/execution_context.rs:37:impl ConstitutionalObject for ExecutionContext {
+crates/amun-constitutional/src/execution_context.rs:88:impl ExecutionContext {
+crates/amun-constitutional/src/execution_journal.rs:25:impl ConstitutionalIdentity for JournalEntry {
+crates/amun-constitutional/src/execution_journal.rs:40:impl ConstitutionalObject for JournalEntry {
+crates/amun-constitutional/src/execution_journal.rs:92:impl JournalEntry {
+crates/amun-constitutional/src/execution_journal.rs:147:impl ConstitutionalIdentity for ExecutionJournal {
+crates/amun-constitutional/src/execution_journal.rs:162:impl ConstitutionalObject for ExecutionJournal {
+crates/amun-constitutional/src/execution_journal.rs:212:impl ExecutionJournal {
+crates/amun-constitutional/src/execution_limits.rs:51:impl ExecutionLimits {
+crates/amun-constitutional/src/execution_receipt.rs:87:impl ConstitutionalIdentity for ExecutionReceipt {
+crates/amun-constitutional/src/execution_receipt.rs:102:impl ConstitutionalObject for ExecutionReceipt {
+crates/amun-constitutional/src/execution_receipt.rs:168:impl ExecutionReceipt {
+crates/amun-constitutional/src/kernel_types.rs:27:impl Default for ReplayPolicy {
+crates/amun-constitutional/src/replay_certificate.rs:32:impl ConstitutionalIdentity for ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:47:impl ConstitutionalObject for ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:130:impl ReplayCertificate {
+crates/amun-constitutional/src/replay_outcome.rs:29:impl ReplayOutcome {
+crates/amun-constitutional/src/restoration_point.rs:58:impl ConstitutionalIdentity for RestorationPoint {
+crates/amun-constitutional/src/restoration_point.rs:73:impl ConstitutionalObject for RestorationPoint {
+crates/amun-constitutional/src/restoration_point.rs:130:impl RestorationPoint {
+crates/amun-constitutional/src/revision_migration.rs:46:impl MigrationPath {
+crates/amun-constitutional/src/revision_migration.rs:96:impl UpgradeProof {
+crates/amun-constitutional/src/snapshot.rs:64:impl ConstitutionalIdentity for ConstitutionalSnapshot {
+crates/amun-constitutional/src/snapshot.rs:79:impl ConstitutionalObject for ConstitutionalSnapshot {
+crates/amun-constitutional/src/snapshot.rs:178:impl ConstitutionalSnapshot {
+crates/amun-constitutional/src/snapshot_scope.rs:50:impl RestorationOutcome {
+crates/amun-constitutional/src/snapshot_scope.rs:87:impl SnapshotScope {
+crates/amun-constitutional/src/state_anchor.rs:59:impl ConstitutionalIdentity for ConstitutionalStateAnchor {
+crates/amun-constitutional/src/state_anchor.rs:74:impl ConstitutionalObject for ConstitutionalStateAnchor {
+crates/amun-constitutional/src/state_anchor.rs:162:impl ConstitutionalStateAnchor {
+crates/amun-constitutional/src/state_anchor_scope.rs:56:impl StateAnchorScope {
+crates/amun-constitutional/src/transition_commitment.rs:23:impl ConstitutionalIdentity for TransitionCommitment {
+crates/amun-constitutional/src/transition_commitment.rs:38:impl ConstitutionalObject for TransitionCommitment {
+crates/amun-constitutional/src/transition_commitment.rs:90:impl TransitionCommitment {
+crates/amun-constitutional/src/transition_evidence.rs:26:impl ConstitutionalIdentity for TransitionEvidence {
+crates/amun-constitutional/src/transition_evidence.rs:41:impl ConstitutionalObject for TransitionEvidence {
+crates/amun-constitutional/src/transition_evidence.rs:93:impl TransitionEvidence {
+crates/amun-constitutional/src/witness_type.rs:34:impl WitnessType {
+crates/amun-contract-events/src/lib.rs:18:impl ContractStorage {
+crates/amun-contract-events/src/lib.rs:77:impl Default for ContractStorage {
+crates/amun-contract-fuzzing/src/lib.rs:17:impl FuzzResult {
+crates/amun-contract-fuzzing/src/lib.rs:35:fn random_opcode(rng: &mut impl Rng) -> OpCode {
+crates/amun-contract-fuzzing/src/lib.rs:46:fn random_program(rng: &mut impl Rng) -> Vec<OpCode> {
+crates/amun-contract-fuzzing/src/lib.rs:177:impl Default for FuzzResult {
+crates/amun-contract-integration/src/lib.rs:12:impl ContractDeployer {
+crates/amun-contract-integration/src/lib.rs:42:impl ContractExecutor {
+crates/amun-contract-registry/src/lib.rs:25:impl Default for ContractRegistry {
+crates/amun-contract-registry/src/lib.rs:31:impl ContractRegistry {
+crates/amun-contract-registry/src/lib.rs:110:impl ContractRegistry {
+crates/amun-contract-sdk/src/lib.rs:11:impl AmunContractSdk {
+crates/amun-contract-sdk/src/lib.rs:64:impl Default for AmunContractSdk {
+crates/amun-contract-upgrade/src/lib.rs:14:impl ContractUpgrader {
+crates/amun-core-optimization/src/lib.rs:15:impl OptimizedRegistry {
+crates/amun-crash-persistence/src/persistence.rs:7:impl CrashPersistence {
+crates/amun-crash-recovery/src/checkpoint.rs:12:impl RecoveryCheckpoint {
+crates/amun-crash-recovery/src/recovery.rs:7:impl CrashRecovery {
+crates/amun-cross-contract/src/transfer_proof.rs:25:impl CrossContractTransferProof {
+crates/amun-cross-contract/src/transfer_registry.rs:13:impl TransferProofRegistry {
+crates/amun-crypto-hardening/src/anti_replay.rs:11:impl AntiReplayGuard {
+crates/amun-crypto-hardening/src/key_rotation.rs:13:impl KeyRotationCertificate {
+crates/amun-crypto-hardening/src/key_rotation.rs:60:impl KeyRotationChain {
+crates/amun-crypto-hardening/src/production_keys.rs:13:impl ValidatorKeypair {
+crates/amun-crypto-hardening/src/production_keys.rs:40:impl ValidatorPublicKey {
+crates/amun-crypto/src/agility.rs:11:impl CryptoAgility {
+crates/amun-crypto/src/agility.rs:35:impl Default for CryptoAgility {
+crates/amun-crypto/src/audit.rs:10:impl EntropyAudit {
+crates/amun-crypto/src/audit.rs:32:impl Default for EntropyAudit {
+crates/amun-crypto/src/ed25519.rs:18:impl Ed25519Signer {
+crates/amun-crypto/src/ed25519.rs:82:impl Zeroize for Ed25519Signer {
+crates/amun-crypto/src/ed25519.rs:88:impl Drop for Ed25519Signer {
+crates/amun-crypto/src/ed25519.rs:94:impl std::fmt::Debug for Ed25519Signer {
+crates/amun-crypto/src/rotation.rs:9:impl KeyRotation {
+crates/amun-defi-amm/src/lib.rs:12:impl Default for AmmEngine {
+crates/amun-defi-amm/src/lib.rs:18:impl AmmEngine {
+crates/amun-defi-core/src/lib.rs:20:impl DefiPool {
+crates/amun-defi-evidence/src/lib.rs:5:impl DefiEvidence {
+crates/amun-defi-governance/src/lib.rs:12:impl Default for DefiParameters {
+crates/amun-defi-governance/src/lib.rs:40:impl Default for GovernanceEngine {
+crates/amun-defi-governance/src/lib.rs:46:impl GovernanceEngine {
+crates/amun-defi-lending-core/src/lib.rs:30:impl InterestModel {
+crates/amun-defi-lending-engine/src/lib.rs:12:impl Default for LendingEngine {
+crates/amun-defi-lending-engine/src/lib.rs:18:impl LendingEngine {
+crates/amun-defi-lending-evidence/src/lib.rs:5:impl LendingEvidence {
+crates/amun-defi-stablecoin/src/lib.rs:18:impl Default for StablecoinEngine {
+crates/amun-defi-stablecoin/src/lib.rs:24:impl StablecoinEngine {
+crates/amun-defi-stress/src/lib.rs:18:impl Default for DefiStressResult {
+crates/amun-defi-stress/src/lib.rs:24:impl DefiStressResult {
+crates/amun-deterministic-allocator/src/arena.rs:9:impl DeterministicArena {
+crates/amun-deterministic-allocator/src/arena.rs:53:impl Default for DeterministicArena {
+crates/amun-deterministic-allocator/src/deterministic_map.rs:8:impl<K: Ord + Clone, V: Clone> DeterministicMap<K, V> {
+crates/amun-deterministic-allocator/src/deterministic_map.rs:51:    pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> + '_ {
+crates/amun-deterministic-allocator/src/deterministic_map.rs:64:impl<K: Ord + Clone, V: Clone> Default for DeterministicMap<K, V> {
+crates/amun-deterministic-allocator/src/deterministic_set.rs:10:impl<T: Ord + Clone> DeterministicSet<T> {
+crates/amun-deterministic-allocator/src/deterministic_set.rs:42:impl<T: Ord + Clone> Default for DeterministicSet<T> {
+crates/amun-deterministic-allocator/src/sorted_vec.rs:10:impl<T: Ord + Clone> SortedVec<T> {
+crates/amun-deterministic-allocator/src/sorted_vec.rs:30:    pub fn iter(&self) -> impl Iterator<Item = &T> + '_ {
+crates/amun-deterministic-allocator/src/sorted_vec.rs:47:impl<T: Ord + Clone> Default for SortedVec<T> {
+crates/amun-deterministic-scheduler/src/budget.rs:9:impl ResourceBudget {
+crates/amun-deterministic-scheduler/src/queue.rs:16:impl DeterministicQueue {
+crates/amun-deterministic-scheduler/src/queue.rs:80:impl Default for DeterministicQueue {
+crates/amun-deterministic-scheduler/src/scheduler.rs:16:impl DeterministicScheduler {
+crates/amun-deterministic-timer/src/timeout.rs:9:impl TimeoutLaw {
+crates/amun-deterministic-timer/src/wheel.rs:10:impl DeterministicTimerWheel {
+crates/amun-deterministic-timer/src/wheel.rs:59:impl Default for DeterministicTimerWheel {
+crates/amun-dual-verification/src/dual_verifier.rs:13:impl DualVerifier {
+crates/amun-economic-law/src/anticartel.rs:6:impl Default for AntiCartelLaw {
+crates/amun-economic-law/src/anticartel.rs:12:impl AntiCartelLaw {
+crates/amun-economic-law/src/inflation.rs:7:impl Default for InflationLaw {
+crates/amun-economic-law/src/inflation.rs:13:impl InflationLaw {
+crates/amun-economics/src/fee.rs:6:impl FeeMarket {
+crates/amun-economics/src/fee.rs:17:impl Default for FeeMarket {
+crates/amun-economics/src/inflation.rs:4:impl InflationCurve {
+crates/amun-economics/src/inflation.rs:10:impl Default for InflationCurve {
+crates/amun-economics/src/reward.rs:4:impl RewardDistributor {
+crates/amun-economics/src/reward.rs:25:impl Default for RewardDistributor {
+crates/amun-economics/src/token.rs:10:impl Token {
+crates/amun-economics/src/treasury.rs:5:impl Treasury {
+crates/amun-economics/src/treasury.rs:28:impl Default for Treasury {
+crates/amun-emergency/src/pause.rs:9:impl EmergencyPause {
+crates/amun-entropy-transcript/src/source.rs:18:impl DeterministicEntropy {
+crates/amun-entropy-transcript/src/transcript.rs:8:impl EntropyTranscript {
+crates/amun-epoch-transition/src/transition.rs:15:impl EpochTransition {
+crates/amun-epoch-transition/src/validator_rotation.rs:10:impl ValidatorRotation {
+crates/amun-epoch-transition/src/validator_rotation.rs:31:impl Default for ValidatorRotation {
+crates/amun-evidence-engine/src/evidence_archive.rs:12:impl VMEvidenceArchive {
+crates/amun-evidence-engine/src/evidence_engine.rs:9:impl EvidenceEngine {
+crates/amun-evidence-engine/src/evidence_types.rs:33:impl ConstitutionalEvidence {
+crates/amun-evidence-finality/src/evidence_finality.rs:25:impl EvidenceVerifiedBlock {
+crates/amun-evidence-finality/src/evidence_finality.rs:75:impl EvidenceBackedQC {
+crates/amun-evidence-finality/src/evidence_finality.rs:94:impl ConstitutionalFinalityCertificate {
+crates/amun-evidence-finality/src/evidence_finality.rs:145:impl EvidenceBackedConsensus {
+crates/amun-evidence-root/src/lib.rs:22:impl EvidenceRoot {
+crates/amun-evidence-root/src/lib.rs:75:impl EvidenceChain {
+crates/amun-evidence/src/equivocation.rs:10:impl EquivocationProof {
+crates/amun-evidence/src/evidence.rs:60:impl Evidence {
+crates/amun-evidence/src/slashing.rs:8:impl SlashingEngine {
+crates/amun-evidence/src/slashing.rs:45:impl Default for SlashingEngine {
+crates/amun-evolution/src/certificate.rs:18:impl ConstitutionalPhysicsProof {
+crates/amun-evolution/src/certificate.rs:76:impl EvolutionActivationCertificate {
+crates/amun-evolution/src/executor.rs:8:impl EvolutionExecutor {
+crates/amun-evolution/src/signatures.rs:20:impl ConstitutionalSignature {
+crates/amun-evolution/src/signatures.rs:63:impl AggregatedSignature {
+crates/amun-evolution/src/transition.rs:19:impl ConstitutionalCheckpoint {
+crates/amun-evolution/src/validator.rs:8:impl EvolutionValidator {
+crates/amun-execution-receipt/src/lib.rs:27:impl CanonicalEncode for ExecutionStatus {
+crates/amun-execution-receipt/src/lib.rs:51:impl CanonicalEncode for ExecutionReceipt {
+crates/amun-execution-receipt/src/lib.rs:63:impl ExecutionReceipt {
+crates/amun-execution-receipt/src/lib.rs:110:impl CanonicalEncode for ExecutionTranscript {
+crates/amun-execution-receipt/src/lib.rs:119:impl Default for ExecutionTranscript {
+crates/amun-execution-receipt/src/lib.rs:125:impl ExecutionTranscript {
+crates/amun-execution/src/executor.rs:13:impl ExecutionContext {
+crates/amun-execution/src/lib.rs:14:impl ExecutionEngine {
+crates/amun-execution/src/lib.rs:121:impl Default for ExecutionEngine {
+crates/amun-execution/src/verified_interpreter.rs:26:impl VerifiedInterpreter {
+crates/amun-execution/src/wasm_profile.rs:23:impl InstructionGasTable {
+crates/amun-execution/src/wasm_profile.rs:46:impl Default for InstructionGasTable {
+crates/amun-execution/src/wasm_profile.rs:64:impl DeterministicWasmProfile {
+crates/amun-experimental-framework/src/main.rs:35:fn measure_us(name: &str, warmup: u32, iterations: u32, mut f: impl FnMut()) -> Stats {
+crates/amun-explorer-api/src/errors.rs:19:impl ApiError {
+crates/amun-explorer-api/src/errors.rs:37:impl IntoResponse for ApiError {
+crates/amun-explorer-api/src/services/account_service.rs:7:impl AccountService {
+crates/amun-explorer-api/src/services/chain_service.rs:27:impl ChainService {
+crates/amun-explorer-api/src/services/constitutional_service.rs:7:impl ConstitutionalService {
+crates/amun-explorer-api/src/services/finality_service.rs:7:impl FinalityService {
+crates/amun-failure-memory/src/ontology.rs:10:impl FailureOntology {
+crates/amun-failure-memory/src/ontology.rs:89:impl Default for FailureOntology {
+crates/amun-failure/src/kernel_state.rs:16:impl KernelHealth {
+crates/amun-failure/src/kernel_state.rs:59:impl QuarantineActions {
+crates/amun-failure/src/kernel_state.rs:80:impl KernelState {
+crates/amun-failure/src/taxonomy.rs:44:impl ConstitutionalFault {
+crates/amun-failure/src/taxonomy.rs:141:impl FailureContext {
+crates/amun-finality-certificate/src/lib.rs:22:impl ConstitutionalFinalityCertificate {
+crates/amun-finality-certificate/src/lib.rs:77:impl FinalityChain {
+crates/amun-fork/src/rule.rs:14:impl ForkChoiceRule {
+crates/amun-formal/src/invariants.rs:3:impl FormalInvariants {
+crates/amun-gas-engine/src/gas_engine.rs:13:impl GasEngine {
+crates/amun-gas-engine/src/gas_meter.rs:10:impl GasMeter {
+crates/amun-gas-engine/src/opcode_costs.rs:6:impl OpCodeCosts {
+crates/amun-gas/src/meter.rs:6:impl GasMeter {
+crates/amun-gas/src/schedule.rs:3:impl GasSchedule {
+crates/amun-genesis/src/block.rs:13:impl GenesisBlock {
+crates/amun-genesis/src/constitution.rs:11:impl GenesisConstitution {
+crates/amun-genesis/src/validator.rs:10:impl GenesisValidator {
+crates/amun-gossip/src/broadcaster.rs:11:impl Broadcaster {
+crates/amun-gossip/src/broadcaster.rs:42:impl Default for Broadcaster {
+crates/amun-gossip/src/dedup.rs:8:impl DedupCache {
+crates/amun-gossip/src/dedup.rs:35:impl Default for DedupCache {
+crates/amun-gossip/src/fanout.rs:7:impl Fanout {
+crates/amun-gossip/src/fanout.rs:38:impl Default for Fanout {
+crates/amun-gossip/src/receiver.rs:9:impl Receiver {
+crates/amun-gossip/src/receiver.rs:35:impl Default for Receiver {
+crates/amun-gossip/src/retry.rs:9:impl RetryManager {
+crates/amun-gossip/src/retry.rs:31:impl Default for RetryManager {
+crates/amun-gossip/src/topics.rs:9:impl Topic {
+crates/amun-governance/src/proposal.rs:25:impl Proposal {
+crates/amun-handle-resolver/src/handle_resolver.rs:10:impl HandleResolver {
+crates/amun-header-gossip/src/observer.rs:13:impl GossipObserver {
+crates/amun-header-gossip/src/relay.rs:8:impl WitnessRelay {
+crates/amun-header-gossip/src/session.rs:4:impl GossipSession {
+crates/amun-header-gossip/src/session.rs:10:impl Default for GossipSession {
+crates/amun-host/src/accounting.rs:8:impl ResourceAccountant {
+crates/amun-host/src/accounting.rs:38:impl Default for ResourceAccountant {
+crates/amun-host/src/boundary.rs:3:impl HostBoundary {
+crates/amun-host/src/nonce_store.rs:13:impl NonceStore {
+crates/amun-host/src/nonce_store.rs:130:impl Default for NonceStore {
+crates/amun-host/src/replay.rs:6:impl ReplayGuard {
+crates/amun-http/src/cost.rs:8:impl RpcCostMeter {
+crates/amun-http/src/server.rs:41:impl Service<Request<Incoming>> for RequestHandler {
+crates/amun-http/src/server.rs:116:impl HttpServer {
+crates/amun-identity/src/chain_id.rs:9:impl ChainIdentity {
+crates/amun-invariant-engine/src/invariant_engine.rs:9:impl InvariantEngine {
+crates/amun-invariants/src/kernel.rs:22:impl IrreducibleInvariants {
+crates/amun-invariants/src/registry.rs:11:impl InvariantRegistry {
+crates/amun-invariants/src/status.rs:12:impl InvariantStatus {
+crates/amun-kernel-types/src/crypto.rs:5:impl PublicKey {
+crates/amun-kernel-types/src/crypto.rs:11:impl Default for PublicKey {
+crates/amun-kernel-types/src/crypto.rs:21:impl Signature {
+crates/amun-kernel-types/src/crypto.rs:27:impl Default for Signature {
+crates/amun-kernel-types/src/epoch.rs:7:impl Epoch {
+crates/amun-kernel-types/src/epoch.rs:31:impl Default for Epoch {
+crates/amun-kernel-types/src/hash.rs:8:impl PublicHash32 {
+crates/amun-kernel-types/src/hash.rs:17:impl AsRef<[u8]> for PublicHash32 {
+crates/amun-kernel-types/src/hash.rs:23:impl core::fmt::Debug for PublicHash32 {
+crates/amun-kernel-types/src/hash.rs:34:impl SecretHash32 {
+crates/amun-kernel-types/src/hash.rs:44:impl CommitmentHash32 {
+crates/amun-kernel-types/src/hash.rs:52:impl AsRef<[u8]> for CommitmentHash32 {
+crates/amun-kernel-types/src/hash.rs:82:impl<D> Hash<D> {
+crates/amun-kernel-types/src/hash.rs:94:impl<D> core::fmt::Debug for Hash<D> {
+crates/amun-kernel-types/src/hash.rs:100:impl<D> Default for Hash<D> {
+crates/amun-kernel-types/src/identity.rs:5:impl ValidatorId {
+crates/amun-kernel-types/src/round.rs:7:impl Round {
+crates/amun-kernel-types/src/round.rs:31:impl Default for Round {
+crates/amun-kernel/src/canonical.rs:18:impl<T: CanonicalEncode + ?Sized> CanonicalEncode for &T {
+crates/amun-kernel/src/canonical.rs:25:impl<T: CanonicalEncode> CanonicalEncode for [T] {
+crates/amun-kernel/src/canonical.rs:35:impl<T: CanonicalEncode> CanonicalEncode for Vec<T> {
+crates/amun-kernel/src/canonical.rs:45:impl CanonicalEncode for u64 {
+crates/amun-kernel/src/canonical.rs:50:impl CanonicalEncode for u32 {
+crates/amun-kernel/src/canonical.rs:55:impl CanonicalEncode for u8 {
+crates/amun-kernel/src/canonical.rs:60:impl CanonicalEncode for [u8; 32] {
+crates/amun-kernel/src/canonical.rs:65:impl CanonicalEncode for [u8; 64] {
+crates/amun-kernel/src/canonical.rs:70:impl CanonicalEncode for str {
+crates/amun-kernel/src/canonical.rs:77:impl CanonicalEncode for String {
+crates/amun-kernel/src/canonical.rs:82:impl CanonicalEncode for bool {
+crates/amun-kernel/src/canonical.rs:88:impl<T: CanonicalEncode> CanonicalEncode for Option<T> {
+crates/amun-kernel/src/canonical.rs:103:impl<A: CanonicalEncode, B: CanonicalEncode> CanonicalEncode for (A, B) {
+crates/amun-kernel/src/canonical.rs:114:impl<'a> CanonicalEncode for CanonicalBytes<'a> {
+crates/amun-kernel/src/canonical.rs:132:impl CanonicalEncoder {
+crates/amun-kernel/src/governance.rs:22:impl CanonicalEncode for Signature {
+crates/amun-kernel/src/governance.rs:63:impl Authority {
+crates/amun-kernel/src/governance.rs:89:impl CanonicalEncode for Authority {
+crates/amun-kernel/src/governance.rs:108:impl CanonicalEncode for AuthorityRole {
+crates/amun-kernel/src/governance.rs:134:impl CanonicalEncode for FreezeBoundary {
+crates/amun-kernel/src/governance.rs:153:impl CanonicalEncode for FreezeDomain {
+crates/amun-kernel/src/governance.rs:175:impl AuthorityRegistry {
+crates/amun-kernel/src/governance.rs:203:impl CanonicalEncode for AuthorityRegistry {
+crates/amun-kernel/src/governance.rs:225:impl Attestation {
+crates/amun-kernel/src/governance.rs:232:impl CanonicalEncode for Attestation {
+crates/amun-kernel/src/governance.rs:256:impl Snapshot {
+crates/amun-kernel/src/governance.rs:287:impl CanonicalEncode for Snapshot {
+crates/amun-kernel/src/governance.rs:315:impl ReleaseSeal {
+crates/amun-kernel/src/governance.rs:347:impl CanonicalEncode for ReleaseSeal {
+crates/amun-keystore/src/store.rs:16:impl KeyStore {
+crates/amun-keystore/src/store.rs:62:impl Drop for KeyStore {
+crates/amun-light-client/src/client.rs:8:impl LightClient {
+crates/amun-light-client/src/constitutional_client.rs:24:impl ConstitutionalLightClient {
+crates/amun-light-client/src/constitutional_client.rs:95:impl Default for ConstitutionalLightClient {
+crates/amun-light-client/src/sync.rs:8:impl SyncBatch {
+crates/amun-lineage-law/src/ancestry.rs:14:impl ProtocolAncestry {
+crates/amun-lineage-law/src/ancestry.rs:55:impl AncestryChain {
+crates/amun-lineage-law/src/compatibility.rs:18:impl CompatibilityTheorem {
+crates/amun-lineage-law/src/compatibility.rs:84:impl CompatibilityVerdict {
+crates/amun-lineage-law/src/lineage.rs:22:impl LineageProof {
+crates/amun-lineage-law/src/lineage.rs:70:impl LineageCertificate {
+crates/amun-lineage-law/src/lineage.rs:97:impl LineageVerification {
+crates/amun-lineage-law/src/migration.rs:22:impl MigrationWitness {
+crates/amun-lineage-law/src/migration.rs:67:impl MigrationCertificate {
+crates/amun-lineage-law/src/migration.rs:103:impl MigrationRules {
+crates/amun-lineage/src/compatibility.rs:12:impl CompatibilityClass {
+crates/amun-lineage/src/lineage.rs:12:impl LineageId {
+crates/amun-lineage/src/lineage.rs:78:impl Default for LineageGraph {
+crates/amun-lineage/src/lineage.rs:84:impl LineageGraph {
+crates/amun-lineage/src/record.rs:14:impl ReplayGuarantee {
+crates/amun-lineage/src/record.rs:36:impl SnapshotGuarantee {
+crates/amun-lineage/src/record.rs:58:impl ProofGuarantee {
+crates/amun-lineage/src/record.rs:80:impl GovernanceGuarantee {
+crates/amun-lineage/src/record.rs:104:impl ContinuityClass {
+crates/amun-lineage/src/record.rs:128:impl EvolutionRecord {
+crates/amun-lineage/src/record.rs:177:impl EvolutionProof {
+crates/amun-lineage/src/serialization.rs:16:macro_rules! constitutional_encode_impl {
+crates/amun-lineage/src/serialization.rs:18:        impl ConstitutionalEncode for $ty {
+crates/amun-live-cluster/src/config.rs:35:impl ValidatorConfig {
+crates/amun-live-cluster/src/validator.rs:71:impl LiveValidator {
+crates/amun-load-generator/src/main.rs:19:impl LoadResult {
+crates/amun-lock-rule/src/lock.rs:10:impl ValidatorLock {
+crates/amun-lock-rule/src/lock.rs:58:impl Default for ValidatorLock {
+crates/amun-mempool-gossip/src/mempool.rs:15:impl Mempool {
+crates/amun-mempool-gossip/src/mempool.rs:70:impl GossipServer {
+crates/amun-mempool-gossip/src/mempool.rs:126:impl GossipClient {
+crates/amun-mempool-gossip/src/messages.rs:37:impl Transaction {
+crates/amun-mempool/src/lib.rs:13:impl Mempool {
+crates/amun-mempool/src/ordering.rs:5:impl CanonicalOrdering {
+crates/amun-mempool/src/pool.rs:12:impl Mempool {
+crates/amun-merkle/src/domain.rs:13:impl MerkleDomain {
+crates/amun-merkle/src/proof.rs:21:impl MerkleProof {
+crates/amun-merkle/src/proof.rs:54:impl Default for MerkleProof {
+crates/amun-merkle/src/proof.rs:60:impl CanonicalEncode for MerkleProof {
+crates/amun-merkle/src/proof.rs:62:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-merkle/src/proof.rs:77:impl CanonicalDecode for MerkleProof {
+crates/amun-merkle/src/tree.rs:10:impl MerkleTree {
+crates/amun-network-constitution/src/anti_replay.rs:9:impl AntiReplayGuard {
+crates/amun-network-constitution/src/anti_replay.rs:47:impl Default for AntiReplayGuard {
+crates/amun-network-constitution/src/message.rs:16:impl NetworkMessageType {
+crates/amun-network-constitution/src/message.rs:61:impl NetworkFrame {
+crates/amun-network-fastpath/src/lib.rs:10:impl Default for MessageBatch {
+crates/amun-network-fastpath/src/lib.rs:16:impl MessageBatch {
+crates/amun-network-scheduler/src/message.rs:36:impl NetworkMessage {
+crates/amun-network-scheduler/src/scheduler.rs:14:impl NetworkScheduler {
+crates/amun-network-simulator/src/adversary.rs:11:impl AdversaryConfig {
+crates/amun-network-simulator/src/delivery.rs:8:impl DeliverySchedule {
+crates/amun-network-simulator/src/simulator.rs:24:impl NetworkSimulator {
+crates/amun-network-transport/src/message.rs:131:impl NetworkMessage {
+crates/amun-network-transport/src/peer.rs:20:impl PeerIdentity {
+crates/amun-network-transport/src/protocol.rs:94:    load_height: impl Fn(u64) -> Option<Vec<u8>>,
+crates/amun-network-transport/src/protocol.rs:95:    vote_handler: impl Fn(&[u8]),
+crates/amun-network-transport/src/sync_over_network.rs:13:impl SyncServer {
+crates/amun-network-transport/src/sync_over_network.rs:99:impl SyncClient {
+crates/amun-network-transport/src/transport.rs:20:impl std::fmt::Display for TransportError {
+crates/amun-network-transport/src/transport.rs:41:impl PeerConnection {
+crates/amun-network-transport/src/transport.rs:89:impl TcpTransport {
+crates/amun-network/src/connection.rs:10:impl Connection {
+crates/amun-network/src/connection.rs:37:impl Default for Connection {
+crates/amun-network/src/discovery.rs:11:impl Discovery {
+crates/amun-network/src/discovery.rs:51:impl Default for Discovery {
+crates/amun-network/src/framing.rs:18:impl Frame {
+crates/amun-network/src/handshake.rs:12:impl Handshake {
+crates/amun-network/src/heartbeat.rs:10:impl Heartbeat {
+crates/amun-network/src/heartbeat.rs:38:impl Default for Heartbeat {
+crates/amun-network/src/peer.rs:20:impl Peer {
+crates/amun-network/src/rate_limit.rs:9:impl RateLimiter {
+crates/amun-network/src/rate_limit.rs:30:impl Default for RateLimiter {
+crates/amun-networking/src/crypto_identity.rs:12:impl PeerKeyPair {
+crates/amun-networking/src/crypto_identity.rs:72:impl SignedMessage {
+crates/amun-networking/src/node.rs:41:impl NetworkNode {
+crates/amun-networking/src/peer.rs:10:impl Peer {
+crates/amun-networking/src/peer_discovery.rs:15:impl PeerAnnouncement {
+crates/amun-networking/src/peer_discovery.rs:42:impl PeerRegistry {
+crates/amun-networking/src/peer_identity.rs:8:impl PeerId {
+crates/amun-networking/src/peer_identity.rs:22:impl PeerIdentity {
+crates/amun-networking/src/peers.rs:24:impl PeerTrust {
+crates/amun-networking/src/quarantine.rs:42:impl QuarantineEngine {
+crates/amun-networking/src/risk.rs:30:impl ConstitutionalRiskProfile {
+crates/amun-networking/src/signed_envelope.rs:15:impl SignedEnvelope {
+crates/amun-networking/src/signed_envelope.rs:40:impl DirectedMessage {
+crates/amun-networking/src/sovereignty.rs:43:impl ConstitutionalHandshake {
+crates/amun-networking/src/sync.rs:34:impl SyncEngine {
+crates/amun-networking/src/tcp_transport.rs:22:impl TcpTransport {
+crates/amun-networking/src/tcp_transport.rs:147:impl Transport for TcpTransport {
+crates/amun-networking/src/transport.rs:14:impl MockTransport {
+crates/amun-networking/src/transport.rs:53:impl Default for MockTransport {
+crates/amun-networking/src/transport.rs:60:impl MockTransport {
+crates/amun-networking/src/trust_anchor.rs:13:impl TrustAnchorRegistry {
+crates/amun-networking/src/validator_certificate.rs:26:impl ValidatorCertificate {
+crates/amun-networking/src/validator_registry.rs:12:impl ValidatorRegistry {
+crates/amun-networking/src/verification.rs:29:impl RemoteVerifier {
+crates/amun-networking/tests/harness/event_scheduler.rs:22:impl Ord for ScheduledEvent {
+crates/amun-networking/tests/harness/event_scheduler.rs:30:impl PartialOrd for ScheduledEvent {
+crates/amun-networking/tests/harness/event_scheduler.rs:35:impl PartialEq for ScheduledEvent {
+crates/amun-networking/tests/harness/event_scheduler.rs:40:impl Eq for ScheduledEvent {}
+crates/amun-networking/tests/harness/event_scheduler.rs:52:impl SchedulingPolicy for DefaultPolicy {}
+crates/amun-networking/tests/harness/event_scheduler.rs:60:impl EventScheduler {
+crates/amun-networking/tests/harness/message_delivery.rs:14:impl Default for DeliveryPolicy {
+crates/amun-networking/tests/harness/message_delivery.rs:37:impl MessageDeliveryEngine {
+crates/amun-networking/tests/harness/scenario.rs:25:impl Default for ScenarioConfig {
+crates/amun-networking/tests/harness/scenario.rs:49:impl ScenarioRunner {
+crates/amun-networking/tests/harness/simulation_node.rs:20:impl SimulationNodeCore {
+crates/amun-networking/tests/harness/simulation_node.rs:33:impl fmt::Debug for SimulationNodeCore {
+crates/amun-networking/tests/n17_multi_node_network.rs:22:impl Network {
+crates/amun-networking/tests/v2_001_time_driven_consensus.rs:9:impl ConsensusScenario for HappyPathScenario {
+crates/amun-networking/tests/v2_002_multi_round_consensus.rs:10:impl ConsensusScenario for MultiRoundScenario {
+crates/amun-networking/tests/v2_003_multi_height_consensus.rs:10:impl ConsensusScenario for MultiHeightScenario {
+crates/amun-networking/tests/v2_004_long_run_stability.rs:11:impl ConsensusScenario for LongRunScenario {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs:13:impl BaselineScenario {
+crates/amun-networking/tests/v2_013_baseline_matrix.rs:22:impl ConsensusScenario for BaselineScenario {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:38:impl Ord for ScheduledEvent {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:46:impl PartialOrd for ScheduledEvent {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:51:impl PartialEq for ScheduledEvent {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:56:impl Eq for ScheduledEvent {}
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:62:impl EventScheduler {
+crates/amun-networking/tests/v2_015a_real_timeout_injection.rs:121:impl TimeoutInjectionSim {
+crates/amun-nft-bridge/src/lib.rs:39:impl BridgeLedger {
+crates/amun-nft-collateral/src/lib.rs:18:impl Default for NftCollateralEngine {
+crates/amun-nft-collateral/src/lib.rs:24:impl NftCollateralEngine {
+crates/amun-nft-constitutional-enforcement/src/lib.rs:20:impl EnforcementEngine {
+crates/amun-nft-constitutional-registry/src/lib.rs:27:impl ConstitutionalRegistry {
+crates/amun-nft-core/src/lib.rs:55:impl NftEvidence {
+crates/amun-nft-evidence/src/lib.rs:29:impl NftEvidenceKernel {
+crates/amun-nft-evidence/src/lib.rs:147:impl From<RegistryError> for CekError {
+crates/amun-nft-explorer/src/lib.rs:42:impl ExplorerEngine {
+crates/amun-nft-fuzz/src/lib.rs:14:impl FuzzResult {
+crates/amun-nft-governance-execution/src/lib.rs:30:impl GovernanceExecution {
+crates/amun-nft-governance/src/lib.rs:21:impl GovernanceLedger {
+crates/amun-nft-indexer/src/lib.rs:36:impl NftIndexer {
+crates/amun-nft-marketplace/src/lib.rs:75:impl Default for MarketplaceEngine {
+crates/amun-nft-marketplace/src/lib.rs:81:impl MarketplaceEngine {
+crates/amun-nft-rights-enforcement/src/lib.rs:18:impl RightsEnforcementEngine {
+crates/amun-nft-royalty-accounting/src/lib.rs:19:impl RoyaltyLedger {
+crates/amun-nft-royalty-settlement/src/lib.rs:21:impl SettlementEngine {
+crates/amun-nft-royalty/src/lib.rs:26:impl RoyaltyEngine {
+crates/amun-nft-sdk/src/lib.rs:20:impl Default for NftSdk {
+crates/amun-nft-sdk/src/lib.rs:26:impl NftSdk {
+crates/amun-node/src/genesis.rs:28:impl Genesis {
+crates/amun-node/src/peer_handshake.rs:19:impl HandshakeMessage {
+crates/amun-node/src/peer_handshake.rs:77:impl AuthenticatedPeer {
+crates/amun-node/src/peer_registry.rs:12:impl PeerRegistry {
+crates/amun-ntr/src/charity.rs:11:impl CharityDistributor {
+crates/amun-ntr/src/presale.rs:10:impl PresaleVesting {
+crates/amun-ntr/src/token.rs:4:impl NtrToken {
+crates/amun-ntr/src/treasury.rs:12:impl AmungoldTreasury {
+crates/amun-operations/src/backup_recovery.rs:17:impl NodeBackup {
+crates/amun-operations/src/health_check.rs:17:impl NodeHealth {
+crates/amun-operations/src/metrics.rs:19:impl NodeMetrics {
+crates/amun-pacemaker/src/pacemaker.rs:18:impl Pacemaker {
+crates/amun-pacemaker/src/round_state.rs:19:impl RoundState {
+crates/amun-pacemaker/src/round_state.rs:57:impl Default for RoundState {
+crates/amun-pccv/src/pccv_verifier.rs:19:impl PCCVVerifier {
+crates/amun-pccv/src/transition_proof_engine.rs:11:impl TransitionProofEngine {
+crates/amun-pccv/src/witness_builder.rs:6:impl WitnessBuilder {
+crates/amun-peer-discovery/src/discovery.rs:33:impl DiscoveryServer {
+crates/amun-peer-discovery/src/discovery.rs:114:impl DiscoveryClient {
+crates/amun-peer-discovery/src/peer_table.rs:31:impl PeerTable {
+crates/amun-peer-identity/src/certificate.rs:10:impl PeerCertificate {
+crates/amun-peer-identity/src/peer_id.rs:13:impl ConstitutionalPeerId {
+crates/amun-peer-identity/src/registry.rs:10:impl PeerRegistry {
+crates/amun-peer-identity/src/verifier.rs:6:impl IdentityVerifier {
+crates/amun-peer-reputation/src/scorer.rs:6:impl Default for PeerScorer {
+crates/amun-peer-reputation/src/scorer.rs:12:impl PeerScorer {
+crates/amun-persistence/src/lib.rs:15:impl PersistentState {
+crates/amun-persistence/src/lib.rs:38:impl FileBackend {
+crates/amun-persistence/src/lib.rs:46:impl PersistenceBackend for FileBackend {
+crates/amun-persistent-node/src/persistent_store.rs:15:impl PersistentValidatorStore {
+crates/amun-proof-archive/src/hot_store.rs:11:impl HotProofStore {
+crates/amun-proof-archive/src/proof_archive.rs:12:impl ProofArchive {
+crates/amun-proof-carrying/src/receipt.rs:30:impl ProofCarryingReceipt {
+crates/amun-proof-carrying/src/verifier.rs:11:impl ProofVerifier {
+crates/amun-protocol-event/src/event.rs:28:impl ProtocolEvent {
+crates/amun-protocol-event/src/transcript.rs:10:impl ProtocolTranscript {
+crates/amun-protocol-event/src/transcript.rs:62:impl Default for ProtocolTranscript {
+crates/amun-quorum-certificate/src/certificate.rs:16:impl QuorumCertificate {
+crates/amun-quorum-certificate/src/lib.rs:14:impl QuorumCertificate {
+crates/amun-recovery/src/lib.rs:26:impl RecoveryEngine {
+crates/amun-replay-cert/src/certificate.rs:19:impl ReplayCertificate {
+crates/amun-replay-cert/src/certifier.rs:14:impl ReplayCertifier {
+crates/amun-replay-cert/src/lib.rs:12:impl Default for ReplayTranscript {
+crates/amun-replay-cert/src/platform.rs:12:impl PlatformFingerprint {
+crates/amun-replay-cert/src/transcript.rs:18:impl ReplayTranscript {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:19:impl ReplayBackedConsensus {
+crates/amun-replay-consensus/src/replay_backed_types.rs:14:impl ReplayVerificationRecord {
+crates/amun-replay-consensus/src/replay_backed_types.rs:34:impl ReplayVerifiedBlock {
+crates/amun-replay-consensus/src/replay_backed_types.rs:64:impl ReplayBackedQC {
+crates/amun-replay-consensus/src/replay_backed_types.rs:96:impl ReplayBackedFinalityCertificate {
+crates/amun-replay-engine/src/adaptive_relay.rs:33:impl RelayTopologyView {
+crates/amun-replay-engine/src/adaptive_relay.rs:59:impl FrontierPressureMetrics {
+crates/amun-replay-engine/src/adaptive_relay.rs:131:impl RelayBackpressure {
+crates/amun-replay-engine/src/adaptive_relay.rs:154:impl EquivalenceRelayCache {
+crates/amun-replay-engine/src/adaptive_relay.rs:180:impl AntiCentralityGuard {
+crates/amun-replay-engine/src/canonical.rs:42:impl Default for CanonicalWriter {
+crates/amun-replay-engine/src/canonical.rs:48:impl CanonicalWriter {
+crates/amun-replay-engine/src/canonical.rs:100:impl<'a> CanonicalReader<'a> {
+crates/amun-replay-engine/src/canonical.rs:161:impl Default for CanonicalHasher {
+crates/amun-replay-engine/src/canonical.rs:167:impl CanonicalHasher {
+crates/amun-replay-engine/src/canonical.rs:194:impl CanonicalEncode for u64 {
+crates/amun-replay-engine/src/canonical.rs:203:impl CanonicalEncode for u32 {
+crates/amun-replay-engine/src/canonical.rs:212:impl CanonicalEncode for u8 {
+crates/amun-replay-engine/src/canonical.rs:221:impl CanonicalEncode for bool {
+crates/amun-replay-engine/src/canonical.rs:231:impl CanonicalEncode for [u8; 32] {
+crates/amun-replay-engine/src/closure_completeness.rs:11:impl ClosureCompleteness {
+crates/amun-replay-engine/src/constitutional_economics.rs:31:impl ProofMarketSurface {
+crates/amun-replay-engine/src/constitutional_economics.rs:63:impl ExecutionLeaseBoundary {
+crates/amun-replay-engine/src/constitutional_economics.rs:114:impl WitnessIncentiveSurface {
+crates/amun-replay-engine/src/constitutional_economics.rs:142:impl EconomicContainmentZone {
+crates/amun-replay-engine/src/constitutional_economics.rs:177:impl ScarcityNeutralityBoundary {
+crates/amun-replay-engine/src/constitutional_governance.rs:37:impl RatificationSurface {
+crates/amun-replay-engine/src/constitutional_governance.rs:123:impl ConstitutionalEvolutionBoundary {
+crates/amun-replay-engine/src/constitutional_governance.rs:171:impl GovernanceContainmentZone {
+crates/amun-replay-engine/src/constitutional_governance.rs:212:impl TemporalConstitutionLineage {
+crates/amun-replay-engine/src/constitutional_identity.rs:36:impl IdentitySurface {
+crates/amun-replay-engine/src/constitutional_identity.rs:77:impl AttributionBoundary {
+crates/amun-replay-engine/src/constitutional_identity.rs:105:impl ReputationNeutralityGuard {
+crates/amun-replay-engine/src/constitutional_identity.rs:142:impl IdentityContainmentZone {
+crates/amun-replay-engine/src/containment_boundary.rs:42:impl SemanticContaminationBoundary {
+crates/amun-replay-engine/src/containment_boundary.rs:77:impl ByzantineContainmentZone {
+crates/amun-replay-engine/src/cross_constitution_federation.rs:36:impl FederationBoundary {
+crates/amun-replay-engine/src/cross_constitution_federation.rs:86:impl ConstitutionalTranslationSurface {
+crates/amun-replay-engine/src/cross_constitution_federation.rs:139:impl SovereigntyPreservingBridge {
+crates/amun-replay-engine/src/derivational_equivalence.rs:22:impl CanonicalDerivationFingerprint {
+crates/amun-replay-engine/src/derivational_equivalence.rs:60:impl DerivationalEquivalenceClass {
+crates/amun-replay-engine/src/derivational_frontier.rs:32:impl DerivationalFrontier {
+crates/amun-replay-engine/src/deterministic.rs:21:impl Default for ExecutionTrace {
+crates/amun-replay-engine/src/deterministic.rs:27:impl ExecutionTrace {
+crates/amun-replay-engine/src/deterministic.rs:51:impl DeterministicExecutor {
+crates/amun-replay-engine/src/deterministic.rs:112:impl ExecutionResult {
+crates/amun-replay-engine/src/equivalence.rs:42:impl ConstitutionalReplayResult {
+crates/amun-replay-engine/src/equivalence.rs:53:impl EquivalenceProver {
+crates/amun-replay-engine/src/execution_dag.rs:39:impl ExecutionDAG {
+crates/amun-replay-engine/src/execution_dependency.rs:36:impl ExecutionDependencyType {
+crates/amun-replay-engine/src/execution_scheduler.rs:30:impl ExecutionScheduler {
+crates/amun-replay-engine/src/execution_task.rs:55:impl ExecutionTask {
+crates/amun-replay-engine/src/execution_vertex.rs:64:impl ExecutionVertex {
+crates/amun-replay-engine/src/isolation_boundary.rs:42:impl IsolationViolation {
+crates/amun-replay-engine/src/isolation_boundary.rs:80:impl ExecutionIsolationBoundary {
+crates/amun-replay-engine/src/lib.rs:50:impl ReplaySession {
+crates/amun-replay-engine/src/lib.rs:108:impl ReplayCursor {
+crates/amun-replay-engine/src/missing_closure.rs:57:impl MissingClosureRequest {
+crates/amun-replay-engine/src/operational_hasher.rs:24:impl OperationalHasher {
+crates/amun-replay-engine/src/proof_routing.rs:58:impl ProofRoute {
+crates/amun-replay-engine/src/runtime_anomaly.rs:48:impl RuntimeAnomaly {
+crates/amun-replay-engine/src/runtime_anomaly.rs:88:impl RuntimeAnomalySurface {
+crates/amun-replay-engine/src/runtime_capability.rs:39:impl CapabilitySet {
+crates/amun-replay-engine/src/runtime_receipt.rs:22:impl RuntimeReceipt {
+crates/amun-replay-engine/src/state.rs:27:impl ReplayState {
+crates/amun-replay-engine/src/temporal_drift.rs:33:impl TemporalDriftBoundary {
+crates/amun-replay-engine/src/temporal_drift.rs:75:impl HistoricalWeightNeutralizer {
+crates/amun-replay-engine/src/temporal_drift.rs:111:impl CompatibilityDecaySurface {
+crates/amun-replay-engine/src/temporal_drift.rs:141:impl TemporalAttributionLineage {
+crates/amun-replay-engine/src/temporal_drift.rs:171:impl EpochContainmentZone {
+crates/amun-replay-engine/src/witness_envelope.rs:60:impl WitnessEnvelope {
+crates/amun-replay-engine/src/zk_adapters.rs:33:impl ZKWitnessEnvelope {
+crates/amun-replay-engine/src/zk_adapters.rs:83:impl DerivabilityCommitment {
+crates/amun-replay-engine/src/zk_adapters.rs:117:impl RecursiveProofBoundary {
+crates/amun-replay-engine/src/zk_adapters.rs:152:impl SelectiveRevealSurface {
+crates/amun-replay-engine/src/zk_adapters.rs:193:impl ExternalVerifierAdapter {
+crates/amun-replay-engine/src/zk_adapters.rs:218:impl ProofInspectabilityGuard {
+crates/amun-replay-optimization/src/lib.rs:24:impl ReplayCache {
+crates/amun-replay-optimization/src/lib.rs:93:impl Default for ReplayCache {
+crates/amun-replay-semantics/src/lib.rs:13:impl ReplayEpoch {
+crates/amun-replay-semantics/src/lib.rs:20:impl ReplayBoundary { pub fn genesis(genesis_hash: [u8; 32]) -> Self { Self { finalized_sequence: 0, boundary_chain_hash: genesis_hash, boundary_state_root: genesis_hash, epoch: ReplayEpoch::new(genesis_hash, 0, 1), replay_version: 1 } } }
+crates/amun-replay-semantics/src/lib.rs:30:impl ReplayCertificate {
+crates/amun-replay-semantics/src/lib.rs:47:impl ReplayEquivalence {
+crates/amun-replay-semantics/src/lib.rs:71:impl ReplayCheckpoint { pub fn verify(&self, boundary: &ReplayBoundary) -> bool { self.sequence >= boundary.finalized_sequence && self.certificate.verify() && self.certificate.boundary.boundary_chain_hash == boundary.boundary_chain_hash } }
+crates/amun-replay-store/src/lib.rs:16:impl ReplayRecord {
+crates/amun-replay-store/src/lib.rs:35:impl ReplayStore {
+crates/amun-replay-verifier/src/replay_verifier.rs:30:impl ReplayVerifier {
+crates/amun-replay/src/certificate.rs:17:impl ReplayCertificate {
+crates/amun-replay/src/certificate.rs:86:impl ReplayCertificateStore {
+crates/amun-replay/src/commit_log.rs:14:impl StateCommit {
+crates/amun-replay/src/commit_log.rs:33:impl CommitLog {
+crates/amun-replay/src/store.rs:10:impl ReplayStore {
+crates/amun-replay/src/store.rs:44:impl Default for ReplayStore {
+crates/amun-replay/src/store.rs:55:impl CertificateProvider for ReplayStore {
+crates/amun-replay/src/validation.rs:11:impl ReplayResult {
+crates/amun-replay/src/validation.rs:33:impl ReplayValidator {
+crates/amun-resource-core/src/resource_id.rs:10:impl ResourceId {
+crates/amun-resource-core/src/resource_id.rs:42:impl serde::Serialize for ResourceId {
+crates/amun-resource-core/src/resource_id.rs:48:impl<'de> serde::Deserialize<'de> for ResourceId {
+crates/amun-resource-core/src/resource_id.rs:61:impl std::fmt::Display for ResourceId {
+crates/amun-resource-core/src/resource_lineage.rs:28:impl ResourceLineage {
+crates/amun-resource-core/src/resource_registry.rs:73:impl ResourceRegistry {
+crates/amun-resource-core/src/transformation_matrix.rs:20:impl TransformationMatrix {
+crates/amun-rpc/src/auth.rs:8:impl AuthValidator {
+crates/amun-rpc/src/client.rs:59:impl RpcClient {
+crates/amun-rpc/src/faucet.rs:48:impl FaucetState {
+crates/amun-rpc/src/methods.rs:9:impl RpcHandler {
+crates/amun-rpc/src/provider.rs:20:impl LiveRpcProvider {
+crates/amun-rpc/src/provider.rs:28:impl ChainDataProvider for LiveRpcProvider {
+crates/amun-rpc/src/provider.rs:54:impl ChainDataProvider for MockProvider {
+crates/amun-rpc/src/types.rs:27:impl RpcResponse {
+crates/amun-runtime-law/src/law.rs:3:impl RuntimeLaw {
+crates/amun-runtime/src/account.rs:13:impl AccountState {
+crates/amun-runtime/src/executor.rs:7:impl AtomicExecutor {
+crates/amun-runtime/src/journal.rs:25:impl ExecutionJournal {
+crates/amun-runtime/src/journal.rs:87:impl Default for ExecutionJournal {
+crates/amun-runtime/src/overlay.rs:13:impl OverlayState {
+crates/amun-runtime/src/overlay.rs:75:impl Default for OverlayState {
+crates/amun-safety-laws/src/equivocation.rs:10:impl EquivocationEvidence {
+crates/amun-safety-laws/src/slash.rs:10:impl SlashingCondition {
+crates/amun-scheduler/src/priority.rs:16:impl Default for ConstitutionalScheduler {
+crates/amun-scheduler/src/priority.rs:22:impl ConstitutionalScheduler {
+crates/amun-sdk-layer/src/charity_api.rs:9:impl CharityApi {
+crates/amun-sdk-layer/src/governance_api.rs:9:impl GovernanceApi {
+crates/amun-sdk-layer/src/sandbox.rs:18:impl Sandbox {
+crates/amun-sdk-layer/src/staking_api.rs:13:impl StakingApi {
+crates/amun-sdk-layer/src/token_api.rs:6:impl TokenApi {
+crates/amun-sdk-layer/src/transaction_builder.rs:7:impl TransactionBuilder {
+crates/amun-sdk-layer/src/treasury_api.rs:8:impl TreasuryApi {
+crates/amun-sdk-layer/src/types.rs:18:impl<T> SdkResult<T> {
+crates/amun-self-preservation/src/action_principle.rs:13:impl Default for ConstitutionalAction {
+crates/amun-self-preservation/src/action_principle.rs:19:impl ConstitutionalAction {
+crates/amun-self-preservation/src/action_principle.rs:49:impl LeastInvariantViolation {
+crates/amun-self-preservation/src/consistency.rs:32:impl MetaConsistency {
+crates/amun-self-preservation/src/legitimacy_guards.rs:37:impl LegitimacyGuard {
+crates/amun-self-preservation/src/phase_transitions.rs:36:impl PhaseTransition {
+crates/amun-self-preservation/src/self_modeling.rs:18:impl SelfModel {
+crates/amun-self-preservation/src/self_modeling.rs:46:impl SelfReferenceGuard {
+crates/amun-serialization-audit/src/verifier.rs:5:impl SerializationVerifier {
+crates/amun-signature-engine/src/verifier.rs:7:impl SignatureVerifier {
+crates/amun-smt/src/canonical_model.rs:16:impl CanonicalModel {
+crates/amun-smt/src/context.rs:14:impl Context {
+crates/amun-smt/src/hash.rs:20:impl Hash {
+crates/amun-smt/src/node.rs:37:impl Node {
+crates/amun-smt/src/proof.rs:67:impl MerkleProof {
+crates/amun-smt/src/tree.rs:41:impl SparseMerkleTree {
+crates/amun-smt/tests/determinism.rs:5:fn random_key(rng: &mut impl Rng) -> Key256 {
+crates/amun-smt/tests/fuzz.rs:5:fn arb_key() -> impl Strategy<Value = Key256> {
+crates/amun-smt/tests/proofs.rs:4:fn random_key(rng: &mut impl Rng) -> Key256 {
+crates/amun-snapshot-constitution/src/snapshot.rs:25:impl SnapshotExecutionContext {
+crates/amun-snapshot-constitution/src/snapshot.rs:59:impl CanonicalSnapshot {
+crates/amun-snapshot-engine-unified/src/lib.rs:16:impl Snapshot {
+crates/amun-snapshot-engine-unified/src/lib.rs:33:impl SnapshotManager {
+crates/amun-snapshot-engine/src/byzantine_sync.rs:53:impl ByzantineSyncEngine {
+crates/amun-snapshot-engine/src/chunk.rs:17:impl SnapshotChunk {
+crates/amun-snapshot-engine/src/chunk.rs:60:impl ChunkBuilder {
+crates/amun-snapshot-engine/src/chunk.rs:117:impl ChunkIndex {
+crates/amun-snapshot-engine/src/chunk_proof.rs:18:impl ChunkProof {
+crates/amun-snapshot-engine/src/compatibility.rs:51:impl CompatibilityEngine {
+crates/amun-snapshot-engine/src/constitutional_hash.rs:11:impl ConstitutionalHash {
+crates/amun-snapshot-engine/src/constitutional_identity.rs:19:impl ConstitutionalIdentity {
+crates/amun-snapshot-engine/src/manifest.rs:30:impl SnapshotManifest {
+crates/amun-snapshot-engine/src/manifest.rs:165:impl ManifestBuilder {
+crates/amun-snapshot-engine/src/replay_continuity.rs:27:impl ReplayContinuityEngine {
+crates/amun-snapshot-engine/src/restore.rs:13:impl SnapshotRestoreEngine {
+crates/amun-snapshot-engine/src/restore.rs:131:impl std::fmt::Display for RestoreError {
+crates/amun-snapshot-engine/src/snapshot.rs:22:impl SnapshotHeader {
+crates/amun-snapshot-engine/src/snapshot.rs:91:impl SerializedNode {
+crates/amun-snapshot-engine/src/snapshot.rs:123:impl SnapshotBuilder {
+crates/amun-snapshot-engine/src/snapshot.rs:140:impl SnapshotData {
+crates/amun-snapshot-engine/src/snapshot.rs:157:impl SnapshotReader {
+crates/amun-snapshot-engine/src/structural_verifier.rs:33:impl std::fmt::Display for StructuralError {
+crates/amun-snapshot-engine/src/structural_verifier.rs:78:impl StructuralVerifier {
+crates/amun-snapshot-engine/src/transition.rs:21:impl TransitionClassifier {
+crates/amun-snapshot-engine/src/traversal.rs:16:impl CanonicalTraversal {
+crates/amun-snapshot-engine/src/traversal.rs:94:impl<'a> StreamingTraversal<'a> {
+crates/amun-snapshot-engine/src/traversal.rs:109:impl<'a> Iterator for StreamingTraversal<'a> {
+crates/amun-snapshot-engine/src/verifier.rs:18:impl SnapshotVerifier {
+crates/amun-snapshot-optimization/src/lib.rs:10:impl IncrementalSnapshot {
+crates/amun-snapshot/src/state.rs:10:impl SignedSnapshot {
+crates/amun-soak-full/src/lib.rs:25:impl Default for FullSoakConfig {
+crates/amun-soak-full/src/lib.rs:53:impl SoakValidator {
+crates/amun-soak-full/src/lib.rs:259:impl Default for SoakValidator {
+crates/amun-soak-test/src/lib.rs:20:impl ValidatorSimulator {
+crates/amun-soak-test/src/lib.rs:173:impl SoakResult {
+crates/amun-soak-test/src/lib.rs:179:impl Default for ValidatorSimulator {
+crates/amun-staking/src/delegation.rs:5:impl DelegationManager {
+crates/amun-staking/src/delegation.rs:18:impl Default for DelegationManager {
+crates/amun-staking/src/slashing.rs:6:impl SlashingConditions {
+crates/amun-staking/src/slashing.rs:24:impl Default for SlashingConditions {
+crates/amun-staking/src/unbonding.rs:12:impl UnbondingQueue {
+crates/amun-staking/src/unbonding.rs:33:impl Default for UnbondingQueue {
+crates/amun-staking/src/validator.rs:11:impl Validator {
+crates/amun-staking/src/validator.rs:26:impl ValidatorRegistry {
+crates/amun-staking/src/validator.rs:69:impl Default for ValidatorRegistry {
+crates/amun-state-machine/src/absolute_invariants.rs:29:impl AbsoluteInvariant {
+crates/amun-state-machine/src/axioms.rs:30:impl ConstitutionalAxiom {
+crates/amun-state-machine/src/axioms.rs:65:impl ConstitutionalAxiomEngine {
+crates/amun-state-machine/src/causality.rs:16:impl Default for VectorClock {
+crates/amun-state-machine/src/causality.rs:22:impl VectorClock {
+crates/amun-state-machine/src/causality.rs:63:impl CausalityMetadata {
+crates/amun-state-machine/src/delta_algebra.rs:39:impl ConstitutionalDelta {
+crates/amun-state-machine/src/delta_laws.rs:17:impl DeltaLaw {
+crates/amun-state-machine/src/engine.rs:12:impl ConstitutionalPolicyEngine {
+crates/amun-state-machine/src/engine.rs:28:impl Default for ConstitutionalExecutionEngine {
+crates/amun-state-machine/src/engine.rs:34:impl ConstitutionalExecutionEngine {
+crates/amun-state-machine/src/engine.rs:120:impl ConstitutionalProofEngine {
+crates/amun-state-machine/src/fork_merge.rs:28:impl ForkDeclaration {
+crates/amun-state-machine/src/fork_merge.rs:65:impl ForkType {
+crates/amun-state-machine/src/fork_merge.rs:100:impl MergeDeclaration {
+crates/amun-state-machine/src/fork_merge.rs:144:impl MergeType {
+crates/amun-state-machine/src/formal_entropy.rs:37:impl EntropyConservationLaws {
+crates/amun-state-machine/src/formal_entropy.rs:64:impl Default for EntropyCollapseThreshold {
+crates/amun-state-machine/src/historical_invariants.rs:23:impl HistoricalInvariant {
+crates/amun-state-machine/src/historical_invariants.rs:85:impl Default for HistoricalInvariantEngine {
+crates/amun-state-machine/src/historical_invariants.rs:91:impl HistoricalInvariantEngine {
+crates/amun-state-machine/src/impossibility.rs:19:impl ImpossibilityProof {
+crates/amun-state-machine/src/merge_math.rs:26:impl MergeConflictResolver {
+crates/amun-state-machine/src/meta_amendment.rs:43:impl MetaAmendmentEngine {
+crates/amun-state-machine/src/preconditions.rs:21:impl Precondition {
+crates/amun-state-machine/src/reconciliation.rs:23:impl ReconciliationEngine {
+crates/amun-state-machine/src/replay_log.rs:18:impl ReplayLogEntry {
+crates/amun-state-machine/src/replay_log.rs:54:impl Default for ConstitutionalReplayDAG {
+crates/amun-state-machine/src/replay_log.rs:60:impl ConstitutionalReplayDAG {
+crates/amun-state-machine/src/stability.rs:15:impl Default for ConstitutionalStabilityMetrics {
+crates/amun-state-machine/src/stability.rs:21:impl ConstitutionalStabilityMetrics {
+crates/amun-state-machine/src/states.rs:17:impl StateTag {
+crates/amun-state-machine/src/states.rs:46:impl ConstitutionalState {
+crates/amun-state-machine/src/thermodynamics.rs:11:impl Default for ConstitutionalEntropy {
+crates/amun-state-machine/src/thermodynamics.rs:17:impl ConstitutionalEntropy {
+crates/amun-state-machine/src/thermodynamics.rs:64:impl Default for StabilityEquations {
+crates/amun-state-machine/src/thermodynamics.rs:70:impl StabilityEquations {
+crates/amun-state-machine/src/transitions.rs:20:impl TransitionType {
+crates/amun-state-machine/src/transitions.rs:40:impl TransitionAlgebra {
+crates/amun-state-machine/src/transitions.rs:132:impl Transition {
+crates/amun-state-machine/src/verifier.rs:19:impl TransitionVerifier {
+crates/amun-state-pruning/src/lib.rs:10:impl PrunableRegistry {
+crates/amun-state-root/src/continuity.rs:5:impl ContinuityChain {
+crates/amun-state-root/src/identity.rs:14:impl CanonicalEncode for ChainIdentityRoot {
+crates/amun-state-root/src/identity.rs:25:impl ChainIdentityRoot {
+crates/amun-state-root/src/proofs.rs:9:impl MerkleProof {
+crates/amun-state-root/src/replay.rs:10:impl CanonicalEncode for ReplayEquivalenceProof {
+crates/amun-state-root/src/replay.rs:29:impl CanonicalEncode for ReplayTranscript {
+crates/amun-state-root/src/replay.rs:47:impl CanonicalEncode for ReplayCertificate {
+crates/amun-state-root/src/root.rs:12:impl CanonicalEncode for StateLeaf {
+crates/amun-state-root/src/root.rs:22:impl StateRootEngine {
+crates/amun-state-root/src/snapshot.rs:32:impl ReplayEquivalenceProof {
+crates/amun-state-root/src/snapshot.rs:40:impl CanonicalEncode for ReplayEquivalenceProof {
+crates/amun-state-root/src/snapshot.rs:48:impl CanonicalEncode for ConstitutionalSnapshot {
+crates/amun-state-root/src/snapshot.rs:62:impl ConstitutionalSnapshot {
+crates/amun-state-stream/src/journal.rs:26:impl SyncJournal {
+crates/amun-state-stream/src/messages.rs:51:impl SyncRequest {
+crates/amun-state-stream/src/messages.rs:73:impl SyncResponse {
+crates/amun-state-stream/src/stream.rs:10:impl Default for StreamConfig {
+crates/amun-state-stream/src/stream.rs:29:impl StreamState {
+crates/amun-state-sync/src/snapshot_certificate.rs:21:impl StateSnapshotCertificate {
+crates/amun-state-sync/src/state_chunk.rs:11:impl StateChunk {
+crates/amun-state-sync/src/state_chunk.rs:55:impl ChunkMerkleProof {
+crates/amun-state-sync/src/stateless_verifier.rs:18:impl StatelessVerifier {
+crates/amun-state-sync/src/sync_package.rs:15:impl ConstitutionalSyncPackage {
+crates/amun-state-sync/src/sync_protocol.rs:58:impl SyncProtocol {
+crates/amun-state-transition/src/journal.rs:31:impl StorageJournal {
+crates/amun-state-transition/src/receipt.rs:14:impl ExecutionReceipt {
+crates/amun-state-transition/src/state.rs:21:impl StateOverlay {
+crates/amun-state-transition/src/state.rs:69:impl StateMachine {
+crates/amun-state-transition/src/state.rs:218:impl Default for StateOverlay {
+crates/amun-state-transition/src/write_set.rs:10:impl WriteSet {
+crates/amun-state-transition/src/write_set.rs:35:    pub fn iter(&self) -> impl Iterator<Item = &StateOperation> {
+crates/amun-state-transition/src/write_set.rs:40:impl Default for WriteSet {
+crates/amun-state-types/src/transitions.rs:15:impl<T> State<T, Unverified, Volatile, Proposed> {
+crates/amun-state-types/src/transitions.rs:27:impl<T, S, D, C> State<T, S, D, C> {
+crates/amun-state-types/src/transitions.rs:34:impl<T, D, C> State<T, Unverified, D, C> {
+crates/amun-state-types/src/transitions.rs:51:impl<T, D, C> State<T, Verified, D, C> {
+crates/amun-state-types/src/transitions.rs:62:impl<T, D, C> State<T, Committed, D, C> {
+crates/amun-state-types/src/transitions.rs:74:impl<T, S, C> State<T, S, Volatile, C> {
+crates/amun-state-types/src/transitions.rs:85:impl<T, S, C> State<T, S, Durable, C> {
+crates/amun-state-types/src/transitions.rs:97:impl<T, S, D> State<T, S, D, Proposed> {
+crates/amun-state-types/src/transitions.rs:108:impl<T, S, D> State<T, S, D, Voted> {
+crates/amun-state-types/src/transitions.rs:119:impl<T, S, D> State<T, S, D, QuorumCertified> {
+crates/amun-state-types/src/transitions.rs:131:impl<T, D, C> State<T, Finalized, D, C> {
+crates/amun-stateless-sync/src/lib.rs:86:impl StatelessNode {
+crates/amun-stateless-sync/src/lib.rs:153:impl Default for StatelessNode {
+crates/amun-stateless-sync/src/lib.rs:165:impl TrustlessBootstrap {
+crates/amun-stf/src/nonce.rs:6:impl NonceStore {
+crates/amun-stf/src/receipt.rs:14:impl ExecutionReceipt {
+crates/amun-stf/src/receipt.rs:33:impl CanonicalEncode for ExecutionReceipt {
+crates/amun-stf/src/receipt.rs:35:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-stf/src/receipt.rs:45:impl CanonicalDecode for ExecutionReceipt {
+crates/amun-stf/src/state.rs:28:impl InMemoryState {
+crates/amun-stf/src/state.rs:82:impl StateStore for InMemoryState {
+crates/amun-stf/src/state.rs:118:impl Default for InMemoryState {
+crates/amun-stf/src/stf.rs:12:impl StfState {
+crates/amun-stf/src/transition.rs:10:impl StateTransition {
+crates/amun-stf/src/transition_result.rs:17:    execute_logic: impl FnOnce(&[u8]) -> TransitionExecutionResult,
+crates/amun-storage-engine/src/checkpoint.rs:7:impl AtomicCheckpoint {
+crates/amun-storage-kernel/src/canonical/mod.rs:5:impl Default for Encoder {
+crates/amun-storage-kernel/src/canonical/mod.rs:11:impl Encoder {
+crates/amun-storage-kernel/src/canonical/mod.rs:43:impl<'a> Decoder<'a> {
+crates/amun-storage-kernel/src/crash/harness.rs:12:impl CrashSimulator {
+crates/amun-storage-kernel/src/crash/harness.rs:47:impl Default for CrashSimulator {
+crates/amun-storage-kernel/src/lib.rs:17:impl Key256 {
+crates/amun-storage-kernel/src/lib.rs:27:impl ValueBlob {
+crates/amun-storage-kernel/src/lib.rs:38:impl StateRoot {
+crates/amun-storage-kernel/src/lib.rs:61:impl StateLineage {
+crates/amun-storage-kernel/src/lib.rs:93:impl ConstitutionalContinuity {
+crates/amun-storage-kernel/src/lib.rs:152:impl ValidityLevel {
+crates/amun-storage-kernel/src/lru.rs:10:impl<K: Eq + Hash + Clone, V> LruCache<K, V> {
+crates/amun-storage-kernel/src/persistence/gc/mod.rs:2:impl GC {
+crates/amun-storage-kernel/src/persistence/node_store.rs:14:impl NodeStore {
+crates/amun-storage-kernel/src/persistence/recovery/mod.rs:2:impl RecoveryEngine {
+crates/amun-storage-kernel/src/persistence/value_store.rs:17:impl ValueStore {
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:21:impl WalEntry {
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:15:impl WalIterator {
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:38:impl Iterator for WalIterator {
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:84:impl ReplayVerifier {
+crates/amun-storage-kernel/src/smt/node.rs:5:impl NodeHash {
+crates/amun-storage-kernel/src/smt/node.rs:22:impl Node {
+crates/amun-storage-kernel/src/smt/proof.rs:40:impl MerkleProof {
+crates/amun-storage-kernel/src/smt/proof.rs:311:impl ProofVerifier {
+crates/amun-storage-kernel/src/smt/tree.rs:22:impl SparseMerkleTree {
+crates/amun-storage-kernel/src/smt/validation.rs:5:impl CycleDetector {
+crates/amun-survival-console/src/dashboard.rs:25:impl SurvivalDashboard {
+crates/amun-survival-console/src/metrics.rs:14:impl SurvivabilityMetrics {
+crates/amun-sync/src/protocol.rs:13:    vote_handler: impl Fn(&[u8]),
+crates/amun-temporal-alignment/src/alignment.rs:10:impl TemporalAlignment {
+crates/amun-temporal-alignment/src/drift.rs:9:impl TemporalDrift {
+crates/amun-time/src/clock.rs:8:impl Default for ConsensusClock {
+crates/amun-time/src/clock.rs:14:impl ConsensusClock {
+crates/amun-timeout-aggregator/src/aggregator.rs:14:impl TimeoutAggregator {
+crates/amun-timeout-aggregator/src/timeout_cert.rs:13:impl TimeoutCertificate {
+crates/amun-timeout-law/src/timeout.rs:12:impl TimeoutCertificate {
+crates/amun-timeout-law/src/timeout.rs:54:impl TimeoutLaw {
+crates/amun-tls/src/cert.rs:6:impl CertificateManager {
+crates/amun-tls/src/config.rs:12:impl TlsServerConfig {
+crates/amun-tls/src/pinning.rs:8:impl CertificatePinning {
+crates/amun-tls/src/pinning.rs:32:impl Default for CertificatePinning {
+crates/amun-tls/src/revocation.rs:7:impl RevocationList {
+crates/amun-tls/src/revocation.rs:23:impl Default for RevocationList {
+crates/amun-tokenomics-ledger/src/lib.rs:19:impl EconomicDelta {
+crates/amun-tokenomics-ledger/src/lib.rs:53:impl Default for EconomicLedger {
+crates/amun-tokenomics-ledger/src/lib.rs:59:impl EconomicLedger {
+crates/amun-tokenomics/src/lib.rs:19:impl Default for EpochEconomics {
+crates/amun-tokenomics/src/lib.rs:25:impl EpochEconomics {
+crates/amun-transaction/src/tx.rs:26:impl UnsignedTransaction {
+crates/amun-transactions/src/lib.rs:25:impl Transaction {
+crates/amun-transcript-semantics/src/lib.rs:12:impl EventIdentity {
+crates/amun-transcript-semantics/src/lib.rs:20:impl EventAuthority {
+crates/amun-transcript-semantics/src/lib.rs:32:impl CausalNode { pub fn new(identity: EventIdentity) -> Self { Self { identity, dependencies: Vec::new(), effects: Vec::new() } } }
+crates/amun-transcript-semantics/src/lib.rs:44:impl TranscriptEntry {
+crates/amun-transcript-semantics/src/lib.rs:62:impl ImmutableReplayCertificate {
+crates/amun-transcript-semantics/src/lib.rs:85:impl ReplayWitness {
+crates/amun-transition-proof/src/enhanced_proof.rs:13:impl MerkleProof {
+crates/amun-transition-proof/src/enhanced_proof.rs:41:impl LineageProof {
+crates/amun-transition-proof/src/enhanced_proof.rs:64:impl WitnessBundle {
+crates/amun-transition-proof/src/proof_builder.rs:12:impl ProofBuilder {
+crates/amun-transition-proof/src/transition_proof.rs:28:impl TransitionProof {
+crates/amun-truth-engine/src/engine.rs:51:impl TruthEngine {
+crates/amun-truth-engine/src/log.rs:29:impl MessageEntry {
+crates/amun-truth-engine/src/log.rs:45:impl MessageLog {
+crates/amun-truth-engine/src/log.rs:182:impl Default for MessageLog {
+crates/amun-truth-engine/src/trace.rs:11:impl StateTrace {
+crates/amun-truth-engine/src/trace.rs:51:impl Default for StateTrace {
+crates/amun-unlock-law/src/unlock.rs:12:impl UnlockProof {
+crates/amun-unlock-law/src/unlock.rs:53:impl UnlockLaw {
+crates/amun-unsafe/src/guard.rs:17:impl<T> InitGuard<T> {
+crates/amun-unsafe/src/guard.rs:41:impl<T> Drop for InitGuard<T> {
+crates/amun-unsafe/src/layout.rs:12:unsafe impl StableLayout for u8 {}
+crates/amun-unsafe/src/layout.rs:13:unsafe impl StableLayout for u16 {}
+crates/amun-unsafe/src/layout.rs:14:unsafe impl StableLayout for u32 {}
+crates/amun-unsafe/src/layout.rs:15:unsafe impl StableLayout for u64 {}
+crates/amun-unsafe/src/layout.rs:16:unsafe impl StableLayout for u128 {}
+crates/amun-unsafe/src/layout.rs:17:unsafe impl StableLayout for i8 {}
+crates/amun-unsafe/src/layout.rs:18:unsafe impl StableLayout for i16 {}
+crates/amun-unsafe/src/layout.rs:19:unsafe impl StableLayout for i32 {}
+crates/amun-unsafe/src/layout.rs:20:unsafe impl StableLayout for i64 {}
+crates/amun-unsafe/src/layout.rs:21:unsafe impl StableLayout for [u8; 32] {}
+crates/amun-unsafe/src/layout.rs:22:unsafe impl StableLayout for [u8; 48] {}
+crates/amun-unsafe/src/layout.rs:23:unsafe impl StableLayout for [u8; 96] {}
+crates/amun-unsafe/src/lib.rs:17:unsafe impl StableLayout for u8 {}
+crates/amun-unsafe/src/lib.rs:18:unsafe impl StableLayout for u16 {}
+crates/amun-unsafe/src/lib.rs:19:unsafe impl StableLayout for u32 {}
+crates/amun-unsafe/src/lib.rs:20:unsafe impl StableLayout for u64 {}
+crates/amun-unsafe/src/lib.rs:21:unsafe impl StableLayout for [u8; 32] {}
+crates/amun-unsafe/src/slot.rs:21:impl<T> RawSlot<T> {
+crates/amun-unsafe/src/slot.rs:112:impl<T> Drop for RawSlot<T> {
+crates/amun-unsafe/src/slot.rs:122:impl<T> Default for RawSlot<T> {
+crates/amun-unsafe/src/tests.rs:80:    impl<'a> Drop for DropCount<'a> {
+crates/amun-unsafe/src/tests.rs:119:    impl<'a> Drop for DropCount<'a> {
+crates/amun-unsafe/src/tests.rs:136:    impl<'a> Drop for DropCount<'a> {
+crates/amun-unsigned-messages/src/proposal.rs:19:impl UnsignedProposal {
+crates/amun-unsigned-messages/src/proposal.rs:147:impl SignedProposal {
+crates/amun-unsigned-messages/src/vote.rs:21:impl UnsignedVote {
+crates/amun-unsigned-messages/src/vote.rs:141:impl SignedVote {
+crates/amun-upgrade/src/protocol.rs:13:impl Default for UpgradeProtocol {
+crates/amun-upgrade/src/protocol.rs:19:impl UpgradeProtocol {
+crates/amun-validator-attestation/src/attestation.rs:14:impl ValidatorAttestation {
+crates/amun-validator-attestation/src/validator_set.rs:19:impl ValidatorSet {
+crates/amun-validator-identity/src/registry.rs:11:impl ValidatorKeyRegistry {
+crates/amun-validator-networking/src/network_messages.rs:44:impl NetworkMessage {
+crates/amun-validator-networking/src/peer_discovery.rs:10:impl PeerRegistry {
+crates/amun-validator-networking/src/rejoin_protocol.rs:17:impl RejoinProtocol {
+crates/amun-validator-networking/src/sync_transport.rs:9:impl SyncTransport {
+crates/amun-validator-networking/src/validator_identity.rs:12:impl ValidatorIdentity {
+crates/amun-validator-registry/src/registry.rs:10:impl ValidatorRegistry {
+crates/amun-validator-registry/src/registry.rs:50:impl Default for ValidatorRegistry {
+crates/amun-validator-runtime/src/validator_cluster.rs:15:impl ValidatorCluster {
+crates/amun-validator-runtime/src/validator_node.rs:17:impl ValidatorNode {
+crates/amun-verification-kernel/src/lib.rs:69:impl VerificationCertificate {
+crates/amun-verification-kernel/src/lib.rs:135:impl VerificationRegistry {
+crates/amun-verified-pipeline/src/vote_pipeline.rs:27:impl RawVote {
+crates/amun-verified-pipeline/src/vote_pipeline.rs:39:impl ParsedVote {
+crates/amun-verified-pipeline/src/vote_pipeline.rs:59:impl VerifiedVote {
+crates/amun-verifier-node/src/report.rs:15:impl VerificationReport {
+crates/amun-verifier-node/src/verifier.rs:7:impl VerifierNode {
+crates/amun-view-change/src/new_view.rs:14:impl NewView {
+crates/amun-view-change/src/view_change.rs:16:impl ViewChange {
+crates/amun-vm-kernel/src/pending_buffer.rs:44:impl PendingBuffer {
+crates/amun-vm-kernel/src/vm_kernel.rs:21:impl VMKernel {
+crates/amun-wal/src/authority_index.rs:16:impl AuthorityIndex {
+crates/amun-wal/src/frame.rs:17:impl WalFrame {
+crates/amun-wal/src/lib.rs:135:impl WriteAheadLog {
+crates/amun-wal/src/lib.rs:923:impl Drop for WriteAheadLog {
+crates/amun-wal/src/wal.rs:18:impl WriteAheadLog {
+crates/amun-wallet-api/src/errors.rs:19:impl ApiError {
+crates/amun-wallet-api/src/errors.rs:30:impl IntoResponse for ApiError {
+crates/amun-wallet-api/src/services/account_service.rs:7:impl AccountService {
+crates/amun-wallet-api/src/services/chain_service.rs:8:impl ChainService {
+crates/amun-wallet-api/src/services/network_service.rs:8:impl NetworkService {
+crates/amun-wallet-api/src/services/transaction_service.rs:11:impl TransactionService {
+crates/amun-wallet-management/src/lib.rs:98:        // Types correctly lack Serialize impl — this test compiles.
+crates/amun-wallet-management/src/lib.rs:99:        // Types correctly lack Serialize impl — this test compiles.
+crates/amun-wallet-management/src/types.rs:8:impl std::fmt::Display for WalletAddress {
+crates/amun-wallet-management/src/types.rs:22:impl WalletSeed {
+crates/amun-wallet-management/src/types.rs:38:impl std::fmt::Debug for WalletSeed {
+crates/amun-wallet-management/src/types.rs:56:impl WalletKeypair {
+crates/amun-websocket/src/server.rs:9:impl WebSocketServer {
+crates/amun_consensus_math/src/fixed.rs:13:impl Fixed {
+crates/amun_consensus_math/src/fixed.rs:96:impl FromStr for Fixed {
+crates/amun_consensus_math/src/fixed.rs:159:impl Add for Fixed {
+crates/amun_consensus_math/src/fixed.rs:167:impl Sub for Fixed {
+crates/amun_consensus_math/src/fixed.rs:175:impl Mul for Fixed {
+crates/amun_consensus_math/src/fixed.rs:183:impl Div for Fixed {
+crates/amun_consensus_math/src/fixed.rs:191:impl Neg for Fixed {
+crates/amun_state_machine/src/certification/mod.rs:17:impl ExecutionCertificate {
+crates/amun_state_machine/src/certification/mod.rs:70:impl ReplayCertificate {
+crates/amun_state_machine/src/event.rs:18:impl EventType {
+crates/amun_state_machine/src/event.rs:47:impl Event {
+crates/amun_state_machine/src/log.rs:15:impl LogEntry {
+crates/amun_state_machine/src/log.rs:47:impl CausalLog {
+crates/amun_state_machine/src/log.rs:85:impl Default for CausalLog {
+crates/amun_state_machine/src/ordering.rs:19:impl CanonicalOrderKey {
+crates/amun_state_machine/src/ordering.rs:42:impl CanonicalOrdering {
+crates/amun_state_machine/src/receipt/mod.rs:19:impl ErrorCode {
+crates/amun_state_machine/src/receipt/mod.rs:50:impl ExecutionReceipt {
+crates/amun_state_machine/src/receipt/mod.rs:96:impl ExecutionReceipts {
+crates/amun_state_machine/src/receipt/mod.rs:130:impl Default for ExecutionReceipts {
+crates/amun_state_machine/src/scheduler.rs:15:impl DeterministicScheduler {
+crates/amun_state_machine/src/scheduler.rs:84:impl Default for DeterministicScheduler {
+crates/amun_state_machine/src/snapshot.rs:15:impl StateSnapshot {
+crates/amun_state_machine/src/snapshot.rs:45:impl SnapshotManager {
+crates/amun_state_machine/src/snapshot.rs:85:impl Default for SnapshotManager {
+crates/amun_state_machine/src/state.rs:16:impl Account {
+crates/amun_state_machine/src/state.rs:48:impl ConstitutionalState {
+crates/amun_state_machine/src/state.rs:98:impl Default for ConstitutionalState {
+crates/amun_state_machine/src/transition.rs:18:impl TransitionResult {
+crates/amun_state_machine/src/transition.rs:51:impl TransitionEngine {
+crates/constitutional-linter/src/edge_semantics.rs:21:impl EdgeType {
+crates/constitutional-linter/src/main.rs:71:impl Layer {

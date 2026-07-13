@@ -1,0 +1,61 @@
+crates/amun-constitutional-authority-semantics/src/capability.rs:66:pub type CapabilityWitness = amun_constitutional_signing::SignedArtifact<AuthorityCapability>;
+crates/amun-constitutional-authority-semantics/src/delegation.rs:10:    pub fn new(root: CapabilityWitness) -> Self {
+crates/amun-constitutional-authority-semantics/src/delegation.rs:16:    pub fn append(&mut self, witness: CapabilityWitness) -> Result<(), String> {
+crates/amun-constitutional-authority-semantics/src/delegation.rs:1:use crate::capability::CapabilityWitness;
+crates/amun-constitutional-authority-semantics/src/delegation.rs:6:    pub witnesses: Vec<CapabilityWitness>,
+crates/amun-constitutional-authority-semantics/src/lib.rs:13:pub use capability::{AuthorityCapability, CapabilityWitness};
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:1:use amun_constitutional_authority_semantics::capability::{AuthorityCapability, CapabilityWitness};
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:41:    let w1 = CapabilityWitness::sign(cap1, &root_key);
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:51:    let w2 = CapabilityWitness::sign(cap2, &delegate1);
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:72:    let w1 = CapabilityWitness::sign(cap1, &root_key);
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:82:    let w2 = CapabilityWitness::sign(cap2, &wrong_key);
+crates/amun-lineage-law/src/compatibility.rs:11:    pub migration_witness: Option<MigrationWitness>,
+crates/amun-lineage-law/src/compatibility.rs:23:        migration_witness: Option<MigrationWitness>,
+crates/amun-lineage-law/src/compatibility.rs:2:use super::migration::MigrationWitness;
+crates/amun-lineage-law/src/lib.rs:11:pub use migration::{MigrationCertificate, MigrationRules, MigrationWitness};
+crates/amun-lineage-law/src/migration.rs:22:impl MigrationWitness {
+crates/amun-lineage-law/src/migration.rs:3:/// A MigrationWitness proves that state was successfully migrated
+crates/amun-lineage-law/src/migration.rs:63:    pub witness: MigrationWitness,
+crates/amun-lineage-law/src/migration.rs:68:    pub fn new(lineage_proof_hash: [u8; 32], witness: MigrationWitness) -> Self {
+crates/amun-lineage-law/src/migration.rs:7:pub struct MigrationWitness {
+crates/amun-pccv/src/lib.rs:142:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:194:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:252:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:41:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:97:            witness: WitnessBundle {
+crates/amun-pccv/src/transition_proof_engine.rs:102:    use crate::enhanced_proof::WitnessBundle;
+crates/amun-pccv/src/transition_proof_engine.rs:213:        let witness = WitnessBundle {
+crates/amun-pccv/src/transition_proof_engine.rs:50:        let witness = WitnessBuilder::build(registry, &consumed_resources, &produced_resources);
+crates/amun-pccv/src/transition_proof_engine.rs:7:use crate::witness_builder::WitnessBuilder;
+crates/amun-pccv/src/witness_builder.rs:11:    ) -> WitnessBundle {
+crates/amun-pccv/src/witness_builder.rs:158:        let bundle = WitnessBuilder::build(&reg, &[id], &[]);
+crates/amun-pccv/src/witness_builder.rs:1:use crate::enhanced_proof::{LineageProof, MerkleProof, WitnessBundle};
+crates/amun-pccv/src/witness_builder.rs:210:        let bundle = WitnessBuilder::build(&reg, &[grandchild], &[]);
+crates/amun-pccv/src/witness_builder.rs:232:        let bundle = WitnessBuilder::build(&reg, &[make_id(0)], &[]);
+crates/amun-pccv/src/witness_builder.rs:26:        WitnessBundle {
+crates/amun-pccv/src/witness_builder.rs:4:pub struct WitnessBuilder;
+crates/amun-pccv/src/witness_builder.rs:6:impl WitnessBuilder {
+crates/amun-replay-semantics/src/lib.rs:67:pub struct ReplayWitness { pub start_sequence: u64, pub end_sequence: u64, pub pre_state_root: [u8; 32], pub post_state_root: [u8; 32], pub transcript_fragment_hash: [u8; 32], pub witness_data: Vec<u8> }
+crates/amun-resource-core/src/resource_registry.rs:102:    /// This is the entry point needed by WitnessBuilder for Merkle proof construction.
+crates/amun-smt/src/error.rs:33:    MissingLeafWitness,
+crates/amun-smt/src/lib.rs:33:pub use proof::{AbsenceReason, LeafWitness, MerkleProof, ProofStep};
+crates/amun-smt/src/proof.rs:133:            let vh = self.value_hash.ok_or(SmtError::MissingLeafWitness)?;
+crates/amun-smt/src/proof.rs:134:            let ver = self.leaf_version.ok_or(SmtError::MissingLeafWitness)?;
+crates/amun-smt/src/proof.rs:21:pub struct LeafWitness {
+crates/amun-smt/src/proof.rs:36:        leaf_witness: LeafWitness,
+crates/amun-smt/src/tree.rs:25:use crate::proof::{AbsenceReason, LeafWitness, MerkleProof, ProofStep};
+crates/amun-smt/src/tree.rs:531:                        leaf_witness: LeafWitness {
+crates/amun-transcript-semantics/src/lib.rs:105:    #[test] fn test_witness_hash() { let w = ReplayWitness::MerkleWitness { leaf_hash: [0x01;32], proof_hashes: vec![[0x02;32]], leaf_index: 0 }; assert_ne!(w.witness_hash(), [0;32]); }
+crates/amun-transcript-semantics/src/lib.rs:78:pub enum ReplayWitness {
+crates/amun-transcript-semantics/src/lib.rs:80:    ExecutionWitness { block_hash: [u8; 32], trace_hash: [u8; 32], step_count: u64 },
+crates/amun-transcript-semantics/src/lib.rs:83:    CompositeWitness { witnesses: Vec<ReplayWitness>, composite_hash: [u8; 32] },
+crates/amun-transcript-semantics/src/lib.rs:85:impl ReplayWitness {
+crates/amun-transcript-semantics/src/lib.rs:88:        match self { ReplayWitness::MerkleWitness { leaf_hash, proof_hashes, leaf_index } => { h.update(b"MERKLE"); h.update(leaf_hash); h.update(leaf_index.to_le_bytes()); for ph in proof_hashes { h.update(ph); } } ReplayWitness::ExecutionWitness { block_hash, trace_hash, step_count } => { h.update(b"EXECUTION"); h.update(block_hash); h.update(trace_hash); h.update(step_count.to_le_bytes()); } ReplayWitness::TranscriptWitness { start_sequence, end_sequence, fragment_hash } => { h.update(b"TRANSCRIPT"); h.update(start_sequence.to_le_bytes()); h.update(end_sequence.to_le_bytes()); h.update(fragment_hash); } ReplayWitness::ReceiptWitness { receipt_hashes, chain_root } => { h.update(b"RECEIPT"); for rh in receipt_hashes { h.update(rh); } h.update(chain_root); } ReplayWitness::CompositeWitness { composite_hash, .. } => { h.update(b"COMPOSITE"); h.update(composite_hash); } }
+crates/amun-transition-proof/src/enhanced_proof.rs:58:pub struct WitnessBundle {
+crates/amun-transition-proof/src/enhanced_proof.rs:64:impl WitnessBundle {
+crates/amun-transition-proof/src/enhanced_proof.rs:90:    pub witness: WitnessBundle,
+crates/amun-transition-proof/src/proof_builder.rs:7:use crate::enhanced_proof::{EnhancedTransitionProof, LineageProof, MerkleProof, WitnessBundle};
+crates/amun-transition-proof/src/proof_builder.rs:93:        let witness = WitnessBundle {
+docs/audit/SECURITY_INVARIANTS.md:12:| R6 | Version monotonicity | ResourceRegistry::consume_and_derive | WitnessBuilder |
+docs/audit/SECURITY_INVARIANTS.md:9:| R3 | Child requires consumed parent | ResourceRegistry::consume_and_derive | WitnessBuilder |
+docs/protocol/lineage_law_v1.md:17:State migration from parent to child protocol must produce a MigrationWitness

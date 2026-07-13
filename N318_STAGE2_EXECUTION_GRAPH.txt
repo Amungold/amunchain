@@ -1,0 +1,466 @@
+============================================================
+N318 — STAGE 2 : EXECUTION GRAPH
+============================================================
+
+========== MAIN ==========
+23:    let ctx = bootstrap::initialize(&config_path).unwrap_or_else(|e| {
+29:            cluster_builder::ClusterBuilder::build(&ctx).expect("LiveValidator configuration");
+31:        let validator = amun_live_cluster::validator::LiveValidator::new(validator_cfg);
+33:        validator.start().expect("Failed to start LiveValidator");
+39:        runtime::run(
+
+========== BOOTSTRAP ==========
+5:use amun_networking::node::NetworkNode;
+6:use amun_networking::tcp_transport::TcpTransport;
+7:use amun_networking::validator_certificate::ValidatorCertificate;
+11:use crate::genesis::Genesis;
+15:    pub transport: TcpTransport,
+16:    pub node: NetworkNode,
+18:    pub genesis: Genesis,
+19:    pub genesis_hash: [u8; 32],
+25:pub fn initialize(config_path: &str) -> Result<BootstrapContext, NodeError> {
+26:    let config = Config::load(config_path)?;
+31:    let key_path = config_dir.join(&config.identity.key_file);
+32:    let keypair = crate::identity::load_or_create_keypair(key_path.to_str().unwrap())?;
+34:    tracing::info!(peer_id = %hex::encode(peer_id.0), "Identity loaded");
+37:    let genesis_path = config_dir.join(&config.genesis.file);
+38:    let genesis_str = fs::read_to_string(&genesis_path)
+39:        .map_err(|e| io_err(&genesis_path, e))?;
+40:    let genesis: Genesis = serde_json::from_str(&genesis_str)
+42:            path: genesis_path.clone(),
+46:    if !amun_orchestrator_genesis::validator::validate(&genesis) {
+50:    let genesis_hash = {
+51:        let mut gen = genesis.clone();
+52:        amun_orchestrator_genesis::generator::recompute_hash(&mut gen);
+53:        hex::decode(&gen.genesis_hash)
+54:            .map_err(|e| NodeError::Genesis(format!("Invalid genesis hash: {}", e)))?
+60:        path = %genesis_path.display(),
+61:        hash = %hex::encode(genesis_hash),
+62:        "Genesis loaded and validated"
+67:    let cert = crate::certificate_loader::load_validator_certificate(
+69:        &genesis,
+72:    tracing::info!("Validator certificate verified");
+74:    // Extract SigningKey from the loaded keypair
+83:        hasher.update(genesis.chain_id.as_bytes());
+87:    // Constitution from genesis
+90:        hash: genesis_hash,
+107:    // NodeNetwork with REAL identity
+113:        genesis_hash,
+118:    let mut node = NetworkNode::new(peer_id.0);
+122:        transport: network.transport,
+125:        genesis,
+126:        genesis_hash,
+
+========== RUNTIME ==========
+8:pub struct NodeRuntime {
+13:impl NodeRuntime {
+18:    pub fn tick(&mut self) {
+19:        self.transport.tick(10);
+22:        while let Some((_peer, data)) = self.transport.recv_from() {
+28:    pub fn broadcast(&self, data: Vec<u8>) {
+30:        self.transport.broadcast(arc_data);
+36:impl NodeRuntime {
+38:        self.transport.recv_raw()
+42:        self.transport.send_raw(data);
+46:pub fn run(
+54:    let mut runtime = NodeRuntime::new(transport);
+56:        runtime.tick();
+
+========== LIVE VALIDATOR ==========
+8:use amun_chain_store::store::ChainStore;
+9:use amun_consensus_network::engine::ConsensusEngine;
+10:use amun_consensus_network::messages::ConsensusVote;
+20:use amun_mempool::Mempool;
+46:    pub engine: Arc<Mutex<ConsensusEngine>>,
+47:    pub store: Arc<Mutex<ChainStore>>,
+52:    pub mempool: Arc<Mutex<Mempool>>,
+72:    pub fn new(config: ValidatorConfig) -> Self {
+73:        let store = ChainStore::open(&config.data_dir)
+74:            .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").unwrap());
+80:        let mut engine = ConsensusEngine::new(config.validator_id, config.total_validators());
+154:            mempool: Arc::new(Mutex::new(Mempool::new())),
+179:    pub fn start(&self) -> Result<(), String> {
+202:        let h1 = thread::spawn(move || {
+265:                                            postcard::from_bytes::<ConsensusVote>(&buf)
+291:        // Consensus thread — only work on current_height + 1
+305:        let h2 = thread::spawn(move || {
+510:                let my_vote = ConsensusVote {
+595:                        // Signature and double-spend: verified by ExecutionEngine
+612:                        // N126.3: Replay determinism from ExecutionEngine
+1281:        assert!(ha >= 1 && hb >= 1, "Store heights: A={}, B={}", ha, hb);
+
+========== RPC SERVER ==========
+3:use amun_rpc::{build_app, AppState};
+23:    let validator = LiveValidator::new(config);
+24:    validator.start().unwrap();
+26:    let state = AppState {
+41:    eprintln!("RPC server on port {}", rpc_port);
+42:    let app = build_app(state);
+46:    axum::serve(listener, app).await.unwrap();
+
+========== NETWORK ==========
+3:use crate::connection_state::{ConnectionInfo, ConnectionState};
+6:use crate::handshake::{
+34:    connection_info: ConnectionInfo,
+36:    handshake_completed: bool,
+37:    handshake_started: Instant,
+55:    pub disconnects: AtomicU64,
+56:    pub reconnects: AtomicU64,
+60:    pub connection_attempts: AtomicU64,
+62:    pub connections_active: AtomicU64,
+63:    pub handshake_success: AtomicU64,
+64:    pub handshake_failed: AtomicU64,
+72:    listen_addr: SocketAddr,
+73:    listener: Option<TcpListener>,
+76:    pending_connections: Arc<Mutex<VecDeque<PendingPeer>>>,
+90:        listen_addr: SocketAddr,
+98:            listen_addr,
+99:            listener: None,
+102:            pending_connections: Arc::new(Mutex::new(VecDeque::new())),
+122:    fn perform_outgoing_handshake(
+160:        if !challenge.accepted {
+187:        if !confirmation.accepted {
+193:            .handshake_success
+198:    fn perform_incoming_handshake(
+249:        let confirmation = AuthConfirmation::accept();
+261:            .handshake_success
+273:    fn schedule_reconnect(&self, addr: SocketAddr) {
+274:        let mut pending = self.pending_connections.lock().unwrap();
+285:    fn create_peer_connection(stream: TcpStream, is_persistent: bool) -> PeerConnection {
+294:            connection_info: ConnectionInfo::new(),
+296:            handshake_completed: false,
+297:            handshake_started: Instant::now(),
+303:    fn accept_new_connections(&self) {
+304:        let listener = match &self.listener {
+309:        let mut new_connections = Vec::new();
+311:            match listener.accept() {
+315:                    match self.perform_incoming_handshake(&mut stream) {
+317:                            new_connections.push((
+326:                            eprintln!("Incoming handshake failed for {}: {:?}", addr, e);
+328:                                .handshake_failed
+338:        if !new_connections.is_empty() {
+340:            for (addr, stream, peer_node_id, capabilities, confirmation) in new_connections {
+341:                let mut conn = Self::create_peer_connection(stream, false);
+342:                conn.handshake_completed = true;
+345:                conn.connection_info.transition(ConnectionState::Connected);
+350:                    .connections_active
+356:    fn process_pending_connections(&self) {
+358:            let mut pending = self.pending_connections.lock().unwrap();
+364:        let mut new_connections = Vec::new();
+368:                .connection_attempts
+387:            match TcpStream::connect_timeout(&peer.addr, std::time::Duration::from_millis(100)) {
+391:                    match self.perform_outgoing_handshake(&mut stream) {
+393:                            self.metrics.reconnects.fetch_add(1, Ordering::Relaxed);
+394:                            new_connections.push((peer.addr, stream, confirmation, capabilities));
+397:                            eprintln!("Outgoing handshake failed for {}: {:?}", peer.addr, e);
+418:        if !new_connections.is_empty() {
+420:            for (addr, stream, confirmation, capabilities) in new_connections {
+421:                let mut conn = Self::create_peer_connection(stream, true);
+422:                conn.handshake_completed = true;
+424:                conn.connection_info.transition(ConnectionState::Connected);
+429:                    .connections_active
+435:            let mut pending = self.pending_connections.lock().unwrap();
+443:        let mut to_reconnect = Vec::new();
+446:            if !conn.handshake_completed {
+447:                if conn.handshake_started.elapsed().as_secs() > HANDSHAKE_TIMEOUT_SECS {
+450:                        to_reconnect.push(*addr);
+466:                            to_reconnect.push(*addr);
+483:                        conn.connection_info
+487:                            to_reconnect.push(*addr);
+499:                self.metrics.disconnects.fetch_add(1, Ordering::Relaxed);
+501:                    .connections_active
+509:        for addr in to_reconnect {
+510:            self.schedule_reconnect(addr);
+518:        let mut to_reconnect = Vec::new();
+521:            if !conn.handshake_completed {
+537:                    conn.connection_info
+541:                        to_reconnect.push(*addr);
+549:                self.metrics.disconnects.fetch_add(1, Ordering::Relaxed);
+551:                    .connections_active
+559:        for addr in to_reconnect {
+560:            self.schedule_reconnect(addr);
+568:        let mut to_reconnect = Vec::new();
+571:            if conn.handshake_completed
+577:                    to_reconnect.push(*addr);
+584:                self.metrics.disconnects.fetch_add(1, Ordering::Relaxed);
+586:                    .connections_active
+594:        for addr in to_reconnect {
+595:            self.schedule_reconnect(addr);
+602:        let listener =
+603:            TcpListener::bind(self.listen_addr).map_err(|e| format!("Bind failed: {}", e))?;
+604:        listener
+607:        self.listener = Some(listener);
+611:    fn connect_to(&self, addr: SocketAddr) {
+612:        self.connect_persistent(addr);
+615:    fn connect_persistent(&self, addr: SocketAddr) {
+621:        self.schedule_reconnect(addr);
+634:            if !conn.handshake_completed {
+668:            Err(format!("Peer {} not connected", peer))
+672:    fn broadcast(&self, data: Arc<[u8]>) {
+674:        let mut broadcast_count = 0u64;
+677:            if !conn.handshake_completed {
+698:            broadcast_count += 1;
+701:        if broadcast_count > 0 {
+707:                .fetch_add(broadcast_count, Ordering::Relaxed);
+710:                .fetch_add(data.len() as u64 * broadcast_count, Ordering::Relaxed);
+719:    fn tick(&mut self, _max_iterations: u32) {
+720:        self.accept_new_connections();
+721:        self.process_pending_connections();
+739:        self.broadcast(std::sync::Arc::from(data.into_boxed_slice()));
+
+========== CONSENSUS ==========
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:7://   3. Same execution → same commitment
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:8://   4. Different execution → different commitment
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:9://   5. Tampered commitment rejected
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:11://   7. GATEKEEPER: vote fields match commitment fields
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:46:    commitment: ExecutionCommitment,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:67:// Helper: create a commitment with computed execution_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:68:fn make_commitment(
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:85:// Helper: create a vote with commitment
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:99:        commitment: make_commitment(voter_id, height, block_hash, state_root),
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:107:fn n109_8_commitment_roundtrip() {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:108:    let commit = make_commitment([1u8; 32], 42, [2u8; 32], [3u8; 32]);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:110:    let encoded = postcard::to_stdvec(&commit).expect("N109.8: serialize");
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:113:    assert_eq!(decoded.validator_id, commit.validator_id);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:114:    assert_eq!(decoded.height, commit.height);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:115:    assert_eq!(decoded.block_hash, commit.block_hash);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:116:    assert_eq!(decoded.state_root, commit.state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:117:    assert_eq!(decoded.execution_root, commit.execution_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:121:// TEST 2: Same execution → same commitment (determinism)
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:124:fn n109_8_same_execution_same_commitment() {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:125:    let c1 = make_commitment([1u8; 32], 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:126:    let c2 = make_commitment([1u8; 32], 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:137:// TEST 3: Different execution → different commitment
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:140:fn n109_8_different_execution_different_commitment() {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:141:    let c1 = make_commitment([1u8; 32], 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:142:    let c2 = make_commitment([1u8; 32], 5, [0xAA; 32], [0xCC; 32]); // Different state_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:152:// TEST 4: Tampered commitment detected
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:155:fn n109_8_tampered_commitment_rejected() {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:156:    let mut commit = make_commitment([9u8; 32], 3, [0x11; 32], [0x22; 32]);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:159:    commit.state_root = [0xFF; 32];
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:163:        &commit.validator_id,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:164:        commit.height,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:165:        &commit.block_hash,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:166:        &commit.state_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:169:        recomputed, commit.execution_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:180:    let commit = make_commitment(pk, 7, [0xDE; 32], [0xAD; 32]);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:185:        compute_execution_root(&pk, commit.height, &commit.block_hash, &commit.state_root);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:187:        recomputed, commit.execution_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:191:    // The commitment carries the validator's identity
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:193:        commit.validator_id, pk,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:194:        "N109.8 FAIL: commitment must identify the validator"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:199:// TEST 6: Different validator → different commitment even with same data
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:202:fn n109_8_different_validator_different_commitment() {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:206:    let c1 = make_commitment([1u8; 32], 1, bh, sr);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:207:    let c2 = make_commitment([2u8; 32], 1, bh, sr);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:216:// TEST 7: GATEKEEPER — vote fields match commitment fields
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:222:// The vote and its commitment must refer to the exact same execution.
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:224:fn n109_8_vote_commitment_matches_vote_target() {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:232:    // GATEKEEPER CHECK 1: vote.height == commitment.height
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:234:        vote.height, vote.commitment.height,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:235:        "N109.8 GATEKEEPER FAIL: vote.height ({}) != commitment.height ({})",
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:236:        vote.height, vote.commitment.height
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:239:    // GATEKEEPER CHECK 2: vote.block_hash == commitment.block_hash
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:241:        vote.block_hash, vote.commitment.block_hash,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:242:        "N109.8 GATEKEEPER FAIL: vote.block_hash != commitment.block_hash"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:245:    // GATEKEEPER CHECK 3: vote.state_root == commitment.state_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:247:        vote.state_root, vote.commitment.state_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:248:        "N109.8 GATEKEEPER FAIL: vote.state_root != commitment.state_root"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:251:    // GATEKEEPER CHECK 4: vote.voter_id == commitment.validator_id
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:253:        vote.voter_id, vote.commitment.validator_id,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:254:        "N109.8 GATEKEEPER FAIL: vote.voter_id != commitment.validator_id"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:260:        vote.commitment.execution_root, recomputed,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:266:// TEST 8: Vote with mismatched commitment is detectable
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:269:fn n109_8_mismatched_vote_commitment_detected() {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:275:    // Replace commitment with one for block B (attack attempt)
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:276:    vote.commitment = make_commitment(voter, 3, [0xFF; 32], [0xEE; 32]);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:279:    let mismatch = vote.block_hash != vote.commitment.block_hash
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:280:        || vote.state_root != vote.commitment.state_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:281:        || vote.height != vote.commitment.height
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:282:        || vote.voter_id != vote.commitment.validator_id;
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:286:        "N109.8 FAIL: vote with mismatched commitment must be detectable"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:290:        vote.block_hash, vote.commitment.block_hash,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:296:// TEST 9: Vote roundtrip with commitment
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:299:fn n109_8_vote_with_commitment_roundtrip() {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:310:        decoded.commitment.execution_root,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:311:        vote.commitment.execution_root
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:314:        decoded.commitment.validator_id,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:315:        vote.commitment.validator_id
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:4:// Validator A (proposer): state_root = X
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:16:    proposer_id: [u8; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:63:            "N109.7 STATE_ROOT_MISMATCH: height={} proposed={} computed={}",
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:98:        proposer_id: [0xAA; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:124:    let proposer_root = simulate_executor(&block_bytes, 42).unwrap(); // Seed 42
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:127:        proposer_id: [0xAA; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:132:        state_root: proposer_root,
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:159:        proposer_id: [1u8; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:238:        proposer_id: [0xFF; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:268:        proposer_id: [0xBB; 32],
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:301:        proposer_id: [1u8; 32],
+crates/amun-consensus-network/tests/n109_block_propagation.rs:20:    proposer_id: [u8; 32],
+crates/amun-consensus-network/tests/n109_block_propagation.rs:63:        proposer_id: [1u8; 32],
+crates/amun-consensus-network/tests/n109_block_propagation.rs:114:    assert_eq!(decoded.proposer_id, proposal.proposer_id, "proposer_id");
+crates/amun-consensus-network/tests/n109_block_propagation.rs:244:    assert_eq!(stored.proposer_id, proposal.proposer_id, "proposer_id");
+crates/amun-consensus-network/src/messages.rs:3:/// A validator's vote for a proposed block.
+crates/amun-consensus-network/src/messages.rs:17:    /// N109.8: Cryptographic execution commitment (optional for backward compatibility).
+crates/amun-consensus-network/src/messages.rs:20:    pub commitment: Option<ExecutionCommitment>,
+crates/amun-consensus-network/src/messages.rs:183:            commitment: None,
+crates/amun-consensus-network/src/messages.rs:410:/// N104.1: A block proposal sent by the designated proposer to all validators.
+crates/amun-consensus-network/src/messages.rs:417:    pub proposer_id: [u8; 32],
+crates/amun-consensus-network/src/messages.rs:431:            proposer_id: [0xBB; 32],
+crates/amun-consensus-network/src/messages.rs:445:            proposer_id: [0xDD; 32],
+crates/amun-consensus-network/src/messages.rs:455:        hasher.update(&proposal.proposer_id);
+crates/amun-consensus-network/src/messages.rs:467:        hasher2.update(&proposal.proposer_id);
+crates/amun-consensus-network/src/messages.rs:497:    pub proposer_id: [u8; 32],
+crates/amun-consensus-network/src/messages.rs:534:use crate::execution_commitment::ExecutionCommitment;
+crates/amun-consensus-network/src/messages.rs:536:/// N109.8: A vote that carries a full execution commitment.
+crates/amun-consensus-network/src/messages.rs:561:    /// N109.8: Cryptographic execution commitment
+crates/amun-consensus-network/src/messages.rs:564:    pub commitment: ExecutionCommitment,
+crates/amun-consensus-network/src/round.rs:6:    pub proposer_id: [u8; 32],
+crates/amun-consensus-network/src/round.rs:7:    pub proposed_block_hash: Option<[u8; 32]>,
+crates/amun-consensus-network/src/round.rs:8:    pub proposed_state_root: Option<[u8; 32]>,
+crates/amun-consensus-network/src/round.rs:17:    pub fn new(height: u64, proposer_id: [u8; 32]) -> Self {
+crates/amun-consensus-network/src/round.rs:20:            proposer_id,
+crates/amun-consensus-network/src/round.rs:21:            proposed_block_hash: None,
+crates/amun-consensus-network/src/round.rs:22:            proposed_state_root: None,
+crates/amun-consensus-network/src/round.rs:32:    pub fn propose(&mut self, block_hash: [u8; 32], state_root: [u8; 32]) {
+crates/amun-consensus-network/src/round.rs:34:        if self.proposed_block_hash.is_some() {
+crates/amun-consensus-network/src/round.rs:38:        self.proposed_block_hash = Some(block_hash);
+crates/amun-consensus-network/src/round.rs:39:        self.proposed_state_root = Some(state_root);
+crates/amun-consensus-network/src/round.rs:45:        if self.proposed_block_hash.is_none() {
+crates/amun-consensus-network/src/round.rs:46:            self.proposed_block_hash = Some(vote.block_hash);
+crates/amun-consensus-network/src/round.rs:47:            self.proposed_state_root = Some(vote.state_root);
+crates/amun-consensus-network/src/round.rs:62:        // Check for equivocation FIRST (before checking proposed_block_hash)
+crates/amun-consensus-network/src/round.rs:69:        if let Some(hash) = self.proposed_block_hash {
+crates/amun-consensus-network/src/round.rs:145:            block_hash: self.proposed_block_hash?,
+crates/amun-consensus-network/src/round.rs:146:            state_root: self.proposed_state_root?,
+crates/amun-consensus-network/src/validator_registry.rs:1:use crate::engine::ConsensusEngine;
+crates/amun-consensus-network/src/validator_registry.rs:3:impl ConsensusEngine {
+crates/amun-consensus-network/src/slashing_state.rs:5:// This root is committed alongside state_root and history_root.
+crates/amun-consensus-network/src/slashing_state.rs:11:/// Wraps the deterministic ledger and exposes a root for consensus commitment.
+crates/amun-consensus-network/src/slashing_merkle.rs:4:// enabling the root to be committed in block headers for consensus
+crates/amun-consensus-network/src/re_executor.rs:19:            "N109.7 STATE_ROOT_MISMATCH: height={} proposed={} computed={}",
+crates/amun-consensus-network/src/metrics.rs:3:// produces a different state root than the proposer claimed.
+crates/amun-consensus-network/src/metrics.rs:8:    ///   - The proposer executed incorrectly (bug or byzantine)
+crates/amun-consensus-network/src/execution_commitment.rs:13://   - Replay of commitments across heights
+crates/amun-consensus-network/src/execution_commitment.rs:14://   - Reuse of commitments by different validators
+crates/amun-consensus-network/src/execution_commitment.rs:15://   - Splitting: voting for block A while committing to block B
+crates/amun-consensus-network/src/execution_commitment.rs:31:    /// The validator making this commitment
+crates/amun-consensus-network/src/execution_commitment.rs:35:    /// Block height this commitment refers to
+crates/amun-consensus-network/src/execution_commitment.rs:47:    /// Binds all four fields into a single cryptographic commitment.
+crates/amun-consensus-network/src/execution_commitment.rs:76:    /// The caller must sign the commitment separately using their Ed25519 key.
+crates/amun-consensus-network/src/execution_commitment.rs:95:    /// N109.8: Sign the commitment with an Ed25519 signing key.
+crates/amun-consensus-network/src/execution_commitment.rs:102:    /// N109.8: Verify the commitment's signature.
+crates/amun-consensus-network/src/execution_commitment.rs:181:        let mut commit = ExecutionCommitment::new(pk, 5, bh, sr);
+crates/amun-consensus-network/src/execution_commitment.rs:182:        commit.sign(&sk);
+crates/amun-consensus-network/src/execution_commitment.rs:184:        assert!(commit.verify().is_ok(), "signature must verify");
+crates/amun-consensus-network/src/execution_commitment.rs:193:        let mut commit = ExecutionCommitment::new(pk, 3, bh, sr);
+crates/amun-consensus-network/src/execution_commitment.rs:194:        commit.sign(&sk);
+crates/amun-consensus-network/src/execution_commitment.rs:197:        commit.state_root = [0xFF; 32];
+crates/amun-consensus-network/src/execution_commitment.rs:200:            commit.verify().is_err(),
+crates/amun-consensus-network/src/execution_commitment.rs:206:    fn n109_8_replayed_commitment_rejected() {
+crates/amun-consensus-network/src/execution_commitment.rs:211:        // Create commitment at height 1
+crates/amun-consensus-network/src/execution_commitment.rs:212:        let mut commit_h1 = ExecutionCommitment::new(pk, 1, bh, sr);
+crates/amun-consensus-network/src/execution_commitment.rs:213:        commit_h1.sign(&sk);
+crates/amun-consensus-network/src/execution_commitment.rs:215:        // Try to replay the SAME commitment at height 2 (should fail)
+crates/amun-consensus-network/src/execution_commitment.rs:216:        let commit_h2 = ExecutionCommitment::new(pk, 2, bh, sr);
+crates/amun-consensus-network/src/execution_commitment.rs:219:            commit_h1.execution_root, commit_h2.execution_root,
+crates/amun-consensus-network/src/lib.rs:25:pub mod execution_commitment;
+crates/amun-consensus-network/src/lib.rs:52:pub use execution_commitment::ExecutionCommitment;
+crates/amun-consensus-network/src/misbehavior.rs:140:            commitment: None,
+crates/amun-consensus-network/src/proposal.rs:1:use crate::engine::ConsensusEngine;
+crates/amun-consensus-network/src/proposal.rs:4:impl ConsensusEngine {
+crates/amun-consensus-network/src/proposal.rs:5:    pub fn start_round(&mut self, height: u64, proposer_id: [u8; 32]) {
+crates/amun-consensus-network/src/proposal.rs:8:            .or_insert_with(|| ConsensusRound::new(height, proposer_id));
+crates/amun-consensus-network/src/evidence_store.rs:97:        proposed: &[u8; 32],
+crates/amun-consensus-network/src/evidence_store.rs:101:        payload.extend_from_slice(proposed);
+crates/amun-consensus-network/src/evidence_store.rs:106:    pub fn invalid_execution_commitment(v: [u8; 32], h: u64, t: u64, reason: &str) -> Self {
+crates/amun-consensus-network/src/engine_metrics.rs:2:pub struct EngineMetrics {
+crates/amun-consensus-network/src/engine_metrics.rs:8:impl EngineMetrics {
+crates/amun-consensus-network/src/engine.rs:14:pub struct ConsensusEngine {
+crates/amun-consensus-network/src/engine.rs:32:impl ConsensusEngine {
+crates/amun-consensus-network/src/engine.rs:226:        if let Err(e) = ConsensusEngine::verify_qc_signatures(&validator_keys, qc) {
+crates/amun-consensus-network/src/engine.rs:241:    /// Get the proposer for a given height (round-robin), skipping suspended validators.
+crates/amun-consensus-network/src/engine.rs:242:    pub fn proposer_for(&self, height: u64) -> usize {
+crates/amun-consensus-network/src/engine.rs:312:    fn n68_round_propose_vote_qc_finalize() {
+crates/amun-consensus-network/src/engine.rs:313:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:315:        let proposer = [1u8; 32];
+crates/amun-consensus-network/src/engine.rs:316:        engine.start_round(1, proposer);
+crates/amun-consensus-network/src/engine.rs:317:        engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/engine.rs:329:                commitment: None,
+crates/amun-consensus-network/src/engine.rs:344:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:346:        engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/engine.rs:359:                    commitment: None,
+crates/amun-consensus-network/src/engine.rs:373:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:375:        engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/engine.rs:385:            commitment: None,
+crates/amun-consensus-network/src/engine.rs:396:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:407:            commitment: None,
+crates/amun-consensus-network/src/engine.rs:414:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:417:            let proposer_idx = engine.proposer_for(height);
+crates/amun-consensus-network/src/engine.rs:418:            let proposer = [(proposer_idx + 1) as u8; 32];
+crates/amun-consensus-network/src/engine.rs:419:            engine.start_round(height, proposer);
+crates/amun-consensus-network/src/engine.rs:423:                .propose([height as u8; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/engine.rs:435:                        commitment: None,
+crates/amun-consensus-network/src/engine.rs:455:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:486:            commitment: None,
+crates/amun-consensus-network/src/engine.rs:499:            commitment: None,
+crates/amun-consensus-network/src/engine.rs:521:            commitment: None,
+crates/amun-consensus-network/src/engine.rs:526:        assert_eq!(round.proposed_block_hash, Some([0xAA; 32]));
+crates/amun-consensus-network/src/engine.rs:528:        assert_eq!(round.proposed_state_root, Some([0xBB; 32]));
+crates/amun-consensus-network/src/staking_adapter.rs:374:        // Validator 1: commit offenses
+crates/amun-consensus-network/src/network_consensus.rs:1:use crate::engine::ConsensusEngine;
+crates/amun-consensus-network/src/network_consensus.rs:7:/// Networked consensus: validators communicate via TCP to propose, vote, and finalize.
+crates/amun-consensus-network/src/network_consensus.rs:9:    pub engine: Arc<Mutex<ConsensusEngine>>,
+crates/amun-consensus-network/src/network_consensus.rs:18:            engine: Arc::new(Mutex::new(ConsensusEngine::new(
+crates/amun-consensus-network/src/network_consensus.rs:33:    /// 1. If we're the proposer, propose a block
+crates/amun-consensus-network/src/network_consensus.rs:36:    pub fn run_round(
+crates/amun-consensus-network/src/network_consensus.rs:43:        let proposer_idx = {
+crates/amun-consensus-network/src/network_consensus.rs:45:            engine.proposer_for(height)
+crates/amun-consensus-network/src/network_consensus.rs:48:        let is_proposer = self.validator_id[0] as usize == proposer_idx + 1;
+crates/amun-consensus-network/src/network_consensus.rs:50:        // Phase 1: Propose if we're the proposer
+crates/amun-consensus-network/src/network_consensus.rs:51:        if is_proposer {
+crates/amun-consensus-network/src/network_consensus.rs:57:                .propose(block_hash, state_root);
+crates/amun-consensus-network/src/network_consensus.rs:70:            commitment: None,
+crates/amun-consensus-network/src/network_consensus.rs:76:                engine.start_round(height, [(proposer_idx + 1) as u8; 32]);
+crates/amun-consensus-network/src/network_consensus.rs:133:        let mut engine = ConsensusEngine::new([1u8; 32], 1);
+crates/amun-consensus-network/src/network_consensus.rs:135:        engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/network_consensus.rs:146:                commitment: None,
+crates/amun-consensus-network/src/vote_binding.rs:4:use crate::execution_commitment::ExecutionCommitment;
+crates/amun-consensus-network/src/vote_binding.rs:10:/// If the vote has NO commitment (legacy vote), the check passes
+crates/amun-consensus-network/src/vote_binding.rs:13:/// If the vote HAS a commitment, all four binding checks are enforced:
+crates/amun-consensus-network/src/vote_binding.rs:14:///   1. vote.height     == commitment.height
+crates/amun-consensus-network/src/vote_binding.rs:15:///   2. vote.block_hash == commitment.block_hash
+crates/amun-consensus-network/src/vote_binding.rs:17:///   4. commitment signature is valid
+crates/amun-consensus-network/src/vote_binding.rs:19:    // N109.9: If no commitment present, allow (backward compat)
+crates/amun-consensus-network/src/vote_binding.rs:20:    let c = match &vote.commitment {
+crates/amun-consensus-network/src/vote_binding.rs:21:        Some(commitment) => commitment,
+crates/amun-consensus-network/src/vote_binding.rs:23:            // Legacy vote — no commitment to verify
+crates/amun-consensus-network/src/vote_binding.rs:32:            "N109.9 HEIGHT_MISMATCH: vote.height={} commitment.height={}",
+crates/amun-consensus-network/src/vote_binding.rs:40:            "N109.9 BLOCK_MISMATCH: vote.block_hash={:?} commitment.block_hash={:?}",
+crates/amun-consensus-network/src/vote_binding.rs:71:    use crate::execution_commitment::ExecutionCommitment;
+crates/amun-consensus-network/src/vote_binding.rs:81:    fn make_signed_commitment(
+crates/amun-consensus-network/src/vote_binding.rs:88:        let mut commit = ExecutionCommitment::new(pk, height, block_hash, state_root);
+crates/amun-consensus-network/src/vote_binding.rs:89:        commit.sign(sk);
+crates/amun-consensus-network/src/vote_binding.rs:90:        commit
+crates/amun-consensus-network/src/vote_binding.rs:93:    fn make_vote_with_commitment(
+crates/amun-consensus-network/src/vote_binding.rs:108:            commitment: Some(make_signed_commitment(
+crates/amun-consensus-network/src/vote_binding.rs:123:            commitment: None, // Legacy vote — no commitment
+crates/amun-consensus-network/src/vote_binding.rs:132:    fn n109_9_valid_vote_with_commitment_passes() {
+crates/amun-consensus-network/src/vote_binding.rs:134:        let vote = make_vote_with_commitment(&sk, pk, 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/vote_binding.rs:141:        let mut vote = make_vote_with_commitment(&sk, pk, 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/vote_binding.rs:150:        let mut vote = make_vote_with_commitment(&sk, pk, 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/vote_binding.rs:159:        let mut vote = make_vote_with_commitment(&sk, pk, 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/vote_binding.rs:160:        vote.commitment.as_mut().unwrap().execution_root = [0xDE; 32];
+crates/amun-consensus-network/src/vote_binding.rs:166:    fn n109_9_unsigned_commitment_rejected() {
+crates/amun-consensus-network/src/vote_binding.rs:168:        let mut vote = make_vote_with_commitment(&sk, pk, 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/vote_binding.rs:169:        vote.commitment.as_mut().unwrap().signature = [0u8; 64];
+crates/amun-consensus-network/src/vote_binding.rs:178:        let mut vote = make_vote_with_commitment(&sk1, pk1, 5, [0xAA; 32], [0xBB; 32]);
+crates/amun-consensus-network/src/vote_binding.rs:180:        vote.commitment.as_mut().unwrap().validator_id = pk2;
+crates/amun-consensus-network/src/vote_binding.rs:196:    fn n109_9_legacy_vote_without_commitment_passes() {
+crates/amun-consensus-network/src/vote_binding.rs:201:            "Legacy votes without commitment must be accepted for backward compatibility"
+crates/amun-consensus-network/src/vote_binding.rs:207:        // Simulate: 3 votes total, 2 with commitment, 1 legacy — all pass
+crates/amun-consensus-network/src/vote_binding.rs:212:        let v1 = make_vote_with_commitment(&sk1, pk1, 10, [0xCC; 32], [0xDD; 32]);
+crates/amun-consensus-network/src/vote_binding.rs:213:        let v2 = make_vote_with_commitment(&sk2, pk2, 10, [0xCC; 32], [0xDD; 32]);
+crates/amun-consensus-network/src/vote_binding.rs:218:            "vote with commitment must pass"
+crates/amun-consensus-network/src/vote_binding.rs:222:            "vote with commitment must pass"

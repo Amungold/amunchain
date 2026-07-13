@@ -1,0 +1,125 @@
+name: Constitutional Release
+
+on:
+push:
+tags:
+- 'v*'
+
+workflow_dispatch:
+
+env:
+CARGO_TERM_COLOR: always
+RUSTFLAGS: "-D warnings"
+
+jobs:
+
+constitutional-verification:
+
+name: Constitutional Verification
+
+runs-on: ubuntu-latest
+
+steps:
+
+  - name: Checkout
+    uses: actions/checkout@v4
+
+  - name: Install Rust
+    uses: dtolnay/rust-toolchain@stable
+
+  - name: Install cargo-deny
+    run: cargo install cargo-deny --locked
+
+  - name: Install cargo-udeps
+    run: cargo install cargo-udeps --locked
+
+  - name: Cargo Check
+    run: cargo check --workspace --all-targets
+
+  - name: Cargo Test
+    run: cargo test --workspace
+
+  - name: Cargo Format
+    run: cargo fmt --all -- --check
+
+  - name: Cargo Clippy
+    run: cargo clippy --workspace --all-targets -- -D warnings
+
+  - name: Cargo Deny
+    run: cargo deny check licenses
+
+  - name: Cargo Udeps
+    run: cargo udeps --workspace
+
+constitutional-release:
+
+name: Constitutional Release Build
+
+needs: constitutional-verification
+
+runs-on: ubuntu-latest
+
+steps:
+
+  - name: Checkout
+    uses: actions/checkout@v4
+
+  - name: Install Rust
+    uses: dtolnay/rust-toolchain@stable
+
+  - name: Generate Specification Hash
+    run: |
+      SPEC_HASH=$(
+        find crates docs constitution \
+          -type f \
+          \( -name "*.rs" -o -name "*.md" -o -name "*.toml" -o -name "*.yaml" -o -name "*.txt" \) \
+          | sort \
+          | xargs cat \
+          | sha256sum \
+          | cut -d' ' -f1
+      )
+
+      echo "SPEC_HASH=${SPEC_HASH}" >> $GITHUB_ENV
+
+      echo "Specification Hash: ${SPEC_HASH}"
+
+  - name: Deterministic Release Build
+    run: cargo build --release --locked
+
+  - name: Generate Release Artifacts
+    run: |
+      mkdir -p release-artifacts
+
+      cp target/release/amun* release-artifacts/ 2>/dev/null || true
+
+      echo "${SPEC_HASH}" > release-artifacts/SPECIFICATION_HASH.txt
+
+      date -u +%Y-%m-%dT%H:%M:%SZ \
+        > release-artifacts/TIMESTAMP.txt
+
+  - name: Upload Artifacts
+    uses: actions/upload-artifact@v4
+    with:
+      name: amunchain-release
+      path: release-artifacts/
+
+  - name: GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: softprops/action-gh-release@v2
+    with:
+      files: release-artifacts/**
+      body: |
+        Constitutional Release
+
+        Specification Hash:
+        ${SPEC_HASH}
+
+        Verification:
+        - cargo check passed
+        - cargo test passed
+        - cargo fmt passed
+        - cargo clippy passed
+        - cargo deny passed
+        - cargo udeps passed
+        - deterministic release build passed
+

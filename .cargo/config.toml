@@ -1,0 +1,30 @@
+# ============================================================
+# Amunchain Build Configuration
+# ============================================================
+
+[build]
+rustflags = []
+
+[target.'cfg(miri)']
+rustflags = ["--cfg", "miri"]
+
+# Faster linker (optional - requires mold)
+# [target.x86_64-unknown-linux-gnu]
+# linker = "clang"
+# rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+
+[alias]
+# Quick checks
+check-all = "check --workspace --all-targets --all-features"
+clippy-all = "clippy --workspace --all-targets --all-features -- -D warnings"
+test-all = "test --workspace --all-features"
+fmt-all = "fmt --all --check"
+
+# Audit commands
+audit-full = ["run", "--package", "amun-audit"]
+deny-check = "deny check"
+udeps-check = "udeps --workspace --all-targets"
+outdated-check = "outdated"
+
+# MIRI
+miri-test = "miri test -p amun-storage-kernel"

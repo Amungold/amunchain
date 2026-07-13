@@ -1,0 +1,268 @@
+crates/amun-constitutional-authority-semantics/src/capability.rs:66:pub type CapabilityWitness = amun_constitutional_signing::SignedArtifact<AuthorityCapability>;
+crates/amun-constitutional-authority-semantics/src/delegation.rs:1:use crate::capability::CapabilityWitness;
+crates/amun-constitutional-authority-semantics/src/delegation.rs:6:    pub witnesses: Vec<CapabilityWitness>,
+crates/amun-constitutional-authority-semantics/src/delegation.rs:10:    pub fn new(root: CapabilityWitness) -> Self {
+crates/amun-constitutional-authority-semantics/src/delegation.rs:16:    pub fn append(&mut self, witness: CapabilityWitness) -> Result<(), String> {
+crates/amun-constitutional-authority-semantics/src/institution.rs:17:pub struct InstitutionalWitness {
+crates/amun-constitutional-authority-semantics/src/lib.rs:13:pub use capability::{AuthorityCapability, CapabilityWitness};
+crates/amun-constitutional-authority-semantics/src/lib.rs:15:pub use institution::{InstitutionalActor, InstitutionalWitness};
+crates/amun-constitutional-authority-semantics/src/lib.rs:16:pub use revocation::{RevocationRegistry, RevocationWitness};
+crates/amun-constitutional-authority-semantics/src/revocation.rs:6:pub struct RevocationWitness {
+crates/amun-constitutional-authority-semantics/src/revocation.rs:24:    pub fn revoke(&mut self, witness: &RevocationWitness) {
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:1:use amun_constitutional_authority_semantics::capability::{AuthorityCapability, CapabilityWitness};
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:3:use amun_constitutional_authority_semantics::revocation::{RevocationRegistry, RevocationWitness};
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:41:    let w1 = CapabilityWitness::sign(cap1, &root_key);
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:51:    let w2 = CapabilityWitness::sign(cap2, &delegate1);
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:72:    let w1 = CapabilityWitness::sign(cap1, &root_key);
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:82:    let w2 = CapabilityWitness::sign(cap2, &wrong_key);
+crates/amun-constitutional-authority-semantics/tests/authority_tests.rs:91:    let w = RevocationWitness {
+crates/amun-constitutional-semantics/src/lib.rs:47:// ─── Witness Normalization ─────────────────────────────────
+crates/amun-constitutional-semantics/src/lib.rs:48:#[derive(Debug, Clone, PartialEq, Eq)] pub struct NormalizedWitness { pub domain: ReplayDomain, pub sequence: u64, pub witness_hash: [u8; 32] }
+crates/amun-constitutional-semantics/src/lib.rs:49:#[derive(Debug, Clone, PartialEq, Eq)] pub struct WitnessNormalization { pub witnesses: Vec<NormalizedWitness>, pub normalization_root: [u8; 32], pub normalization_version: u32 }
+crates/amun-constitutional-semantics/src/lib.rs:50:impl WitnessNormalization {
+crates/amun-constitutional-semantics/src/lib.rs:53:        let n: Vec<_> = sorted.iter().map(|(d,s,h)| NormalizedWitness { domain:*d, sequence:*s, witness_hash:*h }).collect();
+crates/amun-constitutional-semantics/src/lib.rs:118:    #[test] fn test_witness_normalization_deterministic() { let w = vec![(ReplayDomain::Consensus,2,[0x02;32]),(ReplayDomain::Consensus,1,[0x01;32])]; assert_eq!(WitnessNormalization::normalize(&w).normalization_root, WitnessNormalization::normalize(&w).normalization_root); }
+crates/amun-constitutional/src/canonical_witness.rs:1://! Canonical Witness Ordering — deterministic proof surface.
+crates/amun-constitutional/src/canonical_witness.rs:6://!   - Witness caching and equivalence checking
+crates/amun-constitutional/src/canonical_witness.rs:9://! RULE: Witness entries are ordered canonically by:
+crates/amun-constitutional/src/canonical_witness.rs:10://!   1. WitnessType priority (HardDependency first, then Supporting, Audit, Elidable)
+crates/amun-constitutional/src/canonical_witness.rs:11://!   2. Artifact hash (lexicographic) within same WitnessType
+crates/amun-constitutional/src/canonical_witness.rs:13:use crate::constitutional_witness::WitnessEntry;
+crates/amun-constitutional/src/canonical_witness.rs:14:use crate::witness_type::WitnessType;
+crates/amun-constitutional/src/canonical_witness.rs:23:///   5. Within the same WitnessType, entries are sorted by artifact_hash (lexicographic)
+crates/amun-constitutional/src/canonical_witness.rs:27:pub fn canonical_order(entries: &mut [WitnessEntry]) {
+crates/amun-constitutional/src/canonical_witness.rs:29:        // Primary sort: WitnessType priority
+crates/amun-constitutional/src/canonical_witness.rs:43:fn type_priority(wt: WitnessType) -> u8 {
+crates/amun-constitutional/src/canonical_witness.rs:45:        WitnessType::HardDependency => 0,
+crates/amun-constitutional/src/canonical_witness.rs:46:        WitnessType::SupportingDependency => 1,
+crates/amun-constitutional/src/canonical_witness.rs:47:        WitnessType::AuditDependency => 2,
+crates/amun-constitutional/src/canonical_witness.rs:48:        WitnessType::CompressionElidable => 3,
+crates/amun-constitutional/src/canonical_witness.rs:55:    witness: &crate::constitutional_witness::ConstitutionalWitness,
+crates/amun-constitutional/src/canonical_witness.rs:56:) -> crate::constitutional_witness::ConstitutionalWitness {
+crates/amun-constitutional/src/canonical_witness.rs:59:    crate::constitutional_witness::ConstitutionalWitness::new(
+crates/amun-constitutional/src/canonical_witness.rs:70:pub fn is_canonical(entries: &[WitnessEntry]) -> bool {
+crates/amun-constitutional/src/canonical_witness.rs:90:    fn entry(wt: WitnessType, hash: [u8; 32]) -> WitnessEntry {
+crates/amun-constitutional/src/canonical_witness.rs:91:        WitnessEntry::new(hash, wt)
+crates/amun-constitutional/src/canonical_witness.rs:97:            entry(WitnessType::CompressionElidable, [0x01; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:98:            entry(WitnessType::HardDependency, [0x02; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:99:            entry(WitnessType::SupportingDependency, [0x03; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:100:            entry(WitnessType::AuditDependency, [0x04; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:104:        assert_eq!(entries[0].witness_type, WitnessType::HardDependency);
+crates/amun-constitutional/src/canonical_witness.rs:105:        assert_eq!(entries[3].witness_type, WitnessType::CompressionElidable);
+crates/amun-constitutional/src/canonical_witness.rs:111:            entry(WitnessType::HardDependency, [0xCC; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:112:            entry(WitnessType::HardDependency, [0xAA; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:113:            entry(WitnessType::HardDependency, [0xBB; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:124:            entry(WitnessType::HardDependency, [0xAA; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:125:            entry(WitnessType::HardDependency, [0xBB; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:126:            entry(WitnessType::SupportingDependency, [0xCC; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:134:            entry(WitnessType::SupportingDependency, [0xAA; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:135:            entry(WitnessType::HardDependency, [0xBB; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:142:        use crate::constitutional_witness::ConstitutionalWitness;
+crates/amun-constitutional/src/canonical_witness.rs:144:            entry(WitnessType::CompressionElidable, [0x01; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:145:            entry(WitnessType::HardDependency, [0x02; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:147:        let w = ConstitutionalWitness::new(1, 1, 1, [0xAA; 32], [0xAB; 32], entries);
+crates/amun-constitutional/src/canonical_witness.rs:155:        use crate::constitutional_witness::ConstitutionalWitness;
+crates/amun-constitutional/src/canonical_witness.rs:157:            entry(WitnessType::HardDependency, [0xAA; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:158:            entry(WitnessType::SupportingDependency, [0xBB; 32]),
+crates/amun-constitutional/src/canonical_witness.rs:160:        let w = ConstitutionalWitness::new(1, 1, 1, [0xAA; 32], [0xAB; 32], entries);
+crates/amun-constitutional/src/constitutional_witness.rs:1://! ConstitutionalWitness — a formally sufficient constitutional proof surface.
+crates/amun-constitutional/src/constitutional_witness.rs:6://! INVARIANT: Every artifact in the witness has a defined WitnessType.
+crates/amun-constitutional/src/constitutional_witness.rs:18:use crate::witness_type::WitnessType;
+crates/amun-constitutional/src/constitutional_witness.rs:22:pub struct WitnessEntry {
+crates/amun-constitutional/src/constitutional_witness.rs:26:    pub witness_type: WitnessType,
+crates/amun-constitutional/src/constitutional_witness.rs:31:impl WitnessEntry {
+crates/amun-constitutional/src/constitutional_witness.rs:32:    pub fn new(artifact_hash: ConstitutionalHash, witness_type: WitnessType) -> Self {
+crates/amun-constitutional/src/constitutional_witness.rs:41:        Self::new(artifact_hash, WitnessType::HardDependency)
+crates/amun-constitutional/src/constitutional_witness.rs:45:        Self::new(artifact_hash, WitnessType::SupportingDependency)
+crates/amun-constitutional/src/constitutional_witness.rs:49:        Self::new(artifact_hash, WitnessType::AuditDependency)
+crates/amun-constitutional/src/constitutional_witness.rs:53:        Self::new(artifact_hash, WitnessType::CompressionElidable)
+crates/amun-constitutional/src/constitutional_witness.rs:66:pub struct ConstitutionalWitness {
+crates/amun-constitutional/src/constitutional_witness.rs:76:    pub entries: Vec<WitnessEntry>,
+crates/amun-constitutional/src/constitutional_witness.rs:91:impl ConstitutionalIdentity for ConstitutionalWitness {
+crates/amun-constitutional/src/constitutional_witness.rs:106:impl ConstitutionalObject for ConstitutionalWitness {
+crates/amun-constitutional/src/constitutional_witness.rs:141:                "Witness must contain at least one entry",
+crates/amun-constitutional/src/constitutional_witness.rs:154:                "Witness hash mismatch",
+crates/amun-constitutional/src/constitutional_witness.rs:198:impl ConstitutionalWitness {
+crates/amun-constitutional/src/constitutional_witness.rs:205:        entries: Vec<WitnessEntry>,
+crates/amun-constitutional/src/constitutional_witness.rs:237:    pub fn minimal_subset(&self) -> Vec<&WitnessEntry> {
+crates/amun-constitutional/src/constitutional_witness.rs:242:    pub fn compressed_subset(&self) -> Vec<&WitnessEntry> {
+crates/amun-constitutional/src/constitutional_witness.rs:257:            WitnessEntry::hard([0xAA; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:258:            WitnessEntry::supporting([0xBB; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:259:            WitnessEntry::audit([0xCC; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:261:        let w = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], entries);
+crates/amun-constitutional/src/constitutional_witness.rs:270:            WitnessEntry::hard([0xAA; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:271:            WitnessEntry::hard([0xBB; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:272:            WitnessEntry::supporting([0xCC; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:273:            WitnessEntry::elidable([0xDD; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:275:        let w = ConstitutionalWitness::new(1, 1, 1, [0xEE; 32], [0xAB; 32], entries);
+crates/amun-constitutional/src/constitutional_witness.rs:284:            WitnessEntry::hard([0xAA; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:285:            WitnessEntry::elidable([0xBB; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:286:            WitnessEntry::elidable([0xCC; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:288:        let w = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], entries);
+crates/amun-constitutional/src/constitutional_witness.rs:296:        let w = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], vec![]);
+crates/amun-constitutional/src/constitutional_witness.rs:302:        let entries = vec![WitnessEntry::hard([0xAA; 32])];
+crates/amun-constitutional/src/constitutional_witness.rs:303:        let mut w = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], entries);
+crates/amun-constitutional/src/constitutional_witness.rs:312:            WitnessEntry::hard([0xAA; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:313:            WitnessEntry::supporting([0xBB; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:315:        let w1 = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], e1);
+crates/amun-constitutional/src/constitutional_witness.rs:317:            WitnessEntry::hard([0xAA; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:318:            WitnessEntry::supporting([0xBB; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:320:        let w2 = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], e2);
+crates/amun-constitutional/src/constitutional_witness.rs:327:            WitnessEntry::hard([0xAA; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:328:            WitnessEntry::supporting([0xBB; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:331:            WitnessEntry::supporting([0xBB; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:332:            WitnessEntry::hard([0xAA; 32]),
+crates/amun-constitutional/src/constitutional_witness.rs:334:        let w1 = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], e1);
+crates/amun-constitutional/src/constitutional_witness.rs:335:        let w2 = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], e2);
+crates/amun-constitutional/src/hash_domain_registry.rs:48:    /// Witness + proof domains
+crates/amun-constitutional/src/lib.rs:80:// Witness semantics
+crates/amun-constitutional/src/lib.rs:107:pub use constitutional_witness::{ConstitutionalWitness, WitnessEntry};
+crates/amun-constitutional/src/lib.rs:132:pub use witness_type::WitnessType;
+crates/amun-constitutional/src/schema_registry.rs:83:    /// CausalEdge — FIXED: was 0x0014 colliding with ConstitutionalWitness
+crates/amun-constitutional/src/schema_registry.rs:85:    /// ConstitutionalWitness — FIXED: now 0x0015 (was 0x0014)
+crates/amun-constitutional/src/witness_type.rs:1://! WitnessType — classifies artifacts within a constitutional witness.
+crates/amun-constitutional/src/witness_type.rs:13:pub enum WitnessType {
+crates/amun-constitutional/src/witness_type.rs:34:impl WitnessType {
+crates/amun-constitutional/src/witness_type.rs:43:        matches!(self, WitnessType::HardDependency)
+crates/amun-constitutional/src/witness_type.rs:48:        matches!(self, WitnessType::CompressionElidable)
+crates/amun-constitutional/src/witness_type.rs:56:            WitnessType::AuditDependency | WitnessType::CompressionElidable
+crates/amun-constitutional/src/witness_type.rs:66:        assert!(WitnessType::HardDependency.is_required());
+crates/amun-constitutional/src/witness_type.rs:67:        assert!(!WitnessType::SupportingDependency.is_required());
+crates/amun-constitutional/src/witness_type.rs:68:        assert!(!WitnessType::AuditDependency.is_required());
+crates/amun-constitutional/src/witness_type.rs:69:        assert!(!WitnessType::CompressionElidable.is_required());
+crates/amun-constitutional/src/witness_type.rs:73:        assert!(WitnessType::CompressionElidable.is_elidable());
+crates/amun-constitutional/src/witness_type.rs:74:        assert!(!WitnessType::HardDependency.is_elidable());
+crates/amun-constitutional/src/witness_type.rs:78:        assert!(WitnessType::AuditDependency.is_non_essential());
+crates/amun-constitutional/src/witness_type.rs:79:        assert!(WitnessType::CompressionElidable.is_non_essential());
+crates/amun-constitutional/src/witness_type.rs:80:        assert!(!WitnessType::HardDependency.is_non_essential());
+crates/amun-experimental-framework/src/main.rs:426:// ── Experiment 5: Witness Bundle Size ───────────────────────
+crates/amun-experimental-framework/src/main.rs:428:    println!("\n=== Experiment 5: Witness Bundle Size ===");
+crates/amun-header-gossip/src/relay.rs:6:pub struct WitnessRelay;
+crates/amun-header-gossip/src/relay.rs:8:impl WitnessRelay {
+crates/amun-lineage-law/src/compatibility.rs:2:use super::migration::MigrationWitness;
+crates/amun-lineage-law/src/compatibility.rs:11:    pub migration_witness: Option<MigrationWitness>,
+crates/amun-lineage-law/src/compatibility.rs:23:        migration_witness: Option<MigrationWitness>,
+crates/amun-lineage-law/src/lib.rs:11:pub use migration::{MigrationCertificate, MigrationRules, MigrationWitness};
+crates/amun-lineage-law/src/migration.rs:3:/// A MigrationWitness proves that state was successfully migrated
+crates/amun-lineage-law/src/migration.rs:7:pub struct MigrationWitness {
+crates/amun-lineage-law/src/migration.rs:22:impl MigrationWitness {
+crates/amun-lineage-law/src/migration.rs:63:    pub witness: MigrationWitness,
+crates/amun-lineage-law/src/migration.rs:68:    pub fn new(lineage_proof_hash: [u8; 32], witness: MigrationWitness) -> Self {
+crates/amun-pccv/src/lib.rs:41:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:97:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:142:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:194:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:252:            witness: WitnessBundle {
+crates/amun-pccv/src/transition_proof_engine.rs:7:use crate::witness_builder::WitnessBuilder;
+crates/amun-pccv/src/transition_proof_engine.rs:50:        let witness = WitnessBuilder::build(registry, &consumed_resources, &produced_resources);
+crates/amun-pccv/src/transition_proof_engine.rs:102:    use crate::enhanced_proof::WitnessBundle;
+crates/amun-pccv/src/transition_proof_engine.rs:213:        let witness = WitnessBundle {
+crates/amun-pccv/src/witness_builder.rs:1:use crate::enhanced_proof::{LineageProof, MerkleProof, WitnessBundle};
+crates/amun-pccv/src/witness_builder.rs:4:pub struct WitnessBuilder;
+crates/amun-pccv/src/witness_builder.rs:6:impl WitnessBuilder {
+crates/amun-pccv/src/witness_builder.rs:11:    ) -> WitnessBundle {
+crates/amun-pccv/src/witness_builder.rs:26:        WitnessBundle {
+crates/amun-pccv/src/witness_builder.rs:158:        let bundle = WitnessBuilder::build(&reg, &[id], &[]);
+crates/amun-pccv/src/witness_builder.rs:210:        let bundle = WitnessBuilder::build(&reg, &[grandchild], &[]);
+crates/amun-pccv/src/witness_builder.rs:232:        let bundle = WitnessBuilder::build(&reg, &[make_id(0)], &[]);
+crates/amun-replay-engine/src/adaptive_relay.rs:110:        RoutedProofType::FullWitness => {
+crates/amun-replay-engine/src/adaptive_relay.rs:244:        let f1 = make_frontier(100, vec![([0x01; 32], FrontierDependencyReason::HardWitnessRequired, true)]);
+crates/amun-replay-engine/src/adaptive_relay.rs:255:        let decision = adaptive_compression_policy(&pressure, RoutedProofType::FullWitness);
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:1://! ByzantineWitnessFilter — prevent malicious witness propagation.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:13:use amun_constitutional::ConstitutionalWitness;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:14:use amun_constitutional::WitnessType;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:19:    /// Witness passes all structural checks.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:21:    /// Witness is structurally incomplete (missing hard dependencies).
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:25:    /// Witness appears to be part of a dependency inflation attack.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:31:    /// Witness contains self-referential entries.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:33:    /// Witness is empty (no entries).
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:34:    EmptyWitness,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:42:pub fn filter_incoming_witness(witness: &ConstitutionalWitness) -> FilterResult {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:45:        return FilterResult::EmptyWitness;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:57:        .filter(|e| matches!(e.witness_type, WitnessType::HardDependency))
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:61:        // Witness has entries but no hard dependencies — suspicious
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:85:    use amun_constitutional::{WitnessEntry, WitnessType};
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:87:    fn make_witness(entries: Vec<WitnessEntry>) -> ConstitutionalWitness {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:88:        ConstitutionalWitness::new(1, 1, 1, [0xAA; 32], [0xAB; 32], entries)
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:94:        assert!(matches!(filter_incoming_witness(&w), FilterResult::EmptyWitness));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:100:            WitnessEntry::new([0x01; 32], WitnessType::HardDependency),
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:101:            WitnessEntry::new([0x02; 32], WitnessType::SupportingDependency),
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:110:        entries.push(WitnessEntry::new([0x01; 32], WitnessType::HardDependency));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:112:            entries.push(WitnessEntry::new([i as u8; 32], WitnessType::AuditDependency));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:122:            WitnessEntry::new([0xAA; 32], WitnessType::HardDependency), // same as target
+crates/amun-replay-engine/src/constitutional_economics.rs:99:pub struct WitnessIncentiveSurface {
+crates/amun-replay-engine/src/constitutional_economics.rs:114:impl WitnessIncentiveSurface {
+crates/amun-replay-engine/src/constitutional_economics.rs:223:        let incentives = WitnessIncentiveSurface::new(1, [0xAB; 32]);
+crates/amun-replay-engine/src/derivational_frontier.rs:16:    HardWitnessRequired,
+crates/amun-replay-engine/src/execution_dependency.rs:19:    RequiresWitness,
+crates/amun-replay-engine/src/execution_dependency.rs:42:                | ExecutionDependencyType::RequiresWitness
+crates/amun-replay-engine/src/execution_dependency.rs:64:        assert!(ExecutionDependencyType::RequiresWitness.is_mandatory());
+crates/amun-replay-engine/src/execution_task.rs:18:    ProduceWitness = 0x03,
+crates/amun-replay-engine/src/execution_task.rs:44:    /// For ProduceWitness: the target artifact.
+crates/amun-replay-engine/src/execution_vertex.rs:21:    WitnessExtraction,
+crates/amun-replay-engine/src/frontier_reconciliation.rs:105:        let a = make_frontier(100, vec![[0x01; 32]], vec![([0x02; 32], FrontierDependencyReason::HardWitnessRequired, true)]);
+crates/amun-replay-engine/src/frontier_reconciliation.rs:117:        let target = make_frontier(200, vec![[0x01; 32]], vec![([0x02; 32], FrontierDependencyReason::HardWitnessRequired, true), ([0x03; 32], FrontierDependencyReason::CausalChainIncomplete, false)]);
+crates/amun-replay-engine/src/isolation_boundary.rs:30:    WitnessTampering {
+crates/amun-replay-engine/src/isolation_boundary.rs:47:            IsolationViolation::WitnessTampering { .. } => b"Witness tampering attempted".to_vec(),
+crates/amun-replay-engine/src/proof_routing.rs:37:    FullWitness,
+crates/amun-replay-engine/src/proof_routing.rs:217:        let frontier = make_frontier(100, vec![], vec![([0xBB; 32], FrontierDependencyReason::HardWitnessRequired, true)]);
+crates/amun-replay-engine/src/proof_routing.rs:243:        let frontier = make_frontier(300, vec![], vec![([0xBB; 32], FrontierDependencyReason::HardWitnessRequired, true)]);
+crates/amun-replay-engine/src/proof_routing.rs:255:        let mut route = ProofRoute::new(1, [0xBB; 32], [0xAB; 32], RoutedProofType::FullWitness);
+crates/amun-replay-engine/src/runtime_anomaly.rs:16:    SuspiciousWitness,
+crates/amun-replay-engine/src/runtime_anomaly.rs:134:        let anomaly = RuntimeAnomaly::new(1, 100, AnomalyType::SuspiciousWitness, [0xAB; 32]);
+crates/amun-replay-engine/src/runtime_capability.rs:24:    RequestWitness,
+crates/amun-replay-engine/src/runtime_capability.rs:61:            RuntimeCapability::RequestWitness,
+crates/amun-replay-engine/src/runtime_capability.rs:71:            RuntimeCapability::RequestWitness,
+crates/amun-replay-engine/src/witness_envelope.rs:1://! WitnessEnvelope — transport container for witness propagation.
+crates/amun-replay-engine/src/witness_envelope.rs:21:pub struct WitnessEnvelope {
+crates/amun-replay-engine/src/witness_envelope.rs:60:impl WitnessEnvelope {
+crates/amun-replay-engine/src/witness_envelope.rs:101:        let env = WitnessEnvelope::new(
+crates/amun-replay-engine/src/witness_envelope.rs:111:        let e1 = WitnessEnvelope::new(1, [0xAA; 32], 100, [0xAB; 32], [0xBB; 32], PropagationScope::ContextLocal);
+crates/amun-replay-engine/src/witness_envelope.rs:112:        let e2 = WitnessEnvelope::new(1, [0xAA; 32], 100, [0xAB; 32], [0xBB; 32], PropagationScope::ContextLocal);
+crates/amun-replay-engine/src/witness_envelope.rs:119:        let e1 = WitnessEnvelope::new(1, [0xAA; 32], 100, [0xAB; 32], [0xBB; 32], PropagationScope::ContextLocal);
+crates/amun-replay-engine/src/witness_envelope.rs:120:        let e2 = WitnessEnvelope::new(1, [0xAA; 32], 100, [0xAB; 32], [0xBB; 32], PropagationScope::FullBroadcast);
+crates/amun-replay-engine/src/zk_adapters.rs:1://! ZK Witness Adapters — cryptographic portability for derivability.
+crates/amun-replay-engine/src/zk_adapters.rs:18:pub struct ZKWitnessEnvelope {
+crates/amun-replay-engine/src/zk_adapters.rs:33:impl ZKWitnessEnvelope {
+crates/amun-replay-engine/src/zk_adapters.rs:235:        let env = ZKWitnessEnvelope::new(
+crates/amun-replay-semantics/src/lib.rs:67:pub struct ReplayWitness { pub start_sequence: u64, pub end_sequence: u64, pub pre_state_root: [u8; 32], pub post_state_root: [u8; 32], pub transcript_fragment_hash: [u8; 32], pub witness_data: Vec<u8> }
+crates/amun-resource-core/src/resource_registry.rs:102:    /// This is the entry point needed by WitnessBuilder for Merkle proof construction.
+crates/amun-smt/src/error.rs:33:    MissingLeafWitness,
+crates/amun-smt/src/lib.rs:33:pub use proof::{AbsenceReason, LeafWitness, MerkleProof, ProofStep};
+crates/amun-smt/src/proof.rs:21:pub struct LeafWitness {
+crates/amun-smt/src/proof.rs:36:        leaf_witness: LeafWitness,
+crates/amun-smt/src/proof.rs:133:            let vh = self.value_hash.ok_or(SmtError::MissingLeafWitness)?;
+crates/amun-smt/src/proof.rs:134:            let ver = self.leaf_version.ok_or(SmtError::MissingLeafWitness)?;
+crates/amun-smt/src/tree.rs:25:use crate::proof::{AbsenceReason, LeafWitness, MerkleProof, ProofStep};
+crates/amun-smt/src/tree.rs:531:                        leaf_witness: LeafWitness {
+crates/amun-storage-kernel/CONSTITUTION.md:53:**Section 2.3: Witness Selection**
+crates/amun-storage-kernel/src/smt/tree.rs:16:pub struct WitnessLeaf {
+crates/amun-storage-kernel/src/smt/tree.rs:464:    ) -> Option<WitnessLeaf> {
+crates/amun-storage-kernel/src/smt/tree.rs:476:                    return Some(WitnessLeaf {
+crates/amun-storage-kernel/src/smt/tree.rs:498:                    Some(WitnessLeaf {
+crates/amun-storage-kernel/src/smt/tree.rs:527:    fn find_any_leaf(&self, depth: usize, current: NodeHash) -> Option<WitnessLeaf> {
+crates/amun-storage-kernel/src/smt/tree.rs:536:                    return Some(WitnessLeaf {
+crates/amun-storage-kernel/src/smt/tree.rs:554:                } => Some(WitnessLeaf {
+crates/amun-transcript-semantics/src/lib.rs:76:// ─── Witness Types ─────────────────────────────────────────
+crates/amun-transcript-semantics/src/lib.rs:78:pub enum ReplayWitness {
+crates/amun-transcript-semantics/src/lib.rs:79:    MerkleWitness { leaf_hash: [u8; 32], proof_hashes: Vec<[u8; 32]>, leaf_index: u64 },
+crates/amun-transcript-semantics/src/lib.rs:80:    ExecutionWitness { block_hash: [u8; 32], trace_hash: [u8; 32], step_count: u64 },
+crates/amun-transcript-semantics/src/lib.rs:81:    TranscriptWitness { start_sequence: u64, end_sequence: u64, fragment_hash: [u8; 32] },
+crates/amun-transcript-semantics/src/lib.rs:82:    ReceiptWitness { receipt_hashes: Vec<[u8; 32]>, chain_root: [u8; 32] },
+crates/amun-transcript-semantics/src/lib.rs:83:    CompositeWitness { witnesses: Vec<ReplayWitness>, composite_hash: [u8; 32] },
+crates/amun-transcript-semantics/src/lib.rs:85:impl ReplayWitness {
+crates/amun-transcript-semantics/src/lib.rs:88:        match self { ReplayWitness::MerkleWitness { leaf_hash, proof_hashes, leaf_index } => { h.update(b"MERKLE"); h.update(leaf_hash); h.update(leaf_index.to_le_bytes()); for ph in proof_hashes { h.update(ph); } } ReplayWitness::ExecutionWitness { block_hash, trace_hash, step_count } => { h.update(b"EXECUTION"); h.update(block_hash); h.update(trace_hash); h.update(step_count.to_le_bytes()); } ReplayWitness::TranscriptWitness { start_sequence, end_sequence, fragment_hash } => { h.update(b"TRANSCRIPT"); h.update(start_sequence.to_le_bytes()); h.update(end_sequence.to_le_bytes()); h.update(fragment_hash); } ReplayWitness::ReceiptWitness { receipt_hashes, chain_root } => { h.update(b"RECEIPT"); for rh in receipt_hashes { h.update(rh); } h.update(chain_root); } ReplayWitness::CompositeWitness { composite_hash, .. } => { h.update(b"COMPOSITE"); h.update(composite_hash); } }
+crates/amun-transcript-semantics/src/lib.rs:105:    #[test] fn test_witness_hash() { let w = ReplayWitness::MerkleWitness { leaf_hash: [0x01;32], proof_hashes: vec![[0x02;32]], leaf_index: 0 }; assert_ne!(w.witness_hash(), [0;32]); }
+crates/amun-transition-proof/src/enhanced_proof.rs:58:pub struct WitnessBundle {
+crates/amun-transition-proof/src/enhanced_proof.rs:64:impl WitnessBundle {
+crates/amun-transition-proof/src/enhanced_proof.rs:90:    pub witness: WitnessBundle,
+crates/amun-transition-proof/src/proof_builder.rs:7:use crate::enhanced_proof::{EnhancedTransitionProof, LineageProof, MerkleProof, WitnessBundle};
+crates/amun-transition-proof/src/proof_builder.rs:93:        let witness = WitnessBundle {
+docs/CONSTITUTIONAL_MODEL.md:66:## Freeze Witnesses
+docs/REPLAY_LAW.md:73:Transcript = Vec<VerifiedTransitionWitness>
+docs/REPLAY_LAW.md:155:        Witness1 ||
+docs/REPLAY_LAW.md:156:        Witness2 ||
+docs/REPLAY_LAW.md:157:        Witness3
+docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:49:f1 = Witness Validity
+docs/protocol/lineage_law_v1.md:16:### 2.1 Migration Witness
+docs/protocol/lineage_law_v1.md:17:State migration from parent to child protocol must produce a MigrationWitness

@@ -1,0 +1,185 @@
+================ from_constitutional ================
+    70	impl ValidatorCertificate {
+    71	    /// Build an administrative runtime certificate directly from a
+    72	    /// constitutional certificate.
+    73	    ///
+    74	    /// This constructor will gradually replace issue()/issue_v2().
+    75	    pub fn from_constitutional(
+    76	        constitutional: SignedArtifact<ConstitutionalCertificate>,
+    77	        runtime: RuntimeCertificateView,
+    78	        issuer: PeerId,
+    79	    ) -> Self {
+    80	        Self {
+    81	            validator_id: runtime.peer_id,
+    82	            public_key: runtime.public_key,
+    83	            issuer,
+    84	
+    85	            authority_id: runtime.authority_id,
+    86	            authority_version: runtime.authority_version,
+    87	
+    88	            valid_from: runtime.valid_from,
+    89	            valid_until: runtime.valid_until,
+    90	
+    91	            authority_signature: runtime.authority_signature.clone(),
+    92	
+    93	            constitutional: Some(constitutional),
+    94	            runtime,
+    95	        }
+    96	    }
+    97	
+    98	    // ============================================================
+    99	    // Constitutional Administrative View
+   100	    // ============================================================
+   101	
+   102	    pub fn constitutional_subject_key_hex(&self) -> Option<&str> {
+   103	        self.constitutional
+   104	            .as_ref()
+   105	            .map(|c| c.artifact.subject_verifying_key_hex.as_str())
+   106	    }
+   107	
+   108	    pub fn constitutional_certificate_id(&self) -> Option<&str> {
+   109	        self.constitutional
+   110	            .as_ref()
+   111	            .map(|c| c.artifact.certificate_id.as_str())
+   112	    }
+   113	
+   114	    pub fn constitutional_issuer_id(&self) -> Option<&str> {
+   115	        self.constitutional
+   116	            .as_ref()
+   117	            .map(|c| c.artifact.issuer.as_str())
+   118	    }
+   119	
+   120	    pub fn constitutional_scope(&self) -> Option<&str> {
+
+================ issue ================
+   120	    pub fn constitutional_scope(&self) -> Option<&str> {
+   121	        self.constitutional
+   122	            .as_ref()
+   123	            .map(|c| c.artifact.constitutional_scope.as_str())
+   124	    }
+   125	
+   126	    pub fn constitutional_epoch_start(&self) -> Option<&str> {
+   127	        self.constitutional
+   128	            .as_ref()
+   129	            .map(|c| c.artifact.epoch_start.as_str())
+   130	    }
+   131	
+   132	    pub fn constitutional_epoch_end(&self) -> Option<&str> {
+   133	        self.constitutional
+   134	            .as_ref()
+   135	            .map(|c| c.artifact.epoch_end.as_str())
+   136	    }
+   137	
+   138	    /// Create a new certificate signed by an authority.
+   139	    pub fn issue(
+   140	        validator_id: PeerId,
+   141	        public_key: [u8; 32],
+   142	        issuer_keypair: &PeerKeyPair,
+   143	        valid_from: u64,
+   144	        valid_until: u64,
+   145	    ) -> Self {
+   146	        let mut cert = Self {
+   147	            validator_id,
+   148	            public_key,
+   149	            authority_id: [0u8; 32],
+   150	            authority_version: 0,
+   151	            issuer: issuer_keypair.peer_id(),
+   152	            valid_from,
+   153	            valid_until,
+   154	            authority_signature: Vec::new(),
+   155	            constitutional: None,
+   156	
+   157	            runtime: RuntimeCertificateView {
+   158	                peer_id: validator_id,
+   159	                public_key,
+   160	                authority_id: [0u8; 32],
+   161	                authority_version: 0,
+   162	                valid_from,
+   163	                valid_until,
+   164	                authority_signature: Vec::new(),
+   165	            },
+   166	        };
+   167	        // Sign the certificate fields (excluding signature itself)
+   168	        let payload = cert.serialize_for_signing();
+   169	        cert.authority_signature = issuer_keypair.sign(&payload);
+   170	        cert.runtime.authority_signature = cert.authority_signature.clone();
+   171	        cert
+   172	    }
+   173	
+   174	    /// Serialize certificate fields for signing (excludes the signature).
+   175	    fn serialize_for_signing(&self) -> Vec<u8> {
+   176	        let mut data = Vec::new();
+   177	        data.extend_from_slice(&self.validator_id.0);
+   178	        data.extend_from_slice(&self.public_key);
+   179	        data.extend_from_slice(&self.authority_version.to_le_bytes());
+   180	        data.extend_from_slice(&self.authority_id);
+   181	        data.extend_from_slice(&self.issuer.0);
+   182	        data.extend_from_slice(&self.valid_from.to_le_bytes());
+   183	        data.extend_from_slice(&self.valid_until.to_le_bytes());
+   184	        data
+   185	    }
+   186	
+   187	    /// Verify the authority's signature on this certificate.
+   188	    pub fn verify(&self, authority_public_key: &[u8; 32]) -> bool {
+   189	        let payload = self.serialize_for_signing();
+   190	        PeerKeyPair::verify(authority_public_key, &payload, &self.authority_signature)
+   191	    }
+   192	
+   193	    /// Check if the certificate is currently valid.
+   194	    pub fn is_valid_at(&self, timestamp: u64) -> bool {
+   195	        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+   196	    }
+   197	
+   198	    /// Create a new certificate with explicit authority version and id.
+   199	    pub fn issue_v2(
+   200	        validator_id: PeerId,
+
+================ issue_v2 ================
+   198	    /// Create a new certificate with explicit authority version and id.
+   199	    pub fn issue_v2(
+   200	        validator_id: PeerId,
+   201	        public_key: [u8; 32],
+   202	        authority_version: u64,
+   203	        authority_id: [u8; 32],
+   204	        issuer_keypair: &PeerKeyPair,
+   205	        valid_from: u64,
+   206	        valid_until: u64,
+   207	    ) -> Self {
+   208	        let mut cert = Self {
+   209	            validator_id,
+   210	            public_key,
+   211	
+   212	            authority_version,
+   213	            authority_id,
+   214	
+   215	            issuer: issuer_keypair.peer_id(),
+   216	
+   217	            valid_from,
+   218	            valid_until,
+   219	
+   220	            authority_signature: Vec::new(),
+   221	
+   222	            constitutional: None,
+   223	
+   224	            runtime: RuntimeCertificateView {
+   225	                peer_id: validator_id,
+   226	                public_key,
+   227	
+   228	                authority_id,
+   229	                authority_version,
+   230	
+   231	                valid_from,
+   232	                valid_until,
+   233	
+   234	                authority_signature: Vec::new(),
+   235	            },
+   236	        };
+   237	        let payload = cert.serialize_for_signing();
+   238	        cert.authority_signature = issuer_keypair.sign(&payload);
+   239	        cert
+   240	    }
+   241	}
+   242	
+   243	impl ValidatorCertificate {
+   244	    /// Returns the attached constitutional certificate, if present.
+   245	    pub fn constitutional(&self) -> Option<&SignedArtifact<ConstitutionalCertificate>> {

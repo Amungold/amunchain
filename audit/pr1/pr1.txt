@@ -1,0 +1,768 @@
+==================================================================
+crates/amun-networking/src/validator_certificate.rs
+==================================================================
+     1	use crate::crypto_identity::PeerKeyPair;
+     2	use crate::peer_identity::PeerId;
+     3	use amun_constitutional_authority::ConstitutionalCertificate;
+     4	use amun_constitutional_signing::SignedArtifact;
+     5	use serde::{Deserialize, Serialize};
+     6	
+     7	/// A constitutional certificate binding a validator's identity to their public key.
+     8	///
+     9	/// Signed by a constitutional authority to establish trust.
+    10	#[derive(Debug, Clone, Serialize, Deserialize)]
+    11	pub struct ValidatorCertificate {
+    12	    /// The validator's peer identity.
+    13	    pub validator_id: PeerId,
+    14	    /// The validator's public key (for message verification).
+    15	    pub public_key: [u8; 32],
+    16	    /// The authority that issued this certificate.
+    17	    pub issuer: PeerId,
+    18	    /// When this certificate becomes valid.
+    19	    pub authority_id: [u8; 32],
+    20	    pub authority_version: u64,
+    21	    pub valid_from: u64,
+    22	    /// When this certificate expires (0 = never).
+    23	    pub valid_until: u64,
+    24	    /// The authority's signature over the certificate fields.
+    25	    pub authority_signature: Vec<u8>,
+    26	    #[serde(skip_serializing_if = "Option::is_none")]
+    27	    pub constitutional: Option<SignedArtifact<ConstitutionalCertificate>>,
+    28	}
+    29	
+    30	impl ValidatorCertificate {
+    31	    /// Create a new certificate signed by an authority.
+    32	    pub fn issue(
+    33	        validator_id: PeerId,
+    34	        public_key: [u8; 32],
+    35	        issuer_keypair: &PeerKeyPair,
+    36	        valid_from: u64,
+    37	        valid_until: u64,
+    38	    ) -> Self {
+    39	        let mut cert = Self {
+    40	            validator_id,
+    41	            public_key,
+    42	            authority_id: [0u8; 32],
+    43	            authority_version: 0,
+    44	            issuer: issuer_keypair.peer_id(),
+    45	            valid_from,
+    46	            valid_until,
+    47	            authority_signature: Vec::new(),
+    48	            constitutional: None,
+    49	        };
+    50	        // Sign the certificate fields (excluding signature itself)
+    51	        let payload = cert.serialize_for_signing();
+    52	        cert.authority_signature = issuer_keypair.sign(&payload);
+    53	        cert
+    54	    }
+    55	
+    56	    /// Serialize certificate fields for signing (excludes the signature).
+    57	    fn serialize_for_signing(&self) -> Vec<u8> {
+    58	        let mut data = Vec::new();
+    59	        data.extend_from_slice(&self.validator_id.0);
+    60	        data.extend_from_slice(&self.public_key);
+    61	        data.extend_from_slice(&self.authority_version.to_le_bytes());
+    62	        data.extend_from_slice(&self.authority_id);
+    63	        data.extend_from_slice(&self.issuer.0);
+    64	        data.extend_from_slice(&self.valid_from.to_le_bytes());
+    65	        data.extend_from_slice(&self.valid_until.to_le_bytes());
+    66	        data
+    67	    }
+    68	
+    69	    /// Verify the authority's signature on this certificate.
+    70	    pub fn verify(&self, authority_public_key: &[u8; 32]) -> bool {
+    71	        let payload = self.serialize_for_signing();
+    72	        PeerKeyPair::verify(authority_public_key, &payload, &self.authority_signature)
+    73	    }
+    74	
+    75	    /// Check if the certificate is currently valid.
+    76	    pub fn is_valid_at(&self, timestamp: u64) -> bool {
+    77	        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+    78	    }
+    79	
+    80	    /// Create a new certificate with explicit authority version and id.
+    81	    pub fn issue_v2(
+    82	        validator_id: PeerId,
+    83	        public_key: [u8; 32],
+    84	        authority_version: u64,
+    85	        authority_id: [u8; 32],
+    86	        issuer_keypair: &PeerKeyPair,
+    87	        valid_from: u64,
+    88	        valid_until: u64,
+    89	    ) -> Self {
+    90	        let mut cert = Self {
+    91	            validator_id,
+    92	            public_key,
+    93	            authority_version,
+    94	            authority_id,
+    95	            issuer: issuer_keypair.peer_id(),
+    96	            valid_from,
+    97	            valid_until,
+    98	            authority_signature: Vec::new(),
+    99	            constitutional: None,
+   100	        };
+   101	        let payload = cert.serialize_for_signing();
+   102	        cert.authority_signature = issuer_keypair.sign(&payload);
+   103	        cert
+   104	    }
+   105	}
+   106	
+   107	impl ValidatorCertificate {
+   108	    /// Returns the attached constitutional certificate, if present.
+   109	    pub fn constitutional(&self) -> Option<&SignedArtifact<ConstitutionalCertificate>> {
+   110	        self.constitutional.as_ref()
+   111	    }
+   112	
+   113	    /// Attach the constitutional certificate to this runtime object.
+   114	    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+   115	        self.constitutional = Some(cert);
+   116	    }
+   117	
+   118	    /// Administrative validation only.
+   119	    ///
+   120	    /// Runtime networking verification continues to use the existing
+   121	    /// ValidatorCertificate::verify() cryptographic path.
+   122	    pub fn verify_administrative(&self) -> Result<(), String> {
+   123	        match &self.constitutional {
+   124	            Some(cert) => cert.verify(),
+   125	            None => Err("No constitutional certificate attached".into()),
+   126	        }
+   127	    }
+   128	
+   129	    pub fn has_constitutional(&self) -> bool {
+   130	        self.constitutional.is_some()
+   131	    }
+   132	}
+   133	
+   134	#[cfg(test)]
+   135	mod tests {
+   136	    use super::*;
+   137	
+   138	    #[test]
+   139	    fn n21_validator_certificate_issue_and_verify() {
+   140	        let authority = PeerKeyPair::generate();
+   141	        let validator = PeerKeyPair::generate();
+   142	
+   143	        let cert = ValidatorCertificate::issue(
+   144	            validator.peer_id(),
+   145	            validator.verifying_key.to_bytes(),
+   146	            &authority,
+   147	            1000,
+   148	            2000,
+   149	        );
+   150	
+   151	        assert!(cert.verify(&authority.verifying_key.to_bytes()));
+   152	        assert_eq!(cert.validator_id, validator.peer_id());
+   153	        assert_eq!(cert.issuer, authority.peer_id());
+   154	    }
+   155	
+   156	    #[test]
+   157	    fn n21_certificate_rejects_wrong_authority() {
+   158	        let authority = PeerKeyPair::generate();
+   159	        let impostor = PeerKeyPair::generate();
+   160	        let validator = PeerKeyPair::generate();
+   161	
+   162	        let cert = ValidatorCertificate::issue(
+   163	            validator.peer_id(),
+   164	            validator.verifying_key.to_bytes(),
+   165	            &authority,
+   166	            1000,
+   167	            2000,
+   168	        );
+   169	
+   170	        // Impostor tries to verify — must fail
+   171	        assert!(!cert.verify(&impostor.verifying_key.to_bytes()));
+   172	    }
+   173	
+   174	    #[test]
+   175	    fn n21_certificate_tampered_fields_rejected() {
+   176	        let authority = PeerKeyPair::generate();
+   177	        let validator = PeerKeyPair::generate();
+   178	
+   179	        let mut cert = ValidatorCertificate::issue(
+   180	            validator.peer_id(),
+   181	            validator.verifying_key.to_bytes(),
+   182	            &authority,
+   183	            1000,
+   184	            2000,
+   185	        );
+   186	
+   187	        // Tamper with validity period
+   188	        cert.valid_from = 500;
+   189	        assert!(!cert.verify(&authority.verifying_key.to_bytes()));
+   190	    }
+   191	
+   192	    #[test]
+   193	    fn n21_certificate_validity_window() {
+   194	        let authority = PeerKeyPair::generate();
+   195	        let validator = PeerKeyPair::generate();
+   196	
+   197	        let cert = ValidatorCertificate::issue(
+   198	            validator.peer_id(),
+   199	            validator.verifying_key.to_bytes(),
+   200	            &authority,
+   201	            1000,
+   202	            2000,
+   203	        );
+   204	
+   205	        assert!(!cert.is_valid_at(500));
+   206	        assert!(cert.is_valid_at(1000));
+   207	        assert!(cert.is_valid_at(1500));
+   208	        assert!(cert.is_valid_at(2000));
+   209	        assert!(!cert.is_valid_at(2001));
+   210	    }
+   211	
+   212	    #[test]
+   213	    fn n21_certificate_serialization_roundtrip() {
+   214	        let authority = PeerKeyPair::generate();
+   215	        let validator = PeerKeyPair::generate();
+   216	
+   217	        let cert = ValidatorCertificate::issue(
+   218	            validator.peer_id(),
+   219	            validator.verifying_key.to_bytes(),
+   220	            &authority,
+   221	            1000,
+   222	            0, // never expires
+   223	        );
+   224	
+   225	        let json = serde_json::to_string(&cert).unwrap();
+   226	        let decoded: ValidatorCertificate = match serde_json::from_str(&json) {
+   227	            Ok(v) => v,
+   228	            Err(e) => {
+   229	                eprintln!("validator_cert: invalid certificate: {e}");
+   230	                return;
+   231	            }
+   232	        };
+   233	
+   234	        assert!(decoded.verify(&authority.verifying_key.to_bytes()));
+   235	        assert!(decoded.is_valid_at(5000));
+   236	    }
+   237	}
+
+==================================================================
+crates/amun-orchestrator-certificates/src/bridge.rs
+==================================================================
+     1	use amun_constitutional_authority::ConstitutionalCertificate;
+     2	use amun_networking::validator_certificate::ValidatorCertificate;
+     3	use amun_orchestrator_core::error::OrchestratorError;
+     4	
+     5	/// Runtime bridge between the constitutional certificate model
+     6	/// and the networking validator certificate model.
+     7	///
+     8	/// At this stage the bridge performs validation only.
+     9	/// Runtime conversion will be introduced in the next stage.
+    10	pub struct CertificateBridge;
+    11	
+    12	impl CertificateBridge {
+    13	    pub fn validate(certificate: &ConstitutionalCertificate) -> Result<(), OrchestratorError> {
+    14	        if certificate.certificate_id.is_empty() {
+    15	            return Err(OrchestratorError::Certificate(
+    16	                "Missing constitutional certificate id".into(),
+    17	            ));
+    18	        }
+    19	
+    20	        if certificate.subject_verifying_key_hex.is_empty() {
+    21	            return Err(OrchestratorError::Certificate(
+    22	                "Missing constitutional public key".into(),
+    23	            ));
+    24	        }
+    25	
+    26	        Ok(())
+    27	    }
+    28	
+    29	    pub fn convert(
+    30	        _certificate: &ConstitutionalCertificate,
+    31	    ) -> Result<ValidatorCertificate, OrchestratorError> {
+    32	        Err(OrchestratorError::Certificate(
+    33	            "Runtime certificate conversion is not implemented".into(),
+    34	        ))
+    35	    }
+    36	}
+
+==================================================================
+crates/amun-node/src/peer_handshake.rs
+==================================================================
+     1	#![allow(dead_code)]
+     2	use amun_networking::crypto_identity::PeerKeyPair;
+     3	use amun_networking::peer_identity::PeerId;
+     4	use amun_networking::validator_certificate::ValidatorCertificate;
+     5	use serde::{Deserialize, Serialize};
+     6	
+     7	/// Handshake message sent when two nodes establish a connection.
+     8	#[derive(Debug, Clone, Serialize, Deserialize)]
+     9	pub struct HandshakeMessage {
+    10	    pub peer_id: PeerId,
+    11	    pub public_key: [u8; 32],
+    12	    pub certificate: ValidatorCertificate,
+    13	    pub genesis_hash: [u8; 32],
+    14	    pub protocol_version: u32,
+    15	    pub node_name: String,
+    16	    pub listen_port: u16,
+    17	}
+    18	
+    19	impl HandshakeMessage {
+    20	    pub fn new(
+    21	        keypair: &PeerKeyPair,
+    22	        certificate: &ValidatorCertificate,
+    23	        genesis_hash: [u8; 32],
+    24	        node_name: &str,
+    25	        listen_port: u16,
+    26	    ) -> Self {
+    27	        Self {
+    28	            peer_id: keypair.peer_id(),
+    29	            public_key: keypair.verifying_key.to_bytes(),
+    30	            certificate: certificate.clone(),
+    31	            genesis_hash,
+    32	            protocol_version: 1,
+    33	            node_name: node_name.to_string(),
+    34	            listen_port,
+    35	        }
+    36	    }
+    37	
+    38	    /// Verify the handshake message against our genesis and certificate expectations.
+    39	    pub fn verify(&self, our_genesis_hash: &[u8; 32]) -> Result<(), String> {
+    40	        // Verify genesis hash matches
+    41	        if self.genesis_hash != *our_genesis_hash {
+    42	            return Err(format!(
+    43	                "Genesis hash mismatch: peer has {} but we have {}",
+    44	                hex::encode(self.genesis_hash),
+    45	                hex::encode(*our_genesis_hash)
+    46	            ));
+    47	        }
+    48	
+    49	        // Verify certificate is self-consistent
+    50	        if self.certificate.validator_id != self.peer_id {
+    51	            return Err("Certificate validator_id does not match peer_id".into());
+    52	        }
+    53	
+    54	        if self.certificate.public_key != self.public_key {
+    55	            return Err("Certificate public_key does not match handshake public_key".into());
+    56	        }
+    57	
+    58	        // Verify certificate signature
+    59	        if !self.certificate.verify(&self.public_key) {
+    60	            return Err("Certificate signature verification failed".into());
+    61	        }
+    62	
+    63	        Ok(())
+    64	    }
+    65	}
+    66	
+    67	/// Result of a successful peer handshake.
+    68	#[derive(Debug, Clone)]
+    69	pub struct AuthenticatedPeer {
+    70	    pub peer_id: PeerId,
+    71	    pub public_key: [u8; 32],
+    72	    pub node_name: String,
+    73	    pub listen_port: u16,
+    74	    pub protocol_version: u32,
+    75	}
+    76	
+    77	impl AuthenticatedPeer {
+    78	    pub fn from_handshake(handshake: &HandshakeMessage) -> Self {
+    79	        Self {
+    80	            peer_id: handshake.peer_id,
+    81	            public_key: handshake.public_key,
+    82	            node_name: handshake.node_name.clone(),
+    83	            listen_port: handshake.listen_port,
+    84	            protocol_version: handshake.protocol_version,
+    85	        }
+    86	    }
+    87	}
+    88	
+    89	#[cfg(test)]
+    90	mod tests {
+    91	    use super::*;
+    92	    use amun_networking::crypto_identity::PeerKeyPair;
+    93	
+    94	    fn create_test_handshake() -> (HandshakeMessage, [u8; 32]) {
+    95	        let keypair = PeerKeyPair::generate();
+    96	        let genesis_hash = [0x42u8; 32];
+    97	        let cert = ValidatorCertificate::issue(
+    98	            keypair.peer_id(),
+    99	            keypair.verifying_key.to_bytes(),
+   100	            &keypair,
+   101	            0,
+   102	            0,
+   103	        );
+   104	        let handshake = HandshakeMessage::new(&keypair, &cert, genesis_hash, "test-node", 4001);
+   105	        (handshake, genesis_hash)
+   106	    }
+   107	
+   108	    #[test]
+   109	    fn n22_5_valid_handshake_accepted() {
+   110	        let (handshake, genesis_hash) = create_test_handshake();
+   111	        assert!(handshake.verify(&genesis_hash).is_ok());
+   112	    }
+   113	
+   114	    #[test]
+   115	    fn n22_5_genesis_mismatch_rejected() {
+   116	        let (handshake, _) = create_test_handshake();
+   117	        let wrong_genesis = [0x99u8; 32];
+   118	        assert!(handshake.verify(&wrong_genesis).is_err());
+   119	    }
+   120	
+   121	    #[test]
+   122	    fn n22_5_tampered_certificate_rejected() {
+   123	        let (mut handshake, genesis_hash) = create_test_handshake();
+   124	        handshake.certificate.valid_from = 99999;
+   125	        assert!(handshake.verify(&genesis_hash).is_err());
+   126	    }
+   127	
+   128	    #[test]
+   129	    fn n22_5_authenticated_peer_creation() {
+   130	        let (handshake, genesis_hash) = create_test_handshake();
+   131	        handshake.verify(&genesis_hash).unwrap();
+   132	        let peer = AuthenticatedPeer::from_handshake(&handshake);
+   133	        assert_eq!(peer.peer_id, handshake.peer_id);
+   134	        assert_eq!(peer.node_name, "test-node");
+   135	    }
+   136	}
+
+==================================================================
+crates/amun-networking/src/validator_registry.rs
+==================================================================
+     1	use crate::peer_identity::PeerId;
+     2	use crate::trust_anchor::TrustAnchorRegistry;
+     3	use crate::validator_certificate::ValidatorCertificate;
+     4	use std::collections::BTreeMap;
+     5	
+     6	/// Registry of active validators with verified certificates.
+     7	#[derive(Debug, Clone, Default)]
+     8	pub struct ValidatorRegistry {
+     9	    validators: BTreeMap<PeerId, ValidatorCertificate>,
+    10	}
+    11	
+    12	impl ValidatorRegistry {
+    13	    pub fn new() -> Self {
+    14	        Self::default()
+    15	    }
+    16	
+    17	    /// Register a validator after verifying their certificate against trust anchors.
+    18	    pub fn register(
+    19	        &mut self,
+    20	        certificate: ValidatorCertificate,
+    21	        trust_anchors: &TrustAnchorRegistry,
+    22	    ) -> Result<(), &'static str> {
+    23	        // Verify the certificate was issued by a trusted authority
+    24	        let authority_key = trust_anchors
+    25	            .get_key(&certificate.issuer)
+    26	            .ok_or("Issuer is not a trusted authority")?;
+    27	
+    28	        if !certificate.verify(authority_key) {
+    29	            return Err("Certificate signature invalid");
+    30	        }
+    31	
+    32	        self.validators
+    33	            .insert(certificate.validator_id, certificate);
+    34	        Ok(())
+    35	    }
+    36	
+    37	    /// Remove a validator.
+    38	    pub fn remove(&mut self, validator_id: &PeerId) -> bool {
+    39	        self.validators.remove(validator_id).is_some()
+    40	    }
+    41	
+    42	    /// Check if a peer is a registered validator.
+    43	    pub fn is_validator(&self, peer_id: &PeerId) -> bool {
+    44	        self.validators.contains_key(peer_id)
+    45	    }
+    46	
+    47	    /// Check if the registry is empty.
+    48	    pub fn is_empty(&self) -> bool {
+    49	        self.validators.is_empty()
+    50	    }
+    51	
+    52	    /// Number of registered validators.
+    53	    pub fn len(&self) -> usize {
+    54	        self.validators.len()
+    55	    }
+    56	}
+    57	
+    58	#[cfg(test)]
+    59	mod tests {
+    60	    use super::*;
+    61	    use crate::crypto_identity::PeerKeyPair;
+    62	
+    63	    #[test]
+    64	    fn n21_validator_registration_with_valid_certificate() {
+    65	        let authority = PeerKeyPair::generate();
+    66	        let validator = PeerKeyPair::generate();
+    67	
+    68	        let mut trust_anchors = TrustAnchorRegistry::new();
+    69	        trust_anchors.register(authority.peer_id(), authority.verifying_key.to_bytes());
+    70	
+    71	        let cert = ValidatorCertificate::issue(
+    72	            validator.peer_id(),
+    73	            validator.verifying_key.to_bytes(),
+    74	            &authority,
+    75	            1000,
+    76	            0,
+    77	        );
+    78	
+    79	        let mut registry = ValidatorRegistry::new();
+    80	        assert!(registry.register(cert, &trust_anchors).is_ok());
+    81	        assert!(registry.is_validator(&validator.peer_id()));
+    82	        assert_eq!(registry.len(), 1);
+    83	    }
+    84	
+    85	    #[test]
+    86	    fn n21_validator_rejected_without_trust_anchor() {
+    87	        let authority = PeerKeyPair::generate();
+    88	        let validator = PeerKeyPair::generate();
+    89	
+    90	        let trust_anchors = TrustAnchorRegistry::new(); // empty
+    91	
+    92	        let cert = ValidatorCertificate::issue(
+    93	            validator.peer_id(),
+    94	            validator.verifying_key.to_bytes(),
+    95	            &authority,
+    96	            1000,
+    97	            0,
+    98	        );
+    99	
+   100	        let mut registry = ValidatorRegistry::new();
+   101	        assert!(registry.register(cert, &trust_anchors).is_err());
+   102	    }
+   103	
+   104	    #[test]
+   105	    fn n21_validator_rejected_with_forged_certificate() {
+   106	        let authority = PeerKeyPair::generate();
+   107	        let impostor = PeerKeyPair::generate();
+   108	        let validator = PeerKeyPair::generate();
+   109	
+   110	        let mut trust_anchors = TrustAnchorRegistry::new();
+   111	        trust_anchors.register(authority.peer_id(), authority.verifying_key.to_bytes());
+   112	
+   113	        // Impostor tries to issue a certificate pretending to be the authority
+   114	        let forged_cert = ValidatorCertificate::issue(
+   115	            validator.peer_id(),
+   116	            validator.verifying_key.to_bytes(),
+   117	            &impostor, // wrong key
+   118	            1000,
+   119	            0,
+   120	        );
+   121	
+   122	        let mut registry = ValidatorRegistry::new();
+   123	        assert!(registry.register(forged_cert, &trust_anchors).is_err());
+   124	    }
+   125	}
+
+crates/amun-node/src/certificate_loader.rs:13:    // public_key هو [u8; 32] مباشرة
+crates/amun-node/src/certificate_loader.rs:14:    let pk_hex = hex::encode(cert.public_key);
+crates/amun-node/src/certificate_loader.rs:19:        .any(|v| hex::encode(v.public_key.0) == pk_hex)
+crates/amun-node/src/config.rs:51:    pub validator_id: [u8; 32],
+crates/amun-node/src/config.rs:52:    pub authority_public_key: [u8; 32],
+crates/amun-node/src/config.rs:59:    pub validator_id: [u8; 32],
+crates/amun-node/src/peer_registry.rs:61:            public_key: keypair.verifying_key.to_bytes(),
+crates/amun-node/src/cluster_builder.rs:31:                validator_id: peer.validator_id,
+crates/amun-node/src/cluster_builder.rs:38:            validator_id: validator.validator_id,
+crates/amun-node/src/cluster_builder.rs:43:            authority_public_key: validator.authority_public_key,
+crates/amun-node/src/peer_handshake.rs:11:    pub public_key: [u8; 32],
+crates/amun-node/src/peer_handshake.rs:29:            public_key: keypair.verifying_key.to_bytes(),
+crates/amun-node/src/peer_handshake.rs:50:        if self.certificate.validator_id != self.peer_id {
+crates/amun-node/src/peer_handshake.rs:51:            return Err("Certificate validator_id does not match peer_id".into());
+crates/amun-node/src/peer_handshake.rs:54:        if self.certificate.public_key != self.public_key {
+crates/amun-node/src/peer_handshake.rs:55:            return Err("Certificate public_key does not match handshake public_key".into());
+crates/amun-node/src/peer_handshake.rs:59:        if !self.certificate.verify(&self.public_key) {
+crates/amun-node/src/peer_handshake.rs:71:    pub public_key: [u8; 32],
+crates/amun-node/src/peer_handshake.rs:81:            public_key: handshake.public_key,
+crates/amun-node/src/peer_handshake.rs:124:        handshake.certificate.valid_from = 99999;
+crates/amun-networking/src/validator_registry.rs:25:            .get_key(&certificate.issuer)
+crates/amun-networking/src/validator_registry.rs:26:            .ok_or("Issuer is not a trusted authority")?;
+crates/amun-networking/src/validator_registry.rs:33:            .insert(certificate.validator_id, certificate);
+crates/amun-networking/src/validator_registry.rs:38:    pub fn remove(&mut self, validator_id: &PeerId) -> bool {
+crates/amun-networking/src/validator_registry.rs:39:        self.validators.remove(validator_id).is_some()
+crates/amun-networking/src/crypto_identity.rs:67:    pub sender_public_key: [u8; 32],
+crates/amun-networking/src/crypto_identity.rs:77:            sender_public_key: keypair.verifying_key.to_bytes(),
+crates/amun-networking/src/crypto_identity.rs:85:        PeerKeyPair::verify(&self.sender_public_key, &self.payload, &self.signature)
+crates/amun-networking/src/crypto_identity.rs:90:        PeerId::from_bytes(self.sender_public_key)
+crates/amun-networking/src/trust_anchor.rs:10:    anchors: BTreeMap<PeerId, [u8; 32]>, // peer_id -> public_key
+crates/amun-networking/src/trust_anchor.rs:19:    pub fn register(&mut self, peer_id: PeerId, public_key: [u8; 32]) {
+crates/amun-networking/src/trust_anchor.rs:20:        self.anchors.insert(peer_id, public_key);
+crates/amun-networking/src/peer_identity.rs:18:    pub public_key: [u8; 32],
+crates/amun-networking/src/peer_identity.rs:23:    pub fn new(peer_id: PeerId, public_key: [u8; 32], address: SocketAddr) -> Self {
+crates/amun-networking/src/peer_identity.rs:26:            public_key,
+crates/amun-networking/src/peer_discovery.rs:10:    pub public_key: [u8; 32],
+crates/amun-networking/src/peer_discovery.rs:20:            public_key: keypair.verifying_key.to_bytes(),
+crates/amun-networking/src/validator_certificate.rs:13:    pub validator_id: PeerId,
+crates/amun-networking/src/validator_certificate.rs:15:    pub public_key: [u8; 32],
+crates/amun-networking/src/validator_certificate.rs:17:    pub issuer: PeerId,
+crates/amun-networking/src/validator_certificate.rs:21:    pub valid_from: u64,
+crates/amun-networking/src/validator_certificate.rs:23:    pub valid_until: u64,
+crates/amun-networking/src/validator_certificate.rs:25:    pub authority_signature: Vec<u8>,
+crates/amun-networking/src/validator_certificate.rs:33:        validator_id: PeerId,
+crates/amun-networking/src/validator_certificate.rs:34:        public_key: [u8; 32],
+crates/amun-networking/src/validator_certificate.rs:35:        issuer_keypair: &PeerKeyPair,
+crates/amun-networking/src/validator_certificate.rs:36:        valid_from: u64,
+crates/amun-networking/src/validator_certificate.rs:37:        valid_until: u64,
+crates/amun-networking/src/validator_certificate.rs:40:            validator_id,
+crates/amun-networking/src/validator_certificate.rs:41:            public_key,
+crates/amun-networking/src/validator_certificate.rs:44:            issuer: issuer_keypair.peer_id(),
+crates/amun-networking/src/validator_certificate.rs:45:            valid_from,
+crates/amun-networking/src/validator_certificate.rs:46:            valid_until,
+crates/amun-networking/src/validator_certificate.rs:47:            authority_signature: Vec::new(),
+crates/amun-networking/src/validator_certificate.rs:52:        cert.authority_signature = issuer_keypair.sign(&payload);
+crates/amun-networking/src/validator_certificate.rs:59:        data.extend_from_slice(&self.validator_id.0);
+crates/amun-networking/src/validator_certificate.rs:60:        data.extend_from_slice(&self.public_key);
+crates/amun-networking/src/validator_certificate.rs:63:        data.extend_from_slice(&self.issuer.0);
+crates/amun-networking/src/validator_certificate.rs:64:        data.extend_from_slice(&self.valid_from.to_le_bytes());
+crates/amun-networking/src/validator_certificate.rs:65:        data.extend_from_slice(&self.valid_until.to_le_bytes());
+crates/amun-networking/src/validator_certificate.rs:70:    pub fn verify(&self, authority_public_key: &[u8; 32]) -> bool {
+crates/amun-networking/src/validator_certificate.rs:72:        PeerKeyPair::verify(authority_public_key, &payload, &self.authority_signature)
+crates/amun-networking/src/validator_certificate.rs:77:        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+crates/amun-networking/src/validator_certificate.rs:82:        validator_id: PeerId,
+crates/amun-networking/src/validator_certificate.rs:83:        public_key: [u8; 32],
+crates/amun-networking/src/validator_certificate.rs:86:        issuer_keypair: &PeerKeyPair,
+crates/amun-networking/src/validator_certificate.rs:87:        valid_from: u64,
+crates/amun-networking/src/validator_certificate.rs:88:        valid_until: u64,
+crates/amun-networking/src/validator_certificate.rs:91:            validator_id,
+crates/amun-networking/src/validator_certificate.rs:92:            public_key,
+crates/amun-networking/src/validator_certificate.rs:95:            issuer: issuer_keypair.peer_id(),
+crates/amun-networking/src/validator_certificate.rs:96:            valid_from,
+crates/amun-networking/src/validator_certificate.rs:97:            valid_until,
+crates/amun-networking/src/validator_certificate.rs:98:            authority_signature: Vec::new(),
+crates/amun-networking/src/validator_certificate.rs:102:        cert.authority_signature = issuer_keypair.sign(&payload);
+crates/amun-networking/src/validator_certificate.rs:152:        assert_eq!(cert.validator_id, validator.peer_id());
+crates/amun-networking/src/validator_certificate.rs:153:        assert_eq!(cert.issuer, authority.peer_id());
+crates/amun-networking/src/validator_certificate.rs:188:        cert.valid_from = 500;
+crates/amun-authority-registry/src/governance.rs:8:        authority_public_key: [u8; 32],
+crates/amun-authority-registry/src/governance.rs:39:                authority_public_key,
+crates/amun-authority-registry/src/governance.rs:43:                hasher.update(authority_public_key);
+crates/amun-authority-registry/src/governance.rs:80:            authority_public_key: [1u8; 32],
+crates/amun-authority-registry/src/governance.rs:130:            authority_public_key: [1u8; 32],
+crates/amun-authority-registry/src/executor.rs:63:            authority_public_key,
+crates/amun-authority-registry/src/executor.rs:67:                *authority_public_key,
+crates/amun-authority-registry/src/executor.rs:133:            authority_public_key: [3u8; 32],
+crates/amun-authority-registry/src/voting.rs:36:    pub fn submit_vote(&mut self, validator_id: [u8; 32], vote: GovernanceVote) {
+crates/amun-authority-registry/src/voting.rs:37:        self.votes.insert(validator_id, vote);
+crates/amun-authority-registry/src/transaction.rs:14:        validator_id: [u8; 32],
+crates/amun-authority-registry/src/transaction.rs:45:                validator_id,
+crates/amun-authority-registry/src/transaction.rs:49:                    votes.submit_vote(*validator_id, *vote);
+crates/amun-authority-registry/src/transaction.rs:103:            authority_public_key: [3u8; 32],
+crates/amun-authority-registry/src/transaction.rs:123:            validator_id: [1u8; 32],
+crates/amun-authority-registry/src/transaction.rs:144:            authority_public_key: [2u8; 32],
+crates/amun-authority-registry/src/transaction.rs:154:                validator_id: [id; 32],
+crates/amun-authority-registry/src/transaction.rs:168:            authority_public_key: [3u8; 32],
+crates/amun-authority-registry/src/transaction.rs:175:            validator_id: [1u8; 32],
+crates/amun-authority-registry/src/transaction.rs:222:            authority_public_key: [2u8; 32],
+crates/amun-authority-registry/src/transaction.rs:230:                validator_id: [id; 32],
+crates/amun-authority-registry/src/wal.rs:70:            authority_public_key: [2u8; 32],
+crates/amun-authority-registry/src/wal.rs:92:                validator_id: [1u8; 32],
+crates/amun-authority-registry/src/wal.rs:112:            authority_public_key: [3u8; 32],
+crates/amun-authority-registry/src/wal.rs:122:                    validator_id: [id; 32],
+crates/amun-authority-registry/src/wal.rs:164:            authority_public_key: [4u8; 32],
+crates/amun-authority-registry/src/registry.rs:145:        cert.verify(&authority.authority_public_key)
+crates/amun-authority-registry/src/registry.rs:245:        let cert_v1_key = reg.by_version(1).unwrap().authority_public_key;
+crates/amun-authority-registry/src/registry.rs:246:        let cert_v2_key = reg.by_version(2).unwrap().authority_public_key;
+crates/amun-authority-registry/src/registry.rs:247:        assert_eq!(cert_v1_key, a1.authority_public_key);
+crates/amun-authority-registry/src/registry.rs:248:        assert_eq!(cert_v2_key, a2.authority_public_key);
+crates/amun-authority-registry/src/authority.rs:6:    pub authority_public_key: [u8; 32],
+crates/amun-authority-registry/src/authority.rs:14:    pub fn new(public_key: [u8; 32], version: u64, activated_at_height: u64) -> Self {
+crates/amun-authority-registry/src/authority.rs:17:        hasher.update(&public_key);
+crates/amun-authority-registry/src/authority.rs:21:            authority_public_key: public_key,
+crates/amun-authority-registry/src/recovery.rs:46:            authority_public_key: [1u8; 32],
+crates/amun-authority-registry/src/recovery.rs:70:                validator_id: [1u8; 32],
+crates/amun-authority-registry/src/recovery.rs:95:            authority_public_key: [9u8; 32],
+crates/amun-authority-registry/src/recovery.rs:139:            authority_public_key: [2u8; 32],
+crates/amun-authority-registry/src/recovery.rs:149:                    validator_id: [id; 32],
+crates/amun-authority-registry/src/recovery.rs:182:                validator_id: [1u8; 32],
+crates/amun-authority-registry/src/recovery.rs:190:                validator_id: [2u8; 32],
+crates/amun-authority-registry/src/recovery.rs:216:                authority_public_key: [5u8; 32],
+crates/amun-authority-registry/src/recovery.rs:226:                        validator_id: [id; 32],
+crates/amun-live-cluster/genesis/genesis_authority.json:2:  "authority_public_key": [
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:22:fn make_valid_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:24:        validator_id,
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:15:    let validator_id = [0x42u8; 32];
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:20:    misbehavior.record_misbehavior(&validator_id, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:21:    misbehavior.record_misbehavior(&validator_id, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:22:    misbehavior.record_misbehavior(&validator_id, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:27:        .register(ValidatorIdentity::new(validator_id, [0x42u8; 48], 1))
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:31:    let result = adapter.try_slash(&validator_id);
+crates/amun-live-cluster/testdata/certs/validator_2.crt:2:  "validator_id": [
+crates/amun-live-cluster/testdata/certs/validator_2.crt:36:  "public_key": [
+crates/amun-live-cluster/testdata/certs/validator_2.crt:70:  "issuer": [
+crates/amun-live-cluster/testdata/certs/validator_2.crt:139:  "valid_from": 0,
+crates/amun-live-cluster/testdata/certs/validator_2.crt:140:  "valid_until": 0,
+crates/amun-live-cluster/testdata/certs/validator_2.crt:141:  "authority_signature": [
+crates/amun-live-cluster/testdata/certs/validator_1.crt:2:  "validator_id": [
+crates/amun-live-cluster/testdata/certs/validator_1.crt:36:  "public_key": [
+crates/amun-live-cluster/testdata/certs/validator_1.crt:70:  "issuer": [
+crates/amun-live-cluster/testdata/certs/validator_1.crt:139:  "valid_from": 0,
+crates/amun-live-cluster/testdata/certs/validator_1.crt:140:  "valid_until": 0,
+crates/amun-live-cluster/testdata/certs/validator_1.crt:141:  "authority_signature": [
+crates/amun-live-cluster/testdata/certs/validator_3.crt:2:  "validator_id": [
+crates/amun-live-cluster/testdata/certs/validator_3.crt:36:  "public_key": [
+crates/amun-live-cluster/testdata/certs/validator_3.crt:70:  "issuer": [
+crates/amun-live-cluster/testdata/certs/validator_3.crt:139:  "valid_from": 0,
+crates/amun-live-cluster/testdata/certs/validator_3.crt:140:  "valid_until": 0,
+crates/amun-live-cluster/testdata/certs/validator_3.crt:141:  "authority_signature": [
+crates/amun-live-cluster/testdata/certs/validator_4.crt:2:  "validator_id": [
+crates/amun-live-cluster/testdata/certs/validator_4.crt:36:  "public_key": [
+crates/amun-live-cluster/testdata/certs/validator_4.crt:70:  "issuer": [
+crates/amun-live-cluster/testdata/certs/validator_4.crt:139:  "valid_from": 0,
+crates/amun-live-cluster/testdata/certs/validator_4.crt:140:  "valid_until": 0,
+crates/amun-live-cluster/testdata/certs/validator_4.crt:141:  "authority_signature": [
+crates/amun-live-cluster/src/config.rs:7:    pub authority_public_key: [u8; 32],
+crates/amun-live-cluster/src/config.rs:20:    pub validator_id: [u8; 32],
+crates/amun-live-cluster/src/config.rs:25:    pub authority_public_key: [u8; 32],
+crates/amun-live-cluster/src/config.rs:31:    pub validator_id: [u8; 32],
+crates/amun-live-cluster/src/config.rs:43:                validator_id: ids[i],
+crates/amun-live-cluster/src/config.rs:50:            validator_id: ids[validator_index],
+crates/amun-live-cluster/src/config.rs:54:            authority_public_key: load_genesis_authority(concat!(
+crates/amun-live-cluster/src/config.rs:58:            .authority_public_key,
+crates/amun-live-cluster/src/config.rs:68:                validator_id: ids[i],
+crates/amun-live-cluster/src/config.rs:75:            validator_id: ids[validator_index],
+crates/amun-live-cluster/src/config.rs:79:            authority_public_key: load_genesis_authority(concat!(
+crates/amun-live-cluster/src/config.rs:83:            .authority_public_key,
+crates/amun-live-cluster/src/config.rs:97:            .filter(|p| p.validator_id != self.validator_id)
+crates/amun-live-cluster/src/production_config.rs:8:        validator_id: [u8;32],
+crates/amun-live-cluster/src/production_config.rs:10:        authority_public_key: [u8;32],
+crates/amun-live-cluster/src/production_config.rs:16:            validator_id,
+crates/amun-live-cluster/src/production_config.rs:20:            authority_public_key,
+crates/amun-live-cluster/src/validator.rs:26:use amun_validator_identity::vote_signing_payload;
+crates/amun-live-cluster/src/validator.rs:50:    pub validator_id: [u8; 32],
+crates/amun-live-cluster/src/validator.rs:79:        let mut engine = ConsensusEngine::new(config.validator_id, config.total_validators());
+crates/amun-live-cluster/src/validator.rs:86:        seed[0] = config.validator_id[0];
+crates/amun-live-cluster/src/validator.rs:98:            genesis.authority_public_key,
+crates/amun-live-cluster/src/validator.rs:113:        let pk = self_cert.public_key;
+crates/amun-live-cluster/src/validator.rs:114:        let validator_id = amun_validator_identity::derive_validator_id(&pk);
+crates/amun-live-cluster/src/validator.rs:116:        engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
+crates/amun-live-cluster/src/validator.rs:118:        engine.validator_id = validator_id;
+crates/amun-live-cluster/src/validator.rs:133:            let peer_pk = peer_cert.public_key;
+crates/amun-live-cluster/src/validator.rs:134:            let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
+crates/amun-live-cluster/src/validator.rs:135:            engine.register_validator_identity(peer_cert.validator_id.0, peer_id, peer_pk, 100);
+crates/amun-live-cluster/src/validator.rs:144:            validator_id: validator_id,
+crates/amun-live-cluster/src/validator.rs:184:        let validator_id = self.validator_id;
+crates/amun-live-cluster/src/validator.rs:185:        let my_index = (self.config.validator_id[0] as usize).saturating_sub(1);
+crates/amun-live-cluster/src/validator.rs:400:                        validator_id,
+crates/amun-live-cluster/src/validator.rs:426:                    eng.start_round(height, validator_id);
+crates/amun-live-cluster/src/validator.rs:491:                    &validator_id,
+crates/amun-live-cluster/src/validator.rs:492:                    amun_validator_identity::signature::DEFAULT_CHAIN_ID,
+crates/amun-live-cluster/src/validator.rs:502:                    voter_id: validator_id,
+crates/amun-live-cluster/src/validator.rs:522:                if false && validator_id[0] == 4 {
+crates/amun-live-cluster/src/validator.rs:762:                            let result = adapter.try_slash(&cert.validator_id);
+crates/amun-live-cluster/src/validator.rs:767:                                        &cert.validator_id[..4],
+crates/amun-live-cluster/src/validator.rs:777:                                        &cert.validator_id[..4]
+crates/amun-live-cluster/src/validator.rs:857:                authority_public_key: [2u8; 32],
+crates/amun-live-cluster/src/validator.rs:874:                validator_id: [id; 32],
+crates/amun-live-cluster/src/validator.rs:939:                authority_public_key: [2u8; 32],
+crates/amun-live-cluster/src/validator.rs:950:                    validator_id: [id; 32],
+crates/amun-live-cluster/src/validator.rs:982:                    validator_id: [id; 32],
+crates/amun-live-cluster/src/validator.rs:1037:                    validator_id: [id; 32],
+crates/amun-live-cluster/src/validator.rs:1096:                authority_public_key: v2_pk,
+crates/amun-live-cluster/src/validator.rs:1107:                    validator_id: [id; 32],
+crates/amun-live-cluster/src/validator.rs:1133:                    validator_id: [id; 32],
+crates/amun-live-cluster/src/validator.rs:1184:                    validator_id: [id; 32],
+crates/amun-live-cluster/src/bin/benchmark_10.rs:16:            validator_id: ids[i],
+crates/amun-live-cluster/src/bin/benchmark_10.rs:27:                validator_id: ids[i],
+crates/amun-live-cluster/src/bin/benchmark_10.rs:32:                authority_public_key: amun_live_cluster::config::load_genesis_authority(concat!(
+crates/amun-live-cluster/src/bin/benchmark_10.rs:36:                .authority_public_key,
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:76:                validator_id: [88u8; 32],
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:91:                &proof.validator_id, proof.height,
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:96:                &proof.validator_id, &evidence_id,
+crates/amun-live-cluster/src/bin/quorum_exclusion_test.rs:44:        eng.validator_ids = vec![[1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32]];
+crates/amun-live-cluster/src/bin/benchmark_10_event.rs:16:            validator_id: ids[i],
+crates/amun-live-cluster/src/bin/benchmark_10_event.rs:27:                validator_id: ids[i],
+crates/amun-live-cluster/src/bin/benchmark_10_event.rs:32:                authority_public_key: amun_live_cluster::config::load_genesis_authority(concat!(
+crates/amun-live-cluster/src/bin/benchmark_10_event.rs:36:                .authority_public_key,

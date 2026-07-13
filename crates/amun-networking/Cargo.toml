@@ -1,0 +1,25 @@
+[package]
+name = "amun-networking"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+edition = "2021"
+description = "Network layer with constitutional transport, sync, and peer management"
+
+[dev-dependencies]
+amun-certificate-network = { path = "../amun-certificate-network" }
+
+[dependencies]
+parking_lot = "0.12"
+bytes = { version = "1", features = ["serde"] }
+ed25519-dalek = "2"
+amun-constitutional-state = { path = "../amun-constitutional-state" }
+amun-constitutional-block = { path = "../amun-constitutional-block" }
+amun-chain-checkpoint = { path = "../amun-chain-checkpoint" }
+amun-consensus = { path = "../amun-consensus" }
+serde = { version = "1", features = ["derive"] }
+rand = "0.8"
+serde_json = "1"
+hex = "0.4"
+amun-persistent-node = { path = "../amun-persistent-node" }
+postcard = { version = "1", features = ["use-std"] }
+amun-identity-core = { path = "../amun-identity-core" }

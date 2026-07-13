@@ -1,0 +1,13 @@
+name: Constitutional Architecture Check
+on: [push, pull_request]
+jobs:
+  constitution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build workspace
+        run: RUSTFLAGS="-D warnings" cargo build --workspace
+      - name: Run constitutional checks
+        run: tools/check_constitution.sh
+      - name: Run tests
+        run: cargo test --workspace

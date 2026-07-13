@@ -1,0 +1,26 @@
+
+[package]
+name = "amun-block-builder"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+edition = "2021"
+description = "Constitutional block builder for AmunChain"
+
+[dependencies]
+amun-ntr = { path = "../amun-ntr" }
+amun-consensus-network = { path = "../amun-consensus-network" }
+amun-transactions = { path = "../amun-transactions" }
+amun-accounts = { path = "../amun-accounts" }
+amun-execution = { path = "../amun-execution" }
+amun-mempool = { path = "../amun-mempool" }
+serde = { version = "1", features = ["derive"] }
+blake3 = "1"
+hex = "0.4"
+
+amun-constitutional-commitment = { path = "../amun-constitutional-commitment" }
+[dev-dependencies]
+ed25519-dalek = "2"
+rand = "0.8"
+amun-consensus = { path = "../amun-consensus" }
+amun-constitutional-commitment = { path = "../amun-constitutional-commitment" }
+amun-snapshot-engine = { path = "../amun-snapshot-engine" }

@@ -1,0 +1,1500 @@
+crates/amun-runtime/src/account.rs-45-}
+--
+crates/amun-lock-rule/src/lib.rs-1-pub mod lock;
+crates/amun-lock-rule/src/lib.rs-2-pub mod violation;
+crates/amun-lock-rule/src/lib.rs-3-
+crates/amun-lock-rule/src/lib.rs-4-pub use lock::ValidatorLock;
+crates/amun-lock-rule/src/lib.rs:5:pub use violation::{LockViolation, LockViolationEvidence, LockViolationType};
+--
+crates/amun-lock-rule/src/violation.rs-1-#[derive(Debug, Clone)]
+crates/amun-lock-rule/src/violation.rs-2-pub struct LockViolation {
+crates/amun-lock-rule/src/violation.rs-3-    pub validator_id: u64,
+crates/amun-lock-rule/src/violation.rs-4-    pub violation_type: LockViolationType,
+crates/amun-lock-rule/src/violation.rs-5-    pub round: u64,
+crates/amun-lock-rule/src/violation.rs:6:    pub evidence: LockViolationEvidence,
+crates/amun-lock-rule/src/violation.rs-7-}
+crates/amun-lock-rule/src/violation.rs-8-
+crates/amun-lock-rule/src/violation.rs-9-#[derive(Debug, Clone)]
+crates/amun-lock-rule/src/violation.rs-10-pub enum LockViolationType {
+crates/amun-lock-rule/src/violation.rs-11-    LockRegression,
+crates/amun-lock-rule/src/violation.rs-12-    ConflictingLock,
+crates/amun-lock-rule/src/violation.rs-13-    PrevoteViolatesLock,
+crates/amun-lock-rule/src/violation.rs-14-    PrecommitViolatesLock,
+crates/amun-lock-rule/src/violation.rs-15-}
+crates/amun-lock-rule/src/violation.rs-16-
+crates/amun-lock-rule/src/violation.rs-17-#[derive(Debug, Clone)]
+crates/amun-lock-rule/src/violation.rs:18:pub struct LockViolationEvidence {
+crates/amun-lock-rule/src/violation.rs-19-    pub locked_round: u64,
+crates/amun-lock-rule/src/violation.rs-20-    pub locked_value: Option<[u8; 32]>,
+crates/amun-lock-rule/src/violation.rs-21-    pub attempted_round: u64,
+crates/amun-lock-rule/src/violation.rs-22-    pub attempted_value: Option<[u8; 32]>,
+crates/amun-lock-rule/src/violation.rs-23-}
+--
+crates/amun-kernel/src/governance.rs:1://! Constitutional Governance Primitives
+crates/amun-kernel/src/governance.rs-2-//!
+crates/amun-kernel/src/governance.rs-3-//! These are the ONLY governance objects permitted in AmunChain.
+crates/amun-kernel/src/governance.rs-4-//! All governance operations must use CanonicalEncode for determinism.
+crates/amun-kernel/src/governance.rs-5-
+crates/amun-kernel/src/governance.rs-6-use crate::canonical::{CanonicalEncode, CanonicalEncoder};
+crates/amun-kernel/src/governance.rs-7-use crate::hashing::domain_tags;
+crates/amun-kernel/src/governance.rs-8-
+crates/amun-kernel/src/governance.rs-9-// ─── Signature types ──────────────────────────────────────
+--
+crates/amun-kernel/src/lib.rs:1://! # Amun Constitutional Kernel
+crates/amun-kernel/src/lib.rs-2-//!
+crates/amun-kernel/src/lib.rs-3-//! This crate defines the **sovereign protocol primitives** that
+crates/amun-kernel/src/lib.rs-4-//! all other layers depend upon. It owns:
+crates/amun-kernel/src/lib.rs-5-//! - Canonical encoding traits
+crates/amun-kernel/src/lib.rs-6-//! - Domain separation constants
+crates/amun-kernel/src/lib.rs-7-//! - Protocol versioning
+crates/amun-kernel/src/lib.rs-8-
+crates/amun-kernel/src/lib.rs-9-pub mod canonical;
+--
+crates/amun-bls/src/aggregate.rs-1-use amun_kernel_types::PublicKey;
+crates/amun-bls/src/aggregate.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-bls/src/aggregate.rs-3-use crate::constants::{BLS_SIGNATURE_SIZE, BLS_MAX_SIGNERS};
+crates/amun-bls/src/aggregate.rs-4-
+crates/amun-bls/src/aggregate.rs-5-
+crates/amun-bls/src/aggregate.rs-6-pub fn aggregate_signatures(signatures: &[[u8; BLS_SIGNATURE_SIZE]]) -> AmunResult<[u8; BLS_SIGNATURE_SIZE]> {
+crates/amun-bls/src/aggregate.rs-7-    if signatures.is_empty() || signatures.len() > BLS_MAX_SIGNERS {
+crates/amun-bls/src/aggregate.rs:8:        return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0011, 0x0001));
+crates/amun-bls/src/aggregate.rs-9-    }
+crates/amun-bls/src/aggregate.rs-10-    let mut agg = [0u8; BLS_SIGNATURE_SIZE];
+crates/amun-bls/src/aggregate.rs-11-    let mut hasher = blake3::Hasher::new();
+crates/amun-bls/src/aggregate.rs-12-    hasher.update(b"amun-bls-aggregate-v1");
+crates/amun-bls/src/aggregate.rs-13-    for sig in signatures {
+crates/amun-bls/src/aggregate.rs-14-        hasher.update(sig);
+crates/amun-bls/src/aggregate.rs-15-    }
+crates/amun-bls/src/aggregate.rs-16-    let hash = hasher.finalize();
+crates/amun-bls/src/aggregate.rs-17-    agg[..32].copy_from_slice(&hash.as_bytes()[..32]);
+crates/amun-bls/src/aggregate.rs-18-    Ok(agg)
+crates/amun-bls/src/aggregate.rs-19-}
+crates/amun-bls/src/aggregate.rs-20-
+crates/amun-bls/src/aggregate.rs-21-pub fn aggregate_public_keys(public_keys: &[PublicKey]) -> AmunResult<PublicKey> {
+crates/amun-bls/src/aggregate.rs-22-    if public_keys.is_empty() || public_keys.len() > BLS_MAX_SIGNERS {
+crates/amun-bls/src/aggregate.rs:23:        return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0011, 0x0002));
+crates/amun-bls/src/aggregate.rs-24-    }
+crates/amun-bls/src/aggregate.rs-25-    let mut agg = PublicKey::default();
+crates/amun-bls/src/aggregate.rs-26-    let mut hasher = blake3::Hasher::new();
+crates/amun-bls/src/aggregate.rs-27-    hasher.update(b"amun-bls-agg-pubkey-v1");
+crates/amun-bls/src/aggregate.rs-28-    for pk in public_keys {
+crates/amun-bls/src/aggregate.rs-29-        hasher.update(&pk.0);
+crates/amun-bls/src/aggregate.rs-30-    }
+crates/amun-bls/src/aggregate.rs-31-    let hash = hasher.finalize();
+--
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs:1:use amun_defi_evidence::DefiEvidence;
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-2-
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-3-#[test]
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-4-fn n153_swap_evidence_deterministic() {
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs:5:    let e1 = DefiEvidence::generate_swap_evidence([1u8; 32], [10u8; 32], 100, 90, 42);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs:6:    let e2 = DefiEvidence::generate_swap_evidence([1u8; 32], [10u8; 32], 100, 90, 42);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-7-    assert_eq!(e1, e2);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-8-}
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-9-
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-10-#[test]
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-11-fn n153_swap_evidence_differs_by_amount() {
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs:12:    let e1 = DefiEvidence::generate_swap_evidence([1u8; 32], [10u8; 32], 100, 90, 42);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs:13:    let e2 = DefiEvidence::generate_swap_evidence([1u8; 32], [10u8; 32], 200, 180, 42);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-14-    assert_ne!(e1, e2);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-15-}
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-16-
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-17-#[test]
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-18-fn n153_liquidity_evidence_deterministic() {
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs:19:    let e1 = DefiEvidence::generate_liquidity_evidence([2u8; 32], [20u8; 32], 500, 500, 1000, 10);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs:20:    let e2 = DefiEvidence::generate_liquidity_evidence([2u8; 32], [20u8; 32], 500, 500, 1000, 10);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-21-    assert_eq!(e1, e2);
+crates/amun-defi-evidence/tests/n153_evidence_tests.rs-22-}
+--
+crates/amun-defi-evidence/src/lib.rs-1-use sha2::{Digest, Sha256};
+crates/amun-defi-evidence/src/lib.rs-2-
+crates/amun-defi-evidence/src/lib.rs:3:pub struct DefiEvidence;
+crates/amun-defi-evidence/src/lib.rs-4-
+crates/amun-defi-evidence/src/lib.rs:5:impl DefiEvidence {
+crates/amun-defi-evidence/src/lib.rs-6-    pub fn generate_swap_evidence(
+crates/amun-defi-evidence/src/lib.rs-7-        pool_id: [u8; 32],
+crates/amun-defi-evidence/src/lib.rs-8-        swapper: [u8; 32],
+crates/amun-defi-evidence/src/lib.rs-9-        amount_in: u64,
+crates/amun-defi-evidence/src/lib.rs-10-        amount_out: u64,
+crates/amun-defi-evidence/src/lib.rs-11-        block_height: u64,
+crates/amun-defi-evidence/src/lib.rs-12-    ) -> [u8; 32] {
+crates/amun-defi-evidence/src/lib.rs-13-        let mut hasher = Sha256::new();
+--
+crates/amun-ntr/src/charity.rs-1-use amun_kernel_types::PublicHash32;
+crates/amun-ntr/src/charity.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/charity.rs-3-use crate::constants::*;
+crates/amun-ntr/src/charity.rs-4-
+crates/amun-ntr/src/charity.rs-5-pub struct CharityDistributor {
+crates/amun-ntr/src/charity.rs-6-    pub total_allocated: u64,
+crates/amun-ntr/src/charity.rs-7-    pub total_distributed: u64,
+crates/amun-ntr/src/charity.rs-8-    pub remaining: u64,
+crates/amun-ntr/src/charity.rs-9-}
+crates/amun-ntr/src/charity.rs-10-
+--
+crates/amun-ntr/src/charity.rs-21-            total_distributed: 0,
+crates/amun-ntr/src/charity.rs-22-            remaining: allocated,
+crates/amun-ntr/src/charity.rs-23-        }
+crates/amun-ntr/src/charity.rs-24-    }
+crates/amun-ntr/src/charity.rs-25-
+crates/amun-ntr/src/charity.rs-26-    pub fn distribute(&mut self, _recipient: PublicHash32, amount: u64) -> AmunResult<()> {
+crates/amun-ntr/src/charity.rs-27-        if amount > self.remaining {
+crates/amun-ntr/src/charity.rs-28-            return Err(FailureContext::new(
+crates/amun-ntr/src/charity.rs:29:                ConstitutionalFault::InvalidInput,
+crates/amun-ntr/src/charity.rs-30-                0x0020,
+crates/amun-ntr/src/charity.rs-31-                0x0010,
+crates/amun-ntr/src/charity.rs-32-            ));
+crates/amun-ntr/src/charity.rs-33-        }
+crates/amun-ntr/src/charity.rs-34-        self.total_distributed = self
+crates/amun-ntr/src/charity.rs-35-            .total_distributed
+crates/amun-ntr/src/charity.rs-36-            .checked_add(amount)
+crates/amun-ntr/src/charity.rs-37-            .ok_or_else(|| {
+crates/amun-ntr/src/charity.rs:38:                FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0011)
+crates/amun-ntr/src/charity.rs-39-            })?;
+crates/amun-ntr/src/charity.rs-40-        self.remaining = self.remaining.checked_sub(amount).unwrap_or(0);
+crates/amun-ntr/src/charity.rs-41-        Ok(())
+crates/amun-ntr/src/charity.rs-42-    }
+crates/amun-ntr/src/charity.rs-43-}
+--
+crates/amun-ntr/src/treasury.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/treasury.rs-2-use crate::constants::*;
+crates/amun-ntr/src/treasury.rs-3-
+crates/amun-ntr/src/treasury.rs-4-pub struct AmungoldTreasury {
+crates/amun-ntr/src/treasury.rs-5-    pub balance: u64,
+crates/amun-ntr/src/treasury.rs-6-    pub total_collected: u64,
+crates/amun-ntr/src/treasury.rs-7-    pub total_distributed: u64,
+crates/amun-ntr/src/treasury.rs-8-    pub development_fund: u64,
+crates/amun-ntr/src/treasury.rs-9-    pub infrastructure_fund: u64,
+--
+crates/amun-ntr/src/treasury.rs-23-            total_distributed: 0,
+crates/amun-ntr/src/treasury.rs-24-            development_fund: 0,
+crates/amun-ntr/src/treasury.rs-25-            infrastructure_fund: 0,
+crates/amun-ntr/src/treasury.rs-26-        }
+crates/amun-ntr/src/treasury.rs-27-    }
+crates/amun-ntr/src/treasury.rs-28-
+crates/amun-ntr/src/treasury.rs-29-    pub fn deposit_tax(&mut self, amount: u64) -> AmunResult<()> {
+crates/amun-ntr/src/treasury.rs-30-        self.balance = self.balance.checked_add(amount).ok_or_else(|| {
+crates/amun-ntr/src/treasury.rs:31:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0020)
+crates/amun-ntr/src/treasury.rs-32-        })?;
+crates/amun-ntr/src/treasury.rs-33-        self.total_collected = self.total_collected.checked_add(amount).ok_or_else(|| {
+crates/amun-ntr/src/treasury.rs:34:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0021)
+crates/amun-ntr/src/treasury.rs-35-        })?;
+crates/amun-ntr/src/treasury.rs-36-        Ok(())
+crates/amun-ntr/src/treasury.rs-37-    }
+crates/amun-ntr/src/treasury.rs-38-
+crates/amun-ntr/src/treasury.rs-39-    pub fn allocate_development(&mut self, amount: u64) -> AmunResult<()> {
+crates/amun-ntr/src/treasury.rs-40-        if amount > self.balance {
+crates/amun-ntr/src/treasury.rs-41-            return Err(FailureContext::new(
+crates/amun-ntr/src/treasury.rs:42:                ConstitutionalFault::InvalidInput,
+crates/amun-ntr/src/treasury.rs-43-                0x0020,
+crates/amun-ntr/src/treasury.rs-44-                0x0022,
+crates/amun-ntr/src/treasury.rs-45-            ));
+crates/amun-ntr/src/treasury.rs-46-        }
+crates/amun-ntr/src/treasury.rs-47-        self.balance = self.balance.checked_sub(amount).unwrap_or(0);
+crates/amun-ntr/src/treasury.rs-48-        self.development_fund = self
+crates/amun-ntr/src/treasury.rs-49-            .development_fund
+crates/amun-ntr/src/treasury.rs-50-            .checked_add(amount)
+crates/amun-ntr/src/treasury.rs-51-            .unwrap_or(self.development_fund);
+crates/amun-ntr/src/treasury.rs-52-        Ok(())
+crates/amun-ntr/src/treasury.rs-53-    }
+crates/amun-ntr/src/treasury.rs-54-
+crates/amun-ntr/src/treasury.rs-55-    pub fn allocate_infrastructure(&mut self, amount: u64) -> AmunResult<()> {
+crates/amun-ntr/src/treasury.rs-56-        if amount > self.balance {
+crates/amun-ntr/src/treasury.rs-57-            return Err(FailureContext::new(
+crates/amun-ntr/src/treasury.rs:58:                ConstitutionalFault::InvalidInput,
+crates/amun-ntr/src/treasury.rs-59-                0x0020,
+crates/amun-ntr/src/treasury.rs-60-                0x0023,
+crates/amun-ntr/src/treasury.rs-61-            ));
+crates/amun-ntr/src/treasury.rs-62-        }
+crates/amun-ntr/src/treasury.rs-63-        self.balance = self.balance.checked_sub(amount).unwrap_or(0);
+crates/amun-ntr/src/treasury.rs-64-        self.infrastructure_fund = self
+crates/amun-ntr/src/treasury.rs-65-            .infrastructure_fund
+crates/amun-ntr/src/treasury.rs-66-            .checked_add(amount)
+--
+crates/amun-ntr/src/token.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/token.rs-2-use crate::constants::*;
+crates/amun-ntr/src/token.rs-3-pub struct NtrToken { pub balance: u64, pub staked: u64, pub burned: u64 }
+crates/amun-ntr/src/token.rs-4-impl NtrToken {
+crates/amun-ntr/src/token.rs-5-    pub fn new(b: u64) -> Self { Self { balance: b, staked: 0, burned: 0 } }
+crates/amun-ntr/src/token.rs-6-    pub fn transfer(&mut self, a: u64) -> AmunResult<u64> {
+crates/amun-ntr/src/token.rs:7:        if a == 0 || self.balance < a { return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0020, 0x0001)); }
+crates/amun-ntr/src/token.rs-8-        let tax = a * NTR_TREASURY_TAX_BPS as u64 / 10000;
+crates/amun-ntr/src/token.rs-9-        let burn = tax * NTR_BURN_TAX_BPS as u64 / 10000;
+crates/amun-ntr/src/token.rs-10-        self.balance -= a; self.burned += burn;
+crates/amun-ntr/src/token.rs-11-        Ok(tax - burn)
+crates/amun-ntr/src/token.rs-12-    }
+crates/amun-ntr/src/token.rs-13-    pub fn stake(&mut self, a: u64) -> AmunResult<()> {
+crates/amun-ntr/src/token.rs:14:        if a < NTR_MIN_STAKE_AMOUNT || self.balance < a { return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0020, 0x0004)); }
+crates/amun-ntr/src/token.rs-15-        self.balance -= a; self.staked += a; Ok(())
+crates/amun-ntr/src/token.rs-16-    }
+crates/amun-ntr/src/token.rs-17-    pub fn slash(&mut self, bps: u16) -> u64 {
+crates/amun-ntr/src/token.rs-18-        let amt = self.staked * bps as u64 / 10000;
+crates/amun-ntr/src/token.rs-19-        self.staked = self.staked.saturating_sub(amt);
+crates/amun-ntr/src/token.rs-20-        amt
+crates/amun-ntr/src/token.rs-21-    }
+crates/amun-ntr/src/token.rs-22-}
+--
+crates/amun-constitutional-block/tests/block_tests.rs:1:use amun_constitutional_block::{Blockchain, ConstitutionalBlock};
+crates/amun-constitutional-block/tests/block_tests.rs-2-use amun_constitutional_commitments::SparseMerkleTree;
+crates/amun-constitutional-block/tests/block_tests.rs-3-use amun_constitutional_kernel::receipt::ExecutionReceipt;
+crates/amun-constitutional-block/tests/block_tests.rs-4-
+crates/amun-constitutional-block/tests/block_tests.rs-5-fn dummy_receipt(id: &str) -> ExecutionReceipt {
+crates/amun-constitutional-block/tests/block_tests.rs-6-    ExecutionReceipt::new(id.into(), "s".into(), 0, 1, "t".into())
+crates/amun-constitutional-block/tests/block_tests.rs-7-}
+crates/amun-constitutional-block/tests/block_tests.rs-8-
+crates/amun-constitutional-block/tests/block_tests.rs:9:fn make_genesis() -> ConstitutionalBlock {
+crates/amun-constitutional-block/tests/block_tests.rs-10-    let r = dummy_receipt("r1");
+crates/amun-constitutional-block/tests/block_tests.rs:11:    ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-12-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-13-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-14-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-15-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-16-        vec![r],
+crates/amun-constitutional-block/tests/block_tests.rs-17-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-18-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-19-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-26-fn test_genesis_creation() {
+crates/amun-constitutional-block/tests/block_tests.rs-27-    let g = make_genesis();
+crates/amun-constitutional-block/tests/block_tests.rs-28-    assert_eq!(g.block_height, 0);
+crates/amun-constitutional-block/tests/block_tests.rs-29-    assert_eq!(g.parent_hash, "0".repeat(64));
+crates/amun-constitutional-block/tests/block_tests.rs-30-}
+crates/amun-constitutional-block/tests/block_tests.rs-31-
+crates/amun-constitutional-block/tests/block_tests.rs-32-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-33-fn test_block_hash_deterministic() {
+crates/amun-constitutional-block/tests/block_tests.rs:34:    let b1 = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-35-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-36-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-37-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-38-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-39-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-40-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-41-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-42-        "e".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-43-        "ev".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-44-        String::new(),
+crates/amun-constitutional-block/tests/block_tests.rs-45-    );
+crates/amun-constitutional-block/tests/block_tests.rs:46:    let b2 = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-47-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-48-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-49-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-50-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-51-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-52-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-53-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-54-        "e".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-55-        "ev".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-56-        String::new(),
+crates/amun-constitutional-block/tests/block_tests.rs-57-    );
+crates/amun-constitutional-block/tests/block_tests.rs-58-    assert_eq!(b1.block_hash, b2.block_hash);
+crates/amun-constitutional-block/tests/block_tests.rs-59-}
+crates/amun-constitutional-block/tests/block_tests.rs-60-
+crates/amun-constitutional-block/tests/block_tests.rs-61-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-62-fn test_evidence_root_affects_hash() {
+crates/amun-constitutional-block/tests/block_tests.rs:63:    let b1 = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-64-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-65-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-66-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-67-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-68-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-69-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-70-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-71-        "e".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-72-        "ev1".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-73-        String::new(),
+crates/amun-constitutional-block/tests/block_tests.rs-74-    );
+crates/amun-constitutional-block/tests/block_tests.rs:75:    let b2 = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-76-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-77-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-78-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-79-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-80-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-81-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-82-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-83-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-96-
+crates/amun-constitutional-block/tests/block_tests.rs-97-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-98-fn test_evidence_root_determinism() {
+crates/amun-constitutional-block/tests/block_tests.rs-99-    let mut ev1 = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-constitutional-block/tests/block_tests.rs-100-    let mut ev2 = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-constitutional-block/tests/block_tests.rs-101-    ev1.insert(b"action_0", &[42u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-102-    ev2.insert(b"action_0", &[42u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-103-
+crates/amun-constitutional-block/tests/block_tests.rs:104:    let b1 = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-105-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-106-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-107-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-108-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-109-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-110-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-111-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-112-        "e".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-113-        hex::encode(ev1.root()),
+crates/amun-constitutional-block/tests/block_tests.rs-114-        String::new(),
+crates/amun-constitutional-block/tests/block_tests.rs-115-    );
+crates/amun-constitutional-block/tests/block_tests.rs:116:    let b2 = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-117-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-118-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-119-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-120-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-121-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-122-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-123-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-124-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-131-
+crates/amun-constitutional-block/tests/block_tests.rs-132-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-133-fn test_evidence_root_sensitivity() {
+crates/amun-constitutional-block/tests/block_tests.rs-134-    let mut ev1 = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-constitutional-block/tests/block_tests.rs-135-    let mut ev2 = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-constitutional-block/tests/block_tests.rs-136-    ev1.insert(b"action_0", &[42u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-137-    ev2.insert(b"action_0", &[99u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-138-
+crates/amun-constitutional-block/tests/block_tests.rs:139:    let b1 = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-140-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-141-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-142-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-143-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-144-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-145-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-146-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-147-        "e".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-148-        hex::encode(ev1.root()),
+crates/amun-constitutional-block/tests/block_tests.rs-149-        String::new(),
+crates/amun-constitutional-block/tests/block_tests.rs-150-    );
+crates/amun-constitutional-block/tests/block_tests.rs:151:    let b2 = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-152-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-153-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-154-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-155-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-156-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-157-        "s".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-158-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-159-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-162-    );
+crates/amun-constitutional-block/tests/block_tests.rs-163-    assert_ne!(b1.evidence_root, b2.evidence_root);
+crates/amun-constitutional-block/tests/block_tests.rs-164-    assert_ne!(b1.block_hash, b2.block_hash);
+crates/amun-constitutional-block/tests/block_tests.rs-165-}
+crates/amun-constitutional-block/tests/block_tests.rs-166-
+crates/amun-constitutional-block/tests/block_tests.rs-167-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-168-fn test_verify_block_provenance_valid() {
+crates/amun-constitutional-block/tests/block_tests.rs-169-    use amun_constitutional_block::verify_block_provenance;
+crates/amun-constitutional-block/tests/block_tests.rs:170:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-171-
+crates/amun-constitutional-block/tests/block_tests.rs:172:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-173-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-174-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:175:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs-176-        std::slice::from_ref(&cert),
+crates/amun-constitutional-block/tests/block_tests.rs-177-    ));
+crates/amun-constitutional-block/tests/block_tests.rs-178-
+crates/amun-constitutional-block/tests/block_tests.rs:179:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-180-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-181-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-182-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-183-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-184-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-185-        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-186-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-187-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-190-    );
+crates/amun-constitutional-block/tests/block_tests.rs-191-
+crates/amun-constitutional-block/tests/block_tests.rs-192-    assert!(verify_block_provenance(&block, &cert).is_ok());
+crates/amun-constitutional-block/tests/block_tests.rs-193-}
+crates/amun-constitutional-block/tests/block_tests.rs-194-
+crates/amun-constitutional-block/tests/block_tests.rs-195-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-196-fn test_verify_block_provenance_tampered_state_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs-197-    use amun_constitutional_block::verify_block_provenance;
+crates/amun-constitutional-block/tests/block_tests.rs:198:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-199-
+crates/amun-constitutional-block/tests/block_tests.rs:200:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-201-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-202-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:203:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs-204-        std::slice::from_ref(&cert),
+crates/amun-constitutional-block/tests/block_tests.rs-205-    ));
+crates/amun-constitutional-block/tests/block_tests.rs-206-
+crates/amun-constitutional-block/tests/block_tests.rs:207:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-208-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-209-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-210-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-211-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-212-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-213-        "tampered_state".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-214-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-215-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-218-    );
+crates/amun-constitutional-block/tests/block_tests.rs-219-
+crates/amun-constitutional-block/tests/block_tests.rs-220-    assert!(verify_block_provenance(&block, &cert).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs-221-}
+crates/amun-constitutional-block/tests/block_tests.rs-222-
+crates/amun-constitutional-block/tests/block_tests.rs-223-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-224-fn test_verify_block_provenance_wrong_certificate_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs-225-    use amun_constitutional_block::verify_block_provenance;
+crates/amun-constitutional-block/tests/block_tests.rs:226:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-227-
+crates/amun-constitutional-block/tests/block_tests.rs:228:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-229-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-230-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-231-
+crates/amun-constitutional-block/tests/block_tests.rs-232-    // Use a different certificate's merkle root
+crates/amun-constitutional-block/tests/block_tests.rs:233:    let wrong_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&[]));
+crates/amun-constitutional-block/tests/block_tests.rs-234-
+crates/amun-constitutional-block/tests/block_tests.rs:235:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-236-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-237-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-238-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-239-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-240-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-241-        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-242-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-243-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-246-    );
+crates/amun-constitutional-block/tests/block_tests.rs-247-
+crates/amun-constitutional-block/tests/block_tests.rs-248-    assert!(verify_block_provenance(&block, &cert).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs-249-}
+crates/amun-constitutional-block/tests/block_tests.rs-250-
+crates/amun-constitutional-block/tests/block_tests.rs-251-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-252-fn n6b_full_replay_valid() {
+crates/amun-constitutional-block/tests/block_tests.rs-253-    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:254:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-255-
+crates/amun-constitutional-block/tests/block_tests.rs:256:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-257-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-258-    rt.apply_transition(&[2u8; 32], &[0xBB; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-259-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:260:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs-261-        std::slice::from_ref(&cert),
+crates/amun-constitutional-block/tests/block_tests.rs-262-    ));
+crates/amun-constitutional-block/tests/block_tests.rs-263-
+crates/amun-constitutional-block/tests/block_tests.rs:264:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-265-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-266-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-267-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-268-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-269-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-270-        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-271-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-272-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-275-    );
+crates/amun-constitutional-block/tests/block_tests.rs-276-
+crates/amun-constitutional-block/tests/block_tests.rs-277-    assert!(verify_full_replay(&block, &cert, rt.journal()).is_ok());
+crates/amun-constitutional-block/tests/block_tests.rs-278-}
+crates/amun-constitutional-block/tests/block_tests.rs-279-
+crates/amun-constitutional-block/tests/block_tests.rs-280-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-281-fn n6b_full_replay_tampered_journal_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs-282-    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:283:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-284-
+crates/amun-constitutional-block/tests/block_tests.rs:285:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-286-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-287-    rt.apply_transition(&[2u8; 32], &[0xBB; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-288-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:289:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs-290-        std::slice::from_ref(&cert),
+crates/amun-constitutional-block/tests/block_tests.rs-291-    ));
+crates/amun-constitutional-block/tests/block_tests.rs-292-
+crates/amun-constitutional-block/tests/block_tests.rs:293:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-294-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-295-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-296-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-297-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-298-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-299-        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-300-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-301-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-307-    tampered[0].transition_hash = [0xFF; 32];
+crates/amun-constitutional-block/tests/block_tests.rs-308-
+crates/amun-constitutional-block/tests/block_tests.rs-309-    assert!(verify_full_replay(&block, &cert, &tampered).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs-310-}
+crates/amun-constitutional-block/tests/block_tests.rs-311-
+crates/amun-constitutional-block/tests/block_tests.rs-312-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-313-fn n6b_full_replay_wrong_count_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs-314-    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:315:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-316-
+crates/amun-constitutional-block/tests/block_tests.rs:317:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-318-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-319-    rt.apply_transition(&[2u8; 32], &[0xBB; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-320-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs:321:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/tests/block_tests.rs-322-        std::slice::from_ref(&cert),
+crates/amun-constitutional-block/tests/block_tests.rs-323-    ));
+crates/amun-constitutional-block/tests/block_tests.rs-324-
+crates/amun-constitutional-block/tests/block_tests.rs:325:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-326-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-327-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-328-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-329-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-330-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-331-        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-332-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-333-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-337-
+crates/amun-constitutional-block/tests/block_tests.rs-338-    // Only pass one record when cert expects two
+crates/amun-constitutional-block/tests/block_tests.rs-339-    assert!(verify_full_replay(&block, &cert, &rt.journal()[..1]).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs-340-}
+crates/amun-constitutional-block/tests/block_tests.rs-341-
+crates/amun-constitutional-block/tests/block_tests.rs-342-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-343-fn n8_light_client_valid() {
+crates/amun-constitutional-block/tests/block_tests.rs-344-    use amun_constitutional_block::verify_light_client_proof;
+crates/amun-constitutional-block/tests/block_tests.rs:345:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-346-
+crates/amun-constitutional-block/tests/block_tests.rs:347:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-348-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-349-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-350-    let certs = vec![cert.clone()];
+crates/amun-constitutional-block/tests/block_tests.rs:351:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-constitutional-block/tests/block_tests.rs-352-    let hash = cert.certificate_hash();
+crates/amun-constitutional-block/tests/block_tests.rs-353-    let inclusion_proof =
+crates/amun-constitutional-block/tests/block_tests.rs:354:        ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-block/tests/block_tests.rs-355-
+crates/amun-constitutional-block/tests/block_tests.rs:356:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-357-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-358-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-359-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-360-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-361-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-362-        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-363-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-364-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-367-    );
+crates/amun-constitutional-block/tests/block_tests.rs-368-
+crates/amun-constitutional-block/tests/block_tests.rs-369-    assert!(verify_light_client_proof(&block, &cert, &inclusion_proof).is_ok());
+crates/amun-constitutional-block/tests/block_tests.rs-370-}
+crates/amun-constitutional-block/tests/block_tests.rs-371-
+crates/amun-constitutional-block/tests/block_tests.rs-372-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-373-fn n8_light_client_tampered_proof_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs-374-    use amun_constitutional_block::verify_light_client_proof;
+crates/amun-constitutional-block/tests/block_tests.rs:375:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-376-
+crates/amun-constitutional-block/tests/block_tests.rs:377:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-378-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-379-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-380-    let certs = vec![cert.clone()];
+crates/amun-constitutional-block/tests/block_tests.rs:381:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-constitutional-block/tests/block_tests.rs-382-    let hash = cert.certificate_hash();
+crates/amun-constitutional-block/tests/block_tests.rs-383-    let mut inclusion_proof =
+crates/amun-constitutional-block/tests/block_tests.rs:384:        ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-block/tests/block_tests.rs-385-
+crates/amun-constitutional-block/tests/block_tests.rs-386-    // Tamper with the proof's root
+crates/amun-constitutional-block/tests/block_tests.rs-387-    inclusion_proof.root = [0xFF; 32];
+crates/amun-constitutional-block/tests/block_tests.rs-388-
+crates/amun-constitutional-block/tests/block_tests.rs:389:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-390-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-391-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-392-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-393-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-394-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-395-        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-396-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-397-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-400-    );
+crates/amun-constitutional-block/tests/block_tests.rs-401-
+crates/amun-constitutional-block/tests/block_tests.rs-402-    assert!(verify_light_client_proof(&block, &cert, &inclusion_proof).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs-403-}
+crates/amun-constitutional-block/tests/block_tests.rs-404-
+crates/amun-constitutional-block/tests/block_tests.rs-405-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-406-fn n8_light_client_wrong_certificate_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs-407-    use amun_constitutional_block::verify_light_client_proof;
+crates/amun-constitutional-block/tests/block_tests.rs:408:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-409-
+crates/amun-constitutional-block/tests/block_tests.rs:410:    let mut rt1 = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-411-    rt1.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-412-    let cert1 = rt1.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-413-
+crates/amun-constitutional-block/tests/block_tests.rs:414:    let mut rt2 = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-415-    rt2.apply_transition(&[2u8; 32], &[0xBB; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-416-    let cert2 = rt2.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-417-
+crates/amun-constitutional-block/tests/block_tests.rs-418-    let certs = vec![cert1.clone()];
+crates/amun-constitutional-block/tests/block_tests.rs:419:    let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+crates/amun-constitutional-block/tests/block_tests.rs-420-    let hash1 = cert1.certificate_hash();
+crates/amun-constitutional-block/tests/block_tests.rs-421-    let inclusion_proof =
+crates/amun-constitutional-block/tests/block_tests.rs:422:        ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash1).unwrap();
+crates/amun-constitutional-block/tests/block_tests.rs-423-
+crates/amun-constitutional-block/tests/block_tests.rs:424:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-425-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-426-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-427-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-428-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-429-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-430-        hex::encode(rt1.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-431-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-432-        "e".into(),
+--
+crates/amun-constitutional-block/tests/block_tests.rs-436-
+crates/amun-constitutional-block/tests/block_tests.rs-437-    // Use cert2 with inclusion_proof for cert1
+crates/amun-constitutional-block/tests/block_tests.rs-438-    assert!(verify_light_client_proof(&block, &cert2, &inclusion_proof).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs-439-}
+crates/amun-constitutional-block/tests/block_tests.rs-440-
+crates/amun-constitutional-block/tests/block_tests.rs-441-#[test]
+crates/amun-constitutional-block/tests/block_tests.rs-442-fn n8_light_client_wrong_block_root_fails() {
+crates/amun-constitutional-block/tests/block_tests.rs-443-    use amun_constitutional_block::verify_light_client_proof;
+crates/amun-constitutional-block/tests/block_tests.rs:444:    use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/block_tests.rs-445-
+crates/amun-constitutional-block/tests/block_tests.rs:446:    let mut rt = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/block_tests.rs-447-    rt.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-448-    let cert = rt.create_certificate(1, [0u8; 32]);
+crates/amun-constitutional-block/tests/block_tests.rs-449-    let certs = vec![cert.clone()];
+crates/amun-constitutional-block/tests/block_tests.rs-450-    let hash = cert.certificate_hash();
+crates/amun-constitutional-block/tests/block_tests.rs-451-    let inclusion_proof =
+crates/amun-constitutional-block/tests/block_tests.rs:452:        ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+crates/amun-constitutional-block/tests/block_tests.rs-453-
+crates/amun-constitutional-block/tests/block_tests.rs-454-    // Block has a different replay_certificate_root
+crates/amun-constitutional-block/tests/block_tests.rs:455:    let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/tests/block_tests.rs-456-        0,
+crates/amun-constitutional-block/tests/block_tests.rs-457-        "0".repeat(64),
+crates/amun-constitutional-block/tests/block_tests.rs-458-        "t".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-459-        "p".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-460-        vec![],
+crates/amun-constitutional-block/tests/block_tests.rs-461-        hex::encode(rt.state_root()),
+crates/amun-constitutional-block/tests/block_tests.rs-462-        "g".into(),
+crates/amun-constitutional-block/tests/block_tests.rs-463-        "e".into(),
+--
+crates/amun-constitutional-block/tests/finalizer_tests.rs-1-use amun_consensus::action::{ActionLog, ConsensusAction};
+crates/amun-constitutional-block/tests/finalizer_tests.rs-2-use amun_constitutional_block::{
+crates/amun-constitutional-block/tests/finalizer_tests.rs-3-    finalizer::{BlockFinalizer, FinalizationContext},
+crates/amun-constitutional-block/tests/finalizer_tests.rs-4-    Blockchain,
+crates/amun-constitutional-block/tests/finalizer_tests.rs-5-};
+crates/amun-constitutional-block/tests/finalizer_tests.rs:6:use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/tests/finalizer_tests.rs-7-
+crates/amun-constitutional-block/tests/finalizer_tests.rs-8-#[test]
+crates/amun-constitutional-block/tests/finalizer_tests.rs-9-fn test_commit_creates_block_with_state_root() {
+crates/amun-constitutional-block/tests/finalizer_tests.rs-10-    let mut chain = Blockchain::new();
+crates/amun-constitutional-block/tests/finalizer_tests.rs-11-    let mut log = ActionLog::default();
+crates/amun-constitutional-block/tests/finalizer_tests.rs:12:    let mut state = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/finalizer_tests.rs-13-
+crates/amun-constitutional-block/tests/finalizer_tests.rs-14-    log.record(ConsensusAction::None, 1, 0, "Test", [1u8; 32]);
+crates/amun-constitutional-block/tests/finalizer_tests.rs-15-    state.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/finalizer_tests.rs-16-
+crates/amun-constitutional-block/tests/finalizer_tests.rs-17-    let ctx = FinalizationContext {
+crates/amun-constitutional-block/tests/finalizer_tests.rs-18-        state_runtime: Some(state),
+crates/amun-constitutional-block/tests/finalizer_tests.rs-19-        pre_state_root: [0u8; 32],
+crates/amun-constitutional-block/tests/finalizer_tests.rs-20-        governance_root: "gov".into(),
+--
+crates/amun-constitutional-block/tests/finalizer_tests.rs-30-}
+crates/amun-constitutional-block/tests/finalizer_tests.rs-31-
+crates/amun-constitutional-block/tests/finalizer_tests.rs-32-#[test]
+crates/amun-constitutional-block/tests/finalizer_tests.rs-33-fn test_state_root_changes_block_hash() {
+crates/amun-constitutional-block/tests/finalizer_tests.rs-34-    let mut chain1 = Blockchain::new();
+crates/amun-constitutional-block/tests/finalizer_tests.rs-35-    let mut chain2 = Blockchain::new();
+crates/amun-constitutional-block/tests/finalizer_tests.rs-36-    let log = ActionLog::default();
+crates/amun-constitutional-block/tests/finalizer_tests.rs-37-
+crates/amun-constitutional-block/tests/finalizer_tests.rs:38:    let mut state1 = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/finalizer_tests.rs:39:    let mut state2 = ConstitutionalStateRuntime::new();
+crates/amun-constitutional-block/tests/finalizer_tests.rs-40-    state1.apply_transition(&[1u8; 32], &[0xAA; 32]);
+crates/amun-constitutional-block/tests/finalizer_tests.rs-41-    state2.apply_transition(&[1u8; 32], &[0xBB; 32]);
+crates/amun-constitutional-block/tests/finalizer_tests.rs-42-
+crates/amun-constitutional-block/tests/finalizer_tests.rs-43-    let ctx1 = FinalizationContext {
+crates/amun-constitutional-block/tests/finalizer_tests.rs-44-        state_runtime: Some(state1),
+crates/amun-constitutional-block/tests/finalizer_tests.rs-45-        pre_state_root: [0u8; 32],
+crates/amun-constitutional-block/tests/finalizer_tests.rs-46-        governance_root: "g".into(),
+crates/amun-constitutional-block/tests/finalizer_tests.rs-47-        execution_root: "e".into(),
+--
+crates/amun-constitutional-block/src/lib.rs-28-#![allow(clippy::new_without_default)]
+crates/amun-constitutional-block/src/lib.rs-29-#![allow(clippy::collapsible_if)]
+crates/amun-constitutional-block/src/lib.rs-30-#![allow(clippy::manual_map)]
+crates/amun-constitutional-block/src/lib.rs-31-#![allow(clippy::needless_borrows_for_generic_args)]
+crates/amun-constitutional-block/src/lib.rs-32-pub mod block;
+crates/amun-constitutional-block/src/lib.rs-33-pub mod chain;
+crates/amun-constitutional-block/src/lib.rs-34-pub mod finalizer;
+crates/amun-constitutional-block/src/lib.rs-35-
+crates/amun-constitutional-block/src/lib.rs:36:pub use block::{BlockBuilder, ConstitutionalBlock};
+crates/amun-constitutional-block/src/lib.rs-37-pub use chain::Blockchain;
+crates/amun-constitutional-block/src/lib.rs-38-
+crates/amun-constitutional-block/src/lib.rs:39:use amun_constitutional_state::{ConstitutionalStateRuntime, ReplayCertificate};
+crates/amun-constitutional-block/src/lib.rs-40-
+crates/amun-constitutional-block/src/lib.rs-41-/// Verify that a block's state provenance is cryptographically valid.
+crates/amun-constitutional-block/src/lib.rs-42-///
+crates/amun-constitutional-block/src/lib.rs-43-/// Checks:
+crates/amun-constitutional-block/src/lib.rs-44-/// 1. Block's replay_certificate_root matches the certificate's merkle root.
+crates/amun-constitutional-block/src/lib.rs-45-/// 2. Block's state_root matches the certificate's post_state_root.
+crates/amun-constitutional-block/src/lib.rs-46-///
+crates/amun-constitutional-block/src/lib.rs-47-/// Note: Full replay verification (N6B) will add journal-based validation.
+crates/amun-constitutional-block/src/lib.rs-48-pub fn verify_block_provenance(
+crates/amun-constitutional-block/src/lib.rs:49:    block: &block::ConstitutionalBlock,
+crates/amun-constitutional-block/src/lib.rs-50-    cert: &ReplayCertificate,
+crates/amun-constitutional-block/src/lib.rs-51-) -> Result<(), String> {
+crates/amun-constitutional-block/src/lib.rs-52-    // 1. Verify certificate merkle root matches block commitment
+crates/amun-constitutional-block/src/lib.rs:53:    let computed_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+crates/amun-constitutional-block/src/lib.rs-54-        std::slice::from_ref(cert),
+crates/amun-constitutional-block/src/lib.rs-55-    ));
+crates/amun-constitutional-block/src/lib.rs-56-    if block.replay_certificate_root != computed_root {
+crates/amun-constitutional-block/src/lib.rs-57-        return Err(format!(
+crates/amun-constitutional-block/src/lib.rs-58-            "Certificate root mismatch: block={} computed={}",
+crates/amun-constitutional-block/src/lib.rs-59-            block.replay_certificate_root, computed_root
+crates/amun-constitutional-block/src/lib.rs-60-        ));
+crates/amun-constitutional-block/src/lib.rs-61-    }
+--
+crates/amun-constitutional-block/src/lib.rs-67-            "State root mismatch: block={} cert={}",
+crates/amun-constitutional-block/src/lib.rs-68-            block.state_root, cert_state_root
+crates/amun-constitutional-block/src/lib.rs-69-        ));
+crates/amun-constitutional-block/src/lib.rs-70-    }
+crates/amun-constitutional-block/src/lib.rs-71-
+crates/amun-constitutional-block/src/lib.rs-72-    Ok(())
+crates/amun-constitutional-block/src/lib.rs-73-}
+crates/amun-constitutional-block/src/lib.rs-74-
+crates/amun-constitutional-block/src/lib.rs:75:use amun_constitutional_state::StateTransitionRecord;
+crates/amun-constitutional-block/src/lib.rs-76-
+crates/amun-constitutional-block/src/lib.rs-77-/// Full replay verification: cryptographic proof that the block's state
+crates/amun-constitutional-block/src/lib.rs-78-/// was produced by the exact journal of transitions claimed.
+crates/amun-constitutional-block/src/lib.rs-79-///
+crates/amun-constitutional-block/src/lib.rs-80-/// This closes the proof-carrying loop:
+crates/amun-constitutional-block/src/lib.rs-81-///   Block → Certificate → Journal → Replay → StateRoot → Accept/Reject
+crates/amun-constitutional-block/src/lib.rs-82-///
+crates/amun-constitutional-block/src/lib.rs-83-/// Delegates to:
+crates/amun-constitutional-block/src/lib.rs-84-///   - verify_block_provenance() for block↔certificate binding
+crates/amun-constitutional-block/src/lib.rs-85-///   - ReplayCertificate::verify() for journal↔state proof
+crates/amun-constitutional-block/src/lib.rs-86-pub fn verify_full_replay(
+crates/amun-constitutional-block/src/lib.rs:87:    block: &block::ConstitutionalBlock,
+crates/amun-constitutional-block/src/lib.rs-88-    cert: &ReplayCertificate,
+crates/amun-constitutional-block/src/lib.rs:89:    records: &[StateTransitionRecord],
+crates/amun-constitutional-block/src/lib.rs-90-) -> Result<(), String> {
+crates/amun-constitutional-block/src/lib.rs-91-    // Step 1: Verify block ↔ certificate commitment
+crates/amun-constitutional-block/src/lib.rs-92-    verify_block_provenance(block, cert)?;
+crates/amun-constitutional-block/src/lib.rs-93-
+crates/amun-constitutional-block/src/lib.rs-94-    // Step 2: Verify journal ↔ state proof (single source of truth)
+crates/amun-constitutional-block/src/lib.rs-95-    if !cert.verify(records) {
+crates/amun-constitutional-block/src/lib.rs-96-        return Err(
+crates/amun-constitutional-block/src/lib.rs-97-            "Full replay verification failed: journal does not produce the claimed state".into(),
+--
+crates/amun-constitutional-block/src/lib.rs-109-/// No full state, no journal replay, no full certificate set needed.
+crates/amun-constitutional-block/src/lib.rs-110-///
+crates/amun-constitutional-block/src/lib.rs-111-/// Verification steps:
+crates/amun-constitutional-block/src/lib.rs-112-///   1. Inclusion proof is valid → certificate is in the merkle root
+crates/amun-constitutional-block/src/lib.rs-113-///   2. Certificate hash matches inclusion proof's leaf value
+crates/amun-constitutional-block/src/lib.rs-114-///   3. Merkle root matches block.replay_certificate_root
+crates/amun-constitutional-block/src/lib.rs-115-///   4. Certificate's post_state_root matches block.state_root
+crates/amun-constitutional-block/src/lib.rs-116-pub fn verify_light_client_proof(
+crates/amun-constitutional-block/src/lib.rs:117:    block: &block::ConstitutionalBlock,
+crates/amun-constitutional-block/src/lib.rs-118-    cert: &ReplayCertificate,
+crates/amun-constitutional-block/src/lib.rs-119-    inclusion_proof: &CertificateInclusionProof,
+crates/amun-constitutional-block/src/lib.rs-120-) -> Result<(), String> {
+crates/amun-constitutional-block/src/lib.rs-121-    // Step 1: Verify the inclusion proof is cryptographically valid
+crates/amun-constitutional-block/src/lib.rs-122-    if !inclusion_proof.verify() {
+crates/amun-constitutional-block/src/lib.rs-123-        return Err("Invalid certificate inclusion proof".into());
+crates/amun-constitutional-block/src/lib.rs-124-    }
+crates/amun-constitutional-block/src/lib.rs-125-
+--
+crates/amun-constitutional-block/src/chain.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitutional-block/src/chain.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitutional-block/src/chain.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitutional-block/src/chain.rs-4-
+crates/amun-constitutional-block/src/chain.rs:5:use crate::block::ConstitutionalBlock;
+crates/amun-constitutional-block/src/chain.rs-6-
+crates/amun-constitutional-block/src/chain.rs-7-#[derive(Debug, Clone, Default)]
+crates/amun-constitutional-block/src/chain.rs-8-pub struct Blockchain {
+crates/amun-constitutional-block/src/chain.rs:9:    pub blocks: Vec<ConstitutionalBlock>,
+crates/amun-constitutional-block/src/chain.rs-10-}
+crates/amun-constitutional-block/src/chain.rs-11-
+crates/amun-constitutional-block/src/chain.rs-12-impl Blockchain {
+crates/amun-constitutional-block/src/chain.rs-13-    pub fn new() -> Self {
+crates/amun-constitutional-block/src/chain.rs-14-        Self { blocks: Vec::new() }
+crates/amun-constitutional-block/src/chain.rs-15-    }
+crates/amun-constitutional-block/src/chain.rs-16-
+crates/amun-constitutional-block/src/chain.rs:17:    pub fn append(&mut self, block: ConstitutionalBlock) -> Result<(), String> {
+crates/amun-constitutional-block/src/chain.rs-18-        if self.blocks.is_empty() {
+crates/amun-constitutional-block/src/chain.rs-19-            if block.block_height != 0 {
+crates/amun-constitutional-block/src/chain.rs-20-                return Err("Genesis block must have height 0".into());
+crates/amun-constitutional-block/src/chain.rs-21-            }
+crates/amun-constitutional-block/src/chain.rs-22-            if block.parent_hash != "0".repeat(64) {
+crates/amun-constitutional-block/src/chain.rs-23-                return Err("Genesis parent hash must be 64 zeros".into());
+crates/amun-constitutional-block/src/chain.rs-24-            }
+crates/amun-constitutional-block/src/chain.rs-25-        } else {
+--
+crates/amun-constitutional-block/src/chain.rs-65-    ) -> Result<(), String> {
+crates/amun-constitutional-block/src/chain.rs-66-        let block = self
+crates/amun-constitutional-block/src/chain.rs-67-            .blocks
+crates/amun-constitutional-block/src/chain.rs-68-            .get(height as usize)
+crates/amun-constitutional-block/src/chain.rs-69-            .ok_or_else(|| format!("Block not found at height {}", height))?;
+crates/amun-constitutional-block/src/chain.rs-70-        let computed = hex::encode(log.evidence_root());
+crates/amun-constitutional-block/src/chain.rs-71-        if block.evidence_root != computed {
+crates/amun-constitutional-block/src/chain.rs-72-            return Err(format!(
+crates/amun-constitutional-block/src/chain.rs:73:                "Evidence root mismatch at height {}: block has {} but log produces {}",
+crates/amun-constitutional-block/src/chain.rs-74-                height, block.evidence_root, computed
+crates/amun-constitutional-block/src/chain.rs-75-            ));
+crates/amun-constitutional-block/src/chain.rs-76-        }
+crates/amun-constitutional-block/src/chain.rs-77-        Ok(())
+crates/amun-constitutional-block/src/chain.rs-78-    }
+crates/amun-constitutional-block/src/chain.rs-79-
+crates/amun-constitutional-block/src/chain.rs-80-    /// Full chain evidence audit — verify every block against its ActionLog.
+crates/amun-constitutional-block/src/chain.rs-81-    pub fn verify_chain_evidence(
+--
+crates/amun-constitutional-block/src/block.rs-1-use amun_constitutional_commitments::SparseMerkleTree;
+crates/amun-constitutional-block/src/block.rs-2-use amun_constitutional_kernel::receipt::ExecutionReceipt;
+crates/amun-constitutional-block/src/block.rs-3-use serde::{Deserialize, Serialize};
+crates/amun-constitutional-block/src/block.rs-4-
+crates/amun-constitutional-block/src/block.rs-5-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+crates/amun-constitutional-block/src/block.rs:6:pub struct ConstitutionalBlock {
+crates/amun-constitutional-block/src/block.rs-7-    pub schema_version: u32,
+crates/amun-constitutional-block/src/block.rs-8-    pub block_height: u64,
+crates/amun-constitutional-block/src/block.rs-9-    pub parent_hash: String,
+crates/amun-constitutional-block/src/block.rs-10-    pub timestamp: String,
+crates/amun-constitutional-block/src/block.rs-11-    pub proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs-12-    pub execution_receipts: Vec<ExecutionReceipt>,
+crates/amun-constitutional-block/src/block.rs-13-    pub state_root: String,
+crates/amun-constitutional-block/src/block.rs-14-    pub governance_root: String,
+crates/amun-constitutional-block/src/block.rs-15-    pub execution_root: String,
+crates/amun-constitutional-block/src/block.rs-16-    pub evidence_root: String,
+crates/amun-constitutional-block/src/block.rs-17-    pub replay_certificate_root: String,
+crates/amun-constitutional-block/src/block.rs-18-    pub block_hash: String,
+crates/amun-constitutional-block/src/block.rs-19-}
+crates/amun-constitutional-block/src/block.rs-20-
+crates/amun-constitutional-block/src/block.rs:21:impl ConstitutionalBlock {
+crates/amun-constitutional-block/src/block.rs-22-    #[allow(clippy::too_many_arguments)]
+crates/amun-constitutional-block/src/block.rs-23-    pub fn new(
+crates/amun-constitutional-block/src/block.rs-24-        block_height: u64,
+crates/amun-constitutional-block/src/block.rs-25-        parent_hash: String,
+crates/amun-constitutional-block/src/block.rs-26-        timestamp: String,
+crates/amun-constitutional-block/src/block.rs-27-        proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs-28-        execution_receipts: Vec<ExecutionReceipt>,
+crates/amun-constitutional-block/src/block.rs-29-        state_root: String,
+--
+crates/amun-constitutional-block/src/block.rs-76-        timestamp: String,
+crates/amun-constitutional-block/src/block.rs-77-        proposer_certificate_id: String,
+crates/amun-constitutional-block/src/block.rs-78-        execution_receipts: Vec<ExecutionReceipt>,
+crates/amun-constitutional-block/src/block.rs-79-        state_tree: &SparseMerkleTree,
+crates/amun-constitutional-block/src/block.rs-80-        governance_tree: &SparseMerkleTree,
+crates/amun-constitutional-block/src/block.rs-81-        execution_tree: &SparseMerkleTree,
+crates/amun-constitutional-block/src/block.rs-82-        evidence_tree: &SparseMerkleTree,
+crates/amun-constitutional-block/src/block.rs-83-        replay_certificate_root: String,
+crates/amun-constitutional-block/src/block.rs:84:    ) -> ConstitutionalBlock {
+crates/amun-constitutional-block/src/block.rs-85-        let state_root = hex::encode(state_tree.root());
+crates/amun-constitutional-block/src/block.rs-86-        let governance_root = hex::encode(governance_tree.root());
+crates/amun-constitutional-block/src/block.rs-87-        let execution_root = hex::encode(execution_tree.root());
+crates/amun-constitutional-block/src/block.rs-88-        let evidence_root = hex::encode(evidence_tree.root());
+crates/amun-constitutional-block/src/block.rs-89-
+crates/amun-constitutional-block/src/block.rs:90:        ConstitutionalBlock::new(
+crates/amun-constitutional-block/src/block.rs-91-            block_height,
+crates/amun-constitutional-block/src/block.rs-92-            parent_hash,
+crates/amun-constitutional-block/src/block.rs-93-            timestamp,
+crates/amun-constitutional-block/src/block.rs-94-            proposer_certificate_id,
+crates/amun-constitutional-block/src/block.rs-95-            execution_receipts,
+crates/amun-constitutional-block/src/block.rs-96-            state_root,
+crates/amun-constitutional-block/src/block.rs-97-            governance_root,
+crates/amun-constitutional-block/src/block.rs-98-            execution_root,
+--
+crates/amun-constitutional-block/src/finalizer.rs:1:use crate::block::ConstitutionalBlock;
+crates/amun-constitutional-block/src/finalizer.rs-2-use crate::chain::Blockchain;
+crates/amun-constitutional-block/src/finalizer.rs-3-use amun_consensus::action::ActionLog;
+crates/amun-constitutional-block/src/finalizer.rs:4:use amun_constitutional_state::ConstitutionalStateRuntime;
+crates/amun-constitutional-block/src/finalizer.rs-5-
+crates/amun-constitutional-block/src/finalizer.rs-6-#[derive(Debug, Clone)]
+crates/amun-constitutional-block/src/finalizer.rs-7-pub struct FinalizationContext {
+crates/amun-constitutional-block/src/finalizer.rs:8:    pub state_runtime: Option<ConstitutionalStateRuntime>,
+crates/amun-constitutional-block/src/finalizer.rs-9-    pub pre_state_root: [u8; 32],
+crates/amun-constitutional-block/src/finalizer.rs-10-    pub governance_root: String,
+crates/amun-constitutional-block/src/finalizer.rs-11-    pub execution_root: String,
+crates/amun-constitutional-block/src/finalizer.rs-12-    pub timestamp: String,
+crates/amun-constitutional-block/src/finalizer.rs-13-    pub proposer: String,
+crates/amun-constitutional-block/src/finalizer.rs-14-}
+crates/amun-constitutional-block/src/finalizer.rs-15-
+crates/amun-constitutional-block/src/finalizer.rs-16-pub struct BlockFinalizer;
+crates/amun-constitutional-block/src/finalizer.rs-17-
+crates/amun-constitutional-block/src/finalizer.rs-18-impl BlockFinalizer {
+crates/amun-constitutional-block/src/finalizer.rs-19-    pub fn finalize(
+crates/amun-constitutional-block/src/finalizer.rs-20-        chain: &mut Blockchain,
+crates/amun-constitutional-block/src/finalizer.rs-21-        action_log: &ActionLog,
+crates/amun-constitutional-block/src/finalizer.rs-22-        ctx: FinalizationContext,
+crates/amun-constitutional-block/src/finalizer.rs:23:    ) -> Result<ConstitutionalBlock, String> {
+crates/amun-constitutional-block/src/finalizer.rs-24-        let parent_hash = chain
+crates/amun-constitutional-block/src/finalizer.rs-25-            .blocks
+crates/amun-constitutional-block/src/finalizer.rs-26-            .last()
+crates/amun-constitutional-block/src/finalizer.rs-27-            .map(|b| b.block_hash.clone())
+crates/amun-constitutional-block/src/finalizer.rs-28-            .unwrap_or_else(|| "0".repeat(64));
+crates/amun-constitutional-block/src/finalizer.rs-29-
+crates/amun-constitutional-block/src/finalizer.rs-30-        let height = chain.blocks.last().map(|b| b.block_height + 1).unwrap_or(0);
+crates/amun-constitutional-block/src/finalizer.rs-31-
+crates/amun-constitutional-block/src/finalizer.rs-32-        let evidence_root = hex::encode(action_log.evidence_root());
+crates/amun-constitutional-block/src/finalizer.rs-33-
+crates/amun-constitutional-block/src/finalizer.rs-34-        let (state_root, replay_certificate_root) = match &ctx.state_runtime {
+crates/amun-constitutional-block/src/finalizer.rs-35-            Some(rt) => {
+crates/amun-constitutional-block/src/finalizer.rs-36-                let cert = rt.create_certificate(height, ctx.pre_state_root);
+crates/amun-constitutional-block/src/finalizer.rs:37:                let merkle_root = ConstitutionalStateRuntime::certificate_merkle_root(&[cert]);
+crates/amun-constitutional-block/src/finalizer.rs-38-                (hex::encode(rt.state_root()), hex::encode(merkle_root))
+crates/amun-constitutional-block/src/finalizer.rs-39-            }
+crates/amun-constitutional-block/src/finalizer.rs-40-            None => (String::new(), String::new()),
+crates/amun-constitutional-block/src/finalizer.rs-41-        };
+crates/amun-constitutional-block/src/finalizer.rs-42-
+crates/amun-constitutional-block/src/finalizer.rs:43:        let block = ConstitutionalBlock::new(
+crates/amun-constitutional-block/src/finalizer.rs-44-            height,
+crates/amun-constitutional-block/src/finalizer.rs-45-            parent_hash,
+crates/amun-constitutional-block/src/finalizer.rs-46-            ctx.timestamp,
+crates/amun-constitutional-block/src/finalizer.rs-47-            ctx.proposer,
+crates/amun-constitutional-block/src/finalizer.rs-48-            vec![],
+crates/amun-constitutional-block/src/finalizer.rs-49-            state_root,
+crates/amun-constitutional-block/src/finalizer.rs-50-            ctx.governance_root,
+crates/amun-constitutional-block/src/finalizer.rs-51-            ctx.execution_root,
+--
+crates/amun-kernel-types/src/round.rs:1:use amun_failure::{module_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-kernel-types/src/round.rs-2-
+crates/amun-kernel-types/src/round.rs-3-#[repr(transparent)]
+crates/amun-kernel-types/src/round.rs-4-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+crates/amun-kernel-types/src/round.rs-5-pub struct Round(pub u64);
+crates/amun-kernel-types/src/round.rs-6-
+crates/amun-kernel-types/src/round.rs-7-impl Round {
+crates/amun-kernel-types/src/round.rs-8-    pub const ZERO: Self = Self(0);
+crates/amun-kernel-types/src/round.rs-9-    pub const fn new(value: u64) -> Self {
+crates/amun-kernel-types/src/round.rs-10-        Self(value)
+crates/amun-kernel-types/src/round.rs-11-    }
+crates/amun-kernel-types/src/round.rs-12-
+crates/amun-kernel-types/src/round.rs-13-    pub fn next(self) -> AmunResult<Self> {
+crates/amun-kernel-types/src/round.rs-14-        self.0.checked_add(1).map(Self).ok_or_else(|| {
+crates/amun-kernel-types/src/round.rs-15-            FailureContext::new(
+crates/amun-kernel-types/src/round.rs:16:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-kernel-types/src/round.rs-17-                module_ids::AMUN_KERNEL_TYPES,
+crates/amun-kernel-types/src/round.rs-18-                0x0002,
+crates/amun-kernel-types/src/round.rs-19-            )
+crates/amun-kernel-types/src/round.rs-20-        })
+crates/amun-kernel-types/src/round.rs-21-    }
+crates/amun-kernel-types/src/round.rs-22-
+crates/amun-kernel-types/src/round.rs-23-    pub fn previous(self) -> Self {
+crates/amun-kernel-types/src/round.rs-24-        Self(self.0.saturating_sub(1))
+--
+crates/amun-kernel-types/src/epoch.rs:1:use amun_failure::{module_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-kernel-types/src/epoch.rs-2-
+crates/amun-kernel-types/src/epoch.rs-3-#[repr(transparent)]
+crates/amun-kernel-types/src/epoch.rs-4-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+crates/amun-kernel-types/src/epoch.rs-5-pub struct Epoch(pub u64);
+crates/amun-kernel-types/src/epoch.rs-6-
+crates/amun-kernel-types/src/epoch.rs-7-impl Epoch {
+crates/amun-kernel-types/src/epoch.rs-8-    pub const ZERO: Self = Self(0);
+crates/amun-kernel-types/src/epoch.rs-9-    pub const fn new(value: u64) -> Self {
+crates/amun-kernel-types/src/epoch.rs-10-        Self(value)
+crates/amun-kernel-types/src/epoch.rs-11-    }
+crates/amun-kernel-types/src/epoch.rs-12-
+crates/amun-kernel-types/src/epoch.rs-13-    pub fn next(self) -> AmunResult<Self> {
+crates/amun-kernel-types/src/epoch.rs-14-        self.0.checked_add(1).map(Self).ok_or_else(|| {
+crates/amun-kernel-types/src/epoch.rs-15-            FailureContext::new(
+crates/amun-kernel-types/src/epoch.rs:16:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-kernel-types/src/epoch.rs-17-                module_ids::AMUN_KERNEL_TYPES,
+crates/amun-kernel-types/src/epoch.rs-18-                0x0001,
+crates/amun-kernel-types/src/epoch.rs-19-            )
+crates/amun-kernel-types/src/epoch.rs-20-        })
+crates/amun-kernel-types/src/epoch.rs-21-    }
+crates/amun-kernel-types/src/epoch.rs-22-
+crates/amun-kernel-types/src/epoch.rs-23-    pub fn previous(self) -> Self {
+crates/amun-kernel-types/src/epoch.rs-24-        Self(self.0.saturating_sub(1))
+--
+crates/amun-kernel-types/src/lib.rs-1-#![cfg_attr(not(test), deny(clippy::unwrap_used))]
+crates/amun-kernel-types/src/lib.rs-2-// Sovereign kernel primitive types.
+crates/amun-kernel-types/src/lib.rs-3-// Every type is a newtype wrapper — no bare type aliases.
+crates/amun-kernel-types/src/lib.rs:4:// Constitutional capacity constants are defined here to avoid
+crates/amun-kernel-types/src/lib.rs-5-// circular dependencies between amun-codec and amun-constitution.
+crates/amun-kernel-types/src/lib.rs-6-#![no_std]
+crates/amun-kernel-types/src/lib.rs-7-
+crates/amun-kernel-types/src/lib.rs-8-pub mod amounts;
+crates/amun-kernel-types/src/lib.rs-9-pub mod capacity;
+crates/amun-kernel-types/src/lib.rs-10-pub mod crypto;
+crates/amun-kernel-types/src/lib.rs-11-pub mod epoch;
+crates/amun-kernel-types/src/lib.rs-12-pub mod hash;
+--
+crates/amun-kernel-types/src/capacity.rs:1:// Constitutional capacity constants.
+crates/amun-kernel-types/src/capacity.rs-2-// These are the SINGLE SOURCE OF TRUTH for all size limits in the kernel.
+crates/amun-kernel-types/src/capacity.rs-3-// Defined here (in amun-kernel-types) to avoid circular dependencies.
+crates/amun-kernel-types/src/capacity.rs-4-
+crates/amun-kernel-types/src/capacity.rs-5-pub mod constitutional_capacity {
+crates/amun-kernel-types/src/capacity.rs-6-    // Container limits
+crates/amun-kernel-types/src/capacity.rs-7-    pub const MAX_SET_ITEMS: u32 = 256;
+crates/amun-kernel-types/src/capacity.rs-8-    pub const MAX_MAP_ENTRIES: u32 = 256;
+crates/amun-kernel-types/src/capacity.rs-9-    pub const MAX_SEQUENCE_LENGTH: u32 = 10_000;
+--
+crates/amun-accounts/src/lib.rs-1-use amun_constitutional_commitment::{
+crates/amun-accounts/src/lib.rs:2:    ConstitutionalRoots, EconomicSnapshot, EndBlockPipeline, Hash32,
+crates/amun-accounts/src/lib.rs-3-};
+crates/amun-accounts/src/lib.rs:4:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-accounts/src/lib.rs-5-use amun_tokenomics_ledger::EconomicLedger;
+crates/amun-accounts/src/lib.rs-6-use blake3::Hasher;
+crates/amun-accounts/src/lib.rs-7-use std::collections::BTreeMap;
+crates/amun-accounts/src/lib.rs-8-
+crates/amun-accounts/src/lib.rs-9-/// A constitutional account holding balance and nonce.
+crates/amun-accounts/src/lib.rs-10-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+crates/amun-accounts/src/lib.rs-11-pub struct Account {
+crates/amun-accounts/src/lib.rs-12-    pub balance: u64,
+--
+crates/amun-accounts/src/lib.rs-119-    }
+crates/amun-accounts/src/lib.rs-120-
+crates/amun-accounts/src/lib.rs-121-    /// Compute CCA-aware state root from a real EconomicLedger.
+crates/amun-accounts/src/lib.rs-122-    pub fn state_root_with_ledger(&self, ledger: &EconomicLedger) -> [u8; 32] {
+crates/amun-accounts/src/lib.rs-123-        self.constitutional_roots_with_ledger(ledger).state_root
+crates/amun-accounts/src/lib.rs-124-    }
+crates/amun-accounts/src/lib.rs-125-
+crates/amun-accounts/src/lib.rs-126-    /// (Compatibility layer) Compute constitutional roots (uses empty ledger).
+crates/amun-accounts/src/lib.rs:127:    pub fn constitutional_roots(&self) -> ConstitutionalRoots {
+crates/amun-accounts/src/lib.rs-128-        let ledger = EconomicLedger::new();
+crates/amun-accounts/src/lib.rs-129-        self.constitutional_roots_with_ledger(&ledger)
+crates/amun-accounts/src/lib.rs-130-    }
+crates/amun-accounts/src/lib.rs-131-
+crates/amun-accounts/src/lib.rs-132-    /// Compute constitutional roots from a real EconomicLedger.
+crates/amun-accounts/src/lib.rs:133:    pub fn constitutional_roots_with_ledger(&self, ledger: &EconomicLedger) -> ConstitutionalRoots {
+crates/amun-accounts/src/lib.rs-134-        let raw_root = self.raw_state_root();
+crates/amun-accounts/src/lib.rs-135-        let snapshot = self.build_economic_snapshot_with_ledger(ledger);
+crates/amun-accounts/src/lib.rs-136-
+crates/amun-accounts/src/lib.rs:137:        let identity = ConstitutionalIdentity::new(raw_root);
+crates/amun-accounts/src/lib.rs-138-        let identity_root: Hash32 = identity.identity_hash;
+crates/amun-accounts/src/lib.rs-139-        let evidence_root: Hash32 = [0u8; 32];
+crates/amun-accounts/src/lib.rs-140-        let governance_root: Hash32 = [0u8; 32];
+crates/amun-accounts/src/lib.rs-141-
+crates/amun-accounts/src/lib.rs-142-        if let Some(commitment) =
+crates/amun-accounts/src/lib.rs-143-            EndBlockPipeline::execute(identity_root, evidence_root, governance_root, &snapshot)
+crates/amun-accounts/src/lib.rs-144-        {
+crates/amun-accounts/src/lib.rs:145:            ConstitutionalRoots::from_commitment(
+crates/amun-accounts/src/lib.rs-146-                raw_root,
+crates/amun-accounts/src/lib.rs-147-                commitment.economic_root,
+crates/amun-accounts/src/lib.rs-148-                identity_root,
+crates/amun-accounts/src/lib.rs-149-                governance_root,
+crates/amun-accounts/src/lib.rs-150-                &commitment,
+crates/amun-accounts/src/lib.rs-151-            )
+crates/amun-accounts/src/lib.rs-152-        } else {
+crates/amun-accounts/src/lib.rs:153:            ConstitutionalRoots {
+crates/amun-accounts/src/lib.rs-154-                state_root: raw_root,
+crates/amun-accounts/src/lib.rs-155-                commitment_root: [0u8; 32],
+crates/amun-accounts/src/lib.rs-156-                economic_root: [0u8; 32],
+crates/amun-accounts/src/lib.rs-157-                identity_root: [0u8; 32],
+crates/amun-accounts/src/lib.rs-158-                governance_root: [0u8; 32],
+crates/amun-accounts/src/lib.rs-159-                constitutional_root: [0u8; 32],
+crates/amun-accounts/src/lib.rs-160-            }
+crates/amun-accounts/src/lib.rs-161-        }
+--
+crates/amun-replay-engine/src/canonical.rs-15-//
+crates/amun-replay-engine/src/canonical.rs-16-// DEPENDENCY DIRECTION:
+crates/amun-replay-engine/src/canonical.rs-17-//   canonical.rs is depended upon by everything above it.
+crates/amun-replay-engine/src/canonical.rs-18-//   canonical.rs depends on NOTHING except alloc and sha2.
+crates/amun-replay-engine/src/canonical.rs-19-
+crates/amun-replay-engine/src/canonical.rs-20-extern crate alloc;
+crates/amun-replay-engine/src/canonical.rs-21-use alloc::vec::Vec;
+crates/amun-replay-engine/src/canonical.rs-22-
+crates/amun-replay-engine/src/canonical.rs:23:use amun_constitutional::ConstitutionalHash;
+crates/amun-replay-engine/src/canonical.rs-24-
+crates/amun-replay-engine/src/canonical.rs-25-// ────────────────────────────────────────────────────────────────────────────
+crates/amun-replay-engine/src/canonical.rs-26-// TRAIT: CanonicalEncode
+crates/amun-replay-engine/src/canonical.rs-27-// ────────────────────────────────────────────────────────────────────────────
+crates/amun-replay-engine/src/canonical.rs-28-
+crates/amun-replay-engine/src/canonical.rs-29-pub trait CanonicalEncode {
+crates/amun-replay-engine/src/canonical.rs-30-    fn canonical_encode(&self) -> Vec<u8>;
+crates/amun-replay-engine/src/canonical.rs-31-    fn canonical_encode_into(&self, buf: &mut CanonicalWriter);
+--
+crates/amun-replay-engine/src/canonical.rs-70-        self.write_u64(bytes.len() as u64);
+crates/amun-replay-engine/src/canonical.rs-71-        self.buffer.extend_from_slice(bytes);
+crates/amun-replay-engine/src/canonical.rs-72-    }
+crates/amun-replay-engine/src/canonical.rs-73-
+crates/amun-replay-engine/src/canonical.rs-74-    pub fn write_fixed_bytes(&mut self, bytes: &[u8]) {
+crates/amun-replay-engine/src/canonical.rs-75-        self.buffer.extend_from_slice(bytes);
+crates/amun-replay-engine/src/canonical.rs-76-    }
+crates/amun-replay-engine/src/canonical.rs-77-
+crates/amun-replay-engine/src/canonical.rs:78:    pub fn write_hash(&mut self, hash: &ConstitutionalHash) {
+crates/amun-replay-engine/src/canonical.rs-79-        self.write_fixed_bytes(hash);
+crates/amun-replay-engine/src/canonical.rs-80-    }
+crates/amun-replay-engine/src/canonical.rs-81-
+crates/amun-replay-engine/src/canonical.rs-82-    pub fn into_bytes(self) -> Vec<u8> {
+crates/amun-replay-engine/src/canonical.rs-83-        self.buffer
+crates/amun-replay-engine/src/canonical.rs-84-    }
+crates/amun-replay-engine/src/canonical.rs-85-
+crates/amun-replay-engine/src/canonical.rs-86-    pub fn as_bytes(&self) -> &[u8] {
+--
+crates/amun-replay-engine/src/canonical.rs-116-        let slice = &self.buffer[self.position..self.position + 8];
+crates/amun-replay-engine/src/canonical.rs-117-        let bytes: [u8; 8] = slice
+crates/amun-replay-engine/src/canonical.rs-118-            .try_into()
+crates/amun-replay-engine/src/canonical.rs-119-            .expect("canonical: fixed-size conversion failed");
+crates/amun-replay-engine/src/canonical.rs-120-        self.position += 8;
+crates/amun-replay-engine/src/canonical.rs-121-        Ok(u64::from_be_bytes(bytes))
+crates/amun-replay-engine/src/canonical.rs-122-    }
+crates/amun-replay-engine/src/canonical.rs-123-
+crates/amun-replay-engine/src/canonical.rs:124:    pub fn read_hash(&mut self) -> Result<ConstitutionalHash, CanonicalError> {
+crates/amun-replay-engine/src/canonical.rs-125-        if self.remaining() < 32 {
+crates/amun-replay-engine/src/canonical.rs-126-            return Err(CanonicalError::UnexpectedEnd);
+crates/amun-replay-engine/src/canonical.rs-127-        }
+crates/amun-replay-engine/src/canonical.rs-128-        let slice = &self.buffer[self.position..self.position + 32];
+crates/amun-replay-engine/src/canonical.rs:129:        let hash: ConstitutionalHash = slice
+crates/amun-replay-engine/src/canonical.rs-130-            .try_into()
+crates/amun-replay-engine/src/canonical.rs-131-            .expect("canonical: fixed-size conversion failed");
+crates/amun-replay-engine/src/canonical.rs-132-        self.position += 32;
+crates/amun-replay-engine/src/canonical.rs-133-        Ok(hash)
+crates/amun-replay-engine/src/canonical.rs-134-    }
+crates/amun-replay-engine/src/canonical.rs-135-
+crates/amun-replay-engine/src/canonical.rs-136-    pub fn read_bytes(&mut self) -> Result<&'a [u8], CanonicalError> {
+crates/amun-replay-engine/src/canonical.rs-137-        let len = self.read_u64()? as usize;
+--
+crates/amun-replay-engine/src/canonical.rs-170-    }
+crates/amun-replay-engine/src/canonical.rs-171-
+crates/amun-replay-engine/src/canonical.rs-172-    pub fn update<T: CanonicalEncode>(&mut self, item: &T) {
+crates/amun-replay-engine/src/canonical.rs-173-        let mut writer = CanonicalWriter::new();
+crates/amun-replay-engine/src/canonical.rs-174-        item.canonical_encode_into(&mut writer);
+crates/amun-replay-engine/src/canonical.rs-175-        self.buffer.extend_from_slice(writer.as_bytes());
+crates/amun-replay-engine/src/canonical.rs-176-    }
+crates/amun-replay-engine/src/canonical.rs-177-
+crates/amun-replay-engine/src/canonical.rs:178:    pub fn finalize(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/canonical.rs-179-        use sha2::Digest;
+crates/amun-replay-engine/src/canonical.rs-180-        let mut hasher = sha2::Sha256::new();
+crates/amun-replay-engine/src/canonical.rs-181-        hasher.update(&self.buffer);
+crates/amun-replay-engine/src/canonical.rs-182-        let result: [u8; 32] = hasher.finalize().into();
+crates/amun-replay-engine/src/canonical.rs-183-        result
+crates/amun-replay-engine/src/canonical.rs-184-    }
+crates/amun-replay-engine/src/canonical.rs-185-}
+crates/amun-replay-engine/src/canonical.rs-186-
+crates/amun-replay-engine/src/canonical.rs-187-// ────────────────────────────────────────────────────────────────────────────
+crates/amun-replay-engine/src/canonical.rs-188-// TRAIT IMPLEMENTATIONS
+crates/amun-replay-engine/src/canonical.rs-189-// ────────────────────────────────────────────────────────────────────────────
+crates/amun-replay-engine/src/canonical.rs-190-//
+crates/amun-replay-engine/src/canonical.rs:191:// NOTE: ConstitutionalHash IS [u8; 32], so we implement ONLY for [u8; 32].
+crates/amun-replay-engine/src/canonical.rs-192-// No duplicate impl. The type alias resolves to the same concrete type.
+crates/amun-replay-engine/src/canonical.rs-193-
+crates/amun-replay-engine/src/canonical.rs-194-impl CanonicalEncode for u64 {
+crates/amun-replay-engine/src/canonical.rs-195-    fn canonical_encode(&self) -> Vec<u8> {
+crates/amun-replay-engine/src/canonical.rs-196-        self.to_be_bytes().to_vec()
+crates/amun-replay-engine/src/canonical.rs-197-    }
+crates/amun-replay-engine/src/canonical.rs-198-    fn canonical_encode_into(&self, buf: &mut CanonicalWriter) {
+crates/amun-replay-engine/src/canonical.rs-199-        buf.write_u64(*self);
+--
+crates/amun-replay-engine/src/canonical.rs-222-    fn canonical_encode(&self) -> Vec<u8> {
+crates/amun-replay-engine/src/canonical.rs-223-        vec![if *self { 1 } else { 0 }]
+crates/amun-replay-engine/src/canonical.rs-224-    }
+crates/amun-replay-engine/src/canonical.rs-225-    fn canonical_encode_into(&self, buf: &mut CanonicalWriter) {
+crates/amun-replay-engine/src/canonical.rs-226-        buf.write_bool(*self);
+crates/amun-replay-engine/src/canonical.rs-227-    }
+crates/amun-replay-engine/src/canonical.rs-228-}
+crates/amun-replay-engine/src/canonical.rs-229-
+crates/amun-replay-engine/src/canonical.rs:230:// SINGLE implementation for [u8; 32] (which IS ConstitutionalHash)
+crates/amun-replay-engine/src/canonical.rs-231-impl CanonicalEncode for [u8; 32] {
+crates/amun-replay-engine/src/canonical.rs-232-    fn canonical_encode(&self) -> Vec<u8> {
+crates/amun-replay-engine/src/canonical.rs-233-        self.to_vec()
+crates/amun-replay-engine/src/canonical.rs-234-    }
+crates/amun-replay-engine/src/canonical.rs-235-    fn canonical_encode_into(&self, buf: &mut CanonicalWriter) {
+crates/amun-replay-engine/src/canonical.rs-236-        buf.write_fixed_bytes(self);
+crates/amun-replay-engine/src/canonical.rs-237-    }
+crates/amun-replay-engine/src/canonical.rs-238-}
+--
+crates/amun-replay-engine/src/canonical.rs-250-        let v: u64 = 0xDEAD_BEEF_CAFE_BABE;
+crates/amun-replay-engine/src/canonical.rs-251-        let encoded = v.canonical_encode();
+crates/amun-replay-engine/src/canonical.rs-252-        let mut reader = CanonicalReader::new(&encoded);
+crates/amun-replay-engine/src/canonical.rs-253-        assert_eq!(reader.read_u64().unwrap(), v);
+crates/amun-replay-engine/src/canonical.rs-254-    }
+crates/amun-replay-engine/src/canonical.rs-255-
+crates/amun-replay-engine/src/canonical.rs-256-    #[test]
+crates/amun-replay-engine/src/canonical.rs-257-    fn hash_roundtrip() {
+crates/amun-replay-engine/src/canonical.rs:258:        let hash: ConstitutionalHash = [0xAB; 32];
+crates/amun-replay-engine/src/canonical.rs-259-        let encoded = hash.canonical_encode();
+crates/amun-replay-engine/src/canonical.rs-260-        let mut reader = CanonicalReader::new(&encoded);
+crates/amun-replay-engine/src/canonical.rs-261-        assert_eq!(reader.read_hash().unwrap(), hash);
+crates/amun-replay-engine/src/canonical.rs-262-    }
+crates/amun-replay-engine/src/canonical.rs-263-
+crates/amun-replay-engine/src/canonical.rs-264-    #[test]
+crates/amun-replay-engine/src/canonical.rs-265-    fn hasher_is_deterministic() {
+crates/amun-replay-engine/src/canonical.rs-266-        let mut h1 = CanonicalHasher::new();
+--
+crates/amun-replay-engine/src/zk_adapters.rs:1://! ZK Witness Adapters — cryptographic portability for derivability.
+crates/amun-replay-engine/src/zk_adapters.rs-2-//!
+crates/amun-replay-engine/src/zk_adapters.rs-3-//! These adapters wrap constitutional proofs in cryptographic envelopes
+crates/amun-replay-engine/src/zk_adapters.rs-4-//! for efficient, private, or cross-system verification.
+crates/amun-replay-engine/src/zk_adapters.rs-5-//!
+crates/amun-replay-engine/src/zk_adapters.rs-6-//! CRITICAL: ZK proofs attest to derivability, but do NOT define it.
+crates/amun-replay-engine/src/zk_adapters.rs-7-//! The constitutional kernel remains the sole source of truth.
+crates/amun-replay-engine/src/zk_adapters.rs-8-
+crates/amun-replay-engine/src/zk_adapters.rs-9-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/zk_adapters.rs:10:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/zk_adapters.rs:11:use amun_constitutional::ConstitutionalHasher;
+crates/amun-replay-engine/src/zk_adapters.rs-12-
+crates/amun-replay-engine/src/zk_adapters.rs-13-/// A cryptographic wrapper for a constitutional witness.
+crates/amun-replay-engine/src/zk_adapters.rs-14-///
+crates/amun-replay-engine/src/zk_adapters.rs-15-/// The envelope carries a ZK proof that a certain derivability outcome
+crates/amun-replay-engine/src/zk_adapters.rs-16-/// is valid, without necessarily revealing the full witness surface.
+crates/amun-replay-engine/src/zk_adapters.rs-17-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/zk_adapters.rs:18:pub struct ZKWitnessEnvelope {
+crates/amun-replay-engine/src/zk_adapters.rs-19-    /// The target artifact whose admissibility is being proven.
+crates/amun-replay-engine/src/zk_adapters.rs:20:    pub target_artifact_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-21-    /// The constitutional context.
+crates/amun-replay-engine/src/zk_adapters.rs:22:    pub context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-23-    /// The admissibility fingerprint that the ZK proof asserts.
+crates/amun-replay-engine/src/zk_adapters.rs:24:    pub asserted_fingerprint: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-25-    /// The ZK proof payload (opaque bytes — informational until verified).
+crates/amun-replay-engine/src/zk_adapters.rs-26-    pub proof_payload: Vec<u8>,
+crates/amun-replay-engine/src/zk_adapters.rs-27-    /// Whether the proof has been verified against the kernel.
+crates/amun-replay-engine/src/zk_adapters.rs-28-    pub verified: bool,
+crates/amun-replay-engine/src/zk_adapters.rs-29-    /// Hash of this envelope for transport.
+crates/amun-replay-engine/src/zk_adapters.rs:30:    pub envelope_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-31-}
+crates/amun-replay-engine/src/zk_adapters.rs-32-
+crates/amun-replay-engine/src/zk_adapters.rs:33:impl ZKWitnessEnvelope {
+crates/amun-replay-engine/src/zk_adapters.rs-34-    pub fn new(
+crates/amun-replay-engine/src/zk_adapters.rs:35:        target: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs:36:        context: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs:37:        fingerprint: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-38-        proof_payload: Vec<u8>,
+crates/amun-replay-engine/src/zk_adapters.rs-39-    ) -> Self {
+crates/amun-replay-engine/src/zk_adapters.rs-40-        let mut e = Self {
+crates/amun-replay-engine/src/zk_adapters.rs-41-            target_artifact_hash: target,
+crates/amun-replay-engine/src/zk_adapters.rs-42-            context_hash: context,
+crates/amun-replay-engine/src/zk_adapters.rs-43-            asserted_fingerprint: fingerprint,
+crates/amun-replay-engine/src/zk_adapters.rs-44-            proof_payload,
+crates/amun-replay-engine/src/zk_adapters.rs-45-            verified: false,
+crates/amun-replay-engine/src/zk_adapters.rs-46-            envelope_hash: [0; 32],
+crates/amun-replay-engine/src/zk_adapters.rs-47-        };
+crates/amun-replay-engine/src/zk_adapters.rs-48-        e.envelope_hash = e.compute_hash();
+crates/amun-replay-engine/src/zk_adapters.rs-49-        e
+crates/amun-replay-engine/src/zk_adapters.rs-50-    }
+crates/amun-replay-engine/src/zk_adapters.rs-51-
+crates/amun-replay-engine/src/zk_adapters.rs:52:    fn compute_hash(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/zk_adapters.rs:53:        let mut h = ConstitutionalHasher::new(b"ZK_WITNESS_ENVELOPE");
+crates/amun-replay-engine/src/zk_adapters.rs-54-        h.update_bytes(&self.target_artifact_hash)
+crates/amun-replay-engine/src/zk_adapters.rs-55-            .update_bytes(&self.context_hash)
+crates/amun-replay-engine/src/zk_adapters.rs-56-            .update_bytes(&self.asserted_fingerprint)
+crates/amun-replay-engine/src/zk_adapters.rs-57-            .update_bytes(&self.proof_payload);
+crates/amun-replay-engine/src/zk_adapters.rs-58-        h.finalize()
+crates/amun-replay-engine/src/zk_adapters.rs-59-    }
+crates/amun-replay-engine/src/zk_adapters.rs-60-
+crates/amun-replay-engine/src/zk_adapters.rs-61-    /// Mark the proof as verified (after actual ZK verification against kernel).
+--
+crates/amun-replay-engine/src/zk_adapters.rs-66-
+crates/amun-replay-engine/src/zk_adapters.rs-67-/// A commitment to a specific derivability outcome, suitable for ZK wrapping.
+crates/amun-replay-engine/src/zk_adapters.rs-68-///
+crates/amun-replay-engine/src/zk_adapters.rs-69-/// This commitment cryptographically binds the admissibility outcome
+crates/amun-replay-engine/src/zk_adapters.rs-70-/// without revealing the full derivation surface.
+crates/amun-replay-engine/src/zk_adapters.rs-71-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/zk_adapters.rs-72-pub struct DerivabilityCommitment {
+crates/amun-replay-engine/src/zk_adapters.rs-73-    /// The target artifact.
+crates/amun-replay-engine/src/zk_adapters.rs:74:    pub target_artifact_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-75-    /// The canonical derivation fingerprint being committed to.
+crates/amun-replay-engine/src/zk_adapters.rs:76:    pub fingerprint: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-77-    /// A random blinding factor to hide the fingerprint if needed.
+crates/amun-replay-engine/src/zk_adapters.rs-78-    pub blinding: [u8; 32],
+crates/amun-replay-engine/src/zk_adapters.rs-79-    /// The actual commitment hash.
+crates/amun-replay-engine/src/zk_adapters.rs:80:    pub commitment: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-81-}
+crates/amun-replay-engine/src/zk_adapters.rs-82-
+crates/amun-replay-engine/src/zk_adapters.rs-83-impl DerivabilityCommitment {
+crates/amun-replay-engine/src/zk_adapters.rs-84-    pub fn new(
+crates/amun-replay-engine/src/zk_adapters.rs:85:        target: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs:86:        fingerprint: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-87-        blinding: [u8; 32],
+crates/amun-replay-engine/src/zk_adapters.rs-88-    ) -> Self {
+crates/amun-replay-engine/src/zk_adapters.rs-89-        let mut c = Self {
+crates/amun-replay-engine/src/zk_adapters.rs-90-            target_artifact_hash: target,
+crates/amun-replay-engine/src/zk_adapters.rs-91-            fingerprint,
+crates/amun-replay-engine/src/zk_adapters.rs-92-            blinding,
+crates/amun-replay-engine/src/zk_adapters.rs-93-            commitment: [0; 32],
+crates/amun-replay-engine/src/zk_adapters.rs-94-        };
+crates/amun-replay-engine/src/zk_adapters.rs-95-        c.commitment = c.compute_commitment();
+crates/amun-replay-engine/src/zk_adapters.rs-96-        c
+crates/amun-replay-engine/src/zk_adapters.rs-97-    }
+crates/amun-replay-engine/src/zk_adapters.rs-98-
+crates/amun-replay-engine/src/zk_adapters.rs:99:    fn compute_commitment(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/zk_adapters.rs:100:        let mut h = ConstitutionalHasher::new(b"DERIVABILITY_COMMITMENT");
+crates/amun-replay-engine/src/zk_adapters.rs-101-        h.update_bytes(&self.target_artifact_hash)
+crates/amun-replay-engine/src/zk_adapters.rs-102-            .update_bytes(&self.fingerprint)
+crates/amun-replay-engine/src/zk_adapters.rs-103-            .update_bytes(&self.blinding);
+crates/amun-replay-engine/src/zk_adapters.rs-104-        h.finalize()
+crates/amun-replay-engine/src/zk_adapters.rs-105-    }
+crates/amun-replay-engine/src/zk_adapters.rs-106-}
+crates/amun-replay-engine/src/zk_adapters.rs-107-
+crates/amun-replay-engine/src/zk_adapters.rs-108-/// A recursive proof boundary — prevents infinite ZK nesting.
+--
+crates/amun-replay-engine/src/zk_adapters.rs-135-    }
+crates/amun-replay-engine/src/zk_adapters.rs-136-}
+crates/amun-replay-engine/src/zk_adapters.rs-137-
+crates/amun-replay-engine/src/zk_adapters.rs-138-/// A selective reveal surface — discloses only the minimal derivation
+crates/amun-replay-engine/src/zk_adapters.rs-139-/// necessary for an external verifier to check admissibility.
+crates/amun-replay-engine/src/zk_adapters.rs-140-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/zk_adapters.rs-141-pub struct SelectiveRevealSurface {
+crates/amun-replay-engine/src/zk_adapters.rs-142-    /// The target artifact.
+crates/amun-replay-engine/src/zk_adapters.rs:143:    pub target_artifact_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-144-    /// The minimal core hashes being revealed.
+crates/amun-replay-engine/src/zk_adapters.rs:145:    pub revealed_hashes: Vec<ConstitutionalHash>,
+crates/amun-replay-engine/src/zk_adapters.rs-146-    /// The admissibility fingerprint that this surface proves.
+crates/amun-replay-engine/src/zk_adapters.rs:147:    pub fingerprint: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-148-    /// A hash binding the revealed surface to the original witness.
+crates/amun-replay-engine/src/zk_adapters.rs:149:    pub surface_binding: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-150-}
+crates/amun-replay-engine/src/zk_adapters.rs-151-
+crates/amun-replay-engine/src/zk_adapters.rs-152-impl SelectiveRevealSurface {
+crates/amun-replay-engine/src/zk_adapters.rs-153-    pub fn new(
+crates/amun-replay-engine/src/zk_adapters.rs:154:        target: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs:155:        revealed: Vec<ConstitutionalHash>,
+crates/amun-replay-engine/src/zk_adapters.rs:156:        fingerprint: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-157-    ) -> Self {
+crates/amun-replay-engine/src/zk_adapters.rs-158-        let mut s = Self {
+crates/amun-replay-engine/src/zk_adapters.rs-159-            target_artifact_hash: target,
+crates/amun-replay-engine/src/zk_adapters.rs-160-            revealed_hashes: revealed,
+crates/amun-replay-engine/src/zk_adapters.rs-161-            fingerprint,
+crates/amun-replay-engine/src/zk_adapters.rs-162-            surface_binding: [0; 32],
+crates/amun-replay-engine/src/zk_adapters.rs-163-        };
+crates/amun-replay-engine/src/zk_adapters.rs-164-        s.surface_binding = s.compute_binding();
+crates/amun-replay-engine/src/zk_adapters.rs-165-        s
+crates/amun-replay-engine/src/zk_adapters.rs-166-    }
+crates/amun-replay-engine/src/zk_adapters.rs-167-
+crates/amun-replay-engine/src/zk_adapters.rs:168:    fn compute_binding(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/zk_adapters.rs:169:        let mut h = ConstitutionalHasher::new(b"SELECTIVE_REVEAL");
+crates/amun-replay-engine/src/zk_adapters.rs-170-        h.update_bytes(&self.target_artifact_hash)
+crates/amun-replay-engine/src/zk_adapters.rs-171-            .update_bytes(&self.fingerprint);
+crates/amun-replay-engine/src/zk_adapters.rs-172-        for hash in &self.revealed_hashes {
+crates/amun-replay-engine/src/zk_adapters.rs-173-            h.update_bytes(hash);
+crates/amun-replay-engine/src/zk_adapters.rs-174-        }
+crates/amun-replay-engine/src/zk_adapters.rs-175-        h.finalize()
+crates/amun-replay-engine/src/zk_adapters.rs-176-    }
+crates/amun-replay-engine/src/zk_adapters.rs-177-}
+--
+crates/amun-replay-engine/src/zk_adapters.rs-203-/// A guard that ensures ZK proofs remain constitutionally inspectable.
+crates/amun-replay-engine/src/zk_adapters.rs-204-///
+crates/amun-replay-engine/src/zk_adapters.rs-205-/// Prevents opaque proofs from bypassing constitutional verification.
+crates/amun-replay-engine/src/zk_adapters.rs-206-/// Every ZK proof must carry enough information to trace back to a
+crates/amun-replay-engine/src/zk_adapters.rs-207-/// valid constitutional derivation.
+crates/amun-replay-engine/src/zk_adapters.rs-208-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/zk_adapters.rs-209-pub struct ProofInspectabilityGuard {
+crates/amun-replay-engine/src/zk_adapters.rs-210-    /// The original witness hash that this ZK proof derives from.
+crates/amun-replay-engine/src/zk_adapters.rs:211:    pub source_witness_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/zk_adapters.rs-212-    /// Whether the proof preserves full derivability attribution.
+crates/amun-replay-engine/src/zk_adapters.rs-213-    pub attribution_preserved: bool,
+crates/amun-replay-engine/src/zk_adapters.rs-214-    /// Whether the proof can be decomposed into constituent parts.
+crates/amun-replay-engine/src/zk_adapters.rs-215-    pub decomposable: bool,
+crates/amun-replay-engine/src/zk_adapters.rs-216-}
+crates/amun-replay-engine/src/zk_adapters.rs-217-
+crates/amun-replay-engine/src/zk_adapters.rs-218-impl ProofInspectabilityGuard {
+crates/amun-replay-engine/src/zk_adapters.rs:219:    pub fn new(source_witness_hash: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/zk_adapters.rs-220-        Self { source_witness_hash, attribution_preserved: true, decomposable: true }
+crates/amun-replay-engine/src/zk_adapters.rs-221-    }
+crates/amun-replay-engine/src/zk_adapters.rs-222-
+crates/amun-replay-engine/src/zk_adapters.rs-223-    /// Returns true if this ZK proof is constitutionally inspectable.
+crates/amun-replay-engine/src/zk_adapters.rs-224-    pub fn is_inspectable(&self) -> bool {
+crates/amun-replay-engine/src/zk_adapters.rs-225-        self.attribution_preserved && self.decomposable
+crates/amun-replay-engine/src/zk_adapters.rs-226-    }
+crates/amun-replay-engine/src/zk_adapters.rs-227-}
+crates/amun-replay-engine/src/zk_adapters.rs-228-
+crates/amun-replay-engine/src/zk_adapters.rs-229-#[cfg(test)]
+crates/amun-replay-engine/src/zk_adapters.rs-230-mod tests {
+crates/amun-replay-engine/src/zk_adapters.rs-231-    use super::*;
+crates/amun-replay-engine/src/zk_adapters.rs-232-
+crates/amun-replay-engine/src/zk_adapters.rs-233-    #[test]
+crates/amun-replay-engine/src/zk_adapters.rs-234-    fn test_zk_envelope_creation() {
+crates/amun-replay-engine/src/zk_adapters.rs:235:        let env = ZKWitnessEnvelope::new(
+crates/amun-replay-engine/src/zk_adapters.rs-236-            [0xAA; 32], [0xAB; 32], [0xCC; 32], b"zk_proof_data".to_vec(),
+crates/amun-replay-engine/src/zk_adapters.rs-237-        );
+crates/amun-replay-engine/src/zk_adapters.rs-238-        assert_eq!(env.target_artifact_hash, [0xAA; 32]);
+crates/amun-replay-engine/src/zk_adapters.rs-239-        assert!(!env.verified);
+crates/amun-replay-engine/src/zk_adapters.rs-240-    }
+crates/amun-replay-engine/src/zk_adapters.rs-241-
+crates/amun-replay-engine/src/zk_adapters.rs-242-    #[test]
+crates/amun-replay-engine/src/zk_adapters.rs-243-    fn test_derivability_commitment() {
+--
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:1://! ByzantineWitnessFilter — prevent malicious witness propagation.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-2-//!
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-3-//! In a distributed environment, workers may propagate:
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-4-//!   - Incomplete witnesses (missing hard dependencies)
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-5-//!   - Misleading closure fragments
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-6-//!   - Dependency inflation attacks
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-7-//!   - Circular reference chains
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-8-//!
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-9-//! This filter validates structural properties of incoming witnesses
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-10-//! BEFORE they are used for constitutional derivation.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-11-//! It does NOT judge constitutional validity — that remains the kernel's role.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-12-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:13:use amun_constitutional::ConstitutionalWitness;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:14:use amun_constitutional::WitnessType;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-15-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-16-/// Result of filtering a witness from the network.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-17-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-18-pub enum FilterResult {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:19:    /// Witness passes all structural checks.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-20-    Accepted,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:21:    /// Witness is structurally incomplete (missing hard dependencies).
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-22-    Incomplete {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-23-        missing_hard_count: usize,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-24-    },
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:25:    /// Witness appears to be part of a dependency inflation attack.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-26-    InflationSuspected {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-27-        total_entries: usize,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-28-        hard_entries: usize,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-29-        suspicious_ratio: bool,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-30-    },
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:31:    /// Witness contains self-referential entries.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-32-    SelfReferenceDetected,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:33:    /// Witness is empty (no entries).
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:34:    EmptyWitness,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-35-}
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-36-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-37-/// Filter a witness from the network for structural validity.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-38-///
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-39-/// This is a PRE-VERIFICATION filter. It checks structural properties
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-40-/// before the constitutional kernel performs full semantic verification.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-41-/// It prevents obviously malicious witnesses from consuming kernel resources.
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:42:pub fn filter_incoming_witness(witness: &ConstitutionalWitness) -> FilterResult {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-43-    // Empty witness
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-44-    if witness.entries.is_empty() {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:45:        return FilterResult::EmptyWitness;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-46-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-47-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-48-    // Check for self-references
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-49-    for entry in &witness.entries {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-50-        if entry.artifact_hash == witness.target_artifact_hash {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-51-            return FilterResult::SelfReferenceDetected;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-52-        }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-53-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-54-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-55-    // Check hard dependency count
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-56-    let hard_count = witness.entries.iter()
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:57:        .filter(|e| matches!(e.witness_type, WitnessType::HardDependency))
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-58-        .count();
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-59-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-60-    if hard_count == 0 && witness.total_entry_count > 0 {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:61:        // Witness has entries but no hard dependencies — suspicious
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-62-        return FilterResult::Incomplete { missing_hard_count: 0 };
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-63-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-64-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-65-    // Check for dependency inflation (too many non-essential entries)
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-66-    let total = witness.entries.len();
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-67-    if total > 0 {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-68-        let non_essential = total - hard_count;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-69-        let ratio = non_essential as f64 / total as f64;
+--
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-77-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-78-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-79-    FilterResult::Accepted
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-80-}
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-81-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-82-#[cfg(test)]
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-83-mod tests {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-84-    use super::*;
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:85:    use amun_constitutional::{WitnessEntry, WitnessType};
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-86-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:87:    fn make_witness(entries: Vec<WitnessEntry>) -> ConstitutionalWitness {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:88:        ConstitutionalWitness::new(1, 1, 1, [0xAA; 32], [0xAB; 32], entries)
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-89-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-90-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-91-    #[test]
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-92-    fn test_empty_witness_rejected() {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-93-        let w = make_witness(vec![]);
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:94:        assert!(matches!(filter_incoming_witness(&w), FilterResult::EmptyWitness));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-95-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-96-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-97-    #[test]
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-98-    fn test_valid_witness_accepted() {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-99-        let entries = vec![
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:100:            WitnessEntry::new([0x01; 32], WitnessType::HardDependency),
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:101:            WitnessEntry::new([0x02; 32], WitnessType::SupportingDependency),
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-102-        ];
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-103-        let w = make_witness(entries);
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-104-        assert!(matches!(filter_incoming_witness(&w), FilterResult::Accepted));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-105-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-106-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-107-    #[test]
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-108-    fn test_inflation_suspected() {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-109-        let mut entries = Vec::new();
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:110:        entries.push(WitnessEntry::new([0x01; 32], WitnessType::HardDependency));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-111-        for i in 0..50 {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:112:            entries.push(WitnessEntry::new([i as u8; 32], WitnessType::AuditDependency));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-113-        }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-114-        let w = make_witness(entries);
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-115-        let result = filter_incoming_witness(&w);
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-116-        assert!(matches!(result, FilterResult::InflationSuspected { .. }));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-117-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-118-
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-119-    #[test]
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-120-    fn test_self_reference_rejected() {
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-121-        let entries = vec![

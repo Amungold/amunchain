@@ -1,0 +1,353 @@
+==================================================================
+FILE: crates/amun-networking/src/validator_certificate.rs
+==================================================================
+     1	use crate::crypto_identity::PeerKeyPair;
+     2	use crate::peer_identity::PeerId;
+     3	use amun_constitutional_authority::ConstitutionalCertificate;
+     4	use amun_constitutional_signing::SignedArtifact;
+     5	use serde::{Deserialize, Serialize};
+     6	
+     7	/// A constitutional certificate binding a validator's identity to their public key.
+     8	///
+     9	/// Signed by a constitutional authority to establish trust.
+    10	#[derive(Debug, Clone, Serialize, Deserialize)]
+    11	pub struct ValidatorCertificate {
+    12	    /// The validator's peer identity.
+    13	    pub validator_id: PeerId,
+    14	    /// The validator's public key (for message verification).
+    15	    pub public_key: [u8; 32],
+    16	    /// The authority that issued this certificate.
+    17	    pub issuer: PeerId,
+    18	    /// When this certificate becomes valid.
+    19	    pub authority_id: [u8; 32],
+    20	    pub authority_version: u64,
+    21	    pub valid_from: u64,
+    22	    /// When this certificate expires (0 = never).
+    23	    pub valid_until: u64,
+    24	    /// The authority's signature over the certificate fields.
+    25	    pub authority_signature: Vec<u8>,
+    26	    #[serde(skip_serializing_if = "Option::is_none")]
+    27	    pub constitutional: Option<SignedArtifact<ConstitutionalCertificate>>,
+    28	}
+    29	
+    30	impl ValidatorCertificate {
+    31	    /// Create a new certificate signed by an authority.
+    32	    pub fn issue(
+    33	        validator_id: PeerId,
+    34	        public_key: [u8; 32],
+    35	        issuer_keypair: &PeerKeyPair,
+    36	        valid_from: u64,
+    37	        valid_until: u64,
+    38	    ) -> Self {
+    39	        let mut cert = Self {
+    40	            validator_id,
+    41	            public_key,
+    42	            authority_id: [0u8; 32],
+    43	            authority_version: 0,
+    44	            issuer: issuer_keypair.peer_id(),
+    45	            valid_from,
+    46	            valid_until,
+    47	            authority_signature: Vec::new(),
+    48	            constitutional: None,
+    49	        };
+    50	        // Sign the certificate fields (excluding signature itself)
+    51	        let payload = cert.serialize_for_signing();
+    52	        cert.authority_signature = issuer_keypair.sign(&payload);
+    53	        cert
+    54	    }
+    55	
+    56	    /// Serialize certificate fields for signing (excludes the signature).
+    57	    fn serialize_for_signing(&self) -> Vec<u8> {
+    58	        let mut data = Vec::new();
+    59	        data.extend_from_slice(&self.validator_id.0);
+    60	        data.extend_from_slice(&self.public_key);
+    61	        data.extend_from_slice(&self.authority_version.to_le_bytes());
+    62	        data.extend_from_slice(&self.authority_id);
+    63	        data.extend_from_slice(&self.issuer.0);
+    64	        data.extend_from_slice(&self.valid_from.to_le_bytes());
+    65	        data.extend_from_slice(&self.valid_until.to_le_bytes());
+    66	        data
+    67	    }
+    68	
+    69	    /// Verify the authority's signature on this certificate.
+    70	    pub fn verify(&self, authority_public_key: &[u8; 32]) -> bool {
+    71	        let payload = self.serialize_for_signing();
+    72	        PeerKeyPair::verify(authority_public_key, &payload, &self.authority_signature)
+    73	    }
+    74	
+    75	    /// Check if the certificate is currently valid.
+    76	    pub fn is_valid_at(&self, timestamp: u64) -> bool {
+    77	        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+    78	    }
+    79	
+    80	    /// Create a new certificate with explicit authority version and id.
+    81	    pub fn issue_v2(
+    82	        validator_id: PeerId,
+    83	        public_key: [u8; 32],
+    84	        authority_version: u64,
+    85	        authority_id: [u8; 32],
+    86	        issuer_keypair: &PeerKeyPair,
+    87	        valid_from: u64,
+    88	        valid_until: u64,
+    89	    ) -> Self {
+    90	        let mut cert = Self {
+    91	            validator_id,
+    92	            public_key,
+    93	            authority_version,
+    94	            authority_id,
+    95	            issuer: issuer_keypair.peer_id(),
+    96	            valid_from,
+    97	            valid_until,
+    98	            authority_signature: Vec::new(),
+    99	            constitutional: None,
+   100	        };
+   101	        let payload = cert.serialize_for_signing();
+   102	        cert.authority_signature = issuer_keypair.sign(&payload);
+   103	        cert
+   104	    }
+   105	}
+   106	
+   107	impl ValidatorCertificate {
+   108	    /// Returns the attached constitutional certificate, if present.
+   109	    pub fn constitutional(&self) -> Option<&SignedArtifact<ConstitutionalCertificate>> {
+   110	        self.constitutional.as_ref()
+   111	    }
+   112	
+   113	    /// Attach the constitutional certificate to this runtime object.
+   114	    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+   115	        self.constitutional = Some(cert);
+   116	    }
+   117	
+   118	    /// Administrative validation only.
+   119	    ///
+   120	    /// Runtime networking verification continues to use the existing
+   121	    /// ValidatorCertificate::verify() cryptographic path.
+   122	    pub fn verify_administrative(&self) -> Result<(), String> {
+   123	        match &self.constitutional {
+   124	            Some(cert) => cert.verify(),
+   125	            None => Err("No constitutional certificate attached".into()),
+   126	        }
+   127	    }
+   128	
+   129	    pub fn has_constitutional(&self) -> bool {
+   130	        self.constitutional.is_some()
+   131	    }
+   132	}
+   133	
+   134	#[cfg(test)]
+   135	mod tests {
+   136	    use super::*;
+   137	
+   138	    #[test]
+   139	    fn n21_validator_certificate_issue_and_verify() {
+   140	        let authority = PeerKeyPair::generate();
+   141	        let validator = PeerKeyPair::generate();
+   142	
+   143	        let cert = ValidatorCertificate::issue(
+   144	            validator.peer_id(),
+   145	            validator.verifying_key.to_bytes(),
+   146	            &authority,
+   147	            1000,
+   148	            2000,
+   149	        );
+   150	
+   151	        assert!(cert.verify(&authority.verifying_key.to_bytes()));
+   152	        assert_eq!(cert.validator_id, validator.peer_id());
+   153	        assert_eq!(cert.issuer, authority.peer_id());
+   154	    }
+   155	
+   156	    #[test]
+   157	    fn n21_certificate_rejects_wrong_authority() {
+   158	        let authority = PeerKeyPair::generate();
+   159	        let impostor = PeerKeyPair::generate();
+   160	        let validator = PeerKeyPair::generate();
+   161	
+   162	        let cert = ValidatorCertificate::issue(
+   163	            validator.peer_id(),
+   164	            validator.verifying_key.to_bytes(),
+   165	            &authority,
+   166	            1000,
+   167	            2000,
+   168	        );
+   169	
+   170	        // Impostor tries to verify — must fail
+   171	        assert!(!cert.verify(&impostor.verifying_key.to_bytes()));
+   172	    }
+   173	
+   174	    #[test]
+   175	    fn n21_certificate_tampered_fields_rejected() {
+   176	        let authority = PeerKeyPair::generate();
+   177	        let validator = PeerKeyPair::generate();
+   178	
+   179	        let mut cert = ValidatorCertificate::issue(
+   180	            validator.peer_id(),
+   181	            validator.verifying_key.to_bytes(),
+   182	            &authority,
+   183	            1000,
+   184	            2000,
+   185	        );
+   186	
+   187	        // Tamper with validity period
+   188	        cert.valid_from = 500;
+   189	        assert!(!cert.verify(&authority.verifying_key.to_bytes()));
+   190	    }
+   191	
+   192	    #[test]
+   193	    fn n21_certificate_validity_window() {
+   194	        let authority = PeerKeyPair::generate();
+   195	        let validator = PeerKeyPair::generate();
+   196	
+   197	        let cert = ValidatorCertificate::issue(
+   198	            validator.peer_id(),
+   199	            validator.verifying_key.to_bytes(),
+   200	            &authority,
+   201	            1000,
+   202	            2000,
+   203	        );
+   204	
+   205	        assert!(!cert.is_valid_at(500));
+   206	        assert!(cert.is_valid_at(1000));
+   207	        assert!(cert.is_valid_at(1500));
+   208	        assert!(cert.is_valid_at(2000));
+   209	        assert!(!cert.is_valid_at(2001));
+   210	    }
+   211	
+   212	    #[test]
+   213	    fn n21_certificate_serialization_roundtrip() {
+   214	        let authority = PeerKeyPair::generate();
+   215	        let validator = PeerKeyPair::generate();
+   216	
+   217	        let cert = ValidatorCertificate::issue(
+   218	            validator.peer_id(),
+   219	            validator.verifying_key.to_bytes(),
+   220	            &authority,
+   221	            1000,
+   222	            0, // never expires
+   223	        );
+   224	
+   225	        let json = serde_json::to_string(&cert).unwrap();
+   226	        let decoded: ValidatorCertificate = match serde_json::from_str(&json) {
+   227	            Ok(v) => v,
+   228	            Err(e) => {
+   229	                eprintln!("validator_cert: invalid certificate: {e}");
+   230	                return;
+   231	            }
+   232	        };
+   233	
+   234	        assert!(decoded.verify(&authority.verifying_key.to_bytes()));
+   235	        assert!(decoded.is_valid_at(5000));
+   236	    }
+   237	}
+
+==================================================================
+GLOBAL USAGES
+==================================================================
+crates/amun-orchestrator-certificates/src/store.rs:1:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-orchestrator-certificates/src/store.rs:6:    cert: &ValidatorCertificate,
+crates/amun-orchestrator-certificates/src/store.rs:31:pub async fn load_certificate(path: &Path) -> Result<ValidatorCertificate, OrchestratorError> {
+crates/amun-orchestrator-certificates/src/lib.rs:7:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-orchestrator-certificates/src/lib.rs:16:    certs: tokio::sync::RwLock<Vec<ValidatorCertificate>>,
+crates/amun-orchestrator-certificates/src/lib.rs:72:    ) -> Result<ValidatorCertificate, OrchestratorError> {
+crates/amun-orchestrator-certificates/src/lib.rs:104:    async fn find_cert(&self, name: &str) -> Option<ValidatorCertificate> {
+crates/amun-orchestrator-certificates/src/bridge.rs:2:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-orchestrator-certificates/src/bridge.rs:31:    ) -> Result<ValidatorCertificate, OrchestratorError> {
+crates/amun-orchestrator-certificates/src/lib.rs.save:3:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-orchestrator-certificates/src/lib.rs.save:15:    certs: tokio::sync::RwLock<Vec<ValidatorCertificate>>,
+crates/amun-orchestrator-certificates/src/lib.rs.save:40:    ) -> Result<ValidatorCertificate, OrchestratorError> {
+crates/amun-orchestrator-certificates/src/lib.rs.save:47:        let cert = ValidatorCertificate {
+crates/amun-orchestrator-certificates/src/lib.rs.save:74:    async fn find_cert(&self, name: &str) -> Option<ValidatorCertificate> {
+crates/amun-node/src/certificate_loader.rs:2:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-node/src/certificate_loader.rs:7:) -> Result<ValidatorCertificate, String> {
+crates/amun-node/src/certificate_loader.rs:10:    let cert: ValidatorCertificate =
+crates/amun-node/src/bootstrap.rs:7:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-node/src/bootstrap.rs:17:    pub cert: ValidatorCertificate,
+crates/amun-node/src/peer_handshake.rs:4:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-node/src/peer_handshake.rs:12:    pub certificate: ValidatorCertificate,
+crates/amun-node/src/peer_handshake.rs:22:        certificate: &ValidatorCertificate,
+crates/amun-node/src/peer_handshake.rs:97:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_registry.rs:3:use crate::validator_certificate::ValidatorCertificate;
+crates/amun-networking/src/validator_registry.rs:9:    validators: BTreeMap<PeerId, ValidatorCertificate>,
+crates/amun-networking/src/validator_registry.rs:20:        certificate: ValidatorCertificate,
+crates/amun-networking/src/validator_registry.rs:71:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_registry.rs:92:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_registry.rs:114:        let forged_cert = ValidatorCertificate::issue(
+crates/amun-networking/src/trust_anchor.rs:7:/// They issue ValidatorCertificates that bind peer identities to public keys.
+crates/amun-networking/src/validator_certificate.rs:11:pub struct ValidatorCertificate {
+crates/amun-networking/src/validator_certificate.rs:30:impl ValidatorCertificate {
+crates/amun-networking/src/validator_certificate.rs:107:impl ValidatorCertificate {
+crates/amun-networking/src/validator_certificate.rs:121:    /// ValidatorCertificate::verify() cryptographic path.
+crates/amun-networking/src/validator_certificate.rs:143:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:162:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:179:        let mut cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:197:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:217:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:226:        let decoded: ValidatorCertificate = match serde_json::from_str(&json) {
+crates/amun-live-cluster/src/config.rs:1:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-live-cluster/src/config.rs:27:    pub certificate: Option<ValidatorCertificate>,
+crates/amun-live-cluster/src/production_config.rs:2:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-live-cluster/src/validator.rs:127:            let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
+crates/amun-live-cluster/src/validator.rs:1061:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-live-cluster/src/validator.rs:1082:        let v1_cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:2:use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:116:    pub fn verify_certificate_at(&self, cert: &ValidatorCertificate, height: u64) -> bool {
+crates/amun-authority-registry/src/registry.rs:300:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:322:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:341:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:362:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:381:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:401:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:420:        use amun_networking::validator_certificate::ValidatorCertificate;
+crates/amun-authority-registry/src/registry.rs:430:        let cert = ValidatorCertificate::issue_v2(
+
+
+crates/amun-authority-registry/src/registry.rs:322:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:362:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:401:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:430:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-live-cluster/src/validator.rs:1082:        let v1_cert = ValidatorCertificate::issue_v2(
+crates/amun-networking/src/validator_registry.rs:71:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_registry.rs:92:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_registry.rs:114:        let forged_cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:143:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:162:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:179:        let mut cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:197:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:217:        let cert = ValidatorCertificate::issue(
+crates/amun-node/src/peer_handshake.rs:97:        let cert = ValidatorCertificate::issue(
+
+crates/amun-networking/src/validator_certificate.rs:114:    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+
+crates/amun-constitutional-enforcement/src/state_transition.rs:127:    fn n126_identical_execution_and_replay_is_constitutional() {
+crates/amun-constitutional-enforcement/src/state_transition.rs:142:    fn n126_replay_divergence_is_unconstitutional() {
+crates/amun-constitutional-enforcement/src/state_transition.rs:165:    fn n126_supply_not_conserved_is_unconstitutional() {
+crates/amun-constitutional/src/replay_certificate.rs:274:        assert!(c.verify_constitutional().is_err());
+crates/amun-constitutional/src/causality_chain.rs:254:        assert!(c.verify_constitutional().is_err());
+crates/amun-constitutional/src/execution_limits.rs:184:        self.verify_constitutional()?;
+crates/amun-constitutional/src/constitutional_witness.rs:306:        assert!(w.verify_constitutional().is_err());
+crates/amun-constitutional/src/snapshot.rs:345:        assert!(s.verify_constitutional().is_err());
+crates/amun-constitutional/src/constitutional_object.rs:15:        self.verify_constitutional()?;
+crates/amun-constitutional/src/constitutional_failure.rs:182:        self.verify_constitutional()?;
+crates/amun-constitutional/src/state_anchor.rs:307:        assert!(a.verify_constitutional().is_err());
+crates/amun-replay-engine/src/constitutional_economics.rs:200:    fn test_market_is_economic_not_constitutional() {
+crates/amun-replay-engine/src/operational_hasher.rs:56:    fn test_operational_separate_from_constitutional() {
+crates/amun-constitutional-runtime/src/history_root.rs:36:        let all_constitutional = chain.is_fully_constitutional();
+crates/amun-execution/src/tests.rs:22:fn test_wasm_profile_constitutional() {
+crates/amun-execution/src/tests.rs:23:    let profile = DeterministicWasmProfile::constitutional();
+crates/amun-execution/src/tests.rs:32:    let profile = DeterministicWasmProfile::constitutional();
+crates/amun-execution/src/tests.rs:57:    let profile = DeterministicWasmProfile::constitutional();
+crates/amun-execution/src/wasm_profile.rs:65:    pub const fn constitutional() -> Self {
+crates/amun-explorer-api/src/lib.rs:74:    let c = rpc_client::constitutional().await.unwrap();
+crates/amun-explorer-api/src/rpc_client.rs:75:pub async fn constitutional() -> Result<serde_json::Value, reqwest::Error> {
+crates/amun-constitution/src/tests.rs:8:    let c1 = ProtocolCapacities::constitutional();
+crates/amun-constitution/src/tests.rs:9:    let c2 = ProtocolCapacities::constitutional();
+crates/amun-constitution/src/tests.rs:35:    let params = LogicalLivenessParameters::constitutional();
+crates/amun-constitution/src/liveness.rs:13:    pub const fn constitutional() -> Self {
+crates/amun-constitution/src/adaptive_adversary.rs:13:    pub const fn constitutional() -> Self {
+crates/amun-constitution/src/capacity.rs:15:    pub const fn constitutional() -> Self {
+crates/amun-constitution/src/canonical_form.rs:45:    capacities: ProtocolCapacities::constitutional(),
+crates/constitutional-linter/src/main.rs:186:        .filter(|e| e.edge_type.is_constitutional())
+crates/constitutional-linter/src/edge_semantics.rs:87:            if edge.edge_type.is_constitutional() {
+crates/constitutional-linter/src/edge_semantics.rs:106:        assert!(runtime.is_constitutional());
+crates/constitutional-linter/src/edge_semantics.rs:107:        assert!(!optional.is_constitutional());
+
+crates/amun-networking/src/validator_certificate.rs:122:    pub fn verify_administrative(&self) -> Result<(), String> {

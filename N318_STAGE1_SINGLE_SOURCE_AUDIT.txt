@@ -1,0 +1,276 @@
+===============================================================
+N318 - STAGE 1 : SINGLE SOURCE OF TRUTH AUDIT
+===============================================================
+
+========== MAIN ENTRY ==========
+crates/amun-node/src/main.rs:14:fn main() {
+crates/amun-node/src/bin/dump_state_root.rs:5:fn main() {
+crates/amun-node/src/bin/test_replay_determinism.rs:7:fn main() {
+crates/amun-node/src/bin/test_persistence_determinism.rs:7:fn main() {
+crates/amun-node/src/bin/test_multi_height_determinism.rs:7:fn main() {
+crates/amun-node/src/bin/test_crash_recovery_7.rs:10:fn main() {
+crates/amun-node/src/bin/test_constitutional_stress.rs:11:fn main() {
+crates/amun-node/src/bin/test_runtime_mutation_integration.rs:7:fn main() {
+crates/amun-node/src/bin/test_live_state.rs:5:fn main() {
+crates/amun-node/src/bin/test_constitutional_mutation.rs:9:fn main() {
+crates/amun-node/src/bin/test_crash_recovery.rs:10:fn main() {
+crates/amun-node/src/bin/test_sync_rejoin.rs:11:fn main() {
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:12:fn main() {
+crates/amun-node/src/bin/test_replay_stress.rs:11:fn main() {
+crates/amun-node/src/bin/test_network_state_convergence.rs:10:fn main() {
+crates/amun-node/src/bin/test_byzantine_fault.rs:1:fn main() {}
+crates/amun-node/src/bin/test_state_determinism.rs:7:fn main() {
+crates/amun-node/src/bin/test_constitutional_multi_block.rs:11:fn main() {
+crates/amun-node/src/bin/test_multi_byzantine.rs:10:fn main() {
+crates/amun-node/src/bin/test_validator_cluster_determinism.rs:5:fn main() {
+crates/amun-node/src/bin/test_state_evolution.rs:8:fn main() {
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:14:fn main() {
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:10:fn main() {
+crates/amun-node/src/bin/test_constitutional_determinism.rs:8:fn main() {
+amunctl/src/main.rs:131:async fn main() {
+amunctl/src/commands/deploy.rs:23:pub async fn mainnet() {
+
+========== BOOTSTRAP ==========
+crates/amun-node/src/bootstrap.rs:25:pub fn initialize(config_path: &str) -> Result<BootstrapContext, NodeError> {
+crates/amun-node/src/main.rs:23:    let ctx = bootstrap::initialize(&config_path).unwrap_or_else(|e| {
+
+========== CONFIG ==========
+crates/amun-node/src/bootstrap.rs:26:    let config = Config::load(config_path)?;
+crates/amun-node/src/config.rs:102:        let config = Config::load(config_path.to_str().unwrap()).unwrap();
+crates/amun-node/src/config.rs:114:        let err = Config::load("/nonexistent/path/config.toml").unwrap_err();
+crates/amun-node/src/config.rs:123:        let err = Config::load(config_path.to_str().unwrap()).unwrap_err();
+
+========== LIVE VALIDATOR ==========
+crates/amun-node/src/main.rs:31:        let validator = amun_live_cluster::validator::LiveValidator::new(validator_cfg);
+crates/amun-node/src/main.rs:33:        validator.start().expect("Failed to start LiveValidator");
+crates/amun-live-cluster/tests/n102_catchup_test.rs:24:            LiveValidator::new(config)
+crates/amun-live-cluster/tests/n102_catchup_test.rs:95:    let v3_new = LiveValidator::new(config);
+crates/amun-live-cluster/tests/n129_evidence_continuity_audit.rs:23:            LiveValidator::new(config)
+crates/amun-live-cluster/src/validator.rs:852:        let v = LiveValidator::new(config);
+crates/amun-live-cluster/src/validator.rs:934:        let v = LiveValidator::new(config);
+crates/amun-live-cluster/src/validator.rs:1074:        let v = LiveValidator::new(config);
+crates/amun-live-cluster/src/validator.rs:1223:        let v = LiveValidator::new(solo);
+crates/amun-live-cluster/src/validator.rs:1241:            let v = LiveValidator::new(solo);
+crates/amun-live-cluster/src/validator.rs:1252:        let v2 = LiveValidator::new(solo2);
+crates/amun-live-cluster/src/validator.rs:1262:        let v = LiveValidator::new(solo);
+crates/amun-live-cluster/src/validator.rs:1272:        let va = LiveValidator::new(ValidatorConfig::test_cluster(0, &ports).with_quorum(2));
+crates/amun-live-cluster/src/validator.rs:1273:        let vb = LiveValidator::new(ValidatorConfig::test_cluster(1, &ports).with_quorum(2));
+crates/amun-live-cluster/src/validator.rs:1287:        let va = LiveValidator::new(ValidatorConfig::test_cluster(0, &ports).with_quorum(3));
+crates/amun-live-cluster/src/validator.rs:1288:        let vb = LiveValidator::new(ValidatorConfig::test_cluster(1, &ports).with_quorum(3));
+crates/amun-live-cluster/src/validator.rs:1289:        let vc = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(3));
+crates/amun-live-cluster/src/validator.rs:1308:        let v = LiveValidator::new(solo);
+crates/amun-live-cluster/src/validator.rs:1319:            .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/byzantine_partition_test.rs:16:        .map(LiveValidator::new)
+crates/amun-live-cluster/src/bin/byzantine_partition_test.rs:62:    let v2 = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(quorum));
+crates/amun-live-cluster/src/bin/byzantine_partition_test.rs:63:    let v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(quorum));
+crates/amun-live-cluster/src/bin/load_test.rs:21:        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/benchmark_10.rs:38:            LiveValidator::new(config)
+crates/amun-live-cluster/src/bin/rpc_server.rs:23:    let validator = LiveValidator::new(config);
+crates/amun-live-cluster/src/bin/rpc_server.rs:24:    validator.start().unwrap();
+crates/amun-live-cluster/src/bin/e2e_test.rs:14:    let validator = LiveValidator::new(config);
+crates/amun-live-cluster/src/bin/e2e_test.rs:15:    validator.start().unwrap();
+crates/amun-live-cluster/src/bin/soak_test.rs:9:        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/multi_validator_test.rs:16:        .map(LiveValidator::new)
+crates/amun-live-cluster/src/bin/multi_validator_test.rs:84:    let v2 = LiveValidator::new(v2_config);
+crates/amun-live-cluster/src/bin/replay_audit.rs:9:        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/partition_test.rs:9:        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/partition_test.rs:42:    let v2 = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(4));
+crates/amun-live-cluster/src/bin/partition_test.rs:43:    let v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(4));
+crates/amun-live-cluster/src/bin/quorum_exclusion_test.rs:18:        .map(LiveValidator::new)
+crates/amun-live-cluster/src/bin/byzantine_test.rs:12:        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/latency_audit.rs:9:        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/benchmark.rs:9:        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/crash_recovery.rs:9:        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+crates/amun-live-cluster/src/bin/crash_recovery.rs:44:    let new_v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(4));
+crates/amun-live-cluster/src/bin/validator.rs:29:    let validator = LiveValidator::new(config);
+crates/amun-live-cluster/src/bin/validator.rs:30:    validator.start().unwrap();
+crates/amun-live-cluster/src/bin/rejoin_stress.rs:71:            LiveValidator::new(config)
+crates/amun-live-cluster/src/bin/rejoin_stress.rs:101:        let new_v = LiveValidator::new(config);
+crates/amun-live-cluster/src/bin/benchmark_10_event.rs:38:            LiveValidator::new(config)
+
+========== CONSENSUS ENGINE ==========
+crates/amun-consensus-network/src/engine.rs:313:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:344:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:373:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:396:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:414:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/engine.rs:455:        let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-consensus-network/src/network_consensus.rs:18:            engine: Arc::new(Mutex::new(ConsensusEngine::new(
+crates/amun-consensus-network/src/network_consensus.rs:133:        let mut engine = ConsensusEngine::new([1u8; 32], 1);
+crates/amun-explorer-api/src/main.rs:15:    let consensus = ConsensusEngine::new([1u8; 32], 4);
+crates/amun-benchmarks/benches/consensus_bench.rs:55:            let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-benchmarks/benches/consensus_bench.rs:76:            let mut engine = ConsensusEngine::new([0u8; 32], 4);
+crates/amun-live-cluster/src/validator.rs:80:        let mut engine = ConsensusEngine::new(config.validator_id, config.total_validators());
+
+========== CHAIN STORE ==========
+crates/amun-sync/src/bin/sync-server.rs:15:    let store = ChainStore::open(data_dir).expect("Failed to open store");
+crates/amun-sync/src/bin/bootstrap.rs:23:        ChainStore::open(source_dir.to_str().unwrap()).expect("Failed to open source store");
+crates/amun-sync/src/bin/bootstrap.rs:50:        ChainStore::open(target_dir.to_str().unwrap()).expect("Failed to open target store");
+crates/amun-sync/src/bin/gap-fill.rs:15:    let mut store = ChainStore::open(data_dir).expect("Failed to open store");
+crates/amun-sync/src/bin/backfill.rs:14:    let mut store = ChainStore::open(data_dir).expect("Failed to open store");
+crates/amun-sync/src/bin/rejoin.rs:66:    let mut store = ChainStore::open(data_dir.to_str().unwrap()).expect("Failed to open store");
+crates/amun-explorer-api/src/main.rs:12:    let store = ChainStore::open("/tmp/amun-test-validator-0")
+crates/amun-explorer-api/src/main.rs:13:        .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").unwrap());
+crates/amun-benchmarks/benches/storage_bench.rs:29:            let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-benchmarks/benches/storage_bench.rs:40:    let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-live-cluster/src/validator.rs:73:        let store = ChainStore::open(&config.data_dir)
+crates/amun-live-cluster/src/validator.rs:74:            .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").unwrap());
+crates/amun-chain-store/src/store.rs:166:        let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/store.rs:178:            let mut s = ChainStore::open(dir_str).unwrap();
+crates/amun-chain-store/src/store.rs:182:        let s = ChainStore::open(dir_str).unwrap();
+crates/amun-chain-store/src/store.rs:190:        let s = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/store.rs:198:        let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/store.rs:210:            let mut s = ChainStore::open(dir_str).unwrap();
+crates/amun-chain-store/src/store.rs:214:        let s = ChainStore::open(dir_str).unwrap();
+crates/amun-chain-store/src/sync.rs:176:        let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/sync.rs:201:        let mut local = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/sync.rs:211:        let mut local = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/sync.rs:224:        let mut local = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/sync.rs:235:        let store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/sync.rs:242:        let mut local = ChainStore::open(dir2.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/src/snapshot.rs:153:    let mut store = crate::store::ChainStore::open(store_dir.to_str().unwrap())
+crates/amun-chain-store/examples/snapshot_builder_test.rs:28:    let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/examples/store_stats.rs:6:    let store = ChainStore::open(&dir).expect("open failed");
+crates/amun-chain-store/examples/snapshot_verification_test.rs:28:    let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/examples/snapshot_restore_test.rs:28:    let mut store = ChainStore::open(dir.path().to_str().unwrap()).unwrap();
+crates/amun-chain-store/examples/snapshot_restore_test.rs:49:    let restored_store = ChainStore::open(restore_dir.to_str().unwrap()).unwrap();
+crates/amun-chain-store/examples/create_live_snapshot.rs:16:    let store = ChainStore::open(store_dir).expect("open store");
+
+========== MEMPOOL ==========
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:31:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n132_3_6_economic_consistency.rs:27:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n132_3_6_economic_consistency.rs:56:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n132_3_6_economic_consistency.rs:114:    let mut mp1 = Mempool::new();
+crates/amun-block-builder/tests/n132_3_6_economic_consistency.rs:121:    let block2 = b2.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
+crates/amun-block-builder/tests/n111_cca_end_to_end.rs:25:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n111_cca_end_to_end.rs:70:    let block1 = builder1.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
+crates/amun-block-builder/tests/n111_cca_end_to_end.rs:71:    let block2 = builder2.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:7:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n32_certified_block.rs:37:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n32_certified_block.rs:87:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n32_certified_block.rs:160:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n28_first_economic_block.rs:16:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n28_first_economic_block.rs:56:    let mut mempool = Mempool::new();
+crates/amun-block-builder/tests/n28_first_economic_block.rs:97:    let mut mempool = Mempool::new();
+crates/amun-block-builder/src/lib.rs:197:        let mut mempool = Mempool::new();
+crates/amun-block-builder/src/lib.rs:231:        let mut mempool = Mempool::new();
+crates/amun-block-builder/src/lib.rs:254:        let block1 = b1.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
+crates/amun-block-builder/src/lib.rs:255:        let block2 = b2.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
+crates/amun-block-builder/src/lib.rs:265:        let block = builder.build_block(1, [0u8; 32], &mut Mempool::new(), 0, [0u8; 32], 1000);
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:11:    let mut mempool = Mempool::new();
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:25:    let mut mempool = Mempool::new();
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:40:    let mut mempool = Mempool::new();
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:65:    let mut mempool = Mempool::new();
+crates/amun-live-cluster/src/validator.rs:154:            mempool: Arc::new(Mutex::new(Mempool::new())),
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:16:    let mut mempool = Mempool::new();
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:53:    let mut mempool = Mempool::new();
+crates/amun-evidence-root/tests/n40_evidence_backed_block.rs:85:    let mut mempool = Mempool::new();
+crates/amun-mempool-gossip/src/mempool.rs:220:        let mempool = Arc::new(Mutex::new(Mempool::new(100)));
+crates/amun-mempool-gossip/src/mempool.rs:229:        let mut mp = Mempool::new(10);
+crates/amun-mempool-gossip/src/mempool.rs:239:        let mut mp = Mempool::new(10);
+crates/amun-mempool-gossip/src/mempool.rs:248:        let mut mp = Mempool::new(10);
+crates/amun-mempool-gossip/src/mempool.rs:287:        let mut mp = Mempool::new(10);
+crates/amun-mempool/src/lib.rs:78:        let mut mempool = Mempool::new();
+crates/amun-mempool/src/lib.rs:86:        let mut mempool = Mempool::new();
+crates/amun-mempool/src/lib.rs:95:        let mut mempool = Mempool::new();
+crates/amun-mempool/src/lib.rs:106:        let mut mempool = Mempool::new();
+crates/amun-mempool/src/lib.rs:118:        let mut mempool = Mempool::new();
+crates/amun-mempool/src/lib.rs:130:        let mut mempool = Mempool::new();
+
+========== RPC ==========
+crates/amun-wallet-ui/src/main.rs:143:    axum::serve(listener, app).await.unwrap();
+crates/amun-faucet/src/main.rs:37:    axum::serve(listener, app).await.unwrap();
+crates/amun-explorer-api/src/lib.rs:125:    axum::serve(listener, app).await.unwrap();
+crates/amun-explorer-api/src/server.rs:4:pub fn build_app() -> Router {
+crates/amun-rpc/src/lib.rs:202:pub fn build_app(state: AppState) -> Router {
+crates/amun-rpc/src/lib.rs:403:    let app = build_app(state);
+crates/amun-rpc/src/lib.rs:408:    axum::serve(listener, app).await.unwrap();
+crates/amun-live-cluster/src/bin/rpc_server.rs:3:use amun_rpc::{build_app, AppState};
+crates/amun-live-cluster/src/bin/rpc_server.rs:42:    let app = build_app(state);
+crates/amun-live-cluster/src/bin/rpc_server.rs:46:    axum::serve(listener, app).await.unwrap();
+crates/amun-live-cluster/src/bin/e2e_test.rs:4:use amun_rpc::{build_app, AppState};
+crates/amun-live-cluster/src/bin/e2e_test.rs:5:use axum::serve;
+crates/amun-live-cluster/src/bin/e2e_test.rs:39:    let app = build_app(state);
+crates/amun-wallet-api/src/lib.rs:29:        let app = server::build_app();
+crates/amun-wallet-api/src/lib.rs:44:        let app = server::build_app();
+crates/amun-wallet-api/src/lib.rs:59:        let app = server::build_app();
+crates/amun-wallet-api/src/lib.rs:77:        let app = server::build_app();
+crates/amun-wallet-api/src/main.rs:10:    let app = server::build_app();
+crates/amun-wallet-api/src/main.rs:13:    axum::serve(listener, app).await.unwrap();
+crates/amun-wallet-api/src/server.rs:4:pub fn build_app() -> Router {
+
+========== NETWORK ==========
+crates/amun-node/src/bootstrap.rs:118:    let mut node = NetworkNode::new(peer_id.0);
+crates/amun-node/src/network.rs:21:        let mut transport = TcpTransport::new(
+crates/amun-node/src/bin/test_crash_recovery_7.rs:18:        nodes.insert(i, NetworkNode::new(id));
+crates/amun-node/src/bin/test_crash_recovery.rs:18:        nodes.insert(i, NetworkNode::new(id));
+crates/amun-node/src/bin/test_crash_recovery.rs:163:    let mut new_node = NetworkNode::new([2u8; 32]);
+crates/amun-node/src/bin/test_sync_rejoin.rs:25:        nodes.insert(i, NetworkNode::new([i as u8; 32]));
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:26:        nodes.insert(i, NetworkNode::new([i as u8; 32]));
+crates/amun-node/src/bin/test_network_state_convergence.rs:18:        nodes.insert(i, NetworkNode::new(id));
+crates/amun-node/src/bin/test_multi_byzantine.rs:25:        nodes.insert(i, NetworkNode::new([i as u8; 32]));
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:28:        nodes.insert(i, NetworkNode::new([i as u8; 32]));
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:25:    let make_node = |i: usize| -> NetworkNode { NetworkNode::new([i as u8; 32]) };
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:77:    let mut node = NetworkNode::new_bootstrapping([6u8; 32]);
+crates/amun-networking/tests/n18_full_rejoin.rs:70:    let mut node3 = NetworkNode::new_bootstrapping([3u8; 32]);
+crates/amun-networking/tests/n18_full_rejoin.rs:136:    let mut node = NetworkNode::new_bootstrapping([4u8; 32]);
+crates/amun-networking/tests/n18_full_rejoin.rs:147:    let mut node = NetworkNode::new_bootstrapping([5u8; 32]);
+crates/amun-networking/tests/n17_multi_node_network.rs:28:            nodes.insert(i, NetworkNode::new(id));
+crates/amun-networking/tests/n18_checkpoint_sync.rs:61:    let mut node_b = NetworkNode::new_bootstrapping([20u8; 32]);
+crates/amun-networking/tests/n18_checkpoint_sync.rs:101:    let mut node = NetworkNode::new_bootstrapping([21u8; 32]);
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:90:    let mut node_b = NetworkNode::new_bootstrapping([20u8; 32]);
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:153:    let mut node = NetworkNode::new_bootstrapping([30u8; 32]);
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:65:    let mut node3 = NetworkNode::new_bootstrapping([3u8; 32]);
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:113:    let mut node = NetworkNode::new_bootstrapping([7u8; 32]);
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:138:    let mut node = NetworkNode::new_bootstrapping([8u8; 32]);
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:168:    let mut node = NetworkNode::new_bootstrapping([9u8; 32]);
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:23:    let mut server = TcpTransport::new(
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:34:    let mut client = TcpTransport::new(
+crates/amun-networking/tests/n18_catchup_and_rejoin.rs:10:    let mut node = NetworkNode::new_bootstrapping([10u8; 32]);
+crates/amun-networking/tests/n18_catchup_and_rejoin.rs:23:    let mut node = NetworkNode::new_bootstrapping([11u8; 32]);
+crates/amun-networking/tests/n18_catchup_and_rejoin.rs:51:    let mut node = NetworkNode::new_bootstrapping([12u8; 32]);
+crates/amun-networking/tests/n18_node_rejoin.rs:10:    let mut node = NetworkNode::new_bootstrapping([1u8; 32]);
+crates/amun-networking/tests/n18_node_rejoin.rs:20:    let mut node = NetworkNode::new([2u8; 32]);
+crates/amun-networking/tests/n18_node_rejoin.rs:31:    let mut node = NetworkNode::new_bootstrapping([3u8; 32]);
+crates/amun-networking/tests/n18_node_rejoin.rs:78:    let mut node = NetworkNode::new_bootstrapping([5u8; 32]);
+crates/amun-network-transport/src/transport.rs:227:        let transport = TcpTransport::new(
+
+========== RUNTIME ==========
+crates/amun-node/src/runtime.rs:46:pub fn run(
+crates/amun-node/src/main.rs:39:        runtime::run(
+crates/amun-node/src/bin/test_constitutional_stress.rs:3:use amun_constitutional_runtime::runtime_pipeline::ConstitutionalRuntime;
+crates/amun-node/src/bin/test_constitutional_mutation.rs:3:use amun_constitutional_runtime::runtime_pipeline::ConstitutionalRuntime;
+crates/amun-node/src/bin/test_replay_stress.rs:3:use amun_constitutional_runtime::runtime_pipeline::ConstitutionalRuntime;
+crates/amun-node/src/bin/test_constitutional_multi_block.rs:3:use amun_constitutional_runtime::runtime_pipeline::ConstitutionalRuntime;
+crates/amun-node/src/bin/test_constitutional_determinism.rs:2:use amun_constitutional_runtime::runtime_pipeline::ConstitutionalRuntime;
+
+========== LEGACY ENTRY POINTS ==========
+crates/amun-evidence/src/bin/evidence_service.rs
+crates/amun-live-cluster/src/bin/e2e_test.rs
+crates/amun-live-cluster/src/bin/multi_validator_test.rs
+crates/amun-live-cluster/src/bin/quorum_exclusion_test.rs
+crates/amun-live-cluster/src/bin/rpc_server.rs
+crates/amun-live-cluster/src/bin/validator.rs
+crates/amun-node/src/bin/dump_state_root.rs
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs
+crates/amun-node/src/bin/test_constitutional_determinism.rs
+crates/amun-node/src/bin/test_constitutional_multi_block.rs
+crates/amun-node/src/bin/test_constitutional_mutation.rs
+crates/amun-node/src/bin/test_live_state.rs
+crates/amun-node/src/bin/test_multi_height_determinism.rs
+crates/amun-node/src/bin/test_network_state_convergence.rs
+crates/amun-node/src/bin/test_persistence_determinism.rs
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs
+crates/amun-node/src/bin/test_runtime_mutation_integration.rs
+crates/amun-node/src/bin/test_state_determinism.rs
+crates/amun-node/src/bin/test_state_evolution.rs
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs
+crates/amun-node/src/bin/test_sync_rejoin.rs
+crates/amun-node/src/bin/test_validator_cluster_determinism.rs
+crates/amun-sync/src/bin/backfill.rs
+crates/amun-sync/src/bin/bootstrap.rs
+crates/amun-sync/src/bin/gap-fill.rs
+crates/amun-sync/src/bin/handshake.rs
+crates/amun-sync/src/bin/rejoin.rs
+crates/amun-sync/src/bin/snapshot-server.rs
+crates/amun-sync/src/bin/sync-server.rs

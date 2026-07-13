@@ -1,0 +1,103 @@
+use amun_constitutional_commitments::SparseMerkleTree;
+use amun_constitutional_kernel::receipt::ExecutionReceipt;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ConstitutionalBlock {
+    pub schema_version: u32,
+    pub block_height: u64,
+    pub parent_hash: String,
+    pub timestamp: String,
+    pub proposer_certificate_id: String,
+    pub execution_receipts: Vec<ExecutionReceipt>,
+    pub state_root: String,
+    pub governance_root: String,
+    pub execution_root: String,
+    pub evidence_root: String,
+    pub replay_certificate_root: String,
+    pub block_hash: String,
+}
+
+impl ConstitutionalBlock {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        block_height: u64,
+        parent_hash: String,
+        timestamp: String,
+        proposer_certificate_id: String,
+        execution_receipts: Vec<ExecutionReceipt>,
+        state_root: String,
+        governance_root: String,
+        execution_root: String,
+        evidence_root: String,
+        replay_certificate_root: String,
+    ) -> Self {
+        let mut block = Self {
+            schema_version: 1,
+            block_height,
+            parent_hash,
+            timestamp,
+            proposer_certificate_id,
+            execution_receipts,
+            state_root,
+            governance_root,
+            execution_root,
+            evidence_root,
+            replay_certificate_root,
+            block_hash: String::new(),
+        };
+        let hash = block.compute_hash();
+        block.block_hash = hash;
+        block
+    }
+
+    pub fn compute_hash(&self) -> String {
+        let bytes = self.identity_bytes();
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(b"AMUN_BLOCK_V1");
+        hasher.update(&bytes);
+        hex::encode(hasher.finalize().as_bytes())
+    }
+
+    fn identity_bytes(&self) -> Vec<u8> {
+        let mut c = self.clone();
+        c.block_hash = String::new();
+        serde_json::to_vec(&c).expect("Block serialization must not fail")
+    }
+}
+
+pub struct BlockBuilder;
+
+impl BlockBuilder {
+    #[allow(clippy::too_many_arguments)]
+    pub fn build(
+        block_height: u64,
+        parent_hash: String,
+        timestamp: String,
+        proposer_certificate_id: String,
+        execution_receipts: Vec<ExecutionReceipt>,
+        state_tree: &SparseMerkleTree,
+        governance_tree: &SparseMerkleTree,
+        execution_tree: &SparseMerkleTree,
+        evidence_tree: &SparseMerkleTree,
+        replay_certificate_root: String,
+    ) -> ConstitutionalBlock {
+        let state_root = hex::encode(state_tree.root());
+        let governance_root = hex::encode(governance_tree.root());
+        let execution_root = hex::encode(execution_tree.root());
+        let evidence_root = hex::encode(evidence_tree.root());
+
+        ConstitutionalBlock::new(
+            block_height,
+            parent_hash,
+            timestamp,
+            proposer_certificate_id,
+            execution_receipts,
+            state_root,
+            governance_root,
+            execution_root,
+            evidence_root,
+            replay_certificate_root,
+        )
+    }
+}

@@ -1,0 +1,1354 @@
+crates/amun-amendments/src/activation.rs:1:/// Rules governing when an amendment becomes active.
+crates/amun-amendments/src/activation.rs:3:pub struct ActivationRules {
+crates/amun-amendments/src/lib.rs:10:pub use activation::{ActivationEpoch, ActivationRules};
+crates/amun-audit/src/lib.rs:2:// Invariant ownership map:
+crates/amun-block-store/src/lib.rs:40:        if !Path::new(&self.path).exists() {
+crates/amun-bytecode/src/interpreter.rs:218:                OpCode::CheckInvariant { .. } => {
+crates/amun-bytecode/src/opcodes.rs:14:    CheckInvariant { invariant_idx: u32 },
+crates/amun-bytecode/src/opcodes.rs:40:            OpCode::CheckInvariant { .. } => "OP_CHECK_INVARIANT",
+crates/amun-bytecode/src/opcodes.rs:63:            OpCode::CheckInvariant { .. } => 50,
+crates/amun-bytecode/src/opcodes.rs:94:            OpCode::CheckInvariant { .. } | OpCode::EmitClaim { .. }
+crates/amun-chain-store/examples/snapshot_builder_test.rs:41:    assert!(snapshot_dir.join("manifest.json").exists());
+crates/amun-chain-store/examples/snapshot_builder_test.rs:42:    assert!(snapshot_dir.join("state.bin").exists());
+crates/amun-chain-store/src/snapshot.rs:75:    if !manifest_path.exists() {
+crates/amun-chain-store/src/snapshot.rs:78:    if !state_path.exists() {
+crates/amun-chain-store/src/store.rs:38:        if chain_file.exists() && index_file.exists() {
+crates/amun-chain-store/src/store.rs:89:        let offset = if chain_file.exists() {
+crates/amun-compatibility/src/lib.rs:8:pub use migration::{MigrationProof, MigrationRules};
+crates/amun-compatibility/src/migration.rs:1:/// Rules governing state migration between constitutional versions.
+crates/amun-compatibility/src/migration.rs:3:pub struct MigrationRules {
+crates/amun-consensus-execution/src/block_dag.rs:134:            return Err("Block already exists");
+crates/amun-consensus-execution/src/block_dag.rs:215:        // Invariant assertions
+crates/amun-consensus-execution/src/commit.rs:13:pub struct CommitRule {
+crates/amun-consensus-execution/src/commit.rs:161:impl Default for CommitRule {
+crates/amun-consensus-execution/src/commit.rs:30:impl CommitRule {
+crates/amun-consensus-execution/src/fork_choice.rs:177:        // Rule 1: Must extend locked QC
+crates/amun-consensus-execution/src/fork_choice.rs:184:        // Rule 2: Justify QC must justify the parent
+crates/amun-consensus-execution/src/fork_choice.rs:194:            // Rule 3: Justify QC round must be >= locked QC round
+crates/amun-consensus-execution/src/lib.rs:14:pub use commit::{CommitCheckpoint, CommitRule};
+crates/amun-consensus-execution/src/persistent_state.rs:13:    pub commit_rule: CommitRule,
+crates/amun-consensus-execution/src/persistent_state.rs:2:use crate::commit::CommitRule;
+crates/amun-consensus-execution/src/persistent_state.rs:73:        let wal_exists = std::path::Path::new(wal_path).exists();
+crates/amun-consensus-execution/src/persistent_state.rs:75:        if wal_exists {
+crates/amun-consensus-execution/src/persistent_state.rs:90:        let mut cr = CommitRule::new();
+crates/amun-consensus-execution/src/proposal.rs:1:use crate::commit::CommitRule;
+crates/amun-consensus-execution/src/proposal.rs:46:    pub fn is_safe(&self, commit_rule: &CommitRule) -> bool {
+crates/amun-consensus-law/src/finality.rs:3:pub struct FinalityLaw;
+crates/amun-consensus-law/src/finality.rs:5:impl FinalityLaw {
+crates/amun-consensus-law/src/invariants.rs:1:use amun_invariants::kernel::IrreducibleInvariants;
+crates/amun-consensus-law/src/invariants.rs:35:        IrreducibleInvariants::kernel_hash()
+crates/amun-consensus-law/src/invariants.rs:3:pub struct ConsensusInvariants;
+crates/amun-consensus-law/src/invariants.rs:5:impl ConsensusInvariants {
+crates/amun-consensus-law/src/lib.rs:10:pub use transitions::TransitionLaw;
+crates/amun-consensus-law/src/lib.rs:11:pub use validator::ValidatorObligations;
+crates/amun-consensus-law/src/lib.rs:7:pub use finality::FinalityLaw;
+crates/amun-consensus-law/src/lib.rs:8:pub use invariants::ConsensusInvariants;
+crates/amun-consensus-law/src/lib.rs:9:pub use safety::SafetyAxioms;
+crates/amun-consensus-law/src/safety.rs:1:pub struct SafetyAxioms;
+crates/amun-consensus-law/src/safety.rs:3:impl SafetyAxioms {
+crates/amun-consensus-law/src/transitions.rs:11:impl TransitionLaw {
+crates/amun-consensus-law/src/transitions.rs:9:pub struct TransitionLaw;
+crates/amun-consensus-law/src/validator.rs:11:impl ValidatorObligations {
+crates/amun-consensus-law/src/validator.rs:9:pub struct ValidatorObligations;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:30:/// exists in the local EvidenceStore.
+crates/amun-consensus-network/src/evidence_store.rs:223:        if !path.exists() {
+crates/amun-consensus-network/src/misbehavior.rs:37:        if path.exists() {
+crates/amun-consensus-network/src/validator_identity.rs:99:    /// Register a new identity. Returns error if the validator_id already exists.
+crates/amun-constitution-builder/src/hashing.rs:63:    if !dir.exists() {
+crates/amun-constitution/src/operational_semantics.rs:23:pub type RewriteRule = fn(&Configuration) -> Option<Configuration>;
+crates/amun-constitution/src/operational_semantics.rs:34:pub const RULES: &[RewriteRule] = &[];
+crates/amun-constitution/src/refinement_chain.rs:10:    RefinementObligation {
+crates/amun-constitution/src/refinement_chain.rs:12:        implementation: "Operational Semantics Rules",
+crates/amun-constitution/src/refinement_chain.rs:15:    RefinementObligation {
+crates/amun-constitution/src/refinement_chain.rs:16:        specification: "Operational Semantics Rules",
+crates/amun-constitution/src/refinement_chain.rs:20:    RefinementObligation {
+crates/amun-constitution/src/refinement_chain.rs:3:pub struct RefinementObligation {
+crates/amun-constitution/src/refinement_chain.rs:9:pub const REFINEMENT_OBLIGATIONS: &[RefinementObligation] = &[
+crates/amun-constitutional-authority/src/lib.rs:29:pub use rotation::KeyRotationLaw;
+crates/amun-constitutional-authority/src/rotation.rs:11:impl KeyRotationLaw {
+crates/amun-constitutional-authority/src/rotation.rs:9:pub struct KeyRotationLaw;
+crates/amun-constitutional-authority/tests/authority_tests.rs:112:    assert!(KeyRotationLaw::validate_rotation(&old.verifying_key_hex(), &signed, &old).is_ok());
+crates/amun-constitutional-authority/tests/authority_tests.rs:3:    CertificateChain, ConstitutionalCertificate, KeyRotationLaw, RevocationRegistry, TrustAnchor,
+crates/amun-constitutional-enforcement/src/lib.rs:104:                ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/lib.rs:105:                ConstitutionalLaw::ChainContinuity,
+crates/amun-constitutional-enforcement/src/lib.rs:106:                ConstitutionalLaw::SignatureValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:107:                ConstitutionalLaw::NoDoubleSpend,
+crates/amun-constitutional-enforcement/src/lib.rs:108:                ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/lib.rs:109:                ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/lib.rs:110:                ConstitutionalLaw::ReplayDeterminism,
+crates/amun-constitutional-enforcement/src/lib.rs:111:                ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/lib.rs:112:                ConstitutionalLaw::StateTransitionValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:113:                ConstitutionalLaw::EvidenceValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:137:        let checks: Vec<(&ConstitutionalLaw, bool, &str)> = vec![
+crates/amun-constitutional-enforcement/src/lib.rs:139:                &ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/lib.rs:144:                &ConstitutionalLaw::ChainContinuity,
+crates/amun-constitutional-enforcement/src/lib.rs:149:                &ConstitutionalLaw::SignatureValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:154:                &ConstitutionalLaw::NoDoubleSpend,
+crates/amun-constitutional-enforcement/src/lib.rs:159:                &ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/lib.rs:164:                &ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/lib.rs:169:                &ConstitutionalLaw::ReplayDeterminism,
+crates/amun-constitutional-enforcement/src/lib.rs:174:                &ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/lib.rs:179:                &ConstitutionalLaw::StateTransitionValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:184:                &ConstitutionalLaw::EvidenceValidity,
+crates/amun-constitutional-enforcement/src/lib.rs:209:    pub fn is_law_active(&self, law: &ConstitutionalLaw) -> bool {
+crates/amun-constitutional-enforcement/src/lib.rs:212:    pub fn activate_law(&mut self, law: ConstitutionalLaw) {
+crates/amun-constitutional-enforcement/src/lib.rs:217:    pub fn deactivate_law(&mut self, law: &ConstitutionalLaw) {
+crates/amun-constitutional-enforcement/src/lib.rs:252:                assert_eq!(violations[0].law, ConstitutionalLaw::StateRootIntegrity);
+crates/amun-constitutional-enforcement/src/lib.rs:274:        k.deactivate_law(&ConstitutionalLaw::StateRootIntegrity);
+crates/amun-constitutional-enforcement/src/lib.rs:50:    pub law: ConstitutionalLaw,
+crates/amun-constitutional-enforcement/src/lib.rs:56:pub enum ConstitutionalLaw {
+crates/amun-constitutional-enforcement/src/lib.rs:71:    pub active_laws: Vec<ConstitutionalLaw>,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:115:                law: ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:128:                law: ConstitutionalLaw::ChainContinuity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:137:                law: ConstitutionalLaw::SignatureValidity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:146:                law: ConstitutionalLaw::NoDoubleSpend,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:155:                law: ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:164:                law: ConstitutionalLaw::ValidatorSetGovernance,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:173:                law: ConstitutionalLaw::ReplayDeterminism,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:182:                law: ConstitutionalLaw::FinalitySupermajority,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:194:                law: ConstitutionalLaw::StateTransitionValidity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:203:                law: ConstitutionalLaw::EvidenceValidity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:247:                    .any(|v| v.law == ConstitutionalLaw::StateRootIntegrity));
+crates/amun-constitutional-enforcement/src/proof_engine.rs:306:                    .any(|v| v.law == ConstitutionalLaw::FinalitySupermajority));
+crates/amun-constitutional-enforcement/src/proof_engine.rs:6:use crate::{ConstitutionalLaw, ConstitutionalVerdict, ConstitutionalViolation};
+crates/amun-constitutional-enforcement/src/state_transition.rs:158:                    .any(|v| v.law == ConstitutionalLaw::ReplayDeterminism));
+crates/amun-constitutional-enforcement/src/state_transition.rs:178:                    .any(|v| v.law == ConstitutionalLaw::StateTransitionValidity));
+crates/amun-constitutional-enforcement/src/state_transition.rs:57:                law: ConstitutionalLaw::ReplayDeterminism,
+crates/amun-constitutional-enforcement/src/state_transition.rs:70:                law: ConstitutionalLaw::StateTransitionValidity,
+crates/amun-constitutional-enforcement/src/state_transition.rs:7:use crate::{ConstitutionalLaw, ConstitutionalVerdict, ConstitutionalViolation};
+crates/amun-constitutional-evidence/src/lib.rs:55:    // Rule 1: Epoch Check (Exclusion ⇍_C)
+crates/amun-constitutional-evidence/src/lib.rs:61:    // Rule 2: Constitutional Membership (Exclusion ⇍_C)
+crates/amun-constitutional-evidence/src/lib.rs:72:    // Rule 3: Quorum Check (Comparability CC → SH1)
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:25:    /// Invariant mass creates an inescapable region
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:26:    InvariantSingularity,
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:24:    InvariantForce {
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:61:                ConstitutionalForce::InvariantForce { strength, .. } => {
+crates/amun-constitutional-geometry/src/geodesics.rs:28:    /// Check if a direct geodesic exists (no horizons crossed).
+crates/amun-constitutional-geometry/src/horizons.rs:19:    /// Treaty horizon: no treaty exists and none can be established
+crates/amun-constitutional-geometry/src/stability.rs:48:    InvariantAttractor,
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:139:    let search_dir = if cert_dir.exists() {
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:149:        if path.exists() {
+crates/amun-constitutional-integration/src/lib.rs:101:            "forall fc in FinalityCertificate : verify_signatures(fc) = true",
+crates/amun-constitutional-integration/src/lib.rs:102:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:107:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:108:            ObligationId::new(ObligationNamespace::Fault, 1),
+crates/amun-constitutional-integration/src/lib.rs:109:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:111:            "exists v : voted(v,b1) and voted(v,b2) and b1.height=b2.height implies detected(v)",
+crates/amun-constitutional-integration/src/lib.rs:112:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:117:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:118:            ObligationId::new(ObligationNamespace::Recovery, 1),
+crates/amun-constitutional-integration/src/lib.rs:119:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:121:            "forall s : state_root(Recover(s)) = state_root(Original(s))",
+crates/amun-constitutional-integration/src/lib.rs:122:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:127:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:128:            ObligationId::new(ObligationNamespace::Performance, 1),
+crates/amun-constitutional-integration/src/lib.rs:129:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:132:            ObligationSeverity::Minor,
+crates/amun-constitutional-integration/src/lib.rs:137:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:138:            ObligationId::new(ObligationNamespace::Performance, 2),
+crates/amun-constitutional-integration/src/lib.rs:139:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:13:    pub fn build_obligation_registry() -> ObligationRegistry {
+crates/amun-constitutional-integration/src/lib.rs:142:            ObligationSeverity::Minor,
+crates/amun-constitutional-integration/src/lib.rs:147:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:148:            ObligationId::new(ObligationNamespace::Performance, 3),
+crates/amun-constitutional-integration/src/lib.rs:149:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:14:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-integration/src/lib.rs:152:            ObligationSeverity::Minor,
+crates/amun-constitutional-integration/src/lib.rs:159:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:160:                ObligationId::new(ObligationNamespace::Safety, 4),
+crates/amun-constitutional-integration/src/lib.rs:161:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:163:                "forall b in Finalized : state_root(Replay(b)) = state_root(b)",
+crates/amun-constitutional-integration/src/lib.rs:164:                ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:167:            .with_dependency(ObligationId::new(ObligationNamespace::Replay, 2))
+crates/amun-constitutional-integration/src/lib.rs:168:            .with_dependency(ObligationId::new(ObligationNamespace::Evidence, 1)),
+crates/amun-constitutional-integration/src/lib.rs:173:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:174:                ObligationId::new(ObligationNamespace::Replay, 3),
+crates/amun-constitutional-integration/src/lib.rs:175:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:177:                "forall b : |{rc : rc.block = b}| = 1",
+crates/amun-constitutional-integration/src/lib.rs:178:                ObligationSeverity::Major,
+crates/amun-constitutional-integration/src/lib.rs:17:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:181:            .with_dependency(ObligationId::new(ObligationNamespace::Replay, 2)),
+crates/amun-constitutional-integration/src/lib.rs:186:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:187:                ObligationId::new(ObligationNamespace::Replay, 4),
+crates/amun-constitutional-integration/src/lib.rs:188:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:18:            ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-integration/src/lib.rs:190:                "forall b1,b2 in ReplayChain : b1.height+1=b2.height implies linked(b1,b2)",
+crates/amun-constitutional-integration/src/lib.rs:191:                ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:194:            .with_dependency(ObligationId::new(ObligationNamespace::Replay, 1)),
+crates/amun-constitutional-integration/src/lib.rs:199:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:19:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:200:                ObligationId::new(ObligationNamespace::Evidence, 3),
+crates/amun-constitutional-integration/src/lib.rs:201:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:203:                "forall ev1,ev2 in EvidenceChain : linked(ev1, ev2)",
+crates/amun-constitutional-integration/src/lib.rs:204:                ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:207:            .with_dependency(ObligationId::new(ObligationNamespace::Evidence, 2)),
+crates/amun-constitutional-integration/src/lib.rs:212:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:213:                ObligationId::new(ObligationNamespace::Evidence, 4),
+crates/amun-constitutional-integration/src/lib.rs:214:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:216:                "forall ev1,ev2 : ev2.parent = ev1 implies hash(ev1) in ev2.parent_hash",
+crates/amun-constitutional-integration/src/lib.rs:217:                ObligationSeverity::Major,
+crates/amun-constitutional-integration/src/lib.rs:21:            "forall b1,b2 in Finalized : b1.height = b2.height implies b1 = b2",
+crates/amun-constitutional-integration/src/lib.rs:220:            .with_dependency(ObligationId::new(ObligationNamespace::Evidence, 3)),
+crates/amun-constitutional-integration/src/lib.rs:225:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:226:                ObligationId::new(ObligationNamespace::Finality, 3),
+crates/amun-constitutional-integration/src/lib.rs:227:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:229:                "not exists fc1,fc2 : fc1.block = fc2.block and fc1 != fc2",
+crates/amun-constitutional-integration/src/lib.rs:22:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:230:                ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:233:            .with_dependency(ObligationId::new(ObligationNamespace::Finality, 1))
+crates/amun-constitutional-integration/src/lib.rs:234:            .with_dependency(ObligationId::new(ObligationNamespace::Safety, 1)),
+crates/amun-constitutional-integration/src/lib.rs:239:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:240:                ObligationId::new(ObligationNamespace::Cluster, 1),
+crates/amun-constitutional-integration/src/lib.rs:241:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:244:                ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:247:            .with_dependency(ObligationId::new(ObligationNamespace::Finality, 1))
+crates/amun-constitutional-integration/src/lib.rs:248:            .with_dependency(ObligationId::new(ObligationNamespace::Replay, 1))
+crates/amun-constitutional-integration/src/lib.rs:249:            .with_dependency(ObligationId::new(ObligationNamespace::Evidence, 1)),
+crates/amun-constitutional-integration/src/lib.rs:254:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:255:                ObligationId::new(ObligationNamespace::Cluster, 2),
+crates/amun-constitutional-integration/src/lib.rs:256:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:259:                ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:262:            .with_dependency(ObligationId::new(ObligationNamespace::Cluster, 1)),
+crates/amun-constitutional-integration/src/lib.rs:267:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:268:                ObligationId::new(ObligationNamespace::Cluster, 3),
+crates/amun-constitutional-integration/src/lib.rs:269:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:271:                "forall n in {32,64,128,256} : invariants_hold(n)",
+crates/amun-constitutional-integration/src/lib.rs:272:                ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:275:            .with_dependency(ObligationId::new(ObligationNamespace::Cluster, 1))
+crates/amun-constitutional-integration/src/lib.rs:276:            .with_dependency(ObligationId::new(ObligationNamespace::Cluster, 2)),
+crates/amun-constitutional-integration/src/lib.rs:27:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:281:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:282:                ObligationId::new(ObligationNamespace::Fault, 2),
+crates/amun-constitutional-integration/src/lib.rs:283:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:285:                "exists qc1,qc2 : qc1.block=qc2.block and qc1!=qc2 implies system_rejects",
+crates/amun-constitutional-integration/src/lib.rs:286:                ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:289:            .with_dependency(ObligationId::new(ObligationNamespace::Finality, 3)),
+crates/amun-constitutional-integration/src/lib.rs:28:            ObligationId::new(ObligationNamespace::Safety, 2),
+crates/amun-constitutional-integration/src/lib.rs:294:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:295:                ObligationId::new(ObligationNamespace::Recovery, 2),
+crates/amun-constitutional-integration/src/lib.rs:296:                ObligationKind::Derived,
+crates/amun-constitutional-integration/src/lib.rs:299:                ObligationSeverity::Major,
+crates/amun-constitutional-integration/src/lib.rs:29:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:302:            .with_dependency(ObligationId::new(ObligationNamespace::Recovery, 1)),
+crates/amun-constitutional-integration/src/lib.rs:313:        obligation_id: &ObligationId,
+crates/amun-constitutional-integration/src/lib.rs:31:            "forall b in Finalized : exists QC(b) and |signers(QC(b))| >= 2f+1",
+crates/amun-constitutional-integration/src/lib.rs:32:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:338:            ObligationRegistry,
+crates/amun-constitutional-integration/src/lib.rs:355:            let obligations: Vec<ProofObligation> = registry
+crates/amun-constitutional-integration/src/lib.rs:370:            let obligations: Vec<ProofObligation> = registry
+crates/amun-constitutional-integration/src/lib.rs:379:                    ObligationResultStatus::Inconclusive
+crates/amun-constitutional-integration/src/lib.rs:37:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:381:                    ObligationResultStatus::Satisfied
+crates/amun-constitutional-integration/src/lib.rs:384:                results.push(if status == ObligationResultStatus::Satisfied {
+crates/amun-constitutional-integration/src/lib.rs:385:                    ObligationResult::satisfied(obl.id.clone(), refs)
+crates/amun-constitutional-integration/src/lib.rs:387:                    ObligationResult::inconclusive(obl.id.clone(), refs)
+crates/amun-constitutional-integration/src/lib.rs:38:            ObligationId::new(ObligationNamespace::Safety, 3),
+crates/amun-constitutional-integration/src/lib.rs:39:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:3:    EvidenceType, ObligationId, ObligationKind, ObligationNamespace, ObligationRegistry,
+crates/amun-constitutional-integration/src/lib.rs:41:            "forall b : b in Finalized(t) implies b in Finalized(t+delta)",
+crates/amun-constitutional-integration/src/lib.rs:42:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:47:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:48:            ObligationId::new(ObligationNamespace::Replay, 1),
+crates/amun-constitutional-integration/src/lib.rs:49:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:4:    ObligationResult, ObligationResultStatus, ObligationSeverity, ProofObligation,
+crates/amun-constitutional-integration/src/lib.rs:51:            "forall b in Finalized : exists replay_certificate(b)",
+crates/amun-constitutional-integration/src/lib.rs:52:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:57:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:58:            ObligationId::new(ObligationNamespace::Replay, 2),
+crates/amun-constitutional-integration/src/lib.rs:59:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:61:            "forall b : Replay(b, t1) = Replay(b, t2)",
+crates/amun-constitutional-integration/src/lib.rs:62:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:67:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:68:            ObligationId::new(ObligationNamespace::Evidence, 1),
+crates/amun-constitutional-integration/src/lib.rs:69:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:71:            "forall rc in ReplayCertificate : exists ev in EvidenceRoot : ev.replay = rc",
+crates/amun-constitutional-integration/src/lib.rs:72:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:77:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:78:            ObligationId::new(ObligationNamespace::Evidence, 2),
+crates/amun-constitutional-integration/src/lib.rs:79:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:81:            "forall ev : ev in EvidenceRoot implies hash(ev) = constant",
+crates/amun-constitutional-integration/src/lib.rs:82:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:87:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:88:            ObligationId::new(ObligationNamespace::Finality, 1),
+crates/amun-constitutional-integration/src/lib.rs:89:            ObligationKind::Primary,
+crates/amun-constitutional-integration/src/lib.rs:91:            "forall b in Finalized : exists finality_certificate(b)",
+crates/amun-constitutional-integration/src/lib.rs:92:            ObligationSeverity::Critical,
+crates/amun-constitutional-integration/src/lib.rs:97:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:98:            ObligationId::new(ObligationNamespace::Finality, 2),
+crates/amun-constitutional-integration/src/lib.rs:99:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/article_i_certificate.rs:1:use crate::{ObligationKind, ObligationRegistry, ObligationSeverity};
+crates/amun-constitutional-proof/src/article_i_certificate.rs:32:    pub fn issue(registry: &ObligationRegistry, issued_at: u64) -> Option<Self> {
+crates/amun-constitutional-proof/src/article_i_certificate.rs:53:                ObligationKind::Primary => primaries += 1,
+crates/amun-constitutional-proof/src/article_i_certificate.rs:54:                ObligationKind::Derived => derived += 1,
+crates/amun-constitutional-proof/src/article_i_certificate.rs:57:                ObligationSeverity::Critical => critical += 1,
+crates/amun-constitutional-proof/src/article_i_certificate.rs:58:                ObligationSeverity::Major => major += 1,
+crates/amun-constitutional-proof/src/article_i_certificate.rs:59:                ObligationSeverity::Minor => minor += 1,
+crates/amun-constitutional-proof/src/article_i_certificate.rs:60:                ObligationSeverity::Advisory => advisory += 1,
+crates/amun-constitutional-proof/src/certification.rs:100:                r.status == crate::ObligationResultStatus::Failed && r.failure_reason.is_some()
+crates/amun-constitutional-proof/src/certification.rs:116:            .filter(|r| r.status == crate::ObligationResultStatus::Failed)
+crates/amun-constitutional-proof/src/certification.rs:1:use crate::{ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult};
+crates/amun-constitutional-proof/src/certification.rs:36:        registry: &ObligationRegistry,
+crates/amun-constitutional-proof/src/certification.rs:84:    fn gate_c1_all_obligations_registered(registry: &ObligationRegistry) -> GateResult {
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:111:                ObligationResultStatus::Satisfied => "SATISFIED",
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:112:                ObligationResultStatus::Failed => "FAILED",
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:113:                ObligationResultStatus::Inconclusive => "INCONCLUSIVE",
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:114:                ObligationResultStatus::Waived => "WAIVED",
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:115:                ObligationResultStatus::NotApplicable => "NOT_APPLICABLE",
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:127:    fn collect_evidence_refs(results: &[ObligationResult]) -> Vec<String> {
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:23:    pub results: Vec<ObligationResult>,
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:44:        results: Vec<ObligationResult>,
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:52:            .filter(|r| r.status == ObligationResultStatus::Satisfied)
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:5:use crate::{ObligationResult, ObligationResultStatus, VerdictResult};
+crates/amun-constitutional-proof/src/dependency_graph.rs:106:    fn find_cycle(&self) -> Option<ObligationId> {
+crates/amun-constitutional-proof/src/dependency_graph.rs:121:        node: &ObligationId,
+crates/amun-constitutional-proof/src/dependency_graph.rs:122:        white: &mut HashSet<ObligationId>,
+crates/amun-constitutional-proof/src/dependency_graph.rs:123:        gray: &mut HashSet<ObligationId>,
+crates/amun-constitutional-proof/src/dependency_graph.rs:124:        black: &mut HashSet<ObligationId>,
+crates/amun-constitutional-proof/src/dependency_graph.rs:150:        node: &ObligationId,
+crates/amun-constitutional-proof/src/dependency_graph.rs:151:        kinds: &HashMap<ObligationId, crate::ObligationKind>,
+crates/amun-constitutional-proof/src/dependency_graph.rs:163:                .unwrap_or(crate::ObligationKind::Primary);
+crates/amun-constitutional-proof/src/dependency_graph.rs:164:            if kind == crate::ObligationKind::Primary {
+crates/amun-constitutional-proof/src/dependency_graph.rs:17:    pub fn add_node(&mut self, id: ObligationId) {
+crates/amun-constitutional-proof/src/dependency_graph.rs:23:    pub fn add_edge(&mut self, from: ObligationId, to: ObligationId) {
+crates/amun-constitutional-proof/src/dependency_graph.rs:34:    pub fn topological_sort(&self) -> Result<Vec<ObligationId>, RegistryError> {
+crates/amun-constitutional-proof/src/dependency_graph.rs:35:        let mut in_degree: HashMap<ObligationId, usize> = HashMap::new();
+crates/amun-constitutional-proof/src/dependency_graph.rs:3:use crate::{ObligationId, RegistryError};
+crates/amun-constitutional-proof/src/dependency_graph.rs:45:        let mut queue: VecDeque<ObligationId> = in_degree
+crates/amun-constitutional-proof/src/dependency_graph.rs:70:            return Err(RegistryError::CircularDependency(ObligationId::new(
+crates/amun-constitutional-proof/src/dependency_graph.rs:71:                crate::ObligationNamespace::Safety,
+crates/amun-constitutional-proof/src/dependency_graph.rs:7:    nodes: HashSet<ObligationId>,
+crates/amun-constitutional-proof/src/dependency_graph.rs:81:        kinds: &HashMap<ObligationId, crate::ObligationKind>,
+crates/amun-constitutional-proof/src/dependency_graph.rs:87:                .unwrap_or(crate::ObligationKind::Primary);
+crates/amun-constitutional-proof/src/dependency_graph.rs:88:            if kind == crate::ObligationKind::Derived && !self.has_primary_ancestor(node, kinds) {
+crates/amun-constitutional-proof/src/dependency_graph.rs:8:    edges: HashMap<ObligationId, Vec<ObligationId>>,
+crates/amun-constitutional-proof/src/dependency_graph.rs:9:    reverse_edges: HashMap<ObligationId, Vec<ObligationId>>,
+crates/amun-constitutional-proof/src/evidence_archive.rs:25:    /// Returns an error if the evidence ID already exists.
+crates/amun-constitutional-proof/src/evidence_archive.rs:3:use crate::{EvidenceRecord, EvidenceStatus, EvidenceType, ObligationId};
+crates/amun-constitutional-proof/src/evidence_archive.rs:74:    pub fn by_obligation(&self, obligation_id: &ObligationId) -> Vec<&EvidenceRecord> {
+crates/amun-constitutional-proof/src/evidence_record.rs:17:    pub obligation_ids: Vec<ObligationId>,
+crates/amun-constitutional-proof/src/evidence_record.rs:31:        obligation_ids: Vec<ObligationId>,
+crates/amun-constitutional-proof/src/evidence_record.rs:3:use crate::{EvidenceLineage, EvidenceStatus, EvidenceType, ObligationId, Reproducibility};
+crates/amun-constitutional-proof/src/lib.rs:1003:        let id = ObligationId::new(ObligationNamespace::Cluster, 1);
+crates/amun-constitutional-proof/src/lib.rs:101:        let id = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:1025:        let id = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:1048:        let id = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:1080:        obl_id: ObligationId,
+crates/amun-constitutional-proof/src/lib.rs:1096:        let obl = ObligationId::new(ObligationNamespace::Replay, 1);
+crates/amun-constitutional-proof/src/lib.rs:109:        let id: ObligationId = serde_json::from_str(json).unwrap();
+crates/amun-constitutional-proof/src/lib.rs:1107:        let obl = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:110:        assert_eq!(id.namespace(), ObligationNamespace::Safety);
+crates/amun-constitutional-proof/src/lib.rs:1116:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:1136:        let obl = ObligationId::new(ObligationNamespace::Evidence, 1);
+crates/amun-constitutional-proof/src/lib.rs:1151:        let obl = ObligationId::new(ObligationNamespace::Cluster, 1);
+crates/amun-constitutional-proof/src/lib.rs:116:        let id: ObligationId = "SAFETY-001".parse().unwrap();
+crates/amun-constitutional-proof/src/lib.rs:1173:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:117:        assert_eq!(id, ObligationId::new(ObligationNamespace::Safety, 1));
+crates/amun-constitutional-proof/src/lib.rs:1207:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:122:        let id = ObligationId::new(ObligationNamespace::Replay, 4);
+crates/amun-constitutional-proof/src/lib.rs:123:        assert_eq!(id.namespace(), ObligationNamespace::Replay);
+crates/amun-constitutional-proof/src/lib.rs:1241:        let obl1 = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:1242:        let obl2 = ObligationId::new(ObligationNamespace::Safety, 2);
+crates/amun-constitutional-proof/src/lib.rs:1276:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:129:        let result: Result<ObligationId, _> = "UNKNOWN-001".parse();
+crates/amun-constitutional-proof/src/lib.rs:1310:        let obl = ObligationId::new(ObligationNamespace::Replay, 1);
+crates/amun-constitutional-proof/src/lib.rs:1337:        let obl = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:1364:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:1365:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1366:            ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:1367:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:1370:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:1377:        let obl = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:1398:            vec![ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:1399:                ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:139:        let result: Result<ObligationId, _> = "SAFETY".parse();
+crates/amun-constitutional-proof/src/lib.rs:1429:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:142:            Err(RegistryError::InvalidObligationIdFormat(s)) => assert_eq!(s, "SAFETY"),
+crates/amun-constitutional-proof/src/lib.rs:1430:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1431:            ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:1432:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:1435:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:143:            _ => panic!("expected InvalidObligationIdFormat error"),
+crates/amun-constitutional-proof/src/lib.rs:1442:        let obl = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:1463:            vec![ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:1464:                ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:1494:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:1495:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1496:            ObligationId::new(ObligationNamespace::Replay, 1),
+crates/amun-constitutional-proof/src/lib.rs:1497:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:1500:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:150:            ObligationNamespace::Safety,
+crates/amun-constitutional-proof/src/lib.rs:151:            ObligationNamespace::Replay,
+crates/amun-constitutional-proof/src/lib.rs:152:            ObligationNamespace::Evidence,
+crates/amun-constitutional-proof/src/lib.rs:1530:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:1532:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1533:                ObligationId::new(ObligationNamespace::Safety, i),
+crates/amun-constitutional-proof/src/lib.rs:1534:                ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:1535:                format!("Obligation {i}"),
+crates/amun-constitutional-proof/src/lib.rs:1537:                ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:153:            ObligationNamespace::Finality,
+crates/amun-constitutional-proof/src/lib.rs:154:            ObligationNamespace::Cluster,
+crates/amun-constitutional-proof/src/lib.rs:1555:                        vec![ObligationId::new(ObligationNamespace::Safety, 1)],
+crates/amun-constitutional-proof/src/lib.rs:155:            ObligationNamespace::Fault,
+crates/amun-constitutional-proof/src/lib.rs:156:            ObligationNamespace::Recovery,
+crates/amun-constitutional-proof/src/lib.rs:157:            ObligationNamespace::Performance,
+crates/amun-constitutional-proof/src/lib.rs:160:            let parsed: ObligationNamespace = displayed.as_str().try_into().unwrap();
+crates/amun-constitutional-proof/src/lib.rs:1641:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:1643:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1644:                ObligationId::new(ObligationNamespace::Safety, i),
+crates/amun-constitutional-proof/src/lib.rs:1645:                ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:1646:                format!("Obligation {i}"),
+crates/amun-constitutional-proof/src/lib.rs:1648:                ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:167:        let id = ObligationId::new(ObligationNamespace::Finality, 3);
+crates/amun-constitutional-proof/src/lib.rs:169:        let id2: ObligationId = serde_json::from_str(&json).unwrap();
+crates/amun-constitutional-proof/src/lib.rs:1735:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:1737:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1738:                ObligationId::new(ObligationNamespace::Safety, i),
+crates/amun-constitutional-proof/src/lib.rs:1739:                ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:173:    // --- ProofObligation tests (S1) ---
+crates/amun-constitutional-proof/src/lib.rs:1740:                format!("Obligation {i}"),
+crates/amun-constitutional-proof/src/lib.rs:1742:                ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:177:        let id = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:178:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:180:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:182:            "forall b1,b2 in Finalized : b1.height = b2.height implies b1 = b2",
+crates/amun-constitutional-proof/src/lib.rs:183:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:187:        assert_eq!(obl.kind, ObligationKind::Primary);
+crates/amun-constitutional-proof/src/lib.rs:188:        assert_eq!(obl.severity, ObligationSeverity::Critical);
+crates/amun-constitutional-proof/src/lib.rs:191:        assert_eq!(obl.status, ObligationStatus::Active);
+crates/amun-constitutional-proof/src/lib.rs:197:        let dep = ObligationId::new(ObligationNamespace::Finality, 1);
+crates/amun-constitutional-proof/src/lib.rs:198:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:199:            ObligationId::new(ObligationNamespace::Cluster, 1),
+crates/amun-constitutional-proof/src/lib.rs:200:            ObligationKind::Derived,
+crates/amun-constitutional-proof/src/lib.rs:203:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:209:        assert_eq!(obl.kind, ObligationKind::Derived);
+crates/amun-constitutional-proof/src/lib.rs:216:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:217:            ObligationId::new(ObligationNamespace::Performance, 1),
+crates/amun-constitutional-proof/src/lib.rs:218:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:221:            ObligationSeverity::Minor,
+crates/amun-constitutional-proof/src/lib.rs:224:        .with_status(ObligationStatus::Frozen);
+crates/amun-constitutional-proof/src/lib.rs:226:        assert_eq!(obl.status, ObligationStatus::Frozen);
+crates/amun-constitutional-proof/src/lib.rs:231:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:232:            ObligationId::new(ObligationNamespace::Replay, 2),
+crates/amun-constitutional-proof/src/lib.rs:233:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:235:            "forall b : Replay(b, t1) = Replay(b, t2)",
+crates/amun-constitutional-proof/src/lib.rs:236:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:239:        .with_dependency(ObligationId::new(ObligationNamespace::Replay, 1));
+crates/amun-constitutional-proof/src/lib.rs:242:        let obl2: ProofObligation = serde_json::from_str(&json).unwrap();
+crates/amun-constitutional-proof/src/lib.rs:252:            "formal_statement": "forall b in Finalized : exists QC(b) and |signers(QC(b))| >= 2f+1",
+crates/amun-constitutional-proof/src/lib.rs:258:        let obl: ProofObligation = serde_json::from_str(json).unwrap();
+crates/amun-constitutional-proof/src/lib.rs:265:    fn make_id(namespace: ObligationNamespace, seq: u32) -> ObligationId {
+crates/amun-constitutional-proof/src/lib.rs:266:        ObligationId::new(namespace, seq)
+crates/amun-constitutional-proof/src/lib.rs:272:        let a = make_id(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:273:        let b = make_id(ObligationNamespace::Safety, 2);
+crates/amun-constitutional-proof/src/lib.rs:281:        let a = make_id(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:282:        let b = make_id(ObligationNamespace::Safety, 2);
+crates/amun-constitutional-proof/src/lib.rs:283:        let c = make_id(ObligationNamespace::Safety, 3);
+crates/amun-constitutional-proof/src/lib.rs:294:        let a = make_id(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:295:        let b = make_id(ObligationNamespace::Safety, 2);
+crates/amun-constitutional-proof/src/lib.rs:296:        let c = make_id(ObligationNamespace::Safety, 3);
+crates/amun-constitutional-proof/src/lib.rs:310:        g.add_node(make_id(ObligationNamespace::Safety, 1));
+crates/amun-constitutional-proof/src/lib.rs:317:        let primary = make_id(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:318:        let derived = make_id(ObligationNamespace::Cluster, 1);
+crates/amun-constitutional-proof/src/lib.rs:321:        kinds.insert(primary.clone(), ObligationKind::Primary);
+crates/amun-constitutional-proof/src/lib.rs:322:        kinds.insert(derived.clone(), ObligationKind::Derived);
+crates/amun-constitutional-proof/src/lib.rs:331:        let d1 = make_id(ObligationNamespace::Cluster, 1);
+crates/amun-constitutional-proof/src/lib.rs:332:        let d2 = make_id(ObligationNamespace::Cluster, 2);
+crates/amun-constitutional-proof/src/lib.rs:335:        kinds.insert(d1.clone(), ObligationKind::Derived);
+crates/amun-constitutional-proof/src/lib.rs:336:        kinds.insert(d2.clone(), ObligationKind::Derived);
+crates/amun-constitutional-proof/src/lib.rs:350:    // --- ObligationRegistry tests (S3) ---
+crates/amun-constitutional-proof/src/lib.rs:352:    fn simple_obl(id: ObligationId) -> ProofObligation {
+crates/amun-constitutional-proof/src/lib.rs:353:        ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:355:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:358:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:365:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:366:        let id = make_id(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:374:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:375:        let id = make_id(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:383:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:384:        let id = make_id(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:388:        let result = reg.register(simple_obl(make_id(ObligationNamespace::Safety, 2)));
+crates/amun-constitutional-proof/src/lib.rs:394:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:395:        let missing_dep = make_id(ObligationNamespace::Replay, 99);
+crates/amun-constitutional-proof/src/lib.rs:396:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:397:            make_id(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:398:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:401:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:414:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:415:        let id1 = make_id(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:416:        let id2 = make_id(ObligationNamespace::Safety, 2);
+crates/amun-constitutional-proof/src/lib.rs:417:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:419:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:422:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:426:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:428:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:431:            ObligationSeverity::Minor,
+crates/amun-constitutional-proof/src/lib.rs:435:        assert_eq!(reg.by_severity(ObligationSeverity::Critical).len(), 1);
+crates/amun-constitutional-proof/src/lib.rs:436:        assert_eq!(reg.by_severity(ObligationSeverity::Minor).len(), 1);
+crates/amun-constitutional-proof/src/lib.rs:437:        assert_eq!(reg.by_severity(ObligationSeverity::Major).len(), 0);
+crates/amun-constitutional-proof/src/lib.rs:442:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:443:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:444:            make_id(ObligationNamespace::Finality, 1),
+crates/amun-constitutional-proof/src/lib.rs:445:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:448:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:452:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:453:            make_id(ObligationNamespace::Finality, 2),
+crates/amun-constitutional-proof/src/lib.rs:454:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:457:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:470:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:472:            let id = ObligationId::new(ObligationNamespace::Safety, i);
+crates/amun-constitutional-proof/src/lib.rs:473:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:475:                ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:476:                format!("Obligation {i}"),
+crates/amun-constitutional-proof/src/lib.rs:478:                ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:497:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:499:            let id = ObligationId::new(ObligationNamespace::Safety, i);
+crates/amun-constitutional-proof/src/lib.rs:500:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:502:                ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:503:                format!("Obligation {i}"),
+crates/amun-constitutional-proof/src/lib.rs:505:                ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:515:        let mut reg = ObligationRegistry::new();
+crates/amun-constitutional-proof/src/lib.rs:517:            let id = ObligationId::new(ObligationNamespace::Safety, i);
+crates/amun-constitutional-proof/src/lib.rs:518:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:520:                ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:521:                format!("Obligation {i}"),
+crates/amun-constitutional-proof/src/lib.rs:523:                ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:536:        let id = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:537:        let result = ObligationResult::satisfied(id.clone(), vec!["EV-001".into()]);
+crates/amun-constitutional-proof/src/lib.rs:539:        assert_eq!(result.status, ObligationResultStatus::Satisfied);
+crates/amun-constitutional-proof/src/lib.rs:546:        let id = ObligationId::new(ObligationNamespace::Replay, 1);
+crates/amun-constitutional-proof/src/lib.rs:548:        let result = ObligationResult::failed(id.clone(), reason.clone(), vec![]);
+crates/amun-constitutional-proof/src/lib.rs:549:        assert_eq!(result.status, ObligationResultStatus::Failed);
+crates/amun-constitutional-proof/src/lib.rs:555:        let id = ObligationId::new(ObligationNamespace::Cluster, 1);
+crates/amun-constitutional-proof/src/lib.rs:556:        let result = ObligationResult::inconclusive(id.clone(), vec!["EV-032".into()]);
+crates/amun-constitutional-proof/src/lib.rs:557:        assert_eq!(result.status, ObligationResultStatus::Inconclusive);
+crates/amun-constitutional-proof/src/lib.rs:578:        let id = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:579:        let result = ObligationResult::satisfied(id, vec!["EV-001".into()]);
+crates/amun-constitutional-proof/src/lib.rs:581:        let parsed: ObligationResult = serde_json::from_str(&json).unwrap();
+crates/amun-constitutional-proof/src/lib.rs:590:            ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:591:                ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:594:            ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:595:                ObligationId::new(ObligationNamespace::Safety, 2),
+crates/amun-constitutional-proof/src/lib.rs:619:            ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:620:                ObligationId::new(ObligationNamespace::Replay, 1),
+crates/amun-constitutional-proof/src/lib.rs:623:            ObligationResult::failed(
+crates/amun-constitutional-proof/src/lib.rs:624:                ObligationId::new(ObligationNamespace::Replay, 2),
+crates/amun-constitutional-proof/src/lib.rs:628:            ObligationResult::inconclusive(
+crates/amun-constitutional-proof/src/lib.rs:629:                ObligationId::new(ObligationNamespace::Replay, 3),
+crates/amun-constitutional-proof/src/lib.rs:651:            ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:652:                ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:655:            ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:656:                ObligationId::new(ObligationNamespace::Safety, 2),
+crates/amun-constitutional-proof/src/lib.rs:677:        let results = vec![ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:678:            ObligationId::new(ObligationNamespace::Cluster, 1),
+crates/amun-constitutional-proof/src/lib.rs:707:            ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:708:                ObligationId::new(ObligationNamespace::Finality, 1),
+crates/amun-constitutional-proof/src/lib.rs:711:            ObligationResult::failed(
+crates/amun-constitutional-proof/src/lib.rs:712:                ObligationId::new(ObligationNamespace::Finality, 2),
+crates/amun-constitutional-proof/src/lib.rs:735:    fn make_obl(id: ObligationId, severity: ObligationSeverity) -> ProofObligation {
+crates/amun-constitutional-proof/src/lib.rs:736:        ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:738:            ObligationKind::Primary,
+crates/amun-constitutional-proof/src/lib.rs:749:            ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:750:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:752:        let results = vec![ObligationResult::failed(
+crates/amun-constitutional-proof/src/lib.rs:773:            ObligationId::new(ObligationNamespace::Replay, 1),
+crates/amun-constitutional-proof/src/lib.rs:774:            ObligationSeverity::Major,
+crates/amun-constitutional-proof/src/lib.rs:777:            ObligationId::new(ObligationNamespace::Replay, 2),
+crates/amun-constitutional-proof/src/lib.rs:778:            ObligationSeverity::Major,
+crates/amun-constitutional-proof/src/lib.rs:782:            ObligationResult::failed(obl1.id, FailureReason::new("M1", "m1"), vec![]),
+crates/amun-constitutional-proof/src/lib.rs:783:            ObligationResult::failed(obl2.id, FailureReason::new("M2", "m2"), vec![]),
+crates/amun-constitutional-proof/src/lib.rs:801:            ObligationId::new(ObligationNamespace::Evidence, 1),
+crates/amun-constitutional-proof/src/lib.rs:802:            ObligationSeverity::Major,
+crates/amun-constitutional-proof/src/lib.rs:804:        let results = vec![ObligationResult::failed(
+crates/amun-constitutional-proof/src/lib.rs:828:            ObligationId::new(ObligationNamespace::Performance, 1),
+crates/amun-constitutional-proof/src/lib.rs:829:            ObligationSeverity::Minor,
+crates/amun-constitutional-proof/src/lib.rs:831:        let results = vec![ObligationResult::failed(
+crates/amun-constitutional-proof/src/lib.rs:855:            ObligationId::new(ObligationNamespace::Performance, 2),
+crates/amun-constitutional-proof/src/lib.rs:856:            ObligationSeverity::Advisory,
+crates/amun-constitutional-proof/src/lib.rs:858:        let results = vec![ObligationResult::failed(
+crates/amun-constitutional-proof/src/lib.rs:882:            ObligationId::new(ObligationNamespace::Finality, 1),
+crates/amun-constitutional-proof/src/lib.rs:883:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:885:        let results = vec![ObligationResult::satisfied(
+crates/amun-constitutional-proof/src/lib.rs:905:            ObligationId::new(ObligationNamespace::Safety, 1),
+crates/amun-constitutional-proof/src/lib.rs:906:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:909:            ObligationId::new(ObligationNamespace::Safety, 2),
+crates/amun-constitutional-proof/src/lib.rs:910:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:913:            ObligationId::new(ObligationNamespace::Safety, 3),
+crates/amun-constitutional-proof/src/lib.rs:914:            ObligationSeverity::Major,
+crates/amun-constitutional-proof/src/lib.rs:918:            ObligationResult::satisfied(obl1.id, vec!["EV1".into()]),
+crates/amun-constitutional-proof/src/lib.rs:919:            ObligationResult::satisfied(obl2.id, vec!["EV2".into()]),
+crates/amun-constitutional-proof/src/lib.rs:920:            ObligationResult::failed(obl3.id, FailureReason::new("M", "maj"), vec![]),
+crates/amun-constitutional-proof/src/lib.rs:940:            ObligationId::new(ObligationNamespace::Performance, 3),
+crates/amun-constitutional-proof/src/lib.rs:941:            ObligationSeverity::Advisory,
+crates/amun-constitutional-proof/src/lib.rs:943:        let mut result = ObligationResult::satisfied(obl.id.clone(), vec!["EV-W".into()]);
+crates/amun-constitutional-proof/src/lib.rs:944:        result.status = ObligationResultStatus::Waived;
+crates/amun-constitutional-proof/src/lib.rs:95:        let id = ObligationId::new(ObligationNamespace::Safety, 1);
+crates/amun-constitutional-proof/src/lib.rs:961:            ObligationId::new(ObligationNamespace::Cluster, 4),
+crates/amun-constitutional-proof/src/lib.rs:962:            ObligationSeverity::Critical,
+crates/amun-constitutional-proof/src/lib.rs:964:        let mut result = ObligationResult::satisfied(obl.id.clone(), vec!["EV-NA".into()]);
+crates/amun-constitutional-proof/src/lib.rs:965:        result.status = ObligationResultStatus::NotApplicable;
+crates/amun-constitutional-proof/src/lib.rs:983:        let id = ObligationId::new(ObligationNamespace::Replay, 1);
+crates/amun-constitutional-proof/src/obligation_id.rs:10:pub struct ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:11:    pub namespace: ObligationNamespace,
+crates/amun-constitutional-proof/src/obligation_id.rs:15:impl ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:16:    pub fn new(namespace: ObligationNamespace, sequence: u32) -> Self {
+crates/amun-constitutional-proof/src/obligation_id.rs:1:use crate::{ObligationNamespace, RegistryError};
+crates/amun-constitutional-proof/src/obligation_id.rs:23:    pub fn namespace(&self) -> ObligationNamespace {
+crates/amun-constitutional-proof/src/obligation_id.rs:32:impl std::fmt::Display for ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:38:impl Serialize for ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:44:impl<'de> Deserialize<'de> for ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:51:impl FromStr for ObligationId {
+crates/amun-constitutional-proof/src/obligation_id.rs:57:            return Err(RegistryError::InvalidObligationIdFormat(s.to_string()));
+crates/amun-constitutional-proof/src/obligation_id.rs:59:        let namespace: ObligationNamespace = parts[0].try_into()?;
+crates/amun-constitutional-proof/src/obligation_id.rs:62:            .map_err(|_| RegistryError::InvalidObligationIdFormat(s.to_string()))?;
+crates/amun-constitutional-proof/src/obligation_kind.rs:5:pub enum ObligationKind {
+crates/amun-constitutional-proof/src/obligation_namespace.rs:25:impl std::fmt::Display for ObligationNamespace {
+crates/amun-constitutional-proof/src/obligation_namespace.rs:41:impl TryFrom<&str> for ObligationNamespace {
+crates/amun-constitutional-proof/src/obligation_namespace.rs:6:pub enum ObligationNamespace {
+crates/amun-constitutional-proof/src/obligation_registry.rs:109:    fn collect_kinds(&self) -> std::collections::HashMap<ObligationId, ObligationKind> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:10:    obligations: BTreeMap<ObligationId, ProofObligation>,
+crates/amun-constitutional-proof/src/obligation_registry.rs:128:impl Default for ObligationRegistry {
+crates/amun-constitutional-proof/src/obligation_registry.rs:15:impl ObligationRegistry {
+crates/amun-constitutional-proof/src/obligation_registry.rs:24:    pub fn register(&mut self, obligation: ProofObligation) -> Result<(), RegistryError> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:4:    DependencyGraph, ObligationId, ObligationKind, ObligationSeverity, ObligationStatus,
+crates/amun-constitutional-proof/src/obligation_registry.rs:5:    ProofObligation, RegistryError,
+crates/amun-constitutional-proof/src/obligation_registry.rs:66:            obl.status = ObligationStatus::Frozen;
+crates/amun-constitutional-proof/src/obligation_registry.rs:72:    pub fn get(&self, id: &ObligationId) -> Option<&ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:76:    pub fn all_obligations(&self) -> impl Iterator<Item = &ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:80:    pub fn by_namespace(&self, ns: ObligationSeverity) -> Vec<&ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:87:    pub fn by_severity(&self, severity: ObligationSeverity) -> Vec<&ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:94:    pub fn by_phase(&self, phase: &str) -> Vec<&ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:9:pub struct ObligationRegistry {
+crates/amun-constitutional-proof/src/obligation_result.rs:11:    pub status: ObligationResultStatus,
+crates/amun-constitutional-proof/src/obligation_result.rs:20:impl ObligationResult {
+crates/amun-constitutional-proof/src/obligation_result.rs:21:    pub fn satisfied(id: ObligationId, evidence_refs: Vec<String>) -> Self {
+crates/amun-constitutional-proof/src/obligation_result.rs:24:            status: ObligationResultStatus::Satisfied,
+crates/amun-constitutional-proof/src/obligation_result.rs:30:    pub fn failed(id: ObligationId, reason: FailureReason, evidence_refs: Vec<String>) -> Self {
+crates/amun-constitutional-proof/src/obligation_result.rs:33:            status: ObligationResultStatus::Failed,
+crates/amun-constitutional-proof/src/obligation_result.rs:39:    pub fn inconclusive(id: ObligationId, evidence_refs: Vec<String>) -> Self {
+crates/amun-constitutional-proof/src/obligation_result.rs:3:use crate::{FailureReason, ObligationId, ObligationResultStatus};
+crates/amun-constitutional-proof/src/obligation_result.rs:42:            status: ObligationResultStatus::Inconclusive,
+crates/amun-constitutional-proof/src/obligation_result.rs:7:pub struct ObligationResult {
+crates/amun-constitutional-proof/src/obligation_result.rs:9:    pub obligation_id: ObligationId,
+crates/amun-constitutional-proof/src/obligation_result_status.rs:5:pub enum ObligationResultStatus {
+crates/amun-constitutional-proof/src/obligation_severity.rs:5:pub enum ObligationSeverity {
+crates/amun-constitutional-proof/src/obligation_status.rs:10:    Deprecated { superseded_by: ObligationId },
+crates/amun-constitutional-proof/src/obligation_status.rs:1:use crate::ObligationId;
+crates/amun-constitutional-proof/src/obligation_status.rs:6:pub enum ObligationStatus {
+crates/amun-constitutional-proof/src/proof_obligation.rs:11:pub struct ProofObligation {
+crates/amun-constitutional-proof/src/proof_obligation.rs:12:    pub id: ObligationId,
+crates/amun-constitutional-proof/src/proof_obligation.rs:13:    pub kind: ObligationKind,
+crates/amun-constitutional-proof/src/proof_obligation.rs:16:    pub severity: ObligationSeverity,
+crates/amun-constitutional-proof/src/proof_obligation.rs:19:    pub depends_on: Vec<ObligationId>,
+crates/amun-constitutional-proof/src/proof_obligation.rs:21:    pub status: ObligationStatus,
+crates/amun-constitutional-proof/src/proof_obligation.rs:24:impl ProofObligation {
+crates/amun-constitutional-proof/src/proof_obligation.rs:27:        id: ObligationId,
+crates/amun-constitutional-proof/src/proof_obligation.rs:28:        kind: ObligationKind,
+crates/amun-constitutional-proof/src/proof_obligation.rs:31:        severity: ObligationSeverity,
+crates/amun-constitutional-proof/src/proof_obligation.rs:3:use crate::{ObligationId, ObligationKind, ObligationSeverity, ObligationStatus};
+crates/amun-constitutional-proof/src/proof_obligation.rs:43:            status: ObligationStatus::Active,
+crates/amun-constitutional-proof/src/proof_obligation.rs:48:    pub fn with_dependency(mut self, dep: ObligationId) -> Self {
+crates/amun-constitutional-proof/src/proof_obligation.rs:54:    pub fn with_status(mut self, status: ObligationStatus) -> Self {
+crates/amun-constitutional-proof/src/registry_error.rs:14:    ObligationFrozen(ObligationId),
+crates/amun-constitutional-proof/src/registry_error.rs:17:    CircularDependency(ObligationId),
+crates/amun-constitutional-proof/src/registry_error.rs:1:use crate::ObligationId;
+crates/amun-constitutional-proof/src/registry_error.rs:20:    MissingDependency(ObligationId, ObligationId),
+crates/amun-constitutional-proof/src/registry_error.rs:23:    DerivedNotTerminatingInPrimary(ObligationId),
+crates/amun-constitutional-proof/src/registry_error.rs:29:    InvalidObligationIdFormat(String),
+crates/amun-constitutional-proof/src/registry_error.rs:4:/// Errors that can occur in the Obligation Registry.
+crates/amun-constitutional-proof/src/registry_error.rs:8:    DuplicateId(ObligationId),
+crates/amun-constitutional-proof/src/report_generator.rs:25:        registry: &ObligationRegistry,
+crates/amun-constitutional-proof/src/report_generator.rs:3:use crate::{ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult};
+crates/amun-constitutional-proof/src/report_generator.rs:51:            "- **Total Obligations**: {}\n",
+crates/amun-constitutional-proof/src/report_generator.rs:80:                "- **Obligations Checked**: {}\n",
+crates/amun-constitutional-proof/src/report_generator.rs:84:                "- **Obligations Satisfied**: {}\n",
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:105:        // Rule: 1 Major failure => ConditionalPass
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:10:/// Rules (Article II, Section 2):
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:27:        obligations: &[ProofObligation],
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:28:        results: Vec<ObligationResult>,
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:3:    ConstitutionalVerdict, ObligationResult, ObligationResultStatus, ObligationSeverity,
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:48:        obligations: &[ProofObligation],
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:49:        results: &[ObligationResult],
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:4:    ProofObligation, VerdictResult,
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:57:            if result.status == ObligationResultStatus::Satisfied
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:58:                || result.status == ObligationResultStatus::Waived
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:59:                || result.status == ObligationResultStatus::NotApplicable
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:77:                Some(ObligationSeverity::Critical) => critical_failures.push(description),
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:78:                Some(ObligationSeverity::Major) => major_failures.push(description),
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:79:                Some(ObligationSeverity::Minor) => minor_failures.push(description),
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:80:                Some(ObligationSeverity::Advisory) => advisory_failures.push(description),
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:88:        // Rule: Critical failure => Fail
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:97:        // Rule: 2+ Major failures => Fail
+crates/amun-constitutional-runtime/src/block_validator.rs:2:use amun_invariant_engine::invariant_types::InvariantDeclaration;
+crates/amun-constitutional-runtime/src/block_validator.rs:32:        invariants: &[InvariantDeclaration],
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:135:        // Phase 5: Invariant Evaluation
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:136:        let (_invariant_results, invariant_evidence) = InvariantEngine::evaluate(
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:36:    /// → Invariants → Evidence → TransitionProof → PCCV → Archive
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:41:        invariants: &[InvariantDeclaration],
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:4:use amun_invariant_engine::invariant_engine::InvariantEngine;
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:5:use amun_invariant_engine::invariant_types::InvariantDeclaration;
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:96:        // Phase 3: Resource Law Verification
+crates/amun-constitutional-verifier/src/verifier.rs:50:    // Signature exists (full verification would check crypto)
+crates/amun-constitutional/src/architectural_invariants.rs:1://! Architectural Invariants — constitutional laws of the kernel.
+crates/amun-constitutional/src/architectural_invariants.rs:424:            assert!(!invariant.is_empty(), "Invariant must be documented");
+crates/amun-constitutional/src/canonical_serialize.rs:6://! Rules:
+crates/amun-constitutional/src/execution_limits.rs:25:pub struct InvariantLimits {
+crates/amun-constitutional/src/execution_limits.rs:47:    pub invariant: InvariantLimits,
+crates/amun-constitutional/src/execution_limits.rs:78:            invariant: InvariantLimits {
+crates/amun-contract-integration/src/lib.rs:54:        // Verify contract exists
+crates/amun-contract-integration/tests/n167_contract_integration_tests.rs:67:    // Verify contract exists after deployment
+crates/amun-cross-contract/src/transfer_proof.rs:6:/// Implements N48.5-E Section 9 and Law X1 (single-use).
+crates/amun-deterministic-timer/src/lib.rs:4:pub use timeout::TimeoutLaw;
+crates/amun-deterministic-timer/src/timeout.rs:2:pub struct TimeoutLaw {
+crates/amun-deterministic-timer/src/timeout.rs:9:impl TimeoutLaw {
+crates/amun-dual-verification/src/dual_verifier.rs:18:        invariants: &[InvariantDeclaration],
+crates/amun-dual-verification/src/dual_verifier.rs:3:use amun_invariant_engine::invariant_types::InvariantDeclaration;
+crates/amun-economic-law/src/anticartel.rs:12:impl AntiCartelLaw {
+crates/amun-economic-law/src/anticartel.rs:1:pub struct AntiCartelLaw {
+crates/amun-economic-law/src/anticartel.rs:6:impl Default for AntiCartelLaw {
+crates/amun-economic-law/src/inflation.rs:13:impl InflationLaw {
+crates/amun-economic-law/src/inflation.rs:1:pub struct InflationLaw {
+crates/amun-economic-law/src/inflation.rs:7:impl Default for InflationLaw {
+crates/amun-economic-law/src/lib.rs:4:pub use anticartel::AntiCartelLaw;
+crates/amun-economic-law/src/lib.rs:5:pub use inflation::InflationLaw;
+crates/amun-evidence-engine/src/evidence_engine.rs:153:        archive.insert(ConstitutionalEvidence::InvariantViolation {
+crates/amun-evidence-engine/src/evidence_engine.rs:33:            VMEvidence::InvariantViolation { obligation_id } => {
+crates/amun-evidence-engine/src/evidence_engine.rs:34:                ConstitutionalEvidence::InvariantViolation {
+crates/amun-evidence-engine/src/evidence_types.rs:24:    InvariantViolation {
+crates/amun-evidence-engine/src/evidence_types.rs:57:            Self::InvariantViolation {
+crates/amun-evidence-engine/src/evidence_types.rs:77:            Self::InvariantViolation { .. } => "invariant_violation",
+crates/amun-execution-receipt/src/lib.rs:6://! ## Constitutional Invariants
+crates/amun-experimental-framework/src/main.rs:482:// ── Experiment 6: Resource Law Verification ─────────────────
+crates/amun-experimental-framework/src/main.rs:484:    println!("\n=== Experiment 6: Resource Law Verification ===");
+crates/amun-failure/src/taxonomy.rs:27:    // Contract & Invariant (0x6XXX)
+crates/amun-fork/src/lib.rs:2:pub use rule::ForkChoiceRule;
+crates/amun-fork/src/rule.rs:12:pub struct ForkChoiceRule;
+crates/amun-fork/src/rule.rs:14:impl ForkChoiceRule {
+crates/amun-formal/src/invariants.rs:1:pub struct FormalInvariants;
+crates/amun-formal/src/invariants.rs:3:impl FormalInvariants {
+crates/amun-formal/src/lib.rs:2:pub use invariants::FormalInvariants;
+crates/amun-gas-engine/src/opcode_costs.rs:22:            OpCode::CheckInvariant { .. } => 50,
+crates/amun-host/src/nonce_store.rs:78:            if Path::new(path).exists() {
+crates/amun-invariant-engine/src/invariant_engine.rs:107:        let (results, evidence) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:115:        assert!(InvariantEngine::all_passed(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:116:        assert!(!InvariantEngine::has_critical_failure(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:123:        let (results, evidence) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:131:        assert!(!InvariantEngine::all_passed(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:132:        assert!(InvariantEngine::has_critical_failure(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:135:            ConstitutionalEvidence::InvariantViolation { obligation_id, .. } => {
+crates/amun-invariant-engine/src/invariant_engine.rs:138:            _ => panic!("Expected InvariantViolation"),
+crates/amun-invariant-engine/src/invariant_engine.rs:13:        invariants: &[InvariantDeclaration],
+crates/amun-invariant-engine/src/invariant_engine.rs:145:        let (results, evidence) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:153:        assert!(!InvariantEngine::all_passed(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:154:        assert!(!InvariantEngine::has_critical_failure(&results)); // No Critical failed
+crates/amun-invariant-engine/src/invariant_engine.rs:161:        let (results, _) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:170:            InvariantEngine::count_by_severity(&results, InvariantSeverity::Critical),
+crates/amun-invariant-engine/src/invariant_engine.rs:174:            InvariantEngine::count_by_severity(&results, InvariantSeverity::Minor),
+crates/amun-invariant-engine/src/invariant_engine.rs:183:        let (_, evidence) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:194:                ConstitutionalEvidence::InvariantViolation { state_root: sr, .. } => {
+crates/amun-invariant-engine/src/invariant_engine.rs:197:                _ => panic!("Expected InvariantViolation"),
+crates/amun-invariant-engine/src/invariant_engine.rs:19:    ) -> (Vec<InvariantResult>, Vec<ConstitutionalEvidence>)
+crates/amun-invariant-engine/src/invariant_engine.rs:21:        F: Fn(&InvariantDeclaration) -> bool,
+crates/amun-invariant-engine/src/invariant_engine.rs:28:            results.push(InvariantResult {
+crates/amun-invariant-engine/src/invariant_engine.rs:35:                evidence.push(ConstitutionalEvidence::InvariantViolation {
+crates/amun-invariant-engine/src/invariant_engine.rs:49:    pub fn count_by_severity(results: &[InvariantResult], severity: InvariantSeverity) -> usize {
+crates/amun-invariant-engine/src/invariant_engine.rs:4:use crate::invariant_types::{InvariantDeclaration, InvariantResult, InvariantSeverity};
+crates/amun-invariant-engine/src/invariant_engine.rs:57:    pub fn has_critical_failure(results: &[InvariantResult]) -> bool {
+crates/amun-invariant-engine/src/invariant_engine.rs:60:            .any(|r| r.severity == InvariantSeverity::Critical && !r.passed)
+crates/amun-invariant-engine/src/invariant_engine.rs:64:    pub fn all_passed(results: &[InvariantResult]) -> bool {
+crates/amun-invariant-engine/src/invariant_engine.rs:72:    use crate::invariant_types::{InvariantDeclaration, InvariantScope};
+crates/amun-invariant-engine/src/invariant_engine.rs:7:pub struct InvariantEngine;
+crates/amun-invariant-engine/src/invariant_engine.rs:81:    fn sample_invariants() -> Vec<InvariantDeclaration> {
+crates/amun-invariant-engine/src/invariant_engine.rs:83:            InvariantDeclaration {
+crates/amun-invariant-engine/src/invariant_engine.rs:86:                severity: InvariantSeverity::Critical,
+crates/amun-invariant-engine/src/invariant_engine.rs:87:                scope: InvariantScope::State,
+crates/amun-invariant-engine/src/invariant_engine.rs:89:            InvariantDeclaration {
+crates/amun-invariant-engine/src/invariant_engine.rs:92:                severity: InvariantSeverity::Critical,
+crates/amun-invariant-engine/src/invariant_engine.rs:93:                scope: InvariantScope::State,
+crates/amun-invariant-engine/src/invariant_engine.rs:95:            InvariantDeclaration {
+crates/amun-invariant-engine/src/invariant_engine.rs:98:                severity: InvariantSeverity::Minor,
+crates/amun-invariant-engine/src/invariant_engine.rs:99:                scope: InvariantScope::Local,
+crates/amun-invariant-engine/src/invariant_engine.rs:9:impl InvariantEngine {
+crates/amun-invariant-engine/src/invariant_types.rs:18:pub enum InvariantScope {
+crates/amun-invariant-engine/src/invariant_types.rs:31:pub struct InvariantDeclaration {
+crates/amun-invariant-engine/src/invariant_types.rs:34:    pub severity: InvariantSeverity,
+crates/amun-invariant-engine/src/invariant_types.rs:35:    pub scope: InvariantScope,
+crates/amun-invariant-engine/src/invariant_types.rs:40:pub struct InvariantResult {
+crates/amun-invariant-engine/src/invariant_types.rs:43:    pub severity: InvariantSeverity,
+crates/amun-invariant-engine/src/invariant_types.rs:5:pub enum InvariantSeverity {
+crates/amun-invariants/src/kernel.rs:13:    pub severity: InvariantSeverity,
+crates/amun-invariants/src/kernel.rs:20:pub struct IrreducibleInvariants;
+crates/amun-invariants/src/kernel.rs:22:impl IrreducibleInvariants {
+crates/amun-invariants/src/kernel.rs:23:    pub const SINGLE_TRUTH: InvariantDef = InvariantDef {
+crates/amun-invariants/src/kernel.rs:26:        specification: "forall h: |{state_roots_at_height(h)}| = 1",
+crates/amun-invariants/src/kernel.rs:27:        severity: InvariantSeverity::Fatal,
+crates/amun-invariants/src/kernel.rs:2:pub enum InvariantSeverity {
+crates/amun-invariants/src/kernel.rs:34:    pub const SINGLE_FINALITY: InvariantDef = InvariantDef {
+crates/amun-invariants/src/kernel.rs:37:        specification: "forall h: |{finalized_blocks_at_height(h)}| <= 1 under f < n/3",
+crates/amun-invariants/src/kernel.rs:38:        severity: InvariantSeverity::Fatal,
+crates/amun-invariants/src/kernel.rs:45:    pub const EVENTUAL_PROGRESS: InvariantDef = InvariantDef {
+crates/amun-invariants/src/kernel.rs:49:        severity: InvariantSeverity::Critical,
+crates/amun-invariants/src/kernel.rs:56:    pub const FAILURE_MEMORY: InvariantDef = InvariantDef {
+crates/amun-invariants/src/kernel.rs:59:        specification: "forall f in known_failures: mitigation(f) != empty",
+crates/amun-invariants/src/kernel.rs:60:        severity: InvariantSeverity::Degraded,
+crates/amun-invariants/src/kernel.rs:67:    pub fn all() -> [InvariantDef; 4] {
+crates/amun-invariants/src/kernel.rs:9:pub struct InvariantDef {
+crates/amun-invariants/src/lib.rs:6:pub use kernel::{InvariantDef, InvariantSeverity, IrreducibleInvariants};
+crates/amun-invariants/src/lib.rs:7:pub use registry::{InvariantHealth, InvariantRegistry};
+crates/amun-invariants/src/lib.rs:8:pub use status::InvariantStatus;
+crates/amun-invariants/src/registry.rs:11:impl InvariantRegistry {
+crates/amun-invariants/src/registry.rs:16:        for inv in IrreducibleInvariants::all().iter() {
+crates/amun-invariants/src/registry.rs:18:            statuses.push(InvariantStatus::new(inv.id));
+crates/amun-invariants/src/registry.rs:1:use crate::kernel::{InvariantDef, InvariantSeverity, IrreducibleInvariants};
+crates/amun-invariants/src/registry.rs:27:    pub fn register(&mut self, inv: InvariantDef) -> Result<(), &'static str> {
+crates/amun-invariants/src/registry.rs:2:use crate::status::InvariantStatus;
+crates/amun-invariants/src/registry.rs:35:        self.statuses.push(InvariantStatus::new(inv.id));
+crates/amun-invariants/src/registry.rs:56:    pub fn overall_health(&self) -> InvariantHealth {
+crates/amun-invariants/src/registry.rs:6:pub struct InvariantRegistry {
+crates/amun-invariants/src/registry.rs:70:                    .any(|i| i.id == s.invariant_id && i.severity == InvariantSeverity::Fatal)
+crates/amun-invariants/src/registry.rs:75:            InvariantHealth::Critical
+crates/amun-invariants/src/registry.rs:77:            InvariantHealth::Degraded
+crates/amun-invariants/src/registry.rs:79:            InvariantHealth::Unknown
+crates/amun-invariants/src/registry.rs:7:    invariants: Vec<InvariantDef>,
+crates/amun-invariants/src/registry.rs:81:            InvariantHealth::AllInvariantsHold
+crates/amun-invariants/src/registry.rs:87:pub enum InvariantHealth {
+crates/amun-invariants/src/registry.rs:88:    AllInvariantsHold,
+crates/amun-invariants/src/registry.rs:8:    statuses: Vec<InvariantStatus>,
+crates/amun-invariants/src/status.rs:12:impl InvariantStatus {
+crates/amun-invariants/src/status.rs:4:pub struct InvariantStatus {
+crates/amun-lineage-law/src/compatibility.rs:18:impl CompatibilityTheorem {
+crates/amun-lineage-law/src/compatibility.rs:4:/// A CompatibilityTheorem proves that two protocol versions can
+crates/amun-lineage-law/src/compatibility.rs:74:    /// Lawful descendant - migration with proof
+crates/amun-lineage-law/src/compatibility.rs:75:    LawfulDescendant,
+crates/amun-lineage-law/src/compatibility.rs:7:pub struct CompatibilityTheorem {
+crates/amun-lineage-law/src/compatibility.rs:85:    pub fn determine(theorem: &CompatibilityTheorem) -> Self {
+crates/amun-lineage-law/src/compatibility.rs:93:            return CompatibilityVerdict::LawfulDescendant;
+crates/amun-lineage-law/src/lib.rs:11:pub use migration::{MigrationCertificate, MigrationRules, MigrationWitness};
+crates/amun-lineage-law/src/lib.rs:9:pub use compatibility::{CompatibilityTheorem, CompatibilityVerdict};
+crates/amun-lineage-law/src/migration.rs:103:impl MigrationRules {
+crates/amun-lineage-law/src/migration.rs:91:/// MigrationRules define the allowed transformations when migrating
+crates/amun-lineage-law/src/migration.rs:94:pub struct MigrationRules {
+crates/amun-live-cluster/src/validator.rs:837:        // Verify initial state: only authority v1 exists
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:19:                    .any(|v| v.law == ConstitutionalLaw::StateRootIntegrity),
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:39:                    .any(|v| v.law == ConstitutionalLaw::FinalitySupermajority),
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:3:    ConstitutionalEnforcementKernel, ConstitutionalLaw, ConstitutionalVerdict,
+crates/amun-networking/tests/n18_node_rejoin.rs:5:// N18.2 — Lifecycle Invariants
+crates/amun-networking/tests/n18_node_rejoin.rs:73:// N18.5 — Constitutional Invariant REJOIN-001
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:117:    // Verify gap exists between checkpoints
+crates/amun-nft-evidence/src/lib.rs:100:            return Err(CekError::Law1InvalidOwnership);
+crates/amun-nft-evidence/src/lib.rs:103:        // Law 3: metadata hash must match
+crates/amun-nft-evidence/src/lib.rs:106:        // Law 4: replay protection
+crates/amun-nft-evidence/src/lib.rs:120:        // Law 1: only owner can transfer
+crates/amun-nft-evidence/src/lib.rs:123:        // Law 4: replay protection
+crates/amun-nft-evidence/src/lib.rs:137:        // Law 1: only owner can burn
+crates/amun-nft-evidence/src/lib.rs:140:        // Law 4: replay protection
+crates/amun-nft-evidence/src/lib.rs:21:    Law1InvalidOwnership,
+crates/amun-nft-evidence/src/lib.rs:22:    Law2DuplicateToken,
+crates/amun-nft-evidence/src/lib.rs:23:    Law3InvalidMetadataHash,
+crates/amun-nft-evidence/src/lib.rs:24:    Law4ReplayDetected,
+crates/amun-nft-evidence/src/lib.rs:25:    Law5EvidenceGenerationFailed,
+crates/amun-nft-evidence/src/lib.rs:30:    /// Law 1: Valid Ownership — only the owner can transfer or burn
+crates/amun-nft-evidence/src/lib.rs:40:            return Err(CekError::Law1InvalidOwnership);
+crates/amun-nft-evidence/src/lib.rs:45:    /// Law 2: Non-Duplicate Token — token ID must not already exist (for mint)
+crates/amun-nft-evidence/src/lib.rs:51:            return Err(CekError::Law2DuplicateToken);
+crates/amun-nft-evidence/src/lib.rs:56:    /// Law 3: Valid Metadata Hash — for mint operations
+crates/amun-nft-evidence/src/lib.rs:62:            return Err(CekError::Law3InvalidMetadataHash);
+crates/amun-nft-evidence/src/lib.rs:67:    /// Law 4: Replay Protection — check nonce or timestamp ordering
+crates/amun-nft-evidence/src/lib.rs:73:            return Err(CekError::Law4ReplayDetected);
+crates/amun-nft-evidence/src/lib.rs:78:    /// Law 5: Evidence Generation — produce evidence record
+crates/amun-nft-evidence/src/lib.rs:89:        // Law 2: token must not exist
+crates/amun-nft-evidence/src/lib.rs:92:        // Law 1: collection must exist and be active
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:104:    assert_eq!(result, Err(CekError::Law4ReplayDetected));
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:73:    assert_eq!(result, Err(CekError::Law1InvalidOwnership));
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:92:    assert_eq!(result, Err(CekError::Law2DuplicateToken));
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:98:    assert_eq!(result, Err(CekError::Law3InvalidMetadataHash));
+crates/amun-nft-fuzz/src/lib.rs:156:        // Invariant: marketplace should not crash the registry
+crates/amun-nft-fuzz/src/lib.rs:178:        // Invariant: royalty cannot exceed sale price
+crates/amun-nft-fuzz/src/lib.rs:206:        // Invariant: after revoke, cannot propose or veto
+crates/amun-nft-fuzz/src/lib.rs:247:        // Invariant: bridge root should be deterministic
+crates/amun-nft-fuzz/src/lib.rs:86:        // Invariant: collection must remain active
+crates/amun-nft-fuzz/src/lib.rs:93:        // Invariant: active count >= minted NFTs
+crates/amun-nft-marketplace/src/lib.rs:139:        // Check listing exists and is active
+crates/amun-nft-marketplace/src/lib.rs:157:        // Verify token still exists and seller still owns it
+crates/amun-nft-marketplace/src/lib.rs:99:        // Verify token exists and seller owns it
+crates/amun-node/src/certificate_loader.rs:14:    if !path.exists() {
+crates/amun-node/src/main.rs:50:    if path.exists() {
+crates/amun-pacemaker/src/pacemaker.rs:13:    timeout_law: TimeoutLaw,
+crates/amun-pacemaker/src/pacemaker.rs:25:            timeout_law: TimeoutLaw::new(10, 200),
+crates/amun-pacemaker/src/pacemaker.rs:3:use amun_deterministic_timer::{DeterministicTimerWheel, TimeoutLaw};
+crates/amun-persistence/src/lib.rs:56:        if !Path::new(&self.path).exists() {
+crates/amun-persistent-node/src/persistent_store.rs:20:        if backup_file.exists() {
+crates/amun-persistent-node/src/persistent_store.rs:77:        if !backup_file.exists() {
+crates/amun-replay-engine/src/constitutional_governance.rs:125:        // Invariants 1-25 are all constitutional law.
+crates/amun-replay-engine/src/constitutional_governance.rs:316:        // The surface exists. It makes no truth claim.
+crates/amun-replay-engine/src/constitutional_governance.rs:68:    InvariantViolation {
+crates/amun-replay-engine/src/cross_constitution_federation.rs:166:    /// No federation relationship exists.
+crates/amun-replay-engine/src/execution_dependency.rs:8://!   - CausalDependency: why validity exists (constitutional layer)
+crates/amun-replay-engine/src/isolation_boundary.rs:7://! is a constitutional requirement (Invariant 15).
+crates/amun-replay-engine/src/runtime_anomaly.rs:135:        // The anomaly exists — that's all. No validity claim is made.
+crates/amun-replay-engine/src/temporal_drift.rs:232:        // But it still exists in history — just not as authority
+crates/amun-replay-store/src/lib.rs:55:        if !Path::new(&self.path).exists() {
+crates/amun-replay-verifier/src/replay_verifier.rs:35:        invariants: &[InvariantDeclaration],
+crates/amun-replay-verifier/src/replay_verifier.rs:3:use amun_invariant_engine::invariant_types::InvariantDeclaration;
+crates/amun-replay/src/store.rs:28:    /// Check if a certificate with the given hash exists.
+crates/amun-resource-core/src/transformation_matrix.rs:17:/// Static transformation matrix enforcing Law T1.
+crates/amun-rpc/src/faucet.rs:138:    // Ensure faucet account exists with sufficient balance
+crates/amun-runtime-law/src/law.rs:1:pub struct RuntimeLaw;
+crates/amun-runtime-law/src/law.rs:3:impl RuntimeLaw {
+crates/amun-runtime-law/src/lib.rs:2:pub use law::RuntimeLaw;
+crates/amun-self-preservation/src/action_principle.rs:47:pub struct LeastInvariantViolation;
+crates/amun-self-preservation/src/action_principle.rs:49:impl LeastInvariantViolation {
+crates/amun-self-preservation/src/consistency.rs:24:        invariant: super::legitimacy_guards::GuardedInvariant,
+crates/amun-self-preservation/src/legitimacy_guards.rs:13:pub enum GuardedInvariant {
+crates/amun-self-preservation/src/legitimacy_guards.rs:27:    InvariantBroken {
+crates/amun-self-preservation/src/legitimacy_guards.rs:28:        invariant: GuardedInvariant,
+crates/amun-self-preservation/src/legitimacy_guards.rs:38:    pub fn new(invariant: GuardedInvariant, max_violations: u64) -> Self {
+crates/amun-self-preservation/src/legitimacy_guards.rs:63:        Some(GuardViolation::InvariantBroken {
+crates/amun-self-preservation/src/legitimacy_guards.rs:6:    pub protects: GuardedInvariant,
+crates/amun-self-preservation/src/legitimacy_guards.rs:71:    pub fn can_guard(invariant: &GuardedInvariant) -> bool {
+crates/amun-self-preservation/src/legitimacy_guards.rs:72:        !matches!(invariant, GuardedInvariant::MetaAmendmentBounds)
+crates/amun-self-preservation/src/lib.rs:15:pub use action_principle::{ConstitutionalAction, LeastInvariantViolation};
+crates/amun-self-preservation/src/self_modeling.rs:32:        // A self-reference paradox exists when the amendment rules
+crates/amun-smt/src/context.rs:21:    /// Intern a node. Returns existing `Arc` if the hash already exists.
+crates/amun-smt/src/hash.rs:78:/// Guarantees: `depth + skip_len < 256` (a decision bit always exists).
+crates/amun-smt/src/node.rs:3://! # Invariants (enforced by tree, verified by validator)
+crates/amun-smt/src/tree.rs:3://! # Core Invariant
+crates/amun-smt/src/validator.rs:117:            // Invariant: maximal skip (canonical minimality)
+crates/amun-smt/src/validator.rs:46:            // Invariant: no empty children
+crates/amun-smt/src/validator.rs:51:            // Invariant: skip_len within bounds
+crates/amun-smt/tests/identity_laws.rs:21:/// Law 2: DeleteInsertCanonicality
+crates/amun-smt/tests/identity_laws.rs:47:/// Law 3: StructuralDeterminism
+crates/amun-smt/tests/identity_laws.rs:4:/// Law 1: InsertDeleteIdentity
+crates/amun-snapshot-engine-unified/src/lib.rs:52:        if !Path::new(&self.path).exists() {
+crates/amun-state-machine/src/absolute_invariants.rs:29:impl AbsoluteInvariant {
+crates/amun-state-machine/src/absolute_invariants.rs:36:    pub fn all() -> Vec<AbsoluteInvariant> {
+crates/amun-state-machine/src/absolute_invariants.rs:6:pub enum AbsoluteInvariant {
+crates/amun-state-machine/src/axioms.rs:21:    EmptyRootInvariant,
+crates/amun-state-machine/src/axioms.rs:30:impl ConstitutionalAxiom {
+crates/amun-state-machine/src/axioms.rs:44:            Self::EmptyRootInvariant => "Empty root is invariant across protocol versions",
+crates/amun-state-machine/src/axioms.rs:52:/// Axiom verification result.
+crates/amun-state-machine/src/axioms.rs:54:pub enum AxiomVerification {
+crates/amun-state-machine/src/axioms.rs:57:        axiom: ConstitutionalAxiom,
+crates/amun-state-machine/src/axioms.rs:5:pub enum ConstitutionalAxiom {
+crates/amun-state-machine/src/axioms.rs:62:/// The ConstitutionalAxiomEngine verifies that all axioms hold for a given state.
+crates/amun-state-machine/src/axioms.rs:63:pub struct ConstitutionalAxiomEngine;
+crates/amun-state-machine/src/axioms.rs:65:impl ConstitutionalAxiomEngine {
+crates/amun-state-machine/src/axioms.rs:66:    pub fn verify_all() -> Vec<AxiomVerification> {
+crates/amun-state-machine/src/axioms.rs:68:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:69:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:70:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:71:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:72:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:73:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:74:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:75:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:76:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:77:            AxiomVerification::Holds,
+crates/amun-state-machine/src/axioms.rs:78:            AxiomVerification::Holds,
+crates/amun-state-machine/src/delta_laws.rs:17:impl DeltaLaw {
+crates/amun-state-machine/src/delta_laws.rs:19:    pub fn relate(a: &ConstitutionalDelta, b: &ConstitutionalDelta) -> DeltaLaw {
+crates/amun-state-machine/src/delta_laws.rs:21:            return DeltaLaw::Commutative(a.clone(), b.clone());
+crates/amun-state-machine/src/delta_laws.rs:27:            ) => DeltaLaw::Composable(a.clone(), b.clone()),
+crates/amun-state-machine/src/delta_laws.rs:31:            ) => DeltaLaw::Conflicting(a.clone(), b.clone()),
+crates/amun-state-machine/src/delta_laws.rs:43:                    DeltaLaw::Dominates(a.clone(), b.clone())
+crates/amun-state-machine/src/delta_laws.rs:45:                    DeltaLaw::Dominates(b.clone(), a.clone())
+crates/amun-state-machine/src/delta_laws.rs:48:            _ => DeltaLaw::Composable(a.clone(), b.clone()),
+crates/amun-state-machine/src/delta_laws.rs:54:            DeltaLaw::Composable(_, _) => "Deltas compose into single change".to_string(),
+crates/amun-state-machine/src/delta_laws.rs:55:            DeltaLaw::Conflicting(_, _) => "Deltas conflict and cannot coexist".to_string(),
+crates/amun-state-machine/src/delta_laws.rs:56:            DeltaLaw::Dominates(a, _) => {
+crates/amun-state-machine/src/delta_laws.rs:59:            DeltaLaw::Commutative(_, _) => "Deltas commute (order independent)".to_string(),
+crates/amun-state-machine/src/delta_laws.rs:6:pub enum DeltaLaw {
+crates/amun-state-machine/src/derivation.rs:15:pub enum InferenceRule {
+crates/amun-state-machine/src/derivation.rs:1:use super::axioms::ConstitutionalAxiom;
+crates/amun-state-machine/src/derivation.rs:22:    /// If no counterexample exists, the theorem holds
+crates/amun-state-machine/src/derivation.rs:29:    pub theorem: Theorem,
+crates/amun-state-machine/src/derivation.rs:35:    Axiom(ConstitutionalAxiom),
+crates/amun-state-machine/src/derivation.rs:36:    Inference(InferenceRule, Vec<usize>),
+crates/amun-state-machine/src/derivation.rs:37:    TheoremApplication(usize),
+crates/amun-state-machine/src/derivation.rs:43:    pub axioms_checked: Vec<ConstitutionalAxiom>,
+crates/amun-state-machine/src/derivation.rs:5:pub struct Theorem {
+crates/amun-state-machine/src/derivation.rs:8:    pub depends_on: Vec<ConstitutionalAxiom>,
+crates/amun-state-machine/src/engine.rs:123:        invariants: &[ConstitutionalInvariant],
+crates/amun-state-machine/src/engine.rs:130:                ConstitutionalInvariant::NoImpossibleState => {
+crates/amun-state-machine/src/engine.rs:137:                ConstitutionalInvariant::TransitionHistoryAcyclic => {
+crates/amun-state-machine/src/engine.rs:142:                ConstitutionalInvariant::LineageIntact
+crates/amun-state-machine/src/engine.rs:1:use super::historical_invariants::HistoricalInvariantEngine;
+crates/amun-state-machine/src/engine.rs:24:    pub history: HistoricalInvariantEngine,
+crates/amun-state-machine/src/engine.rs:2:use super::invariants::ConstitutionalInvariant;
+crates/amun-state-machine/src/engine.rs:37:            history: HistoricalInvariantEngine::new(),
+crates/amun-state-machine/src/formal_entropy.rs:35:pub struct EntropyConservationLaws;
+crates/amun-state-machine/src/formal_entropy.rs:37:impl EntropyConservationLaws {
+crates/amun-state-machine/src/formal_entropy.rs:38:    /// The First Law: Entropy cannot be destroyed, only transferred or created.
+crates/amun-state-machine/src/formal_entropy.rs:44:    /// The Second Law: Entropy creation is always non-negative.
+crates/amun-state-machine/src/formal_entropy.rs:49:    /// The Third Law: Absolute zero entropy is unreachable (there is always some constitutional order).
+crates/amun-state-machine/src/historical_invariants.rs:125:            HistoricalInvariant::MaxFreezeUnfreezeCycles {
+crates/amun-state-machine/src/historical_invariants.rs:129:            HistoricalInvariant::MaxAmendmentsPerEpoch {
+crates/amun-state-machine/src/historical_invariants.rs:133:            HistoricalInvariant::MaxReplayDivergence {
+crates/amun-state-machine/src/historical_invariants.rs:137:            HistoricalInvariant::MinGovernanceCompatibility {
+crates/amun-state-machine/src/historical_invariants.rs:23:impl HistoricalInvariant {
+crates/amun-state-machine/src/historical_invariants.rs:26:            HistoricalInvariant::MaxFreezeUnfreezeCycles {
+crates/amun-state-machine/src/historical_invariants.rs:37:            HistoricalInvariant::MaxAmendmentsPerEpoch {
+crates/amun-state-machine/src/historical_invariants.rs:3:pub enum HistoricalInvariant {
+crates/amun-state-machine/src/historical_invariants.rs:48:            HistoricalInvariant::MaxReplayDivergence {
+crates/amun-state-machine/src/historical_invariants.rs:59:            HistoricalInvariant::MinGovernanceCompatibility {
+crates/amun-state-machine/src/historical_invariants.rs:77:pub struct HistoricalInvariantEngine {
+crates/amun-state-machine/src/historical_invariants.rs:85:impl Default for HistoricalInvariantEngine {
+crates/amun-state-machine/src/historical_invariants.rs:91:impl HistoricalInvariantEngine {
+crates/amun-state-machine/src/invariants.rs:3:pub enum ConstitutionalInvariant {
+crates/amun-state-machine/src/lib.rs:29:pub use absolute_invariants::AbsoluteInvariant;
+crates/amun-state-machine/src/lib.rs:30:pub use axioms::{AxiomVerification, ConstitutionalAxiom, ConstitutionalAxiomEngine};
+crates/amun-state-machine/src/lib.rs:33:pub use delta_laws::DeltaLaw;
+crates/amun-state-machine/src/lib.rs:34:pub use derivation::{ConsistencyProof, Derivation, DerivationStep, InferenceRule, Theorem};
+crates/amun-state-machine/src/lib.rs:40:    EntropyCollapseThreshold, EntropyConservationLaws, EntropySink, EntropySinkType, FormalEntropy,
+crates/amun-state-machine/src/lib.rs:42:pub use historical_invariants::{HistoricalInvariant, HistoricalInvariantEngine};
+crates/amun-state-machine/src/lib.rs:44:pub use invariants::ConstitutionalInvariant;
+crates/amun-state-machine/src/lib.rs:46:pub use meta_amendment::{MetaAmendmentEngine, MetaAmendmentLaw, MetaAmendmentScope, MetaQuorum};
+crates/amun-state-machine/src/meta_amendment.rs:1:use super::absolute_invariants::AbsoluteInvariant;
+crates/amun-state-machine/src/meta_amendment.rs:47:        absolute_invariants: &[AbsoluteInvariant],
+crates/amun-state-machine/src/meta_amendment.rs:57:                        AbsoluteInvariant::ReplayDeterminismAbsolute => {
+crates/amun-state-machine/src/meta_amendment.rs:5:pub struct MetaAmendmentLaw {
+crates/amun-state-machine/src/meta_amendment.rs:65:                        AbsoluteInvariant::ProvableTransitionAbsolute => {
+crates/amun-state-machine/src/meta_amendment.rs:9:    pub absolute_invariants_untouchable: Vec<AbsoluteInvariant>,
+crates/amun-state-machine/src/postconditions.rs:16:    InvariantsPreserved,
+crates/amun-state-machine/src/reconciliation.rs:26:        let law = DeltaLaw::relate(a, b);
+crates/amun-state-machine/src/reconciliation.rs:28:            DeltaLaw::Composable(_, _) => ReconciliationStrategy::Additive,
+crates/amun-state-machine/src/reconciliation.rs:29:            DeltaLaw::Commutative(_, _) => ReconciliationStrategy::TemporalInterleave,
+crates/amun-state-machine/src/reconciliation.rs:2:use super::delta_laws::DeltaLaw;
+crates/amun-state-machine/src/reconciliation.rs:30:            DeltaLaw::Dominates(winner, _) => ReconciliationStrategy::Supersede {
+crates/amun-state-machine/src/reconciliation.rs:33:            DeltaLaw::Conflicting(_, _) => ReconciliationStrategy::Impossible {
+crates/amun-state-machine/src/verifier.rs:104:                ConstitutionalInvariant::TransitionHistoryAcyclic => {
+crates/amun-state-machine/src/verifier.rs:109:                ConstitutionalInvariant::LineageIntact
+crates/amun-state-machine/src/verifier.rs:1:use super::invariants::ConstitutionalInvariant;
+crates/amun-state-machine/src/verifier.rs:92:        invariants: &[ConstitutionalInvariant],
+crates/amun-state-machine/src/verifier.rs:97:                ConstitutionalInvariant::NoImpossibleState => {
+crates/amun-state-stream/src/journal.rs:60:    /// Load journal from disk, returns None if no journal exists
+crates/amun-stf/src/state.rs:40:        let exists = self
+crates/amun-stf/src/state.rs:44:        if !exists && self.entries.is_full() {
+crates/amun-storage-kernel/ATOMIC_SNAPSHOT_CONSTITUTION.md:32:Within a single snapshot, exactly one freeze point exists.
+crates/amun-storage-kernel/CANONICAL_TRAVERSAL_LAW.md:14:This Law governs:
+crates/amun-storage-kernel/CANONICAL_TRAVERSAL_LAW.md:9:This Law defines the canonical order for traversing, serializing, and
+crates/amun-storage-kernel/CONSTITUTION.md:108:Ratified upon verification of all 10 Constitutional Theorems.
+crates/amun-storage-kernel/CONSTITUTION.md:2:## Supreme Authority - Immutable Laws of State
+crates/amun-storage-kernel/CONSTITUTION.md:31:**Section 1.4: Order Independence (Law 0)**
+crates/amun-storage-kernel/CONSTITUTION.md:33:root R exists. The root SHALL be identical regardless of insertion order.
+crates/amun-storage-kernel/CONSTITUTION.md:49:- Inclusion: Proves (key, value) exists in state
+crates/amun-storage-kernel/CONSTITUTION.md:85:**Section 5.1: Uniqueness Invariant**
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:71:Proves (key, value) exists within snapshot without full download.
+crates/amun-storage-kernel/tests/specification_compliance.rs:105:            "Theorem 5 violated: delete nonexistent changed root"
+crates/amun-storage-kernel/tests/specification_compliance.rs:122:            "Theorem 6 violated: proof verification failed"
+crates/amun-storage-kernel/tests/specification_compliance.rs:134:            "Theorem 7 violated: terminal empty != ZERO"
+crates/amun-storage-kernel/tests/specification_compliance.rs:149:            "Theorem 8 violated: empty tree absence proof"
+crates/amun-storage-kernel/tests/specification_compliance.rs:25:        assert_eq!(root_a.0, root_b.0, "Theorem 1 violated: order independence");
+crates/amun-storage-kernel/tests/specification_compliance.rs:45:            "Theorem 2 violated: delete-reinsert identity"
+crates/amun-storage-kernel/tests/specification_compliance.rs:62:            "Theorem 3 violated: empty identity"
+crates/amun-storage-kernel/tests/specification_compliance.rs:67:    // THEOREM 4: Proof Depth Invariant
+crates/amun-storage-kernel/tests/specification_compliance.rs:79:            "Theorem 4 violated: proof depth != 256"
+crates/amun-storage-kernel/tests/specification_compliance.rs:86:            "Theorem 4 violated: absence proof depth != 256"
+crates/amun-survival-console/src/dashboard.rs:10:    invariant_registry: InvariantRegistry,
+crates/amun-survival-console/src/dashboard.rs:27:        invariant_registry: InvariantRegistry,
+crates/amun-survival-console/src/dashboard.rs:59:        let invariants_hold = health == InvariantHealth::AllInvariantsHold;
+crates/amun-survival-console/src/dashboard.rs:6:use amun_invariants::registry::{InvariantHealth, InvariantRegistry};
+crates/amun-sync/src/bin/snapshot-server.rs:40:        if manifest_path.exists() {
+crates/amun-sync/src/bin/snapshot-server.rs:49:        if state_path.exists() {
+crates/amun-timeout-law/src/lib.rs:3:pub use timeout::{TimeoutCertificate, TimeoutLaw};
+crates/amun-timeout-law/src/timeout.rs:52:pub struct TimeoutLaw;
+crates/amun-timeout-law/src/timeout.rs:54:impl TimeoutLaw {
+crates/amun-unlock-law/src/unlock.rs:51:pub struct UnlockLaw;
+crates/amun-unlock-law/src/unlock.rs:53:impl UnlockLaw {
+crates/amun-vm-kernel/src/pending_buffer.rs:30:    InvariantViolation {
+crates/constitutional-linter/src/main.rs:207:                                    check(&format!("Law {}", law.id), false,
+crates/constitutional-linter/src/main.rs:223:                                    check(&format!("Law {}", law.id), false,
+crates/constitutional-linter/src/main.rs:37:    laws: Vec<Law>,
+crates/constitutional-linter/src/main.rs:41:struct Law {
+docs/CANONICAL_SERIALIZATION.md:3:## Constitutional Law
+docs/CCS_Core_Specification_v1.0.md:121:### 4.3 Constitutional Transition Rules
+docs/CCS_Core_Specification_v1.0.md:134:   exists to reconstruct `Authority(C₁)`.
+docs/CCS_Core_Specification_v1.0.md:143:For every legitimate transition `τ : C₁ → C₂`, there exists a conserved
+docs/CCS_Core_Specification_v1.0.md:156:## 5. The Central Theorem
+docs/CCS_Core_Specification_v1.0.md:158:**Constitutional Authority Uniqueness Theorem:**
+docs/CCS_Core_Specification_v1.0.md:160:For any valid constitutional context `C`, there exists exactly one legitimate
+docs/CCS_Core_Specification_v1.0.md:71:## 3. Axioms
+docs/CCS_Core_Specification_v1.0.md:73:### Axiom 1: Context Dominance
+docs/CCS_Core_Specification_v1.0.md:79:### Axiom 2: Constitutional Determinism
+docs/CCS_Core_Specification_v1.0.md:82:For every valid constitutional context, there exists exactly one authority
+docs/CCS_Core_Specification_v1.0.md:85:### Axiom 3: Authority Uniqueness
+docs/CCS_Core_Specification_v1.0.md:91:### Axiom 4: Constitutional Recoverability
+docs/CCS_Core_Specification_v1.1.md:122:For every legitimate transition `τ : C₁ → C₂`, there exists a conserved
+docs/CCS_Core_Specification_v1.1.md:132:Conservation Law of CCS.
+docs/CCS_Core_Specification_v1.1.md:136:## 5. Theorems (Proven Consequences of the Axioms)
+docs/CCS_Core_Specification_v1.1.md:138:### Theorem 1: Authority Uniqueness
+docs/CCS_Core_Specification_v1.1.md:143:Axiom 2 (Constitutional Determinism).
+docs/CCS_Core_Specification_v1.1.md:2:## Core Specification v1.1 – Final Foundational Axioms
+docs/CCS_Core_Specification_v1.1.md:5:**Status:** Theory Nucleus – Independent Foundational Axioms
+docs/CCS_Core_Specification_v1.1.md:69:## 3. Axioms (Foundational Assumptions of the Theory)
+docs/CCS_Core_Specification_v1.1.md:71:### Axiom 1: Context Dominance
+docs/CCS_Core_Specification_v1.1.md:77:### Axiom 2: Constitutional Determinism (Foundational Axiom)
+docs/CCS_Core_Specification_v1.1.md:80:For every valid constitutional context, there exists exactly one authority
+docs/CCS_Core_Specification_v1.1.md:86:### Axiom 3: Constitutional Recoverability
+docs/CONSTITUTIONAL_AUDIT.md:22:| **Constitutional Comparability (CC)** | ✅ Partially implemented | Evidence ordering exists but not formalized as standalone module |
+docs/CONSTITUTIONAL_AUDIT.md:25:| **Formal Verification** | ❌ Not implemented | TLA+ specification exists in docs but not machine-checked |
+docs/DEVELOPER_GUIDE.md:67:# Constitutional Rules
+docs/DOCS_INDEX.md:25:    Rules for freezing constitutional state at Level 0.
+docs/DOCS_INDEX.md:308:Protocol Laws & Formal Specifications
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:27:Identity is public-key derived. The ValidatorId is a hash of the public key, not an arbitrary number. This prevents identifier spoofing and ensures that the identifier changes only if the key changes. Signature verification is mandatory when the registry is populated. Every vote must carry a valid signature over a well-defined payload. This prevents impersonation and vote forgery. Minimal authority trust. The test setup uses a single hardcoded authority key. The verification logic, however, can be extended to multiple trust anchors without changing the engine internals. No runtime key derivation from seeds. All private key material is generated randomly or loaded from external sources. No deterministic derivation from predictable values exists in the running system. Backward compatibility is achieved via registry emptiness. When the registry is empty, signature verification is skipped. This allows existing unit tests to run unchanged while the production code registers validators.
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:37:The data flow inside LiveValidator proceeds as follows. Generate a random SigningKey. Compute the public key from the signing key verifying key. Compute the validator_id by calling derive_validator_id on the public key. Load the self certificate if it exists. For each peer in the config cluster, load its certificate from the path, verify it with the authority key, extract the public_key field, derive the validator_id, and call engine.register_validator_identity. In the consensus thread, when creating a vote, compute the timestamp, build the payload with vote_signing_payload, sign with the signing key, and set the signature field to the resulting 64-byte signature.
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:85:The amun-validator-identity crate exists with all specified types and functions, and its own three unit tests pass. The ConsensusEngine has a validator_keys field, and process_vote enforces signature verification when the registry is non-empty. The test n105_signature_required_when_registry_populated passes. The LiveValidator generates a real signing key, derives its ValidatorId, signs votes, and loads peer certificates from files. No seed-based derivation or SigningKey from_bytes calls exist in the live cluster runtime source. No runtime fallback path exists for validator identity registration. Certificates are mandatory for all live-cluster peers. All four certificate files exist in the testdata certs directory. The full workspace builds without warnings related to N105. All existing workspace tests pass.
+docs/N106_N107_CONSTITUTIONAL_AUTHORITY_AND_GOVERNANCE.md:275:The amun-authority-registry crate exists and all 52 tests pass. The
+docs/N126_FINAL_BASELINE.md:24:Constitutional Laws Status
+docs/PROJECT_INDEX.md:78:## Consensus Law
+docs/REPLAY_LAW.md:54:- Constitutional Rules
+docs/REPOSITORY_LAYOUT.md:351:No subsystem exists without explicit constitutional placement.
+docs/V2_026_ADVERSARIAL_RECONCILIATION.md:20:## Constitutional Rules Validated
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:106:`C₁ ≤ C₂` iff there exists a constitutional morphism `τ : C₁ → C₂`.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:119:- **V4-006:** Mechanized proof of the Authority Uniqueness Theorem.
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:38:  exists iff there is cryptographic evidence `E` that justifies it:
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:47:## 3. Axioms of CCS
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:49:### Axiom 1: Context Dominance
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:57:### Axiom 2: Contextual Recoverability
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:65:### Axiom 3: Authority Uniqueness
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:73:### Axiom 4: Epoch Supremacy
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:95:   Eventually, if a valid quorum certificate exists for the current validator
+docs/V4_002_003_CCS_THEORY_NUCLEUS.md:99:   Whenever constitutional evidence exists, it is always possible to
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:14:### Layer 1: Ontology (What exists?)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:20:### Layer 2: Axioms (What rules govern?)
+docs/V5_CCS_COMPLETE_RESEARCH_PROGRAM.md:44:- This may become the first "Conservation Law" of CCS.
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:106:for all `P`, the path from genesis always exists.
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:1:# CCS v0.6 – Geometry of Authority (Draft Axioms)
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:4:**Status:** V6-001 – Foundational Axioms for Authority Ordering
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:51:`P₁ ≤ P₂` iff there exists a finite chain of legitimate constitutional
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:58:## 3. Axioms of Constitutional Space
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:60:### Axiom 1: Partial Order
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:67:### Axiom 2: Foundational Position
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:72:### Axiom 3: Conservation of Reachability
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:79:This is the **First Conservation Law of CCS**.
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:81:### Axiom 4: Monotonicity of Authority
+docs/V6_002_PATHS_NOT_POINTS.md:106:but because there exists a verifiable constitutional history leading to
+docs/V6_002_PATHS_NOT_POINTS.md:117:Axiom 2. No separate "Acyclicity Theorem" is needed.
+docs/V6_002_PATHS_NOT_POINTS.md:13:space with partial order `≤`. But the Conservation Axiom (`P₀ ≤ P`)
+docs/V6_002_PATHS_NOT_POINTS.md:4:**Status:** Draft Axioms – From Position to Path
+docs/V6_002_PATHS_NOT_POINTS.md:63:`Legitimate(C)` iff there exists a path `π = (P₀, ..., C)` in `G`.
+docs/V6_002_PATHS_NOT_POINTS.md:69:## 3. Axioms (Path-Based)
+docs/V6_002_PATHS_NOT_POINTS.md:71:### Axiom 1: Foundational Root
+docs/V6_002_PATHS_NOT_POINTS.md:77:### Axiom 2: Deterministic Paths
+docs/V6_002_PATHS_NOT_POINTS.md:86:### Axiom 3: Path Conservation
+docs/V6_002_PATHS_NOT_POINTS.md:92:### Axiom 4: Path Monotonicity
+docs/V6_003_CANONICALIZATION.md:4:**Status:** Final Axiom – The Core of CCS
+docs/V6_003_CANONICALIZATION.md:70:## 4. Axioms (Complete)
+docs/V6_003_CANONICALIZATION.md:72:### Axiom 1: Foundational Root
+docs/V6_003_CANONICALIZATION.md:75:### Axiom 2: Constitutional Determinism (Final Form)
+docs/V6_003_CANONICALIZATION.md:78:For any constitutional possibility graph, there exists exactly one
+docs/V6_003_CANONICALIZATION.md:81:### Axiom 3: Path Conservation
+docs/V6_003_CANONICALIZATION.md:86:### Axiom 4: Constitutional Monotonicity
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:40:## 2. The Key Theorem (Conjecture)
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:42:**Constitutional Authority Theorem:**
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:45:exists **exactly one** path `Λ` that maximizes constitutional continuity.
+docs/V6_005_CONTINUITY_ORDERING.md:31:- Must prove: max exists, max is unique
+docs/V6_005_CONTINUITY_ORDERING.md:37:- Must prove: maximal element exists and is unique
+docs/V6_005_CONTINUITY_ORDERING.md:46:### Axiom C1: Foundational Minimum
+docs/V6_005_CONTINUITY_ORDERING.md:51:### Axiom C2: Extension Monotonicity
+docs/V6_005_CONTINUITY_ORDERING.md:58:### Axiom C3: Evidence Consistency
+docs/V6_005_CONTINUITY_ORDERING.md:66:### Axiom C4: Epoch Dominance
+docs/V6_005_CONTINUITY_ORDERING.md:73:### Axiom C5: Transitive Closure
+docs/V6_005_CONTINUITY_ORDERING.md:79:## 3. The Key Theorem (Conjecture)
+docs/V6_005_CONTINUITY_ORDERING.md:81:**Constitutional Authority Theorem (Order Version):**
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:29:For any two legitimate paths `π₁`, `π₂`, there exists a legitimate path
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:52:## 3. The Central Theorem (Conjecture)
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:54:**Constitutional Convergence Theorem:**
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:26:For any set of conflicting legitimate paths, there exists a total
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:48:## 3. The Core Theorem (Conjecture)
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:50:**Constitutional Preference Theorem:**
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:65:### Axiom P1: Foundational Minimum
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:70:### Axiom P2: Epoch Priority
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:74:### Axiom P3: Evidence Priority
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:78:### Axiom P4: Lexicographic Consistency
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:49:### Resolution Rules
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:51:1. **Epoch Rule:** `π₁` dominates `π₂` if `Epoch(π₁) > Epoch(π₂)`.
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:52:2. **Evidence Rule:** If epochs are equal, `π₁` dominates `π₂` if
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:54:3. **Lexicographic Rule:** If epochs and evidence are equal, `π₁`
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:63:## 3. Axioms of Resolution
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:65:### Axiom R1: Exclusivity
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:70:### Axiom R2: Stability
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:75:### Axiom R3: Completeness
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:83:## 4. The Central Theorem
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:85:**Constitutional Resolution Theorem:**
+docs/V6_009_CONSTITUTIONAL_META_RESOLUTION.md:59:## 3. The Meta-Theorem
+docs/V6_009_CONSTITUTIONAL_META_RESOLUTION.md:61:**Constitutional Meta-Resolution Theorem:**
+docs/V6_009_CONSTITUTIONAL_META_RESOLUTION.md:64:constitutional possibility graph `G` rooted at `P₀`, there exists
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:41:unless there exists constitutional evidence that overrides continuity.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:68:## 4. The Central Theorem
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:70:**Constitutional Finality Theorem:**
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:73:constitutional resolution policy `R ∈ ℜ_C`, there exists exactly one
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:100:`{ C' : P₀ ⊢_C C' }` whose existence is guaranteed by Axiom D5.
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:104:derivability closure. Axiom D5 guarantees this exists.
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:142:## 6. The Final Theorem
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:144:**Constitutional Completeness Theorem:**
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:147:- There exists exactly one final authority `Λ`.
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:50:## 2. Axioms of Constitutional Derivability
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:52:### Axiom D1: Reflexivity
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:57:### Axiom D2: Transitivity
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:62:### Axiom D3: Foundational Origin
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:68:### Axiom D4: Evidence-Backed
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:69:If `C₁ ⊢_C C₂` and `C₁ ≠ C₂`, then there exists verifiable evidence `E`
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:74:### Axiom D5: Deterministic Closure
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:88:Every legitimate context `C` satisfies `P₀ ⊢_C C`. This is Axiom D3.
+docs/V7_002_DERIVABILITY_GEOMETRY.md:15:Axiom D5 (Deterministic Closure) stated that every context has a unique
+docs/V7_002_DERIVABILITY_GEOMETRY.md:34:`∃! P₀` with in-degree 0. This is Axiom D3.
+docs/V7_002_DERIVABILITY_GEOMETRY.md:42:If `C → C₁` and `C → C₂`, then there exists `C'` such that
+docs/V7_002_DERIVABILITY_GEOMETRY.md:55:## 2. The Central Theorem
+docs/V7_002_DERIVABILITY_GEOMETRY.md:57:**Derivability Geometry Theorem:**
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:35:## 2. Axioms of Constitutional Reduction
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:37:### Axiom R1: Foundational Root
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:43:### Axiom R2: Deterministic Reduction
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:50:### Axiom R3: Unique Normal Form (Church-Rosser for CCS)
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:56:### Axiom R4: Reachability
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:15:relation of CCS. But Axiom R2 assumed that each context has exactly
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:27:## 1. Axioms of Constitutional Confluence
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:29:### Axiom CF1: Foundational Root
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:34:### Axiom CF2: Reachability
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:39:### Axiom CF3: Local Branching (Replaces R2)
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:46:### Axiom CF4: Constitutional Confluence
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:47:If `C ⇒*_C A` and `C ⇒*_C B`, then there exists `N` such that
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:53:### Axiom CF5: Termination (Well-Foundedness)
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:61:## 2. The Central Theorem
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:63:**Constitutional Church-Rosser Theorem:**
+docs/V7_005_CONSTITUTIONAL_PRUNING.md:43:## 2. Axioms of Constitutional Pruning
+docs/V7_005_CONSTITUTIONAL_PRUNING.md:45:### Axiom P1: Foundational Root
+docs/V7_005_CONSTITUTIONAL_PRUNING.md:50:### Axiom P2: Legitimate Expansion
+docs/V7_005_CONSTITUTIONAL_PRUNING.md:55:### Axiom P3: Irreversible Pruning
+docs/V7_005_CONSTITUTIONAL_PRUNING.md:60:### Axiom P4: Eventual Convergence
+docs/V7_005_CONSTITUTIONAL_PRUNING.md:66:### Axiom P5: Pruning by Evidence
+docs/V7_005_CONSTITUTIONAL_PRUNING.md:77:## 3. The Central Theorem
+docs/V7_005_CONSTITUTIONAL_PRUNING.md:79:**Constitutional Pruning Theorem:**
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:39:## 2. Axioms of Constitutional Exclusion
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:41:### Axiom E1: Foundational Legitimacy
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:46:### Axiom E2: Exclusion is Permanent
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:52:### Axiom E3: Exclusion Propagates Forward
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:58:### Axiom E4: Legitimacy by Non-Exclusion
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:63:### Axiom E5: Eventual Convergence
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:71:## 3. The Central Theorem
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:73:**Constitutional Exclusion Theorem:**
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:75:If the exclusion relation `⇍_C` satisfies E1-E5, then there exists
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:123:## 4. The Central Theorem
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:125:**Constitutional Completeness Theorem:**
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:127:For any system satisfying D1-D2 and E1-E4, there exists exactly
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:51:## 2. Axioms
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:53:### Axiom D1: Foundational Root
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:58:### Axiom D2: Derivability is Transitive
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:63:### Axiom E1: Exclusion is Irreversible
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:68:### Axiom E2: Exclusion Closes Subtrees
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:73:### Axiom E3: Self-Exclusion is Impossible
+docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:78:### Axiom E4: Derivability and Exclusion are Disjoint
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:116:  rejected (excluded). No permanent ambiguity exists.
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:32:Axioms:
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:40:Axioms:
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:50:**Axiom C1: Constitutional Decidability**
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:56:**Axiom C2: Canonical Completeness**
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:59:There exists at least one derivable, non-excluded, final context.
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:61:**Axiom C3: Canonical Uniqueness**
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:68:## 2. The Complete Set of Axioms
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:72:| Layer | Relation | Axioms |
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:80:## 3. The Central Theorem
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:82:**Constitutional Closure Theorem:**
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:84:For any system satisfying D1-D2, E1-E4, and C1-C3, there exists
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:98:1. By C2, at least one canonical context exists.
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:99:2. By C3, at most one canonical context exists.
+docs/V7_009_WHY_CLOSURE.md:124:5. If a counterexample exists, identify the missing structural
+docs/V7_009_WHY_CLOSURE.md:17:canonical authority exists, and that it is unique.
+docs/V7_009_WHY_CLOSURE.md:85:If no such counterexample exists, Closure is a theorem.
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:112:| Primitive | Derivability `⊢_C` | Axioms D1-D2 |
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:113:| Primitive | Exclusion `⇍_C` | Axioms E1-E4 |
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:114:| Primitive | Single History `SH1` | Axiom SH1 |
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:117:| Derived | Closure | Theorem |
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:39:## 2. The Principle as a Formal Axiom
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:41:### Axiom SH1: Single History
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:53:## 3. The Central Theorem
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:55:**Constitutional Closure Theorem (Final Version):**
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:66:1. Assume Closure fails: either no canonical context exists, or
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:84:   - If they are not all Final, then there exists a larger derivable
+docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:87:4. By Case 1 and Case 2, exactly one canonical context `Λ` exists.
+docs/V8_001_INDEPENDENCE_OF_SH1.md:77:## 3. Verification of Axioms
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:124:| Derivability (⊢_C) | Axiom |
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:125:| Exclusion (⇍_C) | Axiom |
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:126:| Constitutional Comparability (CC) | Axiom |
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:127:| Single History (SH1) | Theorem |
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:128:| Closure (C1-C3) | Theorem |
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:46:## 2. The Comparability Axiom (CC)
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:48:**Axiom CC: Constitutional Comparability**
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:92:## 4. The Central Theorem
+docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:94:**Comparability Theorem:**
+docs/V8_RESEARCH_PROPOSAL.md:37:   - Model-check the Closure Theorem
+docs/VALIDATOR_ORDERING.md:1:# AmunChain Validator Ordering Law
+docs/architecture/DEPENDENCY_CONSTITUTION.md:13:**Law 0.1**: Layer 0 MUST NOT import any amun-* crate.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:14:**Law 0.2**: Only cryptographic, serialization, and constant-time utility crates.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:15:**Law 0.3**: Single source of canonical encoding truth.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:20:**Law 0.5.1**: MAY import Layer 0. MUST NOT import Layers 1-4.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:21:**Law 0.5.2**: Governance semantics are NOT kernel primitives.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:26:**Law I.1**: Traits ONLY. No concrete service implementations.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:27:**Law I.2**: Std/core impls (Debug, Display, Error, From, Clone) permitted.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:28:**Law I.3**: Service impls (Tcp, Http, Ws, Network, Store, Runtime, Tokio) FORBIDDEN.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:29:**Law I.4**: `Send + Sync` MUST be documented with `@constitutional-runtime-contract`.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:30:**Law I.5**: NO async runtime dependencies.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:36:**Law 1.1**: MUST NOT import `amun-runtime`, `amun-storage`, `amun-mempool`.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:41:**Law 2.1**: MUST be deterministic and replayable.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:46:**Law 3.1**: MUST NOT depend on consensus logic.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:51:**Law 4.1**: Primary host for tokio/hyper. MUST NOT contain consensus logic.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:56:**Law 5.1**: Transitions MUST be replay-deterministic.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:61:**Law 6.1**: No production crate MAY depend on a test crate.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:63:## Article II: Async Runtime Laws
+docs/architecture/DEPENDENCY_CONSTITUTION.md:65:**Law Async.1**: tokio/hyper MAY exist outside Layer 4 ONLY behind deterministic interfaces.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:66:**Law Async.2**: Async runtimes MUST NOT alter deterministic protocol behavior.
+docs/architecture/DEPENDENCY_CONSTITUTION.md:67:**Law Async.3**: Optional async deps require constitutional review.
+docs/architecture/DEPENDENCY_RULES.md:1:# Dependency Rules
+docs/architecture/NAMING_CONVENTION.md:12:## Rules
+docs/architecture/PHASE_49_COMPLETE.md:100:| R.1 | System replayable from transcript | Replay Law |
+docs/architecture/PHASE_49_COMPLETE.md:101:| O.1 | Messages respect round monotonicity | Ordering Law |
+docs/architecture/PHASE_49_COMPLETE.md:102:| C.1 | Capabilities MUST be separated | Capability Law |
+docs/architecture/PHASE_49_COMPLETE.md:89:### Constitutional Laws Enforced
+docs/architecture/PHASE_49_COMPLETE.md:91:| Law | Scope | Enforcement |
+docs/architecture/PHASE_49_COMPLETE.md:98:| 1.2 | Consensus → Interfaces only | Interface Law |
+docs/architecture/PHASE_49_COMPLETE.md:99:| T.1 | All events → Canonical Transcript | Transcript Law |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:3:## 1. Invariant-to-Test Traceability
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:55:| A4 | Partial synchrony (GST exists) | Standard distributed systems model |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:5:| Invariant | Description | Test ID | Crate | Status |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:80:| Invariant Engine | amun-invariant-engine | 5 | ✅ |
+docs/audit/SECURITY_INVARIANTS.md:15:## Execution Invariants
+docs/audit/SECURITY_INVARIANTS.md:17:| ID | Invariant | Enforcement |
+docs/audit/SECURITY_INVARIANTS.md:1:# AmunChain Security Invariants Catalog
+docs/audit/SECURITY_INVARIANTS.md:25:## Consensus Invariants
+docs/audit/SECURITY_INVARIANTS.md:27:| ID | Invariant | Enforcement |
+docs/audit/SECURITY_INVARIANTS.md:32:| C4 | No conflicting finality | Theorem 5 (Replay-Backed Safety) |
+docs/audit/SECURITY_INVARIANTS.md:34:## Cryptographic Invariants
+docs/audit/SECURITY_INVARIANTS.md:36:| ID | Invariant | Enforcement |
+docs/audit/SECURITY_INVARIANTS.md:3:## Resource Invariants (R1–R6 + X1)
+docs/audit/SECURITY_INVARIANTS.md:5:| ID | Invariant | Enforcement | Verification |
+docs/audit/THREAT_MODEL.md:14:| Execution | Forged TransitionProof | Proof hash verification (Theorem 1) |
+docs/consensus/I1_translation.md:12:## Semantic Invariants (from CSA-6)
+docs/consensus/I2_extension.md:12:## Semantic Invariants (from CSA-6)
+docs/consensus/I3_reframing.md:22:## Semantic Invariants (from CSA-6)
+docs/consensus/I4_drift.md:21:## Semantic Invariants (from CSA-6)
+docs/consensus/constitution.md:63:### Section 3.2: Nonce Rules
+docs/consensus/origin.md:3:## Semantic Invariants (from CSA-6)
+docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:109:- Axioms
+docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:61:### 4. Axiom Set v1
+docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:93:Recognition Existence Lemma
+docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:111:Recognition Stability Theorem
+docs/constitutional-mathematics/README.md:30:Axioms                 ✅
+docs/constitutional-mathematics/README.md:34:First Lemma            ✅
+docs/constitutional/phase84_freeze.md:2:## Frozen Invariants for Sovereign State Replication
+docs/constitutional_layers.md:56:## Dependency Rules
+docs/federation/FEDERATION_ARCHITECTURE.md:11:Federation exists after:
+docs/federation/FEDERATION_ARCHITECTURE.md:53:## Invariant
+docs/federation/TRUST_GRAPH.md:51:## Invariant
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:239:## 10. Consensus Rules
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:245:## 11. Protocol Upgrade Rules
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:254:## 12. Consensus Invariants
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:258:**Invariant 1:** `constitutional_root == BLAKE3("AMUN_CONSTITUTIONAL_ROOT_V1" || identity_root || evidence_root || governance_root || economic_root)`
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:260:**Invariant 2:** `constitutional_commitment_root == BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || CanonicalSerialization(ConstitutionalCommitment))`
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:262:**Invariant 3:** `state_root` must include `constitutional_commitment_root` as a leaf in its Merkle tree computation.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:264:**Invariant 4:** The `AppHash` MUST commit to `state_root`. For CCA v1.0, this is defined as `AppHash = state_root`. Future versions may introduce additional roots (such as `execution_root` or `receipt_root`) into the `AppHash` computation, in which case the invariant will be updated to reflect the new hash composition while preserving the requirement that `state_root` remains a committed input.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:266:**Invariant 5:** Given identical state transition inputs (same genesis, same transactions up to height N), all validators must compute identical values for all roots defined in this specification.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:31:10. Consensus Rules
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:32:11. Protocol Upgrade Rules
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:33:12. Consensus Invariants
+docs/protocol/FREEZE_CERTIFICATE_v1.md:29:### Constitutional Invariants (FROZEN)
+docs/protocol/lineage_law_v1.md:28:- LawfulDescendant: direct lineage with proof
+docs/protocol/replay_physics_v1.md:13:### 2.2 Ordering Invariant

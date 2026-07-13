@@ -1,0 +1,538 @@
+================ FIELD ACCESS =================
+crates/amun-orchestrator-certificates/src/lib.rs:109:            .find(|c| hex::encode(c.validator_id.0) == name || hex::encode(c.public_key) == name)
+crates/amun-orchestrator-certificates/src/lib.rs.save:79:            .find(|c| hex::encode(c.validator_id.0) == name || hex::encode(c.public_key) == name)
+crates/amun-orchestrator-genesis/src/lib.rs:97:            .any(|v| v.validator_id == validator_id)
+crates/amun-orchestrator-genesis/src/lib.rs:134:            .retain(|v| v.validator_id != *validator_id);
+crates/amun-orchestrator-genesis/src/validator.rs:18:    let mut ids: Vec<_> = genesis.validators.iter().map(|v| v.validator_id).collect();
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:113:    assert_eq!(decoded.validator_id, commit.validator_id);
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:163:        &commit.validator_id,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:193:        commit.validator_id, pk,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:251:    // GATEKEEPER CHECK 4: vote.voter_id == commitment.validator_id
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:253:        vote.voter_id, vote.commitment.validator_id,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:254:        "N109.8 GATEKEEPER FAIL: vote.voter_id != commitment.validator_id"
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:282:        || vote.voter_id != vote.commitment.validator_id;
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:314:        decoded.commitment.validator_id,
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:315:        vote.commitment.validator_id
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:103:        .filter(|s| s.validator_id == [0x42; 32])
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:117:        .filter(|s| s.validator_id == [0x99; 32])
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:82:            validator_id: ev.validator_id,
+crates/amun-consensus-network/src/messages.rs:48:        if a.voter_id != self.validator_id || b.voter_id != self.validator_id {
+crates/amun-consensus-network/src/misbehavior_registry.rs:232:                &record.validator_id,
+crates/amun-consensus-network/src/slashing_ledger.rs:14:    hasher.update(&cert.validator_id);
+crates/amun-consensus-network/src/slashing_ledger.rs:86:            validator_id: cert.validator_id,
+crates/amun-consensus-network/src/slashing_ledger.rs:104:            .filter(|s| s.validator_id == *validator_id)
+crates/amun-consensus-network/src/slashing_ledger.rs:182:        assert_eq!(ledger.history[0].validator_id, [0x42; 32]);
+crates/amun-consensus-network/src/slashing_ledger.rs:245:        assert_eq!(v1[0].validator_id, [0x42; 32]);
+crates/amun-consensus-network/src/slashing_ledger.rs:246:        assert_eq!(v2[0].validator_id, [0x99; 32]);
+crates/amun-consensus-network/src/engine.rs.debug_backup:275:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.debug_backup:287:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.debug_backup:443:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.debug_backup:454:        self.validator_ids
+crates/amun-consensus-network/src/validator_registry.rs:6:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/validator_registry.rs:22:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_engine_metrics_extract:282:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_engine_metrics_extract:294:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_engine_metrics_extract:305:            self.validator_ids.len(),
+crates/amun-consensus-network/src/engine.rs.before_engine_metrics_extract:467:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.before_engine_metrics_extract:478:        self.validator_ids
+crates/amun-consensus-network/src/slashing_merkle.rs:15:    hasher.update(&slash.validator_id);
+crates/amun-consensus-network/src/validator_identity.rs:69:        let recomputed = Self::compute_binding(&self.validator_id, &self.to_public_key());
+crates/amun-consensus-network/src/validator_identity.rs:104:        if self.identities.contains_key(&identity.validator_id) {
+crates/amun-consensus-network/src/validator_identity.rs:107:                &identity.validator_id[..4]
+crates/amun-consensus-network/src/validator_identity.rs:110:        self.identities.insert(identity.validator_id, identity);
+crates/amun-consensus-network/src/validator_identity.rs:234:        assert_eq!(identity.validator_id, validator_id);
+crates/amun-consensus-network/src/validator_identity.rs:271:        assert_eq!(id.validator_id, decoded.validator_id);
+crates/amun-consensus-network/src/messages.rs.n131_backup:48:        if a.voter_id != self.validator_id || b.voter_id != self.validator_id {
+crates/amun-consensus-network/src/messages.rs.bak:44:        if a.voter_id != self.validator_id || b.voter_id != self.validator_id {
+crates/amun-consensus-network/src/engine.rs.before_round_extract:254:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_round_extract:266:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_round_extract:277:            self.validator_ids.len(),
+crates/amun-consensus-network/src/engine.rs.before_round_extract:439:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.before_round_extract:450:        self.validator_ids
+crates/amun-consensus-network/src/execution_commitment.rs:110:            &self.validator_id,
+crates/amun-consensus-network/src/execution_commitment.rs:120:        let verifying_key = ed25519_dalek::VerifyingKey::from_bytes(&self.validator_id)
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:36:        hasher.update(&slash.validator_id);
+crates/amun-consensus-network/src/engine.rs.before_node_state:57:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_node_state:69:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_node_state:80:            self.validator_ids.len(),
+crates/amun-consensus-network/src/engine.rs.before_node_state:242:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.before_node_state:253:        self.validator_ids
+crates/amun-consensus-network/src/misbehavior.rs:77:            validator_id: proof.validator_id,
+crates/amun-consensus-network/src/misbehavior.rs:91:            .filter(|r| r.validator_id == *validator_id)
+crates/amun-consensus-network/src/misbehavior.rs:98:            .filter(|r| r.validator_id == *validator_id)
+crates/amun-consensus-network/src/engine.rs.before_proposal_extract:214:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.before_proposal_extract:225:        self.validator_ids
+crates/amun-consensus-network/src/engine.rs.before_voting_extract:202:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.before_voting_extract:213:        self.validator_ids
+crates/amun-consensus-network/src/evidence_store.rs:171:            .filter(|r| r.validator_id == *validator_id && r.height == height)
+crates/amun-consensus-network/src/evidence_store.rs:179:            .filter(|r| r.validator_id == *validator_id)
+crates/amun-consensus-network/src/engine.rs.n1023_final:281:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.n1023_final:293:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.n1023_final:304:            self.validator_ids.len(),
+crates/amun-consensus-network/src/engine.rs.n1023_final:466:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.n1023_final:477:        self.validator_ids
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:34:        self.validator_id = Some(v);
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:76:            self.validator_id.unwrap(),
+crates/amun-consensus-network/src/engine.rs.before_validator_registry:58:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_validator_registry:70:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.before_validator_registry:81:            self.validator_ids.len(),
+crates/amun-consensus-network/src/engine.rs.before_validator_registry:243:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.before_validator_registry:254:        self.validator_ids
+crates/amun-consensus-network/src/slashing_certificate.rs:98:        data.extend_from_slice(&self.validator_id);
+crates/amun-consensus-network/src/slashing_certificate.rs:139:        hasher.update(&self.validator_id);
+crates/amun-consensus-network/src/slashing_certificate.rs:249:        assert_eq!(decoded.validator_id, cert.validator_id);
+crates/amun-consensus-network/src/evidence_push.rs:68:                validator_id: record.validator_id,
+crates/amun-consensus-network/src/engine.rs:185:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs:196:        self.validator_ids
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:209:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:312:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.n105_2_backup:323:        self.validator_ids
+crates/amun-consensus-network/src/staking_adapter.rs:242:        assert_eq!(slash_result.validator_id, validator_id);
+crates/amun-consensus-network/src/evidence_push_processor.rs:47:                validator_id: record.validator_id,
+crates/amun-consensus-network/src/engine.rs.n131_backup:281:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.n131_backup:293:        self.validator_ids.push(validator_id);
+crates/amun-consensus-network/src/engine.rs.n131_backup:304:            self.validator_ids.len(),
+crates/amun-consensus-network/src/engine.rs.n131_backup:485:        if self.validator_ids.is_empty() {
+crates/amun-consensus-network/src/engine.rs.n131_backup:496:        self.validator_ids
+crates/amun-consensus-network/src/network_consensus.rs:48:        let is_proposer = self.validator_id[0] as usize == proposer_idx + 1;
+crates/amun-consensus-network/src/network_consensus.rs:53:            engine.start_round(height, self.validator_id);
+crates/amun-consensus-network/src/network_consensus.rs:63:            voter_id: self.validator_id,
+crates/amun-consensus-network/src/network_consensus.rs:83:            if *peer_id == self.validator_id {
+crates/amun-consensus-network/src/evidence_gossip.rs:95:        if announcement.validator_id == [0u8; 32] {
+crates/amun-consensus-network/src/vote_binding.rs:48:        &c.validator_id,
+crates/amun-consensus-network/src/vote_binding.rs:180:        vote.commitment.as_mut().unwrap().validator_id = pk2;
+crates/amun-validator-attestation/src/attestation.rs:38:        h.update(&self.validator_id.to_le_bytes());
+crates/amun-view-change/src/view_change.rs:52:        h.update(&self.validator_id.to_le_bytes());
+crates/amun-qc-canonical/src/validator.rs:12:        if !seen.insert(vote.message.validator_id) {
+crates/amun-qc-canonical/src/validator.rs:15:        if validator_set.get_validator(vote.message.validator_id).is_none() {
+crates/amun-qc-canonical/src/canonicalize.rs:15:        if !seen_validators.insert(vote.message.validator_id) {
+crates/amun-qc-canonical/src/canonicalize.rs:40:        .get_validator(vote.message.validator_id)
+crates/amun-qc-canonical/src/canonicalize.rs:68:        .filter_map(|v| validator_set.get_validator(v.message.validator_id))
+crates/amun-node/src/cluster_builder.rs:31:                validator_id: peer.validator_id,
+crates/amun-node/src/cluster_builder.rs:38:            validator_id: validator.validator_id,
+crates/amun-node/src/peer_handshake.rs:50:        if self.certificate.validator_id != self.peer_id {
+crates/amun-quorum-certificate/src/verifier.rs:22:        if validator_set.get_validator(vote.message.validator_id).is_none() {
+crates/amun-quorum-certificate/src/lib.rs:37:        self.votes.iter().map(|v| v.message.validator_id).collect()
+crates/amun-orchestrator-validator/src/config_gen.rs:50:            peer.validator_id
+crates/amun-orchestrator-validator/src/config_gen.rs:101:        hex::encode(config.validator_id.0),
+crates/amun-orchestrator-validator/src/config_gen.rs:107:            .validator_id
+crates/amun-qc-weight/src/derive.rs:15:        if !seen.insert(vote.message.validator_id) {
+crates/amun-qc-weight/src/derive.rs:20:            .get_validator(vote.message.validator_id)
+crates/amun-networking/src/validator_registry.rs:33:            .insert(certificate.validator_id, certificate);
+crates/amun-networking/src/validator_certificate.rs:59:        data.extend_from_slice(&self.validator_id.0);
+crates/amun-networking/src/validator_certificate.rs:152:        assert_eq!(cert.validator_id, validator.peer_id());
+crates/amun-safety-laws/src/uniqueness.rs:7:        if !seen_validators.insert(vote.message.validator_id) {
+crates/amun-safety-laws/src/uniqueness.rs:15:    vote_a.message.validator_id != vote_b.message.validator_id
+crates/amun-safety-laws/src/equivocation.rs:26:        a.validator_id == b.validator_id
+crates/amun-safety-laws/src/equivocation.rs:33:        self.vote_a.message.validator_id
+crates/amun-safety-laws/src/equivocation.rs:47:            vote.message.validator_id,
+crates/amun-rpc/src/lib.rs.bak_rpc_debug:307:    let validators: Vec<serde_json::Value> = engine.validator_ids.iter().map(|id| {
+crates/amun-rpc/src/lib.rs:312:        .validator_ids
+crates/amun-rpc/src/lib.rs.bak_hit:324:    let validators: Vec<serde_json::Value> = engine.validator_ids.iter().map(|id| {
+crates/amun-unsigned-messages/src/vote.rs:54:        h.update(&self.validator_id.to_le_bytes());
+crates/amun-unsigned-messages/src/vote.rs:69:        buf.extend_from_slice(&self.validator_id.to_le_bytes());
+crates/amun-unsigned-messages/src/vote.rs:153:        self.unsigned.validator_id
+crates/amun-unlock-law/src/lib.rs:8:        .any(|v| v.message.validator_id == validator_id)
+crates/amun-unlock-law/src/lib.rs:17:        .filter_map(|v| validator_set.get_validator(v.message.validator_id))
+crates/amun-live-cluster/src/config.rs:97:            .filter(|p| p.validator_id != self.validator_id)
+crates/amun-live-cluster/src/validator.rs:79:        let mut engine = ConsensusEngine::new(config.validator_id, config.total_validators());
+crates/amun-live-cluster/src/validator.rs:86:        seed[0] = config.validator_id[0];
+crates/amun-live-cluster/src/validator.rs:116:        engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
+crates/amun-live-cluster/src/validator.rs:118:        engine.validator_id = validator_id;
+crates/amun-live-cluster/src/validator.rs:135:            engine.register_validator_identity(peer_cert.validator_id.0, peer_id, peer_pk, 100);
+crates/amun-live-cluster/src/validator.rs:184:        let validator_id = self.validator_id;
+crates/amun-live-cluster/src/validator.rs:185:        let my_index = (self.config.validator_id[0] as usize).saturating_sub(1);
+crates/amun-live-cluster/src/validator.rs:762:                            let result = adapter.try_slash(&cert.validator_id);
+crates/amun-live-cluster/src/validator.rs:767:                                        &cert.validator_id[..4],
+crates/amun-live-cluster/src/validator.rs:777:                                        &cert.validator_id[..4]
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:91:                &proof.validator_id, proof.height,
+crates/amun-live-cluster/src/bin/double_vote_test.rs.disabled:96:                &proof.validator_id, &evidence_id,
+crates/amun-live-cluster/src/bin/quorum_exclusion_test.rs:44:        eng.validator_ids = vec![[1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32]];
+crates/amun-constitutional-verifier/src/verifier.rs:24:        .filter_map(|v| validator_set.get_validator(v.message.validator_id))
+crates/amun-constitutional-verifier/src/verifier.rs:39:        .get_validator(vote.message.validator_id)
+crates/amun-constitutional-verifier/src/verifier.rs:63:        if !seen.insert(vote.message.validator_id) {
+crates/amun-constitutional-verifier/src/verifier.rs:75:        .filter_map(|v| validator_set.get_validator(v.message.validator_id))
+crates/amun-verified-pipeline/src/vote_pipeline.rs:41:        let vid = self.signed.validator_id();
+crates/amun-validator-networking/src/validator_identity.rs:26:        hasher.update(&self.validator_id);
+crates/amun-network-transport/src/message.rs:239:                assert_eq!(c.validator_id, [0x42; 32]);
+crates/amun-network-transport/src/message.rs:262:                assert_eq!(e.validator_id, [0x42; 32]);
+crates/amun-network-transport/src/transport.rs:194:        NetworkMessage::BlockAnnounce(b) => NodeId(b.validator_id.0),
+crates/amun-network-transport/src/transport.rs:206:        NetworkMessage::SlashingCertificateAnnounce(s) => NodeId(s.validator_id),
+crates/amun-network-transport/src/transport.rs:207:        NetworkMessage::EvidenceAnnounce(e) => NodeId(e.validator_id),
+crates/amun-network-transport/src/transport.rs:484:                    assert_eq!(b.validator_id.0, node_a_id);
+crates/amun-consensus-messages/src/message.rs:54:        h.update(&self.validator_id.to_le_bytes());
+crates/amun-constitutional-evidence/src/lib.rs:65:    let validators = context.validator_set.validator_ids();
+crates/amun-consensus/src/action.rs:34:        for (i, b) in self.validator_id.iter().enumerate() {
+crates/amun-consensus-execution/src/voter.rs:41:        let vid = vote.message.validator_id;
+crates/amun-consensus-execution/src/voter.rs:83:                    .filter(|v| !self.slashed.contains(&v.message.validator_id))
+crates/amun-consensus-execution/src/voter.rs:84:                    .filter_map(|v| self.validator_set.get_validator(v.message.validator_id))
+crates/amun-consensus-execution/src/voter.rs:109:                    .filter(|v| !self.slashed.contains(&v.message.validator_id))
+crates/amun-consensus-execution/src/voter.rs:110:                    .filter_map(|v| self.validator_set.get_validator(v.message.validator_id))
+crates/amun-consensus-execution/src/voter.rs:148:                    .filter(|v| !self.slashed.contains(&v.message.validator_id))
+crates/amun-consensus-execution/src/voter.rs:149:                    .filter_map(|v| self.validator_set.get_validator(v.message.validator_id))
+crates/amun-consensus-execution/src/leader_schedule.rs:14:        for id in validators.validator_ids() {
+crates/amun-consensus-execution/src/leader_schedule.rs:26:        let ids = self.validators.validator_ids();
+crates/amun-consensus-types/src/vote.rs:51:        self.validator_id.encode_to_writer(writer)?;
+crates/amun-orchestrator-certificates/src/lib.rs:109:            .find(|c| hex::encode(c.validator_id.0) == name || hex::encode(c.public_key) == name)
+crates/amun-orchestrator-certificates/src/lib.rs.save:79:            .find(|c| hex::encode(c.validator_id.0) == name || hex::encode(c.public_key) == name)
+crates/amun-consensus-network/src/validator_identity.rs:43:        PublicKey(self.public_key_bytes)
+crates/amun-consensus-network/src/validator_identity.rs:199:        assert_eq!(reg.get(&[0x42; 32]).unwrap().public_key_bytes[0], 1);
+crates/amun-consensus-network/src/validator_identity.rs:235:        assert_eq!(identity.public_key_bytes[0], 7);
+crates/amun-consensus-network/src/validator_identity.rs:272:        assert_eq!(id.public_key_bytes, decoded.public_key_bytes);
+crates/amun-validator-attestation/src/attestation.rs:39:        h.update(&self.public_key);
+crates/amun-node/src/certificate_loader.rs:14:    let pk_hex = hex::encode(cert.public_key);
+crates/amun-node/src/certificate_loader.rs:19:        .any(|v| hex::encode(v.public_key.0) == pk_hex)
+crates/amun-node/src/peer_handshake.rs:54:        if self.certificate.public_key != self.public_key {
+crates/amun-node/src/peer_handshake.rs:59:        if !self.certificate.verify(&self.public_key) {
+crates/amun-node/src/peer_handshake.rs:81:            public_key: handshake.public_key,
+crates/amun-kernel/src/governance.rs:92:        out.extend_from_slice(&self.public_key);
+crates/amun-orchestrator-validator/src/config_gen.rs:102:        hex::encode(config.public_key.0),
+crates/amun-orchestrator-validator/src/keygen.rs:25:    let hash = Sha256::digest(keypair.public_key);
+crates/amun-orchestrator-validator/src/keygen.rs:35:    hasher.update(keypair.public_key);
+crates/amun-orchestrator-validator/src/keygen.rs:44:    PublicKey(keypair.public_key)
+crates/amun-orchestrator-validator/src/keygen.rs:54:        assert_eq!(kp.public_key.len(), 32);
+crates/amun-attestation/src/validator.rs:26:            &self.public_key,
+crates/amun-attestation/src/validator.rs:27:            &self.public_key,
+crates/amun-replay-engine/src/constitutional_identity.rs:56:        h.update_u64(self.identity_id).update_bytes(&self.public_key_hash);
+crates/amun-networking/src/validator_certificate.rs:60:        data.extend_from_slice(&self.public_key);
+crates/amun-genesis/src/validator.rs:30:        hasher.update(&v.public_key);
+crates/amun-live-cluster/src/validator.rs:113:        let pk = self_cert.public_key;
+crates/amun-live-cluster/src/validator.rs:133:            let peer_pk = peer_cert.public_key;
+crates/amun-wallet-management/src/lib.rs:14:        assert_eq!(kp.public_key.len(), 32);
+crates/amun-wallet-management/src/lib.rs:23:        assert_eq!(kp1.public_key, kp2.public_key);
+crates/amun-wallet-management/src/lib.rs:41:        assert_eq!(kp.public_key, loaded.public_key);
+crates/amun-wallet-management/src/lib.rs:61:        assert!(signer::verify_signature(&kp.public_key, message, &sig));
+crates/amun-wallet-management/src/lib.rs:72:        assert!(!signer::verify_signature(&kp.public_key, message, &sig));
+crates/amun-wallet-management/src/lib.rs:80:        assert!(signer::verify_signature(&kp.public_key, tx_bytes, &sig));
+crates/amun-wallet-management/src/types.rs:58:        hex::encode(self.public_key)
+crates/amun-wallet-management/src/types.rs:64:        hasher.update(&self.public_key);
+crates/amun-wallet-management/src/types.rs:74:        hasher.update(&self.public_key);
+crates/amun-wallet-management/src/keystore.rs:27:        public_key: keypair.public_key_hex(),
+crates/amun-wallet-management/src/keystore.rs:75:        hex::decode(&keystore.public_key).map_err(|e| format!("invalid public key: {}", e))?;
+crates/amun-validator-networking/src/validator_identity.rs:27:        hasher.update(&self.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:125:        message.extend_from_slice(&old_kp.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:126:        message.extend_from_slice(&new_kp.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:129:        let cert = KeyRotationCertificate::new(1, old_kp.public_key, new_kp.public_key, sig, 1000);
+crates/amun-crypto-hardening/src/key_rotation.rs:136:        let mut chain = KeyRotationChain::new(genesis_kp.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:144:            message.extend_from_slice(&current_kp.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:145:            message.extend_from_slice(&new_kp.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:150:                current_kp.public_key,
+crates/amun-crypto-hardening/src/key_rotation.rs:151:                new_kp.public_key,
+crates/amun-crypto-hardening/src/key_rotation.rs:167:        let mut chain = KeyRotationChain::new(kp1.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:171:        message.extend_from_slice(&kp1.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:172:        message.extend_from_slice(&kp2.public_key);
+crates/amun-crypto-hardening/src/key_rotation.rs:175:        let cert = KeyRotationCertificate::new(5, kp1.public_key, kp2.public_key, sig, 1000);
+crates/amun-crypto-hardening/src/production_keys.rs:31:        hex::encode(self.public_key)
+crates/amun-crypto-hardening/src/production_keys.rs:64:        let pubkey = ValidatorPublicKey::from_bytes(kp.public_key);
+crates/amun-crypto-hardening/src/production_keys.rs:74:        let pubkey = ValidatorPublicKey::from_bytes(kp.public_key);
+crates/amun-crypto-hardening/src/production_keys.rs:82:        let pubkey = ValidatorPublicKey::from_bytes(kp.public_key);
+crates/amun-wallet-api/src/routes/accounts.rs:11:        "public_key": keypair.public_key_hex(),
+crates/amun-constitutional-sim/src/evolution.rs:35:            entity_avg[claim.issuer] += eff;
+crates/amun-constitutional-sim/src/evolution.rs:36:            entity_count[claim.issuer] += 1;
+crates/amun-constitutional-sim/src/effectiveness.rs:28:            .filter(|row| row[claim.issuer])
+crates/amun-constitutional-sim/src/effectiveness.rs:40:            let has_treaty = state.treaties[claim.issuer][claim.subject];
+crates/amun-networking/src/validator_registry.rs:25:            .get_key(&certificate.issuer)
+crates/amun-networking/src/validator_certificate.rs:63:        data.extend_from_slice(&self.issuer.0);
+crates/amun-networking/src/validator_certificate.rs:153:        assert_eq!(cert.issuer, authority.peer_id());
+crates/amun-constitutional-authority/src/certificate.rs:63:        tmp.issuer = id.clone();
+crates/amun-constitutional-authority/src/certificate.rs:79:        tmp.issuer = issuer_id;
+crates/amun-constitutional-authority/src/certificate.rs:130:        c.issuer = String::new();
+crates/amun-constitutional-authority/src/chain.rs:59:                if cert.issuer != cert.subject {
+crates/amun-constitutional-authority/src/chain.rs:66:                let issuer_key = self.resolve_key(&cert.issuer).ok_or_else(|| {
+crates/amun-constitutional-authority/src/chain.rs:67:                    format!("Issuer certificate {} not found in chain", cert.issuer)
+crates/amun-constitutional-authority/src/chain.rs:72:                        cert.certificate_id, cert.issuer
+crates/amun-constitutional-authority/src/trust.rs:30:        self.signed_cert.artifact.issuer == self.signed_cert.artifact.subject
+crates/amun-networking/src/validator_certificate.rs:62:        data.extend_from_slice(&self.authority_id);
+crates/amun-authority-registry/src/registry.rs:124:        if cert.authority_id != [0u8; 32] && authority.authority_id != cert.authority_id {
+crates/amun-authority-registry/src/registry.rs:306:        let v1_id = v1.authority_id;
+crates/amun-authority-registry/src/registry.rs:347:        let v1_id = v1.authority_id;
+crates/amun-authority-registry/src/registry.rs:391:        let v2_id = v2.authority_id;
+crates/amun-authority-registry/src/registry.rs:426:        let v1_id = v1.authority_id;
+crates/amun-authority-registry/src/authority.rs:39:        assert_eq!(a1.authority_id, a2.authority_id);
+crates/amun-authority-registry/src/authority.rs:46:        assert_ne!(a1.authority_id, a2.authority_id);
+crates/amun-networking/src/validator_certificate.rs:61:        data.extend_from_slice(&self.authority_version.to_le_bytes());
+crates/amun-rpc/src/lib.rs.bak_rpc_debug:365:            "active_version": authority.active().map(|a| a.authority_version),
+crates/amun-rpc/src/lib.rs:371:            "active_version": authority.active().map(|a| a.authority_version),
+crates/amun-rpc/src/lib.rs.bak_hit:382:            "active_version": authority.active().map(|a| a.authority_version),
+crates/amun-live-cluster/src/validator.rs:99:            genesis.authority_version,
+crates/amun-live-cluster/src/validator.rs:996:            assert_eq!(auths[0].authority_version, 1);
+crates/amun-live-cluster/src/validator.rs:1018:            assert_eq!(auths[0].authority_version, 2);
+crates/amun-authority-registry/src/registry.rs:36:        let version = authority.authority_version;
+crates/amun-authority-registry/src/registry.rs:62:        let version = authority.authority_version;
+crates/amun-authority-registry/src/registry.rs:118:        let authority = match self.by_version(cert.authority_version) {
+crates/amun-authority-registry/src/registry.rs:139:            .any(|a| a.authority_version == cert.authority_version)
+crates/amun-authority-registry/src/registry.rs:160:            if active.authority_version == authority_version {
+crates/amun-authority-registry/src/registry.rs:177:        assert_eq!(reg.active().unwrap().authority_version, 1);
+crates/amun-authority-registry/src/registry.rs:194:        assert_eq!(reg.active().unwrap().authority_version, 2);
+crates/amun-authority-registry/src/registry.rs:201:        assert_eq!(registry.active().unwrap().authority_version, 1);
+crates/amun-authority-registry/src/registry.rs:211:        assert_eq!(reg.active().unwrap().authority_version, 2);
+crates/amun-authority-registry/src/registry.rs:232:        assert_eq!(reg.active().unwrap().authority_version, 3);
+crates/amun-authority-registry/src/registry.rs:293:        assert_eq!(valid[0].authority_version, 1);
+crates/amun-authority-registry/src/registry.rs:477:        assert_eq!(valid[0].authority_version, 2);
+crates/amun-node/src/peer_handshake.rs:124:        handshake.certificate.valid_from = 99999;
+crates/amun-kernel/src/governance.rs:85:        timestamp >= self.valid_from && timestamp <= self.valid_until
+crates/amun-kernel/src/governance.rs:94:        self.valid_from.encode_canonical(out);
+crates/amun-networking/src/validator_certificate.rs:64:        data.extend_from_slice(&self.valid_from.to_le_bytes());
+crates/amun-networking/src/validator_certificate.rs:77:        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+crates/amun-networking/src/validator_certificate.rs:188:        cert.valid_from = 500;
+crates/amun-kernel/src/governance.rs:85:        timestamp >= self.valid_from && timestamp <= self.valid_until
+crates/amun-kernel/src/governance.rs:95:        self.valid_until.encode_canonical(out);
+crates/amun-networking/src/validator_certificate.rs:65:        data.extend_from_slice(&self.valid_until.to_le_bytes());
+crates/amun-networking/src/validator_certificate.rs:77:        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+crates/amun-networking/src/validator_certificate.rs:52:        cert.authority_signature = issuer_keypair.sign(&payload);
+crates/amun-networking/src/validator_certificate.rs:72:        PeerKeyPair::verify(authority_public_key, &payload, &self.authority_signature)
+crates/amun-networking/src/validator_certificate.rs:102:        cert.authority_signature = issuer_keypair.sign(&payload);
+crates/amun-nft-sdk/tests/n145_sdk_tests.rs:25:    sdk.constitutional_registry.lock().unwrap().register(
+crates/amun-nft-sdk/tests/n145_sdk_tests.rs:147:    sdk.constitutional_registry.lock().unwrap().register(
+crates/amun-nft-sdk/src/lib.rs:192:        let reg = self.constitutional_registry.lock().unwrap();
+crates/amun-orchestrator-certificates/src/lib.rs:29:        let path = self.constitutional_cert_path(validator_name);
+crates/amun-orchestrator-certificates/src/lib.rs:41:        self.constitutional_certs.write().await.push(cert.clone());
+crates/amun-orchestrator-certificates/src/lib.rs:86:        let constitutional_path = self.constitutional_cert_path(validator_name);
+crates/amun-orchestrator-certificates/src/lib.rs:117:        self.constitutional_certs
+crates/amun-audit/tests/audit_layer04_byzantine.rs:23:            identity.constitutional_hash,
+crates/amun-audit/tests/audit_layer04_byzantine.rs:69:            foreign.constitutional_hash,
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:22:            identity.constitutional_hash,
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:35:            identity.constitutional_hash,
+crates/amun-constitutional-geometry/src/metrics.rs:91:        if local.constitutional_hash != remote.constitutional_hash {
+crates/amun-constitution-builder/src/digest.rs:22:        hex::encode(self.constitutional_digest())
+crates/amun-snapshot-engine/src/transition.rs:31:                if local.constitutional_hash == remote.constitutional_hash {
+crates/amun-snapshot-engine/src/constitutional_identity.rs:40:        h.update(&self.constitutional_hash);
+crates/amun-snapshot-engine/src/constitutional_identity.rs:58:        w.write_hash(&self.constitutional_hash);
+crates/amun-snapshot-engine/src/manifest.rs:80:        h.update(&self.constitutional_hash);
+crates/amun-snapshot-engine/src/manifest.rs:103:        w.write_hash(&self.constitutional_hash);
+crates/amun-snapshot-engine/src/manifest.rs:192:        self.constitutional_hash = Some(hash);
+crates/amun-snapshot-engine/src/manifest.rs:221:            self.constitutional_hash?,
+crates/amun-snapshot-engine/src/snapshot.rs:38:        w.write_hash(&self.constitutional_hash);
+crates/amun-snapshot-engine/src/compatibility.rs:72:        let same_constitution = local.constitutional_hash == remote.constitutional_hash;
+crates/amun-node/src/main.rs:48:            constitutional_kernel: validator.constitutional_kernel.clone(),
+crates/amun-constitutional-enforcement/src/lib.rs:199:            self.constitutional_count += 1;
+crates/amun-constitutional-enforcement/src/lib.rs:221:        let total = self.constitutional_count + self.unconstitutional_count;
+crates/amun-constitutional-enforcement/src/lib.rs:225:            self.constitutional_count as f64 / total as f64
+crates/amun-constitutional-enforcement/src/lib.rs:241:        assert_eq!(k.constitutional_count, 1);
+crates/amun-state-stream/src/journal.rs:89:        w.write_hash(&self.constitutional_hash);
+crates/amun-constitutional-commitment/tests/verify.rs:37:        commitment.constitutional_root,
+crates/amun-constitutional-commitment/tests/verify.rs:41:    assert!(result.constitutional_root_match);
+crates/amun-constitutional-commitment/tests/verify.rs:56:    let mut tampered = commitment.constitutional_root;
+crates/amun-constitutional-commitment/tests/verify.rs:68:    assert!(!result.constitutional_root_match);
+crates/amun-constitutional-commitment/tests/verify.rs:90:        commitment.constitutional_root,
+crates/amun-constitutional-commitment/tests/verify.rs:94:    assert!(!result.constitutional_root_match);
+crates/amun-constitutional-commitment/tests/verify.rs:119:        commitment.constitutional_root,
+crates/amun-constitutional-commitment/tests/verify.rs:126:        commitment.constitutional_root
+crates/amun-constitutional-commitment/tests/state.rs:49:    assert_eq!(commitment.constitutional_root, loaded.constitutional_root);
+crates/amun-constitutional-commitment/tests/state.rs:88:    assert_ne!(com_a.constitutional_root, com_b.constitutional_root);
+crates/amun-constitutional-commitment/tests/state.rs:108:    assert_ne!(com_a.constitutional_root, com_b.constitutional_root);
+crates/amun-constitutional-commitment/tests/state.rs:127:    assert_eq!(com_a.constitutional_root, com_b.constitutional_root);
+crates/amun-constitutional-commitment/tests/rpc.rs:79:    assert_ne!(status_a.constitutional_root, status_b.constitutional_root);
+crates/amun-constitutional-commitment/tests/endblock_pipeline.rs:61:    assert_ne!(com_a.constitutional_root, com_b.constitutional_root);
+crates/amun-constitutional-commitment/tests/endblock_pipeline.rs:88:    assert_ne!(com_a.constitutional_root, com_b.constitutional_root);
+crates/amun-constitutional-commitment/tests/endblock_pipeline.rs:113:    assert_eq!(com_a.constitutional_root, com_b.constitutional_root);
+crates/amun-constitutional-commitment/src/verify.rs:54:        result.constitutional_root_match && result.commitment_root_match
+crates/amun-constitutional-commitment/src/rpc.rs:30:            constitutional_root: hash_to_hex(&commitment.constitutional_root),
+crates/amun-constitutional-commitment/src/serializer.rs:24:    buf[offset..offset + 32].copy_from_slice(&commitment.constitutional_root);
+crates/amun-constitutional/src/restoration_point.rs:66:        self.constitutional_revision
+crates/amun-constitutional/src/restoration_point.rs:78:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/restoration_point.rs:104:        if self.point_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/restoration_point.rs:117:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/restoration_point.rs:157:        r.point_hash = r.constitutional_hash();
+crates/amun-constitutional/src/replay_certificate.rs:40:        self.constitutional_revision
+crates/amun-constitutional/src/replay_certificate.rs:51:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/replay_certificate.rs:56:            .update_u32(self.scope.constitutional_revision)
+crates/amun-constitutional/src/replay_certificate.rs:89:        if self.certificate_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/replay_certificate.rs:102:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/replay_certificate.rs:115:        if self.scope.constitutional_revision != self.constitutional_revision
+crates/amun-constitutional/src/replay_certificate.rs:166:        c.certificate_hash = c.constitutional_hash();
+crates/amun-constitutional/src/replay_certificate.rs:266:        c.certificate_hash = c.constitutional_hash();
+crates/amun-constitutional/src/replay_certificate.rs:272:        c.scope.constitutional_revision = 2;
+crates/amun-constitutional/src/replay_certificate.rs:273:        c.certificate_hash = c.constitutional_hash();
+crates/amun-constitutional/src/causality_chain.rs:54:        self.constitutional_revision
+crates/amun-constitutional/src/causality_chain.rs:66:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/causality_chain.rs:103:        if self.chain_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/causality_chain.rs:116:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/causality_chain.rs:178:        c.chain_hash = c.constitutional_hash();
+crates/amun-constitutional/src/continuation_chain.rs:67:        self.constitutional_revision
+crates/amun-constitutional/src/continuation_chain.rs:79:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/continuation_chain.rs:104:        if self.chain_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/continuation_chain.rs:117:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/continuation_chain.rs:156:        c.chain_hash = c.constitutional_hash();
+crates/amun-constitutional/src/divergence_resolution.rs:76:        self.constitutional_revision
+crates/amun-constitutional/src/divergence_resolution.rs:88:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/divergence_resolution.rs:114:        if self.resolution_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/divergence_resolution.rs:127:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/divergence_resolution.rs:168:        r.resolution_hash = r.constitutional_hash();
+crates/amun-constitutional/src/transition_evidence.rs:34:        self.constitutional_revision
+crates/amun-constitutional/src/transition_evidence.rs:45:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/transition_evidence.rs:68:        if self.evidence_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/transition_evidence.rs:80:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/transition_evidence.rs:119:        e.evidence_hash = e.constitutional_hash();
+crates/amun-constitutional/src/execution_limits.rs:85:        l.limits_hash = l.constitutional_hash();
+crates/amun-constitutional/src/execution_limits.rs:92:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_limits.rs:127:        if self.limits_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_limits.rs:139:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/certificate_scope.rs:77:            .update_u32(self.constitutional_revision)
+crates/amun-constitutional/src/certificate_scope.rs:112:            || self.constitutional_revision != other.constitutional_revision
+crates/amun-constitutional/src/divergence_point.rs:67:        self.constitutional_revision
+crates/amun-constitutional/src/divergence_point.rs:79:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/divergence_point.rs:107:        if self.divergence_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/divergence_point.rs:120:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/divergence_point.rs:164:        d.divergence_hash = d.constitutional_hash();
+crates/amun-constitutional/src/state_anchor_scope.rs:64:            .update_u32(self.constitutional_revision)
+crates/amun-constitutional/src/state_anchor_scope.rs:88:            || self.constitutional_revision != other.constitutional_revision
+crates/amun-constitutional/src/constitutional_witness.rs:99:        self.constitutional_revision
+crates/amun-constitutional/src/constitutional_witness.rs:111:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/constitutional_witness.rs:148:        if self.witness_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/constitutional_witness.rs:161:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/constitutional_witness.rs:222:        w.witness_hash = w.constitutional_hash();
+crates/amun-constitutional/src/constitutional_witness.rs:305:        w.witness_hash = w.constitutional_hash();
+crates/amun-constitutional/src/execution_receipt.rs:95:        self.constitutional_revision
+crates/amun-constitutional/src/execution_receipt.rs:106:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_receipt.rs:134:        if self.receipt_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_receipt.rs:147:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_receipt.rs:200:        r.receipt_hash = r.constitutional_hash();
+crates/amun-constitutional/src/transition_commitment.rs:31:        self.constitutional_revision
+crates/amun-constitutional/src/transition_commitment.rs:42:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/transition_commitment.rs:65:        if self.commitment_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/transition_commitment.rs:77:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/transition_commitment.rs:114:        c.commitment_hash = c.constitutional_hash();
+crates/amun-constitutional/src/snapshot.rs:72:        self.constitutional_revision
+crates/amun-constitutional/src/snapshot.rs:84:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/snapshot.rs:91:            .update_u32(self.scope.constitutional_revision)
+crates/amun-constitutional/src/snapshot.rs:127:        if self.snapshot_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/snapshot.rs:140:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/snapshot.rs:153:        if self.scope.constitutional_revision != self.constitutional_revision
+crates/amun-constitutional/src/snapshot.rs:215:        s.snapshot_hash = s.constitutional_hash();
+crates/amun-constitutional/src/snapshot.rs:344:        s.snapshot_hash = s.constitutional_hash();
+crates/amun-constitutional/src/canonical_witness.rs:61:        witness.constitutional_revision,
+crates/amun-constitutional/src/causal_edge.rs:54:        self.constitutional_revision
+crates/amun-constitutional/src/causal_edge.rs:66:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/causal_edge.rs:98:        if self.edge_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/causal_edge.rs:111:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/causal_edge.rs:146:        e.edge_hash = e.constitutional_hash();
+crates/amun-constitutional/src/snapshot_scope.rs:95:            .update_u32(self.constitutional_revision)
+crates/amun-constitutional/src/snapshot_scope.rs:123:            || self.constitutional_revision != other.constitutional_revision
+crates/amun-constitutional/src/constitutional_failure.rs:88:        f.failure_hash = f.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs:95:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/constitutional_failure.rs:133:        if self.failure_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/constitutional_failure.rs:145:        if self.constitutional_revision == 0
+crates/amun-constitutional/src/constitutional_failure.rs:188:        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs:193:        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs:198:        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs:203:        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs:209:        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/constitutional_failure.rs:214:        self.failure_hash = self.constitutional_hash();
+crates/amun-constitutional/src/execution_boundary.rs:37:        self.constitutional_revision
+crates/amun-constitutional/src/execution_boundary.rs:48:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_boundary.rs:96:        if self.boundary_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_boundary.rs:108:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_boundary.rs:150:        b.boundary_hash = b.constitutional_hash();
+crates/amun-constitutional/src/execution_boundary.rs:161:        self.boundary_hash = self.constitutional_hash();
+crates/amun-constitutional/src/execution_boundary.rs:166:        self.boundary_hash = self.constitutional_hash();
+crates/amun-constitutional/src/execution_journal.rs:33:        self.constitutional_revision
+crates/amun-constitutional/src/execution_journal.rs:44:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_journal.rs:67:        if self.entry_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_journal.rs:79:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_journal.rs:117:        e.entry_hash = e.constitutional_hash();
+crates/amun-constitutional/src/execution_journal.rs:121:        self.constitutional_revision = constitutional;
+crates/amun-constitutional/src/execution_journal.rs:123:        self.entry_hash = self.constitutional_hash();
+crates/amun-constitutional/src/execution_journal.rs:128:        self.entry_hash = self.constitutional_hash();
+crates/amun-constitutional/src/execution_journal.rs:155:        self.constitutional_revision
+crates/amun-constitutional/src/execution_journal.rs:166:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_journal.rs:187:        if self.journal_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_journal.rs:199:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_journal.rs:226:        j.journal_hash = j.constitutional_hash();
+crates/amun-constitutional/src/execution_journal.rs:232:        if entry.constitutional_revision != self.constitutional_revision {
+crates/amun-constitutional/src/execution_journal.rs:275:        updated.journal_hash = updated.constitutional_hash();
+crates/amun-constitutional/src/state_anchor.rs:67:        self.constitutional_revision
+crates/amun-constitutional/src/state_anchor.rs:79:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/state_anchor.rs:86:            .update_u32(self.scope.constitutional_revision)
+crates/amun-constitutional/src/state_anchor.rs:121:        if self.anchor_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/state_anchor.rs:134:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/state_anchor.rs:147:        if self.scope.constitutional_revision != self.constitutional_revision
+crates/amun-constitutional/src/state_anchor.rs:198:        a.anchor_hash = a.constitutional_hash();
+crates/amun-constitutional/src/state_anchor.rs:299:        a.anchor_hash = a.constitutional_hash();
+crates/amun-constitutional/src/state_anchor.rs:305:        a.scope.constitutional_revision = 2;
+crates/amun-constitutional/src/state_anchor.rs:306:        a.anchor_hash = a.constitutional_hash();
+crates/amun-constitutional/src/execution_context.rs:30:        self.constitutional_revision
+crates/amun-constitutional/src/execution_context.rs:41:            .update_revision(self.constitutional_revision, self.replay_revision)
+crates/amun-constitutional/src/execution_context.rs:63:        if self.context_hash != self.constitutional_hash() {
+crates/amun-constitutional/src/execution_context.rs:75:        if self.constitutional_revision == 0 || self.replay_revision == 0 {
+crates/amun-constitutional/src/execution_context.rs:107:        ctx.context_hash = ctx.constitutional_hash();
+crates/amun-constitutional/src/execution_context.rs:112:        self.context_hash = self.constitutional_hash();
+crates/amun-constitutional/src/execution_context.rs:117:        self.context_hash = self.constitutional_hash();
+crates/amun-constitutional/src/execution_context.rs:122:        self.context_hash = self.constitutional_hash();
+crates/amun-accounts/src/lib.rs:123:        self.constitutional_roots_with_ledger(ledger).state_root
+crates/amun-accounts/src/lib.rs:129:        self.constitutional_roots_with_ledger(&ledger)
+crates/amun-accounts/src/lib.rs:293:        let roots = store.constitutional_roots();
+crates/amun-accounts/src/lib.rs:297:        assert_ne!(roots.constitutional_root, [0u8; 32]);
+crates/amun-networking/src/validator_certificate.rs:110:        self.constitutional.as_ref()
+crates/amun-networking/src/validator_certificate.rs:115:        self.constitutional = Some(cert);
+crates/amun-networking/src/validator_certificate.rs:123:        match &self.constitutional {
+crates/amun-networking/src/validator_certificate.rs:130:        self.constitutional.is_some()
+crates/amun-block-builder/tests/n132_3_6_economic_consistency.rs:78:        .constitutional_roots_with_ledger(&builder.engine.economic);
+crates/amun-block-builder/tests/n132_3_6_economic_consistency.rs:81:        block.constitutional_root, expected.constitutional_root,
+crates/amun-block-builder/tests/n132_3_6_economic_consistency.rs:86:        block.constitutional_root, expected.constitutional_root,
+crates/amun-block-builder/tests/n132_3_6_economic_consistency.rs:124:    assert_ne!(block1.constitutional_root, block2.constitutional_root);
+crates/amun-block-builder/src/lib.rs:79:        hasher.update(&self.constitutional_root);
+crates/amun-block-builder/src/lib.rs:135:            .constitutional_roots_with_ledger(&self.engine.economic);
+crates/amun-block-builder/src/lib.rs:150:            constitutional_root: roots.constitutional_root,
+crates/amun-block-builder/src/lib.rs:271:            block.constitutional_root, [0u8; 32],
+crates/amun-constitutional-signing/tests/signing_tests.rs:51:    assert_eq!(m1.constitutional_digest(), m2.constitutional_digest());
+crates/amun-constitutional-signing/tests/signing_tests.rs:55:    assert_ne!(m1.constitutional_digest(), t.constitutional_digest());
+crates/amun-constitutional-signing/src/signed_artifact.rs:15:        let digest = artifact.constitutional_digest();
+crates/amun-constitutional-signing/src/signed_artifact.rs:33:        let digest = self.artifact.constitutional_digest();
+crates/amun-compatibility/src/matrix.rs:45:        let same_constitution = source.constitutional_hash == target.constitutional_hash;
+crates/amun-rpc/src/lib.rs.bak_rpc_debug:345:    let kernel = state.constitutional_kernel.lock().unwrap();
+crates/amun-rpc/src/lib.rs.bak_rpc_debug:369:            "constitutional_blocks": kernel.constitutional_count,
+crates/amun-rpc/src/lib.rs:351:    let kernel = state.constitutional_kernel.lock().unwrap();
+crates/amun-rpc/src/lib.rs:375:            "constitutional_blocks": kernel.constitutional_count,
+crates/amun-rpc/src/lib.rs.bak_hit:362:    let kernel = state.constitutional_kernel.lock().unwrap();
+crates/amun-rpc/src/lib.rs.bak_hit:386:            "constitutional_blocks": kernel.constitutional_count,
+crates/amun-rpc/src/constitutional.rs:42:            constitutional_root: hex::encode(record.constitutional_root),
+crates/amun-live-cluster/src/validator.rs:293:        let constitutional_kernel_clone = self.constitutional_kernel.clone();
+crates/amun-live-cluster/src/validator.rs:416:                                constitutional_root: block.constitutional_root,
+crates/amun-live-cluster/src/validator.rs:718:                                .map(|r| r.constitutional_root)
+crates/amun-live-cluster/src/bin/rpc_server.rs:34:        constitutional_kernel: validator.constitutional_kernel.clone(),
+crates/amun-nft-mining/tests/n133_mining_tests.rs:13:    assert!(m.constitutional_role == Some("Validator".into()));
+crates/amun-constitutional-authority/src/certificate.rs:58:        tmp.constitutional_scope = scope;
+crates/amun-constitutional-authority/src/certificate.rs:84:        tmp.constitutional_scope = scope;
+crates/amun-civilizational-relations/src/relation.rs:46:        let same_constitution = local.constitutional_hash == remote.constitutional_hash;
+crates/amun-civilizational-relations/src/relation.rs:50:                common_ancestor_hash: local.constitutional_hash,
+crates/amun-chain-store/src/record.rs:65:        assert_eq!(decoded.constitutional_root, record.constitutional_root);
+crates/amun-consensus/src/round_state_machine.rs:134:        if let Some(ref mut kernel) = self.constitutional_kernel {
+crates/amun-state-machine/src/transitions.rs:176:        h.update(&self.constitutional_delta_hash);
+
+================ METHOD CALLS =================
+crates/amun-node/src/peer_handshake.rs:97:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_registry.rs:71:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_registry.rs:92:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_registry.rs:114:        let forged_cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:143:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:162:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:179:        let mut cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:197:        let cert = ValidatorCertificate::issue(
+crates/amun-networking/src/validator_certificate.rs:217:        let cert = ValidatorCertificate::issue(
+crates/amun-live-cluster/src/validator.rs:1082:        let v1_cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:322:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:362:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:401:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:430:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-live-cluster/src/validator.rs:1082:        let v1_cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:322:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:362:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:401:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-authority-registry/src/registry.rs:430:        let cert = ValidatorCertificate::issue_v2(
+crates/amun-networking/src/validator_certificate.rs:122:    pub fn verify_administrative(&self) -> Result<(), String> {
+crates/amun-networking/src/validator_certificate.rs:114:    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+
+================ SERIALIZATION =================
+
+================ NETWORK =================
+crates/amun-node/src/lib.rs:2:pub mod certificate_loader;
+crates/amun-node/src/bootstrap.rs:65:    let cert = crate::certificate_loader::load_validator_certificate(
+crates/amun-node/src/main.rs:2:mod certificate_loader;
+crates/amun-node/src/lib.rs:10:pub mod peer_handshake;
+crates/amun-node/src/main.rs:10:mod peer_handshake;
+crates/amun-node/src/peer_registry.rs:2:use crate::peer_handshake::AuthenticatedPeer;
+crates/amun-consensus-network/src/lib.rs:9:pub mod validator_registry;
+crates/amun-networking/src/lib.rs:50:pub mod validator_registry;
+crates/amun-live-cluster/src/validator.rs:163:                    // Use fully-qualified path to avoid ambiguity with amun_networking::validator_registry
+crates/amun-verified-pipeline/src/vote_pipeline.rs:4:use amun_validator_registry::ValidatorRegistry;

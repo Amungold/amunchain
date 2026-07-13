@@ -1,0 +1,20 @@
+[package]
+name = "amun-orchestrator-service"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Service Manager — process lifecycle, health checks, auto-recovery"
+
+[dependencies]
+libc = "0.2"
+amun-orchestrator-core = { path = "../amun-orchestrator-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tracing = "0.1"
+tokio = { version = "1", features = ["process", "time", "fs", "signal"] }
+async-trait = "0.1"
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tempfile = "3"

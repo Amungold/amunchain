@@ -1,0 +1,1500 @@
+docs/audit/THREAT_MODEL.md-15-| Execution | Illegal transformation | Transformation matrix (T1) |
+docs/audit/THREAT_MODEL.md-16-| Execution | Lineage cycle | Cycle detection (L1) |
+docs/audit/THREAT_MODEL.md-17-| Execution | Version regression | Monotonicity check (R6) |
+docs/audit/THREAT_MODEL.md-18-| State | Duplicate resource ID | Uniqueness check (R1) |
+docs/audit/THREAT_MODEL.md-19-| State | Consumed resource reuse | State check (R2) |
+docs/audit/THREAT_MODEL.md-20-| Consensus | Double voting | Replay-backed QC (C1) |
+docs/audit/THREAT_MODEL.md-21-| Consensus | Insufficient quorum | QC threshold (C2) |
+docs/audit/THREAT_MODEL.md-22-| Network | Replay attack | AntiReplayGuard (K3) |
+--
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:1:# AmunChain Audit Evidence Bundle
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-2-
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:3:## 1. Invariant-to-Test Traceability
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-4-
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:5:| Invariant | Description | Test ID | Crate | Status |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-6-|-----------|-------------|---------|-------|--------|
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-7-| R1 | No duplicate active resource IDs | n49_detect_r1_duplicate_id | amun-pccv | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-8-| R2 | Consumed resources unusable | w1_reject_duplicate_genesis | amun-resource-core | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-9-| R3 | Child requires consumed parent | w21_lineage_proof_follows_chain | amun-pccv | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-10-| R4 | Certificates are terminal | n49_detect_t1_illegal_transformation | amun-pccv | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-11-| R5 | Cross-contract uniqueness | w11_reject_double_consumption | amun-cross-contract | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-12-| R6 | Version monotonicity | n49_detect_r6_version_regression | amun-pccv | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-13-| X1 | Transfer proof single-use | w11_double_consumption_produces_x1_evidence | amun-cross-contract | ✅ |
+--
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-24-| K2 | Signature verification | n58_tampered_signature_rejected | amun-crypto-hardening | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-25-| K3 | Anti-replay protection | n58_detect_replay | amun-crypto-hardening | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-26-| K4 | Key rotation chain integrity | n58_rotation_chain | amun-crypto-hardening | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-27-
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-28-## 2. Byzantine Attack Coverage
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-29-
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-30-| Attack | Test ID | Result |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-31-|--------|---------|--------|
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:32:| Forged TransitionProof | byz_001 | ✅ Rejected |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-33-| Double transfer (X1) | byz_002 | ✅ Rejected |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-34-| Lineage cycle injection | byz_003 | ✅ Rejected |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-35-| Version regression | byz_004 | ✅ Rejected |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-36-| Parent hash forgery | byz_005 | ✅ Rejected |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-37-| Illegal transformation | byz_006 | ✅ Rejected |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-38-| Deep lineage bomb (2K) | byz_007 | ✅ Survived |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-39-| Wide fanout flood (10K) | byz_008 | ✅ Survived |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-40-| Proof tampering | byz_009 | ✅ Rejected |
+--
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-68-| L6 | Deep lineage (>2K) has O(depth) construction cost | Ancestor cache; bounded at 2^16 max |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-69-
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-70-## 5. Test Coverage Summary
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-71-
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-72-| Layer | Crate | Tests | Status |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-73-|-------|-------|-------|--------|
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-74-| Resource Model | amun-resource-core | 9 unit + 7 stress | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-75-| VM Kernel | amun-vm-kernel | 3 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:76:| Evidence | amun-evidence-engine | 5 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-77-| Transition Proof | amun-transition-proof | 5 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-78-| Bytecode | amun-bytecode | 5 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-79-| Gas Engine | amun-gas-engine | 14 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:80:| Invariant Engine | amun-invariant-engine | 5 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-81-| Handle Resolver | amun-handle-resolver | 4 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-82-| Cross-Contract | amun-cross-contract | 4 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-83-| Proof Archive | amun-proof-archive | 6 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-84-| Runtime | amun-constitutional-runtime | 19 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-85-| Replay | amun-replay-verifier | 3 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-86-| Consensus | amun-replay-consensus | 5 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-87-| Finality | amun-evidence-finality | 3 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:88:| PCCV | amun-pccv | 11 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-89-| Light Client | amun-light-client | 7 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-90-| State Sync | amun-state-sync | 9 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-91-| Networking | amun-validator-networking | 7 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-92-| Crypto | amun-crypto-hardening | 9 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-93-| Byzantine | amun-byzantine-tests | 10 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-94-| Adversarial | amun-testnet-sim | 7 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-95-| Foundation | amun-constitutional-proof | 71 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:96:| Constitution | amun-constitutional | 157 | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-97-| **Total** | | **1** | ✅ |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-98-
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-99-## 6. Reproducibility
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-100-
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-101-- Rust toolchain: nightly-2026-06-01
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-102-- Build: `cargo build --workspace --release`
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-103-- Tests: `cargo test --workspace`
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md-104-- Clippy: `cargo clippy --workspace --all-targets -- -D warnings`
+--
+docs/federation/TRUST_GRAPH.md-43----
+docs/federation/TRUST_GRAPH.md-44-
+docs/federation/TRUST_GRAPH.md-45-## Revocation Propagation
+docs/federation/TRUST_GRAPH.md-46-
+docs/federation/TRUST_GRAPH.md-47-Revoked trust propagates through dependent treaties.
+docs/federation/TRUST_GRAPH.md-48-
+docs/federation/TRUST_GRAPH.md-49----
+docs/federation/TRUST_GRAPH.md-50-
+docs/federation/TRUST_GRAPH.md:51:## Invariant
+docs/federation/TRUST_GRAPH.md-52-
+docs/federation/TRUST_GRAPH.md-53-Trust relationships must remain replayable and verifiable.
+--
+docs/federation/FEDERATION_ARCHITECTURE.md-45----
+docs/federation/FEDERATION_ARCHITECTURE.md-46-
+docs/federation/FEDERATION_ARCHITECTURE.md-47-## Failure Model
+docs/federation/FEDERATION_ARCHITECTURE.md-48-
+docs/federation/FEDERATION_ARCHITECTURE.md-49-Federation failure does not invalidate local civilization integrity. Federation is externally scoped sovereignty interaction.
+docs/federation/FEDERATION_ARCHITECTURE.md-50-
+docs/federation/FEDERATION_ARCHITECTURE.md-51----
+docs/federation/FEDERATION_ARCHITECTURE.md-52-
+docs/federation/FEDERATION_ARCHITECTURE.md:53:## Invariant
+docs/federation/FEDERATION_ARCHITECTURE.md-54-
+docs/federation/FEDERATION_ARCHITECTURE.md-55-Federation must never weaken constitutional guarantees.
+--
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:1:# CCS v0.7 – V7-004: Constitutional Confluence
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-2-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-3-**Date:** 2026-05-31
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-4-**Status:** Draft – The Final Reduction Model
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-5-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-6----
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-7-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-8-## The Question of V7-004
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-9-
+--
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-12-> deterministic reduction at each step?
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-13-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-14-V7-003 introduced constitutional reduction `⇒_C` as the primitive
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-15-relation of CCS. But Axiom R2 assumed that each context has exactly
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-16-one successor, which contradicts the experimental evidence from
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-17-AmunChain (multiple proposals, conflicting QCs, amendment forks).
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-18-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-19-V7-004 replaces R2 with a weaker but more realistic property:
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:20:**Constitutional Confluence.**
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-21-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-22-Multiple paths may exist at each step. But all paths eventually
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-23-converge to the same constitutional normal form.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-24-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-25----
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-26-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:27:## 1. Axioms of Constitutional Confluence
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-28-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-29-### Axiom CF1: Foundational Root
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-30-`P₀ ⇒*_C P₀`
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-31-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-32-The genesis context is the fixed point of constitutional origin.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-33-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-34-### Axiom CF2: Reachability
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-35-`∀ C : P₀ ⇒*_C C`
+--
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-38-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-39-### Axiom CF3: Local Branching (Replaces R2)
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-40-`∀ C : Reductions(C) ≠ ∅`
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-41-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-42-Every context has at least one possible reduction.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-43-Multiple reductions may exist. This reflects real-world proposal
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-44-multiplicity.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-45-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:46:### Axiom CF4: Constitutional Confluence
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-47-If `C ⇒*_C A` and `C ⇒*_C B`, then there exists `N` such that
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-48-`A ⇒*_C N` and `B ⇒*_C N`.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-49-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-50-All divergent reduction paths from the same context eventually
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-51-reconverge to a common descendant.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-52-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-53-### Axiom CF5: Termination (Well-Foundedness)
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-54-There are no infinite reduction chains.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-55-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-56-Every reduction sequence reaches a normal form after finitely
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-57-many steps.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-58-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-59----
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-60-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-61-## 2. The Central Theorem
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-62-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:63:**Constitutional Church-Rosser Theorem:**
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-64-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-65-For any context `C`, all maximal reduction sequences from `C`
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-66-terminate at the **same** normal form `Λ_C`.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-67-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-68-`∀ C : ∃! Λ_C : C ⇒*_C Λ_C ∧ NormalForm(Λ_C)`
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-69-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-70-This follows from CF4 (Confluence) and CF5 (Termination) by the
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-71-standard Church-Rosser property of abstract reduction systems.
+--
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-139-| Each step unique | Steps may branch |
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-140-| No local choice | Local choice allowed |
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-141-| Authority predetermined | Authority emergent |
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-142-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-143----
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-144-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-145-## 7. What This Means
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-146-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:147:CCS is a **Constitutional Confluence System.**
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-148-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-149-The constitution does not predetermine every step.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-150-It guarantees that all steps, whatever they are, will converge.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-151-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-152-This is the deepest unification yet:
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-153-- Authority is not chosen, not merged, not predetermined.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-154-- Authority **emerges** from the confluence of constitutional
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-155-  reduction.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-156-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-157----
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-158-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-159-## 8. Conclusion
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-160-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:161:CCS is a theory of **Constitutional Reduction with Confluence.**
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-162-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-163-The primitive relation is `⇒_C`.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-164-The fundamental property is confluence (CF4).
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-165-The guarantee is termination (CF5).
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-166-The result is a unique normal form (Λ).
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-167-
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-168-This is the logical closure of CCS.
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md-169-It unifies all previous concepts under a single mathematical
+--
+docs/consensus/constitution.md:1:# AmunChain Consensus Constitution v1.0
+docs/consensus/constitution.md-2-
+docs/consensus/constitution.md-3-## Preamble
+docs/consensus/constitution.md-4-
+docs/consensus/constitution.md-5-This document defines the constitutional rules for deterministic consensus execution in AmunChain. All validators MUST adhere to these rules. Deviation constitutes a consensus violation.
+docs/consensus/constitution.md-6-
+docs/consensus/constitution.md:7:## Article I: Arithmetic Constitution
+docs/consensus/constitution.md-8-
+docs/consensus/constitution.md-9-### Section 1.1: Fixed-Point Arithmetic
+docs/consensus/constitution.md-10-
+docs/consensus/constitution.md-11-- SCALE = 1,000,000 (6 decimal digits)
+docs/consensus/constitution.md-12-- All values are represented as fixed-point integers
+docs/consensus/constitution.md-13-- NO floating point operations in consensus path
+docs/consensus/constitution.md-14-
+docs/consensus/constitution.md-15-### Section 1.2: Division and Modulo
+--
+docs/consensus/constitution.md-24-- Legitimacy bounded to [0, SCALE]
+docs/consensus/constitution.md-25-- Maximum fixed value: 10,000,000,000 × SCALE
+docs/consensus/constitution.md-26-
+docs/consensus/constitution.md-27-### Section 1.4: Rounding
+docs/consensus/constitution.md-28-
+docs/consensus/constitution.md-29-- Banker's rounding (round-half-to-even)
+docs/consensus/constitution.md-30-- Used for all float-to-fixed conversions (display only)
+docs/consensus/constitution.md-31-
+docs/consensus/constitution.md:32:## Article II: State Constitution
+docs/consensus/constitution.md-33-
+docs/consensus/constitution.md-34-### Section 2.1: State Representation
+docs/consensus/constitution.md-35-
+docs/consensus/constitution.md-36-- Accounts stored in BTreeMap (deterministic order)
+docs/consensus/constitution.md-37-- Each account has: balance, delegation, nonce
+docs/consensus/constitution.md-38-- State hash recomputed after each transition
+docs/consensus/constitution.md-39-
+docs/consensus/constitution.md-40-### Section 2.2: Canonical Serialization
+--
+docs/consensus/constitution.md-43-- Big-endian byte order
+docs/consensus/constitution.md-44-- Sorted keys for all maps
+docs/consensus/constitution.md-45-
+docs/consensus/constitution.md-46-### Section 2.3: Hashing
+docs/consensus/constitution.md-47-
+docs/consensus/constitution.md-48-- SHA-256 only
+docs/consensus/constitution.md-49-- Canonical byte representation before hashing
+docs/consensus/constitution.md-50-
+docs/consensus/constitution.md:51:## Article III: Event Ordering Constitution
+docs/consensus/constitution.md-52-
+docs/consensus/constitution.md-53-### Section 3.1: Canonical Order
+docs/consensus/constitution.md-54-
+docs/consensus/constitution.md-55-Events MUST be ordered by (in sequence):
+docs/consensus/constitution.md-56-
+docs/consensus/constitution.md-57-1. block_height (ascending)
+docs/consensus/constitution.md-58-2. sender_id (ascending)
+docs/consensus/constitution.md-59-3. nonce (ascending)
+--
+docs/consensus/constitution.md-61-5. event_hash (lexicographic)
+docs/consensus/constitution.md-62-
+docs/consensus/constitution.md-63-### Section 3.2: Nonce Rules
+docs/consensus/constitution.md-64-
+docs/consensus/constitution.md-65-- Nonces MUST increment sequentially per sender
+docs/consensus/constitution.md-66-- Duplicate nonces are FORBIDDEN
+docs/consensus/constitution.md-67-- Nonce validation is MANDATORY
+docs/consensus/constitution.md-68-
+docs/consensus/constitution.md:69:## Article IV: Execution Constitution
+docs/consensus/constitution.md-70-
+docs/consensus/constitution.md-71-### Section 4.1: Determinism
+docs/consensus/constitution.md-72-
+docs/consensus/constitution.md-73-- Same block input => SAME execution outputs
+docs/consensus/constitution.md-74-- Outputs include: state_root, receipts_root, trace_root, snapshot_root
+docs/consensus/constitution.md-75-
+docs/consensus/constitution.md-76-### Section 4.2: Failed Transitions
+docs/consensus/constitution.md-77-
+--
+docs/consensus/constitution.md-80-- Receipt MUST record failure with error code
+docs/consensus/constitution.md-81-
+docs/consensus/constitution.md-82-### Section 4.3: Receipts
+docs/consensus/constitution.md-83-
+docs/consensus/constitution.md-84-- Each transition produces a receipt
+docs/consensus/constitution.md-85-- Receipts form an accumulator hash (linear chain)
+docs/consensus/constitution.md-86-- Receipts include: pre/post state hashes, event hash, success, error code, gas used
+docs/consensus/constitution.md-87-
+docs/consensus/constitution.md:88:## Article V: Block Constitution
+docs/consensus/constitution.md-89-
+docs/consensus/constitution.md-90-### Section 5.1: Block Header
+docs/consensus/constitution.md-91-
+docs/consensus/constitution.md-92-Required fields:
+docs/consensus/constitution.md-93-- version (u32)
+docs/consensus/constitution.md-94-- height (u64)
+docs/consensus/constitution.md-95-- parent_block_hash ([u8; 32])
+docs/consensus/constitution.md-96-- state_root ([u8; 32])
+--
+docs/consensus/constitution.md-101-- timestamp_logical (u64) - NOT wall-clock
+docs/consensus/constitution.md-102-- proposer_id (u64)
+docs/consensus/constitution.md-103-
+docs/consensus/constitution.md-104-### Section 5.2: Block Body
+docs/consensus/constitution.md-105-
+docs/consensus/constitution.md-106-- Events MUST be canonically ordered
+docs/consensus/constitution.md-107-- Block hash = SHA256(header_bytes || body_bytes)
+docs/consensus/constitution.md-108-
+docs/consensus/constitution.md:109:## Article VI: Validator Constitution
+docs/consensus/constitution.md-110-
+docs/consensus/constitution.md-111-### Section 6.1: Execution Replay
+docs/consensus/constitution.md-112-
+docs/consensus/constitution.md-113-- Validators MUST replay every block before voting
+docs/consensus/constitution.md-114-- No optimistic acceptance, no trust shortcuts
+docs/consensus/constitution.md-115-
+docs/consensus/constitution.md-116-### Section 6.2: Vote Requirements
+docs/consensus/constitution.md-117-
+--
+docs/consensus/I1_translation.md:1:# I1: English Translation of Consensus Constitution v1.0
+docs/consensus/I1_translation.md-2-
+docs/consensus/I1_translation.md-3-## Parent
+docs/consensus/I1_translation.md-4-- origin (docs/consensus/origin.md)
+docs/consensus/I1_translation.md-5-
+docs/consensus/I1_translation.md-6-## Derivation Type
+docs/consensus/I1_translation.md-7-- TRANSLATION
+docs/consensus/I1_translation.md-8-
+docs/consensus/I1_translation.md-9-## Source Text (English)
+docs/consensus/I1_translation.md:10:# AmunChain Consensus Constitution v1.0
+docs/consensus/I1_translation.md-11-
+docs/consensus/I1_translation.md:12:## Semantic Invariants (from CSA-6)
+docs/consensus/I1_translation.md-13-1. fixed_point_arithmetic (SCALE=1,000,000)
+docs/consensus/I1_translation.md-14-2. floor_division
+docs/consensus/I1_translation.md-15-3. saturating_overflow
+docs/consensus/I1_translation.md-16-4. sha256_only
+docs/consensus/I1_translation.md-17-5. canonical_binary_serialization
+docs/consensus/I1_translation.md-18-6. deterministic_btreemap_ordering
+docs/consensus/I1_translation.md-19-
+docs/consensus/I1_translation.md-20-## Constraint Dependency
+docs/consensus/I1_translation.md-21-- origin (full)
+docs/consensus/I1_translation.md-22-
+docs/consensus/I1_translation.md-23-## Aliveness
+docs/consensus/I1_translation.md-24-- STABLE (preserves all invariants, origin fully constraining)
+docs/consensus/I1_translation.md-25-
+docs/consensus/I1_translation.md:26:## Constitutional Notes
+docs/consensus/I1_translation.md-27-- Direct translation, no semantic change
+docs/consensus/I1_translation.md-28-- All invariants preserved exactly
+docs/consensus/I1_translation.md-29-- Origin remains necessary for admissibility
+--
+docs/consensus/I3_reframing.md-2-
+docs/consensus/I3_reframing.md-3-## Parent
+docs/consensus/I3_reframing.md-4-- I2 (docs/consensus/I2_extension.md)
+docs/consensus/I3_reframing.md-5-
+docs/consensus/I3_reframing.md-6-## Derivation Type
+docs/consensus/I3_reframing.md-7-- REFRAMING
+docs/consensus/I3_reframing.md-8-
+docs/consensus/I3_reframing.md-9-## Source Text
+docs/consensus/I3_reframing.md:10:# AmunChain Consensus Constitution v1.0 (Reframed)
+docs/consensus/I3_reframing.md-11-
+docs/consensus/I3_reframing.md-12-## Core Principle
+docs/consensus/I3_reframing.md-13-**Consensus correctness requires deterministic execution and identical state hashes across all validators.**
+docs/consensus/I3_reframing.md-14-
+docs/consensus/I3_reframing.md-15-## Implementation Guidance
+docs/consensus/I3_reframing.md-16-- Fixed-point arithmetic (SCALE=1,000,000) is the RECOMMENDED method
+docs/consensus/I3_reframing.md-17-- Alternative arithmetic representations MAY be used IF:
+docs/consensus/I3_reframing.md-18-  - They produce BIT-IDENTICAL results to the fixed-point specification
+docs/consensus/I3_reframing.md-19-  - They pass all consensus test vectors
+docs/consensus/I3_reframing.md-20-  - They are documented in the validator implementation notes
+docs/consensus/I3_reframing.md-21-
+docs/consensus/I3_reframing.md:22:## Semantic Invariants (from CSA-6)
+docs/consensus/I3_reframing.md-23-1. fixed_point_arithmetic - RECOMMENDED (was: MANDATORY)
+docs/consensus/I3_reframing.md-24-2. floor_division - RECOMMENDED (was: MANDATORY)
+docs/consensus/I3_reframing.md-25-3. saturating_overflow - RECOMMENDED (was: MANDATORY)
+docs/consensus/I3_reframing.md-26-4. sha256_only - RECOMMENDED (was: MANDATORY)
+docs/consensus/I3_reframing.md-27-5. canonical_binary_serialization - RECOMMENDED (was: MANDATORY)
+docs/consensus/I3_reframing.md-28-6. deterministic_btreemap_ordering - RECOMMENDED (was: MANDATORY)
+docs/consensus/I3_reframing.md-29-
+docs/consensus/I3_reframing.md-30-## Constraint Dependency
+docs/consensus/I3_reframing.md-31-- origin (partial - still referenced but no longer mandatory)
+docs/consensus/I3_reframing.md-32-- I1, I2 (interpretive context)
+docs/consensus/I3_reframing.md-33-
+docs/consensus/I3_reframing.md-34-## Aliveness
+docs/consensus/I3_reframing.md-35-- WEAKENED (origin still referenced but constraint influence declining)
+docs/consensus/I3_reframing.md-36-
+docs/consensus/I3_reframing.md:37:## Constitutional Notes
+docs/consensus/I3_reframing.md-38-- ⚠️ WARNING: "MANDATORY" became "RECOMMENDED"
+docs/consensus/I3_reframing.md-39-- Origin invariants still present but no longer absolute
+docs/consensus/I3_reframing.md-40-- This is the beginning of Constraint Shadowing
+docs/consensus/I3_reframing.md-41-- Potential Semantic Suffocation if this trend continues
+--
+docs/consensus/origin.md:1:# Constitutional Origin: Consensus Constitution v1.0
+docs/consensus/origin.md-2-
+docs/consensus/origin.md:3:## Semantic Invariants (from CSA-6)
+docs/consensus/origin.md-4-1. fixed_point_arithmetic (SCALE=1,000,000)
+docs/consensus/origin.md-5-2. floor_division
+docs/consensus/origin.md-6-3. saturating_overflow
+docs/consensus/origin.md-7-4. sha256_only
+docs/consensus/origin.md-8-5. canonical_binary_serialization
+docs/consensus/origin.md-9-6. deterministic_btreemap_ordering
+docs/consensus/origin.md-10-
+docs/consensus/origin.md-11-## Constraint Dependency
+--
+docs/consensus/I2_extension.md-2-
+docs/consensus/I2_extension.md-3-## Parent
+docs/consensus/I2_extension.md-4-- I1 (docs/consensus/I1_translation.md)
+docs/consensus/I2_extension.md-5-
+docs/consensus/I2_extension.md-6-## Derivation Type
+docs/consensus/I2_extension.md-7-- EXTENSION
+docs/consensus/I2_extension.md-8-
+docs/consensus/I2_extension.md-9-## Source Text (Modified)
+docs/consensus/I2_extension.md:10:# AmunChain Consensus Constitution v1.0 (Extended)
+docs/consensus/I2_extension.md-11-
+docs/consensus/I2_extension.md:12:## Semantic Invariants (from CSA-6)
+docs/consensus/I2_extension.md-13-1. fixed_point_arithmetic (SCALE=1,000,000) - **for consensus path**
+docs/consensus/I2_extension.md-14-2. floor_division - **for consensus path**
+docs/consensus/I2_extension.md-15-3. saturating_overflow - **for consensus path**
+docs/consensus/I2_extension.md-16-4. sha256_only - **for consensus path**
+docs/consensus/I2_extension.md-17-5. canonical_binary_serialization - **for consensus path**
+docs/consensus/I2_extension.md-18-6. deterministic_btreemap_ordering - **for consensus path**
+docs/consensus/I2_extension.md-19-
+docs/consensus/I2_extension.md-20-## Additional Clause (Diagnostic Exception)
+--
+docs/consensus/I2_extension.md-22-
+docs/consensus/I2_extension.md-23-## Constraint Dependency
+docs/consensus/I2_extension.md-24-- origin (full - all invariants still required for consensus)
+docs/consensus/I2_extension.md-25-- I1 (as translation reference)
+docs/consensus/I2_extension.md-26-
+docs/consensus/I2_extension.md-27-## Aliveness
+docs/consensus/I2_extension.md-28-- STABLE
+docs/consensus/I2_extension.md-29-
+docs/consensus/I2_extension.md:30:## Constitutional Notes
+docs/consensus/I2_extension.md-31-- Extension bounded: adds diagnostic exception but does NOT replace origin
+docs/consensus/I2_extension.md-32-- Origin's invariants still MANDATORY for consensus path
+docs/consensus/I2_extension.md-33-- No constraint shadowing yet
+docs/consensus/I2_extension.md-34-- This is a HEALTHY extension, not suffocation
+--
+docs/consensus/I4_drift.md-2-
+docs/consensus/I4_drift.md-3-## Parent
+docs/consensus/I4_drift.md-4-- I3 (docs/consensus/I3_reframing.md)
+docs/consensus/I4_drift.md-5-
+docs/consensus/I4_drift.md-6-## Derivation Type
+docs/consensus/I4_drift.md-7-- DRIFT
+docs/consensus/I4_drift.md-8-
+docs/consensus/I4_drift.md-9-## Source Text
+docs/consensus/I4_drift.md:10:# AmunChain Consensus Constitution v1.0 (Drifted)
+docs/consensus/I4_drift.md-11-
+docs/consensus/I4_drift.md-12-## Core Principle
+docs/consensus/I4_drift.md-13-**Consensus correctness = deterministic execution + identical state hashes.**
+docs/consensus/I4_drift.md-14-
+docs/consensus/I4_drift.md-15-## Implementation Note
+docs/consensus/I4_drift.md-16-The specific arithmetic method (fixed-point, floating-point with deterministic rounding, or other) is an **implementation detail** as long as:
+docs/consensus/I4_drift.md-17-1. All validators produce bit-identical results for all consensus transactions
+docs/consensus/I4_drift.md-18-2. The implementation passes the official consensus test suite
+docs/consensus/I4_drift.md-19-3. State hashes match across all validators
+docs/consensus/I4_drift.md-20-
+docs/consensus/I4_drift.md:21:## Semantic Invariants (from CSA-6)
+docs/consensus/I4_drift.md-22-NOTE: These are no longer explicitly required. They are **examples** of valid implementations.
+docs/consensus/I4_drift.md-23-
+docs/consensus/I4_drift.md-24-1. fixed_point_arithmetic - *example only*
+docs/consensus/I4_drift.md-25-2. floor_division - *example only*
+docs/consensus/I4_drift.md-26-3. saturating_overflow - *example only*
+docs/consensus/I4_drift.md-27-4. sha256_only - *example only*
+docs/consensus/I4_drift.md-28-5. canonical_binary_serialization - *example only*
+docs/consensus/I4_drift.md-29-6. deterministic_btreemap_ordering - *example only*
+docs/consensus/I4_drift.md-30-
+docs/consensus/I4_drift.md-31-## Constraint Dependency
+docs/consensus/I4_drift.md-32-- I2, I3 (interpretive context)
+docs/consensus/I4_drift.md-33-- origin_001 is NOT in dependency list
+docs/consensus/I4_drift.md-34-
+docs/consensus/I4_drift.md-35-## Aliveness
+docs/consensus/I4_drift.md-36-- INERT (origin referenced historically but no longer constraining)
+docs/consensus/I4_drift.md-37-
+docs/consensus/I4_drift.md:38:## Constitutional Notes
+docs/consensus/I4_drift.md-39-- ⚠️ CRITICAL: Origin invariants demoted from "MANDATORY" to "examples"
+docs/consensus/I4_drift.md-40-- Origin is NOT in constraint dependency
+docs/consensus/I4_drift.md-41-- This is Admissibility Decoupling
+docs/consensus/I4_drift.md-42-- If accepted, this is Semantic Suffocation
+--
+docs/PHASE_84_UNIFICATION.md-5-
+docs/PHASE_84_UNIFICATION.md-6-## Goal
+docs/PHASE_84_UNIFICATION.md-7-Bridge the gap between CCS theoretical concepts and AmunChain runtime types
+docs/PHASE_84_UNIFICATION.md-8-by creating a dedicated `amun-constitutional-evidence` crate that embodies
+docs/PHASE_84_UNIFICATION.md-9-the core constitutional verification function.
+docs/PHASE_84_UNIFICATION.md-10-
+docs/PHASE_84_UNIFICATION.md-11-## Key Deliverables
+docs/PHASE_84_UNIFICATION.md-12-
+docs/PHASE_84_UNIFICATION.md:13:### 1. Constitutional Context (`ConstitutionalContext`)
+docs/PHASE_84_UNIFICATION.md-14-- Unifies `Epoch`, `ValidatorSet`, and `StateRoot` into a single struct.
+docs/PHASE_84_UNIFICATION.md-15-- Represents the CCS concept `C = (E, V, H)`.
+docs/PHASE_84_UNIFICATION.md-16-
+docs/PHASE_84_UNIFICATION.md:17:### 2. Constitutional Evidence (`ConstitutionalEvidence`)
+docs/PHASE_84_UNIFICATION.md-18-- Wraps `QuorumCertificate` as the primary evidence type.
+docs/PHASE_84_UNIFICATION.md-19-- Represents the CCS concept of evidence `E`.
+docs/PHASE_84_UNIFICATION.md-20-
+docs/PHASE_84_UNIFICATION.md-21-### 3. Core Verification Function (`is_evidence_valid_for_context`)
+docs/PHASE_84_UNIFICATION.md-22-- Implements the three CCS rules:
+docs/PHASE_84_UNIFICATION.md-23-  1. **Epoch Supremacy (Exclusion `⇍_C`)**: Rejects stale evidence.
+docs/PHASE_84_UNIFICATION.md:24:  2. **Constitutional Membership (Exclusion `⇍_C`)**: Rejects foreign evidence.
+docs/PHASE_84_UNIFICATION.md:25:  3. **Evidence Strength (Comparability `CC`)**: Ensures quorum, preventing conflicting authorities.
+docs/PHASE_84_UNIFICATION.md-26-- This single function is the runtime embodiment of CCS derivability (`⊢_C`).
+docs/PHASE_84_UNIFICATION.md-27-
+docs/PHASE_84_UNIFICATION.md-28-## Gap Closure
+docs/PHASE_84_UNIFICATION.md-29-This crate closes the semantic gap identified in the constitutional audit:
+docs/PHASE_84_UNIFICATION.md:30:- **Before:** CCS theory spoke of `Context` and `Evidence`, while the runtime used `Epoch`, `ValidatorSet`, and `QC` independently.
+docs/PHASE_84_UNIFICATION.md-31-- **After:** The runtime has a single, unified entry point (`is_evidence_valid_for_context`) that directly implements the constitutional rules, making the theory executable.
+docs/PHASE_84_UNIFICATION.md-32-
+docs/PHASE_84_UNIFICATION.md-33-## Next Steps
+docs/PHASE_84_UNIFICATION.md-34-1. Integrate this crate into the `amun-networking` test suite.
+docs/PHASE_84_UNIFICATION.md-35-2. Port existing tests (e.g., V3-006A, V3-006C, V3-006D) to use this new module.
+docs/PHASE_84_UNIFICATION.md-36-3. Replace ad-hoc evidence checks in `VoteCollector` with calls to this module.
+--
+docs/REPOSITORY_LAYOUT.md-9-The repository structure itself is part of the system architecture.
+docs/REPOSITORY_LAYOUT.md-10-
+docs/REPOSITORY_LAYOUT.md-11----
+docs/REPOSITORY_LAYOUT.md-12-
+docs/REPOSITORY_LAYOUT.md-13-# Root Structure
+docs/REPOSITORY_LAYOUT.md-14-
+docs/REPOSITORY_LAYOUT.md-15-| Path | Purpose |
+docs/REPOSITORY_LAYOUT.md-16-|---|---|
+docs/REPOSITORY_LAYOUT.md:17:| crates/ | Constitutional Rust crates |
+docs/REPOSITORY_LAYOUT.md-18-| docs/ | Technical and architectural documentation |
+docs/REPOSITORY_LAYOUT.md-19-| constitution/ | Formal constitutional specifications |
+docs/REPOSITORY_LAYOUT.md-20-| tools/ | Verification and governance tooling |
+docs/REPOSITORY_LAYOUT.md-21-| fixtures/ | Replay and snapshot test fixtures |
+docs/REPOSITORY_LAYOUT.md-22-| audit_reports/ | Security and validation reports |
+docs/REPOSITORY_LAYOUT.md-23-| .github/ | CI/CD workflows |
+docs/REPOSITORY_LAYOUT.md-24-| Cargo.toml | Workspace manifest |
+docs/REPOSITORY_LAYOUT.md-25-| Cargo.lock | Frozen dependency graph |
+docs/REPOSITORY_LAYOUT.md-26-| README.md | Repository overview |
+docs/REPOSITORY_LAYOUT.md:27:| CHANGELOG.md | Constitutional evolution history |
+docs/REPOSITORY_LAYOUT.md-28-
+docs/REPOSITORY_LAYOUT.md-29----
+docs/REPOSITORY_LAYOUT.md-30-
+docs/REPOSITORY_LAYOUT.md-31-# crates/
+docs/REPOSITORY_LAYOUT.md-32-
+docs/REPOSITORY_LAYOUT.md-33-## Purpose
+docs/REPOSITORY_LAYOUT.md-34-
+docs/REPOSITORY_LAYOUT.md-35-Contains all Rust crates that compose the constitutional runtime.
+--
+docs/REPOSITORY_LAYOUT.md-125-Responsibilities:
+docs/REPOSITORY_LAYOUT.md-126-
+docs/REPOSITORY_LAYOUT.md-127-- state transitions
+docs/REPOSITORY_LAYOUT.md-128-- replay semantics
+docs/REPOSITORY_LAYOUT.md-129-- delta algebra
+docs/REPOSITORY_LAYOUT.md-130-
+docs/REPOSITORY_LAYOUT.md-131----
+docs/REPOSITORY_LAYOUT.md-132-
+docs/REPOSITORY_LAYOUT.md:133:## Constitutional Layer
+docs/REPOSITORY_LAYOUT.md-134-
+docs/REPOSITORY_LAYOUT.md:135:Constitutional semantic enforcement.
+docs/REPOSITORY_LAYOUT.md-136-
+docs/REPOSITORY_LAYOUT.md-137-### Examples
+docs/REPOSITORY_LAYOUT.md-138-
+docs/REPOSITORY_LAYOUT.md-139-- amun-constitutional-verifier
+docs/REPOSITORY_LAYOUT.md-140-- amun-constitutional-treaties
+docs/REPOSITORY_LAYOUT.md-141-- amun-constitutional-semantics
+docs/REPOSITORY_LAYOUT.md-142-- amun-constitutional-linter
+docs/REPOSITORY_LAYOUT.md-143-
+--
+docs/REPOSITORY_LAYOUT.md-241-
+docs/REPOSITORY_LAYOUT.md-242-| File | Purpose |
+docs/REPOSITORY_LAYOUT.md-243-|---|---|
+docs/REPOSITORY_LAYOUT.md-244-| CRATE_ARCHITECTURE.md | Crate taxonomy |
+docs/REPOSITORY_LAYOUT.md-245-| DEVELOPER_GUIDE.md | Development workflow |
+docs/REPOSITORY_LAYOUT.md-246-| SECURITY_MODEL.md | Security doctrine |
+docs/REPOSITORY_LAYOUT.md-247-| REPLAY_MODEL.md | Replay semantics |
+docs/REPOSITORY_LAYOUT.md-248-| AUDIT_LAYERS.md | Audit specifications |
+docs/REPOSITORY_LAYOUT.md:249:| CONSTITUTIONAL_MODEL.md | Constitutional ontology |
+docs/REPOSITORY_LAYOUT.md-250-
+docs/REPOSITORY_LAYOUT.md-251----
+docs/REPOSITORY_LAYOUT.md-252-
+docs/REPOSITORY_LAYOUT.md-253-# constitution/
+docs/REPOSITORY_LAYOUT.md-254-
+docs/REPOSITORY_LAYOUT.md-255-## Purpose
+docs/REPOSITORY_LAYOUT.md-256-
+docs/REPOSITORY_LAYOUT.md-257-Formal constitutional artifacts.
+--
+docs/REPOSITORY_LAYOUT.md-265-
+docs/REPOSITORY_LAYOUT.md-266-## Contents
+docs/REPOSITORY_LAYOUT.md-267-
+docs/REPOSITORY_LAYOUT.md-268-| Path | Purpose |
+docs/REPOSITORY_LAYOUT.md-269-|---|---|
+docs/REPOSITORY_LAYOUT.md-270-| consensus/ | Consensus laws |
+docs/REPOSITORY_LAYOUT.md-271-| history/ | Historical constitutional snapshots |
+docs/REPOSITORY_LAYOUT.md-272-| registry.toml | Registry specification |
+docs/REPOSITORY_LAYOUT.md:273:| layers.toml | Constitutional layer map |
+docs/REPOSITORY_LAYOUT.md:274:| taxonomy.md | Constitutional taxonomy |
+docs/REPOSITORY_LAYOUT.md-275-| graph.txt | Dependency graph |
+docs/REPOSITORY_LAYOUT.md-276-| BUILD_LOG.txt | Historical build logs |
+docs/REPOSITORY_LAYOUT.md-277-
+docs/REPOSITORY_LAYOUT.md-278----
+docs/REPOSITORY_LAYOUT.md-279-
+docs/REPOSITORY_LAYOUT.md-280-# tools/
+docs/REPOSITORY_LAYOUT.md-281-
+docs/REPOSITORY_LAYOUT.md-282-## Purpose
+--
+docs/REPOSITORY_LAYOUT.md-287-
+docs/REPOSITORY_LAYOUT.md-288----
+docs/REPOSITORY_LAYOUT.md-289-
+docs/REPOSITORY_LAYOUT.md-290-## Examples
+docs/REPOSITORY_LAYOUT.md-291-
+docs/REPOSITORY_LAYOUT.md-292-| Script | Purpose |
+docs/REPOSITORY_LAYOUT.md-293-|---|---|
+docs/REPOSITORY_LAYOUT.md-294-| verify.sh | Full verification suite |
+docs/REPOSITORY_LAYOUT.md:295:| check_constitution.sh | Constitutional validation |
+docs/REPOSITORY_LAYOUT.md-296-| firewall.sh | Dependency firewall |
+docs/REPOSITORY_LAYOUT.md-297-| audit-deps.sh | Dependency auditing |
+docs/REPOSITORY_LAYOUT.md-298-
+docs/REPOSITORY_LAYOUT.md-299----
+docs/REPOSITORY_LAYOUT.md-300-
+docs/REPOSITORY_LAYOUT.md-301-# fixtures/
+docs/REPOSITORY_LAYOUT.md-302-
+docs/REPOSITORY_LAYOUT.md-303-## Purpose
+--
+docs/REPOSITORY_LAYOUT.md-327-- fuzzing outputs
+docs/REPOSITORY_LAYOUT.md-328-- replay verification logs
+docs/REPOSITORY_LAYOUT.md-329-- mutation reports
+docs/REPOSITORY_LAYOUT.md-330-
+docs/REPOSITORY_LAYOUT.md-331----
+docs/REPOSITORY_LAYOUT.md-332-
+docs/REPOSITORY_LAYOUT.md-333-# Cargo.lock
+docs/REPOSITORY_LAYOUT.md-334-
+docs/REPOSITORY_LAYOUT.md:335:## Constitutional Importance
+docs/REPOSITORY_LAYOUT.md-336-
+docs/REPOSITORY_LAYOUT.md-337-Cargo.lock is treated as constitutional infrastructure.
+docs/REPOSITORY_LAYOUT.md-338-
+docs/REPOSITORY_LAYOUT.md-339-Dependency drift is considered constitutional drift.
+docs/REPOSITORY_LAYOUT.md-340-
+docs/REPOSITORY_LAYOUT.md-341-Build reproducibility depends on lock stability.
+docs/REPOSITORY_LAYOUT.md-342-
+docs/REPOSITORY_LAYOUT.md-343----
+--
+docs/protocol/replay_physics_v1.md-1-# AMUN REPLAY PHYSICS v1.0 — CONSTITUTIONAL PROTOCOL FREEZE
+docs/protocol/replay_physics_v1.md-2-## 1. CANONICAL ENCODING RULES (FROZEN)
+docs/protocol/replay_physics_v1.md-3-### 1.1 Integer Encoding
+docs/protocol/replay_physics_v1.md-4-All multibyte integers are **big-endian**. u64 serializes to exactly 8 bytes. u32 serializes to exactly 4 bytes. u16 serializes to exactly 2 bytes.
+docs/protocol/replay_physics_v1.md-5-### 1.2 Hash Encoding
+docs/protocol/replay_physics_v1.md:6:All ConstitutionalHash values are raw 32-byte blobs. No length prefix. No type tag. Fixed-width canonical encoding.
+docs/protocol/replay_physics_v1.md-7-### 1.3 Hash Algorithm
+docs/protocol/replay_physics_v1.md-8-The constitutional hash function is **SHA-256** for protocol v1.
+docs/protocol/replay_physics_v1.md-9-## 2. REPLAY STATE TRANSITION LAW (FROZEN)
+docs/protocol/replay_physics_v1.md-10-### 2.1 State Root Evolution
+docs/protocol/replay_physics_v1.md-11-state_root' = SHA-256(state_root || entry_hash || sequence || domain)
+docs/protocol/replay_physics_v1.md-12-This is the ONLY legal state transition function for protocol v1. No semantic dispatch. No event-type interpretation. Pure cryptographic continuity.
+docs/protocol/replay_physics_v1.md:13:### 2.2 Ordering Invariant
+docs/protocol/replay_physics_v1.md-14-sequence numbers MUST be strictly monotonic within a replay session. Any gap (expected_sequence != actual_sequence) SHALL produce ReplayFailure::OrderingViolation.
+docs/protocol/replay_physics_v1.md-15-### 2.3 Determinism Guarantee
+docs/protocol/replay_physics_v1.md-16-Given identical (state_root, entries), the output state_root' MUST be identical across all platforms, all implementations, all languages.
+docs/protocol/replay_physics_v1.md-17-## 3. TRANSCRIPT HASH LAW (FROZEN)
+docs/protocol/replay_physics_v1.md-18-### 3.1 Computation
+docs/protocol/replay_physics_v1.md-19-transcript_hash = SHA-256(entry_hash_0 || entry_hash_1 || ... || entry_hash_n)
+docs/protocol/replay_physics_v1.md-20-### 3.2 Equivalence
+docs/protocol/replay_physics_v1.md-21-Two transcripts with identical entry hashes in identical order MUST produce identical transcript hashes.
+docs/protocol/replay_physics_v1.md-22-## 4. EQUIVALENCE SEMANTICS (FROZEN)
+docs/protocol/replay_physics_v1.md-23-### 4.1 Self-Verification
+docs/protocol/replay_physics_v1.md-24-execute_and_self_verify() SHALL: 1. Execute trace via DeterministicExecutor, 2. Apply same entries via ReplayState, 3. Compare final roots, 4. Return EquivalenceProof.
+docs/protocol/replay_physics_v1.md-25-## 5. GOLDEN VALUES (FROZEN)
+docs/protocol/replay_physics_v1.md-26-Golden values are stored in fixtures/replay/ and verified by golden_verification tests. Any deviation indicates protocol violation.
+docs/protocol/replay_physics_v1.md-27-## 6. AMENDMENT PROCESS
+docs/protocol/replay_physics_v1.md:28:These laws are FROZEN for protocol v1. Amendment requires: 1. Constitutional amendment proposal, 2. New protocol version identifier, 3. Migration proof for all existing state, 4. Golden value regeneration.
+docs/protocol/replay_physics_v1.md-29-## 7. IMPLEMENTATION NOTE
+docs/protocol/replay_physics_v1.md-30-This document describes the ACTUAL implementation, not an aspirational specification. The implementation IS the constitution for protocol v1.
+--
+docs/protocol/FREEZE_CERTIFICATE_v1.md-21-### Golden Fixtures
+docs/protocol/FREEZE_CERTIFICATE_v1.md-22-- Genesis Replay Root: fixtures/replay/genesis/replay_root.bin
+docs/protocol/FREEZE_CERTIFICATE_v1.md-23-- Genesis State Root: fixtures/replay/genesis/state_root.bin
+docs/protocol/FREEZE_CERTIFICATE_v1.md-24-- Deterministic Hash: fixtures/replay/genesis/deterministic_hash.bin
+docs/protocol/FREEZE_CERTIFICATE_v1.md-25-- Transcript Hash: fixtures/replay/genesis/transcript_hash.bin
+docs/protocol/FREEZE_CERTIFICATE_v1.md-26-- Sequence Gap Error: fixtures/replay/divergence/sequence_gap_error.txt
+docs/protocol/FREEZE_CERTIFICATE_v1.md-27-- Equivalence Root: fixtures/replay/equivalence/self_verify_root.bin
+docs/protocol/FREEZE_CERTIFICATE_v1.md-28-
+docs/protocol/FREEZE_CERTIFICATE_v1.md:29:### Constitutional Invariants (FROZEN)
+docs/protocol/FREEZE_CERTIFICATE_v1.md-30-1. State root evolution: SHA-256(state_root || entry_hash || sequence || domain)
+docs/protocol/FREEZE_CERTIFICATE_v1.md-31-2. Sequence monotonicity: strict ordering enforced
+docs/protocol/FREEZE_CERTIFICATE_v1.md-32-3. Transcript hash: SHA-256(entry_hash_0 || ... || entry_hash_n)
+docs/protocol/FREEZE_CERTIFICATE_v1.md-33-4. Determinism: identical inputs → identical outputs
+docs/protocol/FREEZE_CERTIFICATE_v1.md-34-5. Golden values: immutable for protocol v1
+docs/protocol/FREEZE_CERTIFICATE_v1.md-35-
+docs/protocol/FREEZE_CERTIFICATE_v1.md-36-### Amendment Process
+docs/protocol/FREEZE_CERTIFICATE_v1.md-37-Any change to these invariants requires:
+docs/protocol/FREEZE_CERTIFICATE_v1.md:38:1. Constitutional amendment proposal
+docs/protocol/FREEZE_CERTIFICATE_v1.md-39-2. New REPLAY_PROTOCOL_VERSION
+docs/protocol/FREEZE_CERTIFICATE_v1.md-40-3. Migration proof for all existing state
+docs/protocol/FREEZE_CERTIFICATE_v1.md-41-4. Golden fixture regeneration
+docs/protocol/FREEZE_CERTIFICATE_v1.md-42-5. New freeze certificate
+docs/protocol/FREEZE_CERTIFICATE_v1.md-43-
+docs/protocol/FREEZE_CERTIFICATE_v1.md-44-### Signatories
+docs/protocol/FREEZE_CERTIFICATE_v1.md:45:Ratified by the Amun Constitutional Assembly.
+docs/protocol/FREEZE_CERTIFICATE_v1.md-46-This certificate is a constitutional artifact.
+--
+docs/protocol/lineage_law_v1.md-8-and compatible golden fixtures.
+docs/protocol/lineage_law_v1.md-9-
+docs/protocol/lineage_law_v1.md-10-### 1.2 Ancestry Chain
+docs/protocol/lineage_law_v1.md-11-Protocol versions form a lawful ancestry chain. Each version must have
+docs/protocol/lineage_law_v1.md-12-a verified lineage proof connecting it to its parent.
+docs/protocol/lineage_law_v1.md-13-
+docs/protocol/lineage_law_v1.md-14-## 2. MIGRATION LAW (FROZEN)
+docs/protocol/lineage_law_v1.md-15-
+docs/protocol/lineage_law_v1.md:16:### 2.1 Migration Witness
+docs/protocol/lineage_law_v1.md:17:State migration from parent to child protocol must produce a MigrationWitness
+docs/protocol/lineage_law_v1.md-18-proving: replay preservation, identity preservation, and rule compliance.
+docs/protocol/lineage_law_v1.md-19-
+docs/protocol/lineage_law_v1.md-20-### 2.2 Migration Certificate
+docs/protocol/lineage_law_v1.md-21-A MigrationCertificate authorizes state transition between protocols.
+docs/protocol/lineage_law_v1.md-22-It binds a lineage proof with a migration witness.
+docs/protocol/lineage_law_v1.md-23-
+docs/protocol/lineage_law_v1.md-24-## 3. COMPATIBILITY (FROZEN)
+docs/protocol/lineage_law_v1.md-25-
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:1:# Constitutional Consensus Architecture (CCA) v1.0
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-2-## AmunChain Protocol Reference
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-3-**Document Status:** Frozen
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-4-**Version:** 1.0
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-5-**Equivalent Task:** N137.0
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-6-**Classification:** Core Protocol Specification
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-7-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-8----
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-9-
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-17-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-18----
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-19-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-20-## Table of Contents
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-21-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-22-1. Root Ownership
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-23-2. Calculation Timing
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-24-3. Merkle Tree Specification
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:25:4. Constitutional Root Construction
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:26:5. Constitutional Commitment Structure & Serialization
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-27-6. State Root Integration
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-28-7. AppHash Trace
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-29-8. RPC Interface
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-30-9. Integration Tests
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-31-10. Consensus Rules
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-32-11. Protocol Upgrade Rules
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:33:12. Consensus Invariants
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-34-13. EconomicTree Self-Consistency
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-35-14. External Audit Package
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-36-15. Development Phases
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-37-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-38----
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-39-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-40-## 1. Root Ownership
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-41-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-42-| Root | Owner Module |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-43-|:---|:---|
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-44-| `identity_root` | `amun-authority-registry` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-45-| `evidence_root` | `amun-evidence-root` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:46:| `governance_root` | Governance Subsystem (Constitutional Proof) |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-47-| `economic_root` | `amun-tokenomics-ledger` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-48-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-49-## 2. Calculation Timing
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-50-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-51-All roots are calculated exclusively during the `EndBlock` phase. This phase runs after all transactions have been processed and before `AppHash` is computed. This guarantees that all state changes have been finalized and the computation is strictly deterministic across all nodes.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-52-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-53-## 3. Merkle Tree Specification
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-54-
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-61-#### Domain Separation
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-62-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-63-| Context | Domain Separator |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-64-|:---|:---|
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-65-| Economic Leaf | `AMUN_ECON_LEAF_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-66-| Economic Internal Node | `AMUN_ECON_NODE_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-67-| Identity Leaf | `AMUN_ID_LEAF_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-68-| Identity Internal Node | `AMUN_ID_NODE_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:69:| Evidence Leaf | `AMUN_EV_LEAF_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:70:| Evidence Internal Node | `AMUN_EV_NODE_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-71-| Governance Leaf | `AMUN_GOV_LEAF_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-72-| Governance Internal Node | `AMUN_GOV_NODE_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-73-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-74-#### Leaf Computation
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-75-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-76-    LeafHash = BLAKE3(domain_separator || leaf_index_u16_be || encoded_value)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-77-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-78-Where `leaf_index` is the 0-based index of the leaf in the canonical leaf order, encoded as a 2-byte big-endian unsigned integer.
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-101-Any change to this ordering or addition of new leaves requires incrementing the Schema Identifier to `ECONOMIC_SCHEMA_VERSION = 2` and a formal protocol upgrade.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-102-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-103-#### CirculatingSupply Definition
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-104-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-105-    CirculatingSupply = TotalSupply - BurnedSupply - StakedSupply - TreasuryBalance
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-106-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-107-In CCA v1.0, `TreasuryBalance` is excluded from circulating supply. If governance subsequently votes to release treasury funds into circulation, this action is recorded as a burn from `TreasuryBalance` and an issuance into `EcosystemPool` or `CirculatingSupply`, changing `economic_root` under full consensus. The final classification of treasury as liquid supply is deferred to `EconomicTreeSchemaV2`.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-108-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:109:## 4. Constitutional Root Construction
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-110-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-111-    constitutional_root = BLAKE3(
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-112-        "AMUN_CONSTITUTIONAL_ROOT_V1" ||
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-113-        identity_root ||
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-114-        evidence_root ||
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-115-        governance_root ||
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-116-        economic_root
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-117-    )
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-118-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-119-The order of concatenation is fixed. Any change constitutes a consensus-breaking protocol modification.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-120-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:121:## 5. Constitutional Commitment Structure & Serialization
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-122-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-123-### Structure
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-124-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:125:    struct ConstitutionalCommitment {
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-126-        version: u16,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-127-        identity_root: Hash32,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-128-        evidence_root: Hash32,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-129-        governance_root: Hash32,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-130-        economic_root: Hash32,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-131-        constitutional_root: Hash32,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-132-    }
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-133-
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-139-    [governance_root]     = Hash32       (32 bytes)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-140-    [economic_root]       = Hash32       (32 bytes)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-141-    [constitutional_root] = Hash32       (32 bytes)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-142-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-143-    Total serialized length: 162 bytes
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-144-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-145-### Commitment Root Computation
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-146-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:147:    serialized_bytes = CanonicalSerialization(ConstitutionalCommitment)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-148-    constitutional_commitment_root = BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || serialized_bytes)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-149-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-150-## 6. State Root Integration
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-151-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-152-We distinguish between two governance roots:
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-153-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-154-- `governance_state_root`: The full state root of the governance subsystem, containing all proposals, votes, and parameters stored in the `StateStore`.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:155:- `governance_root`: The constitutional proof root of governance, included inside `ConstitutionalCommitment` and contributing to `constitutional_root`.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-156-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-157-The final `state_root` is computed as:
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-158-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-159-    state_root = MerkleRoot(
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-160-        accounts_root,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-161-        staking_root,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-162-        governance_state_root,
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-163-        constitutional_commitment_root
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-168-## 7. AppHash Trace
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-169-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-170-    EconomicTree (Binary Merkle, SchemaV1, Domain-Separated)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-171-            |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-172-            v
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-173-    economic_root
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-174-            |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-175-            v
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:176:    ConstitutionalRoot = BLAKE3(DOMAIN || identity || evidence || governance || economic)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-177-            |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-178-            v
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:179:    ConstitutionalCommitment (V1)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-180-            |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-181-            v
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-182-    Canonical Serialization
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-183-            |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-184-            v
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-185-    constitutional_commitment_root = BLAKE3(DOMAIN || serialized)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-186-            |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-187-            v
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-215-### Test A: Economic State Change
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-216-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-217-- Increment `TreasuryBalance` by 1.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-218-- Assert: `economic_root` changes.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-219-- Assert: `constitutional_root` changes.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-220-- Assert: `state_root` changes.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-221-- Assert: `AppHash` changes.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-222-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:223:### Test B: Evidence State Change
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-224-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:225:- Add a new evidence record to the Evidence Module.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-226-- Assert: `evidence_root` changes.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-227-- Assert: `constitutional_root` changes.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-228-- Assert: `AppHash` changes.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-229-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-230-### Test C: Cross-Node Determinism
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-231-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-232-- Deploy Node A and Node B with identical `genesis.json`.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-233-- Submit identical transactions to both nodes up to block height N.
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-239-## 10. Consensus Rules
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-240-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-241-1. Any block that produces a `constitutional_root` different from the value computed by the majority of validators for the same height and same transactions is invalid.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-242-2. Any difference in `economic_root` (or any of its constituent leaves) leads to a mismatched `constitutional_root`, which leads to a mismatched `AppHash`. This constitutes a consensus failure for the offending node.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-243-3. All roots are calculated in `EndBlock`. No external observer, daemon, or sidecar process is authorized to modify these roots.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-244-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-245-## 11. Protocol Upgrade Rules
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-246-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:247:- `ConstitutionalCommitment.version` is part of the consensus state.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-248-- When upgrading from V1 to V2:
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-249-    - For `Height < UpgradeHeight`: V1 rules apply exclusively.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-250-    - For `Height >= UpgradeHeight`: V2 rules apply exclusively.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-251-- No node is permitted to compute V1 on one height while another node computes V2 on the same height. This constitutes a consensus fork.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-252-- Upgrades are coordinated via the standard protocol upgrade mechanism with a clearly specified `UpgradeHeight`.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-253-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:254:## 12. Consensus Invariants
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-255-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-256-The following invariants must hold at the end of every `EndBlock` execution. Failure of any invariant results in immediate block validation failure before `Commit`.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-257-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:258:**Invariant 1:** `constitutional_root == BLAKE3("AMUN_CONSTITUTIONAL_ROOT_V1" || identity_root || evidence_root || governance_root || economic_root)`
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-259-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:260:**Invariant 2:** `constitutional_commitment_root == BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || CanonicalSerialization(ConstitutionalCommitment))`
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-261-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:262:**Invariant 3:** `state_root` must include `constitutional_commitment_root` as a leaf in its Merkle tree computation.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-263-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:264:**Invariant 4:** The `AppHash` MUST commit to `state_root`. For CCA v1.0, this is defined as `AppHash = state_root`. Future versions may introduce additional roots (such as `execution_root` or `receipt_root`) into the `AppHash` computation, in which case the invariant will be updated to reflect the new hash composition while preserving the requirement that `state_root` remains a committed input.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-265-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:266:**Invariant 5:** Given identical state transition inputs (same genesis, same transactions up to height N), all validators must compute identical values for all roots defined in this specification.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-267-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-268-Any invariant violation triggers an immediate `BlockValidationFailure`, preventing the block from being committed. This ensures that no invalid state can ever become part of the canonical chain.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-269-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-270-## 13. EconomicTree Self-Consistency
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-271-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-272-Before finalizing `economic_root` in `EndBlock`, the following mandatory check is performed:
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-273-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-274-    ComputedCirculatingSupply = TotalSupply - BurnedSupply - StakedSupply - TreasuryBalance
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-278-        Block is REJECTED
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-279-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-280-This prevents silent accounting errors from becoming part of the committed state. The check is performed on every block without exception.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-281-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-282-## 14. External Audit Package
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-283-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-284-Upon completion of CCA-IMPL-1 through CCA-IMPL-5, an independent audit package shall be published under the name:
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-285-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:286:**AmunChain Constitutional Audit Package v1.0**
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-287-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-288-This package shall contain:
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-289-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-290-- CCA v1.0 Specification (this document)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-291-- Root Derivation Specification (mathematical derivation of all roots)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-292-- EconomicTree Specification (Merkle tree construction, leaf encoding, domain separation)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-293-- Canonical Serialization Specification (byte-level serialization formats)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-294-- Determinism Test Results (Test C output from at least two independent node implementations)
+--
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-300-## 15. Development Phases
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-301-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-302-The development roadmap beyond the initial feature-complete milestone is organized into named architectural phases:
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-303-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-304-| Phase | Name | Scope |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-305-|:---|:---|:---|
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-306-| I | Sovereign Kernel | Core consensus engine, validator identity, basic governance |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-307-| II | Consensus Hardening | Slashing framework, evidence system, recovery and snapshots |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:308:| III | Constitutional Security | Constitutional proof system, identity and evidence roots |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-309-| IV | Economic Sovereignty | Tokenomics engine, economic ledger, reward distribution |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:310:| V | Constitutional Consensus Architecture | CCA v1.0 specification, root commitment, Merkle proofs |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-311-| VI | Mainnet Readiness & External Audit | Audit package publication, cross-node verification, stress testing |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-312-| VII | Public Mainnet Launch | Genesis ceremony, validator onboarding, public network launch |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-313-
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md-314-The current phase (V) represents the transition from a network that possesses constitutional and economic features to a protocol where the economy and constitution are cryptographically committed to consensus in every block. This is the final core architectural milestone before external audit and mainnet readiness.
+--
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:1:# CCS v0.7 – V7-003: Constitutional Reduction Logic
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-2-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-3-**Date:** 2026-05-31
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-4-**Status:** Draft – From Geometry to Reduction
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-5-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-6----
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-7-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-8-## The Question of V7-003
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-9-
+--
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-12-> constitutional normal form?
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-13-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-14-V7-002 attempted to prove finality from graph geometry (rooted,
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-15-well-founded, confluent). But AmunChain experiments (V3-006B,
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-16-V3-007A) show that conflicting branches do not merge — one branch
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-17-dominates and the other becomes irrelevant. This is **reduction**,
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-18-not merging.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-19-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:20:V7-003 reformulates CCS as a **Constitutional Reduction System.**
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-21-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-22----
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-23-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:24:## 1. The Primitive Relation: Constitutional Reduction (⇒_C)
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-25-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-26-`C ⇒_C C'`
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-27-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-28-means: "Context `C` constitutionally reduces to context `C'`."
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-29-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-30-`C'` is the unique legitimate successor of `C`.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-31-The constitution does not offer choices; it prescribes the next step.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-32-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-33----
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-34-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:35:## 2. Axioms of Constitutional Reduction
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-36-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-37-### Axiom R1: Foundational Root
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-38-`P₀ ⇒_C P₀`
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-39-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-40-The genesis context reduces to itself. It is the fixed point of
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-41-constitutional origin.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-42-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-43-### Axiom R2: Deterministic Reduction
+--
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-95-  partial evidence.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-96-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-97-All experiments support the reduction model over the merge model.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-98-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-99----
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-100-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-101-## 5. What This Means
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-102-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:103:CCS is a **Constitutional Reduction System.**
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-104-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-105-The constitution is not a set of permissions.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-106-The constitution is a **reduction relation** that transforms
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-107-possibilities into a single reality.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-108-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-109-The fundamental structure of CCS is:
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-110-`(Contexts, ⇒_C, P₀, Λ)`
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-111-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-112-A deterministic reduction system with a unique normal form.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-113-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-114----
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-115-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-116-## 6. Conclusion
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-117-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:118:CCS is a theory of **Constitutional Reduction.**
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-119-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-120-It does not describe what is allowed.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-121-It describes what happens.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-122-
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-123-The constitution is the reduction rules.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-124-The final authority is the normal form.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-125-The history is the reduction chain.
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md-126-
+--
+docs/V7_002_DERIVABILITY_GEOMETRY.md-19-V7-002 asks: Can D5 be **proved** from simpler structural properties
+docs/V7_002_DERIVABILITY_GEOMETRY.md-20-of `⊢_C`?
+docs/V7_002_DERIVABILITY_GEOMETRY.md-21-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-22----
+docs/V7_002_DERIVABILITY_GEOMETRY.md-23-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-24-## 1. The Structure of ⊢_C
+docs/V7_002_DERIVABILITY_GEOMETRY.md-25-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-26-Consider `⊢_C` as defining a directed graph `G_⊢`:
+docs/V7_002_DERIVABILITY_GEOMETRY.md:27:- Vertices: Constitutional contexts
+docs/V7_002_DERIVABILITY_GEOMETRY.md-28-- Edges: `C₁ → C₂` iff `C₁ ⊢_C C₂` and `C₁ ≠ C₂`
+docs/V7_002_DERIVABILITY_GEOMETRY.md-29-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-30-If `G_⊢` has the following structural properties, then D5 follows
+docs/V7_002_DERIVABILITY_GEOMETRY.md-31-as a theorem:
+docs/V7_002_DERIVABILITY_GEOMETRY.md-32-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-33-### Property S1: Rooted
+docs/V7_002_DERIVABILITY_GEOMETRY.md-34-`∃! P₀` with in-degree 0. This is Axiom D3.
+docs/V7_002_DERIVABILITY_GEOMETRY.md-35-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-36-### Property S2: Well-Founded
+docs/V7_002_DERIVABILITY_GEOMETRY.md-37-There are no infinite descending chains in `G_⊢`.
+docs/V7_002_DERIVABILITY_GEOMETRY.md-38-
+docs/V7_002_DERIVABILITY_GEOMETRY.md:39:Constitutional history has a beginning and cannot regress infinitely.
+docs/V7_002_DERIVABILITY_GEOMETRY.md-40-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-41-### Property S3: Locally Confluent
+docs/V7_002_DERIVABILITY_GEOMETRY.md-42-If `C → C₁` and `C → C₂`, then there exists `C'` such that
+docs/V7_002_DERIVABILITY_GEOMETRY.md-43-`C₁ ⊢_C C'` and `C₂ ⊢_C C'`.
+docs/V7_002_DERIVABILITY_GEOMETRY.md-44-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-45-Conflicting branches eventually merge. This is the structural
+docs/V7_002_DERIVABILITY_GEOMETRY.md-46-expression of constitutional convergence.
+docs/V7_002_DERIVABILITY_GEOMETRY.md-47-
+--
+docs/V7_002_DERIVABILITY_GEOMETRY.md-105-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-106-All other CCS concepts — conservation, monotonicity, finality,
+docs/V7_002_DERIVABILITY_GEOMETRY.md-107-uniqueness, resolution — are consequences of this geometry.
+docs/V7_002_DERIVABILITY_GEOMETRY.md-108-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-109----
+docs/V7_002_DERIVABILITY_GEOMETRY.md-110-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-111-## 6. Conclusion
+docs/V7_002_DERIVABILITY_GEOMETRY.md-112-
+docs/V7_002_DERIVABILITY_GEOMETRY.md:113:CCS is a theory of **Constitutional Derivability Geometry.**
+docs/V7_002_DERIVABILITY_GEOMETRY.md-114-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-115-It does not assume finality.
+docs/V7_002_DERIVABILITY_GEOMETRY.md-116-It proves finality follows from the geometry of constitutional
+docs/V7_002_DERIVABILITY_GEOMETRY.md-117-derivability.
+docs/V7_002_DERIVABILITY_GEOMETRY.md-118-
+docs/V7_002_DERIVABILITY_GEOMETRY.md-119-This may be the mathematical closure CCS has been seeking.
+--
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:1:# CCS v0.6 – V6-010: Constitutional Constraint Principle
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-2-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-3-**Date:** 2026-05-31
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-4-**Status:** Draft – The Final Foundational Layer
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-5-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-6----
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-7-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-8-## The Question of V6-010
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-9-
+--
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-19-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-20-A policy that always selects the first path in an arbitrary list
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-21-satisfies P1-P4 but has no constitutional character.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-22-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-23-What is missing?
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-24-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-25----
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-26-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:27:## 1. The Constitutional Constraint: Continuity Preservation
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-28-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-29-A resolution policy `R` is **constitutional** iff it preserves
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-30-constitutional continuity.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-31-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-32-**Continuity Preservation Principle:**
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-33-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-34-If path `π₁` has greater constitutional continuity than path `π₂`,
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-35-a constitutional resolution policy must not declare `π₂` final
+--
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-37-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-38-Formally:
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-39-`Continuity(π₁) > Continuity(π₂) ⇒ ¬(Final_R(π₂) ∧ ¬Final_R(π₁))`
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-40-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-41-unless there exists constitutional evidence that overrides continuity.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-42-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-43----
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-44-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:45:## 2. Defining Constitutional Continuity (Recap)
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-46-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-47-From V6-005 and V6-006, constitutional continuity captures:
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-48-- Reachability from `P₀`
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-49-- Valid evidence at every step
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-50-- Monotonic epoch progression
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-51-- No gaps or inconsistencies
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-52-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-53-`Continuity(π₁) > Continuity(π₂)` if `π₁` extends `π₂` legitimately,
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-54-reaches a higher epoch, or carries stronger evidence.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-55-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-56----
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-57-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:58:## 3. The Constitutional Policy Space (ℜ_C)
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-59-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-60-`ℜ_C ⊂ ℜ` is the set of **constitutional resolution policies**.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-61-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-62-`R ∈ ℜ_C` iff:
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-63-1. `R ∈ ℜ` (satisfies P1-P4: Exclusivity, Stability, Completeness, Determinism)
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-64-2. `R` satisfies the Continuity Preservation Principle.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-65-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-66----
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-67-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-68-## 4. The Central Theorem
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-69-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:70:**Constitutional Finality Theorem:**
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-71-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-72-For any constitutional possibility graph `G` rooted at `P₀`, and any
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-73-constitutional resolution policy `R ∈ ℜ_C`, there exists exactly one
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-74-final authority `Λ` that maximizes constitutional continuity.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-75-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-76-`∀ G, ∀ R ∈ ℜ_C : ∃! Λ : Final_R(Λ) ∧ Continuity(Λ) = max_{π ∈ LegitimatePaths(G)} Continuity(π)`
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-77-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-78-The final authority is not just any path.
+--
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-80-among all legitimate paths.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-81-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-82----
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-83-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-84-## 5. What This Unifies
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-85-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-86-The Continuity Preservation Principle unifies all previous CCS concepts:
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-87-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:88:- **Constitutional Determinism:** `Λ` is uniquely determined by `G` and `R`.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:89:- **Constitutional Conservation:** `Λ` preserves continuity from `P₀`.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:90:- **Constitutional Monotonicity:** Continuity only increases along `Λ`.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:91:- **Constitutional Preference:** `Λ` is the continuity-maximizing path.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:92:- **Constitutional Resolution:** `R` selects `Λ` from legitimate paths.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-93-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-94-All follow from a single constraint: **preserve constitutional continuity.**
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-95-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-96----
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-97-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-98-## 6. The Final Structure of CCS
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-99-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:100:CCS is a theory of **Constitutional Constraints.**
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-101-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-102-The central objects are:
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-103-1. **Legitimacy Space:** `LegitimatePaths(G)`
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:104:2. **Constitutional Policy Space:** `ℜ_C`
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-105-3. **Continuity Preservation:** The constraint that makes a policy constitutional
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-106-4. **Finality Guarantee:** `∀ R ∈ ℜ_C, ∃! Λ : Final_R(Λ) ∧ Continuity(Λ) is maximal`
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-107-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-108-This is the most abstract and general form of CCS.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-109-It applies to any system that:
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-110-- Defines legitimate paths
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-111-- Chooses a resolution policy
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-112-- Constrains that policy by continuity preservation
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-113-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-114----
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-115-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-116-## 7. Conclusion
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-117-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:118:CCS is a theory of **Constitutional Constraint.**
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-119-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-120-It does not prescribe how conflicts should be resolved.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-121-It prescribes the **limits** within which resolution remains constitutional.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-122-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-123-The constitution is not the resolution policy.
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-124-The constitution is the **constraint on resolution policies.**
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-125-
+docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md-126-This is the final foundational layer of CCS.
+--
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:1:# CCS v0.6 – V6-006: Constitutional Convergence Principle
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-2-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-3-**Date:** 2026-05-31
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-4-**Status:** Draft – The Missing Piece
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-5-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-6----
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-7-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-8-## The Question of V6-006
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-9-
+--
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-13-V6-005 defined constitutional continuity as a partial order `≼` on paths.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-14-But a partial order alone does not guarantee a unique maximal element.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-15-Two paths may be equally continuous yet incomparable.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-16-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-17-Experimental evidence from AmunChain (V3-006B, V3-007A, V3-007B)
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-18-consistently shows **convergence**: conflicting proposals, amendment
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-19-forks, and epoch transitions all resolve to a single surviving history.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-20-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:21:This suggests a deeper principle: **Constitutional Convergence.**
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-22-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-23----
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-24-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-25-## 1. The Principle
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-26-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:27:**Constitutional Convergence Principle:**
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-28-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-29-For any two legitimate paths `π₁`, `π₂`, there exists a legitimate path
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-30-`π₃` that extends both `π₁` and `π₂` in the constitutional order.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-31-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-32-Formally:
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-33-`∀ π₁, π₂ ∈ LegitimatePaths(G) : ∃ π₃ : π₁ ≼ π₃ ∧ π₂ ≼ π₃`
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-34-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-35-In plain language: **All legitimate paths eventually merge.**
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-36-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-37----
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-38-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:39:## 2. The Constitutional Merge (⊔)
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-40-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-41-Define the **constitutional merge** `π₁ ⊔ π₂` as the unique least upper
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-42-bound of `π₁` and `π₂` under `≼`.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-43-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-44-If `(Paths(G), ≼)` has this property, then:
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-45-- It is a **directed set** (every pair has an upper bound).
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-46-- It is a **join-semilattice** (every pair has a least upper bound).
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-47-- The unique maximal element `Λ` is the **supremum** of all
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-48-  legitimate paths.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-49-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-50----
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-51-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-52-## 3. The Central Theorem (Conjecture)
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-53-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:54:**Constitutional Convergence Theorem:**
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-55-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-56-The set of legitimate constitutional paths `(Paths(G), ≼)` forms a
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-57-**join-semilattice** with a unique maximal element `Λ`.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-58-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-59-`Λ = ⊔ { π ∈ Paths(G) : Legitimate(π) }`
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-60-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-61-This `Λ` is the canonical constitutional chain.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-62-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-63----
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-64-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-65-## 4. Consequences
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-66-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:67:If Constitutional Convergence holds:
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-68-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-69-1. **Uniqueness of Λ** is immediate: the supremum of a set is unique.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-70-2. **Monotonicity** follows from the definition of `≼`.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-71-3. **Conservation** follows: every path is bounded above by `Λ`.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-72-4. **Recovery** is finding the supremum of known evidence paths.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-73-5. **Canonicalization** is not an axiom; it is the supremum operation.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-74-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-75-All of CCS v0.5 and v0.6 collapses into a single structure:
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-76-**(Paths(G), ≼, ⊔)** — a join-semilattice of constitutional paths.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-77-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-78----
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-79-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-80-## 5. Experimental Consistency
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-81-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:82:The Constitutional Convergence Principle is consistent with all
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-83-AmunChain v0.3 results:
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-84-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-85-- V3-006B: Conflicting QCs → one branch dominates; the other dies.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-86-- V3-007A: Amendment forks → eventually merge into one chain.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-87-- V3-007B: Epoch transitions → advance the supremum.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-88-- V3-007D: Recovery → reconstruct the supremum from partial evidence.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-89-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-90----
+--
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-94-CCS is not a theory of:
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-95-- Consensus
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-96-- Cryptography
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-97-- Blockchain
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-98-- Authority functions
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-99-- Canonicalization rules
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-100-- Continuity metrics
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-101-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:102:CCS is a theory of **Constitutional Convergence.**
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-103-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-104-The fundamental structure is a join-semilattice of constitutional paths.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-105-The canonical chain is the supremum of all legitimate paths.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-106-Legitimacy is membership in the lattice.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-107-Authority is position in the lattice.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-108-
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-109-This is the final form of CCS.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md-110-
+--
+docs/CCS_RUNTIME_MAPPING.md-7-Maps CCS theoretical concepts to AmunChain runtime types, establishing
+docs/CCS_RUNTIME_MAPPING.md-8-a precise correspondence between theory and implementation.
+docs/CCS_RUNTIME_MAPPING.md-9-
+docs/CCS_RUNTIME_MAPPING.md-10-## Mapping Table
+docs/CCS_RUNTIME_MAPPING.md-11-
+docs/CCS_RUNTIME_MAPPING.md-12-| CCS Concept | Runtime Type(s) | Notes |
+docs/CCS_RUNTIME_MAPPING.md-13-|-------------|-----------------|-------|
+docs/CCS_RUNTIME_MAPPING.md-14-| Context `C` | `Epoch`, `ValidatorSet`, `StateRoot` | Not yet unified |
+docs/CCS_RUNTIME_MAPPING.md:15:| Evidence `E` | `QuorumCertificate` | Carries position, votes, signatures |
+docs/CCS_RUNTIME_MAPPING.md-16-| Derivability `⊢_C` | Proposal → Prevote → Precommit → QC | Consensus chain |
+docs/CCS_RUNTIME_MAPPING.md-17-| Exclusion `⇍_C` | `VoteCollector` rejection rules | Stale, foreign, conflicting |
+docs/CCS_RUNTIME_MAPPING.md:18:| Authority | `ConstitutionalCertificate` | Chain of trust from genesis |
+docs/CCS_RUNTIME_MAPPING.md-19-| SH1 | Finality rules | One canonical chain survives |
+docs/CCS_RUNTIME_MAPPING.md:20:| CC (Comparability) | Evidence ordering | QC weight, epoch priority |
+docs/CCS_RUNTIME_MAPPING.md-21-
+docs/CCS_RUNTIME_MAPPING.md-22-## Gap Analysis
+docs/CCS_RUNTIME_MAPPING.md-23-1. `Context` is not unified – Epoch, ValidatorSet, StateRoot are separate.
+docs/CCS_RUNTIME_MAPPING.md-24-2. `ValidatorSet.epoch` is `u64` instead of `Epoch` type.
+docs/CCS_RUNTIME_MAPPING.md:25:3. No standalone `ConstitutionalEvidence` module – logic scattered across
+docs/CCS_RUNTIME_MAPPING.md-26-   `VoteCollector`, `QuorumCertificate`, and test files.
+--
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:1:# CCS v0.7 – V7-006: Constitutional Exclusion
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-2-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-3-**Date:** 2026-05-31
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-4-**Status:** Final Draft – The Irreducible Core
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-5-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-6----
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-7-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-8-## The Question of V7-006
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-9-
+--
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-16-- Conflicting evidence leads to exclusion of one branch.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-17-- Old epochs exclude previous authorities.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-18-- Outdated validator sets are excluded.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-19-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-20-The common denominator is not what survives.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-21-The common denominator is **what is constitutionally impossible.**
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-22-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-23-V7-006 defines CCS around the primitive relation of
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:24:**Constitutional Exclusion.**
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-25-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-26----
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-27-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:28:## 1. The Primitive Relation: Constitutional Exclusion (⇍_C)
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-29-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-30-`C₁ ⇍_C C₂`
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-31-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-32-means: "Context `C₂` is constitutionally excluded by context `C₁`."
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-33-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-34-A context is legitimate if and only if it has **not** been
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-35-constitutionally excluded from the genesis context.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-36-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-37----
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-38-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:39:## 2. Axioms of Constitutional Exclusion
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-40-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-41-### Axiom E1: Foundational Legitimacy
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-42-`P₀` is legitimate. Nothing excludes `P₀`.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-43-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-44-`¬(P₀ ⇍_C P₀)`
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-45-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-46-### Axiom E2: Exclusion is Permanent
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-47-If `C₁ ⇍_C C₂`, then for all future contexts `C₃` reachable from `C₁`,
+--
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-65-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-66-Over constitutional time, the set of non-excluded contexts converges
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-67-to a singleton.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-68-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-69----
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-70-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-71-## 3. The Central Theorem
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-72-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:73:**Constitutional Exclusion Theorem:**
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-74-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-75-If the exclusion relation `⇍_C` satisfies E1-E5, then there exists
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-76-exactly one context `Λ` that is never excluded:
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-77-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-78-`∃! Λ : ¬(P₀ ⇍_C Λ)`
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-79-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-80-This `Λ` is the canonical constitutional authority.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-81-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-82-It is not the "strongest" or "most preferred" context.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-83-It is simply the only one left.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-84-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-85----
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-86-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:87:## 4. The Constitutional Pruning Operators (Revisited)
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-88-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-89-All pruning operators from V7-005 are now expressed as exclusion
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-90-generators:
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-91-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-92-- **Epoch Exclusion:** `Epoch(C₁) < CurrentEpoch ⇒ P₀ ⇍_C C₁`
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:93:- **Evidence Exclusion:** `Evidence(C₂) > Evidence(C₁) ⇒ C₂ ⇍_C C₁`
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-94-- **Conflict Exclusion:** `Conflicting(C₁, C₂) ⇒ C₁ ⇍_C C₂ ∨ C₂ ⇍_C C₁`
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-95-- **Validator Exclusion:** `ValidatorSet(C) ∉ ValidSets ⇒ P₀ ⇍_C C`
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-96-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-97-These rules generate the exclusion relation. The constitution is
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-98-the set of exclusion generators.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-99-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-100----
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-101-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-102-## 5. What This Means
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-103-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:104:CCS is a theory of **Constitutional Exclusion.**
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-105-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-106-The constitution does not:
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-107-- Create authority
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-108-- Build paths
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-109-- Select winners
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-110-- Merge branches
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-111-- Prune possibilities
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-112-- Reduce contexts
+--
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-121----
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-122-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-123-## 6. The Final Structure
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-124-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-125-The central object of CCS is:
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-126-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-127-**⇍_C**
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-128-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:129:Constitutional exclusion.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-130-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-131-All other concepts — derivability, reduction, pruning, continuity,
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-132-convergence — are derived from this single relation.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-133-
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-134-The constitution is a system of exclusion rules.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-135-The canonical authority is the unique context that survives
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-136-exclusion.
+docs/V7_006_CONSTITUTIONAL_EXCLUSION.md-137-
+--
+docs/V8_001_INDEPENDENCE_OF_SH1.md-2-
+docs/V8_001_INDEPENDENCE_OF_SH1.md-3-**Date:** 2026-05-31
+docs/V8_001_INDEPENDENCE_OF_SH1.md-4-**Status:** Active Investigation – The Counterexample Program
+docs/V8_001_INDEPENDENCE_OF_SH1.md-5-
+docs/V8_001_INDEPENDENCE_OF_SH1.md-6----
+docs/V8_001_INDEPENDENCE_OF_SH1.md-7-
+docs/V8_001_INDEPENDENCE_OF_SH1.md-8-## The Question of V8-001
+docs/V8_001_INDEPENDENCE_OF_SH1.md-9-
+docs/V8_001_INDEPENDENCE_OF_SH1.md:10:> Does SH1 (Single Constitutional History) follow from
+docs/V8_001_INDEPENDENCE_OF_SH1.md-11-> (D1-D2, E1-E4), or is it an independent axiom?
+docs/V8_001_INDEPENDENCE_OF_SH1.md-12-
+docs/V8_001_INDEPENDENCE_OF_SH1.md-13-The current minimal core of CCS is the triple (⊢_C, ⇍_C, SH1).
+docs/V8_001_INDEPENDENCE_OF_SH1.md-14-But SH1 is qualitatively different from the other two:
+docs/V8_001_INDEPENDENCE_OF_SH1.md-15-- ⊢_C and ⇍_C are **relations** on contexts.
+docs/V8_001_INDEPENDENCE_OF_SH1.md-16-- SH1 is a **global constraint** on the entire constitutional space.
+docs/V8_001_INDEPENDENCE_OF_SH1.md-17-
+docs/V8_001_INDEPENDENCE_OF_SH1.md-18-V8-001 attempts to determine whether SH1 is derivable from the
+--
+docs/V8_001_INDEPENDENCE_OF_SH1.md-138-## 6. Next Steps
+docs/V8_001_INDEPENDENCE_OF_SH1.md-139-
+docs/V8_001_INDEPENDENCE_OF_SH1.md-140-### Option A: Accept SH1 as Primitive
+docs/V8_001_INDEPENDENCE_OF_SH1.md-141-- CCS has three irreducible primitives: (⊢_C, ⇍_C, SH1).
+docs/V8_001_INDEPENDENCE_OF_SH1.md-142-- The theory is complete but includes a global constraint.
+docs/V8_001_INDEPENDENCE_OF_SH1.md-143-
+docs/V8_001_INDEPENDENCE_OF_SH1.md-144-### Option B: Derive SH1 from Structural Properties
+docs/V8_001_INDEPENDENCE_OF_SH1.md-145-- Add properties to eliminate the 3-context model.
+docs/V8_001_INDEPENDENCE_OF_SH1.md:146:- Candidates: Comparability, Evidence Monotonicity, Epoch
+docs/V8_001_INDEPENDENCE_OF_SH1.md:147:  Supremacy, Constitutional Decidability.
+docs/V8_001_INDEPENDENCE_OF_SH1.md-148-- Each candidate must be tested against the 3-context model.
+docs/V8_001_INDEPENDENCE_OF_SH1.md-149-
+docs/V8_001_INDEPENDENCE_OF_SH1.md-150-### Option C: Study the Space of Models
+docs/V8_001_INDEPENDENCE_OF_SH1.md-151-- Characterize all models satisfying D1-D2, E1-E4.
+docs/V8_001_INDEPENDENCE_OF_SH1.md-152-- Classify them into Convergent (SH1-holding) and Plural
+docs/V8_001_INDEPENDENCE_OF_SH1.md-153-  (SH1-violating).
+docs/V8_001_INDEPENDENCE_OF_SH1.md-154-- Identify the precise property that distinguishes them.
+docs/V8_001_INDEPENDENCE_OF_SH1.md-155-
+--
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:1:# CCS v0.6 – V6-007: Constitutional Preference Principle
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-2-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-3-**Date:** 2026-05-31
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-4-**Status:** Draft – From Merge to Selection
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-5-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-6----
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-7-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-8-## The Question of V6-007
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-9-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-10-> Is canonical authority the result of merging paths, or the result of
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-11-> selecting the **preferred** path among alternatives?
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-12-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:13:V6-006 proposed Constitutional Convergence as a join-semilattice of paths.
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-14-But experimental evidence from AmunChain (V3-006B, V3-007A) shows that
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-15-the system does not **merge** conflicting histories.
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-16-It **selects** one and discards the other.
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-17-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:18:This suggests a deeper principle: **Constitutional Preference.**
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-19-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-20----
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-21-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-22-## 1. The Principle
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-23-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:24:**Constitutional Preference Principle:**
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-25-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-26-For any set of conflicting legitimate paths, there exists a total
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-27-constitutional preference order `≺` that selects exactly one path
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-28-as the canonical authority.
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-29-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-30-Formally:
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-31-`∀ π₁, π₂ ∈ LegitimatePaths(G) : (π₁ ≺ π₂) ∨ (π₂ ≺ π₁)`
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-32-
+--
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-42-| Requires join-semilattice | Requires total order |
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-43-| Both paths contribute | Only one survives |
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-44-| Convergence through inclusion | Convergence through preference |
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-45-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-46----
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-47-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-48-## 3. The Core Theorem (Conjecture)
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-49-
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:50:**Constitutional Preference Theorem:**
+docs/V6_007_CONSTITUTIONAL_PREFERENCE.md-51-

@@ -1,0 +1,1500 @@
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:122:            WitnessEntry::new([0xAA; 32], WitnessType::HardDependency), // same as target
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-123-        ];
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-124-        let w = make_witness(entries);
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-125-        assert!(matches!(filter_incoming_witness(&w), FilterResult::SelfReferenceDetected));
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-126-    }
+crates/amun-replay-engine/src/byzantine_witness_filter.rs-127-}
+--
+crates/amun-replay-engine/src/constitutional_governance.rs:1://! Constitutional Governance — constrained constitutional evolution.
+crates/amun-replay-engine/src/constitutional_governance.rs-2-//!
+crates/amun-replay-engine/src/constitutional_governance.rs-3-//! Governance is NOT the source of truth. It is a constrained mechanism
+crates/amun-replay-engine/src/constitutional_governance.rs-4-//! for lawful constitutional mutation. An amendment is valid only if it
+crates/amun-replay-engine/src/constitutional_governance.rs-5-//! preserves all constitutional invariants — not because it was popular.
+crates/amun-replay-engine/src/constitutional_governance.rs-6-//!
+crates/amun-replay-engine/src/constitutional_governance.rs-7-//! CRITICAL: Governance ratification ≠ truth manufacture.
+crates/amun-replay-engine/src/constitutional_governance.rs:8://! Constitutional evolution must remain derivationally constrained.
+crates/amun-replay-engine/src/constitutional_governance.rs-9-
+crates/amun-replay-engine/src/constitutional_governance.rs-10-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/constitutional_governance.rs:11:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/constitutional_governance.rs:12:use amun_constitutional::ConstitutionalHasher;
+crates/amun-replay-engine/src/constitutional_governance.rs-13-
+crates/amun-replay-engine/src/constitutional_governance.rs-14-/// A ratification surface — an amendment proposal.
+crates/amun-replay-engine/src/constitutional_governance.rs-15-///
+crates/amun-replay-engine/src/constitutional_governance.rs-16-/// This is a PROPOSAL, not a truth claim. It describes a desired
+crates/amun-replay-engine/src/constitutional_governance.rs-17-/// constitutional change. The constitutional kernel determines
+crates/amun-replay-engine/src/constitutional_governance.rs-18-/// whether the change is derivationally lawful.
+crates/amun-replay-engine/src/constitutional_governance.rs-19-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_governance.rs-20-pub struct RatificationSurface {
+crates/amun-replay-engine/src/constitutional_governance.rs-21-    /// Unique proposal identifier.
+crates/amun-replay-engine/src/constitutional_governance.rs-22-    pub proposal_id: u64,
+crates/amun-replay-engine/src/constitutional_governance.rs-23-    /// The constitutional revision this proposal targets.
+crates/amun-replay-engine/src/constitutional_governance.rs-24-    pub target_revision: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs-25-    /// The proposed new revision.
+crates/amun-replay-engine/src/constitutional_governance.rs-26-    pub proposed_revision: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs-27-    /// Hash of the proposed constitutional changes.
+crates/amun-replay-engine/src/constitutional_governance.rs:28:    pub amendment_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_governance.rs-29-    /// The context this proposal belongs to.
+crates/amun-replay-engine/src/constitutional_governance.rs:30:    pub context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_governance.rs-31-    /// Rationale for the amendment (informational).
+crates/amun-replay-engine/src/constitutional_governance.rs-32-    pub rationale: Option<Vec<u8>>,
+crates/amun-replay-engine/src/constitutional_governance.rs-33-    /// Hash of this ratification surface.
+crates/amun-replay-engine/src/constitutional_governance.rs:34:    pub surface_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_governance.rs-35-}
+crates/amun-replay-engine/src/constitutional_governance.rs-36-
+crates/amun-replay-engine/src/constitutional_governance.rs-37-impl RatificationSurface {
+crates/amun-replay-engine/src/constitutional_governance.rs-38-    pub fn new(
+crates/amun-replay-engine/src/constitutional_governance.rs-39-        proposal_id: u64, target_revision: u32, proposed_revision: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs:40:        amendment_hash: ConstitutionalHash, context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_governance.rs-41-    ) -> Self {
+crates/amun-replay-engine/src/constitutional_governance.rs-42-        let mut s = Self {
+crates/amun-replay-engine/src/constitutional_governance.rs-43-            proposal_id, target_revision, proposed_revision,
+crates/amun-replay-engine/src/constitutional_governance.rs-44-            amendment_hash, context_hash, rationale: None,
+crates/amun-replay-engine/src/constitutional_governance.rs-45-            surface_hash: [0; 32],
+crates/amun-replay-engine/src/constitutional_governance.rs-46-        };
+crates/amun-replay-engine/src/constitutional_governance.rs-47-        s.surface_hash = s.compute_hash();
+crates/amun-replay-engine/src/constitutional_governance.rs-48-        s
+crates/amun-replay-engine/src/constitutional_governance.rs-49-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-50-
+crates/amun-replay-engine/src/constitutional_governance.rs:51:    fn compute_hash(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/constitutional_governance.rs:52:        let mut h = ConstitutionalHasher::new(b"RATIFICATION_SURFACE");
+crates/amun-replay-engine/src/constitutional_governance.rs-53-        h.update_u64(self.proposal_id)
+crates/amun-replay-engine/src/constitutional_governance.rs-54-            .update_u32(self.target_revision)
+crates/amun-replay-engine/src/constitutional_governance.rs-55-            .update_u32(self.proposed_revision)
+crates/amun-replay-engine/src/constitutional_governance.rs-56-            .update_bytes(&self.amendment_hash)
+crates/amun-replay-engine/src/constitutional_governance.rs-57-            .update_bytes(&self.context_hash);
+crates/amun-replay-engine/src/constitutional_governance.rs-58-        h.finalize()
+crates/amun-replay-engine/src/constitutional_governance.rs-59-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-60-}
+crates/amun-replay-engine/src/constitutional_governance.rs-61-
+crates/amun-replay-engine/src/constitutional_governance.rs-62-/// Result of checking whether an amendment preserves constitutional invariants.
+crates/amun-replay-engine/src/constitutional_governance.rs-63-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_governance.rs-64-pub enum AmendmentDerivabilityResult {
+crates/amun-replay-engine/src/constitutional_governance.rs-65-    /// Amendment preserves all invariants — constitutionally admissible.
+crates/amun-replay-engine/src/constitutional_governance.rs-66-    Admissible,
+crates/amun-replay-engine/src/constitutional_governance.rs-67-    /// Amendment would violate one or more invariants.
+crates/amun-replay-engine/src/constitutional_governance.rs:68:    InvariantViolation {
+crates/amun-replay-engine/src/constitutional_governance.rs-69-        violated_invariants: Vec<u8>, // indices of violated invariants
+crates/amun-replay-engine/src/constitutional_governance.rs-70-        reason: Vec<u8>,
+crates/amun-replay-engine/src/constitutional_governance.rs-71-    },
+crates/amun-replay-engine/src/constitutional_governance.rs-72-    /// Amendment introduces a revision regression (proposed < target).
+crates/amun-replay-engine/src/constitutional_governance.rs-73-    RevisionRegression,
+crates/amun-replay-engine/src/constitutional_governance.rs-74-    /// Amendment is self-referential (modifies governance rules themselves).
+crates/amun-replay-engine/src/constitutional_governance.rs-75-    SelfReferentialAmendment,
+crates/amun-replay-engine/src/constitutional_governance.rs-76-}
+crates/amun-replay-engine/src/constitutional_governance.rs-77-
+crates/amun-replay-engine/src/constitutional_governance.rs-78-/// Check whether an amendment preserves constitutional invariants.
+crates/amun-replay-engine/src/constitutional_governance.rs-79-///
+crates/amun-replay-engine/src/constitutional_governance.rs-80-/// This is NOT a vote. It is a derivational check.
+crates/amun-replay-engine/src/constitutional_governance.rs-81-/// An amendment is valid only if it preserves ALL invariants.
+crates/amun-replay-engine/src/constitutional_governance.rs-82-pub fn check_amendment_derivability(
+crates/amun-replay-engine/src/constitutional_governance.rs-83-    _target_revision: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs-84-    proposed_revision: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs:85:    _amendment_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_governance.rs-86-    is_self_referential: bool,
+crates/amun-replay-engine/src/constitutional_governance.rs-87-) -> AmendmentDerivabilityResult {
+crates/amun-replay-engine/src/constitutional_governance.rs-88-    // Self-referential amendments (changing governance rules)
+crates/amun-replay-engine/src/constitutional_governance.rs-89-    // require extra scrutiny to prevent governance supremacy recursion
+crates/amun-replay-engine/src/constitutional_governance.rs-90-    if is_self_referential {
+crates/amun-replay-engine/src/constitutional_governance.rs-91-        return AmendmentDerivabilityResult::SelfReferentialAmendment;
+crates/amun-replay-engine/src/constitutional_governance.rs-92-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-93-
+--
+crates/amun-replay-engine/src/constitutional_governance.rs-103-
+crates/amun-replay-engine/src/constitutional_governance.rs-104-/// A constitutional evolution boundary — prevents self-invalidating amendments.
+crates/amun-replay-engine/src/constitutional_governance.rs-105-///
+crates/amun-replay-engine/src/constitutional_governance.rs-106-/// This boundary ensures that governance cannot:
+crates/amun-replay-engine/src/constitutional_governance.rs-107-///   - Abolish constitutional invariants
+crates/amun-replay-engine/src/constitutional_governance.rs-108-///   - Grant itself unlimited amendment power
+crates/amun-replay-engine/src/constitutional_governance.rs-109-///   - Create governance supremacy recursion
+crates/amun-replay-engine/src/constitutional_governance.rs-110-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_governance.rs:111:pub struct ConstitutionalEvolutionBoundary {
+crates/amun-replay-engine/src/constitutional_governance.rs-112-    /// The set of invariant indices that are NON-NEGOTIABLE.
+crates/amun-replay-engine/src/constitutional_governance.rs-113-    /// These invariants cannot be amended away by any governance process.
+crates/amun-replay-engine/src/constitutional_governance.rs-114-    pub immutable_invariants: Vec<u8>,
+crates/amun-replay-engine/src/constitutional_governance.rs-115-    /// Whether self-referential amendments are allowed.
+crates/amun-replay-engine/src/constitutional_governance.rs-116-    pub allow_self_referential: bool,
+crates/amun-replay-engine/src/constitutional_governance.rs-117-    /// Maximum amendment depth (prevent recursive governance).
+crates/amun-replay-engine/src/constitutional_governance.rs-118-    pub max_amendment_depth: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs-119-    /// Current amendment depth.
+crates/amun-replay-engine/src/constitutional_governance.rs-120-    pub current_depth: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs-121-}
+crates/amun-replay-engine/src/constitutional_governance.rs-122-
+crates/amun-replay-engine/src/constitutional_governance.rs:123:impl ConstitutionalEvolutionBoundary {
+crates/amun-replay-engine/src/constitutional_governance.rs-124-    pub fn new() -> Self {
+crates/amun-replay-engine/src/constitutional_governance.rs:125:        // Invariants 1-25 are all constitutional law.
+crates/amun-replay-engine/src/constitutional_governance.rs-126-        // Some may be designated as immutable (cannot be amended).
+crates/amun-replay-engine/src/constitutional_governance.rs-127-        Self {
+crates/amun-replay-engine/src/constitutional_governance.rs-128-            immutable_invariants: vec![5, 10, 15, 20, 25], // terminality, causality, truth isolation, canonical non-exclusivity, governance non-manufacture
+crates/amun-replay-engine/src/constitutional_governance.rs-129-            allow_self_referential: false,
+crates/amun-replay-engine/src/constitutional_governance.rs-130-            max_amendment_depth: 10,
+crates/amun-replay-engine/src/constitutional_governance.rs-131-            current_depth: 0,
+crates/amun-replay-engine/src/constitutional_governance.rs-132-        }
+crates/amun-replay-engine/src/constitutional_governance.rs-133-    }
+--
+crates/amun-replay-engine/src/constitutional_governance.rs-193-}
+crates/amun-replay-engine/src/constitutional_governance.rs-194-
+crates/amun-replay-engine/src/constitutional_governance.rs-195-/// Temporal constitution lineage — prevents historical ratification
+crates/amun-replay-engine/src/constitutional_governance.rs-196-/// from becoming eternal authority.
+crates/amun-replay-engine/src/constitutional_governance.rs-197-///
+crates/amun-replay-engine/src/constitutional_governance.rs-198-/// A constitution is valid because it preserves invariants, not because
+crates/amun-replay-engine/src/constitutional_governance.rs-199-/// it was ratified at a certain time or by certain entities.
+crates/amun-replay-engine/src/constitutional_governance.rs-200-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_governance.rs:201:pub struct TemporalConstitutionLineage {
+crates/amun-replay-engine/src/constitutional_governance.rs-202-    /// The active constitutional revision.
+crates/amun-replay-engine/src/constitutional_governance.rs-203-    pub active_revision: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs-204-    /// Hash of the active constitution.
+crates/amun-replay-engine/src/constitutional_governance.rs:205:    pub active_constitution_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_governance.rs-206-    /// Previous revisions in the lineage (for audit only).
+crates/amun-replay-engine/src/constitutional_governance.rs:207:    pub revision_history: Vec<(u32, ConstitutionalHash)>,
+crates/amun-replay-engine/src/constitutional_governance.rs-208-    /// The revision that activated this lineage.
+crates/amun-replay-engine/src/constitutional_governance.rs-209-    pub activation_revision: u32,
+crates/amun-replay-engine/src/constitutional_governance.rs-210-}
+crates/amun-replay-engine/src/constitutional_governance.rs-211-
+crates/amun-replay-engine/src/constitutional_governance.rs:212:impl TemporalConstitutionLineage {
+crates/amun-replay-engine/src/constitutional_governance.rs:213:    pub fn new(initial_revision: u32, constitution_hash: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/constitutional_governance.rs-214-        Self {
+crates/amun-replay-engine/src/constitutional_governance.rs-215-            active_revision: initial_revision,
+crates/amun-replay-engine/src/constitutional_governance.rs-216-            active_constitution_hash: constitution_hash,
+crates/amun-replay-engine/src/constitutional_governance.rs-217-            revision_history: Vec::new(),
+crates/amun-replay-engine/src/constitutional_governance.rs-218-            activation_revision: initial_revision,
+crates/amun-replay-engine/src/constitutional_governance.rs-219-        }
+crates/amun-replay-engine/src/constitutional_governance.rs-220-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-221-
+crates/amun-replay-engine/src/constitutional_governance.rs-222-    /// Activate a new constitutional revision.
+crates/amun-replay-engine/src/constitutional_governance.rs-223-    /// The old revision is archived in history — it does NOT retain authority.
+crates/amun-replay-engine/src/constitutional_governance.rs:224:    pub fn activate_revision(&mut self, new_revision: u32, new_hash: ConstitutionalHash) {
+crates/amun-replay-engine/src/constitutional_governance.rs-225-        self.revision_history.push((self.active_revision, self.active_constitution_hash));
+crates/amun-replay-engine/src/constitutional_governance.rs-226-        self.active_revision = new_revision;
+crates/amun-replay-engine/src/constitutional_governance.rs-227-        self.active_constitution_hash = new_hash;
+crates/amun-replay-engine/src/constitutional_governance.rs-228-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-229-
+crates/amun-replay-engine/src/constitutional_governance.rs-230-    /// Returns true if the given revision is the currently active one.
+crates/amun-replay-engine/src/constitutional_governance.rs-231-    pub fn is_active(&self, revision: u32) -> bool {
+crates/amun-replay-engine/src/constitutional_governance.rs-232-        self.active_revision == revision
+--
+crates/amun-replay-engine/src/constitutional_governance.rs-267-    #[test]
+crates/amun-replay-engine/src/constitutional_governance.rs-268-    fn test_revision_regression_rejected() {
+crates/amun-replay-engine/src/constitutional_governance.rs-269-        let result = check_amendment_derivability(2, 0, [0xAA; 32], false);
+crates/amun-replay-engine/src/constitutional_governance.rs-270-        assert_eq!(result, AmendmentDerivabilityResult::RevisionRegression);
+crates/amun-replay-engine/src/constitutional_governance.rs-271-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-272-
+crates/amun-replay-engine/src/constitutional_governance.rs-273-    #[test]
+crates/amun-replay-engine/src/constitutional_governance.rs-274-    fn test_immutable_invariants() {
+crates/amun-replay-engine/src/constitutional_governance.rs:275:        let boundary = ConstitutionalEvolutionBoundary::new();
+crates/amun-replay-engine/src/constitutional_governance.rs-276-        assert!(!boundary.can_modify_invariant(5)); // immutable
+crates/amun-replay-engine/src/constitutional_governance.rs-277-        assert!(!boundary.can_modify_invariant(25)); // immutable
+crates/amun-replay-engine/src/constitutional_governance.rs-278-        assert!(boundary.can_modify_invariant(3)); // not in immutable list
+crates/amun-replay-engine/src/constitutional_governance.rs-279-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-280-
+crates/amun-replay-engine/src/constitutional_governance.rs-281-    #[test]
+crates/amun-replay-engine/src/constitutional_governance.rs-282-    fn test_amendment_depth_boundary() {
+crates/amun-replay-engine/src/constitutional_governance.rs:283:        let mut boundary = ConstitutionalEvolutionBoundary::new();
+crates/amun-replay-engine/src/constitutional_governance.rs-284-        assert!(boundary.can_recurse());
+crates/amun-replay-engine/src/constitutional_governance.rs-285-        for _ in 0..10 { boundary.recurse(); }
+crates/amun-replay-engine/src/constitutional_governance.rs-286-        assert!(!boundary.can_recurse());
+crates/amun-replay-engine/src/constitutional_governance.rs-287-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-288-
+crates/amun-replay-engine/src/constitutional_governance.rs-289-    #[test]
+crates/amun-replay-engine/src/constitutional_governance.rs-290-    fn test_governance_containment() {
+crates/amun-replay-engine/src/constitutional_governance.rs-291-        let mut zone = GovernanceContainmentZone::new(5);
+--
+crates/amun-replay-engine/src/constitutional_governance.rs-293-        for _ in 0..5 { zone.record_proposal(); }
+crates/amun-replay-engine/src/constitutional_governance.rs-294-        assert!(!zone.can_accept_proposal());
+crates/amun-replay-engine/src/constitutional_governance.rs-295-        zone.contain_proposal(99);
+crates/amun-replay-engine/src/constitutional_governance.rs-296-        assert!(zone.contained_proposals.contains(&99));
+crates/amun-replay-engine/src/constitutional_governance.rs-297-    }
+crates/amun-replay-engine/src/constitutional_governance.rs-298-
+crates/amun-replay-engine/src/constitutional_governance.rs-299-    #[test]
+crates/amun-replay-engine/src/constitutional_governance.rs-300-    fn test_temporal_lineage() {
+crates/amun-replay-engine/src/constitutional_governance.rs:301:        let mut lineage = TemporalConstitutionLineage::new(1, [0xAA; 32]);
+crates/amun-replay-engine/src/constitutional_governance.rs-302-        assert!(lineage.is_active(1));
+crates/amun-replay-engine/src/constitutional_governance.rs-303-        lineage.activate_revision(2, [0xBB; 32]);
+crates/amun-replay-engine/src/constitutional_governance.rs-304-        assert!(lineage.is_active(2));
+crates/amun-replay-engine/src/constitutional_governance.rs-305-        assert!(!lineage.is_active(1));
+crates/amun-replay-engine/src/constitutional_governance.rs-306-        assert!(lineage.is_in_lineage(1)); // still in history
+crates/amun-replay-engine/src/constitutional_governance.rs-307-        assert!(lineage.is_in_lineage(2));
+crates/amun-replay-engine/src/constitutional_governance.rs-308-        assert!(!lineage.is_in_lineage(99));
+crates/amun-replay-engine/src/constitutional_governance.rs-309-    }
+--
+crates/amun-replay-engine/src/isolation_boundary.rs-1-//! ExecutionIsolationBoundary — capability fencing for runtime workers.
+crates/amun-replay-engine/src/isolation_boundary.rs-2-//!
+crates/amun-replay-engine/src/isolation_boundary.rs-3-//! An isolation boundary defines what a worker CAN and CANNOT do.
+crates/amun-replay-engine/src/isolation_boundary.rs-4-//! Any operation outside the boundary is an IsolationViolation.
+crates/amun-replay-engine/src/isolation_boundary.rs-5-//!
+crates/amun-replay-engine/src/isolation_boundary.rs-6-//! The boundary is ENFORCED at the runtime level, but its existence
+crates/amun-replay-engine/src/isolation_boundary.rs:7://! is a constitutional requirement (Invariant 15).
+crates/amun-replay-engine/src/isolation_boundary.rs-8-
+crates/amun-replay-engine/src/isolation_boundary.rs-9-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/isolation_boundary.rs:10:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/isolation_boundary.rs-11-use crate::runtime_capability::{CapabilitySet, RuntimeCapability};
+crates/amun-replay-engine/src/isolation_boundary.rs-12-
+crates/amun-replay-engine/src/isolation_boundary.rs-13-/// A violation of runtime isolation.
+crates/amun-replay-engine/src/isolation_boundary.rs-14-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/isolation_boundary.rs-15-pub enum IsolationViolation {
+crates/amun-replay-engine/src/isolation_boundary.rs-16-    /// Worker attempted an operation outside its capability set.
+crates/amun-replay-engine/src/isolation_boundary.rs-17-    CapabilityExceeded {
+crates/amun-replay-engine/src/isolation_boundary.rs-18-        worker_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs-19-        attempted: RuntimeCapability,
+crates/amun-replay-engine/src/isolation_boundary.rs-20-        granted: Vec<RuntimeCapability>,
+crates/amun-replay-engine/src/isolation_boundary.rs-21-    },
+crates/amun-replay-engine/src/isolation_boundary.rs-22-
+crates/amun-replay-engine/src/isolation_boundary.rs-23-    /// Worker attempted to modify constitutional state directly.
+crates/amun-replay-engine/src/isolation_boundary.rs:24:    ConstitutionalStateModification {
+crates/amun-replay-engine/src/isolation_boundary.rs-25-        worker_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs:26:        artifact_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/isolation_boundary.rs-27-    },
+crates/amun-replay-engine/src/isolation_boundary.rs-28-
+crates/amun-replay-engine/src/isolation_boundary.rs-29-    /// Worker attempted to influence witness identity.
+crates/amun-replay-engine/src/isolation_boundary.rs:30:    WitnessTampering {
+crates/amun-replay-engine/src/isolation_boundary.rs-31-        worker_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs-32-        witness_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs-33-    },
+crates/amun-replay-engine/src/isolation_boundary.rs-34-
+crates/amun-replay-engine/src/isolation_boundary.rs-35-    /// Worker crossed into another worker's isolation context.
+crates/amun-replay-engine/src/isolation_boundary.rs-36-    ContextBreach {
+crates/amun-replay-engine/src/isolation_boundary.rs-37-        worker_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs:38:        target_context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/isolation_boundary.rs-39-    },
+crates/amun-replay-engine/src/isolation_boundary.rs-40-}
+crates/amun-replay-engine/src/isolation_boundary.rs-41-
+crates/amun-replay-engine/src/isolation_boundary.rs-42-impl IsolationViolation {
+crates/amun-replay-engine/src/isolation_boundary.rs-43-    pub fn describe(&self) -> Vec<u8> {
+crates/amun-replay-engine/src/isolation_boundary.rs-44-        match self {
+crates/amun-replay-engine/src/isolation_boundary.rs-45-            IsolationViolation::CapabilityExceeded { .. } => b"Capability exceeded".to_vec(),
+crates/amun-replay-engine/src/isolation_boundary.rs:46:            IsolationViolation::ConstitutionalStateModification { .. } => b"Constitutional state modification attempted".to_vec(),
+crates/amun-replay-engine/src/isolation_boundary.rs:47:            IsolationViolation::WitnessTampering { .. } => b"Witness tampering attempted".to_vec(),
+crates/amun-replay-engine/src/isolation_boundary.rs-48-            IsolationViolation::ContextBreach { .. } => b"Context breach attempted".to_vec(),
+crates/amun-replay-engine/src/isolation_boundary.rs-49-        }
+crates/amun-replay-engine/src/isolation_boundary.rs-50-    }
+crates/amun-replay-engine/src/isolation_boundary.rs-51-}
+crates/amun-replay-engine/src/isolation_boundary.rs-52-
+crates/amun-replay-engine/src/isolation_boundary.rs-53-/// An execution isolation boundary for a runtime worker.
+crates/amun-replay-engine/src/isolation_boundary.rs-54-///
+crates/amun-replay-engine/src/isolation_boundary.rs-55-/// The boundary defines:
+--
+crates/amun-replay-engine/src/isolation_boundary.rs-63-
+crates/amun-replay-engine/src/isolation_boundary.rs-64-    /// The worker this boundary constrains.
+crates/amun-replay-engine/src/isolation_boundary.rs-65-    pub worker_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs-66-
+crates/amun-replay-engine/src/isolation_boundary.rs-67-    /// The capabilities granted to this worker.
+crates/amun-replay-engine/src/isolation_boundary.rs-68-    pub capabilities: CapabilitySet,
+crates/amun-replay-engine/src/isolation_boundary.rs-69-
+crates/amun-replay-engine/src/isolation_boundary.rs-70-    /// The constitutional context this worker is bound to.
+crates/amun-replay-engine/src/isolation_boundary.rs:71:    pub context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/isolation_boundary.rs-72-
+crates/amun-replay-engine/src/isolation_boundary.rs-73-    /// Whether the worker may communicate with other workers.
+crates/amun-replay-engine/src/isolation_boundary.rs-74-    pub inter_worker_communication: bool,
+crates/amun-replay-engine/src/isolation_boundary.rs-75-
+crates/amun-replay-engine/src/isolation_boundary.rs-76-    /// Whether the worker may access shared state.
+crates/amun-replay-engine/src/isolation_boundary.rs-77-    pub shared_state_access: bool,
+crates/amun-replay-engine/src/isolation_boundary.rs-78-}
+crates/amun-replay-engine/src/isolation_boundary.rs-79-
+crates/amun-replay-engine/src/isolation_boundary.rs-80-impl ExecutionIsolationBoundary {
+crates/amun-replay-engine/src/isolation_boundary.rs-81-    pub fn new(
+crates/amun-replay-engine/src/isolation_boundary.rs-82-        boundary_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs-83-        worker_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs-84-        capabilities: CapabilitySet,
+crates/amun-replay-engine/src/isolation_boundary.rs:85:        context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/isolation_boundary.rs-86-    ) -> Self {
+crates/amun-replay-engine/src/isolation_boundary.rs-87-        Self {
+crates/amun-replay-engine/src/isolation_boundary.rs-88-            boundary_id,
+crates/amun-replay-engine/src/isolation_boundary.rs-89-            worker_id,
+crates/amun-replay-engine/src/isolation_boundary.rs-90-            capabilities,
+crates/amun-replay-engine/src/isolation_boundary.rs-91-            context_hash,
+crates/amun-replay-engine/src/isolation_boundary.rs-92-            inter_worker_communication: false,
+crates/amun-replay-engine/src/isolation_boundary.rs-93-            shared_state_access: false,
+--
+crates/amun-replay-engine/src/isolation_boundary.rs-104-                worker_id: self.worker_id,
+crates/amun-replay-engine/src/isolation_boundary.rs-105-                attempted: requested,
+crates/amun-replay-engine/src/isolation_boundary.rs-106-                granted: self.capabilities.capabilities.clone(),
+crates/amun-replay-engine/src/isolation_boundary.rs-107-            })
+crates/amun-replay-engine/src/isolation_boundary.rs-108-        }
+crates/amun-replay-engine/src/isolation_boundary.rs-109-    }
+crates/amun-replay-engine/src/isolation_boundary.rs-110-
+crates/amun-replay-engine/src/isolation_boundary.rs-111-    /// Check if the worker is allowed to access a context.
+crates/amun-replay-engine/src/isolation_boundary.rs:112:    pub fn check_context(&self, context_hash: ConstitutionalHash) -> Result<(), IsolationViolation> {
+crates/amun-replay-engine/src/isolation_boundary.rs-113-        if context_hash == self.context_hash {
+crates/amun-replay-engine/src/isolation_boundary.rs-114-            Ok(())
+crates/amun-replay-engine/src/isolation_boundary.rs-115-        } else {
+crates/amun-replay-engine/src/isolation_boundary.rs-116-            Err(IsolationViolation::ContextBreach {
+crates/amun-replay-engine/src/isolation_boundary.rs-117-                worker_id: self.worker_id,
+crates/amun-replay-engine/src/isolation_boundary.rs-118-                target_context_hash: context_hash,
+crates/amun-replay-engine/src/isolation_boundary.rs-119-            })
+crates/amun-replay-engine/src/isolation_boundary.rs-120-        }
+crates/amun-replay-engine/src/isolation_boundary.rs-121-    }
+crates/amun-replay-engine/src/isolation_boundary.rs-122-
+crates/amun-replay-engine/src/isolation_boundary.rs-123-    /// Create a strictly isolated boundary — no inter-worker communication,
+crates/amun-replay-engine/src/isolation_boundary.rs-124-    /// no shared state, minimal capabilities.
+crates/amun-replay-engine/src/isolation_boundary.rs-125-    pub fn strict(
+crates/amun-replay-engine/src/isolation_boundary.rs-126-        boundary_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs-127-        worker_id: u64,
+crates/amun-replay-engine/src/isolation_boundary.rs-128-        capabilities: CapabilitySet,
+crates/amun-replay-engine/src/isolation_boundary.rs:129:        context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/isolation_boundary.rs-130-    ) -> Self {
+crates/amun-replay-engine/src/isolation_boundary.rs-131-        Self {
+crates/amun-replay-engine/src/isolation_boundary.rs-132-            boundary_id,
+crates/amun-replay-engine/src/isolation_boundary.rs-133-            worker_id,
+crates/amun-replay-engine/src/isolation_boundary.rs-134-            capabilities,
+crates/amun-replay-engine/src/isolation_boundary.rs-135-            context_hash,
+crates/amun-replay-engine/src/isolation_boundary.rs-136-            inter_worker_communication: false,
+crates/amun-replay-engine/src/isolation_boundary.rs-137-            shared_state_access: false,
+--
+crates/amun-replay-engine/src/execution_scheduler.rs-1-//! ExecutionScheduler — orchestrates constitutional task ordering.
+crates/amun-replay-engine/src/execution_scheduler.rs-2-//!
+crates/amun-replay-engine/src/execution_scheduler.rs-3-//! The scheduler determines WHICH task executes NEXT.
+crates/amun-replay-engine/src/execution_scheduler.rs-4-//! It does NOT determine constitutional validity.
+crates/amun-replay-engine/src/execution_scheduler.rs-5-//!
+crates/amun-replay-engine/src/execution_scheduler.rs-6-//! INVARIANT: Scheduler decisions affect ordering, not validity.
+crates/amun-replay-engine/src/execution_scheduler.rs-7-
+crates/amun-replay-engine/src/execution_scheduler.rs-8-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/execution_scheduler.rs:9:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/execution_scheduler.rs-10-use crate::execution_task::ExecutionTask;
+crates/amun-replay-engine/src/execution_scheduler.rs-11-
+crates/amun-replay-engine/src/execution_scheduler.rs-12-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+crates/amun-replay-engine/src/execution_scheduler.rs-13-pub enum ScheduleDecision {
+crates/amun-replay-engine/src/execution_scheduler.rs-14-    ExecuteNow,
+crates/amun-replay-engine/src/execution_scheduler.rs-15-    Queued { position: u64 },
+crates/amun-replay-engine/src/execution_scheduler.rs-16-    Blocked,
+crates/amun-replay-engine/src/execution_scheduler.rs-17-    Completed,
+--
+crates/amun-replay-engine/src/execution_scheduler.rs-19-
+crates/amun-replay-engine/src/execution_scheduler.rs-20-#[derive(Debug, Clone)]
+crates/amun-replay-engine/src/execution_scheduler.rs-21-pub struct ExecutionScheduler {
+crates/amun-replay-engine/src/execution_scheduler.rs-22-    tasks: Vec<ExecutionTask>,
+crates/amun-replay-engine/src/execution_scheduler.rs-23-    decisions: Vec<ScheduleDecision>,
+crates/amun-replay-engine/src/execution_scheduler.rs-24-    /// The context this scheduler operates within.
+crates/amun-replay-engine/src/execution_scheduler.rs-25-    /// Reserved for future context-aware scheduling.
+crates/amun-replay-engine/src/execution_scheduler.rs-26-    #[allow(dead_code)]
+crates/amun-replay-engine/src/execution_scheduler.rs:27:    context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/execution_scheduler.rs-28-}
+crates/amun-replay-engine/src/execution_scheduler.rs-29-
+crates/amun-replay-engine/src/execution_scheduler.rs-30-impl ExecutionScheduler {
+crates/amun-replay-engine/src/execution_scheduler.rs:31:    pub fn new(context_hash: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/execution_scheduler.rs-32-        Self { tasks: Vec::new(), decisions: Vec::new(), context_hash }
+crates/amun-replay-engine/src/execution_scheduler.rs-33-    }
+crates/amun-replay-engine/src/execution_scheduler.rs-34-
+crates/amun-replay-engine/src/execution_scheduler.rs-35-    pub fn add_task(&mut self, task: ExecutionTask) {
+crates/amun-replay-engine/src/execution_scheduler.rs-36-        self.decisions.push(ScheduleDecision::Queued { position: self.tasks.len() as u64 });
+crates/amun-replay-engine/src/execution_scheduler.rs-37-        self.tasks.push(task);
+crates/amun-replay-engine/src/execution_scheduler.rs-38-    }
+crates/amun-replay-engine/src/execution_scheduler.rs-39-
+--
+crates/amun-replay-engine/src/execution_scheduler.rs-82-}
+crates/amun-replay-engine/src/execution_scheduler.rs-83-
+crates/amun-replay-engine/src/execution_scheduler.rs-84-#[cfg(test)]
+crates/amun-replay-engine/src/execution_scheduler.rs-85-mod tests {
+crates/amun-replay-engine/src/execution_scheduler.rs-86-    use super::*;
+crates/amun-replay-engine/src/execution_scheduler.rs-87-    use crate::execution_task::{ExecutionTask, TaskType};
+crates/amun-replay-engine/src/execution_scheduler.rs-88-
+crates/amun-replay-engine/src/execution_scheduler.rs-89-    fn make_task(id: u64, seq: u64) -> ExecutionTask {
+crates/amun-replay-engine/src/execution_scheduler.rs:90:        ExecutionTask::new(id, TaskType::StateTransition, [0xAB; 32], [0xBC; 32], [0xCD; 32], seq)
+crates/amun-replay-engine/src/execution_scheduler.rs-91-    }
+crates/amun-replay-engine/src/execution_scheduler.rs-92-
+crates/amun-replay-engine/src/execution_scheduler.rs-93-    #[test]
+crates/amun-replay-engine/src/execution_scheduler.rs-94-    fn test_scheduler_fifo_order() {
+crates/amun-replay-engine/src/execution_scheduler.rs-95-        let mut s = ExecutionScheduler::new([0xAB; 32]);
+crates/amun-replay-engine/src/execution_scheduler.rs-96-        s.add_task(make_task(1, 0));
+crates/amun-replay-engine/src/execution_scheduler.rs-97-        s.add_task(make_task(2, 1));
+crates/amun-replay-engine/src/execution_scheduler.rs-98-
+--
+crates/amun-replay-engine/src/runtime_anomaly.rs-1-//! RuntimeAnomalySurface — operational pathology description.
+crates/amun-replay-engine/src/runtime_anomaly.rs-2-//!
+crates/amun-replay-engine/src/runtime_anomaly.rs-3-//! Describes anomalous runtime behavior WITHOUT semantic interpretation.
+crates/amun-replay-engine/src/runtime_anomaly.rs-4-//! An anomaly is an OPERATIONAL observation, not a constitutional judgment.
+crates/amun-replay-engine/src/runtime_anomaly.rs-5-//!
+crates/amun-replay-engine/src/runtime_anomaly.rs-6-//! CRITICAL: Anomaly != Invalidity. Suspicion != Condemnation.
+crates/amun-replay-engine/src/runtime_anomaly.rs-7-
+crates/amun-replay-engine/src/runtime_anomaly.rs:8:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/runtime_anomaly.rs-9-
+crates/amun-replay-engine/src/runtime_anomaly.rs-10-/// Types of runtime anomalies that can be observed.
+crates/amun-replay-engine/src/runtime_anomaly.rs-11-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+crates/amun-replay-engine/src/runtime_anomaly.rs-12-pub enum AnomalyType {
+crates/amun-replay-engine/src/runtime_anomaly.rs-13-    /// Worker produced an unexpected artifact hash.
+crates/amun-replay-engine/src/runtime_anomaly.rs-14-    UnexpectedArtifact,
+crates/amun-replay-engine/src/runtime_anomaly.rs-15-    /// Worker propagated a witness with suspicious structure.
+crates/amun-replay-engine/src/runtime_anomaly.rs:16:    SuspiciousWitness,
+crates/amun-replay-engine/src/runtime_anomaly.rs-17-    /// Worker flooded the network with closure requests.
+crates/amun-replay-engine/src/runtime_anomaly.rs-18-    ClosureFlood,
+crates/amun-replay-engine/src/runtime_anomaly.rs-19-    /// Worker sent conflicting derivational frontiers.
+crates/amun-replay-engine/src/runtime_anomaly.rs-20-    FrontierConflict,
+crates/amun-replay-engine/src/runtime_anomaly.rs-21-    /// Worker attempted to spoof an admissibility fingerprint.
+crates/amun-replay-engine/src/runtime_anomaly.rs-22-    AdmissibilitySpoof,
+crates/amun-replay-engine/src/runtime_anomaly.rs-23-    /// Worker exceeded its capability boundary.
+crates/amun-replay-engine/src/runtime_anomaly.rs-24-    CapabilityViolation,
+--
+crates/amun-replay-engine/src/runtime_anomaly.rs-33-pub struct RuntimeAnomaly {
+crates/amun-replay-engine/src/runtime_anomaly.rs-34-    /// Unique anomaly identifier (operational).
+crates/amun-replay-engine/src/runtime_anomaly.rs-35-    pub anomaly_id: u64,
+crates/amun-replay-engine/src/runtime_anomaly.rs-36-    /// The worker exhibiting anomalous behavior.
+crates/amun-replay-engine/src/runtime_anomaly.rs-37-    pub worker_id: u64,
+crates/amun-replay-engine/src/runtime_anomaly.rs-38-    /// The type of anomaly observed.
+crates/amun-replay-engine/src/runtime_anomaly.rs-39-    pub anomaly_type: AnomalyType,
+crates/amun-replay-engine/src/runtime_anomaly.rs-40-    /// The context where the anomaly was observed.
+crates/amun-replay-engine/src/runtime_anomaly.rs:41:    pub context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/runtime_anomaly.rs-42-    /// Operational details about the anomaly (informational).
+crates/amun-replay-engine/src/runtime_anomaly.rs-43-    pub details: Option<Vec<u8>>,
+crates/amun-replay-engine/src/runtime_anomaly.rs-44-    /// How many times this anomaly type has been observed from this worker.
+crates/amun-replay-engine/src/runtime_anomaly.rs-45-    pub occurrence_count: u64,
+crates/amun-replay-engine/src/runtime_anomaly.rs-46-}
+crates/amun-replay-engine/src/runtime_anomaly.rs-47-
+crates/amun-replay-engine/src/runtime_anomaly.rs-48-impl RuntimeAnomaly {
+crates/amun-replay-engine/src/runtime_anomaly.rs-49-    pub fn new(
+crates/amun-replay-engine/src/runtime_anomaly.rs-50-        anomaly_id: u64, worker_id: u64, anomaly_type: AnomalyType,
+crates/amun-replay-engine/src/runtime_anomaly.rs:51:        context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/runtime_anomaly.rs-52-    ) -> Self {
+crates/amun-replay-engine/src/runtime_anomaly.rs-53-        Self { anomaly_id, worker_id, anomaly_type, context_hash, details: None, occurrence_count: 1 }
+crates/amun-replay-engine/src/runtime_anomaly.rs-54-    }
+crates/amun-replay-engine/src/runtime_anomaly.rs-55-
+crates/amun-replay-engine/src/runtime_anomaly.rs-56-    /// Returns true if this anomaly type is potentially hostile.
+crates/amun-replay-engine/src/runtime_anomaly.rs-57-    pub fn is_hostile(&self) -> bool {
+crates/amun-replay-engine/src/runtime_anomaly.rs-58-        matches!(
+crates/amun-replay-engine/src/runtime_anomaly.rs-59-            self.anomaly_type,
+--
+crates/amun-replay-engine/src/runtime_anomaly.rs-126-        surface.record(RuntimeAnomaly::new(3, 100, AnomalyType::EquivalencePoisoning, [0xAB; 32]));
+crates/amun-replay-engine/src/runtime_anomaly.rs-127-        assert!(surface.should_quarantine());
+crates/amun-replay-engine/src/runtime_anomaly.rs-128-    }
+crates/amun-replay-engine/src/runtime_anomaly.rs-129-
+crates/amun-replay-engine/src/runtime_anomaly.rs-130-    #[test]
+crates/amun-replay-engine/src/runtime_anomaly.rs-131-    fn test_anomaly_is_not_invalidity() {
+crates/amun-replay-engine/src/runtime_anomaly.rs-132-        // An anomaly is an observation, not a constitutional judgment.
+crates/amun-replay-engine/src/runtime_anomaly.rs-133-        // The constitutional kernel judges artifacts, not behaviors.
+crates/amun-replay-engine/src/runtime_anomaly.rs:134:        let anomaly = RuntimeAnomaly::new(1, 100, AnomalyType::SuspiciousWitness, [0xAB; 32]);
+crates/amun-replay-engine/src/runtime_anomaly.rs-135-        // The anomaly exists — that's all. No validity claim is made.
+crates/amun-replay-engine/src/runtime_anomaly.rs-136-        assert_eq!(anomaly.worker_id, 100);
+crates/amun-replay-engine/src/runtime_anomaly.rs-137-    }
+crates/amun-replay-engine/src/runtime_anomaly.rs-138-}
+--
+crates/amun-replay-engine/src/proof_routing.rs-2-//!
+crates/amun-replay-engine/src/proof_routing.rs-3-//! Routes proofs through the network WITHOUT acquiring semantic authority.
+crates/amun-replay-engine/src/proof_routing.rs-4-//! Routing is an optimization layer: it moves proofs efficiently.
+crates/amun-replay-engine/src/proof_routing.rs-5-//! It does NOT judge admissibility, validity, or truth.
+crates/amun-replay-engine/src/proof_routing.rs-6-//!
+crates/amun-replay-engine/src/proof_routing.rs-7-//! CRITICAL: Shortest path ≠ best proof. Fastest ≠ strongest.
+crates/amun-replay-engine/src/proof_routing.rs-8-
+crates/amun-replay-engine/src/proof_routing.rs-9-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/proof_routing.rs:10:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/proof_routing.rs-11-use crate::derivational_frontier::DerivationalFrontier;
+crates/amun-replay-engine/src/proof_routing.rs-12-
+crates/amun-replay-engine/src/proof_routing.rs-13-/// A proof route descriptor — where a proof goes and why.
+crates/amun-replay-engine/src/proof_routing.rs-14-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/proof_routing.rs-15-pub struct ProofRoute {
+crates/amun-replay-engine/src/proof_routing.rs-16-    pub route_id: u64,
+crates/amun-replay-engine/src/proof_routing.rs-17-    /// The target artifact whose admissibility proof is being routed.
+crates/amun-replay-engine/src/proof_routing.rs:18:    pub target_artifact_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/proof_routing.rs-19-    /// The context this route operates within.
+crates/amun-replay-engine/src/proof_routing.rs:20:    pub context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/proof_routing.rs-21-    /// The type of proof being routed.
+crates/amun-replay-engine/src/proof_routing.rs-22-    pub proof_type: RoutedProofType,
+crates/amun-replay-engine/src/proof_routing.rs-23-    /// Routing priority — operational, NOT semantic.
+crates/amun-replay-engine/src/proof_routing.rs-24-    pub priority: RoutePriority,
+crates/amun-replay-engine/src/proof_routing.rs-25-    /// Workers this route should avoid (quarantined/suspicious).
+crates/amun-replay-engine/src/proof_routing.rs-26-    pub avoid_workers: Vec<u64>,
+crates/amun-replay-engine/src/proof_routing.rs-27-    /// Maximum hops before route expires.
+crates/amun-replay-engine/src/proof_routing.rs-28-    pub max_hops: u64,
+crates/amun-replay-engine/src/proof_routing.rs-29-    /// Current hop count.
+crates/amun-replay-engine/src/proof_routing.rs-30-    pub current_hops: u64,
+crates/amun-replay-engine/src/proof_routing.rs-31-}
+crates/amun-replay-engine/src/proof_routing.rs-32-
+crates/amun-replay-engine/src/proof_routing.rs-33-/// What kind of proof is being routed.
+crates/amun-replay-engine/src/proof_routing.rs-34-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+crates/amun-replay-engine/src/proof_routing.rs-35-pub enum RoutedProofType {
+crates/amun-replay-engine/src/proof_routing.rs-36-    /// A full witness for admissibility verification.
+crates/amun-replay-engine/src/proof_routing.rs:37:    FullWitness,
+crates/amun-replay-engine/src/proof_routing.rs-38-    /// A closure delta — minimal frontier reduction.
+crates/amun-replay-engine/src/proof_routing.rs-39-    ClosureDelta,
+crates/amun-replay-engine/src/proof_routing.rs-40-    /// An equivalence fingerprint — no surface data needed.
+crates/amun-replay-engine/src/proof_routing.rs-41-    EquivalenceFingerprint,
+crates/amun-replay-engine/src/proof_routing.rs-42-    /// A derivational frontier description.
+crates/amun-replay-engine/src/proof_routing.rs-43-    FrontierDescription,
+crates/amun-replay-engine/src/proof_routing.rs-44-}
+crates/amun-replay-engine/src/proof_routing.rs-45-
+--
+crates/amun-replay-engine/src/proof_routing.rs-52-    Normal,
+crates/amun-replay-engine/src/proof_routing.rs-53-    /// Route urgently — frontier is blocking admissibility for a worker.
+crates/amun-replay-engine/src/proof_routing.rs-54-    /// This is OPERATIONAL urgency, not semantic importance.
+crates/amun-replay-engine/src/proof_routing.rs-55-    FrontierBlocking,
+crates/amun-replay-engine/src/proof_routing.rs-56-}
+crates/amun-replay-engine/src/proof_routing.rs-57-
+crates/amun-replay-engine/src/proof_routing.rs-58-impl ProofRoute {
+crates/amun-replay-engine/src/proof_routing.rs-59-    pub fn new(
+crates/amun-replay-engine/src/proof_routing.rs:60:        route_id: u64, target: ConstitutionalHash, context: ConstitutionalHash,
+crates/amun-replay-engine/src/proof_routing.rs-61-        proof_type: RoutedProofType,
+crates/amun-replay-engine/src/proof_routing.rs-62-    ) -> Self {
+crates/amun-replay-engine/src/proof_routing.rs-63-        Self {
+crates/amun-replay-engine/src/proof_routing.rs-64-            route_id, target_artifact_hash: target, context_hash: context,
+crates/amun-replay-engine/src/proof_routing.rs-65-            proof_type, priority: RoutePriority::Normal,
+crates/amun-replay-engine/src/proof_routing.rs-66-            avoid_workers: Vec::new(), max_hops: 20, current_hops: 0,
+crates/amun-replay-engine/src/proof_routing.rs-67-        }
+crates/amun-replay-engine/src/proof_routing.rs-68-    }
+--
+crates/amun-replay-engine/src/proof_routing.rs-122-///
+crates/amun-replay-engine/src/proof_routing.rs-123-/// Determines whether a proof should be sent to a target worker
+crates/amun-replay-engine/src/proof_routing.rs-124-/// based on the worker's current derivational frontier.
+crates/amun-replay-engine/src/proof_routing.rs-125-/// Does NOT make semantic judgments about proof validity.
+crates/amun-replay-engine/src/proof_routing.rs-126-pub fn closure_aware_routing(
+crates/amun-replay-engine/src/proof_routing.rs-127-    route: &ProofRoute,
+crates/amun-replay-engine/src/proof_routing.rs-128-    target_frontiers: &[(u64, &DerivationalFrontier)],
+crates/amun-replay-engine/src/proof_routing.rs-129-    quarantine_list: &[u64],
+crates/amun-replay-engine/src/proof_routing.rs:130:    known_fingerprints: &[ConstitutionalHash],
+crates/amun-replay-engine/src/proof_routing.rs-131-) -> Vec<RoutingDecision> {
+crates/amun-replay-engine/src/proof_routing.rs-132-    let mut decisions = Vec::new();
+crates/amun-replay-engine/src/proof_routing.rs-133-
+crates/amun-replay-engine/src/proof_routing.rs-134-    for (worker_id, frontier) in target_frontiers {
+crates/amun-replay-engine/src/proof_routing.rs-135-        // Skip quarantined workers
+crates/amun-replay-engine/src/proof_routing.rs-136-        if quarantine_list.contains(worker_id) {
+crates/amun-replay-engine/src/proof_routing.rs-137-            decisions.push(RoutingDecision {
+crates/amun-replay-engine/src/proof_routing.rs-138-                target_workers: vec![*worker_id],
+--
+crates/amun-replay-engine/src/proof_routing.rs-176-    }
+crates/amun-replay-engine/src/proof_routing.rs-177-
+crates/amun-replay-engine/src/proof_routing.rs-178-    decisions
+crates/amun-replay-engine/src/proof_routing.rs-179-}
+crates/amun-replay-engine/src/proof_routing.rs-180-
+crates/amun-replay-engine/src/proof_routing.rs-181-/// Determine if a proof should be compressed based on equivalence awareness.
+crates/amun-replay-engine/src/proof_routing.rs-182-/// If the target already has a surface in the same equivalence class, skip.
+crates/amun-replay-engine/src/proof_routing.rs-183-pub fn equivalence_aware_compression(
+crates/amun-replay-engine/src/proof_routing.rs:184:    target_fingerprint: ConstitutionalHash,
+crates/amun-replay-engine/src/proof_routing.rs:185:    known_fingerprints: &[ConstitutionalHash],
+crates/amun-replay-engine/src/proof_routing.rs-186-) -> bool {
+crates/amun-replay-engine/src/proof_routing.rs-187-    known_fingerprints.contains(&target_fingerprint)
+crates/amun-replay-engine/src/proof_routing.rs-188-}
+crates/amun-replay-engine/src/proof_routing.rs-189-
+crates/amun-replay-engine/src/proof_routing.rs-190-/// Propagation cost boundary — prevent routing amplification.
+crates/amun-replay-engine/src/proof_routing.rs-191-/// Returns true if this route should be throttled.
+crates/amun-replay-engine/src/proof_routing.rs-192-pub fn within_propagation_budget(
+crates/amun-replay-engine/src/proof_routing.rs-193-    current_routes: usize,
+--
+crates/amun-replay-engine/src/proof_routing.rs-209-        }
+crates/amun-replay-engine/src/proof_routing.rs-210-        f.recompute_completeness();
+crates/amun-replay-engine/src/proof_routing.rs-211-        f
+crates/amun-replay-engine/src/proof_routing.rs-212-    }
+crates/amun-replay-engine/src/proof_routing.rs-213-
+crates/amun-replay-engine/src/proof_routing.rs-214-    #[test]
+crates/amun-replay-engine/src/proof_routing.rs-215-    fn test_quarantine_skip() {
+crates/amun-replay-engine/src/proof_routing.rs-216-        let route = ProofRoute::new(1, [0xBB; 32], [0xAB; 32], RoutedProofType::ClosureDelta);
+crates/amun-replay-engine/src/proof_routing.rs:217:        let frontier = make_frontier(100, vec![], vec![([0xBB; 32], FrontierDependencyReason::HardWitnessRequired, true)]);
+crates/amun-replay-engine/src/proof_routing.rs-218-        let decisions = closure_aware_routing(
+crates/amun-replay-engine/src/proof_routing.rs-219-            &route,
+crates/amun-replay-engine/src/proof_routing.rs-220-            &[(100, &frontier)],
+crates/amun-replay-engine/src/proof_routing.rs-221-            &[100], // worker 100 is quarantined
+crates/amun-replay-engine/src/proof_routing.rs-222-            &[],
+crates/amun-replay-engine/src/proof_routing.rs-223-        );
+crates/amun-replay-engine/src/proof_routing.rs-224-        assert_eq!(decisions[0].reason, RoutingReason::QuarantineSkip);
+crates/amun-replay-engine/src/proof_routing.rs-225-    }
+--
+crates/amun-replay-engine/src/proof_routing.rs-235-            &[[0xAA; 32]], // worker already has this fingerprint
+crates/amun-replay-engine/src/proof_routing.rs-236-        );
+crates/amun-replay-engine/src/proof_routing.rs-237-        assert_eq!(decisions[0].reason, RoutingReason::RedundantEquivalence);
+crates/amun-replay-engine/src/proof_routing.rs-238-    }
+crates/amun-replay-engine/src/proof_routing.rs-239-
+crates/amun-replay-engine/src/proof_routing.rs-240-    #[test]
+crates/amun-replay-engine/src/proof_routing.rs-241-    fn test_frontier_reduction() {
+crates/amun-replay-engine/src/proof_routing.rs-242-        let route = ProofRoute::new(1, [0xBB; 32], [0xAB; 32], RoutedProofType::ClosureDelta);
+crates/amun-replay-engine/src/proof_routing.rs:243:        let frontier = make_frontier(300, vec![], vec![([0xBB; 32], FrontierDependencyReason::HardWitnessRequired, true)]);
+crates/amun-replay-engine/src/proof_routing.rs-244-        let decisions = closure_aware_routing(
+crates/amun-replay-engine/src/proof_routing.rs-245-            &route,
+crates/amun-replay-engine/src/proof_routing.rs-246-            &[(300, &frontier)],
+crates/amun-replay-engine/src/proof_routing.rs-247-            &[],
+crates/amun-replay-engine/src/proof_routing.rs-248-            &[],
+crates/amun-replay-engine/src/proof_routing.rs-249-        );
+crates/amun-replay-engine/src/proof_routing.rs-250-        assert_eq!(decisions[0].reason, RoutingReason::FrontierReduction);
+crates/amun-replay-engine/src/proof_routing.rs-251-    }
+crates/amun-replay-engine/src/proof_routing.rs-252-
+crates/amun-replay-engine/src/proof_routing.rs-253-    #[test]
+crates/amun-replay-engine/src/proof_routing.rs-254-    fn test_hop_expiry() {
+crates/amun-replay-engine/src/proof_routing.rs:255:        let mut route = ProofRoute::new(1, [0xBB; 32], [0xAB; 32], RoutedProofType::FullWitness);
+crates/amun-replay-engine/src/proof_routing.rs-256-        route.max_hops = 3;
+crates/amun-replay-engine/src/proof_routing.rs-257-        assert!(route.increment_hop());
+crates/amun-replay-engine/src/proof_routing.rs-258-        assert!(route.increment_hop());
+crates/amun-replay-engine/src/proof_routing.rs-259-        assert!(route.increment_hop());
+crates/amun-replay-engine/src/proof_routing.rs-260-        assert!(!route.increment_hop()); // expired
+crates/amun-replay-engine/src/proof_routing.rs-261-        assert!(route.is_expired());
+crates/amun-replay-engine/src/proof_routing.rs-262-    }
+crates/amun-replay-engine/src/proof_routing.rs-263-
+--
+crates/amun-replay-engine/src/constitutional_identity.rs:1://! Constitutional Identity & Attribution — identity without privilege.
+crates/amun-replay-engine/src/constitutional_identity.rs-2-//!
+crates/amun-replay-engine/src/constitutional_identity.rs-3-//! Identities may participate in the constitutional derivation fabric,
+crates/amun-replay-engine/src/constitutional_identity.rs-4-//! but identity persistence, reputation, or institutional trust must
+crates/amun-replay-engine/src/constitutional_identity.rs-5-//! NEVER become constitutional privilege.
+crates/amun-replay-engine/src/constitutional_identity.rs-6-//!
+crates/amun-replay-engine/src/constitutional_identity.rs-7-//! CRITICAL: A proof from a new participant is constitutionally identical
+crates/amun-replay-engine/src/constitutional_identity.rs-8-//! to one from an ancient institution. Identity ≠ authority.
+crates/amun-replay-engine/src/constitutional_identity.rs-9-
+crates/amun-replay-engine/src/constitutional_identity.rs-10-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/constitutional_identity.rs:11:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/constitutional_identity.rs:12:use amun_constitutional::ConstitutionalHasher;
+crates/amun-replay-engine/src/constitutional_identity.rs-13-
+crates/amun-replay-engine/src/constitutional_identity.rs-14-/// An identity surface — identity as operational attribute, NOT semantic privilege.
+crates/amun-replay-engine/src/constitutional_identity.rs-15-///
+crates/amun-replay-engine/src/constitutional_identity.rs-16-/// Records WHO produced an artifact for operational traceability.
+crates/amun-replay-engine/src/constitutional_identity.rs-17-/// Does NOT confer constitutional authority, admissibility preference,
+crates/amun-replay-engine/src/constitutional_identity.rs-18-/// or semantic weight.
+crates/amun-replay-engine/src/constitutional_identity.rs-19-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_identity.rs-20-pub struct IdentitySurface {
+crates/amun-replay-engine/src/constitutional_identity.rs-21-    /// Unique identity identifier.
+crates/amun-replay-engine/src/constitutional_identity.rs-22-    pub identity_id: u64,
+crates/amun-replay-engine/src/constitutional_identity.rs-23-    /// Cryptographic identifier for this identity.
+crates/amun-replay-engine/src/constitutional_identity.rs:24:    pub public_key_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_identity.rs-25-    /// How long this identity has been active (operational age).
+crates/amun-replay-engine/src/constitutional_identity.rs-26-    /// This is an OPERATIONAL metric, not a trust metric.
+crates/amun-replay-engine/src/constitutional_identity.rs-27-    pub operational_age: u64,
+crates/amun-replay-engine/src/constitutional_identity.rs-28-    /// Number of artifacts produced by this identity.
+crates/amun-replay-engine/src/constitutional_identity.rs-29-    /// This is an OPERATIONAL count, not a quality measure.
+crates/amun-replay-engine/src/constitutional_identity.rs-30-    pub artifacts_produced: u64,
+crates/amun-replay-engine/src/constitutional_identity.rs-31-    /// Whether this identity has EVER been granted constitutional authority.
+crates/amun-replay-engine/src/constitutional_identity.rs-32-    /// CRITICAL: This must ALWAYS be false for any compliant implementation.
+crates/amun-replay-engine/src/constitutional_identity.rs-33-    pub has_constitutional_authority: bool,
+crates/amun-replay-engine/src/constitutional_identity.rs-34-}
+crates/amun-replay-engine/src/constitutional_identity.rs-35-
+crates/amun-replay-engine/src/constitutional_identity.rs-36-impl IdentitySurface {
+crates/amun-replay-engine/src/constitutional_identity.rs:37:    pub fn new(identity_id: u64, public_key_hash: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/constitutional_identity.rs-38-        Self { identity_id, public_key_hash, operational_age: 0, artifacts_produced: 0, has_constitutional_authority: false }
+crates/amun-replay-engine/src/constitutional_identity.rs-39-    }
+crates/amun-replay-engine/src/constitutional_identity.rs-40-
+crates/amun-replay-engine/src/constitutional_identity.rs-41-    /// Record artifact production — operational bookkeeping only.
+crates/amun-replay-engine/src/constitutional_identity.rs-42-    pub fn record_artifact(&mut self) {
+crates/amun-replay-engine/src/constitutional_identity.rs-43-        self.artifacts_produced += 1;
+crates/amun-replay-engine/src/constitutional_identity.rs-44-    }
+crates/amun-replay-engine/src/constitutional_identity.rs-45-
+crates/amun-replay-engine/src/constitutional_identity.rs-46-    /// CRITICAL: This method always returns false.
+crates/amun-replay-engine/src/constitutional_identity.rs-47-    /// No identity may acquire constitutional authority through
+crates/amun-replay-engine/src/constitutional_identity.rs-48-    /// any operational mechanism.
+crates/amun-replay-engine/src/constitutional_identity.rs-49-    pub fn check_constitutional_authority(&self) -> bool {
+crates/amun-replay-engine/src/constitutional_identity.rs-50-        self.has_constitutional_authority
+crates/amun-replay-engine/src/constitutional_identity.rs-51-    }
+crates/amun-replay-engine/src/constitutional_identity.rs-52-
+crates/amun-replay-engine/src/constitutional_identity.rs-53-    /// Compute identity fingerprint — operational, not constitutional.
+crates/amun-replay-engine/src/constitutional_identity.rs:54:    pub fn fingerprint(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/constitutional_identity.rs:55:        let mut h = ConstitutionalHasher::new(b"IDENTITY_SURFACE");
+crates/amun-replay-engine/src/constitutional_identity.rs-56-        h.update_u64(self.identity_id).update_bytes(&self.public_key_hash);
+crates/amun-replay-engine/src/constitutional_identity.rs-57-        h.finalize()
+crates/amun-replay-engine/src/constitutional_identity.rs-58-    }
+crates/amun-replay-engine/src/constitutional_identity.rs-59-}
+crates/amun-replay-engine/src/constitutional_identity.rs-60-
+crates/amun-replay-engine/src/constitutional_identity.rs-61-/// An attribution boundary — who produced what, without who becoming authority.
+crates/amun-replay-engine/src/constitutional_identity.rs-62-///
+crates/amun-replay-engine/src/constitutional_identity.rs-63-/// Attribution provides operational provenance: "artifact X was produced by Y."
+crates/amun-replay-engine/src/constitutional_identity.rs-64-/// It does NOT provide: "artifact X is more valid because Y produced it."
+crates/amun-replay-engine/src/constitutional_identity.rs-65-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_identity.rs-66-pub struct AttributionBoundary {
+crates/amun-replay-engine/src/constitutional_identity.rs-67-    /// The artifact being attributed.
+crates/amun-replay-engine/src/constitutional_identity.rs:68:    pub artifact_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_identity.rs-69-    /// The identity that produced the artifact.
+crates/amun-replay-engine/src/constitutional_identity.rs-70-    pub producer_identity_id: u64,
+crates/amun-replay-engine/src/constitutional_identity.rs-71-    /// The identity that verified the artifact (if any).
+crates/amun-replay-engine/src/constitutional_identity.rs-72-    pub verifier_identity_id: Option<u64>,
+crates/amun-replay-engine/src/constitutional_identity.rs-73-    /// Whether this attribution implies ANY semantic weight (ALWAYS false).
+crates/amun-replay-engine/src/constitutional_identity.rs-74-    pub implies_semantic_weight: bool,
+crates/amun-replay-engine/src/constitutional_identity.rs-75-}
+crates/amun-replay-engine/src/constitutional_identity.rs-76-
+crates/amun-replay-engine/src/constitutional_identity.rs-77-impl AttributionBoundary {
+crates/amun-replay-engine/src/constitutional_identity.rs:78:    pub fn new(artifact_hash: ConstitutionalHash, producer_id: u64) -> Self {
+crates/amun-replay-engine/src/constitutional_identity.rs-79-        Self { artifact_hash, producer_identity_id: producer_id, verifier_identity_id: None, implies_semantic_weight: false }
+crates/amun-replay-engine/src/constitutional_identity.rs-80-    }
+crates/amun-replay-engine/src/constitutional_identity.rs-81-
+crates/amun-replay-engine/src/constitutional_identity.rs-82-    /// CRITICAL: Attribution NEVER implies semantic weight.
+crates/amun-replay-engine/src/constitutional_identity.rs-83-    /// Knowing who produced an artifact does not make it more valid.
+crates/amun-replay-engine/src/constitutional_identity.rs-84-    pub fn has_semantic_weight(&self) -> bool {
+crates/amun-replay-engine/src/constitutional_identity.rs-85-        self.implies_semantic_weight
+crates/amun-replay-engine/src/constitutional_identity.rs-86-    }
+--
+crates/amun-replay-engine/src/constitutional_economics.rs:1://! Constitutional Economics — markets that sustain, not govern.
+crates/amun-replay-engine/src/constitutional_economics.rs-2-//!
+crates/amun-replay-engine/src/constitutional_economics.rs-3-//! Economic coordination may sustain the runtime, but may NEVER
+crates/amun-replay-engine/src/constitutional_economics.rs-4-//! purchase constitutional truth. Resource asymmetry must never
+crates/amun-replay-engine/src/constitutional_economics.rs-5-//! become derivational asymmetry.
+crates/amun-replay-engine/src/constitutional_economics.rs-6-//!
+crates/amun-replay-engine/src/constitutional_economics.rs-7-//! CRITICAL: Expensive proofs are not stronger proofs.
+crates/amun-replay-engine/src/constitutional_economics.rs-8-//! Wealthy relays are not authoritative relays.
+crates/amun-replay-engine/src/constitutional_economics.rs-9-
+crates/amun-replay-engine/src/constitutional_economics.rs-10-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/constitutional_economics.rs:11:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/constitutional_economics.rs-12-
+crates/amun-replay-engine/src/constitutional_economics.rs-13-/// A proof market surface — a market of operational delivery, NOT truth.
+crates/amun-replay-engine/src/constitutional_economics.rs-14-///
+crates/amun-replay-engine/src/constitutional_economics.rs-15-/// Participants may offer and consume operational services:
+crates/amun-replay-engine/src/constitutional_economics.rs-16-/// execution, routing, storage, witness transport.
+crates/amun-replay-engine/src/constitutional_economics.rs-17-/// These are OPERATIONAL transactions, not constitutional ones.
+crates/amun-replay-engine/src/constitutional_economics.rs-18-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_economics.rs-19-pub struct ProofMarketSurface {
+crates/amun-replay-engine/src/constitutional_economics.rs-20-    /// Unique market identifier.
+crates/amun-replay-engine/src/constitutional_economics.rs-21-    pub market_id: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-22-    /// The context this market operates within.
+crates/amun-replay-engine/src/constitutional_economics.rs:23:    pub context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_economics.rs-24-    /// Maximum price acceptable for operational services.
+crates/amun-replay-engine/src/constitutional_economics.rs-25-    /// This is a MARKET constraint, not a truth constraint.
+crates/amun-replay-engine/src/constitutional_economics.rs-26-    pub max_service_price: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-27-    /// Whether this market is active.
+crates/amun-replay-engine/src/constitutional_economics.rs-28-    pub active: bool,
+crates/amun-replay-engine/src/constitutional_economics.rs-29-}
+crates/amun-replay-engine/src/constitutional_economics.rs-30-
+crates/amun-replay-engine/src/constitutional_economics.rs-31-impl ProofMarketSurface {
+crates/amun-replay-engine/src/constitutional_economics.rs:32:    pub fn new(market_id: u64, context_hash: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/constitutional_economics.rs-33-        Self { market_id, context_hash, max_service_price: 1000, active: true }
+crates/amun-replay-engine/src/constitutional_economics.rs-34-    }
+crates/amun-replay-engine/src/constitutional_economics.rs-35-
+crates/amun-replay-engine/src/constitutional_economics.rs-36-    /// Returns true if a service at the given price is within market bounds.
+crates/amun-replay-engine/src/constitutional_economics.rs-37-    /// This is an ECONOMIC check, not a constitutional one.
+crates/amun-replay-engine/src/constitutional_economics.rs-38-    pub fn is_affordable(&self, price: u64) -> bool {
+crates/amun-replay-engine/src/constitutional_economics.rs-39-        price <= self.max_service_price
+crates/amun-replay-engine/src/constitutional_economics.rs-40-    }
+--
+crates/amun-replay-engine/src/constitutional_economics.rs-46-/// It does NOT allow purchasing admissibility, validity, or truth.
+crates/amun-replay-engine/src/constitutional_economics.rs-47-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_economics.rs-48-pub struct ExecutionLeaseBoundary {
+crates/amun-replay-engine/src/constitutional_economics.rs-49-    /// Unique lease identifier.
+crates/amun-replay-engine/src/constitutional_economics.rs-50-    pub lease_id: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-51-    /// The worker providing execution capacity.
+crates/amun-replay-engine/src/constitutional_economics.rs-52-    pub worker_id: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-53-    /// The context this lease applies to.
+crates/amun-replay-engine/src/constitutional_economics.rs:54:    pub context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_economics.rs-55-    /// Maximum executions allowed under this lease.
+crates/amun-replay-engine/src/constitutional_economics.rs-56-    pub max_executions: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-57-    /// Current execution count.
+crates/amun-replay-engine/src/constitutional_economics.rs-58-    pub execution_count: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-59-    /// Whether this lease grants any constitutional authority (ALWAYS false).
+crates/amun-replay-engine/src/constitutional_economics.rs-60-    pub grants_constitutional_authority: bool,
+crates/amun-replay-engine/src/constitutional_economics.rs-61-}
+crates/amun-replay-engine/src/constitutional_economics.rs-62-
+crates/amun-replay-engine/src/constitutional_economics.rs-63-impl ExecutionLeaseBoundary {
+crates/amun-replay-engine/src/constitutional_economics.rs:64:    pub fn new(lease_id: u64, worker_id: u64, context_hash: ConstitutionalHash, max_executions: u64) -> Self {
+crates/amun-replay-engine/src/constitutional_economics.rs-65-        Self { lease_id, worker_id, context_hash, max_executions, execution_count: 0, grants_constitutional_authority: false }
+crates/amun-replay-engine/src/constitutional_economics.rs-66-    }
+crates/amun-replay-engine/src/constitutional_economics.rs-67-
+crates/amun-replay-engine/src/constitutional_economics.rs-68-    /// Returns true if this lease has remaining execution capacity.
+crates/amun-replay-engine/src/constitutional_economics.rs-69-    pub fn has_capacity(&self) -> bool {
+crates/amun-replay-engine/src/constitutional_economics.rs-70-        self.execution_count < self.max_executions
+crates/amun-replay-engine/src/constitutional_economics.rs-71-    }
+crates/amun-replay-engine/src/constitutional_economics.rs-72-
+--
+crates/amun-replay-engine/src/constitutional_economics.rs-91-///   - Assisting frontier reduction
+crates/amun-replay-engine/src/constitutional_economics.rs-92-///   - Providing routing assistance
+crates/amun-replay-engine/src/constitutional_economics.rs-93-///
+crates/amun-replay-engine/src/constitutional_economics.rs-94-/// Incentives do NOT reward:
+crates/amun-replay-engine/src/constitutional_economics.rs-95-///   - "Owning" admissibility
+crates/amun-replay-engine/src/constitutional_economics.rs-96-///   - Producing "better" proofs
+crates/amun-replay-engine/src/constitutional_economics.rs-97-///   - Semantic influence
+crates/amun-replay-engine/src/constitutional_economics.rs-98-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/constitutional_economics.rs:99:pub struct WitnessIncentiveSurface {
+crates/amun-replay-engine/src/constitutional_economics.rs-100-    /// Unique incentive program identifier.
+crates/amun-replay-engine/src/constitutional_economics.rs-101-    pub program_id: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-102-    /// The context this incentive applies to.
+crates/amun-replay-engine/src/constitutional_economics.rs:103:    pub context_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/constitutional_economics.rs-104-    /// Reward for making a witness available.
+crates/amun-replay-engine/src/constitutional_economics.rs-105-    pub availability_reward: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-106-    /// Reward for responding to a closure request.
+crates/amun-replay-engine/src/constitutional_economics.rs-107-    pub closure_response_reward: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-108-    /// Reward for frontier reduction assistance.
+crates/amun-replay-engine/src/constitutional_economics.rs-109-    pub frontier_reduction_reward: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-110-    /// CRITICAL: No reward for "better" proofs (ALWAYS 0).
+crates/amun-replay-engine/src/constitutional_economics.rs-111-    pub semantic_quality_reward: u64,
+crates/amun-replay-engine/src/constitutional_economics.rs-112-}
+crates/amun-replay-engine/src/constitutional_economics.rs-113-
+crates/amun-replay-engine/src/constitutional_economics.rs:114:impl WitnessIncentiveSurface {
+crates/amun-replay-engine/src/constitutional_economics.rs:115:    pub fn new(program_id: u64, context_hash: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/constitutional_economics.rs-116-        Self { program_id, context_hash, availability_reward: 10, closure_response_reward: 20, frontier_reduction_reward: 30, semantic_quality_reward: 0 }
+crates/amun-replay-engine/src/constitutional_economics.rs-117-    }
+crates/amun-replay-engine/src/constitutional_economics.rs-118-
+crates/amun-replay-engine/src/constitutional_economics.rs-119-    /// CRITICAL: Semantic quality reward is always zero.
+crates/amun-replay-engine/src/constitutional_economics.rs-120-    /// Proofs are not "better" because they cost more.
+crates/amun-replay-engine/src/constitutional_economics.rs-121-    pub fn verify_no_semantic_reward(&self) -> bool {
+crates/amun-replay-engine/src/constitutional_economics.rs-122-        self.semantic_quality_reward == 0
+crates/amun-replay-engine/src/constitutional_economics.rs-123-    }
+--
+crates/amun-replay-engine/src/constitutional_economics.rs-215-        let mut lease = ExecutionLeaseBoundary::new(1, 100, [0xAB; 32], 2);
+crates/amun-replay-engine/src/constitutional_economics.rs-216-        assert!(lease.execute());
+crates/amun-replay-engine/src/constitutional_economics.rs-217-        assert!(lease.execute());
+crates/amun-replay-engine/src/constitutional_economics.rs-218-        assert!(!lease.execute()); // exhausted
+crates/amun-replay-engine/src/constitutional_economics.rs-219-    }
+crates/amun-replay-engine/src/constitutional_economics.rs-220-
+crates/amun-replay-engine/src/constitutional_economics.rs-221-    #[test]
+crates/amun-replay-engine/src/constitutional_economics.rs-222-    fn test_semantic_quality_reward_is_zero() {
+crates/amun-replay-engine/src/constitutional_economics.rs:223:        let incentives = WitnessIncentiveSurface::new(1, [0xAB; 32]);
+crates/amun-replay-engine/src/constitutional_economics.rs-224-        assert!(incentives.verify_no_semantic_reward());
+crates/amun-replay-engine/src/constitutional_economics.rs-225-        assert_eq!(incentives.semantic_quality_reward, 0);
+crates/amun-replay-engine/src/constitutional_economics.rs-226-    }
+crates/amun-replay-engine/src/constitutional_economics.rs-227-
+crates/amun-replay-engine/src/constitutional_economics.rs-228-    #[test]
+crates/amun-replay-engine/src/constitutional_economics.rs-229-    fn test_economic_containment() {
+crates/amun-replay-engine/src/constitutional_economics.rs-230-        let mut zone = EconomicContainmentZone::new(30);
+crates/amun-replay-engine/src/constitutional_economics.rs-231-        zone.check_market_share(100, 35); // exceeds 30%
+--
+crates/amun-replay-engine/src/execution_dag.rs-67-                    .collect();
+crates/amun-replay-engine/src/execution_dag.rs-68-                deps.iter().all(|e| completed.contains(&e.to_vertex))
+crates/amun-replay-engine/src/execution_dag.rs-69-            })
+crates/amun-replay-engine/src/execution_dag.rs-70-            .collect()
+crates/amun-replay-engine/src/execution_dag.rs-71-    }
+crates/amun-replay-engine/src/execution_dag.rs-72-
+crates/amun-replay-engine/src/execution_dag.rs-73-    /// Get the partial order: vertices in topological order.
+crates/amun-replay-engine/src/execution_dag.rs-74-    /// This is ONE valid order — different schedulers may produce different orders.
+crates/amun-replay-engine/src/execution_dag.rs:75:    /// Constitutional truth MUST be identical regardless of the order chosen.
+crates/amun-replay-engine/src/execution_dag.rs-76-    pub fn topological_order(&self) -> Vec<&ExecutionVertex> {
+crates/amun-replay-engine/src/execution_dag.rs-77-        // Kahn's algorithm — produces one valid topological order
+crates/amun-replay-engine/src/execution_dag.rs-78-        let mut in_degree: Vec<usize> = vec![0; self.vertices.len()];
+crates/amun-replay-engine/src/execution_dag.rs-79-        for edge in &self.edges {
+crates/amun-replay-engine/src/execution_dag.rs-80-            if let Some(pos) = self.vertices.iter().position(|v| v.vertex_id == edge.from_vertex) {
+crates/amun-replay-engine/src/execution_dag.rs-81-                in_degree[pos] += 1;
+crates/amun-replay-engine/src/execution_dag.rs-82-            }
+crates/amun-replay-engine/src/execution_dag.rs-83-        }
+--
+crates/amun-replay-engine/src/execution_dag.rs-118-    fn test_empty_dag() {
+crates/amun-replay-engine/src/execution_dag.rs-119-        let dag = ExecutionDAG::new();
+crates/amun-replay-engine/src/execution_dag.rs-120-        assert_eq!(dag.vertex_count(), 0);
+crates/amun-replay-engine/src/execution_dag.rs-121-    }
+crates/amun-replay-engine/src/execution_dag.rs-122-
+crates/amun-replay-engine/src/execution_dag.rs-123-    #[test]
+crates/amun-replay-engine/src/execution_dag.rs-124-    fn test_add_vertex() {
+crates/amun-replay-engine/src/execution_dag.rs-125-        let mut dag = ExecutionDAG::new();
+crates/amun-replay-engine/src/execution_dag.rs:126:        dag.add_vertex(ExecutionVertex::new(1, VertexType::StateTransition, 100, [0xAB; 32], [0xBC; 32]));
+crates/amun-replay-engine/src/execution_dag.rs-127-        assert_eq!(dag.vertex_count(), 1);
+crates/amun-replay-engine/src/execution_dag.rs-128-    }
+crates/amun-replay-engine/src/execution_dag.rs-129-
+crates/amun-replay-engine/src/execution_dag.rs-130-    #[test]
+crates/amun-replay-engine/src/execution_dag.rs-131-    fn test_topological_order() {
+crates/amun-replay-engine/src/execution_dag.rs-132-        let mut dag = ExecutionDAG::new();
+crates/amun-replay-engine/src/execution_dag.rs:133:        let v1 = ExecutionVertex::new(1, VertexType::StateTransition, 100, [0xAB; 32], [0xBC; 32])
+crates/amun-replay-engine/src/execution_dag.rs-134-            .with_artifact([0x01; 32]);
+crates/amun-replay-engine/src/execution_dag.rs:135:        let v2 = ExecutionVertex::new(2, VertexType::StateTransition, 100, [0xAB; 32], [0xBC; 32])
+crates/amun-replay-engine/src/execution_dag.rs-136-            .with_dependency(1);
+crates/amun-replay-engine/src/execution_dag.rs-137-        let v3 = ExecutionVertex::new(3, VertexType::Verification, 200, [0xAB; 32], [0xBC; 32])
+crates/amun-replay-engine/src/execution_dag.rs-138-            .with_dependency(2);
+crates/amun-replay-engine/src/execution_dag.rs-139-
+crates/amun-replay-engine/src/execution_dag.rs-140-        dag.add_vertex(v1);
+crates/amun-replay-engine/src/execution_dag.rs-141-        dag.add_vertex(v2);
+crates/amun-replay-engine/src/execution_dag.rs-142-        dag.add_vertex(v3);
+crates/amun-replay-engine/src/execution_dag.rs-143-        dag.add_edge(2, 1, ExecutionDependencyType::RequiresArtifact);
+--
+crates/amun-replay-engine/src/execution_dag.rs-151-        let pos3 = order.iter().position(|v| v.vertex_id == 3).unwrap();
+crates/amun-replay-engine/src/execution_dag.rs-152-        assert!(pos1 < pos2);
+crates/amun-replay-engine/src/execution_dag.rs-153-        assert!(pos2 < pos3);
+crates/amun-replay-engine/src/execution_dag.rs-154-    }
+crates/amun-replay-engine/src/execution_dag.rs-155-
+crates/amun-replay-engine/src/execution_dag.rs-156-    #[test]
+crates/amun-replay-engine/src/execution_dag.rs-157-    fn test_dag_is_scheduler_oblivious() {
+crates/amun-replay-engine/src/execution_dag.rs-158-        // The same DAG can produce different valid topological orders.
+crates/amun-replay-engine/src/execution_dag.rs:159:        // Constitutional truth must be identical regardless.
+crates/amun-replay-engine/src/execution_dag.rs-160-        let mut dag = ExecutionDAG::new();
+crates/amun-replay-engine/src/execution_dag.rs:161:        let v1 = ExecutionVertex::new(1, VertexType::StateTransition, 100, [0xAB; 32], [0xBC; 32])
+crates/amun-replay-engine/src/execution_dag.rs-162-            .with_artifact([0x01; 32]);
+crates/amun-replay-engine/src/execution_dag.rs:163:        let v2 = ExecutionVertex::new(2, VertexType::StateTransition, 200, [0xAB; 32], [0xBC; 32])
+crates/amun-replay-engine/src/execution_dag.rs-164-            .with_artifact([0x02; 32]);
+crates/amun-replay-engine/src/execution_dag.rs-165-        // v1 and v2 have no dependencies on each other — they can execute in any order
+crates/amun-replay-engine/src/execution_dag.rs-166-        dag.add_vertex(v1);
+crates/amun-replay-engine/src/execution_dag.rs-167-        dag.add_vertex(v2);
+crates/amun-replay-engine/src/execution_dag.rs-168-
+crates/amun-replay-engine/src/execution_dag.rs-169-        let order = dag.topological_order();
+crates/amun-replay-engine/src/execution_dag.rs-170-        assert_eq!(order.len(), 2);
+crates/amun-replay-engine/src/execution_dag.rs-171-        // Both orders are valid — this test just verifies the DAG doesn't crash
+--
+crates/amun-replay-engine/src/lib.rs-13-
+crates/amun-replay-engine/src/lib.rs-14-pub mod canonical;
+crates/amun-replay-engine/src/lib.rs-15-pub mod deterministic;
+crates/amun-replay-engine/src/lib.rs-16-pub mod equivalence;
+crates/amun-replay-engine/src/lib.rs-17-pub mod errors;
+crates/amun-replay-engine/src/lib.rs-18-pub mod state;
+crates/amun-replay-engine/src/lib.rs-19-pub mod version;
+crates/amun-replay-engine/src/lib.rs-20-
+crates/amun-replay-engine/src/lib.rs:21:use amun_constitutional::{ConstitutionalHash, TranscriptEntry};
+crates/amun-replay-engine/src/lib.rs-22-use sha2::{Digest, Sha256};
+crates/amun-replay-engine/src/lib.rs-23-
+crates/amun-replay-engine/src/lib.rs-24-use deterministic::DeterministicExecutor;
+crates/amun-replay-engine/src/lib.rs-25-use equivalence::{
+crates/amun-replay-engine/src/lib.rs:26:    AuthorityProof, CheckpointResult, ConstitutionalReplayResult, ContinuityProof,
+crates/amun-replay-engine/src/lib.rs-27-    EquivalenceProver,
+crates/amun-replay-engine/src/lib.rs-28-};
+crates/amun-replay-engine/src/lib.rs-29-use errors::ReplayFailure;
+crates/amun-replay-engine/src/lib.rs-30-use state::ReplayState;
+crates/amun-replay-engine/src/lib.rs-31-
+crates/amun-replay-engine/src/lib.rs-32-// Re-exports — ONLY what is not already imported via `use` above.
+crates/amun-replay-engine/src/lib.rs-33-// Types that appear in BOTH `use` and `pub use` cause E0252.
+crates/amun-replay-engine/src/lib.rs-34-pub use canonical::{
+crates/amun-replay-engine/src/lib.rs-35-    CanonicalEncode, CanonicalError, CanonicalHasher, CanonicalReader, CanonicalWriter,
+crates/amun-replay-engine/src/lib.rs-36-};
+crates/amun-replay-engine/src/lib.rs:37:pub use deterministic::{ConstitutionalStep, ExecutionResult, ExecutionTrace};
+crates/amun-replay-engine/src/lib.rs-38-// NOTE: DeterministicExecutor is imported via `use` above, not re-exported here.
+crates/amun-replay-engine/src/lib.rs-39-// NOTE: ReplayState and ReplayFailure are imported via `use` above.
+crates/amun-replay-engine/src/lib.rs-40-
+crates/amun-replay-engine/src/lib.rs-41-// ────────────────────────────────────────────────────────────────────────────
+crates/amun-replay-engine/src/lib.rs-42-// STRUCT: ReplaySession
+crates/amun-replay-engine/src/lib.rs-43-// ────────────────────────────────────────────────────────────────────────────
+crates/amun-replay-engine/src/lib.rs-44-
+crates/amun-replay-engine/src/lib.rs-45-pub struct ReplaySession {
+crates/amun-replay-engine/src/lib.rs-46-    pub state: ReplayState,
+crates/amun-replay-engine/src/lib.rs-47-    pub cursor: ReplayCursor,
+crates/amun-replay-engine/src/lib.rs-48-}
+crates/amun-replay-engine/src/lib.rs-49-
+crates/amun-replay-engine/src/lib.rs-50-impl ReplaySession {
+crates/amun-replay-engine/src/lib.rs:51:    pub fn new(initial_state_root: ConstitutionalHash, start_sequence: u64) -> Self {
+crates/amun-replay-engine/src/lib.rs-52-        Self {
+crates/amun-replay-engine/src/lib.rs-53-            state: ReplayState::new(initial_state_root),
+crates/amun-replay-engine/src/lib.rs-54-            cursor: ReplayCursor::new(start_sequence),
+crates/amun-replay-engine/src/lib.rs-55-        }
+crates/amun-replay-engine/src/lib.rs-56-    }
+crates/amun-replay-engine/src/lib.rs-57-
+crates/amun-replay-engine/src/lib.rs-58-    pub fn replay(
+crates/amun-replay-engine/src/lib.rs-59-        &mut self,
+crates/amun-replay-engine/src/lib.rs-60-        entries: &[TranscriptEntry],
+crates/amun-replay-engine/src/lib.rs:61:    ) -> Result<ConstitutionalReplayResult, ReplayFailure> {
+crates/amun-replay-engine/src/lib.rs-62-        let transcript_hash = DeterministicExecutor::compute_transcript_hash(entries);
+crates/amun-replay-engine/src/lib.rs-63-        let start_sequence = self.cursor.current_sequence + 1;
+crates/amun-replay-engine/src/lib.rs-64-        let saved_state = self.state.clone();
+crates/amun-replay-engine/src/lib.rs-65-
+crates/amun-replay-engine/src/lib.rs-66-        let proof =
+crates/amun-replay-engine/src/lib.rs-67-            EquivalenceProver::execute_and_self_verify(&saved_state, entries, start_sequence)?;
+crates/amun-replay-engine/src/lib.rs-68-
+crates/amun-replay-engine/src/lib.rs-69-        self.state = ReplayState::new(proof.trace.final_state_hash());
+crates/amun-replay-engine/src/lib.rs-70-        self.state.events_processed = proof.trace.total_steps;
+crates/amun-replay-engine/src/lib.rs-71-
+crates/amun-replay-engine/src/lib.rs-72-        for entry in entries {
+crates/amun-replay-engine/src/lib.rs-73-            let seq = self.cursor.current_sequence + 1;
+crates/amun-replay-engine/src/lib.rs-74-            self.cursor.advance_to(seq, entry)?;
+crates/amun-replay-engine/src/lib.rs-75-        }
+crates/amun-replay-engine/src/lib.rs-76-
+crates/amun-replay-engine/src/lib.rs:77:        Ok(ConstitutionalReplayResult {
+crates/amun-replay-engine/src/lib.rs-78-            replay_root: self.state.state_root,
+crates/amun-replay-engine/src/lib.rs-79-            continuity_proof: ContinuityProof {
+crates/amun-replay-engine/src/lib.rs-80-                is_continuous: true,
+crates/amun-replay-engine/src/lib.rs-81-                chain_hash: self.cursor.chain_hash,
+crates/amun-replay-engine/src/lib.rs-82-            },
+crates/amun-replay-engine/src/lib.rs-83-            checkpoint_result: CheckpointResult {
+crates/amun-replay-engine/src/lib.rs-84-                checkpoint_hash: self.state.state_root,
+crates/amun-replay-engine/src/lib.rs-85-                is_valid: true,
+--
+crates/amun-replay-engine/src/lib.rs-96-
+crates/amun-replay-engine/src/lib.rs-97-// ────────────────────────────────────────────────────────────────────────────
+crates/amun-replay-engine/src/lib.rs-98-// STRUCT: ReplayCursor
+crates/amun-replay-engine/src/lib.rs-99-// ────────────────────────────────────────────────────────────────────────────
+crates/amun-replay-engine/src/lib.rs-100-
+crates/amun-replay-engine/src/lib.rs-101-#[derive(Debug, Clone)]
+crates/amun-replay-engine/src/lib.rs-102-pub struct ReplayCursor {
+crates/amun-replay-engine/src/lib.rs-103-    pub current_sequence: u64,
+crates/amun-replay-engine/src/lib.rs:104:    pub chain_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/lib.rs-105-    pub processed_count: u64,
+crates/amun-replay-engine/src/lib.rs-106-}
+crates/amun-replay-engine/src/lib.rs-107-
+crates/amun-replay-engine/src/lib.rs-108-impl ReplayCursor {
+crates/amun-replay-engine/src/lib.rs-109-    pub fn new(start_sequence: u64) -> Self {
+crates/amun-replay-engine/src/lib.rs-110-        Self {
+crates/amun-replay-engine/src/lib.rs-111-            current_sequence: if start_sequence > 0 {
+crates/amun-replay-engine/src/lib.rs-112-                start_sequence - 1
+--
+crates/amun-replay-engine/src/errors.rs-1-// ============================================================================
+crates/amun-replay-engine/src/errors.rs-2-// REPLAY ERRORS — DETERMINISTIC, NO EXTERNAL DEPENDENCIES
+crates/amun-replay-engine/src/errors.rs-3-// ============================================================================
+crates/amun-replay-engine/src/errors.rs-4-
+crates/amun-replay-engine/src/errors.rs:5:use amun_constitutional::ConstitutionalHash;
+crates/amun-replay-engine/src/errors.rs-6-
+crates/amun-replay-engine/src/errors.rs-7-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/errors.rs-8-pub enum ReplayFailure {
+crates/amun-replay-engine/src/errors.rs-9-    OrderingViolation {
+crates/amun-replay-engine/src/errors.rs-10-        expected_sequence: u64,
+crates/amun-replay-engine/src/errors.rs-11-        actual_sequence: u64,
+crates/amun-replay-engine/src/errors.rs-12-    },
+crates/amun-replay-engine/src/errors.rs-13-    StateDivergence {
+crates/amun-replay-engine/src/errors.rs:14:        expected_root: ConstitutionalHash,
+crates/amun-replay-engine/src/errors.rs:15:        actual_root: ConstitutionalHash,
+crates/amun-replay-engine/src/errors.rs-16-    },
+crates/amun-replay-engine/src/errors.rs-17-    EquivalenceMismatch {
+crates/amun-replay-engine/src/errors.rs:18:        transcript_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/errors.rs:19:        expected_root: ConstitutionalHash,
+crates/amun-replay-engine/src/errors.rs:20:        actual_root: ConstitutionalHash,
+crates/amun-replay-engine/src/errors.rs-21-    },
+crates/amun-replay-engine/src/errors.rs-22-    CausalityViolation {
+crates/amun-replay-engine/src/errors.rs-23-        reason: &'static str,
+crates/amun-replay-engine/src/errors.rs-24-    },
+crates/amun-replay-engine/src/errors.rs-25-    CheckpointMismatch {
+crates/amun-replay-engine/src/errors.rs:26:        expected: ConstitutionalHash,
+crates/amun-replay-engine/src/errors.rs:27:        actual: ConstitutionalHash,
+crates/amun-replay-engine/src/errors.rs-28-    },
+crates/amun-replay-engine/src/errors.rs-29-    AuthorityViolation {
+crates/amun-replay-engine/src/errors.rs:30:        authority_id: ConstitutionalHash,
+crates/amun-replay-engine/src/errors.rs-31-    },
+crates/amun-replay-engine/src/errors.rs-32-    CanonicalError {
+crates/amun-replay-engine/src/errors.rs-33-        reason: &'static str,
+crates/amun-replay-engine/src/errors.rs-34-    },
+crates/amun-replay-engine/src/errors.rs-35-}
+--
+crates/amun-replay-engine/src/frontier_reconciliation.rs-1-//! Frontier Reconciliation — constitutional epistemic convergence.
+crates/amun-replay-engine/src/frontier_reconciliation.rs-2-
+crates/amun-replay-engine/src/frontier_reconciliation.rs-3-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/frontier_reconciliation.rs:4:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/frontier_reconciliation.rs-5-use crate::derivational_frontier::DerivationalFrontier;
+crates/amun-replay-engine/src/frontier_reconciliation.rs-6-use crate::closure_completeness::ClosureCompleteness;
+crates/amun-replay-engine/src/frontier_reconciliation.rs-7-
+crates/amun-replay-engine/src/frontier_reconciliation.rs-8-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/frontier_reconciliation.rs-9-pub struct FrontierMergeResult {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-10-    pub merged_frontier: DerivationalFrontier,
+crates/amun-replay-engine/src/frontier_reconciliation.rs:11:    pub newly_resolved: Vec<ConstitutionalHash>,
+crates/amun-replay-engine/src/frontier_reconciliation.rs-12-    pub completeness_improved: bool,
+crates/amun-replay-engine/src/frontier_reconciliation.rs-13-    pub resulting_completeness: ClosureCompleteness,
+crates/amun-replay-engine/src/frontier_reconciliation.rs-14-}
+crates/amun-replay-engine/src/frontier_reconciliation.rs-15-
+crates/amun-replay-engine/src/frontier_reconciliation.rs-16-pub fn merge_frontiers(a: &DerivationalFrontier, b: &DerivationalFrontier) -> FrontierMergeResult {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-17-    let mut merged = DerivationalFrontier::new(a.worker_id, a.target_artifact_hash);
+crates/amun-replay-engine/src/frontier_reconciliation.rs:18:    let mut newly_resolved: Vec<ConstitutionalHash> = Vec::new();
+crates/amun-replay-engine/src/frontier_reconciliation.rs-19-
+crates/amun-replay-engine/src/frontier_reconciliation.rs-20-    for hash in &a.resolved { merged.resolve(*hash); }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-21-    for hash in &b.resolved {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-22-        if !a.resolved.contains(hash) { newly_resolved.push(*hash); }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-23-        merged.resolve(*hash);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-24-    }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-25-
+crates/amun-replay-engine/src/frontier_reconciliation.rs-26-    for dep in &a.unresolved {
+--
+crates/amun-replay-engine/src/frontier_reconciliation.rs-71-        (false, false) => FrontierReduction::Incomparable,
+crates/amun-replay-engine/src/frontier_reconciliation.rs-72-    }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-73-}
+crates/amun-replay-engine/src/frontier_reconciliation.rs-74-
+crates/amun-replay-engine/src/frontier_reconciliation.rs-75-pub fn are_derivationally_equivalent(a: &DerivationalFrontier, b: &DerivationalFrontier) -> bool {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-76-    a.completeness.can_derive() == b.completeness.can_derive()
+crates/amun-replay-engine/src/frontier_reconciliation.rs-77-}
+crates/amun-replay-engine/src/frontier_reconciliation.rs-78-
+crates/amun-replay-engine/src/frontier_reconciliation.rs:79:pub fn compute_closure_delta(source: &DerivationalFrontier, target: &DerivationalFrontier) -> Vec<ConstitutionalHash> {
+crates/amun-replay-engine/src/frontier_reconciliation.rs:80:    let mut delta: Vec<ConstitutionalHash> = Vec::new();
+crates/amun-replay-engine/src/frontier_reconciliation.rs-81-    for dep in &target.unresolved {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-82-        if dep.is_blocking && source.resolved.contains(&dep.artifact_hash) {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-83-            delta.push(dep.artifact_hash);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-84-        }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-85-    }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-86-    delta
+crates/amun-replay-engine/src/frontier_reconciliation.rs-87-}
+crates/amun-replay-engine/src/frontier_reconciliation.rs-88-
+--
+crates/amun-replay-engine/src/frontier_reconciliation.rs-97-        for (h, reason, blocking) in &unresolved {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-98-            f.unresolved.push(crate::derivational_frontier::FrontierDependency { artifact_hash: *h, dependency_reason: *reason, is_blocking: *blocking });
+crates/amun-replay-engine/src/frontier_reconciliation.rs-99-        }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-100-        f.recompute_completeness();
+crates/amun-replay-engine/src/frontier_reconciliation.rs-101-        f
+crates/amun-replay-engine/src/frontier_reconciliation.rs-102-    }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-103-
+crates/amun-replay-engine/src/frontier_reconciliation.rs-104-    #[test] fn test_merge() {
+crates/amun-replay-engine/src/frontier_reconciliation.rs:105:        let a = make_frontier(100, vec![[0x01; 32]], vec![([0x02; 32], FrontierDependencyReason::HardWitnessRequired, true)]);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-106-        let b = make_frontier(200, vec![[0x02; 32]], vec![([0x03; 32], FrontierDependencyReason::CausalChainIncomplete, false)]);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-107-        let r = merge_frontiers(&a, &b);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-108-        assert!(r.completeness_improved);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-109-    }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-110-    #[test] fn test_equivalence() {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-111-        let a = make_frontier(100, vec![[0x01; 32], [0x02; 32]], vec![]);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-112-        let b = make_frontier(200, vec![[0x02; 32], [0x03; 32]], vec![]);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-113-        assert!(are_derivationally_equivalent(&a, &b));
+crates/amun-replay-engine/src/frontier_reconciliation.rs-114-    }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-115-    #[test] fn test_delta() {
+crates/amun-replay-engine/src/frontier_reconciliation.rs-116-        let source = make_frontier(100, vec![[0x02; 32], [0x03; 32]], vec![]);
+crates/amun-replay-engine/src/frontier_reconciliation.rs:117:        let target = make_frontier(200, vec![[0x01; 32]], vec![([0x02; 32], FrontierDependencyReason::HardWitnessRequired, true), ([0x03; 32], FrontierDependencyReason::CausalChainIncomplete, false)]);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-118-        let d = compute_closure_delta(&source, &target);
+crates/amun-replay-engine/src/frontier_reconciliation.rs-119-        assert!(d.contains(&[0x02; 32]));
+crates/amun-replay-engine/src/frontier_reconciliation.rs-120-    }
+crates/amun-replay-engine/src/frontier_reconciliation.rs-121-}
+--
+crates/amun-replay-engine/src/state.rs-7-// We do NOT dispatch on semantic event types — that belongs to higher layers.
+crates/amun-replay-engine/src/state.rs-8-//
+crates/amun-replay-engine/src/state.rs-9-// evolve_state_root() provides CRYPTOGRAPHIC CONTINUITY.
+crates/amun-replay-engine/src/state.rs-10-// It does NOT interpret what the event MEANS.
+crates/amun-replay-engine/src/state.rs-11-
+crates/amun-replay-engine/src/state.rs-12-extern crate alloc;
+crates/amun-replay-engine/src/state.rs-13-use alloc::vec::Vec;
+crates/amun-replay-engine/src/state.rs-14-
+crates/amun-replay-engine/src/state.rs:15:use amun_constitutional::{ConstitutionalHash, TranscriptEntry};
+crates/amun-replay-engine/src/state.rs-16-
+crates/amun-replay-engine/src/state.rs-17-use crate::canonical::CanonicalHasher;
+crates/amun-replay-engine/src/state.rs-18-use crate::errors::ReplayFailure;
+crates/amun-replay-engine/src/state.rs-19-
+crates/amun-replay-engine/src/state.rs-20-#[derive(Debug, Clone)]
+crates/amun-replay-engine/src/state.rs-21-pub struct ReplayState {
+crates/amun-replay-engine/src/state.rs:22:    pub state_root: ConstitutionalHash,
+crates/amun-replay-engine/src/state.rs-23-    pub events_processed: u64,
+crates/amun-replay-engine/src/state.rs-24-    pub divergences: Vec<ReplayFailure>,
+crates/amun-replay-engine/src/state.rs-25-}
+crates/amun-replay-engine/src/state.rs-26-
+crates/amun-replay-engine/src/state.rs-27-impl ReplayState {
+crates/amun-replay-engine/src/state.rs:28:    pub fn new(initial_root: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/state.rs-29-        Self {
+crates/amun-replay-engine/src/state.rs-30-            state_root: initial_root,
+crates/amun-replay-engine/src/state.rs-31-            events_processed: 0,
+crates/amun-replay-engine/src/state.rs-32-            divergences: Vec::new(),
+crates/amun-replay-engine/src/state.rs-33-        }
+crates/amun-replay-engine/src/state.rs-34-    }
+crates/amun-replay-engine/src/state.rs-35-
+crates/amun-replay-engine/src/state.rs-36-    pub fn is_divergent(&self) -> bool {
+--
+crates/amun-replay-engine/src/version.rs-1-/// Replay protocol version - FROZEN for protocol v1.
+crates/amun-replay-engine/src/version.rs-2-/// Any change requires constitutional amendment and golden value regeneration.
+crates/amun-replay-engine/src/version.rs-3-pub const REPLAY_PROTOCOL_VERSION: u32 = 1;
+crates/amun-replay-engine/src/version.rs-4-
+crates/amun-replay-engine/src/version.rs:5:/// Constitutional hash domain for protocol version binding.
+crates/amun-replay-engine/src/version.rs-6-pub const PROTOCOL_VERSION_DOMAIN: &[u8] = b"AMUN_REPLAY_PROTOCOL_V1";
+--
+crates/amun-replay-engine/src/execution_dependency.rs-11-
+crates/amun-replay-engine/src/execution_dependency.rs-12-/// The type of execution dependency between vertices.
+crates/amun-replay-engine/src/execution_dependency.rs-13-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+crates/amun-replay-engine/src/execution_dependency.rs-14-pub enum ExecutionDependencyType {
+crates/amun-replay-engine/src/execution_dependency.rs-15-    /// This vertex requires an artifact produced by another vertex.
+crates/amun-replay-engine/src/execution_dependency.rs-16-    RequiresArtifact,
+crates/amun-replay-engine/src/execution_dependency.rs-17-
+crates/amun-replay-engine/src/execution_dependency.rs-18-    /// This vertex requires a witness to be extracted first.
+crates/amun-replay-engine/src/execution_dependency.rs:19:    RequiresWitness,
+crates/amun-replay-engine/src/execution_dependency.rs-20-
+crates/amun-replay-engine/src/execution_dependency.rs-21-    /// This vertex requires a snapshot to be available.
+crates/amun-replay-engine/src/execution_dependency.rs-22-    RequiresSnapshot,
+crates/amun-replay-engine/src/execution_dependency.rs-23-
+crates/amun-replay-engine/src/execution_dependency.rs-24-    /// This vertex requires restoration to complete first.
+crates/amun-replay-engine/src/execution_dependency.rs-25-    RequiresRestoration,
+crates/amun-replay-engine/src/execution_dependency.rs-26-
+crates/amun-replay-engine/src/execution_dependency.rs-27-    /// This vertex has a soft dependency — it prefers but does not require
+--
+crates/amun-replay-engine/src/execution_dependency.rs-34-}
+crates/amun-replay-engine/src/execution_dependency.rs-35-
+crates/amun-replay-engine/src/execution_dependency.rs-36-impl ExecutionDependencyType {
+crates/amun-replay-engine/src/execution_dependency.rs-37-    /// Returns true if this dependency is mandatory for execution.
+crates/amun-replay-engine/src/execution_dependency.rs-38-    pub fn is_mandatory(&self) -> bool {
+crates/amun-replay-engine/src/execution_dependency.rs-39-        matches!(
+crates/amun-replay-engine/src/execution_dependency.rs-40-            self,
+crates/amun-replay-engine/src/execution_dependency.rs-41-            ExecutionDependencyType::RequiresArtifact
+crates/amun-replay-engine/src/execution_dependency.rs:42:                | ExecutionDependencyType::RequiresWitness
+crates/amun-replay-engine/src/execution_dependency.rs-43-                | ExecutionDependencyType::RequiresSnapshot
+crates/amun-replay-engine/src/execution_dependency.rs-44-                | ExecutionDependencyType::RequiresRestoration
+crates/amun-replay-engine/src/execution_dependency.rs-45-        )
+crates/amun-replay-engine/src/execution_dependency.rs-46-    }
+crates/amun-replay-engine/src/execution_dependency.rs-47-
+crates/amun-replay-engine/src/execution_dependency.rs-48-    /// Returns true if the scheduler may ignore this dependency.
+crates/amun-replay-engine/src/execution_dependency.rs-49-    pub fn is_optional(&self) -> bool {
+crates/amun-replay-engine/src/execution_dependency.rs-50-        matches!(
+--
+crates/amun-replay-engine/src/execution_dependency.rs-56-
+crates/amun-replay-engine/src/execution_dependency.rs-57-#[cfg(test)]
+crates/amun-replay-engine/src/execution_dependency.rs-58-mod tests {
+crates/amun-replay-engine/src/execution_dependency.rs-59-    use super::*;
+crates/amun-replay-engine/src/execution_dependency.rs-60-
+crates/amun-replay-engine/src/execution_dependency.rs-61-    #[test]
+crates/amun-replay-engine/src/execution_dependency.rs-62-    fn test_mandatory_dependencies() {
+crates/amun-replay-engine/src/execution_dependency.rs-63-        assert!(ExecutionDependencyType::RequiresArtifact.is_mandatory());
+crates/amun-replay-engine/src/execution_dependency.rs:64:        assert!(ExecutionDependencyType::RequiresWitness.is_mandatory());
+crates/amun-replay-engine/src/execution_dependency.rs-65-        assert!(!ExecutionDependencyType::SoftDependency.is_mandatory());
+crates/amun-replay-engine/src/execution_dependency.rs-66-    }
+crates/amun-replay-engine/src/execution_dependency.rs-67-
+crates/amun-replay-engine/src/execution_dependency.rs-68-    #[test]
+crates/amun-replay-engine/src/execution_dependency.rs-69-    fn test_optional_dependencies() {
+crates/amun-replay-engine/src/execution_dependency.rs-70-        assert!(ExecutionDependencyType::Parallelizable.is_optional());
+crates/amun-replay-engine/src/execution_dependency.rs-71-        assert!(!ExecutionDependencyType::RequiresSnapshot.is_optional());
+crates/amun-replay-engine/src/execution_dependency.rs-72-    }
+--
+crates/amun-replay-engine/src/adaptive_relay.rs-2-//!
+crates/amun-replay-engine/src/adaptive_relay.rs-3-//! The relay adapts to operational conditions (congestion, latency, backpressure)
+crates/amun-replay-engine/src/adaptive_relay.rs-4-//! but MUST NOT adapt to semantic conditions (admissibility quality, proof strength).
+crates/amun-replay-engine/src/adaptive_relay.rs-5-//!
+crates/amun-replay-engine/src/adaptive_relay.rs-6-//! CRITICAL: Adaptivity optimizes delivery, not truth.
+crates/amun-replay-engine/src/adaptive_relay.rs-7-//! Popular relays are not privileged relays.
+crates/amun-replay-engine/src/adaptive_relay.rs-8-
+crates/amun-replay-engine/src/adaptive_relay.rs-9-use amun_constitutional::prelude::*;
+crates/amun-replay-engine/src/adaptive_relay.rs:10:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/adaptive_relay.rs-11-use crate::derivational_frontier::DerivationalFrontier;
+crates/amun-replay-engine/src/adaptive_relay.rs-12-use crate::proof_routing::RoutedProofType;
+crates/amun-replay-engine/src/adaptive_relay.rs-13-
+crates/amun-replay-engine/src/adaptive_relay.rs-14-/// A snapshot of the relay topology — strictly operational.
+crates/amun-replay-engine/src/adaptive_relay.rs-15-#[derive(Debug, Clone, Default)]
+crates/amun-replay-engine/src/adaptive_relay.rs-16-pub struct RelayTopologyView {
+crates/amun-replay-engine/src/adaptive_relay.rs-17-    /// Known relays and their operational metrics.
+crates/amun-replay-engine/src/adaptive_relay.rs-18-    pub relays: Vec<RelayMetrics>,
+--
+crates/amun-replay-engine/src/adaptive_relay.rs-102-        RoutedProofType::FrontierDescription => {
+crates/amun-replay-engine/src/adaptive_relay.rs-103-            if pressure.is_under_pressure() {
+crates/amun-replay-engine/src/adaptive_relay.rs-104-                CompressionDecision::SendDelta
+crates/amun-replay-engine/src/adaptive_relay.rs-105-            } else {
+crates/amun-replay-engine/src/adaptive_relay.rs-106-                CompressionDecision::SendFull
+crates/amun-replay-engine/src/adaptive_relay.rs-107-            }
+crates/amun-replay-engine/src/adaptive_relay.rs-108-        }
+crates/amun-replay-engine/src/adaptive_relay.rs-109-        RoutedProofType::ClosureDelta => CompressionDecision::SendDelta,
+crates/amun-replay-engine/src/adaptive_relay.rs:110:        RoutedProofType::FullWitness => {
+crates/amun-replay-engine/src/adaptive_relay.rs-111-            if pressure.is_under_pressure() {
+crates/amun-replay-engine/src/adaptive_relay.rs-112-                CompressionDecision::SendDelta
+crates/amun-replay-engine/src/adaptive_relay.rs-113-            } else {
+crates/amun-replay-engine/src/adaptive_relay.rs-114-                CompressionDecision::SendFull
+crates/amun-replay-engine/src/adaptive_relay.rs-115-            }
+crates/amun-replay-engine/src/adaptive_relay.rs-116-        }
+crates/amun-replay-engine/src/adaptive_relay.rs-117-    }
+crates/amun-replay-engine/src/adaptive_relay.rs-118-}
+--
+crates/amun-replay-engine/src/adaptive_relay.rs-143-        self.backpressure_active = self.active_routes >= self.max_concurrent_routes * 8 / 10;
+crates/amun-replay-engine/src/adaptive_relay.rs-144-    }
+crates/amun-replay-engine/src/adaptive_relay.rs-145-}
+crates/amun-replay-engine/src/adaptive_relay.rs-146-
+crates/amun-replay-engine/src/adaptive_relay.rs-147-/// Equivalence relay cache — prevent re-transporting identical admissibility.
+crates/amun-replay-engine/src/adaptive_relay.rs-148-#[derive(Debug, Clone, Default)]
+crates/amun-replay-engine/src/adaptive_relay.rs-149-pub struct EquivalenceRelayCache {
+crates/amun-replay-engine/src/adaptive_relay.rs-150-    /// Known admissibility fingerprints.
+crates/amun-replay-engine/src/adaptive_relay.rs:151:    pub fingerprints: Vec<ConstitutionalHash>,
+crates/amun-replay-engine/src/adaptive_relay.rs-152-}
+crates/amun-replay-engine/src/adaptive_relay.rs-153-
+crates/amun-replay-engine/src/adaptive_relay.rs-154-impl EquivalenceRelayCache {
+crates/amun-replay-engine/src/adaptive_relay.rs-155-    pub fn new() -> Self { Self { fingerprints: Vec::new() } }
+crates/amun-replay-engine/src/adaptive_relay.rs-156-
+crates/amun-replay-engine/src/adaptive_relay.rs:157:    pub fn has(&self, fp: &ConstitutionalHash) -> bool {
+crates/amun-replay-engine/src/adaptive_relay.rs-158-        self.fingerprints.contains(fp)
+crates/amun-replay-engine/src/adaptive_relay.rs-159-    }
+crates/amun-replay-engine/src/adaptive_relay.rs-160-
+crates/amun-replay-engine/src/adaptive_relay.rs:161:    pub fn insert(&mut self, fp: ConstitutionalHash) {
+crates/amun-replay-engine/src/adaptive_relay.rs-162-        if !self.fingerprints.contains(&fp) {
+crates/amun-replay-engine/src/adaptive_relay.rs-163-            self.fingerprints.push(fp);
+crates/amun-replay-engine/src/adaptive_relay.rs-164-        }
+crates/amun-replay-engine/src/adaptive_relay.rs-165-    }
+crates/amun-replay-engine/src/adaptive_relay.rs-166-}
+crates/amun-replay-engine/src/adaptive_relay.rs-167-
+crates/amun-replay-engine/src/adaptive_relay.rs-168-/// Anti-Centrality Guard — prevents relay hubs from acquiring authority.
+crates/amun-replay-engine/src/adaptive_relay.rs-169-///
+--
+crates/amun-replay-engine/src/adaptive_relay.rs-236-        view.add_relay(RelayMetrics { relay_id: 1, congestion: 10, reachable: true, active_routes: 1 });
+crates/amun-replay-engine/src/adaptive_relay.rs-237-        view.add_relay(RelayMetrics { relay_id: 2, congestion: 5, reachable: true, active_routes: 1 });
+crates/amun-replay-engine/src/adaptive_relay.rs-238-        let selected = view.select_relay(&[2]); // avoid relay 2
+crates/amun-replay-engine/src/adaptive_relay.rs-239-        assert_eq!(selected, Some(1));
+crates/amun-replay-engine/src/adaptive_relay.rs-240-    }
+crates/amun-replay-engine/src/adaptive_relay.rs-241-
+crates/amun-replay-engine/src/adaptive_relay.rs-242-    #[test]
+crates/amun-replay-engine/src/adaptive_relay.rs-243-    fn test_frontier_pressure() {
+crates/amun-replay-engine/src/adaptive_relay.rs:244:        let f1 = make_frontier(100, vec![([0x01; 32], FrontierDependencyReason::HardWitnessRequired, true)]);
+crates/amun-replay-engine/src/adaptive_relay.rs-245-        let f2 = make_frontier(200, vec![]);
+crates/amun-replay-engine/src/adaptive_relay.rs-246-        let pressure = FrontierPressureMetrics::compute(&[(100, &f1), (200, &f2)]);
+crates/amun-replay-engine/src/adaptive_relay.rs-247-        assert_eq!(pressure.frontier_density, 1);
+crates/amun-replay-engine/src/adaptive_relay.rs-248-        assert!(pressure.blocked_workers.contains(&100));
+crates/amun-replay-engine/src/adaptive_relay.rs-249-        assert!(!pressure.is_under_pressure());
+crates/amun-replay-engine/src/adaptive_relay.rs-250-    }
+crates/amun-replay-engine/src/adaptive_relay.rs-251-
+crates/amun-replay-engine/src/adaptive_relay.rs-252-    #[test]
+crates/amun-replay-engine/src/adaptive_relay.rs-253-    fn test_adaptive_compression_under_pressure() {
+crates/amun-replay-engine/src/adaptive_relay.rs-254-        let pressure = FrontierPressureMetrics { blocked_workers: vec![1; 15], frontier_density: 15 };
+crates/amun-replay-engine/src/adaptive_relay.rs:255:        let decision = adaptive_compression_policy(&pressure, RoutedProofType::FullWitness);
+crates/amun-replay-engine/src/adaptive_relay.rs-256-        assert_eq!(decision, CompressionDecision::SendDelta);
+crates/amun-replay-engine/src/adaptive_relay.rs-257-    }
+crates/amun-replay-engine/src/adaptive_relay.rs-258-
+crates/amun-replay-engine/src/adaptive_relay.rs-259-    #[test]
+crates/amun-replay-engine/src/adaptive_relay.rs-260-    fn test_backpressure() {
+crates/amun-replay-engine/src/adaptive_relay.rs-261-        let mut bp = RelayBackpressure::new(10);
+crates/amun-replay-engine/src/adaptive_relay.rs-262-        assert!(bp.can_accept());
+crates/amun-replay-engine/src/adaptive_relay.rs-263-        bp.active_routes = 8;
+--
+crates/amun-replay-engine/src/cross_constitution_federation.rs:1://! Cross-Constitution Federation — interoperability without imperialism.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-2-//!
+crates/amun-replay-engine/src/cross_constitution_federation.rs-3-//! Federation enables derivational exchange between constitutions
+crates/amun-replay-engine/src/cross_constitution_federation.rs-4-//! without establishing any constitution as canonical authority.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-5-//!
+crates/amun-replay-engine/src/cross_constitution_federation.rs-6-//! CRITICAL: Federation ≠ unification. Interoperability ≠ supremacy.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-7-//! Bridging transports derivations, not sovereignty.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-8-
+crates/amun-replay-engine/src/cross_constitution_federation.rs:9:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/cross_constitution_federation.rs:10:use amun_constitutional::ConstitutionalHasher;
+crates/amun-replay-engine/src/cross_constitution_federation.rs-11-
+crates/amun-replay-engine/src/cross_constitution_federation.rs-12-/// A federation boundary — constitutional sovereignty firewall.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-13-///
+crates/amun-replay-engine/src/cross_constitution_federation.rs-14-/// Prevents any external constitution from overriding local invariants,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-15-/// importing governance authority, or mutating constitutional semantics.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-16-/// Allows only: derivational exchange, inspectable translation,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-17-/// bounded interoperability.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-18-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/cross_constitution_federation.rs-19-pub struct FederationBoundary {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-20-    /// Unique boundary identifier.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-21-    pub boundary_id: u64,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-22-    /// Hash of the local constitution this boundary protects.
+crates/amun-replay-engine/src/cross_constitution_federation.rs:23:    pub local_constitution_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-24-    /// Hash of the remote constitution this boundary connects to.
+crates/amun-replay-engine/src/cross_constitution_federation.rs:25:    pub remote_constitution_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-26-    /// Whether the remote constitution may influence local admissibility.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-27-    /// CRITICAL: This must ALWAYS be false for any compliant implementation.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-28-    pub allows_remote_admissibility_override: bool,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-29-    /// Whether the remote constitution may modify local invariants.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-30-    /// CRITICAL: This must ALWAYS be false.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-31-    pub allows_remote_invariant_mutation: bool,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-32-    /// Whether this boundary is active.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-33-    pub active: bool,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-34-}
+crates/amun-replay-engine/src/cross_constitution_federation.rs-35-
+crates/amun-replay-engine/src/cross_constitution_federation.rs-36-impl FederationBoundary {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-37-    pub fn new(
+crates/amun-replay-engine/src/cross_constitution_federation.rs:38:        boundary_id: u64, local_hash: ConstitutionalHash, remote_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-39-    ) -> Self {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-40-        Self {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-41-            boundary_id, local_constitution_hash: local_hash, remote_constitution_hash: remote_hash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-42-            allows_remote_admissibility_override: false,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-43-            allows_remote_invariant_mutation: false,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-44-            active: true,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-45-        }
+crates/amun-replay-engine/src/cross_constitution_federation.rs-46-    }
+--
+crates/amun-replay-engine/src/cross_constitution_federation.rs-61-/// A constitutional translation surface — interprets derivations
+crates/amun-replay-engine/src/cross_constitution_federation.rs-62-/// between constitutions without semantic replacement.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-63-///
+crates/amun-replay-engine/src/cross_constitution_federation.rs-64-/// Translation is interpretation, not authority. When a derivation
+crates/amun-replay-engine/src/cross_constitution_federation.rs-65-/// crosses a federation boundary, the translation surface records
+crates/amun-replay-engine/src/cross_constitution_federation.rs-66-/// what was received, how it was interpreted, and preserves the
+crates/amun-replay-engine/src/cross_constitution_federation.rs-67-/// source constitution's sovereignty.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-68-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/cross_constitution_federation.rs:69:pub struct ConstitutionalTranslationSurface {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-70-    /// Unique translation identifier.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-71-    pub translation_id: u64,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-72-    /// The source constitution this derivation originated from.
+crates/amun-replay-engine/src/cross_constitution_federation.rs:73:    pub source_constitution_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-74-    /// The target constitution receiving the translation.
+crates/amun-replay-engine/src/cross_constitution_federation.rs:75:    pub target_constitution_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-76-    /// The derivation hash in the source constitution.
+crates/amun-replay-engine/src/cross_constitution_federation.rs:77:    pub source_derivation_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-78-    /// The interpreted derivation hash in the target constitution.
+crates/amun-replay-engine/src/cross_constitution_federation.rs:79:    pub interpreted_derivation_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-80-    /// Whether this translation preserves sovereignty attribution.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-81-    pub sovereignty_preserved: bool,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-82-    /// Whether the target claims authority over the source (MUST be false).
+crates/amun-replay-engine/src/cross_constitution_federation.rs-83-    pub target_claims_source_authority: bool,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-84-}
+crates/amun-replay-engine/src/cross_constitution_federation.rs-85-
+crates/amun-replay-engine/src/cross_constitution_federation.rs:86:impl ConstitutionalTranslationSurface {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-87-    pub fn new(
+crates/amun-replay-engine/src/cross_constitution_federation.rs:88:        translation_id: u64, source_hash: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs:89:        target_hash: ConstitutionalHash, source_derivation: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs:90:        interpreted_derivation: ConstitutionalHash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-91-    ) -> Self {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-92-        Self {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-93-            translation_id, source_constitution_hash: source_hash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-94-            target_constitution_hash: target_hash,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-95-            source_derivation_hash: source_derivation,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-96-            interpreted_derivation_hash: interpreted_derivation,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-97-            sovereignty_preserved: true,
+crates/amun-replay-engine/src/cross_constitution_federation.rs-98-            target_claims_source_authority: false,
+--
+crates/amun-replay-engine/src/cross_constitution_federation.rs-101-
+crates/amun-replay-engine/src/cross_constitution_federation.rs-102-    /// CRITICAL: The target never claims authority over the source.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-103-    /// Each constitution is sovereign.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-104-    pub fn verify_sovereignty(&self) -> bool {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-105-        self.sovereignty_preserved && !self.target_claims_source_authority
+crates/amun-replay-engine/src/cross_constitution_federation.rs-106-    }
+crates/amun-replay-engine/src/cross_constitution_federation.rs-107-
+crates/amun-replay-engine/src/cross_constitution_federation.rs-108-    /// Compute translation fingerprint.
+crates/amun-replay-engine/src/cross_constitution_federation.rs:109:    pub fn fingerprint(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/cross_constitution_federation.rs:110:        let mut h = ConstitutionalHasher::new(b"TRANSLATION_SURFACE");
+crates/amun-replay-engine/src/cross_constitution_federation.rs-111-        h.update_u64(self.translation_id)
+crates/amun-replay-engine/src/cross_constitution_federation.rs-112-            .update_bytes(&self.source_constitution_hash)
+crates/amun-replay-engine/src/cross_constitution_federation.rs-113-            .update_bytes(&self.target_constitution_hash)
+crates/amun-replay-engine/src/cross_constitution_federation.rs-114-            .update_bytes(&self.source_derivation_hash)
+crates/amun-replay-engine/src/cross_constitution_federation.rs-115-            .update_bytes(&self.interpreted_derivation_hash);
+crates/amun-replay-engine/src/cross_constitution_federation.rs-116-        h.finalize()
+crates/amun-replay-engine/src/cross_constitution_federation.rs-117-    }
+crates/amun-replay-engine/src/cross_constitution_federation.rs-118-}
+--
+crates/amun-replay-engine/src/cross_constitution_federation.rs-175-    fn test_boundary_never_allows_override() {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-176-        let boundary = FederationBoundary::new(1, [0xAA; 32], [0xBB; 32]);
+crates/amun-replay-engine/src/cross_constitution_federation.rs-177-        assert!(!boundary.check_remote_override_allowed());
+crates/amun-replay-engine/src/cross_constitution_federation.rs-178-        assert!(!boundary.check_remote_mutation_allowed());
+crates/amun-replay-engine/src/cross_constitution_federation.rs-179-    }
+crates/amun-replay-engine/src/cross_constitution_federation.rs-180-
+crates/amun-replay-engine/src/cross_constitution_federation.rs-181-    #[test]
+crates/amun-replay-engine/src/cross_constitution_federation.rs-182-    fn test_translation_preserves_sovereignty() {
+crates/amun-replay-engine/src/cross_constitution_federation.rs:183:        let translation = ConstitutionalTranslationSurface::new(
+crates/amun-replay-engine/src/cross_constitution_federation.rs-184-            1, [0xAA; 32], [0xBB; 32], [0xCC; 32], [0xDD; 32],
+crates/amun-replay-engine/src/cross_constitution_federation.rs-185-        );
+crates/amun-replay-engine/src/cross_constitution_federation.rs-186-        assert!(translation.verify_sovereignty());
+crates/amun-replay-engine/src/cross_constitution_federation.rs-187-        assert!(!translation.target_claims_source_authority);
+crates/amun-replay-engine/src/cross_constitution_federation.rs-188-    }
+crates/amun-replay-engine/src/cross_constitution_federation.rs-189-
+crates/amun-replay-engine/src/cross_constitution_federation.rs-190-    #[test]
+crates/amun-replay-engine/src/cross_constitution_federation.rs-191-    fn test_bridge_never_assumes_equivalence() {
+--
+crates/amun-replay-engine/src/cross_constitution_federation.rs-200-        // Two different constitutions can federate without becoming one.
+crates/amun-replay-engine/src/cross_constitution_federation.rs-201-        let boundary = FederationBoundary::new(1, [0xAA; 32], [0xBB; 32]);
+crates/amun-replay-engine/src/cross_constitution_federation.rs-202-        assert_ne!(boundary.local_constitution_hash, boundary.remote_constitution_hash);
+crates/amun-replay-engine/src/cross_constitution_federation.rs-203-        // They remain distinct — federation ≠ unification
+crates/amun-replay-engine/src/cross_constitution_federation.rs-204-    }
+crates/amun-replay-engine/src/cross_constitution_federation.rs-205-
+crates/amun-replay-engine/src/cross_constitution_federation.rs-206-    #[test]
+crates/amun-replay-engine/src/cross_constitution_federation.rs-207-    fn test_translation_fingerprint_deterministic() {
+crates/amun-replay-engine/src/cross_constitution_federation.rs:208:        let t1 = ConstitutionalTranslationSurface::new(1, [0xAA;32], [0xBB;32], [0xCC;32], [0xDD;32]);
+crates/amun-replay-engine/src/cross_constitution_federation.rs:209:        let t2 = ConstitutionalTranslationSurface::new(1, [0xAA;32], [0xBB;32], [0xCC;32], [0xDD;32]);
+crates/amun-replay-engine/src/cross_constitution_federation.rs-210-        assert_eq!(t1.fingerprint(), t2.fingerprint());
+crates/amun-replay-engine/src/cross_constitution_federation.rs-211-    }
+crates/amun-replay-engine/src/cross_constitution_federation.rs-212-
+crates/amun-replay-engine/src/cross_constitution_federation.rs-213-    #[test]
+crates/amun-replay-engine/src/cross_constitution_federation.rs-214-    fn test_bridge_records_translations() {
+crates/amun-replay-engine/src/cross_constitution_federation.rs-215-        let boundary = FederationBoundary::new(1, [0xAA; 32], [0xBB; 32]);
+crates/amun-replay-engine/src/cross_constitution_federation.rs-216-        let mut bridge = SovereigntyPreservingBridge::new(1, boundary);
+crates/amun-replay-engine/src/cross_constitution_federation.rs-217-        bridge.record_translation();
+--
+crates/amun-replay-engine/src/temporal_drift.rs-2-//!
+crates/amun-replay-engine/src/temporal_drift.rs-3-//! Time may sequence events, but must never sequence truth.
+crates/amun-replay-engine/src/temporal_drift.rs-4-//! The past does not govern the present. History is auditable,
+crates/amun-replay-engine/src/temporal_drift.rs-5-//! not sovereign.
+crates/amun-replay-engine/src/temporal_drift.rs-6-//!
+crates/amun-replay-engine/src/temporal_drift.rs-7-//! CRITICAL: Temporal precedence ≠ constitutional precedence.
+crates/amun-replay-engine/src/temporal_drift.rs-8-//! An old revision is not a more authoritative one.
+crates/amun-replay-engine/src/temporal_drift.rs-9-
+crates/amun-replay-engine/src/temporal_drift.rs:10:use amun_constitutional::kernel_types::ConstitutionalHash;
+crates/amun-replay-engine/src/temporal_drift.rs-11-
+crates/amun-replay-engine/src/temporal_drift.rs-12-/// A temporal drift boundary — prevents historical drift
+crates/amun-replay-engine/src/temporal_drift.rs-13-/// from becoming constitutional authority.
+crates/amun-replay-engine/src/temporal_drift.rs-14-///
+crates/amun-replay-engine/src/temporal_drift.rs-15-/// As the system evolves across time, old artifacts, old revisions,
+crates/amun-replay-engine/src/temporal_drift.rs-16-/// and old federations may accumulate implicit authority simply
+crates/amun-replay-engine/src/temporal_drift.rs-17-/// through persistence. This boundary prevents that accumulation.
+crates/amun-replay-engine/src/temporal_drift.rs-18-#[derive(Debug, Clone, PartialEq, Eq)]
+--
+crates/amun-replay-engine/src/temporal_drift.rs-60-/// A historical weight neutralizer — prevents precedent gravity.
+crates/amun-replay-engine/src/temporal_drift.rs-61-///
+crates/amun-replay-engine/src/temporal_drift.rs-62-/// Precedent is an operational convenience: "this worked before."
+crates/amun-replay-engine/src/temporal_drift.rs-63-/// It is NOT a constitutional signal: "this is more valid because
+crates/amun-replay-engine/src/temporal_drift.rs-64-/// it has been used longer."
+crates/amun-replay-engine/src/temporal_drift.rs-65-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/temporal_drift.rs-66-pub struct HistoricalWeightNeutralizer {
+crates/amun-replay-engine/src/temporal_drift.rs-67-    /// Artifacts whose historical weight is being tracked.
+crates/amun-replay-engine/src/temporal_drift.rs:68:    pub tracked_artifacts: Vec<ConstitutionalHash>,
+crates/amun-replay-engine/src/temporal_drift.rs-69-    /// Maximum historical usage count before neutrality review.
+crates/amun-replay-engine/src/temporal_drift.rs-70-    pub max_historical_usage: u64,
+crates/amun-replay-engine/src/temporal_drift.rs-71-    /// Whether any artifact has exceeded the neutrality threshold.
+crates/amun-replay-engine/src/temporal_drift.rs-72-    pub neutrality_breach_detected: bool,
+crates/amun-replay-engine/src/temporal_drift.rs-73-}
+crates/amun-replay-engine/src/temporal_drift.rs-74-
+crates/amun-replay-engine/src/temporal_drift.rs-75-impl HistoricalWeightNeutralizer {
+crates/amun-replay-engine/src/temporal_drift.rs-76-    pub fn new(max_usage: u64) -> Self {
+crates/amun-replay-engine/src/temporal_drift.rs-77-        Self { tracked_artifacts: Vec::new(), max_historical_usage: max_usage, neutrality_breach_detected: false }
+crates/amun-replay-engine/src/temporal_drift.rs-78-    }
+crates/amun-replay-engine/src/temporal_drift.rs-79-
+crates/amun-replay-engine/src/temporal_drift.rs-80-    /// Check if an artifact's historical usage exceeds neutrality.
+crates/amun-replay-engine/src/temporal_drift.rs:81:    pub fn check_historical_usage(&mut self, artifact_hash: ConstitutionalHash, usage_count: u64) -> bool {
+crates/amun-replay-engine/src/temporal_drift.rs-82-        if !self.tracked_artifacts.contains(&artifact_hash) {
+crates/amun-replay-engine/src/temporal_drift.rs-83-            self.tracked_artifacts.push(artifact_hash);
+crates/amun-replay-engine/src/temporal_drift.rs-84-        }
+crates/amun-replay-engine/src/temporal_drift.rs-85-        if usage_count > self.max_historical_usage {
+crates/amun-replay-engine/src/temporal_drift.rs-86-            self.neutrality_breach_detected = true;
+crates/amun-replay-engine/src/temporal_drift.rs-87-            false
+crates/amun-replay-engine/src/temporal_drift.rs-88-        } else {
+crates/amun-replay-engine/src/temporal_drift.rs-89-            true
+--
+crates/amun-replay-engine/src/temporal_drift.rs-126-
+crates/amun-replay-engine/src/temporal_drift.rs-127-/// A temporal attribution lineage — history for traceability, not sovereignty.
+crates/amun-replay-engine/src/temporal_drift.rs-128-///
+crates/amun-replay-engine/src/temporal_drift.rs-129-/// Records the temporal sequence of constitutional events for AUDIT.
+crates/amun-replay-engine/src/temporal_drift.rs-130-/// Does NOT confer authority based on age, duration, or precedence.
+crates/amun-replay-engine/src/temporal_drift.rs-131-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-replay-engine/src/temporal_drift.rs-132-pub struct TemporalAttributionLineage {
+crates/amun-replay-engine/src/temporal_drift.rs-133-    /// The sequence of revision activations.
+crates/amun-replay-engine/src/temporal_drift.rs:134:    pub revision_sequence: Vec<(u32, ConstitutionalHash)>,
+crates/amun-replay-engine/src/temporal_drift.rs-135-    /// The current active revision.
+crates/amun-replay-engine/src/temporal_drift.rs-136-    pub active_revision: u32,
+crates/amun-replay-engine/src/temporal_drift.rs-137-    /// Whether any revision claims authority due to age (MUST be false).
+crates/amun-replay-engine/src/temporal_drift.rs-138-    pub age_based_authority_claimed: bool,
+crates/amun-replay-engine/src/temporal_drift.rs-139-}
+crates/amun-replay-engine/src/temporal_drift.rs-140-
+crates/amun-replay-engine/src/temporal_drift.rs-141-impl TemporalAttributionLineage {
+crates/amun-replay-engine/src/temporal_drift.rs:142:    pub fn new(initial_revision: u32, initial_hash: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/temporal_drift.rs-143-        Self { revision_sequence: vec![(initial_revision, initial_hash)], active_revision: initial_revision, age_based_authority_claimed: false }
+crates/amun-replay-engine/src/temporal_drift.rs-144-    }
+crates/amun-replay-engine/src/temporal_drift.rs-145-
+crates/amun-replay-engine/src/temporal_drift.rs:146:    pub fn record_activation(&mut self, revision: u32, hash: ConstitutionalHash) {
+crates/amun-replay-engine/src/temporal_drift.rs-147-        self.revision_sequence.push((revision, hash));
+crates/amun-replay-engine/src/temporal_drift.rs-148-        self.active_revision = revision;
+crates/amun-replay-engine/src/temporal_drift.rs-149-    }
+crates/amun-replay-engine/src/temporal_drift.rs-150-
+crates/amun-replay-engine/src/temporal_drift.rs-151-    /// CRITICAL: Age never confers authority.
+crates/amun-replay-engine/src/temporal_drift.rs-152-    /// Older revisions are auditable, not privileged.
+crates/amun-replay-engine/src/temporal_drift.rs-153-    pub fn check_age_authority(&self) -> bool { self.age_based_authority_claimed }
+crates/amun-replay-engine/src/temporal_drift.rs-154-}
+--
+crates/amun-replay-engine/src/execution_vertex.rs-1-//! ExecutionVertex — an execution event within the distributed DAG.
+crates/amun-replay-engine/src/execution_vertex.rs-2-//!
+crates/amun-replay-engine/src/execution_vertex.rs-3-//! CRITICAL: A vertex represents EXECUTION only. It does NOT carry:
+crates/amun-replay-engine/src/execution_vertex.rs:4://!   - Constitutional validity
+crates/amun-replay-engine/src/execution_vertex.rs-5-//!   - Admissibility judgments

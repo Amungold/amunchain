@@ -1,0 +1,30 @@
+[package]
+name = "amun-benchmarks"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Performance benchmarks for AmunChain components"
+
+[[bench]]
+name = "consensus_bench"
+harness = false
+
+[[bench]]
+name = "storage_bench"
+harness = false
+
+[[bench]]
+name = "sync_bench"
+harness = false
+
+[dependencies]
+ed25519-dalek = "2"
+amun-validator-identity = { path = "../amun-validator-identity" }
+amun-consensus-network = { path = "../amun-consensus-network" }
+amun-chain-store = { path = "../amun-chain-store" }
+amun-state-sync = { path = "../amun-state-sync" }
+amun-resource-core = { path = "../amun-resource-core" }
+criterion = { version = "0.5", features = ["html_reports"] }
+tempfile = "3"
+postcard = { version = "1", features = ["use-std"] }
+rand = "0.8"

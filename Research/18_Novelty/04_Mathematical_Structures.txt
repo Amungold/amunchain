@@ -1,0 +1,1582 @@
+crates/amun-accounts/src/lib.rs:137:        let identity = ConstitutionalIdentity::new(raw_root);
+crates/amun-accounts/src/lib.rs:4:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-amendments/src/proposal.rs:127:        proposer: ProposerIdentity,
+crates/amun-amendments/src/proposal.rs:145:        let mut h = CanonicalHasher::with_domain(AMENDMENT_DOMAIN);
+crates/amun-amendments/src/proposal.rs:1:use amun_canonical_codec::CanonicalHasher;
+crates/amun-amendments/src/proposal.rs:51:    pub proposed_by: ProposerIdentity,
+crates/amun-amendments/src/proposal.rs:8:pub struct ProposerIdentity {
+crates/amun-audit/tests/audit_layer01_physics.rs:102:        let root1 = SparseMerkleTree::canonical_empty_root();
+crates/amun-audit/tests/audit_layer01_physics.rs:103:        let root2 = SparseMerkleTree::canonical_empty_root();
+crates/amun-audit/tests/audit_layer01_physics.rs:3:    use amun_canonical_codec::CanonicalWriter;
+crates/amun-audit/tests/audit_layer01_physics.rs:61:        let mut w = CanonicalWriter::new();
+crates/amun-audit/tests/audit_layer01_physics.rs:84:        let tree1 = SparseMerkleTree::empty().insert(&key, &value, 1);
+crates/amun-audit/tests/audit_layer01_physics.rs:85:        let tree2 = SparseMerkleTree::empty().insert(&key, &value, 1);
+crates/amun-audit/tests/audit_layer01_physics.rs:86:        let tree3 = SparseMerkleTree::empty().insert(&key, &value, 1);
+crates/amun-audit/tests/audit_layer01_physics.rs:99:    // CONST-PHYS-005: Canonical empty root is a frozen constant
+crates/amun-audit/tests/audit_layer01_physics.rs:9:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-audit/tests/audit_layer02_geometry.rs:10:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer02_geometry.rs:37:        let tree = SparseMerkleTree::empty();
+crates/amun-audit/tests/audit_layer02_geometry.rs:3:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-audit/tests/audit_layer02_geometry.rs:47:        let tree = SparseMerkleTree::empty();
+crates/amun-audit/tests/audit_layer02_geometry.rs:59:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer02_geometry.rs:63:            SparseMerkleTree::canonical_empty_root(),
+crates/amun-audit/tests/audit_layer03_snapshot.rs:4:        CompatibilityEngine, CompatibilityLevel, ConstitutionalIdentity, SnapshotHeader,
+crates/amun-audit/tests/audit_layer03_snapshot.rs:57:        let id1 = ConstitutionalIdentity::new([0x42u8; 32]);
+crates/amun-audit/tests/audit_layer03_snapshot.rs:58:        let id2 = ConstitutionalIdentity::new([0x42u8; 32]);
+crates/amun-audit/tests/audit_layer03_snapshot.rs:72:        let id = ConstitutionalIdentity::new([0xAAu8; 32]);
+crates/amun-audit/tests/audit_layer04_byzantine.rs:10:        let identity = ConstitutionalIdentity::new([0x01u8; 32]);
+crates/amun-audit/tests/audit_layer04_byzantine.rs:4:        ByzantineSyncEngine, ConstitutionalIdentity, PeerManifest, SnapshotManifest, SyncDecision,
+crates/amun-audit/tests/audit_layer04_byzantine.rs:55:        let local = ConstitutionalIdentity::new([0xAAu8; 32]);
+crates/amun-audit/tests/audit_layer04_byzantine.rs:56:        let foreign = ConstitutionalIdentity::new([0xBBu8; 32]);
+crates/amun-audit/tests/audit_layer05_identity.rs:16:    // CONST-ID-002: Identity must self-verify
+crates/amun-audit/tests/audit_layer05_identity.rs:19:        let id = ConstitutionalIdentity::new([0xFFu8; 32]);
+crates/amun-audit/tests/audit_layer05_identity.rs:22:            "CONST-ID-002 VIOLATION: Identity must self-verify"
+crates/amun-audit/tests/audit_layer05_identity.rs:29:        let id = ConstitutionalIdentity::new([0xFFu8; 32]);
+crates/amun-audit/tests/audit_layer05_identity.rs:31:        let decoded = ConstitutionalIdentity::decode(&encoded)
+crates/amun-audit/tests/audit_layer05_identity.rs:3:    use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-audit/tests/audit_layer05_identity.rs:46:        let id = ConstitutionalIdentity::new([0x13u8; 32]);
+crates/amun-audit/tests/audit_layer05_identity.rs:51:        if let Some(decoded) = ConstitutionalIdentity::decode(&encoded) {
+crates/amun-audit/tests/audit_layer05_identity.rs:8:        let id1 = ConstitutionalIdentity::new([0x01u8; 32]);
+crates/amun-audit/tests/audit_layer05_identity.rs:9:        let id2 = ConstitutionalIdentity::new([0x02u8; 32]);
+crates/amun-audit/tests/audit_layer06_replay.rs:106:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer06_replay.rs:33:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer06_replay.rs:4:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-audit/tests/audit_layer09_freeze.rs:25:    // CONST-FREEZE-003: Canonical empty root is stable
+crates/amun-audit/tests/audit_layer09_freeze.rs:28:        let root1 = SparseMerkleTree::canonical_empty_root();
+crates/amun-audit/tests/audit_layer09_freeze.rs:29:        let root2 = SparseMerkleTree::canonical_empty_root();
+crates/amun-audit/tests/audit_layer09_freeze.rs:3:    use amun_storage_kernel::SparseMerkleTree;
+crates/amun-audit/tests/audit_layer10_adversarial.rs:19:        let mut tree1 = SparseMerkleTree::empty();
+crates/amun-audit/tests/audit_layer10_adversarial.rs:25:        let mut tree2 = SparseMerkleTree::empty();
+crates/amun-audit/tests/audit_layer10_adversarial.rs:3:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-audit/tests/audit_layer10_adversarial.rs:42:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer10_adversarial.rs:64:        let tree = SparseMerkleTree::empty().insert(&key1, &value, 0);
+crates/amun-audit/tests/audit_layer10_adversarial.rs:79:        let fresh = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer10_adversarial.rs:80:        let cycled = SparseMerkleTree::empty()
+crates/amun-audit/tests/audit_layer11_crash.rs:17:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer11_crash.rs:4:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-audit/tests/audit_layer11_crash.rs:89:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer12_fuzzing.rs:14:            let _ = MerkleProof::decode(&data);
+crates/amun-audit/tests/audit_layer12_fuzzing.rs:22:        let mut tree = SparseMerkleTree::empty();
+crates/amun-audit/tests/audit_layer12_fuzzing.rs:3:    use amun_storage_kernel::smt::proof::MerkleProof;
+crates/amun-audit/tests/audit_layer12_fuzzing.rs:46:        let tree = SparseMerkleTree::empty().insert(&Key256(key), &value, 0);
+crates/amun-audit/tests/audit_layer12_fuzzing.rs:4:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-audit/tests/audit_layer13_differential.rs:11:        let mut w1 = CanonicalWriter::new();
+crates/amun-audit/tests/audit_layer13_differential.rs:15:        let mut w2 = CanonicalWriter::new();
+crates/amun-audit/tests/audit_layer13_differential.rs:21:            "CONST-DIFF-001 VIOLATION: Canonical encoding not deterministic"
+crates/amun-audit/tests/audit_layer13_differential.rs:29:        let mut h1 = CanonicalHasher::with_domain(PROTOCOL_DOMAIN_LEAF);
+crates/amun-audit/tests/audit_layer13_differential.rs:33:        let mut h2 = CanonicalHasher::with_domain(PROTOCOL_DOMAIN_LEAF);
+crates/amun-audit/tests/audit_layer13_differential.rs:46:        let root1 = SparseMerkleTree::canonical_empty_root();
+crates/amun-audit/tests/audit_layer13_differential.rs:47:        let tree = SparseMerkleTree::empty();
+crates/amun-audit/tests/audit_layer13_differential.rs:4:    use amun_canonical_codec::{CanonicalHasher, CanonicalWriter};
+crates/amun-audit/tests/audit_layer13_differential.rs:51:            "CONST-DIFF-003 VIOLATION: Canonical empty root != tree empty root"
+crates/amun-audit/tests/audit_layer13_differential.rs:5:    use amun_storage_kernel::SparseMerkleTree;
+crates/amun-audit/tests/audit_layer13_differential.rs:7:    // CONST-DIFF-001: Canonical encoding is deterministic
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:10:        let identity = ConstitutionalIdentity::new([0x01u8; 32]);
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:4:        ByzantineSyncEngine, ConstitutionalIdentity, PeerManifest, SnapshotManifest, SyncDecision,
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:69:        let local = ConstitutionalIdentity::new([0xAAu8; 32]);
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:70:        let foreign = ConstitutionalIdentity::new([0xBBu8; 32]);
+crates/amun-audit/tests/audit_layer15_temporal.rs:33:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-audit/tests/audit_layer15_temporal.rs:4:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-audit/tests/audit_layer15_temporal.rs:76:        let mut tree = SparseMerkleTree::empty();
+crates/amun-audit/tests/audit_layer15_temporal.rs:82:        let mut tree = SparseMerkleTree::empty();
+crates/amun-audit/tests/audit_layer16_mutation.rs:31:        let root = SparseMerkleTree::canonical_empty_root();
+crates/amun-audit/tests/audit_layer16_mutation.rs:3:    use amun_canonical_codec::CanonicalWriter;
+crates/amun-audit/tests/audit_layer16_mutation.rs:41:        let mut w = CanonicalWriter::new();
+crates/amun-audit/tests/audit_layer16_mutation.rs:4:    use amun_storage_kernel::SparseMerkleTree;
+crates/amun-binary-codec/src/codec.rs:10:pub struct CanonicalEncoder {
+crates/amun-binary-codec/src/codec.rs:114:impl Default for CanonicalEncoder {
+crates/amun-binary-codec/src/codec.rs:14:impl CanonicalEncoder {
+crates/amun-binary-codec/src/codec.rs:49:pub struct CanonicalDecoder<'a> {
+crates/amun-binary-codec/src/codec.rs:54:impl<'a> CanonicalDecoder<'a> {
+crates/amun-binary-codec/src/event_codec.rs:12:pub fn decode_event_position(dec: &mut CanonicalDecoder) -> Option<ChainPosition> {
+crates/amun-binary-codec/src/event_codec.rs:1:use crate::codec::{CanonicalDecoder, CanonicalEncoder};
+crates/amun-binary-codec/src/event_codec.rs:7:pub fn encode_event_position(enc: &mut CanonicalEncoder, position: ChainPosition) {
+crates/amun-binary-codec/src/lib.rs:4:pub use codec::{CanonicalDecoder, CanonicalEncoder, CodecError};
+crates/amun-block/src/body.rs:2:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-block/src/body.rs:56:impl CanonicalEncode for BlockBody {
+crates/amun-block/src/body.rs:59:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-block/src/body.rs:68:impl CanonicalDecode for BlockBody {
+crates/amun-block/src/header.rs:1:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-block/src/header.rs:51:impl CanonicalEncode for BlockHeader {
+crates/amun-block/src/header.rs:53:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-block/src/header.rs:68:impl CanonicalDecode for BlockHeader {
+crates/amun-block/src/tests.rs:3:use amun_codec::{CanonicalDecode, CanonicalEncode};
+crates/amun-canonical-codec/src/hasher.rs:11:impl CanonicalHasher {
+crates/amun-canonical-codec/src/hasher.rs:1:pub struct CanonicalHasher {
+crates/amun-canonical-codec/src/hasher.rs:5:impl Default for CanonicalHasher {
+crates/amun-canonical-codec/src/lib.rs:11:pub use hasher::CanonicalHasher;
+crates/amun-canonical-codec/src/lib.rs:12:pub use reader::CanonicalReader;
+crates/amun-canonical-codec/src/lib.rs:13:pub use writer::CanonicalWriter;
+crates/amun-canonical-codec/src/reader.rs:3:pub struct CanonicalReader<'a> {
+crates/amun-canonical-codec/src/reader.rs:8:impl<'a> CanonicalReader<'a> {
+crates/amun-canonical-codec/src/writer.rs:11:impl CanonicalWriter {
+crates/amun-canonical-codec/src/writer.rs:1:pub struct CanonicalWriter {
+crates/amun-canonical-codec/src/writer.rs:38:            panic!("CanonicalWriter: allocation exceeds constitutional limit");
+crates/amun-canonical-codec/src/writer.rs:5:impl Default for CanonicalWriter {
+crates/amun-canonical-collections/src/lib.rs:115:impl<K: Ord, V> DeterministicCollection for CanonicalMap<K, V> {}
+crates/amun-canonical-collections/src/lib.rs:116:impl<K: Ord, V> BoundedCollection for CanonicalMap<K, V> {
+crates/amun-canonical-collections/src/lib.rs:120:impl<K: Ord + CanonicalEncode, V: CanonicalEncode> ReplaySafe for CanonicalMap<K, V> {
+crates/amun-canonical-collections/src/lib.rs:127:impl<K: Ord + CanonicalEncode, V: CanonicalEncode> CanonicalEncode for CanonicalMap<K, V> {
+crates/amun-canonical-collections/src/lib.rs:130:impl<K: Ord, V> Default for CanonicalMap<K, V> { fn default() -> Self { Self::new() } }
+crates/amun-canonical-collections/src/lib.rs:132:// ─── CanonicalDeque<T> ─────────────────────────────────────
+crates/amun-canonical-collections/src/lib.rs:134:pub struct CanonicalDeque<T> { inner: VecDeque<T>, max_capacity: usize }
+crates/amun-canonical-collections/src/lib.rs:136:impl<T> CanonicalDeque<T> {
+crates/amun-canonical-collections/src/lib.rs:13:use amun_kernel::canonical::CanonicalEncode;
+crates/amun-canonical-collections/src/lib.rs:155:impl<T> DeterministicCollection for CanonicalDeque<T> {}
+crates/amun-canonical-collections/src/lib.rs:156:impl<T> BoundedCollection for CanonicalDeque<T> {
+crates/amun-canonical-collections/src/lib.rs:160:impl<T: CanonicalEncode> ReplaySafe for CanonicalDeque<T> {
+crates/amun-canonical-collections/src/lib.rs:167:impl<T: CanonicalEncode> CanonicalEncode for CanonicalDeque<T> {
+crates/amun-canonical-collections/src/lib.rs:170:impl<T> Default for CanonicalDeque<T> { fn default() -> Self { Self::new() } }
+crates/amun-canonical-collections/src/lib.rs:175:    #[test] fn test_set_deterministic() { let mut s = CanonicalSet::new(); s.insert(3u64).unwrap(); s.insert(1u64).unwrap(); s.insert(2u64).unwrap(); assert_eq!(s.iter().copied().collect::<Vec<_>>(), vec![1,2,3]); }
+crates/amun-canonical-collections/src/lib.rs:176:    #[test] fn test_set_capacity() { let mut s = CanonicalSet::with_capacity(2); s.insert(1u64).unwrap(); s.insert(2u64).unwrap(); assert!(s.insert(3u64).is_err()); }
+crates/amun-canonical-collections/src/lib.rs:177:    #[test] fn test_set_default_not_unbounded() { assert_eq!(CanonicalSet::<u64>::new().capacity(), 1_048_576); }
+crates/amun-canonical-collections/src/lib.rs:178:    #[test] fn test_rejects_zero_capacity() { assert!(CanonicalSet::<u64>::try_with_capacity(0).is_err()); }
+crates/amun-canonical-collections/src/lib.rs:179:    #[test] fn test_replay_root_deterministic() { let mut a = CanonicalSet::new(); let mut b = CanonicalSet::new(); a.insert(1u64).unwrap(); a.insert(2u64).unwrap(); b.insert(2u64).unwrap(); b.insert(1u64).unwrap(); assert_eq!(a.canonical_root(), b.canonical_root()); }
+crates/amun-canonical-collections/src/lib.rs:180:    #[test] fn test_map_deterministic() { let mut m = CanonicalMap::new(); m.insert("c",3).unwrap(); m.insert("a",1).unwrap(); m.insert("b",2).unwrap(); assert_eq!(m.keys().copied().collect::<Vec<_>>(), vec!["a","b","c"]); }
+crates/amun-canonical-collections/src/lib.rs:181:    #[test] fn test_deque_fifo() { let mut d = CanonicalDeque::new(); d.push_back(1).unwrap(); d.push_back(2).unwrap(); d.push_back(3).unwrap(); assert_eq!(d.pop_front(), Some(1)); assert_eq!(d.pop_front(), Some(2)); assert_eq!(d.pop_front(), Some(3)); }
+crates/amun-canonical-collections/src/lib.rs:182:    #[test] fn test_domain_separation() { let mut s = CanonicalSet::new(); s.insert(1u64).unwrap(); let mut m = CanonicalMap::new(); m.insert(1u64,1u64).unwrap(); assert_ne!(s.canonical_root(), m.canonical_root()); }
+crates/amun-canonical-collections/src/lib.rs:183:    #[test] fn test_full_detection() { let mut s = CanonicalSet::with_capacity(1); s.insert(1u64).unwrap(); assert!(s.is_full()); }
+crates/amun-canonical-collections/src/lib.rs:18:pub trait ReplaySafe: DeterministicCollection + CanonicalEncode {
+crates/amun-canonical-collections/src/lib.rs:1://! Canonical Collections — deterministic, replay-safe container types.
+crates/amun-canonical-collections/src/lib.rs:43:// ─── CanonicalSet<T> ───────────────────────────────────────
+crates/amun-canonical-collections/src/lib.rs:45:pub struct CanonicalSet<T: Ord> { inner: BTreeSet<T>, max_capacity: usize }
+crates/amun-canonical-collections/src/lib.rs:47:impl<T: Ord> CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:67:impl<T: Ord> DeterministicCollection for CanonicalSet<T> {}
+crates/amun-canonical-collections/src/lib.rs:68:impl<T: Ord> BoundedCollection for CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:72:impl<T: Ord + CanonicalEncode> ReplaySafe for CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:79:impl<T: Ord + CanonicalEncode> CanonicalEncode for CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:82:impl<T: Ord> Default for CanonicalSet<T> { fn default() -> Self { Self::new() } }
+crates/amun-canonical-collections/src/lib.rs:83:impl<T: Ord> IntoIterator for CanonicalSet<T> {
+crates/amun-canonical-collections/src/lib.rs:88:// ─── CanonicalMap<K,V> ─────────────────────────────────────
+crates/amun-canonical-collections/src/lib.rs:90:pub struct CanonicalMap<K: Ord, V> { inner: BTreeMap<K, V>, max_capacity: usize }
+crates/amun-canonical-collections/src/lib.rs:92:impl<K: Ord, V> CanonicalMap<K, V> {
+crates/amun-canonical/src/decoder.rs:13:    pub fn read_u64(&mut self) -> Result<u64, CanonicalError> {
+crates/amun-canonical/src/decoder.rs:15:            return Err(CanonicalError::TruncatedData);
+crates/amun-canonical/src/decoder.rs:1:use crate::error::CanonicalError;
+crates/amun-canonical/src/decoder.rs:23:    pub fn read_u32(&mut self) -> Result<u32, CanonicalError> {
+crates/amun-canonical/src/decoder.rs:25:            return Err(CanonicalError::TruncatedData);
+crates/amun-canonical/src/decoder.rs:33:    pub fn read_bytes(&mut self) -> Result<&[u8], CanonicalError> {
+crates/amun-canonical/src/decoder.rs:36:            return Err(CanonicalError::TruncatedData);
+crates/amun-canonical/src/decoder.rs:3:pub struct CanonicalDecoder<'a> {
+crates/amun-canonical/src/decoder.rs:43:    pub fn read_u8(&mut self) -> Result<u8, CanonicalError> {
+crates/amun-canonical/src/decoder.rs:45:            return Err(CanonicalError::TruncatedData);
+crates/amun-canonical/src/decoder.rs:8:impl<'a> CanonicalDecoder<'a> {
+crates/amun-canonical/src/encoder.rs:19:    pub fn write_u64(&mut self, v: u64) -> Result<(), CanonicalError> {
+crates/amun-canonical/src/encoder.rs:1:use crate::error::CanonicalError;
+crates/amun-canonical/src/encoder.rs:22:            .map_err(|_| CanonicalError::BufferOverflow)
+crates/amun-canonical/src/encoder.rs:25:    pub fn write_u32(&mut self, v: u32) -> Result<(), CanonicalError> {
+crates/amun-canonical/src/encoder.rs:28:            .map_err(|_| CanonicalError::BufferOverflow)
+crates/amun-canonical/src/encoder.rs:31:    pub fn write_u16(&mut self, v: u16) -> Result<(), CanonicalError> {
+crates/amun-canonical/src/encoder.rs:34:            .map_err(|_| CanonicalError::BufferOverflow)
+crates/amun-canonical/src/encoder.rs:37:    pub fn write_u8(&mut self, v: u8) -> Result<(), CanonicalError> {
+crates/amun-canonical/src/encoder.rs:38:        self.buf.push(v).map_err(|_| CanonicalError::BufferOverflow)
+crates/amun-canonical/src/encoder.rs:41:    pub fn write_bytes(&mut self, b: &[u8]) -> Result<(), CanonicalError> {
+crates/amun-canonical/src/encoder.rs:43:            return Err(CanonicalError::InvalidLength);
+crates/amun-canonical/src/encoder.rs:48:            .map_err(|_| CanonicalError::BufferOverflow)
+crates/amun-canonical/src/encoder.rs:4:pub struct CanonicalEncoder {
+crates/amun-canonical/src/encoder.rs:9:impl CanonicalEncoder {
+crates/amun-canonical/src/error.rs:2:pub enum CanonicalError {
+crates/amun-canonical/src/lib.rs:10:pub use encoder::CanonicalEncoder;
+crates/amun-canonical/src/lib.rs:12:pub use error::CanonicalError;
+crates/amun-canonical/src/lib.rs:15:pub use sorter::CanonicalSorter;
+crates/amun-canonical/src/lib.rs:9:pub use decoder::CanonicalDecoder;
+crates/amun-canonical/src/sorter.rs:3:pub struct CanonicalSorter;
+crates/amun-canonical/src/sorter.rs:5:impl CanonicalSorter {
+crates/amun-chain-checkpoint/src/inclusion.rs:20:    pub proof: MerkleProof,
+crates/amun-chain-checkpoint/src/inclusion.rs:2:use amun_constitutional_commitments::smt::{MerkleProof, SparseMerkleTree};
+crates/amun-chain-checkpoint/src/inclusion.rs:31:    let mut tree = SparseMerkleTree::new(CHECKPOINT_MERKLE_DOMAIN);
+crates/amun-chain-checkpoint/src/inclusion.rs:51:        let tree = SparseMerkleTree::new(CHECKPOINT_MERKLE_DOMAIN);
+crates/amun-chain-checkpoint/src/inclusion.rs:8:    let mut tree = SparseMerkleTree::new(CHECKPOINT_MERKLE_DOMAIN);
+crates/amun-chain-checkpoint/src/lib.rs:221:    /// Necessary for Merkle tree operations that expect [u8; 32].
+crates/amun-chain-checkpoint/src/lib.rs:47:/// of the AmunChain proof layers (ReplayCertificate, CertificateMerkleRoot, etc.).
+crates/amun-chain-store/src/record.rs:22:    /// CCA v1.0: Economic Merkle tree root
+crates/amun-chain-store/src/record.rs:24:    /// CCA v1.0: Identity root from authority registry
+crates/amun-chunked-snapshot/src/manifest.rs:15:    pub fn new(snapshot: &CanonicalSnapshot, chunks: &[SnapshotChunk]) -> Self {
+crates/amun-chunked-snapshot/src/manifest.rs:2:use amun_snapshot_constitution::CanonicalSnapshot;
+crates/amun-civilizational-relations/src/lib.rs:5:pub use topology::CivilizationalTopology;
+crates/amun-civilizational-relations/src/relation.rs:1:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-civilizational-relations/src/relation.rs:38:    pub fn classify(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> Self {
+crates/amun-civilizational-relations/src/topology.rs:17:impl CivilizationalTopology {
+crates/amun-civilizational-relations/src/topology.rs:6:pub struct CivilizationalTopology {
+crates/amun-codec/src/canonical_sort.rs:10:impl<T: CanonicalEncode> CanonicalSortKey for T {
+crates/amun-codec/src/canonical_sort.rs:11:    fn write_sort_key(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/canonical_sort.rs:16:pub fn compare_by_canonical_bytes<T: CanonicalEncode>(a: &T, b: &T) -> core::cmp::Ordering {
+crates/amun-codec/src/canonical_sort.rs:1:// Canonical sorting using byte-ordered comparison.
+crates/amun-codec/src/canonical_sort.rs:3:use crate::encode::CanonicalEncode;
+crates/amun-codec/src/canonical_sort.rs:44:pub fn canonical_sort<T: CanonicalEncode>(items: &mut [T]) {
+crates/amun-codec/src/canonical_sort.rs:4:use crate::writer::{BufferWriter, CanonicalWriter, WriteResult};
+crates/amun-codec/src/canonical_sort.rs:6:pub trait CanonicalSortKey {
+crates/amun-codec/src/canonical_sort.rs:7:    fn write_sort_key(&self, writer: &mut impl CanonicalWriter) -> WriteResult;
+crates/amun-codec/src/containers.rs:1:// Canonical container encoding: sequences, sets, and maps.
+crates/amun-codec/src/containers.rs:3:use crate::encode::CanonicalEncode;
+crates/amun-codec/src/containers.rs:45:pub fn encode_sequence<T: CanonicalEncode>(
+crates/amun-codec/src/containers.rs:47:    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/containers.rs:4:use crate::writer::{CanonicalWriter, WriteResult};
+crates/amun-codec/src/containers.rs:64:pub fn encode_set<T: CanonicalEncode + Ord>(
+crates/amun-codec/src/containers.rs:66:    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/containers.rs:95:pub fn encode_map<K: CanonicalEncode + Ord, V: CanonicalEncode>(
+crates/amun-codec/src/containers.rs:97:    writer: &mut impl CanonicalWriter,
+crates/amun-codec/src/decode.rs:108:impl CanonicalDecode for [u8; 48] {
+crates/amun-codec/src/decode.rs:123:impl CanonicalDecode for [u8; 96] {
+crates/amun-codec/src/decode.rs:140:        impl CanonicalDecode for $t {
+crates/amun-codec/src/decode.rs:161:impl<D> CanonicalDecode for amun_kernel_types::Hash<D> {
+crates/amun-codec/src/decode.rs:176:impl CanonicalDecode for amun_kernel_types::PublicHash32 {
+crates/amun-codec/src/decode.rs:191:impl CanonicalDecode for amun_kernel_types::CommitmentHash32 {
+crates/amun-codec/src/decode.rs:22:impl CanonicalDecode for u8 {
+crates/amun-codec/src/decode.rs:35:impl CanonicalDecode for u16 {
+crates/amun-codec/src/decode.rs:48:impl CanonicalDecode for u32 {
+crates/amun-codec/src/decode.rs:63:impl CanonicalDecode for u64 {
+crates/amun-codec/src/decode.rs:6:pub trait CanonicalDecode: Sized {
+crates/amun-codec/src/decode.rs:78:impl CanonicalDecode for u128 {
+crates/amun-codec/src/decode.rs:93:impl CanonicalDecode for [u8; 32] {
+crates/amun-codec/src/encode.rs:103:impl CanonicalEncode for Amount {
+crates/amun-codec/src/encode.rs:105:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:110:impl CanonicalEncode for ValidatorId {
+crates/amun-codec/src/encode.rs:112:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:117:impl CanonicalEncode for PublicKey {
+crates/amun-codec/src/encode.rs:119:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:124:impl CanonicalEncode for Signature {
+crates/amun-codec/src/encode.rs:126:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:133:impl<D> CanonicalEncode for amun_kernel_types::Hash<D> {
+crates/amun-codec/src/encode.rs:135:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:13:pub trait CanonicalEncode {
+crates/amun-codec/src/encode.rs:140:impl CanonicalEncode for amun_kernel_types::PublicHash32 {
+crates/amun-codec/src/encode.rs:142:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:147:impl CanonicalEncode for amun_kernel_types::CommitmentHash32 {
+crates/amun-codec/src/encode.rs:149:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:15:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult;
+crates/amun-codec/src/encode.rs:1:// CanonicalEncode trait with single source of truth.
+crates/amun-codec/src/encode.rs:29:impl CanonicalEncode for u8 {
+crates/amun-codec/src/encode.rs:31:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:36:impl CanonicalEncode for u16 {
+crates/amun-codec/src/encode.rs:38:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:43:impl CanonicalEncode for u32 {
+crates/amun-codec/src/encode.rs:45:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:50:impl CanonicalEncode for u64 {
+crates/amun-codec/src/encode.rs:52:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:57:impl CanonicalEncode for u128 {
+crates/amun-codec/src/encode.rs:59:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:64:impl CanonicalEncode for [u8; 32] {
+crates/amun-codec/src/encode.rs:66:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:71:impl CanonicalEncode for [u8; 48] {
+crates/amun-codec/src/encode.rs:73:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:78:impl CanonicalEncode for [u8; 96] {
+crates/amun-codec/src/encode.rs:7:use crate::writer::{BufferWriter, CanonicalWriter, HasherWriter, WriteResult};
+crates/amun-codec/src/encode.rs:80:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/encode.rs:87:        impl CanonicalEncode for $t {
+crates/amun-codec/src/encode.rs:89:            fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/hash.rs:11:impl<T: CanonicalEncode> CanonicalHash for T {
+crates/amun-codec/src/hash.rs:1:// Canonical hash trait and streaming hash implementation.
+crates/amun-codec/src/hash.rs:20:pub fn hash_value_streaming<T: CanonicalEncode>(value: &T) -> AmunResult<PublicHash32> {
+crates/amun-codec/src/hash.rs:3:use crate::encode::CanonicalEncode;
+crates/amun-codec/src/hash.rs:7:pub trait CanonicalHash {
+crates/amun-codec/src/lib.rs:18:pub use canonical_sort::{canonical_sort, compare_by_canonical_bytes, CanonicalSortKey};
+crates/amun-codec/src/lib.rs:1:// Canonical deterministic serialization.
+crates/amun-codec/src/lib.rs:22:pub use decode::CanonicalDecode;
+crates/amun-codec/src/lib.rs:24:pub use encode::CanonicalEncode;
+crates/amun-codec/src/lib.rs:26:pub use transducer::{CanonicalCursor, CanonicalTransducer, SliceCursor, U64Cursor};
+crates/amun-codec/src/lib.rs:28:pub use writer::{BufferWriter, CanonicalWriter, HasherWriter, ShadowBufferWriter, WriteResult};
+crates/amun-codec/src/lib.rs:2:// Single source of truth: CanonicalWriter trait.
+crates/amun-codec/src/transducer.rs:10:impl CanonicalTransducer {
+crates/amun-codec/src/transducer.rs:11:    pub fn compare<A: CanonicalCursor, B: CanonicalCursor>(
+crates/amun-codec/src/transducer.rs:40:impl CanonicalCursor for U64Cursor {
+crates/amun-codec/src/transducer.rs:4:pub trait CanonicalCursor {
+crates/amun-codec/src/transducer.rs:62:impl<'a> CanonicalCursor for SliceCursor<'a> {
+crates/amun-codec/src/transducer.rs:8:pub struct CanonicalTransducer;
+crates/amun-codec/src/versioned.rs:2:use crate::writer::{CanonicalWriter, WriteResult};
+crates/amun-codec/src/versioned.rs:35:    pub fn write(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-codec/src/writer.rs:160:impl<'a> CanonicalWriter for ShadowBufferWriter<'a> {
+crates/amun-codec/src/writer.rs:40:impl<'a> CanonicalWriter for BufferWriter<'a> {
+crates/amun-codec/src/writer.rs:76:impl<'a> CanonicalWriter for HasherWriter<'a> {
+crates/amun-codec/src/writer.rs:8:pub trait CanonicalWriter {
+crates/amun-compatibility/src/matrix.rs:2:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-compatibility/src/matrix.rs:34:    pub source_identity: ConstitutionalIdentity,
+crates/amun-compatibility/src/matrix.rs:35:    pub target_identity: ConstitutionalIdentity,
+crates/amun-compatibility/src/matrix.rs:44:    pub fn compute(source: &ConstitutionalIdentity, target: &ConstitutionalIdentity) -> Self {
+crates/amun-complexity-budget/src/budget.rs:20:    pub fn exceeds_budget(&self, metrics: &ComplexityMetrics) -> Option<BudgetViolation> {
+crates/amun-complexity-budget/src/budget.rs:54:use crate::metrics::ComplexityMetrics;
+crates/amun-complexity-budget/src/lib.rs:5:pub use metrics::ComplexityMetrics;
+crates/amun-complexity-budget/src/metrics.rs:11:impl ComplexityMetrics {
+crates/amun-complexity-budget/src/metrics.rs:2:pub struct ComplexityMetrics {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:178:            EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/engine.rs:192:pub struct ConsensusMetrics {
+crates/amun-consensus-network/src/engine.rs:198:impl ConsensusMetrics {
+crates/amun-consensus-network/src/engine.rs:243:    pub metrics: ConsensusMetrics,
+crates/amun-consensus-network/src/engine.rs:263:            metrics: ConsensusMetrics::new(),
+crates/amun-consensus-network/src/evidence_gossip.rs:162:            evidence_type: EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/evidence_store.rs:103:        Self::new(v, h, EvidenceType::StateRootMismatch, t, payload)
+crates/amun-consensus-network/src/evidence_store.rs:15:    StateRootMismatch,
+crates/amun-consensus-network/src/evidence_store.rs:264:            EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/evidence_store.rs:336:            EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/evidence_store.rs:60:            EvidenceType::StateRootMismatch => 0x01u8,
+crates/amun-consensus-network/src/integrated_slashing.rs:174:        // Each StateRootMismatch = weight 3
+crates/amun-consensus-network/src/integrated_slashing.rs:180:                EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/lib.rs:18:pub use validator_identity::{ValidatorIdentity, ValidatorIdentityRegistry};
+crates/amun-consensus-network/src/lib.rs:55:pub use metrics::ConsensusMetrics;
+crates/amun-consensus-network/src/metrics.rs:23:impl ConsensusMetrics {
+crates/amun-consensus-network/src/metrics.rs:5:pub struct ConsensusMetrics {
+crates/amun-consensus-network/src/misbehavior_registry.rs:164:            EvidenceType::StateRootMismatch => self.thresholds.state_root_mismatch_weight,
+crates/amun-consensus-network/src/misbehavior_registry.rs:274:        reg.record_misbehavior(&[1u8; 32], &[0xA2; 32], &EvidenceType::StateRootMismatch, 2); // +3
+crates/amun-consensus-network/src/misbehavior_registry.rs:309:        reg.record_misbehavior(&[1u8; 32], &[0xD2; 32], &EvidenceType::StateRootMismatch, 2); // +3
+crates/amun-consensus-network/src/misbehavior_registry.rs:310:        reg.record_misbehavior(&[1u8; 32], &[0xD3; 32], &EvidenceType::StateRootMismatch, 3); // +3
+crates/amun-consensus-network/src/misbehavior_registry.rs:374:            EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/misbehavior_registry.rs:396:        reg.record_misbehavior(&[1u8; 32], &[0x02; 32], &EvidenceType::StateRootMismatch, 2); // +3 → 5 → suspension
+crates/amun-consensus-network/src/misbehavior_registry.rs:398:        reg.record_misbehavior(&[1u8; 32], &[0x03; 32], &EvidenceType::StateRootMismatch, 3); // +3 → 8 → slashing
+crates/amun-consensus-network/src/real_staking_adapter.rs:110:            .register(crate::ValidatorIdentity::new(validator_id, pk.0, 1))
+crates/amun-consensus-network/src/real_staking_adapter.rs:14:    pub identity_registry: ValidatorIdentityRegistry,
+crates/amun-consensus-network/src/real_staking_adapter.rs:185:        let mut id_registry = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/real_staking_adapter.rs:187:            .register(crate::ValidatorIdentity::new(validator_id, [0x42u8; 48], 1))
+crates/amun-consensus-network/src/real_staking_adapter.rs:22:            identity_registry: ValidatorIdentityRegistry::new(),
+crates/amun-consensus-network/src/real_staking_adapter.rs:28:        identity_registry: ValidatorIdentityRegistry,
+crates/amun-consensus-network/src/real_staking_adapter.rs:5:use crate::validator_identity::ValidatorIdentityRegistry;
+crates/amun-consensus-network/src/slashing.rs:112:        registry.record_misbehavior(&[1u8; 32], &[0xD2; 32], &EvidenceType::StateRootMismatch, 2); // +3
+crates/amun-consensus-network/src/slashing.rs:132:            (EvidenceType::StateRootMismatch, 13),
+crates/amun-consensus-network/src/slashing.rs:66:        // One StateRootMismatch (weight 3) → score=3, below warning (5)
+crates/amun-consensus-network/src/slashing.rs:70:            &EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/slashing_certificate.rs:94:    /// N114.1: Canonical bytes to be signed (excludes signature and hash).
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:10:/// N121.4: A Merkle inclusion proof for an executed slash.
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:1:// N121.4 — Merkle Inclusion Proofs for Slashing Ledger
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:22:    /// Merkle proof: sibling hashes from leaf to root
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:25:    /// The expected Merkle root
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:5:// slashing_root and a Merkle proof.
+crates/amun-consensus-network/src/slashing_merkle.rs:139:            "N120.1 FAIL: Merkle root must be order-sensitive (A,B) != (B,A)"
+crates/amun-consensus-network/src/slashing_merkle.rs:22:/// N120.1: Compute the Merkle root from a slice of executed slashes.
+crates/amun-consensus-network/src/slashing_merkle.rs:23:/// Uses a simple binary Merkle tree with blake3.
+crates/amun-consensus-network/src/slashing_merkle.rs:3:// Computes a Merkle root from the SlashingLedger's executed certificates,
+crates/amun-consensus-network/src/slashing_merkle.rs:85:        // Note: order matters for Merkle trees. Same set, same order = same root.
+crates/amun-consensus-network/src/slashing_state.rs:4:// first-class consensus state component with its own Merkle root.
+crates/amun-consensus-network/src/validator_identity.rs:100:    pub fn register(&mut self, identity: ValidatorIdentity) -> Result<(), String> {
+crates/amun-consensus-network/src/validator_identity.rs:102:            return Err("Identity binding verification failed".into());
+crates/amun-consensus-network/src/validator_identity.rs:115:    pub fn get(&self, validator_id: &[u8; 32]) -> Option<&ValidatorIdentity> {
+crates/amun-consensus-network/src/validator_identity.rs:150:impl Default for ValidatorIdentityRegistry {
+crates/amun-consensus-network/src/validator_identity.rs:168:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:174:        let mut id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:181:        let id1 = ValidatorIdentity::new([0x01; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:182:        let id2 = ValidatorIdentity::new([0x02; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:188:        let id1 = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:189:        let id2 = ValidatorIdentity::new([0x42; 32], make_pk_bytes(2), 100);
+crates/amun-consensus-network/src/validator_identity.rs:195:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:196:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:19:pub struct ValidatorIdentity {
+crates/amun-consensus-network/src/validator_identity.rs:1:// N113.1 — Unified Validator Identity
+crates/amun-consensus-network/src/validator_identity.rs:205:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:206:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:213:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:214:        let mut id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:221:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:222:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:232:        let identity = ValidatorIdentity::new(validator_id, pk_bytes, 100);
+crates/amun-consensus-network/src/validator_identity.rs:237:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:249:        let mut reg = ValidatorIdentityRegistry::new();
+crates/amun-consensus-network/src/validator_identity.rs:251:        let id1 = ValidatorIdentity::new([0x01; 32], make_pk_bytes(10), 1);
+crates/amun-consensus-network/src/validator_identity.rs:252:        let id2 = ValidatorIdentity::new([0x02; 32], make_pk_bytes(20), 2);
+crates/amun-consensus-network/src/validator_identity.rs:257:        let id1_alt = ValidatorIdentity::new([0x01; 32], make_pk_bytes(99), 3);
+crates/amun-consensus-network/src/validator_identity.rs:268:        let id = ValidatorIdentity::new([0x42; 32], make_pk_bytes(1), 100);
+crates/amun-consensus-network/src/validator_identity.rs:270:        let decoded: ValidatorIdentity = postcard::from_bytes(&encoded).unwrap();
+crates/amun-consensus-network/src/validator_identity.rs:40:impl ValidatorIdentity {
+crates/amun-consensus-network/src/validator_identity.rs:4:// with a permanent ValidatorIdentity struct that binds consensus identity,
+crates/amun-consensus-network/src/validator_identity.rs:87:/// N113.1: Registry mapping validator_id → ValidatorIdentity.
+crates/amun-consensus-network/src/validator_identity.rs:88:pub struct ValidatorIdentityRegistry {
+crates/amun-consensus-network/src/validator_identity.rs:89:    identities: std::collections::HashMap<[u8; 32], ValidatorIdentity>,
+crates/amun-consensus-network/src/validator_identity.rs:92:impl ValidatorIdentityRegistry {
+crates/amun-consensus-network/src/validator_identity.rs:9:// Every ValidatorIdentity is cryptographically bound to its PublicKey.
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:171:    let mut metrics = ConsensusMetrics::default();
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:230:// TEST: Metrics increment correctly on mismatch
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:234:    let mut metrics = ConsensusMetrics::default();
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:37:// N109.7B — Metrics
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:40:struct ConsensusMetrics {
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:85:    // Roots differ because Merkle tree is order-sensitive
+crates/amun-consensus-types/src/bitmap.rs:1:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-consensus-types/src/bitmap.rs:36:impl CanonicalEncode for SignerBitmap {
+crates/amun-consensus-types/src/bitmap.rs:38:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/bitmap.rs:43:impl CanonicalDecode for SignerBitmap {
+crates/amun-consensus-types/src/message.rs:2:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-consensus-types/src/message.rs:52:impl CanonicalEncode for ConsensusMessage {
+crates/amun-consensus-types/src/message.rs:54:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/message.rs:66:impl CanonicalDecode for ConsensusMessage {
+crates/amun-consensus-types/src/phase.rs:1:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-consensus-types/src/phase.rs:55:impl CanonicalEncode for ConsensusPhase {
+crates/amun-consensus-types/src/phase.rs:57:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/phase.rs:62:impl CanonicalDecode for ConsensusPhase {
+crates/amun-consensus-types/src/qc.rs:25:impl CanonicalEncode for QuorumCertificate {
+crates/amun-consensus-types/src/qc.rs:27:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/qc.rs:38:impl CanonicalDecode for QuorumCertificate {
+crates/amun-consensus-types/src/qc.rs:4:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-consensus-types/src/round.rs:1:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-consensus-types/src/round.rs:27:impl CanonicalEncode for ConsensusRound {
+crates/amun-consensus-types/src/round.rs:29:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/round.rs:34:impl CanonicalDecode for ConsensusRound {
+crates/amun-consensus-types/src/tests.rs:3:use amun_codec::CanonicalDecode;
+crates/amun-consensus-types/src/tests.rs:4:use amun_codec::CanonicalEncode;
+crates/amun-consensus-types/src/validator.rs:17:impl CanonicalEncode for ValidatorIndex {
+crates/amun-consensus-types/src/validator.rs:19:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/validator.rs:1:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-consensus-types/src/validator.rs:24:impl CanonicalDecode for ValidatorIndex {
+crates/amun-consensus-types/src/vote.rs:43:impl CanonicalEncode for Vote {
+crates/amun-consensus-types/src/vote.rs:45:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-consensus-types/src/vote.rs:4:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-consensus-types/src/vote.rs:56:impl CanonicalDecode for Vote {
+crates/amun-consensus/amun_consensus/src/block/mod.rs:105:        CanonicalOrdering::sort_events(&mut self.events, block_height);
+crates/amun-consensus/amun_consensus/src/block/mod.rs:109:        CanonicalOrdering::is_canonically_ordered(&self.events, block_height)
+crates/amun-consensus/amun_consensus/src/block/mod.rs:4:use amun_state_machine::{Event, CanonicalOrdering};
+crates/amun-consensus/src/action.rs:100:            amun_constitutional_commitments::SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-consensus/src/action.rs:113:            amun_constitutional_commitments::SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-consensus/src/action.rs:132:    pub proof: MerkleProof,
+crates/amun-consensus/src/action.rs:138:        let tree = amun_constitutional_commitments::SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-consensus/src/action.rs:2:use amun_constitutional_commitments::smt::MerkleProof;
+crates/amun-consensus/src/round_state_machine.rs:131:        //   - StateRootIntegrity (block root == execution root)
+crates/amun-constitution-builder/src/canonical_bytes.rs:5:pub trait CanonicalSerialize {
+crates/amun-constitution-builder/src/certificate.rs:59:impl CanonicalEmit for FreezeCertificate {
+crates/amun-constitution-builder/src/certificate.rs:5:use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/certificate.rs:7:use crate::emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/certificate.rs:81:impl CanonicalSerialize for FreezeCertificate {
+crates/amun-constitution-builder/src/certificate.rs:83:        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitution-builder/src/digest.rs:5:use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/digest.rs:8:pub trait ArtifactDigest: CanonicalSerialize {
+crates/amun-constitution-builder/src/emitter.rs:5:pub trait CanonicalEmit {
+crates/amun-constitution-builder/src/federation.rs:105:impl CanonicalSerialize for FederationArtifact {
+crates/amun-constitution-builder/src/federation.rs:107:        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitution-builder/src/federation.rs:5:use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/federation.rs:70:impl CanonicalEmit for FederationArtifact {
+crates/amun-constitution-builder/src/federation.rs:7:use crate::emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/lib.rs:17:pub use canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/lib.rs:20:pub use emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/manifest.rs:51:impl CanonicalEmit for ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs:56:        lines.push("## Civilization Identity".to_string());
+crates/amun-constitution-builder/src/manifest.rs:5:use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/manifest.rs:7:use crate::emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/manifest.rs:82:impl CanonicalSerialize for ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs:84:        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitution-builder/src/treaty.rs:49:impl CanonicalEmit for TreatyArtifact {
+crates/amun-constitution-builder/src/treaty.rs:5:use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/treaty.rs:7:use crate::emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/treaty.rs:82:impl CanonicalSerialize for TreatyArtifact {
+crates/amun-constitution-builder/src/treaty.rs:84:        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitution-builder/src/verify.rs:11:    pub fn verify_replay<T: CanonicalSerialize + PartialEq>(
+crates/amun-constitution-builder/src/verify.rs:21:            return Err("Canonical byte representations differ".into());
+crates/amun-constitution-builder/src/verify.rs:5:use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-core/src/ordering.rs:1:/// Canonical validator ordering law.
+crates/amun-constitution/src/canonical_form.rs:10:pub struct ConstitutionalCanonicalForm {
+crates/amun-constitution/src/canonical_form.rs:1:// Constitutional Canonical Form (CCF) — the protocol specification.
+crates/amun-constitution/src/canonical_form.rs:23:impl ConstitutionalCanonicalForm {
+crates/amun-constitution/src/canonical_form.rs:41:pub const CURRENT_CCF: ConstitutionalCanonicalForm = ConstitutionalCanonicalForm {
+crates/amun-constitution/src/hash_domains.rs:8:    MerkleInternal = 0x05,
+crates/amun-constitution/src/refinement_chain.rs:12:        implementation: "Operational Semantics Rules",
+crates/amun-constitution/src/refinement_chain.rs:16:        specification: "Operational Semantics Rules",
+crates/amun-constitution/src/refinement_chain.rs:21:        specification: "Canonical Encoding (Cursor)",
+crates/amun-constitution/src/refinement_chain.rs:22:        implementation: "Canonical Encoding (Buffer)",
+crates/amun-constitution/src/replay.rs:1:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-constitution/src/replay.rs:53:impl CanonicalEncode for ReplayContext {
+crates/amun-constitution/src/replay.rs:55:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-constitution/src/replay.rs:61:impl CanonicalDecode for ReplayContext {
+crates/amun-constitutional-authority-semantics/src/capability.rs:1:use amun_constitution_builder::canonical_bytes::CanonicalSerialize;
+crates/amun-constitutional-authority-semantics/src/capability.rs:60:impl CanonicalSerialize for AuthorityCapability {
+crates/amun-constitutional-authority-semantics/src/lib.rs:1://! Constitutional Authority Semantics
+crates/amun-constitutional-authority/src/certificate.rs:122:    /// Canonical bytes used for identity hashing.
+crates/amun-constitutional-authority/src/certificate.rs:132:        serde_json::to_vec(&c).expect("Identity serialization must not fail")
+crates/amun-constitutional-authority/src/certificate.rs:141:impl CanonicalSerialize for ConstitutionalCertificate {
+crates/amun-constitutional-authority/src/certificate.rs:143:        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitutional-authority/src/certificate.rs:5:use amun_constitution_builder::{canonical_bytes::CanonicalSerialize, digest::ArtifactDigest};
+crates/amun-constitutional-authority/src/certificate.rs:94:    // Identity helpers
+crates/amun-constitutional-block/src/block.rs:1:use amun_constitutional_commitments::SparseMerkleTree;
+crates/amun-constitutional-block/src/block.rs:79:        state_tree: &SparseMerkleTree,
+crates/amun-constitutional-block/src/block.rs:80:        governance_tree: &SparseMerkleTree,
+crates/amun-constitutional-block/src/block.rs:81:        execution_tree: &SparseMerkleTree,
+crates/amun-constitutional-block/src/block.rs:82:        evidence_tree: &SparseMerkleTree,
+crates/amun-constitutional-block/src/lib.rs:114:///   3. Merkle root matches block.replay_certificate_root
+crates/amun-constitutional-block/src/lib.rs:81:///   Block → Certificate → Journal → Replay → StateRoot → Accept/Reject
+crates/amun-constitutional-block/tests/block_tests.rs:100:    let mut ev2 = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-constitutional-block/tests/block_tests.rs:134:    let mut ev1 = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-constitutional-block/tests/block_tests.rs:135:    let mut ev2 = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-constitutional-block/tests/block_tests.rs:2:use amun_constitutional_commitments::SparseMerkleTree;
+crates/amun-constitutional-block/tests/block_tests.rs:99:    let mut ev1 = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-constitutional-commitments/src/lib.rs:6:pub use smt::{MerkleProof, ProofType, SparseMerkleTree};
+crates/amun-constitutional-commitments/src/smt.rs:14:pub struct MerkleProof {
+crates/amun-constitutional-commitments/src/smt.rs:22:/// A canonical sparse Merkle tree with fixed depth 256.
+crates/amun-constitutional-commitments/src/smt.rs:25:pub struct SparseMerkleTree {
+crates/amun-constitutional-commitments/src/smt.rs:32:impl SparseMerkleTree {
+crates/amun-constitutional-commitments/src/smt.rs:63:    pub fn prove(&self, logical_key: &[u8]) -> MerkleProof {
+crates/amun-constitutional-commitments/src/smt.rs:75:        MerkleProof {
+crates/amun-constitutional-commitments/src/smt.rs:84:    pub fn verify(&self, root: &[u8; 32], proof: &MerkleProof) -> bool {
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:1:use amun_constitutional_commitments::SparseMerkleTree;
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:34:    let mut state_tree = SparseMerkleTree::new(b"AMUN_STATE_DOMAIN");
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:40:    let mut gov_tree = SparseMerkleTree::new(b"AMUN_GOVERNANCE_DOMAIN");
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:4:    let mut state_tree = SparseMerkleTree::new(b"AMUN_STATE_DOMAIN");
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:5:    let mut gov_tree = SparseMerkleTree::new(b"AMUN_GOVERNANCE_DOMAIN");
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:6:    let mut exec_tree = SparseMerkleTree::new(b"AMUN_EXECUTION_DOMAIN");
+crates/amun-constitutional-enforcement/src/lib.rs:104:                ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/lib.rs:139:                &ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/lib.rs:252:                assert_eq!(violations[0].law, ConstitutionalLaw::StateRootIntegrity);
+crates/amun-constitutional-enforcement/src/lib.rs:274:        k.deactivate_law(&ConstitutionalLaw::StateRootIntegrity);
+crates/amun-constitutional-enforcement/src/lib.rs:57:    StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:115:                law: ConstitutionalLaw::StateRootIntegrity,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:247:                    .any(|v| v.law == ConstitutionalLaw::StateRootIntegrity));
+crates/amun-constitutional-geometry/src/curvature.rs:11:impl LegitimacyCurvature {
+crates/amun-constitutional-geometry/src/curvature.rs:25:pub struct ReplayCurvature {
+crates/amun-constitutional-geometry/src/curvature.rs:31:impl ReplayCurvature {
+crates/amun-constitutional-geometry/src/curvature.rs:49:pub struct CausalCurvature {
+crates/amun-constitutional-geometry/src/curvature.rs:4:pub struct LegitimacyCurvature {
+crates/amun-constitutional-geometry/src/curvature.rs:64:impl CausalCurvature {
+crates/amun-constitutional-geometry/src/directed_metric.rs:28:impl DirectedMetric {
+crates/amun-constitutional-geometry/src/directed_metric.rs:5:pub struct DirectedMetric {
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:18:    pub boundary_metric: MetricTensorField,
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:1:use super::metric_tensor::MetricTensorField;
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:23:    /// Metric determinant approaches zero (degenerate geometry)
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:24:    MetricDegeneracy,
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:34:    TopologyChange,
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:39:    pub fn detect(metric: &MetricTensorField, previous_metric: &MetricTensorField) -> Option<Self> {
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:43:                singularity_type: SingularityType::MetricDegeneracy,
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:60:                singularity_type: SingularityType::MetricDegeneracy,
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:73:        !self.is_crossed || matches!(self.singularity_type, SingularityType::TopologyChange)
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:14:    pub local_metric: MetricTensorField,
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:1:use super::metric_tensor::MetricTensorField;
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:45:            local_metric: MetricTensorField::new([0u8; 32]),
+crates/amun-constitutional-geometry/src/lib.rs:17:pub use curvature::{CausalCurvature, LegitimacyCurvature, ReplayCurvature};
+crates/amun-constitutional-geometry/src/lib.rs:18:pub use directed_metric::DirectedMetric;
+crates/amun-constitutional-geometry/src/lib.rs:24:pub use metric_tensor::MetricTensorField;
+crates/amun-constitutional-geometry/src/metric_tensor.rs:20:impl MetricTensorField {
+crates/amun-constitutional-geometry/src/metric_tensor.rs:22:        // Identity metric as default (flat space)
+crates/amun-constitutional-geometry/src/metric_tensor.rs:6:pub struct MetricTensorField {
+crates/amun-constitutional-geometry/src/metrics.rs:2:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-constitutional-geometry/src/metrics.rs:75:    pub fn compute(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> Self {
+crates/amun-constitutional-governance/src/capability.rs:5:use amun_constitution_builder::{canonical_bytes::CanonicalSerialize, digest::ArtifactDigest};
+crates/amun-constitutional-governance/src/capability.rs:72:impl CanonicalSerialize for Capability {
+crates/amun-constitutional-governance/src/capability.rs:74:        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitutional-governance/src/voting.rs:64:impl CanonicalSerialize for Proposal {
+crates/amun-constitutional-governance/src/voting.rs:66:        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitutional-governance/src/voting.rs:6:use amun_constitution_builder::canonical_bytes::CanonicalSerialize;
+crates/amun-constitutional-kernel/src/receipt.rs:5:use amun_constitution_builder::{canonical_bytes::CanonicalSerialize, digest::ArtifactDigest};
+crates/amun-constitutional-kernel/src/receipt.rs:61:impl CanonicalSerialize for ExecutionReceipt {
+crates/amun-constitutional-kernel/src/receipt.rs:63:        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitutional-semantics/src/lib.rs:112:use amun_transcript_semantics::EventIdentity;
+crates/amun-constitutional-semantics/src/lib.rs:113:    fn mk(seq: u64, hash: [u8; 32], parent: [u8; 32]) -> TranscriptEntry { TranscriptEntry::Consensus(ConsensusEvent { identity: EventIdentity::new(hash, parent, [0xAA; 32], seq, ReplayDomain::Consensus, [0xBB; 32]), round: seq, event_type: ConsensusEventType::Proposal, authority: EventAuthority::Authoritative }) }
+crates/amun-constitutional-semantics/src/lib.rs:11:#[derive(Debug, Clone, PartialEq, Eq)] pub enum AccumulatorType { Sequential, MerkleTree, RSAAccumulator }
+crates/amun-constitutional-semantics/src/lib.rs:1://! Constitutional Semantics — complete truth model for replay verification.
+crates/amun-constitutional-state/src/lib.rs:1:use amun_constitutional_commitments::SparseMerkleTree;
+crates/amun-constitutional-state/src/lib.rs:206:    /// Compute a Merkle root of the journal entries.
+crates/amun-constitutional-state/src/lib.rs:208:        let mut tree = SparseMerkleTree::new(b"AMUN_JOURNAL_DOMAIN");
+crates/amun-constitutional-state/src/lib.rs:357:    /// Build a Merkle root from multiple ReplayCertificates.
+crates/amun-constitutional-state/src/lib.rs:360:        let mut tree = SparseMerkleTree::new(b"AMUN_CERTIFICATE_MERKLE_DOMAIN");
+crates/amun-constitutional-state/src/lib.rs:379:        // Single cert: Merkle root must be deterministic
+crates/amun-constitutional-state/src/lib.rs:402:use amun_constitutional_commitments::smt::MerkleProof;
+crates/amun-constitutional-state/src/lib.rs:404:/// A Merkle proof that a specific ReplayCertificate is included
+crates/amun-constitutional-state/src/lib.rs:410:    pub proof: MerkleProof,
+crates/amun-constitutional-state/src/lib.rs:424:        let mut tree = SparseMerkleTree::new(b"AMUN_CERTIFICATE_MERKLE_DOMAIN");
+crates/amun-constitutional-state/src/lib.rs:443:        // Verify that the stored certificate_hash matches the leaf_value in the Merkle proof
+crates/amun-constitutional-state/src/lib.rs:447:        let tree = SparseMerkleTree::new(b"AMUN_CERTIFICATE_MERKLE_DOMAIN");
+crates/amun-constitutional-state/src/lib.rs:53:        let mut tree = SparseMerkleTree::new(b"AMUN_STATE_DOMAIN");
+crates/amun-constitutional-verifier/src/result.rs:13:    CanonicalOrderingViolated,
+crates/amun-constitutional/src/architectural_invariants.rs:103:/// INVARIANT 7: Replay-Derived State Identity
+crates/amun-constitutional/src/architectural_invariants.rs:215:/// INVARIANT 16: Canonical Serialization Determinism
+crates/amun-constitutional/src/architectural_invariants.rs:217:/// Canonical serialization must produce identical bytes for identical
+crates/amun-constitutional/src/architectural_invariants.rs:225:    "Canonical serialization produces identical bytes for identical semantics.";
+crates/amun-constitutional/src/architectural_invariants.rs:254:/// INVARIANT 20: Canonical Non-Exclusivity
+crates/amun-constitutional/src/architectural_invariants.rs:256:/// Canonical equivalence representation must never imply derivational
+crates/amun-constitutional/src/architectural_invariants.rs:261:/// CONSEQUENCE: Canonicalization is compression, not authority.
+crates/amun-constitutional/src/architectural_invariants.rs:265:    "Canonical equivalence representation must never imply derivational exclusivity.";
+crates/amun-constitutional/src/architectural_invariants.rs:362:/// INVARIANT 28: Identity Non-Privilege
+crates/amun-constitutional/src/architectural_invariants.rs:364:/// Identity persistence must never create constitutional privilege.
+crates/amun-constitutional/src/architectural_invariants.rs:371:/// identical to one from an ancient institution. Identity is an
+crates/amun-constitutional/src/architectural_invariants.rs:374:    "Identity persistence must never create constitutional privilege.";
+crates/amun-constitutional/src/architectural_invariants.rs:80:    "Constitutional artifacts are immutable. Identity = hash.";
+crates/amun-constitutional/src/canonical_serialize.rs:15:pub trait CanonicalEncode {
+crates/amun-constitutional/src/canonical_serialize.rs:1://! Canonical Serialization — deterministic byte representation.
+crates/amun-constitutional/src/canonical_serialize.rs:21:pub trait CanonicalDecode: Sized {
+crates/amun-constitutional/src/canonical_witness.rs:1://! Canonical Witness Ordering — deterministic proof surface.
+crates/amun-constitutional/src/causal_edge.rs:14:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/causal_edge.rs:46:impl ConstitutionalIdentity for CausalEdge {
+crates/amun-constitutional/src/causality_chain.rs:15:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/causality_chain.rs:46:impl ConstitutionalIdentity for CausalityChain {
+crates/amun-constitutional/src/constitutional_object.rs:20:pub trait ConstitutionalIdentity {
+crates/amun-constitutional/src/constitutional_witness.rs:14:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/constitutional_witness.rs:91:impl ConstitutionalIdentity for ConstitutionalWitness {
+crates/amun-constitutional/src/continuation_chain.rs:16:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/continuation_chain.rs:59:impl ConstitutionalIdentity for ContinuationChain {
+crates/amun-constitutional/src/divergence_point.rs:10:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/divergence_point.rs:59:impl ConstitutionalIdentity for DivergencePoint {
+crates/amun-constitutional/src/divergence_resolution.rs:10:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/divergence_resolution.rs:68:impl ConstitutionalIdentity for DivergenceResolution {
+crates/amun-constitutional/src/execution_boundary.rs:29:impl ConstitutionalIdentity for ExecutionBoundary {
+crates/amun-constitutional/src/execution_boundary.rs:5:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/execution_context.rs:22:impl ConstitutionalIdentity for ExecutionContext {
+crates/amun-constitutional/src/execution_context.rs:5:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/execution_journal.rs:147:impl ConstitutionalIdentity for ExecutionJournal {
+crates/amun-constitutional/src/execution_journal.rs:25:impl ConstitutionalIdentity for JournalEntry {
+crates/amun-constitutional/src/execution_journal.rs:5:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/execution_receipt.rs:23:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/execution_receipt.rs:41:/// # Certificate Semantics
+crates/amun-constitutional/src/execution_receipt.rs:87:impl ConstitutionalIdentity for ExecutionReceipt {
+crates/amun-constitutional/src/kernel_types.rs:7:    Canonical = 0x01,
+crates/amun-constitutional/src/lib.rs:106:pub use constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/lib.rs:98:pub use canonical_serialize::{CanonicalDecode, CanonicalEncode};
+crates/amun-constitutional/src/replay_certificate.rs:12:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/replay_certificate.rs:32:impl ConstitutionalIdentity for ReplayCertificate {
+crates/amun-constitutional/src/restoration_point.rs:13:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/restoration_point.rs:58:impl ConstitutionalIdentity for RestorationPoint {
+crates/amun-constitutional/src/snapshot.rs:18:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/snapshot.rs:64:impl ConstitutionalIdentity for ConstitutionalSnapshot {
+crates/amun-constitutional/src/state_anchor.rs:13://! INVARIANT (Replay-Derived State Identity):
+crates/amun-constitutional/src/state_anchor.rs:22:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/state_anchor.rs:59:impl ConstitutionalIdentity for ConstitutionalStateAnchor {
+crates/amun-constitutional/src/transition_commitment.rs:23:impl ConstitutionalIdentity for TransitionCommitment {
+crates/amun-constitutional/src/transition_commitment.rs:5:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-constitutional/src/transition_evidence.rs:26:impl ConstitutionalIdentity for TransitionEvidence {
+crates/amun-constitutional/src/transition_evidence.rs:5:use crate::constitutional_object::{ConstitutionalIdentity, ConstitutionalObject};
+crates/amun-core-optimization/src/lib.rs:11:    pub cache: BTreeMap<[u8; 32], CachedMerkleState>,
+crates/amun-core-optimization/src/lib.rs:28:            CachedMerkleState {
+crates/amun-core-optimization/src/lib.rs:4:pub struct CachedMerkleState {
+crates/amun-evidence/src/evidence.rs:30:pub struct MerkleProof {
+crates/amun-evidence/src/evidence.rs:47:        invalidity_proof: MerkleProof,
+crates/amun-evolution/src/certificate.rs:124:        let mut h = CanonicalHasher::with_domain(CERTIFICATE_DOMAIN);
+crates/amun-evolution/src/certificate.rs:1:use amun_canonical_codec::CanonicalHasher;
+crates/amun-evolution/src/certificate.rs:39:        let mut h = CanonicalHasher::with_domain(b"AMUN_PHYSICS_PROOF_V1");
+crates/amun-evolution/src/signatures.rs:39:        let mut h = CanonicalHasher::with_domain(b"AMUN_SIGNATURE_V1");
+crates/amun-evolution/src/signatures.rs:4:use amun_canonical_codec::CanonicalHasher;
+crates/amun-evolution/src/signatures.rs:79:        let mut h = CanonicalHasher::with_domain(b"AMUN_AGGREGATE_SIG_V1");
+crates/amun-evolution/src/transition.rs:41:        let mut h = amun_canonical_codec::CanonicalHasher::with_domain(b"AMUN_CHECKPOINT_V1");
+crates/amun-execution-receipt/src/lib.rs:110:impl CanonicalEncode for ExecutionTranscript {
+crates/amun-execution-receipt/src/lib.rs:139:        CanonicalEncoder::hash_value(self, domain_tags::EXECUTION_TRANSCRIPT)
+crates/amun-execution-receipt/src/lib.rs:13:use amun_kernel::canonical::{CanonicalEncode, CanonicalEncoder};
+crates/amun-execution-receipt/src/lib.rs:27:impl CanonicalEncode for ExecutionStatus {
+crates/amun-execution-receipt/src/lib.rs:51:impl CanonicalEncode for ExecutionReceipt {
+crates/amun-execution-receipt/src/lib.rs:87:        CanonicalEncoder::hash_value(self, domain_tags::EXECUTION_RECEIPT)
+crates/amun-failure/src/taxonomy.rs:23:    MerkleProofInvalid = 0x4004,
+crates/amun-failure/src/tests.rs:13:    assert!(ConstitutionalFault::MerkleProofInvalid.should_halt());
+crates/amun-identity/src/chain_id.rs:19:        let mut enc = CanonicalEncoder::new(SchemaVersion::V4);
+crates/amun-identity/src/chain_id.rs:1:use amun_canonical::{CanonicalEncoder, SchemaVersion};
+crates/amun-identity/src/chain_id.rs:3:pub struct ChainIdentity {
+crates/amun-identity/src/chain_id.rs:9:impl ChainIdentity {
+crates/amun-identity/src/lib.rs:2:pub use chain_id::ChainIdentity;
+crates/amun-kernel-types/src/capacity.rs:13:    // Canonical encoding limits
+crates/amun-kernel/src/canonical.rs:103:impl<A: CanonicalEncode, B: CanonicalEncode> CanonicalEncode for (A, B) {
+crates/amun-kernel/src/canonical.rs:112:pub struct CanonicalBytes<'a>(pub &'a [u8]);
+crates/amun-kernel/src/canonical.rs:114:impl<'a> CanonicalEncode for CanonicalBytes<'a> {
+crates/amun-kernel/src/canonical.rs:129:/// Canonical hashing with domain separation.
+crates/amun-kernel/src/canonical.rs:130:pub struct CanonicalEncoder;
+crates/amun-kernel/src/canonical.rs:132:impl CanonicalEncoder {
+crates/amun-kernel/src/canonical.rs:137:        I::Item: CanonicalEncode + Ord,
+crates/amun-kernel/src/canonical.rs:162:        T: CanonicalEncode + Ord + Clone,
+crates/amun-kernel/src/canonical.rs:170:    pub fn hash_value<V: CanonicalEncode + ?Sized>(value: &V, domain_tag: &[u8]) -> [u8; 32] {
+crates/amun-kernel/src/canonical.rs:187:        let h1 = CanonicalEncoder::hash_value("hello", b"test");
+crates/amun-kernel/src/canonical.rs:188:        let h2 = CanonicalEncoder::hash_value("hello", b"test");
+crates/amun-kernel/src/canonical.rs:18:impl<T: CanonicalEncode + ?Sized> CanonicalEncode for &T {
+crates/amun-kernel/src/canonical.rs:194:        let h1 = CanonicalEncoder::hash_value(&42u64, b"domain_a");
+crates/amun-kernel/src/canonical.rs:195:        let h2 = CanonicalEncoder::hash_value(&42u64, b"domain_b");
+crates/amun-kernel/src/canonical.rs:24:// Canonical encoding for slices
+crates/amun-kernel/src/canonical.rs:25:impl<T: CanonicalEncode> CanonicalEncode for [T] {
+crates/amun-kernel/src/canonical.rs:34:// Canonical encoding for vectors
+crates/amun-kernel/src/canonical.rs:35:impl<T: CanonicalEncode> CanonicalEncode for Vec<T> {
+crates/amun-kernel/src/canonical.rs:3:/// Canonical encoding version
+crates/amun-kernel/src/canonical.rs:45:impl CanonicalEncode for u64 {
+crates/amun-kernel/src/canonical.rs:50:impl CanonicalEncode for u32 {
+crates/amun-kernel/src/canonical.rs:55:impl CanonicalEncode for u8 {
+crates/amun-kernel/src/canonical.rs:60:impl CanonicalEncode for [u8; 32] {
+crates/amun-kernel/src/canonical.rs:65:impl CanonicalEncode for [u8; 64] {
+crates/amun-kernel/src/canonical.rs:70:impl CanonicalEncode for str {
+crates/amun-kernel/src/canonical.rs:77:impl CanonicalEncode for String {
+crates/amun-kernel/src/canonical.rs:7:pub trait CanonicalEncode {
+crates/amun-kernel/src/canonical.rs:82:impl CanonicalEncode for bool {
+crates/amun-kernel/src/canonical.rs:88:impl<T: CanonicalEncode> CanonicalEncode for Option<T> {
+crates/amun-kernel/src/governance.rs:108:impl CanonicalEncode for AuthorityRole {
+crates/amun-kernel/src/governance.rs:134:impl CanonicalEncode for FreezeBoundary {
+crates/amun-kernel/src/governance.rs:153:impl CanonicalEncode for FreezeDomain {
+crates/amun-kernel/src/governance.rs:192:        CanonicalEncoder::hash_value(&sorted, domain_tags::AUTHORITY)
+crates/amun-kernel/src/governance.rs:203:impl CanonicalEncode for AuthorityRegistry {
+crates/amun-kernel/src/governance.rs:228:        CanonicalEncoder::hash_value(&self.snapshot, domain_tags::SIGNATURE_PAYLOAD)
+crates/amun-kernel/src/governance.rs:22:impl CanonicalEncode for Signature {
+crates/amun-kernel/src/governance.rs:232:impl CanonicalEncode for Attestation {
+crates/amun-kernel/src/governance.rs:283:        CanonicalEncoder::hash_value(self, domain_tags::SNAPSHOT)
+crates/amun-kernel/src/governance.rs:287:impl CanonicalEncode for Snapshot {
+crates/amun-kernel/src/governance.rs:317:        CanonicalEncoder::hash_value(self, domain_tags::RELEASE_SEAL)
+crates/amun-kernel/src/governance.rs:340:        CanonicalEncoder::hash_value(
+crates/amun-kernel/src/governance.rs:341:            &crate::canonical::CanonicalBytes(&payload),
+crates/amun-kernel/src/governance.rs:347:impl CanonicalEncode for ReleaseSeal {
+crates/amun-kernel/src/governance.rs:4://! All governance operations must use CanonicalEncode for determinism.
+crates/amun-kernel/src/governance.rs:6:use crate::canonical::{CanonicalEncode, CanonicalEncoder};
+crates/amun-kernel/src/governance.rs:73:        let id = CanonicalEncoder::hash_value(&public_key, domain_tags::AUTHORITY);
+crates/amun-kernel/src/governance.rs:89:impl CanonicalEncode for Authority {
+crates/amun-kernel/src/lib.rs:14:pub use canonical::{CanonicalEncode, CanonicalEncoder};
+crates/amun-kernel/src/lib.rs:5://! - Canonical encoding traits
+crates/amun-lineage/src/lineage.rs:14:        let mut h = CanonicalHasher::with_domain(LINEAGE_DOMAIN);
+crates/amun-lineage/src/lineage.rs:1:use amun_canonical_codec::CanonicalHasher;
+crates/amun-lineage/src/lineage.rs:25:        let mut h = CanonicalHasher::with_domain(LINEAGE_DOMAIN);
+crates/amun-lineage/src/record.rs:150:        let mut h = CanonicalHasher::with_domain(EVOLUTION_DOMAIN);
+crates/amun-lineage/src/record.rs:202:        let mut h = CanonicalHasher::with_domain(EVOLUTION_DOMAIN);
+crates/amun-lineage/src/record.rs:2:use amun_canonical_codec::CanonicalHasher;
+crates/amun-lineage/src/serialization.rs:19:            fn constitutional_encode(&self, w: &mut CanonicalWriter) {
+crates/amun-lineage/src/serialization.rs:22:            fn constitutional_decode(r: &mut CanonicalReader) -> Option<Self> {
+crates/amun-lineage/src/serialization.rs:5:use amun_canonical_codec::{CanonicalReader, CanonicalWriter};
+crates/amun-lineage/src/serialization.rs:8:    fn constitutional_encode(&self, w: &mut CanonicalWriter);
+crates/amun-lineage/src/serialization.rs:9:    fn constitutional_decode(r: &mut CanonicalReader) -> Option<Self>
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:58:        .register(amun_consensus_network::ValidatorIdentity::new(vid, pk.0, 1))
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:27:        .register(ValidatorIdentity::new(validator_id, [0x42u8; 48], 1))
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:6:    ValidatorIdentity,
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:19:                    .any(|v| v.law == ConstitutionalLaw::StateRootIntegrity),
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:20:                "Must detect StateRootIntegrity violation"
+crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:9:    // StateRootIntegrity fails → block must be rejected
+crates/amun-mempool/src/ordering.rs:3:pub struct CanonicalOrdering;
+crates/amun-mempool/src/ordering.rs:5:impl CanonicalOrdering {
+crates/amun-merkle/src/domain.rs:13:impl MerkleDomain {
+crates/amun-merkle/src/domain.rs:4:// Constitutional Merkle domain separation.
+crates/amun-merkle/src/domain.rs:7:pub enum MerkleDomain {
+crates/amun-merkle/src/lib.rs:10:pub use tree::MerkleTree;
+crates/amun-merkle/src/lib.rs:8:pub use domain::MerkleDomain;
+crates/amun-merkle/src/lib.rs:9:pub use proof::MerkleProof;
+crates/amun-merkle/src/proof.rs:150:    use amun_codec::CanonicalEncode;
+crates/amun-merkle/src/proof.rs:154:        let l1 = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/proof.rs:155:        let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/proof.rs:156:        let root = MerkleTree::compute_root(&[l1, l2]);
+crates/amun-merkle/src/proof.rs:157:        let mut proof = MerkleProof::new();
+crates/amun-merkle/src/proof.rs:164:        let l1 = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/proof.rs:165:        let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/proof.rs:166:        let mut proof = MerkleProof::new();
+crates/amun-merkle/src/proof.rs:16:pub struct MerkleProof {
+crates/amun-merkle/src/proof.rs:170:        let decoded = MerkleProof::decode_exact(&buf[..len]).unwrap();
+crates/amun-merkle/src/proof.rs:171:        assert!(decoded.verify(&l1, &MerkleTree::compute_root(&[l1, l2])));
+crates/amun-merkle/src/proof.rs:176:        let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/proof.rs:177:        let mut proof = MerkleProof::new();
+crates/amun-merkle/src/proof.rs:181:        assert!(MerkleProof::decode_exact(&buf[..len + 1]).is_err());
+crates/amun-merkle/src/proof.rs:188:        assert!(MerkleProof::decode(&buf).is_err());
+crates/amun-merkle/src/proof.rs:199:        assert!(MerkleProof::decode(&buf).is_err());
+crates/amun-merkle/src/proof.rs:1:use crate::tree::MerkleTree;
+crates/amun-merkle/src/proof.rs:21:impl MerkleProof {
+crates/amun-merkle/src/proof.rs:2:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-merkle/src/proof.rs:48:            current = MerkleTree::internal_hash(left, right);
+crates/amun-merkle/src/proof.rs:54:impl Default for MerkleProof {
+crates/amun-merkle/src/proof.rs:60:impl CanonicalEncode for MerkleProof {
+crates/amun-merkle/src/proof.rs:62:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-merkle/src/proof.rs:77:impl CanonicalDecode for MerkleProof {
+crates/amun-merkle/src/tests.rs:14:    let h1 = MerkleTree::leaf_hash(b"test");
+crates/amun-merkle/src/tests.rs:15:    let h2 = MerkleTree::leaf_hash(b"test");
+crates/amun-merkle/src/tests.rs:21:    let l = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/tests.rs:22:    let r = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/tests.rs:23:    let h1 = MerkleTree::internal_hash(&l, &r);
+crates/amun-merkle/src/tests.rs:24:    let h2 = MerkleTree::internal_hash(&l, &r);
+crates/amun-merkle/src/tests.rs:32:    let leaf = MerkleTree::leaf_hash(b"hello");
+crates/amun-merkle/src/tests.rs:33:    let root = MerkleTree::compute_root(&[leaf]);
+crates/amun-merkle/src/tests.rs:39:    let l1 = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/tests.rs:40:    let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/tests.rs:42:        MerkleTree::compute_root(&[l1, l2]),
+crates/amun-merkle/src/tests.rs:43:        MerkleTree::compute_root(&[l1, l2])
+crates/amun-merkle/src/tests.rs:49:    let l1 = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/tests.rs:50:    let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/tests.rs:51:    let l3 = MerkleTree::leaf_hash(b"c");
+crates/amun-merkle/src/tests.rs:53:        MerkleTree::compute_root(&[l1, l2, l3]),
+crates/amun-merkle/src/tests.rs:54:        MerkleTree::compute_root(&[l1, l2, l3])
+crates/amun-merkle/src/tests.rs:60:    let l1 = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/tests.rs:61:    let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/tests.rs:62:    let l3 = MerkleTree::leaf_hash(b"c");
+crates/amun-merkle/src/tests.rs:63:    let root3 = MerkleTree::compute_root(&[l1, l2, l3]);
+crates/amun-merkle/src/tests.rs:64:    let root4 = MerkleTree::compute_root(&[l1, l2, l3, l3]);
+crates/amun-merkle/src/tests.rs:70:    let l1 = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/tests.rs:71:    let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/tests.rs:73:        MerkleTree::compute_root(&[l1, l2]),
+crates/amun-merkle/src/tests.rs:74:        MerkleTree::compute_root(&[l2, l1])
+crates/amun-merkle/src/tests.rs:7:    let root = MerkleTree::empty_root();
+crates/amun-merkle/src/tests.rs:80:    let l1 = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/tests.rs:81:    let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/tests.rs:82:    let root = MerkleTree::compute_root(&[l1, l2]);
+crates/amun-merkle/src/tests.rs:83:    let mut proof = MerkleProof::new();
+crates/amun-merkle/src/tests.rs:92:    let l1 = MerkleTree::leaf_hash(b"a");
+crates/amun-merkle/src/tests.rs:93:    let l2 = MerkleTree::leaf_hash(b"b");
+crates/amun-merkle/src/tests.rs:94:    let l3 = MerkleTree::leaf_hash(b"c");
+crates/amun-merkle/src/tests.rs:95:    let root = MerkleTree::compute_root(&[l1, l2]);
+crates/amun-merkle/src/tests.rs:96:    let mut proof = MerkleProof::new();
+crates/amun-merkle/src/tests.rs:9:    assert_eq!(root, MerkleTree::empty_root());
+crates/amun-merkle/src/tree.rs:10:impl MerkleTree {
+crates/amun-merkle/src/tree.rs:12:        crate::domain::MerkleDomain::Empty.hash(b"")
+crates/amun-merkle/src/tree.rs:16:        crate::domain::MerkleDomain::Leaf.hash(data)
+crates/amun-merkle/src/tree.rs:23:        crate::domain::MerkleDomain::Internal.hash(&buf)
+crates/amun-merkle/src/tree.rs:4:// Constitutional Merkle tree capacity.
+crates/amun-merkle/src/tree.rs:8:pub struct MerkleTree;
+crates/amun-network-transport/src/message.rs:132:    /// Canonical encoding of the message for wire transmission.
+crates/amun-network-transport/src/peer.rs:14:pub struct PeerIdentity {
+crates/amun-network-transport/src/peer.rs:20:impl PeerIdentity {
+crates/amun-network-transport/src/peer.rs:36:        let peer = PeerIdentity::new(
+crates/amun-network-transport/src/transport.rs:100:    pub fn add_peer(&self, peer: PeerIdentity) {
+crates/amun-network-transport/src/transport.rs:222:        let identity = PeerIdentity::new(
+crates/amun-network-transport/src/transport.rs:231:        let peer = PeerIdentity::new(
+crates/amun-network-transport/src/transport.rs:2:use crate::peer::{NodeId, PeerIdentity};
+crates/amun-network-transport/src/transport.rs:82:    pub identity: PeerIdentity,
+crates/amun-network-transport/src/transport.rs:83:    peers: Arc<Mutex<HashMap<NodeId, PeerIdentity>>>,
+crates/amun-network-transport/src/transport.rs:90:    pub fn new(identity: PeerIdentity, bind_address: SocketAddr) -> Self {
+crates/amun-networking/src/messages.rs:6:    IdentityRequest,
+crates/amun-networking/src/messages.rs:8:    IdentityResponse,
+crates/amun-networking/src/peer_discovery.rs:117:        let identity = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:132:        let identity = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:151:        let identity = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:173:        let id1 = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:178:        let id2 = PeerIdentity::new(
+crates/amun-networking/src/peer_discovery.rs:2:use crate::peer_identity::{PeerId, PeerIdentity};
+crates/amun-networking/src/peer_discovery.rs:38:    peers: BTreeMap<PeerId, PeerIdentity>,
+crates/amun-networking/src/peer_discovery.rs:48:    pub fn register(&mut self, identity: PeerIdentity, timestamp: u64) {
+crates/amun-networking/src/peer_discovery.rs:71:    pub fn get(&self, peer_id: &PeerId) -> Option<&PeerIdentity> {
+crates/amun-networking/src/peer_identity.rs:16:pub struct PeerIdentity {
+crates/amun-networking/src/peer_identity.rs:22:impl PeerIdentity {
+crates/amun-networking/src/peers.rs:14:    IdentityVerified = 1,
+crates/amun-networking/src/peers.rs:25:    pub fn can_request_sync(peer: &PeerIdentity) -> bool {
+crates/amun-networking/src/peers.rs:26:        peer.trust_level >= TrustLevel::IdentityVerified
+crates/amun-networking/src/peers.rs:29:    pub fn can_accept_manifest(peer: &PeerIdentity) -> bool {
+crates/amun-networking/src/peers.rs:33:    pub fn upgrade_trust(peer: &mut PeerIdentity, new_level: TrustLevel) {
+crates/amun-networking/src/peers.rs:39:    pub fn degrade_trust(peer: &mut PeerIdentity, _reason: &str) {
+crates/amun-networking/src/peers.rs:3:pub struct PeerIdentity {
+crates/amun-networking/src/quarantine.rs:1:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-networking/src/quarantine.rs:21:    pub source_identity: ConstitutionalIdentity,
+crates/amun-networking/src/quarantine.rs:44:        local: &ConstitutionalIdentity,
+crates/amun-networking/src/quarantine.rs:45:        remote: &ConstitutionalIdentity,
+crates/amun-networking/src/risk.rs:51:            ConstitutionalRisk::IdentityCorruption => {
+crates/amun-networking/src/risk.rs:9:    IdentityCorruption,
+crates/amun-networking/src/sovereignty.rs:16:/// Multi-phase: Identity -> Physics -> Replay -> Lineage -> Temporal -> Sync
+crates/amun-networking/src/sovereignty.rs:19:    pub local_identity: ConstitutionalIdentity,
+crates/amun-networking/src/sovereignty.rs:1:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-networking/src/sovereignty.rs:20:    pub remote_identity: Option<ConstitutionalIdentity>,
+crates/amun-networking/src/sovereignty.rs:34:    IdentityVerification,
+crates/amun-networking/src/sovereignty.rs:44:    pub fn new(local: ConstitutionalIdentity) -> Self {
+crates/amun-networking/src/sovereignty.rs:48:            phase: HandshakePhase::IdentityVerification,
+crates/amun-networking/src/sovereignty.rs:60:    pub fn accept_remote(&mut self, remote: ConstitutionalIdentity) {
+crates/amun-networking/src/sovereignty.rs:66:            HandshakePhase::Rejected { reason: "Identity mismatch".to_string() }
+crates/amun-networking/src/sovereignty.rs:7:    pub local_identity: ConstitutionalIdentity,
+crates/amun-networking/src/sync.rs:35:    pub fn new(local_identity: ConstitutionalIdentity) -> Self {
+crates/amun-networking/src/sync.rs:3:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-networking/src/sync.rs:46:    pub fn initiate_sync(&mut self, remote: ConstitutionalIdentity) -> SyncResult {
+crates/amun-networking/src/sync.rs:8:    pub local_identity: ConstitutionalIdentity,
+crates/amun-networking/src/verification.rs:10:        remote_identity: ConstitutionalIdentity,
+crates/amun-networking/src/verification.rs:15:        remote_identity: ConstitutionalIdentity,
+crates/amun-networking/src/verification.rs:1:use amun_snapshot_engine::ConstitutionalIdentity;
+crates/amun-networking/src/verification.rs:23:    TamperedIdentity,
+crates/amun-networking/src/verification.rs:31:        local: &ConstitutionalIdentity,
+crates/amun-networking/src/verification.rs:32:        remote: &ConstitutionalIdentity,
+crates/amun-networking/src/verification.rs:35:            return VerificationResult::TamperedIdentity;
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:15:use amun_networking::peer_identity::PeerIdentity;
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:169:        let identity = PeerIdentity::new(
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:56:// N20.10.2 — Peer Identity Exchange over TCP
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:66:    let alice_identity = PeerIdentity::new(
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:71:    let bob_identity = PeerIdentity::new(
+crates/amun-nft-royalty/src/lib.rs:57:/// Accumulates royalty records into a Merkle root
+crates/amun-node/src/main.rs:31:struct IdentitySection {
+crates/amun-node/src/main.rs:44:    identity: IdentitySection,
+crates/amun-operations/src/metrics.rs:19:impl NodeMetrics {
+crates/amun-operations/src/metrics.rs:5:pub struct NodeMetrics {
+crates/amun-operations/src/metrics.rs:66:        let mut metrics = NodeMetrics::new();
+crates/amun-pccv/src/pccv_verifier.rs:30:                    reason: "Merkle proof root mismatch".into(),
+crates/amun-pccv/src/pccv_verifier.rs:3:    ResourceArchetype, ResourceRegistry, ResourceState, TransformationMatrix,
+crates/amun-pccv/src/pccv_verifier.rs:85:                if !TransformationMatrix::is_legal(parent_meta.archetype, meta.archetype) {
+crates/amun-pccv/src/witness_builder.rs:1:use crate::enhanced_proof::{LineageProof, MerkleProof, WitnessBundle};
+crates/amun-pccv/src/witness_builder.rs:234:        // With 10 leaves, the Merkle proof should have at least 1 sibling
+crates/amun-pccv/src/witness_builder.rs:237:            "Merkle proof for 10-leaf tree must have siblings"
+crates/amun-pccv/src/witness_builder.rs:37:    ) -> MerkleProof {
+crates/amun-pccv/src/witness_builder.rs:39:        MerkleProof {
+crates/amun-pccv/src/witness_builder.rs:74:        // Walk up the Merkle tree
+crates/amun-peer-identity/src/lib.rs:16:pub use verifier::IdentityVerifier;
+crates/amun-peer-identity/src/lib.rs:1://! Constitutional Peer Identity
+crates/amun-peer-identity/src/verifier.rs:4:pub struct IdentityVerifier;
+crates/amun-peer-identity/src/verifier.rs:6:impl IdentityVerifier {
+crates/amun-peer-identity/tests/peer_identity_tests.rs:25:    assert!(IdentityVerifier::verify(&cert, GENESIS).is_ok());
+crates/amun-peer-identity/tests/peer_identity_tests.rs:2:use amun_peer_identity::{ConstitutionalPeerId, IdentityVerifier, PeerCertificate, PeerRegistry};
+crates/amun-peer-identity/tests/peer_identity_tests.rs:33:    assert!(IdentityVerifier::verify(&cert, GENESIS).is_err());
+crates/amun-proof-carrying/src/receipt.rs:16:    /// Merkle proof of inclusion in the state tree (mandatory).
+crates/amun-proof-carrying/src/receipt.rs:17:    pub state_proof: MerkleProof,
+crates/amun-proof-carrying/src/receipt.rs:19:    pub governance_proof: Option<MerkleProof>,
+crates/amun-proof-carrying/src/receipt.rs:21:    pub execution_proof: Option<MerkleProof>,
+crates/amun-proof-carrying/src/receipt.rs:34:        state_proof: MerkleProof,
+crates/amun-proof-carrying/src/receipt.rs:35:        governance_proof: Option<MerkleProof>,
+crates/amun-proof-carrying/src/receipt.rs:36:        execution_proof: Option<MerkleProof>,
+crates/amun-proof-carrying/src/receipt.rs:5:use amun_constitutional_commitments::MerkleProof;
+crates/amun-proof-carrying/src/receipt.rs:9:/// A proof-carrying receipt binds an execution receipt with the Merkle
+crates/amun-proof-carrying/src/verifier.rs:22:        let state_tree = SparseMerkleTree::new(b"AMUN_STATE_DOMAIN");
+crates/amun-proof-carrying/src/verifier.rs:35:            let gov_tree = SparseMerkleTree::new(b"AMUN_GOVERNANCE_DOMAIN");
+crates/amun-proof-carrying/src/verifier.rs:49:            let exec_tree = SparseMerkleTree::new(b"AMUN_EXECUTION_DOMAIN");
+crates/amun-proof-carrying/src/verifier.rs:6:use amun_constitutional_commitments::SparseMerkleTree;
+crates/amun-proof-carrying/tests/proof_tests.rs:12:    let mut st = SparseMerkleTree::new(b"AMUN_STATE_DOMAIN");
+crates/amun-proof-carrying/tests/proof_tests.rs:13:    let gov = SparseMerkleTree::new(b"AMUN_GOVERNANCE_DOMAIN");
+crates/amun-proof-carrying/tests/proof_tests.rs:14:    let exec_tree = SparseMerkleTree::new(b"AMUN_EXECUTION_DOMAIN");
+crates/amun-proof-carrying/tests/proof_tests.rs:15:    let evidence_tree = SparseMerkleTree::new(b"AMUN_EVIDENCE_DOMAIN");
+crates/amun-proof-carrying/tests/proof_tests.rs:2:use amun_constitutional_commitments::SparseMerkleTree;
+crates/amun-protocol-event/src/event.rs:1:use amun_binary_codec::{CanonicalDecoder, CanonicalEncoder};
+crates/amun-protocol-event/src/event.rs:47:    /// Canonical binary encode with schema version.
+crates/amun-protocol-event/src/event.rs:50:        let mut enc = CanonicalEncoder::new();
+crates/amun-protocol-event/src/event.rs:92:    /// Canonical binary decode with schema version check.
+crates/amun-protocol-event/src/event.rs:94:        let mut dec = CanonicalDecoder::new(data);
+crates/amun-qc-canonical/src/canonicalize.rs:6:/// Canonicalize a QC by removing duplicate and invalid votes
+crates/amun-replay-consensus/src/replay_backed_types.rs:35:    /// Compute the replay root — Merkle root of all replay verification hashes.
+crates/amun-replay-engine/src/adaptive_relay.rs:16:pub struct RelayTopologyView {
+crates/amun-replay-engine/src/adaptive_relay.rs:18:    pub relays: Vec<RelayMetrics>,
+crates/amun-replay-engine/src/adaptive_relay.rs:226:        let mut view = RelayTopologyView::new();
+crates/amun-replay-engine/src/adaptive_relay.rs:227:        view.add_relay(RelayMetrics { relay_id: 1, congestion: 200, reachable: true, active_routes: 10 });
+crates/amun-replay-engine/src/adaptive_relay.rs:228:        view.add_relay(RelayMetrics { relay_id: 2, congestion: 10, reachable: true, active_routes: 2 });
+crates/amun-replay-engine/src/adaptive_relay.rs:235:        let mut view = RelayTopologyView::new();
+crates/amun-replay-engine/src/adaptive_relay.rs:236:        view.add_relay(RelayMetrics { relay_id: 1, congestion: 10, reachable: true, active_routes: 1 });
+crates/amun-replay-engine/src/adaptive_relay.rs:237:        view.add_relay(RelayMetrics { relay_id: 2, congestion: 5, reachable: true, active_routes: 1 });
+crates/amun-replay-engine/src/adaptive_relay.rs:23:pub struct RelayMetrics {
+crates/amun-replay-engine/src/adaptive_relay.rs:246:        let pressure = FrontierPressureMetrics::compute(&[(100, &f1), (200, &f2)]);
+crates/amun-replay-engine/src/adaptive_relay.rs:254:        let pressure = FrontierPressureMetrics { blocked_workers: vec![1; 15], frontier_density: 15 };
+crates/amun-replay-engine/src/adaptive_relay.rs:33:impl RelayTopologyView {
+crates/amun-replay-engine/src/adaptive_relay.rs:36:    pub fn add_relay(&mut self, metrics: RelayMetrics) {
+crates/amun-replay-engine/src/adaptive_relay.rs:52:pub struct FrontierPressureMetrics {
+crates/amun-replay-engine/src/adaptive_relay.rs:59:impl FrontierPressureMetrics {
+crates/amun-replay-engine/src/adaptive_relay.rs:97:    pressure: &FrontierPressureMetrics,
+crates/amun-replay-engine/src/canonical.rs:100:impl<'a> CanonicalReader<'a> {
+crates/amun-replay-engine/src/canonical.rs:112:    pub fn read_u64(&mut self) -> Result<u64, CanonicalError> {
+crates/amun-replay-engine/src/canonical.rs:114:            return Err(CanonicalError::UnexpectedEnd);
+crates/amun-replay-engine/src/canonical.rs:124:    pub fn read_hash(&mut self) -> Result<ConstitutionalHash, CanonicalError> {
+crates/amun-replay-engine/src/canonical.rs:126:            return Err(CanonicalError::UnexpectedEnd);
+crates/amun-replay-engine/src/canonical.rs:136:    pub fn read_bytes(&mut self) -> Result<&'a [u8], CanonicalError> {
+crates/amun-replay-engine/src/canonical.rs:139:            return Err(CanonicalError::UnexpectedEnd);
+crates/amun-replay-engine/src/canonical.rs:148:pub enum CanonicalError {
+crates/amun-replay-engine/src/canonical.rs:154:// STRUCT: CanonicalHasher
+crates/amun-replay-engine/src/canonical.rs:157:pub struct CanonicalHasher {
+crates/amun-replay-engine/src/canonical.rs:161:impl Default for CanonicalHasher {
+crates/amun-replay-engine/src/canonical.rs:167:impl CanonicalHasher {
+crates/amun-replay-engine/src/canonical.rs:172:    pub fn update<T: CanonicalEncode>(&mut self, item: &T) {
+crates/amun-replay-engine/src/canonical.rs:173:        let mut writer = CanonicalWriter::new();
+crates/amun-replay-engine/src/canonical.rs:194:impl CanonicalEncode for u64 {
+crates/amun-replay-engine/src/canonical.rs:198:    fn canonical_encode_into(&self, buf: &mut CanonicalWriter) {
+crates/amun-replay-engine/src/canonical.rs:203:impl CanonicalEncode for u32 {
+crates/amun-replay-engine/src/canonical.rs:207:    fn canonical_encode_into(&self, buf: &mut CanonicalWriter) {
+crates/amun-replay-engine/src/canonical.rs:212:impl CanonicalEncode for u8 {
+crates/amun-replay-engine/src/canonical.rs:216:    fn canonical_encode_into(&self, buf: &mut CanonicalWriter) {
+crates/amun-replay-engine/src/canonical.rs:221:impl CanonicalEncode for bool {
+crates/amun-replay-engine/src/canonical.rs:225:    fn canonical_encode_into(&self, buf: &mut CanonicalWriter) {
+crates/amun-replay-engine/src/canonical.rs:231:impl CanonicalEncode for [u8; 32] {
+crates/amun-replay-engine/src/canonical.rs:235:    fn canonical_encode_into(&self, buf: &mut CanonicalWriter) {
+crates/amun-replay-engine/src/canonical.rs:252:        let mut reader = CanonicalReader::new(&encoded);
+crates/amun-replay-engine/src/canonical.rs:260:        let mut reader = CanonicalReader::new(&encoded);
+crates/amun-replay-engine/src/canonical.rs:266:        let mut h1 = CanonicalHasher::new();
+crates/amun-replay-engine/src/canonical.rs:26:// TRAIT: CanonicalEncode
+crates/amun-replay-engine/src/canonical.rs:271:        let mut h2 = CanonicalHasher::new();
+crates/amun-replay-engine/src/canonical.rs:281:        let mut h1 = CanonicalHasher::new();
+crates/amun-replay-engine/src/canonical.rs:285:        let mut h2 = CanonicalHasher::new();
+crates/amun-replay-engine/src/canonical.rs:29:pub trait CanonicalEncode {
+crates/amun-replay-engine/src/canonical.rs:31:    fn canonical_encode_into(&self, buf: &mut CanonicalWriter);
+crates/amun-replay-engine/src/canonical.rs:35:// STRUCT: CanonicalWriter
+crates/amun-replay-engine/src/canonical.rs:38:pub struct CanonicalWriter {
+crates/amun-replay-engine/src/canonical.rs:42:impl Default for CanonicalWriter {
+crates/amun-replay-engine/src/canonical.rs:48:impl CanonicalWriter {
+crates/amun-replay-engine/src/canonical.rs:92:// STRUCT: CanonicalReader
+crates/amun-replay-engine/src/canonical.rs:95:pub struct CanonicalReader<'a> {
+crates/amun-replay-engine/src/constitutional_identity.rs:132:pub struct IdentityContainmentZone {
+crates/amun-replay-engine/src/constitutional_identity.rs:142:impl IdentityContainmentZone {
+crates/amun-replay-engine/src/constitutional_identity.rs:168:        let identity = IdentitySurface::new(1, [0xAA; 32]);
+crates/amun-replay-engine/src/constitutional_identity.rs:174:        let i1 = IdentitySurface::new(1, [0xAA; 32]);
+crates/amun-replay-engine/src/constitutional_identity.rs:175:        let i2 = IdentitySurface::new(1, [0xAA; 32]);
+crates/amun-replay-engine/src/constitutional_identity.rs:195:        let mut zone = IdentityContainmentZone::new(40);
+crates/amun-replay-engine/src/constitutional_identity.rs:1://! Constitutional Identity & Attribution — identity without privilege.
+crates/amun-replay-engine/src/constitutional_identity.rs:204:        let mut identity = IdentitySurface::new(1, [0xAA; 32]);
+crates/amun-replay-engine/src/constitutional_identity.rs:20:pub struct IdentitySurface {
+crates/amun-replay-engine/src/constitutional_identity.rs:36:impl IdentitySurface {
+crates/amun-replay-engine/src/constitutional_identity.rs:8://! to one from an ancient institution. Identity ≠ authority.
+crates/amun-replay-engine/src/derivational_equivalence.rs:142:        let fp1 = CanonicalDerivationFingerprint::compute([0xAA; 32], true, [0xAB; 32]);
+crates/amun-replay-engine/src/derivational_equivalence.rs:143:        let fp2 = CanonicalDerivationFingerprint::compute([0xAA; 32], true, [0xAB; 32]);
+crates/amun-replay-engine/src/derivational_equivalence.rs:149:        let fp1 = CanonicalDerivationFingerprint::compute([0xAA; 32], true, [0xAB; 32]);
+crates/amun-replay-engine/src/derivational_equivalence.rs:150:        let fp2 = CanonicalDerivationFingerprint::compute([0xAA; 32], false, [0xAB; 32]);
+crates/amun-replay-engine/src/derivational_equivalence.rs:184:        // Canonical order: sorted
+crates/amun-replay-engine/src/derivational_equivalence.rs:20:pub struct CanonicalDerivationFingerprint(pub [u8; 32]);
+crates/amun-replay-engine/src/derivational_equivalence.rs:22:impl CanonicalDerivationFingerprint {
+crates/amun-replay-engine/src/derivational_equivalence.rs:38:    pub fingerprint: CanonicalDerivationFingerprint,
+crates/amun-replay-engine/src/derivational_equivalence.rs:67:        let fingerprint = CanonicalDerivationFingerprint::compute(
+crates/amun-replay-engine/src/derivational_equivalence.rs:7://! CRITICAL: Canonicalization is compression, not authority.
+crates/amun-replay-engine/src/equivalence.rs:111:            domain: ReplayDomain::Canonical,
+crates/amun-replay-engine/src/errors.rs:32:    CanonicalError {
+crates/amun-replay-engine/src/lib.rs:149:            domain: ReplayDomain::Canonical,
+crates/amun-replay-engine/src/lib.rs:35:    CanonicalEncode, CanonicalError, CanonicalHasher, CanonicalReader, CanonicalWriter,
+crates/amun-replay-engine/src/state.rs:103:            domain: ReplayDomain::Canonical,
+crates/amun-replay-engine/src/state.rs:108:            domain: ReplayDomain::Canonical,
+crates/amun-replay-engine/src/state.rs:17:use crate::canonical::CanonicalHasher;
+crates/amun-replay-engine/src/state.rs:45:        let mut hasher = CanonicalHasher::new();
+crates/amun-replay-engine/src/state.rs:73:            domain: ReplayDomain::Canonical,
+crates/amun-replay-engine/src/state.rs:87:            domain: ReplayDomain::Canonical,
+crates/amun-replay-semantics/src/lib.rs:1://! Replay Semantics — formal constitutional model for replay.
+crates/amun-resource-core/src/resource_registry.rs:102:    /// This is the entry point needed by WitnessBuilder for Merkle proof construction.
+crates/amun-resource-core/src/resource_registry.rs:161:        if TransformationMatrix::is_terminal(parent.archetype) {
+crates/amun-resource-core/src/resource_registry.rs:164:        if !TransformationMatrix::is_legal(parent.archetype, child_meta.archetype) {
+crates/amun-resource-core/src/resource_registry.rs:209:    /// Compute the Merkle state root from all active resources.
+crates/amun-resource-core/src/resource_registry.rs:210:    /// Each leaf = hash_resource(metadata).  This is a true Merkle tree,
+crates/amun-resource-core/src/resource_registry.rs:211:    /// enabling Merkle proof construction for PCCV.
+crates/amun-resource-core/src/resource_registry.rs:221:        // Build Merkle tree bottom-up
+crates/amun-resource-core/src/resource_registry.rs:303:        if !TransformationMatrix::is_legal(parent.archetype, child_meta.archetype) {
+crates/amun-resource-core/src/resource_registry.rs:525:            "Merkle root must be non-zero for non-empty state"
+crates/amun-resource-core/src/resource_registry.rs:5:use crate::{DerivationType, ResourceArchetype, ResourceId, ResourceLineage, TransformationMatrix};
+crates/amun-resource-core/src/transformation_matrix.rs:18:pub struct TransformationMatrix;
+crates/amun-resource-core/src/transformation_matrix.rs:20:impl TransformationMatrix {
+crates/amun-rpc/src/client.rs:161:    pub fn get_metrics(&self) -> Result<MetricsResponse, String> {
+crates/amun-rpc/src/client.rs:45:pub struct MetricsResponse {
+crates/amun-rpc/src/lib.rs:127:async fn metrics(State(state): State<AppState>) -> Json<MetricsResponse> {
+crates/amun-rpc/src/lib.rs:129:    Json(MetricsResponse {
+crates/amun-rpc/src/lib.rs:56:pub struct MetricsResponse {
+crates/amun-rpc/src/provider.rs:11:    fn get_metrics(&self) -> Result<MetricsResponse, String>;
+crates/amun-rpc/src/provider.rs:2:    AccountResponse, BlockResponse, HeadResponse, MetricsResponse, RangeResponse, RpcClient,
+crates/amun-rpc/src/provider.rs:41:    fn get_metrics(&self) -> Result<MetricsResponse, String> {
+crates/amun-rpc/src/provider.rs:95:    fn get_metrics(&self) -> Result<MetricsResponse, String> {
+crates/amun-rpc/src/provider.rs:96:        Ok(MetricsResponse {
+crates/amun-self-preservation/src/action_principle.rs:1:use amun_constitutional_geometry::directed_metric::DirectedMetric;
+crates/amun-self-preservation/src/action_principle.rs:30:    pub fn add_step(&mut self, state_hash: [u8; 32], metric: &DirectedMetric) {
+crates/amun-self-preservation/src/legitimacy_guards.rs:16:    ConstitutionalIdentity,
+crates/amun-self-preservation/src/legitimacy_guards.rs:19:    ProofSemantics,
+crates/amun-serialization-audit/src/verifier.rs:13:                let mut enc = CanonicalEncoder::new(SchemaVersion::V4);
+crates/amun-serialization-audit/src/verifier.rs:1:use amun_canonical::{CanonicalEncoder, SchemaVersion};
+crates/amun-serialization-audit/src/verifier.rs:22:        let mut enc = CanonicalEncoder::new(SchemaVersion::V4);
+crates/amun-serialization-audit/src/verifier.rs:25:        let mut enc2 = CanonicalEncoder::new(SchemaVersion::V4);
+crates/amun-smt/src/canonical_model.rs:12:pub struct CanonicalModel {
+crates/amun-smt/src/canonical_model.rs:16:impl CanonicalModel {
+crates/amun-smt/src/canonical_model.rs:2:use crate::{Key256, SparseMerkleTree};
+crates/amun-smt/src/canonical_model.rs:33:    pub fn rebuild(&self) -> Result<SparseMerkleTree, SmtError> {
+crates/amun-smt/src/canonical_model.rs:37:        let mut tree = SparseMerkleTree::empty();
+crates/amun-smt/src/canonical_model.rs:46:    incremental: &SparseMerkleTree,
+crates/amun-smt/src/canonical_model.rs:47:    model: &CanonicalModel,
+crates/amun-smt/src/hash.rs:24:/// Canonical hash of an empty subtree: H(AMUN_EMPTY_V1).
+crates/amun-smt/src/hash.rs:3://! # Key Hashing Semantics
+crates/amun-smt/src/lib.rs:15://! - [`tree`]: the `SparseMerkleTree` type
+crates/amun-smt/src/lib.rs:16://! - [`proof`]: Merkle proof types and verification
+crates/amun-smt/src/lib.rs:1://! # Amun-SMT: Canonical Authenticated Sparse Merkle Tree
+crates/amun-smt/src/lib.rs:30:pub use tree::{Key256, SparseMerkleTree, StateRoot};
+crates/amun-smt/src/lib.rs:33:pub use proof::{AbsenceReason, LeafWitness, MerkleProof, ProofStep};
+crates/amun-smt/src/node.rs:16:/// Canonical hash of an empty subtree — computed once.
+crates/amun-smt/src/proof.rs:1://! Merkle proof types for inclusion and absence verification.
+crates/amun-smt/src/proof.rs:54:/// A self-contained Merkle proof for a single key.
+crates/amun-smt/src/proof.rs:56:pub struct MerkleProof {
+crates/amun-smt/src/proof.rs:67:impl MerkleProof {
+crates/amun-smt/src/tree.rs:1://! Canonical Sparse Merkle Patricia Tree.
+crates/amun-smt/src/tree.rs:25:use crate::proof::{AbsenceReason, LeafWitness, MerkleProof, ProofStep};
+crates/amun-smt/src/tree.rs:33:pub struct StateRoot(pub Hash);
+crates/amun-smt/src/tree.rs:36:pub struct SparseMerkleTree {
+crates/amun-smt/src/tree.rs:41:impl SparseMerkleTree {
+crates/amun-smt/src/tree.rs:432:    ) -> Result<Option<MerkleProof>, SmtError> {
+crates/amun-smt/src/tree.rs:441:        MerkleProof::new_inclusion(key_hash, vh, ver, steps).map(Some)
+crates/amun-smt/src/tree.rs:499:    ) -> Result<Option<MerkleProof>, SmtError> {
+crates/amun-smt/src/tree.rs:509:    ) -> Result<Option<MerkleProof>, SmtError> {
+crates/amun-smt/src/tree.rs:514:            return MerkleProof::new_absence(*key_hash, AbsenceReason::EmptyTree, vec![])
+crates/amun-smt/src/tree.rs:528:                MerkleProof::new_absence(
+crates/amun-smt/src/tree.rs:569:                    return MerkleProof::new_absence(
+crates/amun-smt/src/tree.rs:596:                    return MerkleProof::new_absence(
+crates/amun-smt/src/tree.rs:59:    pub fn root(&self) -> StateRoot {
+crates/amun-smt/src/tree.rs:60:        StateRoot(hash_root(&self.internal_root))
+crates/amun-smt/tests/determinism.rs:22:    let mut t1 = SparseMerkleTree::empty();
+crates/amun-smt/tests/determinism.rs:31:    let mut t2 = SparseMerkleTree::empty();
+crates/amun-smt/tests/determinism.rs:47:    let t1 = SparseMerkleTree::empty()
+crates/amun-smt/tests/determinism.rs:54:        SparseMerkleTree::empty().root().0,
+crates/amun-smt/tests/differential.rs:2:use amun_smt::canonical_model::{CanonicalModel, assert_equivalent};
+crates/amun-smt/tests/differential.rs:51:    let mut model = CanonicalModel::new();
+crates/amun-smt/tests/differential.rs:52:    let mut tree = SparseMerkleTree::empty();
+crates/amun-smt/tests/differential.rs:6:    let mut model = CanonicalModel::new();
+crates/amun-smt/tests/differential.rs:7:    let mut tree = SparseMerkleTree::empty();
+crates/amun-smt/tests/exhaustive.rs:2:use amun_smt::canonical_model::{CanonicalModel, assert_equivalent};
+crates/amun-smt/tests/exhaustive.rs:43:        let mut model = CanonicalModel::new();
+crates/amun-smt/tests/exhaustive.rs:44:        let mut tree = SparseMerkleTree::empty();
+crates/amun-smt/tests/fuzz.rs:16:        let mut t1 = SparseMerkleTree::empty();
+crates/amun-smt/tests/fuzz.rs:22:        let mut t2 = SparseMerkleTree::empty();
+crates/amun-smt/tests/fuzz.rs:46:        let mut t = SparseMerkleTree::empty();
+crates/amun-smt/tests/fuzz.rs:58:        if t.root().0 != SparseMerkleTree::empty().root().0 {
+crates/amun-smt/tests/fuzz.rs:65:        prop_assert_eq!(t.root().0, SparseMerkleTree::empty().root().0);
+crates/amun-smt/tests/fuzz.rs:72:        let t = SparseMerkleTree::empty()
+crates/amun-smt/tests/identity_laws.rs:11:    let t = SparseMerkleTree::empty();
+crates/amun-smt/tests/identity_laws.rs:15:    assert_eq!(t2.root(), SparseMerkleTree::empty().root());
+crates/amun-smt/tests/identity_laws.rs:16:    assert_eq!(t2.internal_root(), SparseMerkleTree::empty().internal_root());
+crates/amun-smt/tests/identity_laws.rs:18:    println!("InsertDeleteIdentity: PASSED");
+crates/amun-smt/tests/identity_laws.rs:21:/// Law 2: DeleteInsertCanonicality
+crates/amun-smt/tests/identity_laws.rs:29:    let mut model = CanonicalModel::new();
+crates/amun-smt/tests/identity_laws.rs:2:use amun_smt::canonical_model::{CanonicalModel, assert_equivalent};
+crates/amun-smt/tests/identity_laws.rs:30:    let mut tree = SparseMerkleTree::empty();
+crates/amun-smt/tests/identity_laws.rs:44:    println!("DeleteInsertCanonicality: PASSED");
+crates/amun-smt/tests/identity_laws.rs:4:/// Law 1: InsertDeleteIdentity
+crates/amun-smt/tests/identity_laws.rs:54:    let t1 = SparseMerkleTree::empty()
+crates/amun-smt/tests/identity_laws.rs:58:    let t2 = SparseMerkleTree::empty()
+crates/amun-smt/tests/proofs.rs:15:    let t = SparseMerkleTree::empty()
+crates/amun-smt/tests/proofs.rs:32:    let t = SparseMerkleTree::empty()
+crates/amun-smt/tests/proofs.rs:46:    let t = SparseMerkleTree::empty();
+crates/amun-smt/tests/validator.rs:13:    let mut t = SparseMerkleTree::empty();
+crates/amun-smt/tests/validator.rs:24:    let t = SparseMerkleTree::empty()
+crates/amun-smt/tests/validator.rs:6:    let t = SparseMerkleTree::empty();
+crates/amun-snapshot-constitution/src/export.rs:13:) -> Result<CanonicalSnapshot, SnapshotError> {
+crates/amun-snapshot-constitution/src/export.rs:1:use crate::snapshot::{CanonicalSnapshot, SnapshotError, SnapshotExecutionContext};
+crates/amun-snapshot-constitution/src/export.rs:25:    CanonicalSnapshot::new(position, sm.current_root, entries, context)
+crates/amun-snapshot-constitution/src/import.rs:1:use crate::snapshot::{CanonicalSnapshot, SnapshotExecutionContext};
+crates/amun-snapshot-constitution/src/import.rs:8:    snapshot: &CanonicalSnapshot,
+crates/amun-snapshot-constitution/src/lib.rs:7:pub use snapshot::{CanonicalSnapshot, SnapshotError, SnapshotExecutionContext};
+crates/amun-snapshot-constitution/src/snapshot.rs:49:pub struct CanonicalSnapshot {
+crates/amun-snapshot-constitution/src/snapshot.rs:59:impl CanonicalSnapshot {
+crates/amun-snapshot-engine/src/byzantine_sync.rs:1:use super::constitutional_identity::ConstitutionalIdentity;
+crates/amun-snapshot-engine/src/byzantine_sync.rs:27:    IdentityMismatch {
+crates/amun-snapshot-engine/src/byzantine_sync.rs:28:        local: ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/byzantine_sync.rs:29:        remote: ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/byzantine_sync.rs:48:    pub local_identity: ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/byzantine_sync.rs:54:    pub fn new(local_identity: ConstitutionalIdentity, required_quorum: u64) -> Self {
+crates/amun-snapshot-engine/src/byzantine_sync.rs:9:    pub identity: ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/chunk.rs:106:// Chunk Index - Merkle tree over chunk hashes
+crates/amun-snapshot-engine/src/chunk.rs:128:                let mut h = CanonicalHasher::with_domain(b"AMUN_CHUNK_MERKLE_V1");
+crates/amun-snapshot-engine/src/chunk.rs:2:// Each chunk is individually hashed and committed in a Merkle tree.
+crates/amun-snapshot-engine/src/chunk.rs:35:        let mut h = CanonicalHasher::with_domain(PROTOCOL_DOMAIN_CHUNK);
+crates/amun-snapshot-engine/src/chunk.rs:5:use amun_canonical_codec::CanonicalHasher;
+crates/amun-snapshot-engine/src/chunk_proof.rs:116:        let mut r = CanonicalReader::new(data);
+crates/amun-snapshot-engine/src/chunk_proof.rs:19:    /// Generate a Merkle proof that a chunk is included in the chunk index.
+crates/amun-snapshot-engine/src/chunk_proof.rs:2:use amun_canonical_codec::{CanonicalHasher, CanonicalReader, CanonicalWriter};
+crates/amun-snapshot-engine/src/chunk_proof.rs:55:                let mut h = CanonicalHasher::with_domain(b"AMUN_CHUNK_MERKLE_V1");
+crates/amun-snapshot-engine/src/chunk_proof.rs:74:    /// Rebuilds the Merkle root from the chunk hash and sibling steps.
+crates/amun-snapshot-engine/src/chunk_proof.rs:78:            let mut h = CanonicalHasher::with_domain(b"AMUN_CHUNK_MERKLE_V1");
+crates/amun-snapshot-engine/src/chunk_proof.rs:95:        let mut w = CanonicalWriter::new();
+crates/amun-snapshot-engine/src/compatibility.rs:141:    pub fn can_sync(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> bool {
+crates/amun-snapshot-engine/src/compatibility.rs:150:    pub fn can_migrate(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> bool {
+crates/amun-snapshot-engine/src/compatibility.rs:161:    pub fn can_read(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> bool {
+crates/amun-snapshot-engine/src/compatibility.rs:24:    pub local_identity: ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/compatibility.rs:25:    pub remote_identity: ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/compatibility.rs:32:    IdenticalIdentity,
+crates/amun-snapshot-engine/src/compatibility.rs:55:        local: &ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/compatibility.rs:56:        remote: &ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/compatibility.rs:60:        // Identity check
+crates/amun-snapshot-engine/src/compatibility.rs:62:            reasons.push(CompatibilityReason::IdenticalIdentity);
+crates/amun-snapshot-engine/src/compatibility.rs:6:use super::constitutional_identity::ConstitutionalIdentity;
+crates/amun-snapshot-engine/src/constitutional_hash.rs:22:        let mut h = CanonicalHasher::with_domain(PROTOCOL_DOMAIN_CONSTITUTION);
+crates/amun-snapshot-engine/src/constitutional_hash.rs:6:use amun_canonical_codec::CanonicalHasher;
+crates/amun-snapshot-engine/src/constitutional_identity.rs:19:impl ConstitutionalIdentity {
+crates/amun-snapshot-engine/src/constitutional_identity.rs:1:use amun_canonical_codec::{CanonicalHasher, CanonicalReader, CanonicalWriter};
+crates/amun-snapshot-engine/src/constitutional_identity.rs:21:        let canonical_empty_root = SparseMerkleTree::canonical_empty_root();
+crates/amun-snapshot-engine/src/constitutional_identity.rs:39:        let mut h = CanonicalHasher::with_domain(PROTOCOL_DOMAIN_CONSTITUTION);
+crates/amun-snapshot-engine/src/constitutional_identity.rs:3:use amun_storage_kernel::SparseMerkleTree;
+crates/amun-snapshot-engine/src/constitutional_identity.rs:57:        let mut w = CanonicalWriter::new();
+crates/amun-snapshot-engine/src/constitutional_identity.rs:6:pub struct ConstitutionalIdentity {
+crates/amun-snapshot-engine/src/constitutional_identity.rs:72:        let mut r = CanonicalReader::new(data);
+crates/amun-snapshot-engine/src/lib.rs:29:pub use constitutional_identity::ConstitutionalIdentity;
+crates/amun-snapshot-engine/src/lib.rs:36:pub use traversal::{CanonicalTraversal, SerializedNode, StreamingTraversal};
+crates/amun-snapshot-engine/src/manifest.rs:109:        let mut r = CanonicalReader::new(data);
+crates/amun-snapshot-engine/src/manifest.rs:66:        let mut h = CanonicalHasher::with_domain(PROTOCOL_DOMAIN_MANIFEST);
+crates/amun-snapshot-engine/src/manifest.rs:6:use amun_canonical_codec::{CanonicalHasher, CanonicalReader, CanonicalWriter};
+crates/amun-snapshot-engine/src/manifest.rs:89:        let mut w = CanonicalWriter::new();
+crates/amun-snapshot-engine/src/restore.rs:14:    pub fn restore(chunks: &ChunkIndex) -> Result<SparseMerkleTree, RestoreError> {
+crates/amun-snapshot-engine/src/restore.rs:1:use amun_canonical_codec::CanonicalReader;
+crates/amun-snapshot-engine/src/restore.rs:3:use amun_storage_kernel::SparseMerkleTree;
+crates/amun-snapshot-engine/src/restore.rs:68:        let tree = SparseMerkleTree {
+crates/amun-snapshot-engine/src/restore.rs:71:            empty_ladder: SparseMerkleTree::empty().empty_ladder,
+crates/amun-snapshot-engine/src/restore.rs:78:        let mut r = CanonicalReader::new(&serialized.data);
+crates/amun-snapshot-engine/src/snapshot.rs:102:        let mut r = CanonicalReader::new(data);
+crates/amun-snapshot-engine/src/snapshot.rs:163:        let mut r = CanonicalReader::new(remaining);
+crates/amun-snapshot-engine/src/snapshot.rs:1:use amun_canonical_codec::{CanonicalReader, CanonicalWriter};
+crates/amun-snapshot-engine/src/snapshot.rs:24:        let mut w = CanonicalWriter::new();
+crates/amun-snapshot-engine/src/snapshot.rs:43:        let mut r = CanonicalReader::new(data);
+crates/amun-snapshot-engine/src/snapshot.rs:93:        let mut w = CanonicalWriter::new();
+crates/amun-snapshot-engine/src/structural_verifier.rs:2:use amun_storage_kernel::SparseMerkleTree;
+crates/amun-snapshot-engine/src/structural_verifier.rs:90:        let empty_ladder = &SparseMerkleTree::empty().empty_ladder;
+crates/amun-snapshot-engine/src/transition.rs:23:        local: &ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/transition.rs:24:        remote: &ConstitutionalIdentity,
+crates/amun-snapshot-engine/src/transition.rs:2:use super::constitutional_identity::ConstitutionalIdentity;
+crates/amun-snapshot-engine/src/transition.rs:53:    pub fn can_sync(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> bool {
+crates/amun-snapshot-engine/src/transition.rs:57:    pub fn can_migrate(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> bool {
+crates/amun-snapshot-engine/src/traversal.rs:12:pub struct CanonicalTraversal {
+crates/amun-snapshot-engine/src/traversal.rs:133:                        let mut w = amun_canonical_codec::CanonicalWriter::new();
+crates/amun-snapshot-engine/src/traversal.rs:141:                        let mut w = amun_canonical_codec::CanonicalWriter::new();
+crates/amun-snapshot-engine/src/traversal.rs:16:impl CanonicalTraversal {
+crates/amun-snapshot-engine/src/traversal.rs:21:    pub fn traverse(&mut self, tree: &SparseMerkleTree) {
+crates/amun-snapshot-engine/src/traversal.rs:25:    fn visit_node(&mut self, depth: usize, node_hash: NodeHash, tree: &SparseMerkleTree) {
+crates/amun-snapshot-engine/src/traversal.rs:2:use amun_storage_kernel::SparseMerkleTree;
+crates/amun-snapshot-engine/src/traversal.rs:45:                    let mut w = amun_canonical_codec::CanonicalWriter::new();
+crates/amun-snapshot-engine/src/traversal.rs:53:                    let mut w = amun_canonical_codec::CanonicalWriter::new();
+crates/amun-snapshot-engine/src/traversal.rs:89:    tree: &'a SparseMerkleTree,
+crates/amun-snapshot-engine/src/traversal.rs:95:    pub fn new(tree: &'a SparseMerkleTree) -> Self {
+crates/amun-snapshot-engine/src/verifier.rs:26:        let canonical_empty = SparseMerkleTree::canonical_empty_root();
+crates/amun-snapshot-engine/src/verifier.rs:29:                "Canonical empty root mismatch: expected {:?}, got {:?}",
+crates/amun-snapshot-engine/src/verifier.rs:53:        let canonical_empty = SparseMerkleTree::canonical_empty_root();
+crates/amun-snapshot-engine/src/verifier.rs:8:use amun_storage_kernel::SparseMerkleTree;
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:119:        let id = ConstitutionalIdentity::new([0xFFu8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:11:        let id1 = ConstitutionalIdentity::new(hash);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:121:        let decoded = ConstitutionalIdentity::decode(&encoded).unwrap();
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:128:        let id = ConstitutionalIdentity::new([0x13u8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:12:        let id2 = ConstitutionalIdentity::new(hash);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:133:        let decoded = ConstitutionalIdentity::decode(&encoded).unwrap();
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:19:        let id1 = ConstitutionalIdentity::new([0x01u8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:20:        let id2 = ConstitutionalIdentity::new([0x02u8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:27:        let id = ConstitutionalIdentity::new([0xAAu8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:33:        let id = ConstitutionalIdentity::new([0x11u8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:40:        let id1 = ConstitutionalIdentity::new([0xAAu8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:41:        let id2 = ConstitutionalIdentity::new([0xBBu8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:48:        let mut id1 = ConstitutionalIdentity::new([0xCCu8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:49:        let mut id2 = ConstitutionalIdentity::new([0xDDu8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:4:        CompatibilityEngine, CompatibilityLevel, ConstitutionalHash, ConstitutionalIdentity,
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:58:        let id = ConstitutionalIdentity::new([0xCCu8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:64:        let id = ConstitutionalIdentity::new([0xDDu8; 32]);
+crates/amun-snapshot-engine/tests/constitutional_tests.rs:71:        let id = ConstitutionalIdentity::new([0xEEu8; 32]);
+crates/amun-state-machine/src/absolute_invariants.rs:22:    IdentityMutationProvable,
+crates/amun-state-machine/src/absolute_invariants.rs:45:            Self::IdentityMutationProvable,
+crates/amun-state-machine/src/axioms.rs:11:    IdentityPreservation,
+crates/amun-state-machine/src/axioms.rs:35:            Self::IdentityPreservation => {
+crates/amun-state-machine/src/delta_algebra.rs:100:            Self::IdentityDelta {
+crates/amun-state-machine/src/delta_algebra.rs:1:use amun_canonical_codec::CanonicalHasher;
+crates/amun-state-machine/src/delta_algebra.rs:24:    IdentityDelta {
+crates/amun-state-machine/src/delta_algebra.rs:46:            Self::IdentityDelta { .. } => 0x05,
+crates/amun-state-machine/src/delta_algebra.rs:60:            Self::IdentityDelta { .. } => 3,
+crates/amun-state-machine/src/delta_algebra.rs:67:        let mut h = CanonicalHasher::with_domain(b"AMUN_DELTA_V1");
+crates/amun-state-machine/src/delta_laws.rs:29:                ConstitutionalDelta::IdentityDelta { .. },
+crates/amun-state-machine/src/delta_laws.rs:30:                ConstitutionalDelta::IdentityDelta { .. },
+crates/amun-state-machine/src/engine.rs:14:        TransitionAlgebra::resolve(from, transition).is_some()
+crates/amun-state-machine/src/engine.rs:18:        TransitionAlgebra::forbidden_transitions(from)
+crates/amun-state-machine/src/engine.rs:67:        let to_tag = TransitionAlgebra::resolve(from.state_tag, transition_type).unwrap();
+crates/amun-state-machine/src/engine.rs:6:use super::transitions::{Transition, TransitionAlgebra, TransitionType};
+crates/amun-state-machine/src/fork_merge.rs:128:        let mut h = CanonicalHasher::with_domain(b"AMUN_MERGE_V1");
+crates/amun-state-machine/src/fork_merge.rs:1:use amun_canonical_codec::CanonicalHasher;
+crates/amun-state-machine/src/fork_merge.rs:3:/// Fork Divergence Algebra: governs constitutional bifurcation.
+crates/amun-state-machine/src/fork_merge.rs:53:        let mut h = CanonicalHasher::with_domain(b"AMUN_FORK_V1");
+crates/amun-state-machine/src/fork_merge.rs:76:/// Merge Compatibility Algebra: governs constitutional reunification.
+crates/amun-state-machine/src/invariants.rs:17:    IdentityNotSilentlyMutated,
+crates/amun-state-machine/src/lib.rs:51:pub use stability::ConstitutionalStabilityMetrics;
+crates/amun-state-machine/src/lib.rs:55:    Transition, TransitionAlgebra, TransitionId, TransitionProof, TransitionType,
+crates/amun-state-machine/src/merge_math.rs:13:    IdentityMerged { new_constitution_hash: [u8; 32] },
+crates/amun-state-machine/src/merge_math.rs:15:    IdentityAbsorbed {
+crates/amun-state-machine/src/merge_math.rs:20:    IdentityFederated,
+crates/amun-state-machine/src/merge_math.rs:23:/// Merge Conflict Resolution Algebra.
+crates/amun-state-machine/src/merge_math.rs:49:            super::fork_merge::MergeType::Union => MergeResolution::IdentityMerged {
+crates/amun-state-machine/src/merge_math.rs:53:                MergeResolution::IdentityAbsorbed {
+crates/amun-state-machine/src/merge_math.rs:63:            super::fork_merge::MergeType::Federation => MergeResolution::IdentityFederated,
+crates/amun-state-machine/src/meta_amendment.rs:21:    ProofSemantics,
+crates/amun-state-machine/src/meta_amendment.rs:53:            MetaAmendmentScope::ProofSemantics | MetaAmendmentScope::ReplayGuarantees => {
+crates/amun-state-machine/src/meta_amendment.rs:66:                            if matches!(scope, MetaAmendmentScope::ProofSemantics) {
+crates/amun-state-machine/src/preconditions.rs:18:    IdentityPreserved,
+crates/amun-state-machine/src/preconditions.rs:27:        let legal = TransitionAlgebra::legal_transitions(from.state_tag);
+crates/amun-state-machine/src/preconditions.rs:2:use super::transitions::{TransitionAlgebra, TransitionType};
+crates/amun-state-machine/src/replay_log.rs:2:use amun_canonical_codec::CanonicalHasher;
+crates/amun-state-machine/src/replay_log.rs:33:        let mut h = CanonicalHasher::with_domain(b"AMUN_REPLAY_LOG_V1");
+crates/amun-state-machine/src/stability.rs:15:impl Default for ConstitutionalStabilityMetrics {
+crates/amun-state-machine/src/stability.rs:1:/// Metrics for constitutional stability over time.
+crates/amun-state-machine/src/stability.rs:21:impl ConstitutionalStabilityMetrics {
+crates/amun-state-machine/src/stability.rs:3:pub struct ConstitutionalStabilityMetrics {
+crates/amun-state-machine/src/states.rs:1:use amun_canonical_codec::CanonicalHasher;
+crates/amun-state-machine/src/states.rs:71:        let mut h = CanonicalHasher::with_domain(b"AMUN_STATE_V1");
+crates/amun-state-machine/src/transitions.rs:165:        let mut h = CanonicalHasher::with_domain(b"AMUN_TRANSITION_V1");
+crates/amun-state-machine/src/transitions.rs:2:use amun_canonical_codec::CanonicalHasher;
+crates/amun-state-machine/src/transitions.rs:39:pub struct TransitionAlgebra;
+crates/amun-state-machine/src/transitions.rs:40:impl TransitionAlgebra {
+crates/amun-state-machine/src/verifier.rs:33:        let to_tag = match TransitionAlgebra::resolve(from.state_tag, transition_type) {
+crates/amun-state-machine/src/verifier.rs:36:                let forbidden = TransitionAlgebra::forbidden_transitions(from.state_tag);
+crates/amun-state-machine/src/verifier.rs:4:use super::transitions::{Transition, TransitionAlgebra, TransitionType};
+crates/amun-state-root/src/identity.rs:14:impl CanonicalEncode for ChainIdentityRoot {
+crates/amun-state-root/src/identity.rs:1:use amun_kernel::canonical::{CanonicalEncode, CanonicalEncoder};
+crates/amun-state-root/src/identity.rs:25:impl ChainIdentityRoot {
+crates/amun-state-root/src/identity.rs:27:        CanonicalEncoder::hash_value(self, domain_tags::IDENTITY)
+crates/amun-state-root/src/identity.rs:5:pub struct ChainIdentityRoot {
+crates/amun-state-root/src/lib.rs:12:pub use identity::ChainIdentityRoot;
+crates/amun-state-root/src/lib.rs:14:pub use root::StateRootEngine;
+crates/amun-state-root/src/proofs.rs:4:pub struct MerkleProof {
+crates/amun-state-root/src/proofs.rs:9:impl MerkleProof {
+crates/amun-state-root/src/replay.rs:10:impl CanonicalEncode for ReplayEquivalenceProof {
+crates/amun-state-root/src/replay.rs:1:use amun_kernel::canonical::{encode_hash_slice, CanonicalEncode};
+crates/amun-state-root/src/replay.rs:29:impl CanonicalEncode for ReplayTranscript {
+crates/amun-state-root/src/replay.rs:47:impl CanonicalEncode for ReplayCertificate {
+crates/amun-state-root/src/root.rs:12:impl CanonicalEncode for StateLeaf {
+crates/amun-state-root/src/root.rs:1:use amun_kernel::canonical::{CanonicalEncode, CanonicalEncoder};
+crates/amun-state-root/src/root.rs:20:pub struct StateRootEngine;
+crates/amun-state-root/src/root.rs:22:impl StateRootEngine {
+crates/amun-state-root/src/root.rs:32:        Ok(CanonicalEncoder::hash_sorted(
+crates/amun-state-root/src/root.rs:40:        CanonicalEncoder::hash_sorted(domain_roots.iter(), domain_tags::STATE_ROOT)
+crates/amun-state-root/src/snapshot.rs:3:use amun_kernel::canonical::{CanonicalEncode, CanonicalEncoder};
+crates/amun-state-root/src/snapshot.rs:40:impl CanonicalEncode for ReplayEquivalenceProof {
+crates/amun-state-root/src/snapshot.rs:48:impl CanonicalEncode for ConstitutionalSnapshot {
+crates/amun-state-root/src/snapshot.rs:71:        CanonicalEncoder::hash_value(self, domain_tags::SNAPSHOT)
+crates/amun-state-stream/src/journal.rs:6:use amun_canonical_codec::{CanonicalReader, CanonicalWriter};
+crates/amun-state-stream/src/journal.rs:81:        let mut w = CanonicalWriter::new();
+crates/amun-state-stream/src/journal.rs:96:        let mut r = CanonicalReader::new(data);
+crates/amun-state-stream/src/messages.rs:1:use amun_canonical_codec::{CanonicalReader, CanonicalWriter};
+crates/amun-state-stream/src/messages.rs:53:        let mut w = CanonicalWriter::new();
+crates/amun-state-stream/src/messages.rs:61:        let mut r = CanonicalReader::new(data);
+crates/amun-state-stream/src/messages.rs:75:        let mut w = CanonicalWriter::new();
+crates/amun-state-stream/src/messages.rs:83:        let mut r = CanonicalReader::new(data);
+crates/amun-state-sync/src/state_chunk.rs:48:pub struct ChunkMerkleProof {
+crates/amun-state-sync/src/state_chunk.rs:55:impl ChunkMerkleProof {
+crates/amun-state-sync/src/state_chunk.rs:75:pub fn build_chunk_merkle_tree(chunks: &[StateChunk]) -> ([u8; 32], Vec<ChunkMerkleProof>) {
+crates/amun-state-sync/src/state_chunk.rs:84:        proofs.push(ChunkMerkleProof {
+crates/amun-state-sync/src/stateless_verifier.rs:70:                    reason: format!("Merkle proof failed for chunk {}", proof.chunk_id),
+crates/amun-state-sync/src/sync_package.rs:11:    pub chunk_proofs: Vec<ChunkMerkleProof>,
+crates/amun-state-sync/src/sync_package.rs:19:        chunk_proofs: Vec<ChunkMerkleProof>,
+crates/amun-state-sync/src/sync_package.rs:4:use crate::state_chunk::{ChunkMerkleProof, StateChunk};
+crates/amun-state-sync/src/sync_protocol.rs:382:// Note: The Merkle tree implementation has a known limitation with odd
+crates/amun-state-transition/src/state.rs:149:        let mut enc = CanonicalEncoder::new(SchemaVersion::V4);
+crates/amun-state-transition/src/state.rs:167:        let mut enc = CanonicalEncoder::new(SchemaVersion::V4);
+crates/amun-state-transition/src/state.rs:3:use amun_canonical::{CanonicalEncoder, SchemaVersion};
+crates/amun-stf/src/receipt.rs:1:use amun_codec::{CanonicalDecode, CanonicalEncode, CanonicalWriter, WriteResult};
+crates/amun-stf/src/receipt.rs:33:impl CanonicalEncode for ExecutionReceipt {
+crates/amun-stf/src/receipt.rs:35:    fn encode_to_writer(&self, writer: &mut impl CanonicalWriter) -> WriteResult {
+crates/amun-stf/src/receipt.rs:45:impl CanonicalDecode for ExecutionReceipt {
+crates/amun-stf/src/state.rs:114:        Ok(amun_merkle::MerkleTree::compute_root(&leaves))
+crates/amun-stf/src/transition_result.rs:21:        use amun_state_root::root::{StateLeaf, StateRootEngine};
+crates/amun-stf/src/transition_result.rs:26:        StateRootEngine::domain_root(&leaves).map_err(|e| format!("pre_root: {}", e))?
+crates/amun-stf/src/transition_result.rs:32:        use amun_state_root::root::{StateLeaf, StateRootEngine};
+crates/amun-stf/src/transition_result.rs:37:        StateRootEngine::domain_root(&leaves).map_err(|e| format!("post_root: {}", e))?
+crates/amun-storage-kernel/ATOMIC_SNAPSHOT_CONSTITUTION.md:43:For the SparseMerkleTree, the freeze is natural: the persistent
+crates/amun-storage-kernel/CANONICAL_TRAVERSAL_LAW.md:17:- Proof step ordering within Merkle proofs
+crates/amun-storage-kernel/CANONICAL_TRAVERSAL_LAW.md:80:Merkle proof steps are collected top-down during traversal and
+crates/amun-storage-kernel/CONSTITUTION.md:17:The canonical logical state is a full explicit 256-depth Sparse Merkle Tree.
+crates/amun-storage-kernel/CONSTITUTION.md:26:**Section 1.3: Canonical Empty Root**
+crates/amun-storage-kernel/CONSTITUTION.md:35:**Section 1.5: Delete-Reinsert Identity**
+crates/amun-storage-kernel/CONSTITUTION.md:44:**Section 2.1: Fixed Proof Geometry**
+crates/amun-storage-kernel/CONSTITUTION.md:45:All Merkle proofs SHALL contain exactly 256 ProofStep entries.
+crates/amun-storage-kernel/CONSTITUTION.md:93:**Section 6.1: Dual Geometry**
+crates/amun-storage-kernel/CONSTITUTION.md:94:Canonical logical geometry SHALL remain full explicit 256-depth.
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:101:only chunks containing those nodes plus Merkle proofs for
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:156:**Section 9.1: Proof Geometry**
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:24:- Merkle root of chunk index
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:59:- Chunk index: Merkle tree over ordered chunk hashes
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:60:- Snapshot root: Merkle root of chunk index
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:64:via Merkle proof from chunk hash to snapshot root.
+crates/amun-storage-kernel/SNAPSHOT_CONSTITUTION.md:72:Combines SMT Merkle proof (256 steps) with chunk index proof.
+crates/amun-storage-kernel/SPECIFICATION.md:2:## Derived from the Constitution - Implementation Semantics
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:33:| StateRootMismatch | ReplayVerifier divergence | Quarantine state, resync from trusted peer |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:36:| NonCanonicalStructure | Canonical invariant check fails | Reconstruct from lineage |
+crates/amun-storage-kernel/examples/generate_golden.rs:1:use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-storage-kernel/examples/generate_golden.rs:7:    let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-storage-kernel/src/lib.rs:13:pub use smt::{MerkleProof, NodeHash, ProofStep, ProofVerifier, SparseMerkleTree};
+crates/amun-storage-kernel/src/lib.rs:37:pub struct StateRoot(pub [u8; 32]);
+crates/amun-storage-kernel/src/lib.rs:38:impl StateRoot {
+crates/amun-storage-kernel/src/lib.rs:55:    pub state_root: StateRoot,
+crates/amun-storage-kernel/src/lib.rs:56:    pub prev_state_root: StateRoot,
+crates/amun-storage-kernel/src/lib.rs:65:        state_root: StateRoot,
+crates/amun-storage-kernel/src/lib.rs:66:        prev_state_root: StateRoot,
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:2:use crate::{Key256, SparseMerkleTree};
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:87:        let mut tree = SparseMerkleTree::empty();
+crates/amun-storage-kernel/src/smt/mod.rs:10:pub use tree::SparseMerkleTree;
+crates/amun-storage-kernel/src/smt/mod.rs:9:pub use proof::{MerkleProof, ProofStep, ProofType, ProofVerifier};
+crates/amun-storage-kernel/src/smt/proof.rs:301:        Some(MerkleProof {
+crates/amun-storage-kernel/src/smt/proof.rs:312:    pub fn verify(proof: &MerkleProof, root: [u8; 32]) -> bool {
+crates/amun-storage-kernel/src/smt/proof.rs:33:pub struct MerkleProof {
+crates/amun-storage-kernel/src/smt/proof.rs:40:impl MerkleProof {
+crates/amun-storage-kernel/src/smt/proof.rs:8:    super::tree::SparseMerkleTree::canonical_empty_root()
+crates/amun-storage-kernel/src/smt/tree.rs:10:pub struct SparseMerkleTree {
+crates/amun-storage-kernel/src/smt/tree.rs:22:impl SparseMerkleTree {
+crates/amun-storage-kernel/src/smt/tree.rs:317:    pub fn generate_inclusion_proof(&self, key: &Key256) -> Option<super::proof::MerkleProof> {
+crates/amun-storage-kernel/src/smt/tree.rs:326:        Some(super::proof::MerkleProof::new_inclusion(
+crates/amun-storage-kernel/src/smt/tree.rs:397:    pub fn generate_absence_proof(&self, key: &Key256) -> Option<super::proof::MerkleProof> {
+crates/amun-storage-kernel/src/smt/tree.rs:3:use crate::StateRoot;
+crates/amun-storage-kernel/src/smt/tree.rs:420:                    Some(super::proof::MerkleProof::new_empty_tree_absence(
+crates/amun-storage-kernel/src/smt/tree.rs:444:                        return Some(super::proof::MerkleProof::new_absence(
+crates/amun-storage-kernel/src/smt/tree.rs:47:    pub fn root(&self) -> StateRoot {
+crates/amun-storage-kernel/src/smt/tree.rs:48:        StateRoot(self.root.0)
+crates/amun-storage-kernel/tests/canonical_constants.rs:4:    use amun_storage_kernel::SparseMerkleTree;
+crates/amun-storage-kernel/tests/canonical_constants.rs:8:        let computed = SparseMerkleTree::canonical_empty_root();
+crates/amun-storage-kernel/tests/compute_real_empty_root.rs:3:    use amun_storage_kernel::SparseMerkleTree;
+crates/amun-storage-kernel/tests/compute_real_empty_root.rs:7:        let tree = SparseMerkleTree::empty();
+crates/amun-storage-kernel/tests/delete_equivalence.rs:10:        let tree = SparseMerkleTree::empty()
+crates/amun-storage-kernel/tests/delete_equivalence.rs:25:        let tree1 = SparseMerkleTree::empty().insert(&key1, &value, 0);
+crates/amun-storage-kernel/tests/delete_equivalence.rs:39:        let fresh = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-storage-kernel/tests/delete_equivalence.rs:3:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-storage-kernel/tests/delete_equivalence.rs:41:        let deleted_reinserted = SparseMerkleTree::empty()
+crates/amun-storage-kernel/tests/delete_equivalence.rs:9:        let empty_root = SparseMerkleTree::canonical_empty_root();
+crates/amun-storage-kernel/tests/ladder_consistency.rs:4:    use amun_storage_kernel::SparseMerkleTree;
+crates/amun-storage-kernel/tests/ladder_consistency.rs:8:        let tree = SparseMerkleTree::empty();
+crates/amun-storage-kernel/tests/proptest_smt.rs:24:                    let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-storage-kernel/tests/proptest_smt.rs:3:    use amun_storage_kernel::{Key256, SparseMerkleTree};
+crates/amun-storage-kernel/tests/proptest_smt.rs:49:                    let tree = SparseMerkleTree::empty().insert(&present_key, &value, 0);
+crates/amun-storage-kernel/tests/proptest_smt.rs:75:                    let mut tree_a = SparseMerkleTree::empty();
+crates/amun-storage-kernel/tests/proptest_smt.rs:81:                    let mut tree_b = SparseMerkleTree::empty();
+crates/amun-storage-kernel/tests/replay_equivalence.rs:106:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-storage-kernel/tests/replay_equivalence.rs:35:        let tree = SparseMerkleTree::empty().insert(&key, &value, 0);
+crates/amun-storage-kernel/tests/replay_equivalence.rs:5:        Key256, SparseMerkleTree,
+crates/amun-storage-kernel/tests/specification_compliance.rs:116:        let tree = SparseMerkleTree::empty().insert(&k, &v, 0);
+crates/amun-storage-kernel/tests/specification_compliance.rs:131:        let tree = SparseMerkleTree::empty();
+crates/amun-storage-kernel/tests/specification_compliance.rs:144:        let tree = SparseMerkleTree::empty();
+crates/amun-storage-kernel/tests/specification_compliance.rs:15:        let root_a = SparseMerkleTree::empty()
+crates/amun-storage-kernel/tests/specification_compliance.rs:20:        let root_b = SparseMerkleTree::empty()
+crates/amun-storage-kernel/tests/specification_compliance.rs:29:    // THEOREM 2: Delete-Reinsert Identity
+crates/amun-storage-kernel/tests/specification_compliance.rs:36:        let fresh = SparseMerkleTree::empty().insert(&k, &v, 0);
+crates/amun-storage-kernel/tests/specification_compliance.rs:37:        let cycled = SparseMerkleTree::empty()
+crates/amun-storage-kernel/tests/specification_compliance.rs:3:    use amun_storage_kernel::{smt::constants::CANONICAL_EMPTY_ROOT_V1, Key256, SparseMerkleTree};
+crates/amun-storage-kernel/tests/specification_compliance.rs:50:    // THEOREM 3: Empty Identity
+crates/amun-storage-kernel/tests/specification_compliance.rs:57:        let result = SparseMerkleTree::empty().insert(&k, &v, 0).delete(&k);
+crates/amun-storage-kernel/tests/specification_compliance.rs:73:        let tree = SparseMerkleTree::empty().insert(&k, &v, 0);
+crates/amun-storage-kernel/tests/specification_compliance.rs:99:        let tree = SparseMerkleTree::empty().insert(&k1, &v, 0);
+crates/amun-survival-console/src/dashboard.rs:1:use crate::metrics::SurvivabilityMetrics;
+crates/amun-survival-console/src/dashboard.rs:46:    ) -> SurvivabilityMetrics {
+crates/amun-survival-console/src/dashboard.rs:4:use amun_complexity_budget::metrics::ComplexityMetrics;
+crates/amun-survival-console/src/dashboard.rs:50:        let metrics = ComplexityMetrics::measure(
+crates/amun-survival-console/src/dashboard.rs:72:        SurvivabilityMetrics {
+crates/amun-survival-console/src/lib.rs:5:pub use metrics::SurvivabilityMetrics;
+crates/amun-survival-console/src/metrics.rs:14:impl SurvivabilityMetrics {
+crates/amun-survival-console/src/metrics.rs:4:pub struct SurvivabilityMetrics {
+crates/amun-transcript-semantics/src/lib.rs:102:    #[test] fn test_causal_chain() { let p = EventIdentity::new([0x01;32],[0x00;32],[0xAA;32],1,ReplayDomain::Consensus,[0xBB;32]); let c = EventIdentity::new([0x02;32],[0x01;32],[0xAA;32],2,ReplayDomain::Consensus,[0xBB;32]); assert!(c.verify_causal_chain(&p)); }
+crates/amun-transcript-semantics/src/lib.rs:105:    #[test] fn test_witness_hash() { let w = ReplayWitness::MerkleWitness { leaf_hash: [0x01;32], proof_hashes: vec![[0x02;32]], leaf_index: 0 }; assert_ne!(w.witness_hash(), [0;32]); }
+crates/amun-transcript-semantics/src/lib.rs:11:pub struct EventIdentity { pub event_hash: [u8; 32], pub causal_parent: [u8; 32], pub authority_root: [u8; 32], pub transcript_position: u64, pub domain: ReplayDomain, pub epoch_id: [u8; 32] }
+crates/amun-transcript-semantics/src/lib.rs:12:impl EventIdentity {
+crates/amun-transcript-semantics/src/lib.rs:14:    pub fn verify_causal_chain(&self, parent: &EventIdentity) -> bool { self.causal_parent == parent.event_hash && self.transcript_position == parent.transcript_position + 1 }
+crates/amun-transcript-semantics/src/lib.rs:1://! Transcript Semantics — constitutional causal transcript model.
+crates/amun-transcript-semantics/src/lib.rs:31:#[derive(Debug, Clone, PartialEq, Eq)] pub struct CausalNode { pub identity: EventIdentity, pub dependencies: Vec<EventIdentity>, pub effects: Vec<EventIdentity> }
+crates/amun-transcript-semantics/src/lib.rs:32:impl CausalNode { pub fn new(identity: EventIdentity) -> Self { Self { identity, dependencies: Vec::new(), effects: Vec::new() } } }
+crates/amun-transcript-semantics/src/lib.rs:36:#[derive(Debug, Clone, PartialEq, Eq)] pub struct ConsensusEvent { pub identity: EventIdentity, pub round: u64, pub event_type: ConsensusEventType, pub authority: EventAuthority }
+crates/amun-transcript-semantics/src/lib.rs:37:#[derive(Debug, Clone, PartialEq, Eq)] pub struct ExecutionEvent { pub identity: EventIdentity, pub block_hash: [u8; 32], pub pre_state_root: [u8; 32], pub post_state_root: [u8; 32], pub receipt_hash: [u8; 32], pub authority: EventAuthority }
+crates/amun-transcript-semantics/src/lib.rs:39:#[derive(Debug, Clone, PartialEq, Eq)] pub struct GovernanceEvent { pub identity: EventIdentity, pub event_type: GovernanceEventType, pub authority: EventAuthority }
+crates/amun-transcript-semantics/src/lib.rs:40:#[derive(Debug, Clone, PartialEq, Eq)] pub struct CertifyingEvent { pub identity: EventIdentity, pub certifies: EventIdentity, pub certificate_hash: [u8; 32], pub certifier_authority: [u8; 32] }
+crates/amun-transcript-semantics/src/lib.rs:45:    pub fn identity(&self) -> &EventIdentity {
+crates/amun-transcript-semantics/src/lib.rs:79:    MerkleWitness { leaf_hash: [u8; 32], proof_hashes: Vec<[u8; 32]>, leaf_index: u64 },
+crates/amun-transcript-semantics/src/lib.rs:88:        match self { ReplayWitness::MerkleWitness { leaf_hash, proof_hashes, leaf_index } => { h.update(b"MERKLE"); h.update(leaf_hash); h.update(leaf_index.to_le_bytes()); for ph in proof_hashes { h.update(ph); } } ReplayWitness::ExecutionWitness { block_hash, trace_hash, step_count } => { h.update(b"EXECUTION"); h.update(block_hash); h.update(trace_hash); h.update(step_count.to_le_bytes()); } ReplayWitness::TranscriptWitness { start_sequence, end_sequence, fragment_hash } => { h.update(b"TRANSCRIPT"); h.update(start_sequence.to_le_bytes()); h.update(end_sequence.to_le_bytes()); h.update(fragment_hash); } ReplayWitness::ReceiptWitness { receipt_hashes, chain_root } => { h.update(b"RECEIPT"); for rh in receipt_hashes { h.update(rh); } h.update(chain_root); } ReplayWitness::CompositeWitness { composite_hash, .. } => { h.update(b"COMPOSITE"); h.update(composite_hash); } }
+crates/amun-transcript-semantics/src/lib.rs:96:    pub fn causal_integrity(parent: &EventIdentity, child: &EventIdentity) -> Result<(), TranscriptError> { if !child.verify_causal_chain(parent) { Err(TranscriptError::CausalChainBroken { parent_hash: parent.event_hash, child_parent_hash: child.causal_parent }) } else { Ok(()) } }
+crates/amun-transcript-semantics/src/lib.rs:9:// ─── Event Identity ───────────────────────────────────────
+crates/amun-transition-proof/src/enhanced_proof.rs:13:impl MerkleProof {
+crates/amun-transition-proof/src/enhanced_proof.rs:59:    pub consumed_proofs: Vec<MerkleProof>,
+crates/amun-transition-proof/src/enhanced_proof.rs:7:pub struct MerkleProof {
+crates/amun-transition-proof/src/proof_builder.rs:122:    ) -> MerkleProof {
+crates/amun-transition-proof/src/proof_builder.rs:124:        MerkleProof {
+crates/amun-transition-proof/src/proof_builder.rs:7:use crate::enhanced_proof::{EnhancedTransitionProof, LineageProof, MerkleProof, WitnessBundle};
+crates/amun-truth-engine/src/engine.rs:218:    ) -> Result<CanonicalSnapshot, amun_snapshot_constitution::SnapshotError> {
+crates/amun-truth-engine/src/engine.rs:231:    pub fn import_snapshot(&mut self, snapshot: &CanonicalSnapshot) -> Result<(), &'static str> {
+crates/amun-truth-engine/src/engine.rs:5:use amun_snapshot_constitution::{export_snapshot, import_snapshot, CanonicalSnapshot};
+crates/amun-validator-networking/src/lib.rs:77:        let id = ValidatorIdentity::new([1u8; 32], [2u8; 32], "10.0.0.1".into(), 9000);
+crates/amun-validator-networking/src/lib.rs:87:        let id = ValidatorIdentity::new([1u8; 32], [2u8; 32], "10.0.0.1".into(), 9000);
+crates/amun-validator-networking/src/peer_discovery.rs:15:    pub fn register(&mut self, identity: ValidatorIdentity) {
+crates/amun-validator-networking/src/peer_discovery.rs:1:use crate::validator_identity::ValidatorIdentity;
+crates/amun-validator-networking/src/peer_discovery.rs:23:    pub fn get(&self, fingerprint: &[u8; 32]) -> Option<&ValidatorIdentity> {
+crates/amun-validator-networking/src/peer_discovery.rs:31:    pub fn list_peers(&self) -> Vec<&ValidatorIdentity> {
+crates/amun-validator-networking/src/peer_discovery.rs:35:    pub fn random_peers(&self, count: usize) -> Vec<&ValidatorIdentity> {
+crates/amun-validator-networking/src/peer_discovery.rs:37:        let mut peers: Vec<&ValidatorIdentity> = self.peers.values().collect();
+crates/amun-validator-networking/src/peer_discovery.rs:7:    peers: HashMap<[u8; 32], ValidatorIdentity>,
+crates/amun-validator-networking/src/validator_identity.rs:12:impl ValidatorIdentity {
+crates/amun-validator-networking/src/validator_identity.rs:5:pub struct ValidatorIdentity {
+crates/amun-validator-runtime/src/validator_node.rs:13:    pub metrics: NodeMetrics,
+crates/amun-validator-runtime/src/validator_node.rs:28:            metrics: NodeMetrics::new(),
+crates/amun-validator-runtime/src/validator_node.rs:5:use amun_operations::metrics::NodeMetrics;
+crates/amun-verified-pipeline/src/lib.rs:3:pub use vote_pipeline::{CanonicalVote, ParsedVote, RawVote, VerifiedVote};
+crates/amun-verified-pipeline/src/vote_pipeline.rs:23:pub struct CanonicalVote {
+crates/amun-verified-pipeline/src/vote_pipeline.rs:60:    pub fn canonicalize(&self) -> Result<CanonicalVote, &'static str> {
+crates/amun-verified-pipeline/src/vote_pipeline.rs:64:        Ok(CanonicalVote {
+crates/amun-vm-kernel/src/vm_kernel.rs:1:use amun_resource_core::{RegistryError, ResourceMetadata, ResourceRegistry, TransformationMatrix};
+crates/amun-vm-kernel/src/vm_kernel.rs:53:                    if TransformationMatrix::is_terminal(parent.archetype) {
+crates/amun-vm-kernel/src/vm_kernel.rs:61:                    if !TransformationMatrix::is_legal(parent.archetype, meta.archetype) {
+crates/amun_state_machine/src/event.rs:58:    /// Canonical binary serialization (no ambiguity)
+crates/amun_state_machine/src/lib.rs:25:pub use ordering::CanonicalOrdering;
+crates/amun_state_machine/src/ordering.rs:12:pub struct CanonicalOrderKey {
+crates/amun_state_machine/src/ordering.rs:19:impl CanonicalOrderKey {
+crates/amun_state_machine/src/ordering.rs:3://! Canonical Ordering Constitution
+crates/amun_state_machine/src/ordering.rs:40:pub struct CanonicalOrdering;
+crates/amun_state_machine/src/ordering.rs:42:impl CanonicalOrdering {
+crates/amun_state_machine/src/ordering.rs:46:            let key_a = CanonicalOrderKey::from_event(a, block_height);
+crates/amun_state_machine/src/ordering.rs:47:            let key_b = CanonicalOrderKey::from_event(b, block_height);
+crates/amun_state_machine/src/ordering.rs:55:            let key_prev = CanonicalOrderKey::from_event(&events[i-1], block_height);
+crates/amun_state_machine/src/ordering.rs:56:            let key_curr = CanonicalOrderKey::from_event(&events[i], block_height);
+crates/amun_state_machine/src/ordering.rs:93:        CanonicalOrdering::sort_events(&mut events, 100);
+crates/amun_state_machine/src/ordering.rs:99:        assert!(CanonicalOrdering::is_canonically_ordered(&events, 100));
+crates/amun_state_machine/src/receipt/mod.rs:93:    pub accumulator_hash: [u8; 32],  // Linear hash chain, not Merkle root
+crates/amun_state_machine/src/state.rs:74:    /// Canonical state hash (deterministic)
+crates/constitutional-linter/src/main.rs:181:    // ─── 2. Edge Semantics Summary ────────────────────────
+crates/constitutional-linter/src/main.rs:182:    println!("\n--- Edge Semantics ---");
+docs/AUDIT_LAYERS.md:22:# Layer 02 — Geometry
+docs/AUDIT_LAYERS.md:24:Validates Merkle geometry.
+docs/AUDIT_LAYERS.md:57:# Layer 05 — Identity
+docs/CANONICAL_HASH.md:16:| Genesis | `AMUN_GENESIS_V1` | Identity derivation |
+docs/CANONICAL_HASH.md:1:# AmunChain Canonical Hash Protocol
+docs/CANONICAL_SERIALIZATION.md:1:# AmunChain Canonical Serialization
+docs/CANONICAL_SERIALIZATION.md:40:See `amun_consensus::canonical::CanonicalEncoder` and `CanonicalDecoder`.
+docs/CCS_Core_Specification_v1.0.md:35:- `A` (Canonical Authority): The unique authority object derived from `C`.
+docs/CCS_RUNTIME_MAPPING.md:14:| Context `C` | `Epoch`, `ValidatorSet`, `StateRoot` | Not yet unified |
+docs/CCS_RUNTIME_MAPPING.md:23:1. `Context` is not unified – Epoch, ValidatorSet, StateRoot are separate.
+docs/CRATE_ARCHITECTURE.md:155:Merkle-based light verification.
+docs/CRATE_ARCHITECTURE.md:42:Canonical binary serialization.
+docs/CRATE_ARCHITECTURE.md:79:Sparse Merkle tree implementation.
+docs/DOCS_INDEX.md:15:    Canonical taxonomy of all constitutional concepts.
+docs/DOCS_INDEX.md:225:    Canonical hashing specification.
+docs/DOCS_INDEX.md:227:    Canonical serialization specification.
+docs/DOCS_INDEX.md:375:    V6.001: Geometry of authority.
+docs/DOCS_INDEX.md:379:    V6.003: Canonicalization.
+docs/DOCS_INDEX.md:68:Registry & Identity
+docs/DOCS_INDEX.md:89:    Canonical traversal rules for storage.
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:1:# N105: Cryptographic Validator Identity
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:27:Identity is public-key derived. The ValidatorId is a hash of the public key, not an arbitrary number. This prevents identifier spoofing and ensures that the identifier changes only if the key changes. Signature verification is mandatory when the registry is populated. Every vote must carry a valid signature over a well-defined payload. This prevents impersonation and vote forgery. Minimal authority trust. The test setup uses a single hardcoded authority key. The verification logic, however, can be extended to multiple trust anchors without changing the engine internals. No runtime key derivation from seeds. All private key material is generated randomly or loaded from external sources. No deterministic derivation from predictable values exists in the running system. Backward compatibility is achieved via registry emptiness. When the registry is empty, signature verification is skipped. This allows existing unit tests to run unchanged while the production code registers validators.
+docs/N106_N107_CONSTITUTIONAL_AUTHORITY_AND_GOVERNANCE.md:109:replayed from WAL, ensuring no loss of governance decisions after a crash. Identity
+docs/N126_FINAL_BASELINE.md:26:1.  StateRootIntegrity        = cert.state_root != [0u8; 32]           PARTIAL
+docs/N126_FINAL_BASELINE.md:46:2. Execution state root proofs (StateRootIntegrity)
+docs/PHASE_84_UNIFICATION.md:14:- Unifies `Epoch`, `ValidatorSet`, and `StateRoot` into a single struct.
+docs/PROJECT_INDEX.md:171:## Constitutional Identity
+docs/PROTOCOL_HARDENING_ROADMAP.md:37:- [ ] Merkle tree optimization
+docs/REPLAY_LAW.md:300:    Sparse Merkle Tree
+docs/REPLAY_LAW.md:302:Identity:
+docs/REPLAY_LAW.md:327:- Merkle proof freeze
+docs/REPLAY_LAW.md:53:- Canonical Transcript
+docs/REPLAY_LAW.md:55:- Deterministic State Algebra
+docs/REPLAY_LAW.md:71:Canonical transcript structure:
+docs/REPLAY_MODEL.md:24:## Canonical Ordering
+docs/V3_006D_FOREIGN_AUTHORITY.md:20:| V3-006A Identity Impersonation | ✅ 40 rejections | ✅ 27/27 | Closed |
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:17:- Identity theft (signature verification fails)
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:9:| V3-006A Identity Impersonation | 40 rejections | 27/27 committed | ✅ |
+docs/V5_CCS_RESEARCH_PROGRAM.md:59:- Identity: A context can remain unchanged
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:114:## 5. The Geometry of Authority
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:138:"Geometry of Authority" or remains a theory of individual positions.
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:150:to a "Geometry of Authority" — and this may prove to be the most
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:1:# CCS v0.6 – Geometry of Authority (Draft Axioms)
+docs/V6_001_GEOMETRY_OF_AUTHORITY.md:25:- Geometry: not the point, but the relations between points.
+docs/V6_003_CANONICALIZATION.md:141:`(G, Canonicalize)`
+docs/V6_003_CANONICALIZATION.md:1:# CCS v0.6 – V6-003: Canonicalization
+docs/V6_003_CANONICALIZATION.md:45:## 2. The Canonicalization Function
+docs/V6_003_CANONICALIZATION.md:47:`Canonicalize : G → Λ`
+docs/V6_003_CANONICALIZATION.md:52:`Canonicalize` is:
+docs/V6_003_CANONICALIZATION.md:66:`Authority = Canonicalize(G)`
+docs/V6_003_CANONICALIZATION.md:76:`∀ G : ∃! Λ = Canonicalize(G)`
+docs/V6_003_CANONICALIZATION.md:92:Canonical history only grows; it never regresses.
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:107:- Canonicalization functions
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:10:> Must `Canonicalize` be an axiom, or can it be derived from a deeper
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:115:`Canonicalize` is not an axiom. It is a **theorem** of constitutional
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:138:It is not `Canonicalize`.
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:13:V6-003 introduced `Canonicalize : G → Λ` as the central object of CCS.
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:17:This document proposes that `Canonicalize` is not an axiom.
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:47:If this theorem holds, then `Canonicalize` is not an axiom.
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:4:**Status:** Draft – From Canonicalization to Emergent Authority
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:57:### If `Canonicalize` is an axiom:
+docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:62:### If `Canonicalize` is a theorem:
+docs/V6_005_CONTINUITY_ORDERING.md:4:**Status:** Draft – From Metric to Order
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:73:5. **Canonicalization** is not an axiom; it is the supremum operation.
+docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:99:- Canonicalization rules
+docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:120:- Canonicalization functions
+docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:21:- **V6-003:** Canonicalization as primitive
+docs/V7_002_DERIVABILITY_GEOMETRY.md:113:CCS is a theory of **Constitutional Derivability Geometry.**
+docs/V7_002_DERIVABILITY_GEOMETRY.md:1:# CCS v0.7 – V7-002: Derivability Geometry
+docs/V7_002_DERIVABILITY_GEOMETRY.md:57:**Derivability Geometry Theorem:**
+docs/V7_003_CONSTITUTIONAL_REDUCTION.md:4:**Status:** Draft – From Geometry to Reduction
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:112:### Canonicalization
+docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:113:`Canonicalize` is not an axiom. It is the Church-Rosser property
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:122:CCS is a **Constitutional Algebra** with three operations:
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:26:## 1. The Three-Layer Constitutional Algebra
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:4:**Status:** Final – The Complete Algebraic Core
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:51:`∀ C : P₀ ⊢_C C ⇒ Eventually(Excluded(C) ∨ Canonical(C))`
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:56:**Axiom C2: Canonical Completeness**
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:61:**Axiom C3: Canonical Uniqueness**
+docs/V7_008_CONSTITUTIONAL_CLOSURE.md:62:`Canonical(C₁) ∧ Canonical(C₂) ⇒ C₁ = C₂`
+docs/architecture/CRATE_CLASSIFICATION.md:6:- amun-codec - Canonical serialization
+docs/architecture/CRATE_CLASSIFICATION.md:7:- amun-merkle - Merkle tree utilities
+docs/architecture/DEPENDENCY_CONSTITUTION.md:17:### Layer 0.5 — Constitutional Semantics
+docs/architecture/PHASE_49_COMPLETE.md:106:1. **Canonical Collections crate** — abstraction over BTree* types
+docs/architecture/PHASE_49_COMPLETE.md:108:3. **Formal State Transition Semantics** — (State, Event) → State'
+docs/architecture/PHASE_49_COMPLETE.md:21:| 0.5 | Constitutional Semantics | amun-constitution, amun-invariants, interfaces | ✅ Pure |
+docs/architecture/PHASE_49_COMPLETE.md:42:4. **Protocol Transcript**: Canonical event ledger with chained SHA-256 hashing
+docs/architecture/PHASE_49_COMPLETE.md:79:### Key Metrics
+docs/architecture/PHASE_49_COMPLETE.md:99:| T.1 | All events → Canonical Transcript | Transcript Law |
+docs/audit/SECURITY_INVARIANTS.md:10:| R4 | Certificates are terminal | TransformationMatrix::is_terminal | PCCVVerifier |
+docs/consensus/constitution.md:40:### Section 2.2: Canonical Serialization
+docs/consensus/constitution.md:49:- Canonical byte representation before hashing
+docs/consensus/constitution.md:53:### Section 3.1: Canonical Order
+docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:108:- Formal Semantics
+docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:110:- Quantitative Metrics
+docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:25:### 2. Legitimacy Topology
+docs/constitutional-mathematics/PHASE_111_FOUNDATIONS_V1.md:75:### 5. Divergence Metric
+docs/constitutional-mathematics/README.md:28:Formal Semantics       ✅
+docs/constitutional-mathematics/README.md:32:Divergence Metric      ✅
+docs/constitutional/phase84_freeze.md:21:- Chunk Merkle domain: AMUN_CHUNK_MERKLE_V1
+docs/constitutional/phase84_freeze.md:29:- Each chunk carries independent Merkle inclusion proof
+docs/constitutional/phase84_freeze.md:31:- Proof verification rebuilds Merkle root from chunk hash + siblings
+docs/constitutional/phase85_seal.md:9:1. Canonical tags for all constitutional enums (no as u8)
+docs/constitutional/topology.md:10:- **Topology-centric**: Different nodes with identical authority dependencies produce the SAME `authority_root`
+docs/constitutional/topology.md:12:- **Deterministic**: Canonical encoding + sorted dependencies prevents ordering attacks
+docs/constitutional/topology.md:1:# Constitutional Topology: Core Definitions
+docs/economics/ECONOMIC_LAYER_REVIEW.md:100:| Economic Merkle Tree builder | EXISTS | — |
+docs/economics/ECONOMIC_LAYER_REVIEW.md:97:### Phase III: Economic Merkle State
+docs/federation/FEDERATION_ARCHITECTURE.md:25:| Federation Handshake | Identity negotiation |
+docs/federation/TRUST_GRAPH.md:29:| Observed | Identity known |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:134:### Canonical Serialization V1
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:147:    serialized_bytes = CanonicalSerialization(ConstitutionalCommitment)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:159:    state_root = MerkleRoot(
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:170:    EconomicTree (Binary Merkle, SchemaV1, Domain-Separated)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:182:    Canonical Serialization
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:188:    state_root = MerkleRoot(accounts, staking, governance_state, commitment_root)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:24:3. Merkle Tree Specification
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:260:**Invariant 2:** `constitutional_commitment_root == BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || CanonicalSerialization(ConstitutionalCommitment))`
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:262:**Invariant 3:** `state_root` must include `constitutional_commitment_root` as a leaf in its Merkle tree computation.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:292:- EconomicTree Specification (Merkle tree construction, leaf encoding, domain separation)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:293:- Canonical Serialization Specification (byte-level serialization formats)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:310:| V | Constitutional Consensus Architecture | CCA v1.0 specification, root commitment, Merkle proofs |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:53:## 3. Merkle Tree Specification
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:67:| Identity Leaf | `AMUN_ID_LEAF_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:68:| Identity Internal Node | `AMUN_ID_NODE_V1` |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:88:#### EconomicTree Leaves (Canonical Order V1)
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:90:| Leaf Index | Leaf Name | Canonical Encoding |
+docs/protocol/FREEZE_CERTIFICATE_v1.md:12:- Canonical Encoding: big-endian
+docs/protocol/FREEZE_CERTIFICATE_v1.md:8:### Protocol Identity
+docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:134:Quality Metrics
+docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:136:Metric| Result

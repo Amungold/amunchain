@@ -1,0 +1,273 @@
+     1	use crate::crypto_identity::PeerKeyPair;
+     2	use crate::peer_identity::PeerId;
+     3	use amun_constitutional_authority::ConstitutionalCertificate;
+     4	use amun_constitutional_signing::SignedArtifact;
+     5	use serde::{Deserialize, Serialize};
+     6	
+     7	/// A constitutional certificate binding a validator's identity to their public key.
+     8	///
+     9	/// Signed by a constitutional authority to establish trust.
+    10	#[derive(Debug, Clone, Serialize, Deserialize)]
+    11	pub struct ValidatorCertificate {
+    12	    /// The validator's peer identity.
+    13	    pub validator_id: PeerId,
+    14	    /// The validator's public key (for message verification).
+    15	    pub public_key: [u8; 32],
+    16	    /// The authority that issued this certificate.
+    17	    pub issuer: PeerId,
+    18	    /// When this certificate becomes valid.
+    19	    pub authority_id: [u8; 32],
+    20	    pub authority_version: u64,
+    21	    pub valid_from: u64,
+    22	    /// When this certificate expires (0 = never).
+    23	    pub valid_until: u64,
+    24	    /// The authority's signature over the certificate fields.
+    25	    pub authority_signature: Vec<u8>,
+    26	    #[serde(skip_serializing_if = "Option::is_none")]
+    27	    pub constitutional: Option<SignedArtifact<ConstitutionalCertificate>>,
+    28	}
+    29	
+    30	impl ValidatorCertificate {
+    31	    /// Create a new certificate signed by an authority.
+    32	    pub fn issue(
+    33	        validator_id: PeerId,
+    34	        public_key: [u8; 32],
+    35	        issuer_keypair: &PeerKeyPair,
+    36	        valid_from: u64,
+    37	        valid_until: u64,
+    38	    ) -> Self {
+    39	        let mut cert = Self {
+    40	            validator_id,
+    41	            public_key,
+    42	            authority_id: [0u8; 32],
+    43	            authority_version: 0,
+    44	            issuer: issuer_keypair.peer_id(),
+    45	            valid_from,
+    46	            valid_until,
+    47	            authority_signature: Vec::new(),
+    48	            constitutional: None,
+    49	        };
+    50	        // Sign the certificate fields (excluding signature itself)
+    51	        let payload = cert.serialize_for_signing();
+    52	        cert.authority_signature = issuer_keypair.sign(&payload);
+    53	        cert
+    54	    }
+    55	
+    56	    /// Serialize certificate fields for signing (excludes the signature).
+    57	    fn serialize_for_signing(&self) -> Vec<u8> {
+    58	        let mut data = Vec::new();
+    59	        data.extend_from_slice(&self.validator_id.0);
+    60	        data.extend_from_slice(&self.public_key);
+    61	        data.extend_from_slice(&self.authority_version.to_le_bytes());
+    62	        data.extend_from_slice(&self.authority_id);
+    63	        data.extend_from_slice(&self.issuer.0);
+    64	        data.extend_from_slice(&self.valid_from.to_le_bytes());
+    65	        data.extend_from_slice(&self.valid_until.to_le_bytes());
+    66	        data
+    67	    }
+    68	
+    69	    /// Verify the authority's signature on this certificate.
+    70	    pub fn verify(&self, authority_public_key: &[u8; 32]) -> bool {
+    71	        let payload = self.serialize_for_signing();
+    72	        PeerKeyPair::verify(authority_public_key, &payload, &self.authority_signature)
+    73	    }
+    74	
+    75	    /// Check if the certificate is currently valid.
+    76	    pub fn is_valid_at(&self, timestamp: u64) -> bool {
+    77	        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+    78	    }
+    79	
+    80	    /// Create a new certificate with explicit authority version and id.
+    81	    pub fn issue_v2(
+    82	        validator_id: PeerId,
+    83	        public_key: [u8; 32],
+    84	        authority_version: u64,
+    85	        authority_id: [u8; 32],
+    86	        issuer_keypair: &PeerKeyPair,
+    87	        valid_from: u64,
+    88	        valid_until: u64,
+    89	    ) -> Self {
+    90	        let mut cert = Self {
+    91	            validator_id,
+    92	            public_key,
+    93	            authority_version,
+    94	            authority_id,
+    95	            issuer: issuer_keypair.peer_id(),
+    96	            valid_from,
+    97	            valid_until,
+    98	            authority_signature: Vec::new(),
+    99	            constitutional: None,
+   100	        };
+   101	        let payload = cert.serialize_for_signing();
+   102	        cert.authority_signature = issuer_keypair.sign(&payload);
+   103	        cert
+   104	    }
+   105	}
+   106	
+   107	impl ValidatorCertificate {
+   108	    /// Returns the attached constitutional certificate, if present.
+   109	    pub fn constitutional(&self) -> Option<&SignedArtifact<ConstitutionalCertificate>> {
+   110	        self.constitutional.as_ref()
+   111	    }
+   112	
+   113	    /// Attach the constitutional certificate to this runtime object.
+   114	    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+   115	        self.constitutional = Some(cert);
+   116	    }
+   117	
+   118	    /// Administrative validation only.
+   119	    ///
+   120	    /// Runtime networking verification continues to use the existing
+   121	    /// ValidatorCertificate::verify() cryptographic path.
+   122	    pub fn verify_administrative(&self) -> Result<(), String> {
+   123	        match &self.constitutional {
+   124	            Some(cert) => cert.verify(),
+   125	            None => Err("No constitutional certificate attached".into()),
+   126	        }
+   127	    }
+   128	
+   129	    // ============================================================
+   130	    // Runtime Administrative Facade
+   131	    // ============================================================
+   132	
+   133	    pub fn validator_id(&self) -> &PeerId {
+   134	        &self.validator_id
+   135	    }
+   136	
+   137	    pub fn public_key(&self) -> &[u8; 32] {
+   138	        &self.public_key
+   139	    }
+   140	
+   141	    pub fn issuer(&self) -> &PeerId {
+   142	        &self.issuer
+   143	    }
+   144	
+   145	    pub fn authority_id(&self) -> &[u8; 32] {
+   146	        &self.authority_id
+   147	    }
+   148	
+   149	    pub fn authority_version(&self) -> u64 {
+   150	        self.authority_version
+   151	    }
+   152	
+   153	    pub fn valid_from(&self) -> u64 {
+   154	        self.valid_from
+   155	    }
+   156	
+   157	    pub fn valid_until(&self) -> u64 {
+   158	        self.valid_until
+   159	    }
+   160	
+   161	    pub fn authority_signature(&self) -> &[u8] {
+   162	        &self.authority_signature
+   163	    }
+   164	
+   165	    pub fn has_constitutional(&self) -> bool {
+   166	        self.constitutional.is_some()
+   167	    }
+   168	}
+   169	
+   170	#[cfg(test)]
+   171	mod tests {
+   172	    use super::*;
+   173	
+   174	    #[test]
+   175	    fn n21_validator_certificate_issue_and_verify() {
+   176	        let authority = PeerKeyPair::generate();
+   177	        let validator = PeerKeyPair::generate();
+   178	
+   179	        let cert = ValidatorCertificate::issue(
+   180	            validator.peer_id(),
+   181	            validator.verifying_key.to_bytes(),
+   182	            &authority,
+   183	            1000,
+   184	            2000,
+   185	        );
+   186	
+   187	        assert!(cert.verify(&authority.verifying_key.to_bytes()));
+   188	        assert_eq!(cert.validator_id, validator.peer_id());
+   189	        assert_eq!(cert.issuer, authority.peer_id());
+   190	    }
+   191	
+   192	    #[test]
+   193	    fn n21_certificate_rejects_wrong_authority() {
+   194	        let authority = PeerKeyPair::generate();
+   195	        let impostor = PeerKeyPair::generate();
+   196	        let validator = PeerKeyPair::generate();
+   197	
+   198	        let cert = ValidatorCertificate::issue(
+   199	            validator.peer_id(),
+   200	            validator.verifying_key.to_bytes(),
+   201	            &authority,
+   202	            1000,
+   203	            2000,
+   204	        );
+   205	
+   206	        // Impostor tries to verify — must fail
+   207	        assert!(!cert.verify(&impostor.verifying_key.to_bytes()));
+   208	    }
+   209	
+   210	    #[test]
+   211	    fn n21_certificate_tampered_fields_rejected() {
+   212	        let authority = PeerKeyPair::generate();
+   213	        let validator = PeerKeyPair::generate();
+   214	
+   215	        let mut cert = ValidatorCertificate::issue(
+   216	            validator.peer_id(),
+   217	            validator.verifying_key.to_bytes(),
+   218	            &authority,
+   219	            1000,
+   220	            2000,
+   221	        );
+   222	
+   223	        // Tamper with validity period
+   224	        cert.valid_from = 500;
+   225	        assert!(!cert.verify(&authority.verifying_key.to_bytes()));
+   226	    }
+   227	
+   228	    #[test]
+   229	    fn n21_certificate_validity_window() {
+   230	        let authority = PeerKeyPair::generate();
+   231	        let validator = PeerKeyPair::generate();
+   232	
+   233	        let cert = ValidatorCertificate::issue(
+   234	            validator.peer_id(),
+   235	            validator.verifying_key.to_bytes(),
+   236	            &authority,
+   237	            1000,
+   238	            2000,
+   239	        );
+   240	
+   241	        assert!(!cert.is_valid_at(500));
+   242	        assert!(cert.is_valid_at(1000));
+   243	        assert!(cert.is_valid_at(1500));
+   244	        assert!(cert.is_valid_at(2000));
+   245	        assert!(!cert.is_valid_at(2001));
+   246	    }
+   247	
+   248	    #[test]
+   249	    fn n21_certificate_serialization_roundtrip() {
+   250	        let authority = PeerKeyPair::generate();
+   251	        let validator = PeerKeyPair::generate();
+   252	
+   253	        let cert = ValidatorCertificate::issue(
+   254	            validator.peer_id(),
+   255	            validator.verifying_key.to_bytes(),
+   256	            &authority,
+   257	            1000,
+   258	            0, // never expires
+   259	        );
+   260	
+   261	        let json = serde_json::to_string(&cert).unwrap();
+   262	        let decoded: ValidatorCertificate = match serde_json::from_str(&json) {
+   263	            Ok(v) => v,
+   264	            Err(e) => {
+   265	                eprintln!("validator_cert: invalid certificate: {e}");
+   266	                return;
+   267	            }
+   268	        };
+   269	
+   270	        assert!(decoded.verify(&authority.verifying_key.to_bytes()));
+   271	        assert!(decoded.is_valid_at(5000));
+   272	    }
+   273	}

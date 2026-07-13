@@ -1,0 +1,43 @@
+[package]
+name = "amun-sync"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+edition = "2021"
+description = "State synchronization and catch-up protocol for AmunChain"
+
+[dependencies]
+amun-chain-store = { path = "../amun-chain-store" }
+amun-network-transport = { path = "../amun-network-transport" }
+amun-networking = { path = "../amun-networking" }
+hex = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+postcard = "1.0"
+rand = "0.8"
+
+[[bin]]
+name = "backfill"
+path = "src/bin/backfill.rs"
+
+[[bin]]
+name = "sync-server"
+path = "src/bin/sync-server.rs"
+
+[[bin]]
+name = "gap-fill"
+path = "src/bin/gap-fill.rs"
+
+[[bin]]
+name = "bootstrap"
+path = "src/bin/bootstrap.rs"
+
+[[bin]]
+name = "snapshot-server"
+path = "src/bin/snapshot-server.rs"
+
+[[bin]]
+name = "handshake"
+path = "src/bin/handshake.rs"
+
+[[bin]]
+name = "rejoin"
+path = "src/bin/rejoin.rs"

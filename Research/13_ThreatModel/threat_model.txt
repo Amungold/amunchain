@@ -1,0 +1,659 @@
+crates/amun-attack-lab/src/lib.rs:7:pub use scenario::AttackScenario;
+crates/amun-attack-lab/src/lib.rs:8:pub use simulator::AttackSimulator;
+crates/amun-attack-lab/src/lib.rs:9:pub use strategy::ByzantineStrategy;
+crates/amun-attack-lab/src/scenario.rs:2:use crate::strategy::ByzantineStrategy;
+crates/amun-attack-lab/src/scenario.rs:12:pub struct AttackScenario {
+crates/amun-attack-lab/src/scenario.rs:18:    pub strategy: ByzantineStrategy,
+crates/amun-attack-lab/src/simulator.rs:1:use crate::scenario::AttackScenario;
+crates/amun-attack-lab/src/simulator.rs:18:    pub equivocation_events: Vec<EquivocationEvent>,
+crates/amun-attack-lab/src/simulator.rs:32:pub struct EquivocationEvent {
+crates/amun-attack-lab/src/simulator.rs:44:pub struct AttackSimulator {
+crates/amun-attack-lab/src/simulator.rs:45:    pub scenarios: Vec<AttackScenario>,
+crates/amun-attack-lab/src/simulator.rs:60:impl AttackSimulator {
+crates/amun-attack-lab/src/simulator.rs:67:    pub fn register_scenario(&mut self, scenario: AttackScenario) -> Result<(), &'static str> {
+crates/amun-attack-lab/src/simulator.rs:81:        scenario: &AttackScenario,
+crates/amun-attack-lab/src/simulator.rs:115:                    state.equivocation_events.push(EquivocationEvent {
+crates/amun-attack-lab/src/simulator.rs:182:impl Default for AttackSimulator {
+crates/amun-attack-lab/src/strategy.rs:2:pub enum ByzantineStrategy {
+crates/amun-audit/tests/audit_layer04_byzantine.rs:4:        ByzantineSyncEngine, ConstitutionalIdentity, PeerManifest, SnapshotManifest, SyncDecision,
+crates/amun-audit/tests/audit_layer04_byzantine.rs:26:        let mut engine = ByzantineSyncEngine::new(identity.clone(), 2);
+crates/amun-audit/tests/audit_layer04_byzantine.rs:57:        let mut engine = ByzantineSyncEngine::new(local.clone(), 1);
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:4:        ByzantineSyncEngine, ConstitutionalIdentity, PeerManifest, SnapshotManifest, SyncDecision,
+crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:38:        let mut engine = ByzantineSyncEngine::new(identity.clone(), 2);
+crates/amun-block-builder/src/lib.rs:2:use amun_consensus_network::SlashingCertificate;
+crates/amun-block-builder/src/lib.rs:18:    pub slashing_certificates: Vec<SlashingCertificate>,
+crates/amun-block-builder/src/lib.rs:127:        slashing_certificates: Vec<SlashingCertificate>,
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:2:// N110.4b — Consensus Verification of SlashingCertificates
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:5:use amun_consensus_network::{EvidenceCount, EvidenceType, SlashingCertificate, ValidatorStatus};
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:9:fn make_valid_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:10:    SlashingCertificate::from_slash_result(
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:29:fn build_test_block(certs: Vec<SlashingCertificate>) -> Block {
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:89:    let cert = SlashingCertificate::from_slash_result(
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:1:// N120.2 — Slashing Root in Block Header Tests
+crates/amun-block/src/body.rs:3:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-block/src/body.rs:47:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0007, 0x0110)
+crates/amun-block/src/body.rs:50:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0007, 0x0111)
+crates/amun-block/src/body.rs:72:                ConstitutionalFault::BufferTooSmall,
+crates/amun-block/src/body.rs:81:                ConstitutionalFault::CapacityExceeded,
+crates/amun-block/src/body.rs:91:                    ConstitutionalFault::BufferTooSmall,
+crates/amun-block/src/body.rs:99:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0007, 0x0103)
+crates/amun-block/src/header.rs:3:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-block/src/header.rs:72:                ConstitutionalFault::BufferTooSmall,
+crates/amun-bls/src/aggregate.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-bls/src/aggregate.rs:8:        return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0011, 0x0001));
+crates/amun-bls/src/aggregate.rs:23:        return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0011, 0x0002));
+crates/amun-byzantine-harness/Cargo.toml:6:description = "AmunChain Byzantine adversary harness"
+crates/amun-byzantine-harness/src/harness.rs:3:use amun_safety_laws::{check_vote_uniqueness, detect_equivocation, EquivocationEvidence};
+crates/amun-byzantine-harness/src/harness.rs:5:/// Harness for testing Byzantine scenarios
+crates/amun-byzantine-harness/src/harness.rs:6:pub struct ByzantineHarness;
+crates/amun-byzantine-harness/src/harness.rs:8:impl ByzantineHarness {
+crates/amun-byzantine-harness/src/harness.rs:15:    pub fn detect_equivocation(votes: &[ConsensusVote]) -> Vec<EquivocationEvidence> {
+crates/amun-byzantine-harness/src/lib.rs:2:pub use harness::ByzantineHarness;
+crates/amun-byzantine-harness/src/scenarios.rs:2:pub struct ByzantineScenario {
+crates/amun-byzantine-harness/src/scenarios.rs:11:impl ByzantineScenario {
+crates/amun-byzantine-tests/Cargo.toml:5:description = "Byzantine attack suite for the constitutional runtime"
+crates/amun-codec/src/budget.rs:3:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/budget.rs:24:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-codec/src/budget.rs:35:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-codec/src/budget.rs:46:                ConstitutionalFault::DecodeBudgetExceeded,
+crates/amun-codec/src/containers.rs:5:use amun_failure::{module_ids, operation_ids, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/containers.rs:52:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs:72:                ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs:83:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs:103:                ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/containers.rs:114:            ConstitutionalFault::CapacityExceeded,
+crates/amun-codec/src/decode.rs:1:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/decode.rs:13:                ConstitutionalFault::TrailingBytesDetected,
+crates/amun-codec/src/decode.rs:26:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:39:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:52:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:67:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:82:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:97:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:112:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:127:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:165:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:180:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/decode.rs:195:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/versioned.rs:3:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/versioned.rs:51:                ConstitutionalFault::MalformedEncoding,
+crates/amun-codec/src/versioned.rs:60:                ConstitutionalFault::EncodingVersionMismatch,
+crates/amun-codec/src/versioned.rs:68:                ConstitutionalFault::MalformedEncoding,
+crates/amun-codec/src/versioned.rs:79:                ConstitutionalFault::ReplayViolation,
+crates/amun-codec/src/writer.rs:4:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-codec/src/writer.rs:44:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-codec/src/writer.rs:51:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs:81:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-codec/src/writer.rs:115:                ConstitutionalFault::InvalidStateTransition,
+crates/amun-codec/src/writer.rs:128:                ConstitutionalFault::InvalidStateTransition,
+crates/amun-codec/src/writer.rs:136:                ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs:166:                    ConstitutionalFault::BufferTooSmall,
+crates/amun-codec/src/writer.rs:177:                    ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-execution/src/voter.rs:6:/// Equivocation proof for a validator voting for different blocks
+crates/amun-consensus-execution/src/voter.rs:8:pub struct EquivocationProof {
+crates/amun-consensus-execution/src/voter.rs:22:    evidence: Vec<EquivocationProof>,
+crates/amun-consensus-execution/src/voter.rs:49:        // Equivocation check
+crates/amun-consensus-execution/src/voter.rs:53:                let proof = EquivocationProof {
+crates/amun-consensus-execution/src/voter.rs:63:                    "Equivocation detected: validator {} voted for {:?} and {:?} in round {} phase {:?}",
+crates/amun-consensus-execution/src/voter.rs:160:    pub fn get_evidence(&self) -> &[EquivocationProof] {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:4:// Enforces that a SlashingCertificate is only accepted when ALL evidence
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:18:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:32:    cert: &SlashingCertificate,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:86:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:88:    fn make_cert_with_evidence_ids(ids: Vec<[u8; 32]>) -> SlashingCertificate {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:89:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/certificate_gossip.rs:4:// Manages SlashingCertificate propagation, validation, dedup, and storage.
+crates/amun-consensus-network/src/certificate_gossip.rs:7:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/certificate_gossip.rs:11:    pub certificates: HashMap<[u8; 32], SlashingCertificate>,
+crates/amun-consensus-network/src/certificate_gossip.rs:25:    pub fn receive_certificate(&mut self, cert: SlashingCertificate) -> Result<bool, String> {
+crates/amun-consensus-network/src/certificate_gossip.rs:44:    pub fn get_pending(&self) -> Vec<&SlashingCertificate> {
+crates/amun-consensus-network/src/certificate_gossip.rs:74:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/certificate_gossip.rs:76:    fn make_test_cert(id: [u8; 32]) -> SlashingCertificate {
+crates/amun-consensus-network/src/certificate_gossip.rs:77:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/engine.rs:2:    ConsensusVote, EquivocationProof, FinalityCertificate, QuorumCertificate, SignedVote,
+crates/amun-consensus-network/src/engine.rs:73:                return Err("Equivocation detected: double vote for different blocks".into());
+crates/amun-consensus-network/src/engine.rs:402:            if e.contains("Equivocation detected") {
+crates/amun-consensus-network/src/engine.rs:416:                let proof = EquivocationProof {
+crates/amun-consensus-network/src/evidence_gossip.rs:5:// possesses the evidence referenced by a SlashingCertificate.
+crates/amun-consensus-network/src/evidence_store.rs:5:// This is required for N110 Slashing which does frequent evidence lookups.
+crates/amun-consensus-network/src/execution_commitment.rs:18:// This is the foundation for N110 Slashing and N111 Evidence.
+crates/amun-consensus-network/src/finality_gate.rs:1:// N118.1 — Finality Gate for Slashing Certificates
+crates/amun-consensus-network/src/finality_gate.rs:40:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/finality_gate.rs:43:    fn make_certificate(height: u64) -> SlashingCertificate {
+crates/amun-consensus-network/src/finality_gate.rs:44:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/integrated_slashing.rs:2:// N109.12 — Integrated Slashing Pipeline
+crates/amun-consensus-network/src/integrated_slashing.rs:4:// Connects EvidenceStore → MisbehaviorRegistry(N109.11) → SlashingEngine → Stake Penalty
+crates/amun-consensus-network/src/integrated_slashing.rs:18://   SlashingEngine::process() → penalty_bps
+crates/amun-consensus-network/src/integrated_slashing.rs:38:    SlashingTriggered { penalty_bps: u64 },
+crates/amun-consensus-network/src/integrated_slashing.rs:44:pub struct IntegratedSlashingPipeline {
+crates/amun-consensus-network/src/integrated_slashing.rs:53:impl IntegratedSlashingPipeline {
+crates/amun-consensus-network/src/integrated_slashing.rs:115:                PipelineResult::SlashingTriggered {
+crates/amun-consensus-network/src/integrated_slashing.rs:156:impl Default for IntegratedSlashingPipeline {
+crates/amun-consensus-network/src/integrated_slashing.rs:171:        let mut pipeline = IntegratedSlashingPipeline::default();
+crates/amun-consensus-network/src/integrated_slashing.rs:233:        assert!(matches!(result, PipelineResult::SlashingTriggered { .. }));
+crates/amun-consensus-network/src/integrated_slashing.rs:256:        let mut pipeline = IntegratedSlashingPipeline::default();
+crates/amun-consensus-network/src/integrated_slashing.rs:283:        let mut pipeline = IntegratedSlashingPipeline::default();
+crates/amun-consensus-network/src/integrated_slashing.rs:303:        let mut pipeline = IntegratedSlashingPipeline::default();
+crates/amun-consensus-network/src/integrated_slashing.rs:331:        let mut pipeline = IntegratedSlashingPipeline::new(thresholds);
+crates/amun-consensus-network/src/integrated_slashing.rs:339:        assert!(matches!(r2, PipelineResult::SlashingTriggered { .. }));
+crates/amun-consensus-network/src/integrated_slashing.rs:345:        let mut pipeline = IntegratedSlashingPipeline::default();
+crates/amun-consensus-network/src/lib.rs:50:pub use integrated_slashing::{IntegratedSlashingPipeline, PipelineResult};
+crates/amun-consensus-network/src/lib.rs:62:pub use slashing_certificate::{CertificateResultingStatus, EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/lib.rs:63:pub use slashing_certificate_builder::SlashingCertificateBuilder;
+crates/amun-consensus-network/src/lib.rs:64:pub use slashing_fraud_proof::SlashingFraudProof;
+crates/amun-consensus-network/src/lib.rs:65:pub use slashing_inclusion_proof::{build_inclusion_proof, SlashingInclusionProof};
+crates/amun-consensus-network/src/lib.rs:66:pub use slashing_ledger::{certificate_id, ExecutedSlash, SlashingLedger};
+crates/amun-consensus-network/src/lib.rs:68:pub use slashing_state::SlashingState;
+crates/amun-consensus-network/src/lib.rs:69:pub use staking_adapter::{SlashResult, SlashingExecutor, StakingAdapter};
+crates/amun-consensus-network/src/messages.rs:34:pub struct EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:43:impl EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:202:        let proof = EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:262:        let proof = EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:275:        let proof = EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:288:        let proof = EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:303:        let proof = EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:316:        let proof = EquivocationProof {
+crates/amun-consensus-network/src/messages.rs:516:    /// N110.3: Slashing certificate for network propagation
+crates/amun-consensus-network/src/messages.rs:517:    SlashingCertificate(crate::slashing_certificate::SlashingCertificate),
+crates/amun-consensus-network/src/misbehavior.rs:1:use crate::messages::EquivocationProof;
+crates/amun-consensus-network/src/misbehavior.rs:20:    pub proof: EquivocationProof,
+crates/amun-consensus-network/src/misbehavior.rs:64:    pub fn hash_proof(proof: &EquivocationProof) -> [u8; 32] {
+crates/amun-consensus-network/src/misbehavior.rs:69:    pub fn add_proof(&mut self, proof: EquivocationProof) -> Result<[u8; 32], String> {
+crates/amun-consensus-network/src/misbehavior.rs:151:        let mut proof = EquivocationProof {
+crates/amun-consensus-network/src/misbehavior.rs:170:        let proof = EquivocationProof {
+crates/amun-consensus-network/src/misbehavior.rs:185:        let mut proof1 = EquivocationProof {
+crates/amun-consensus-network/src/misbehavior.rs:197:        let mut proof2 = EquivocationProof {
+crates/amun-consensus-network/src/misbehavior.rs:218:        let mut proof = EquivocationProof {
+crates/amun-consensus-network/src/misbehavior.rs:236:        let mut proof = EquivocationProof {
+crates/amun-consensus-network/src/misbehavior.rs:248:        let mut proof2 = EquivocationProof {
+crates/amun-consensus-network/src/misbehavior.rs:271:        let mut proof = EquivocationProof {
+crates/amun-consensus-network/src/misbehavior_registry.rs:7:// After N109.11, N110 Slashing can simply:
+crates/amun-consensus-network/src/multi_signer_certificate.rs:1:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/multi_signer_certificate.rs:5:    pub certificate: SlashingCertificate,
+crates/amun-consensus-network/src/multi_signer_certificate.rs:14:        certificate: SlashingCertificate,
+crates/amun-consensus-network/src/multi_signer_certificate.rs:91:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/multi_signer_certificate.rs:95:    fn make_certificate() -> SlashingCertificate {
+crates/amun-consensus-network/src/multi_signer_certificate.rs:96:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/real_staking_adapter.rs:4:use crate::staking_adapter::SlashingExecutor;
+crates/amun-consensus-network/src/real_staking_adapter.rs:7:use amun_staking::slashing::SlashingConditions;
+crates/amun-consensus-network/src/real_staking_adapter.rs:13:    pub rules: SlashingConditions,
+crates/amun-consensus-network/src/real_staking_adapter.rs:21:            rules: SlashingConditions::new(),
+crates/amun-consensus-network/src/real_staking_adapter.rs:32:            rules: SlashingConditions::new(),
+crates/amun-consensus-network/src/real_staking_adapter.rs:51:impl SlashingExecutor for RealStakingExecutor {
+crates/amun-consensus-network/src/slashing.rs:2:// N109.13 — Unified Slashing Interface
+crates/amun-consensus-network/src/slashing.rs:28:        _ => 25,       // Slashing level
+crates/amun-consensus-network/src/slashing.rs:104:        assert_eq!(slash_percentage(&registry, &[1u8; 32]), 25); // Slashing level
+crates/amun-consensus-network/src/slashing.rs:156:        // Add one more DoubleVote → 31 → Slashing
+crates/amun-consensus-network/src/slashing_certificate.rs:2:// N110.2 — SlashingCertificate
+crates/amun-consensus-network/src/slashing_certificate.rs:7:// Unlike FinalityCertificate (produced by Quorum), SlashingCertificate is
+crates/amun-consensus-network/src/slashing_certificate.rs:29:pub struct SlashingCertificate {
+crates/amun-consensus-network/src/slashing_certificate.rs:93:impl SlashingCertificate {
+crates/amun-consensus-network/src/slashing_certificate.rs:151:    /// Construct a SlashingCertificate from raw data.
+crates/amun-consensus-network/src/slashing_certificate.rs:152:    /// For a more ergonomic construction, use SlashingCertificateBuilder.
+crates/amun-consensus-network/src/slashing_certificate.rs:229:        let cert = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:247:        let decoded: SlashingCertificate = postcard::from_bytes(&encoded).unwrap();
+crates/amun-consensus-network/src/slashing_certificate.rs:258:        let cert1 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:270:        let cert2 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:290:        let c1 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:302:        let c2 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate.rs:319:        let mut cert = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:2:use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:4:pub struct SlashingCertificateBuilder {
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:17:impl SlashingCertificateBuilder {
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:74:    pub fn build(self) -> SlashingCertificate {
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:75:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:90:impl Default for SlashingCertificateBuilder {
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:1:// N121.3 — Slashing Fraud Proof Engine
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:12:pub struct SlashingFraudProof {
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:36:impl SlashingFraudProof {
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:118:        let proof = SlashingFraudProof::new([0xAA; 32], 42, claimed, history);
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:133:        let proof = SlashingFraudProof::new([0xAA; 32], 42, root, history);
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:148:        let mut proof = SlashingFraudProof::new([0xAA; 32], 42, claimed, history);
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:165:        let mut proof = SlashingFraudProof::new([0xAA; 32], 42, claimed, history);
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:179:        let proof = SlashingFraudProof::new([0xAA; 32], 42, [0xBA; 32], history);
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:182:        let decoded: SlashingFraudProof = postcard::from_bytes(&encoded).unwrap();
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:1:// N121.4 — Merkle Inclusion Proofs for Slashing Ledger
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:12:pub struct SlashingInclusionProof {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:30:impl SlashingInclusionProof {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:97:) -> Result<SlashingInclusionProof, String> {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:111:        .map(SlashingInclusionProof::leaf_hash)
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:151:    Ok(SlashingInclusionProof {
+crates/amun-consensus-network/src/slashing_ledger.rs:1:// N119 — Deterministic Slashing Ledger & Replay Protection
+crates/amun-consensus-network/src/slashing_ledger.rs:3:// Prevents the same SlashingCertificate from being executed
+crates/amun-consensus-network/src/slashing_ledger.rs:7:use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/slashing_ledger.rs:11:pub fn certificate_id(cert: &SlashingCertificate) -> [u8; 32] {
+crates/amun-consensus-network/src/slashing_ledger.rs:42:pub struct SlashingLedger {
+crates/amun-consensus-network/src/slashing_ledger.rs:48:impl SlashingLedger {
+crates/amun-consensus-network/src/slashing_ledger.rs:63:    pub fn execute<F, T>(&mut self, cert: &SlashingCertificate, execute_fn: F) -> Result<T, String>
+crates/amun-consensus-network/src/slashing_ledger.rs:109:impl Default for SlashingLedger {
+crates/amun-consensus-network/src/slashing_ledger.rs:119:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_ledger.rs:122:    fn make_cert(id: u64) -> SlashingCertificate {
+crates/amun-consensus-network/src/slashing_ledger.rs:123:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_ledger.rs:159:        let mut ledger = SlashingLedger::new();
+crates/amun-consensus-network/src/slashing_ledger.rs:177:        let mut ledger = SlashingLedger::new();
+crates/amun-consensus-network/src/slashing_ledger.rs:201:        let mut ledger = SlashingLedger::new();
+crates/amun-consensus-network/src/slashing_ledger.rs:220:        let cert2 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_ledger.rs:236:        let mut ledger = SlashingLedger::new();
+crates/amun-consensus-network/src/slashing_merkle.rs:1:// N120 — On-Chain Slashing Ledger Root
+crates/amun-consensus-network/src/slashing_merkle.rs:3:// Computes a Merkle root from the SlashingLedger's executed certificates,
+crates/amun-consensus-network/src/slashing_state.rs:1:// N121.1 — Slashing State Integration
+crates/amun-consensus-network/src/slashing_state.rs:7:use crate::slashing_ledger::{ExecutedSlash, SlashingLedger};
+crates/amun-consensus-network/src/slashing_state.rs:13:pub struct SlashingState {
+crates/amun-consensus-network/src/slashing_state.rs:14:    pub ledger: SlashingLedger,
+crates/amun-consensus-network/src/slashing_state.rs:18:impl SlashingState {
+crates/amun-consensus-network/src/slashing_state.rs:21:        let ledger = SlashingLedger::new();
+crates/amun-consensus-network/src/slashing_state.rs:29:        cert: &crate::slashing_certificate::SlashingCertificate,
+crates/amun-consensus-network/src/slashing_state.rs:61:impl Default for SlashingState {
+crates/amun-consensus-network/src/slashing_state.rs:71:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/slashing_state.rs:74:    fn make_cert() -> SlashingCertificate {
+crates/amun-consensus-network/src/slashing_state.rs:75:        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_state.rs:95:        let state = SlashingState::new();
+crates/amun-consensus-network/src/slashing_state.rs:103:        let mut state = SlashingState::new();
+crates/amun-consensus-network/src/slashing_state.rs:123:        let mut state = SlashingState::new();
+crates/amun-consensus-network/src/slashing_state.rs:125:        let cert2 = SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/slashing_state.rs:155:        let mut state = SlashingState::new();
+crates/amun-consensus-network/src/staking_adapter.rs:4:// Bridges N109 MisbehaviorRegistry → Economic Slashing.
+crates/amun-consensus-network/src/staking_adapter.rs:31:pub trait SlashingExecutor {
+crates/amun-consensus-network/src/staking_adapter.rs:37:/// N110.1: Adapter that connects MisbehaviorRegistry to SlashingExecutor.
+crates/amun-consensus-network/src/staking_adapter.rs:38:pub struct StakingAdapter<E: SlashingExecutor> {
+crates/amun-consensus-network/src/staking_adapter.rs:44:impl<E: SlashingExecutor> StakingAdapter<E> {
+crates/amun-consensus-network/src/staking_adapter.rs:96:        cert: &crate::SlashingCertificate,
+crates/amun-consensus-network/src/staking_adapter.rs:177:    impl SlashingExecutor for SimulatedStaking {
+crates/amun-consensus-network/src/staking_adapter.rs:196:    /// N110.1 GATEKEEPER: Slashing reduces real validator stake
+crates/amun-consensus-network/src/staking_adapter.rs:208:        // 3 DoubleVotes (weight 10 each) = score 30 → Slashing
+crates/amun-consensus-network/src/staking_adapter.rs:412:        let cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs:448:        let mut cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs:490:        let mut cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs:527:            crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs:563:            crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:4:// Node A creates evidence, produces a SlashingCertificate, and sends it
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:14:    EvidenceStore, EvidenceType, EvidenceValidationResult, SlashingCertificate, ValidatorStatus,
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:17:/// Helper: create a valid SlashingCertificate that references specific evidence IDs.
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:18:fn make_certificate(validator_id: [u8; 32], evidence_ids: Vec<[u8; 32]>) -> SlashingCertificate {
+crates/amun-consensus-network/tests/n111_7_end_to_end_evidence_sync.rs:19:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:13:    SlashingCertificate, ValidatorStatus,
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:26:fn make_certificate(validator_id: [u8; 32], evidence_ids: Vec<[u8; 32]>) -> SlashingCertificate {
+crates/amun-consensus-network/tests/n112_4_push_sync_end_to_end.rs:27:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:2:// N114.3 — SlashingCertificate Signature Tests
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:4:use amun_consensus_network::{EvidenceCount, EvidenceType, SlashingCertificate, ValidatorStatus};
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:7:fn make_unsigned_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:8:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n114_3_certificate_signatures.rs:133:    let decoded: SlashingCertificate = postcard::from_bytes(&encoded).unwrap();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:1:// N121.2 — Deterministic Replay of Slashing State
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:7:    EvidenceCount, EvidenceType, SlashingCertificate, SlashingState, ValidatorStatus,
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:10:fn make_cert(validator_id: [u8; 32], height: u64, amount: u64) -> SlashingCertificate {
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:11:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:39:    let mut state_a = SlashingState::new();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:45:    let mut state_b = SlashingState::new();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:51:    let mut state_c = SlashingState::new();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:76:    let mut state_a = SlashingState::new();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:81:    let mut state_b = SlashingState::new();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:95:    let state = SlashingState::new();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:108:    let mut state1 = SlashingState::new();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:111:    let mut state2 = SlashingState::new();
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:124:    let mut state = SlashingState::new();
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:8:    EvidenceCount, EvidenceType, SlashingCertificate, SlashingState, ValidatorStatus,
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:11:fn make_cert(vid: [u8; 32], h: u64, amt: u64) -> SlashingCertificate {
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:12:    SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:33:    let mut state = SlashingState::new();
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:66:    let mut original = SlashingState::new();
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:73:    let mut restored = SlashingState::new();
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:88:    let mut state = SlashingState::new();
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:131:    let mut state = SlashingState::new();
+crates/amun-consensus-network/tests/n121_5_snapshot_and_audit.rs:148:    let state = SlashingState::new();
+crates/amun-consensus-types/src/bitmap.rs:47:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/errors.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-consensus-types/src/errors.rs:9:    EquivocationDetected = 0x1004,
+crates/amun-consensus-types/src/errors.rs:19:            ConstitutionalFault::InvalidStateTransition,
+crates/amun-consensus-types/src/message.rs:81:                amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-consensus-types/src/message.rs:88:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/message.rs:98:                    amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-consensus-types/src/phase.rs:66:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/phase.rs:73:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-consensus-types/src/qc.rs:42:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/qc.rs:50:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-consensus-types/src/qc.rs:64:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/vote.rs:60:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-consensus-types/src/vote.rs:68:                amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-constitution/src/adaptive_adversary.rs:1:// Adaptive corruption model for Byzantine adversary.
+crates/amun-constitution/src/adversary_model.rs:1:// Byzantine adversary capabilities and limitations.
+crates/amun-constitution/src/adversary_model.rs:4:pub struct AdversaryCapabilities {
+crates/amun-constitution/src/adversary_model.rs:14:pub struct AdversaryLimitations {
+crates/amun-constitution/src/economics.rs:3:use amun_failure::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-constitution/src/economics.rs:28:                ConstitutionalFault::CryptoBudgetExceeded,
+crates/amun-constitution/src/economics.rs:40:                    ConstitutionalFault::CryptoBudgetExceeded,
+crates/amun-constitution/src/replay.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-constitution/src/replay.rs:65:                ConstitutionalFault::BufferTooSmall,
+crates/amun-constitution/src/replay.rs:71:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B01)
+crates/amun-constitution/src/replay.rs:74:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B02)
+crates/amun-constitution/src/replay.rs:79:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B03)
+crates/amun-constitution/src/replay.rs:82:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B04)
+crates/amun-constitution/src/replay.rs:85:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B05)
+crates/amun-constitution/src/replay.rs:88:            FailureContext::new(ConstitutionalFault::MalformedEncoding, 0x0006, 0x0B06)
+crates/amun-constitution/src/rushing_adversary.rs:1:// Rushing adversary model. Adversary sees honest messages before responding.
+crates/amun-constitution/src/rushing_adversary.rs:4:pub struct RushingAdversary {
+crates/amun-constitutional-enforcement/src/lib.rs:61:    SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/lib.rs:108:                ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/lib.rs:159:                &ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/lib.rs:161:                "Slashing lacks evidence",
+crates/amun-constitutional-enforcement/src/proof_engine.rs:152:        // Slashing Evidence Binding
+crates/amun-constitutional-enforcement/src/proof_engine.rs:155:                law: ConstitutionalLaw::SlashingEvidenceBinding,
+crates/amun-constitutional-enforcement/src/proof_engine.rs:156:                description: "Slashing certificate lacks valid evidence".into(),
+crates/amun-constitutional-integration/src/lib.rs:108:            ObligationId::new(ObligationNamespace::Fault, 1),
+crates/amun-constitutional-integration/src/lib.rs:282:                ObligationId::new(ObligationNamespace::Fault, 2),
+crates/amun-constitutional-proof/src/lib.rs:155:            ObligationNamespace::Fault,
+crates/amun-constitutional-proof/src/obligation_namespace.rs:18:    Fault,
+crates/amun-constitutional-proof/src/obligation_namespace.rs:33:            Self::Fault => "FAULT",
+crates/amun-constitutional-proof/src/obligation_namespace.rs:51:            "FAULT" => Ok(Self::Fault),
+crates/amun-constitutional-semantics/src/lib.rs:94:#[derive(Debug, Clone, PartialEq, Eq)] pub enum ContinuityViolation { Gap { missing_from: u64, missing_to: u64 }, HiddenBranch { branch_root: [u8; 32], first_sequence: u64 }, EquivocationWindow { start: u64, end: u64, first_hash: [u8; 32], second_hash: [u8; 32] }, OrphanSegment { segment_root: [u8; 32], start_sequence: u64, end_sequence: u64 } }
+crates/amun-contract-security/src/lib.rs:6:pub struct SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:12:pub fn audit_reentrancy() -> SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:41:    SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:48:pub fn audit_gas_exhaustion() -> SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:74:    SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:81:pub fn audit_state_isolation() -> SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:96:    SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:103:pub fn audit_determinism() -> SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:115:    SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:122:pub fn audit_malicious_bytecode() -> SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:127:    SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:134:pub fn audit_evidence_consistency() -> SecurityAuditResult {
+crates/amun-contract-security/src/lib.rs:143:    SecurityAuditResult {
+crates/amun-economics/src/fee.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-economics/src/fee.rs:12:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0010)
+crates/amun-economics/src/token.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-economics/src/token.rs:28:                ConstitutionalFault::InvalidInput,
+crates/amun-economics/src/token.rs:34:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0003)
+crates/amun-economics/src/token.rs:42:                ConstitutionalFault::InvalidInput,
+crates/amun-economics/src/token.rs:48:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0006)
+crates/amun-economics/src/token.rs:51:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0007)
+crates/amun-economics/src/treasury.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-economics/src/treasury.rs:11:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0012, 0x0020)
+crates/amun-economics/src/treasury.rs:18:                ConstitutionalFault::InvalidInput,
+crates/amun-evidence/Cargo.toml:6:description = "AmunChain Byzantine evidence"
+crates/amun-evidence/src/equivocation.rs:1:pub struct EquivocationProof {
+crates/amun-evidence/src/equivocation.rs:10:impl EquivocationProof {
+crates/amun-evidence/src/evidence.rs:1:// Byzantine evidence system.
+crates/amun-evidence/src/evidence.rs:9:    Equivocation = 0x01,
+crates/amun-evidence/src/evidence.rs:16:pub struct EquivocationPosition {
+crates/amun-evidence/src/evidence.rs:40:    Equivocation {
+crates/amun-evidence/src/evidence.rs:41:        position: EquivocationPosition,
+crates/amun-evidence/src/evidence.rs:72:            EvidenceProof::Equivocation { first, second, .. } => {
+crates/amun-evidence/src/lib.rs:4:pub use equivocation::EquivocationProof;
+crates/amun-evidence/src/lib.rs:5:pub use slashing::SlashingEngine;
+crates/amun-evidence/src/slashing.rs:1:use crate::equivocation::EquivocationProof;
+crates/amun-evidence/src/slashing.rs:3:pub struct SlashingEngine {
+crates/amun-evidence/src/slashing.rs:8:impl SlashingEngine {
+crates/amun-evidence/src/slashing.rs:18:        proof: &EquivocationProof,
+crates/amun-evidence/src/slashing.rs:45:impl Default for SlashingEngine {
+crates/amun-evidence/src/tests.rs:8:            evidence_type: EvidenceType::Equivocation,
+crates/amun-evidence/src/tests.rs:12:            proof: EvidenceProof::Equivocation {
+crates/amun-evidence/src/tests.rs:13:                position: EquivocationPosition {
+crates/amun-evidence/src/tests.rs:38:            evidence_type: EvidenceType::Equivocation,
+crates/amun-evidence/src/tests.rs:42:            proof: EvidenceProof::Equivocation {
+crates/amun-evidence/src/tests.rs:43:                position: EquivocationPosition {
+crates/amun-execution/src/executor.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-failure/src/kernel_state.rs:4:use crate::taxonomy::{module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-failure/src/kernel_state.rs:10:        fault: ConstitutionalFault,
+crates/amun-failure/src/kernel_state.rs:21:    pub fn poison(self, fault: ConstitutionalFault, epoch: u64, round: u64) -> Self {
+crates/amun-failure/src/kernel_state.rs:56:    pub evidence_fault: Option<ConstitutionalFault>,
+crates/amun-failure/src/lib.rs:11:    module_ids, operation_ids, AmunResult, ConstitutionalFault, FailureContext, FaultSeverity,
+crates/amun-failure/src/taxonomy.rs:5:pub enum ConstitutionalFault {
+crates/amun-failure/src/taxonomy.rs:19:    // Byzantine & Security (0x4XXX)
+crates/amun-failure/src/taxonomy.rs:20:    EquivocationDetected = 0x4001,
+crates/amun-failure/src/taxonomy.rs:44:impl ConstitutionalFault {
+crates/amun-failure/src/taxonomy.rs:45:    pub const fn severity(self) -> FaultSeverity {
+crates/amun-failure/src/taxonomy.rs:50:            | Self::MemoryBudgetExhausted => FaultSeverity::Degraded,
+crates/amun-failure/src/taxonomy.rs:56:            | Self::SequenceMismatch => FaultSeverity::Rejected,
+crates/amun-failure/src/taxonomy.rs:57:            _ => FaultSeverity::Critical,
+crates/amun-failure/src/taxonomy.rs:62:        matches!(self.severity(), FaultSeverity::Critical)
+crates/amun-failure/src/taxonomy.rs:68:pub enum FaultSeverity {
+crates/amun-failure/src/taxonomy.rs:136:    pub fault: ConstitutionalFault,
+crates/amun-failure/src/taxonomy.rs:142:    pub const fn new(fault: ConstitutionalFault, module_id: u16, operation_id: u16) -> Self {
+crates/amun-failure/src/taxonomy.rs:150:    pub fn severity(&self) -> FaultSeverity {
+crates/amun-failure/src/tests.rs:8:    assert!(ConstitutionalFault::EquivocationDetected.should_halt());
+crates/amun-failure/src/tests.rs:9:    assert!(ConstitutionalFault::UnsafeContractViolation.should_halt());
+crates/amun-failure/src/tests.rs:10:    assert!(ConstitutionalFault::ConstitutionalViolation.should_halt());
+crates/amun-failure/src/tests.rs:11:    assert!(ConstitutionalFault::InvalidQuorum.should_halt());
+crates/amun-failure/src/tests.rs:12:    assert!(ConstitutionalFault::SignatureInvalid.should_halt());
+crates/amun-failure/src/tests.rs:13:    assert!(ConstitutionalFault::MerkleProofInvalid.should_halt());
+crates/amun-failure/src/tests.rs:14:    assert!(ConstitutionalFault::DurabilityViolation.should_halt());
+crates/amun-failure/src/tests.rs:15:    assert!(ConstitutionalFault::JournalHashMismatch.should_halt());
+crates/amun-failure/src/tests.rs:16:    assert!(ConstitutionalFault::ArithmeticOverflow.should_halt());
+crates/amun-failure/src/tests.rs:17:    assert!(ConstitutionalFault::ArithmeticUnderflow.should_halt());
+crates/amun-failure/src/tests.rs:18:    assert!(ConstitutionalFault::DecodeBudgetExceeded.should_halt());
+crates/amun-failure/src/tests.rs:19:    assert!(ConstitutionalFault::CryptoBudgetExceeded.should_halt());
+crates/amun-failure/src/tests.rs:24:    assert!(!ConstitutionalFault::BufferTooSmall.should_halt());
+crates/amun-failure/src/tests.rs:25:    assert!(!ConstitutionalFault::CapacityExceeded.should_halt());
+crates/amun-failure/src/tests.rs:26:    assert!(!ConstitutionalFault::TableFull.should_halt());
+crates/amun-failure/src/tests.rs:27:    assert!(!ConstitutionalFault::MemoryBudgetExhausted.should_halt());
+crates/amun-failure/src/tests.rs:32:    assert!(!ConstitutionalFault::InvalidStateTransition.should_halt());
+crates/amun-failure/src/tests.rs:33:    assert!(!ConstitutionalFault::UninitializedAccess.should_halt());
+crates/amun-failure/src/tests.rs:34:    assert!(!ConstitutionalFault::DoubleInitialization.should_halt());
+crates/amun-failure/src/tests.rs:35:    assert!(!ConstitutionalFault::TemporalViolation.should_halt());
+crates/amun-failure/src/tests.rs:36:    assert!(!ConstitutionalFault::ReplayViolation.should_halt());
+crates/amun-failure/src/tests.rs:37:    assert!(!ConstitutionalFault::SequenceMismatch.should_halt());
+crates/amun-failure/src/tests.rs:43:        ConstitutionalFault::CapacityExceeded,
+crates/amun-failure/src/tests.rs:47:    assert_eq!(ctx.fault, ConstitutionalFault::CapacityExceeded);
+crates/amun-failure/src/tests.rs:55:        ConstitutionalFault::EquivocationDetected,
+crates/amun-failure/src/tests.rs:70:    let health = KernelHealth::healthy().poison(ConstitutionalFault::UnsafeContractViolation, 1, 5);
+crates/amun-failure/src/tests.rs:77:        .poison(ConstitutionalFault::EquivocationDetected, 1, 3)
+crates/amun-failure/src/tests.rs:78:        .poison(ConstitutionalFault::InvalidQuorum, 2, 7);
+crates/amun-failure/src/tests.rs:83:        assert_eq!(fault, ConstitutionalFault::EquivocationDetected);
+crates/amun-failure/src/tests.rs:92:    let health = KernelHealth::healthy().poison(ConstitutionalFault::UnsafeContractViolation, 1, 0);
+crates/amun-failure/src/tests.rs:110:        ConstitutionalFault::UnsafeContractViolation,
+crates/amun-failure/src/tests.rs:120:    assert!(FaultSeverity::Critical > FaultSeverity::Rejected);
+crates/amun-failure/src/tests.rs:121:    assert!(FaultSeverity::Rejected > FaultSeverity::Degraded);
+crates/amun-kernel-types/src/epoch.rs:1:use amun_failure::{module_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-kernel-types/src/epoch.rs:16:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-kernel-types/src/round.rs:1:use amun_failure::{module_ids, AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-kernel-types/src/round.rs:16:                ConstitutionalFault::ArithmeticOverflow,
+crates/amun-live-cluster/src/bin/byzantine_test.rs:34:    println!("=== Phase 2: Byzantine attacks (10s) ===");
+crates/amun-live-cluster/src/bin/byzantine_test.rs:86:            println!("  Attack: {} sent", label);
+crates/amun-live-cluster/src/bin/byzantine_test.rs:125:        "  Byzantine verdict:      {}",
+crates/amun-live-cluster/src/validator.rs:61:    /// N120.4: Slashing ledger for computing the merkle root
+crates/amun-live-cluster/src/validator.rs:62:    pub slashing_ledger: Arc<Mutex<amun_consensus_network::SlashingLedger>>,
+crates/amun-live-cluster/src/validator.rs:162:            slashing_ledger: Arc::new(Mutex::new(amun_consensus_network::SlashingLedger::new())),
+crates/amun-live-cluster/src/validator.rs:396:                    let pending_certs: Vec<amun_consensus_network::SlashingCertificate> =
+crates/amun-live-cluster/src/validator.rs:582:                        // Slashing evidence: certificates have non-empty evidence_ids
+crates/amun-live-cluster/src/validator.rs:737:                        let pending: Vec<amun_consensus_network::SlashingCertificate> = {
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:3:    SlashingCertificate, StakingAdapter, ValidatorStatus,
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:6:// use amun_staking::slashing::SlashingConditions;
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:22:fn make_valid_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
+crates/amun-live-cluster/tests/n110_4c_state_transition.rs:23:    SlashingCertificate::from_slash_result(
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:1:// N118 — Finality-Gated Slashing Verification
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:34:        "N118: Slashing must execute in finality path"
+crates/amun-live-cluster/tests/n118_finality_gated_slashing.rs:41:    eprintln!("N118 PASSED: Slashing executes in finality-gated path");
+crates/amun-live-cluster/tests/n120_4_consensus_enforcement.rs:46:    // Attacker tampers with the root after the block is built
+crates/amun-merkle/src/proof.rs:81:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-merkle/src/proof.rs:90:                amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-merkle/src/proof.rs:102:                    amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-merkle/src/proof.rs:112:                    amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-merkle/src/proof.rs:122:                        amun_failure::ConstitutionalFault::MalformedEncoding,
+crates/amun-merkle/src/proof.rs:130:                    amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-network-simulator/src/adversary.rs:3:pub struct AdversaryConfig {
+crates/amun-network-simulator/src/adversary.rs:11:impl AdversaryConfig {
+crates/amun-network-simulator/src/lib.rs:5:pub use adversary::AdversaryConfig;
+crates/amun-network-simulator/src/simulator.rs:1:use crate::adversary::AdversaryConfig;
+crates/amun-network-simulator/src/simulator.rs:15:    pub adversary: AdversaryConfig,
+crates/amun-network-simulator/src/simulator.rs:25:    pub fn new(schedule: DeliverySchedule, adversary: AdversaryConfig) -> Self {
+crates/amun-network-transport/src/message.rs:11:    /// N110.3: Slashing certificate announcement
+crates/amun-network-transport/src/message.rs:12:    SlashingCertificateAnnounce(SlashingCertificateAnnounce),
+crates/amun-network-transport/src/message.rs:49:/// N110.3: Slashing certificate announcement for network propagation.
+crates/amun-network-transport/src/message.rs:51:pub struct SlashingCertificateAnnounce {
+crates/amun-network-transport/src/message.rs:227:        let msg = NetworkMessage::SlashingCertificateAnnounce(SlashingCertificateAnnounce {
+crates/amun-network-transport/src/message.rs:238:            NetworkMessage::SlashingCertificateAnnounce(c) => {
+crates/amun-network-transport/src/transport.rs:206:        NetworkMessage::SlashingCertificateAnnounce(s) => NodeId(s.validator_id),
+crates/amun-networking/src/risk.rs:16:    /// Peer exhibits Byzantine behavior
+crates/amun-networking/src/risk.rs:17:    ByzantineBehavior { evidence_count: u64 },
+crates/amun-networking/src/risk.rs:67:            ConstitutionalRisk::ByzantineBehavior { .. } => {
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:61:    // Attacker provides a different trusted root
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:80:    // Attacker sends checkpoint at lower height
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:151:// N19.5 — Byzantine Rejoin Source
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:168:    // Byzantine source provides wrong root
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:125:    // Attacker provides wrong trusted root
+crates/amun-node/src/bin/test_multi_byzantine.rs:71:            // Byzantine nodes send conflicting proposals
+crates/amun-node/src/bin/test_multi_byzantine.rs:89:                println!("Byzantine nodes {:?} sent conflicting proposals", byzantine);
+crates/amun-node/src/bin/test_multi_byzantine.rs:132:        "Testing with {} Byzantine validators out of {}...",
+crates/amun-node/src/bin/test_multi_byzantine.rs:145:    // Honest validators are all except the Byzantine ones
+crates/amun-node/src/bin/test_multi_byzantine.rs:166:            "\nPASS: Network tolerates {} Byzantine validators",
+crates/amun-ntr/src/charity.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/charity.rs:29:                ConstitutionalFault::InvalidInput,
+crates/amun-ntr/src/charity.rs:38:                FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0011)
+crates/amun-ntr/src/token.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/token.rs:7:        if a == 0 || self.balance < a { return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0020, 0x0001)); }
+crates/amun-ntr/src/token.rs:14:        if a < NTR_MIN_STAKE_AMOUNT || self.balance < a { return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0020, 0x0004)); }
+crates/amun-ntr/src/treasury.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-ntr/src/treasury.rs:31:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0020)
+crates/amun-ntr/src/treasury.rs:34:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0020, 0x0021)
+crates/amun-ntr/src/treasury.rs:42:                ConstitutionalFault::InvalidInput,
+crates/amun-ntr/src/treasury.rs:58:                ConstitutionalFault::InvalidInput,
+crates/amun-replay-engine/src/byzantine_witness_filter.rs:1://! ByzantineWitnessFilter — prevent malicious witness propagation.
+crates/amun-replay-engine/src/constitutional_governance.rs:158:/// Just as Byzantine workers are contained without invalidation,
+crates/amun-replay-engine/src/containment_boundary.rs:71:/// A Byzantine containment zone — isolates workers without semantic invalidation.
+crates/amun-replay-engine/src/containment_boundary.rs:73:pub struct ByzantineContainmentZone {
+crates/amun-replay-engine/src/containment_boundary.rs:77:impl ByzantineContainmentZone {
+crates/amun-replay-engine/src/containment_boundary.rs:137:        let mut zone = ByzantineContainmentZone::new();
+crates/amun-runtime/src/account.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-runtime/src/account.rs:27:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0050)
+crates/amun-runtime/src/account.rs:30:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0051)
+crates/amun-runtime/src/account.rs:38:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0052)
+crates/amun-runtime/src/account.rs:41:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0053)
+crates/amun-runtime/src/journal.rs:1:use amun_failure::{ConstitutionalFault, FailureContext};
+crates/amun-runtime/src/journal.rs:34:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0020)
+crates/amun-runtime/src/journal.rs:38:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0021)
+crates/amun-runtime/src/journal.rs:42:                ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/journal.rs:50:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0023)
+crates/amun-runtime/src/journal.rs:62:                ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/journal.rs:74:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000A, 0x0028)
+crates/amun-runtime/src/overlay.rs:31:                        amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-runtime/src/overlay.rs:48:                        amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-safety-laws/Cargo.toml:6:description = "AmunChain Byzantine safety laws"
+crates/amun-safety-laws/src/equivocation.rs:5:pub struct EquivocationEvidence {
+crates/amun-safety-laws/src/equivocation.rs:10:impl EquivocationEvidence {
+crates/amun-safety-laws/src/equivocation.rs:41:pub fn detect_equivocation(votes: &[ConsensusVote]) -> Vec<EquivocationEvidence> {
+crates/amun-safety-laws/src/equivocation.rs:53:                evidence.push(EquivocationEvidence::new(existing.clone(), vote.clone()));
+crates/amun-safety-laws/src/lib.rs:4:pub use equivocation::{detect_equivocation, EquivocationEvidence};
+crates/amun-safety-laws/src/slash.rs:1:use crate::equivocation::EquivocationProof;
+crates/amun-safety-laws/src/slash.rs:3:/// Slashing condition: what penalty applies for equivocation.
+crates/amun-safety-laws/src/slash.rs:5:pub struct SlashingCondition {
+crates/amun-safety-laws/src/slash.rs:10:impl SlashingCondition {
+crates/amun-safety-laws/src/slash.rs:17:        proof: &EquivocationProof,
+crates/amun-sdk-layer/src/staking_api.rs:4:use amun_staking::slashing::SlashingConditions;
+crates/amun-sdk-layer/src/staking_api.rs:10:    pub slashing: SlashingConditions,
+crates/amun-sdk-layer/src/staking_api.rs:15:        Self { registry: ValidatorRegistry::new(), delegation: DelegationManager::new(), slashing: SlashingConditions::new() }
+crates/amun-snapshot-engine/src/byzantine_sync.rs:47:pub struct ByzantineSyncEngine {
+crates/amun-snapshot-engine/src/byzantine_sync.rs:53:impl ByzantineSyncEngine {
+crates/amun-snapshot-engine/src/lib.rs:22:pub use byzantine_sync::{ByzantineSyncEngine, CivilizationGroup, PeerManifest, SyncDecision};
+crates/amun-snapshot-engine/src/restore.rs:66:            .map_err(|e| RestoreError::StructuralFault(e.to_string()))?;
+crates/amun-snapshot-engine/src/restore.rs:128:    StructuralFault(String),
+crates/amun-snapshot-engine/src/restore.rs:170:            RestoreError::StructuralFault(e) => write!(f, "Structural fault: {}", e),
+crates/amun-staking/src/delegation.rs:1:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-staking/src/delegation.rs:11:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0013, 0x0010)
+crates/amun-staking/src/lib.rs:8:pub use slashing::SlashingConditions;
+crates/amun-staking/src/slashing.rs:2:pub struct SlashingConditions {
+crates/amun-staking/src/slashing.rs:6:impl SlashingConditions {
+crates/amun-staking/src/slashing.rs:24:impl Default for SlashingConditions {
+crates/amun-staking/src/tests.rs:16:    let rules = SlashingConditions::new();
+crates/amun-staking/src/validator.rs:1:use crate::slashing::SlashingConditions;
+crates/amun-staking/src/validator.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-staking/src/validator.rs:37:                ConstitutionalFault::CapacityExceeded,
+crates/amun-staking/src/validator.rs:43:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0013, 0x0002)
+crates/amun-staking/src/validator.rs:49:    pub fn slash(&mut self, pk: &PublicKey, rules: &SlashingConditions) -> AmunResult<u64> {
+crates/amun-staking/src/validator.rs:62:            ConstitutionalFault::InvalidInput,
+crates/amun-stf/src/nonce.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-stf/src/nonce.rs:21:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0008, 0x0200)
+crates/amun-stf/src/nonce.rs:35:                FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0008, 0x0201)
+crates/amun-stf/src/nonce.rs:39:                ConstitutionalFault::ReplayViolation,
+crates/amun-stf/src/receipt.rs:49:                amun_failure::ConstitutionalFault::BufferTooSmall,
+crates/amun-stf/src/state.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-stf/src/state.rs:46:                ConstitutionalFault::CapacityExceeded,
+crates/amun-stf/src/state.rs:58:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0003)
+crates/amun-stf/src/state.rs:94:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0001)
+crates/amun-stf/src/state.rs:98:            FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0002)
+crates/amun-stf/src/state.rs:111:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0006)
+crates/amun-stf/src/stf.rs:25:                amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-stf/src/stf.rs:37:                amun_failure::ConstitutionalFault::CapacityExceeded,
+crates/amun-stf/src/transition.rs:5:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-stf/src/transition.rs:21:                    ConstitutionalFault::CryptoBudgetExceeded,
+crates/amun-stf/src/transition.rs:34:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0008, 0x0100)
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:48:### Level 4: ByzantineEvidence (Malicious Behavior Detected)
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:51:| EquivocationDetected | Two different states at same sequence | Slash validator, broadcast evidence |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:73:| Equivocation Evidence | Permanent Ban + Slash |
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:98:| ByzantineEvidence | Permanent | Never released |
+crates/amun-survival-console/src/dashboard.rs:2:use amun_attack_lab::simulator::AttackSimulator;
+crates/amun-survival-console/src/dashboard.rs:14:    attack_simulator: AttackSimulator,
+crates/amun-survival-console/src/dashboard.rs:31:        attack_simulator: AttackSimulator,
+crates/amun-testnet-sim/Cargo.toml:5:description = "Byzantine and adversarial testnet simulation"
+crates/amun-testnet-sim/tests/adversarial_tests.rs:229:// ── N60.6 — Byzantine Conflicting Blocks ────────────────────
+crates/amun-transaction/src/tx.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+crates/amun-transaction/src/tx.rs:129:                ConstitutionalFault::InvalidInput,
+crates/amun-transaction/src/tx.rs:136:                ConstitutionalFault::InvalidInput,
+crates/amun-transaction/src/tx.rs:144:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x000E, 0x0003)
+crates/amun-transaction/src/tx.rs:163:                ConstitutionalFault::InvalidInput,
+crates/amun-transaction/src/tx.rs:170:                ConstitutionalFault::InvalidInput,
+crates/amun-transaction/src/tx.rs:177:                ConstitutionalFault::InvalidInput,
+crates/amun-verification-kernel/src/lib.rs:23:    Security,
+crates/amun-wallet-management/src/types.rs:16:/// **Security**: This type does NOT implement Serialize or Deserialize.
+crates/amun-wallet-management/src/types.rs:46:/// **Security**: This type does NOT implement Serialize or Deserialize.
+docs/AUDIT_LAYERS.md:46:# Layer 04 — Byzantine
+docs/AUDIT_LAYERS.md:163:# Layer 14 — Byzantine Mesh
+docs/CANONICAL_HASH.md:20:| Byzantine Round | `AMUN_BYZANTINE_ROUND_V1` | Simulation round |
+docs/DOCS_INDEX.md:45:    Adversary model for the networking layer.
+docs/DOCS_INDEX.md:117:    Networking layer and Byzantine hardening.
+docs/DOCS_INDEX.md:147:    Security invariants checklist.
+docs/DOCS_INDEX.md:149:    Threat model for AmunChain.
+docs/DOCS_INDEX.md:229:    Security model overview.
+docs/DOCS_INDEX.md:235:    Security policy and responsible disclosure.
+docs/DOCS_INDEX.md:371:    v3.006: Byzantine constitutional attacks.
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:49:Vote acceptance now requires that votes from registered validators carry a valid signature. Unsigned or incorrectly signed votes are rejected with an error. Quorum counting is unchanged and uses the same active_validator_count logic, now operating over the registered validator identifiers. Proposer selection is unchanged and still uses round-robin selection over the registered identifiers. Equivocation detection remains functional, as it compares voter_id and block hashes. Signature validation adds an additional layer of evidence, because an equivocating validator must still sign both conflicting votes, making the proof of misbehavior cryptographically stronger. The performance impact is one Ed25519 verification per vote, which is a constant-time operation taking microseconds. There is no measurable impact on consensus throughput in test clusters.
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:51:## Security Considerations
+docs/N106_N107_CONSTITUTIONAL_AUTHORITY_AND_GOVERNANCE.md:199:## Security Considerations
+docs/N110_COMPLETE.md:1:N110 — Provable Economic Slashing Pipeline
+docs/N110_COMPLETE.md:25:2. SlashingCertificate — a serialisable, hashable, verifiable
+docs/N110_COMPLETE.md:58:  Threshold crossed → SlashingCertificate created ........ N110.2
+docs/N110_COMPLETE.md:64:  Transport layer sends SlashingCertificateAnnounce ...... N110.3b
+docs/N110_COMPLETE.md:93:N110.2             Slashing certificate ..................  4
+docs/N110_COMPLETE.md:113:Security Assumptions
+docs/N110_COMPLETE.md:142:2. Certificate gossip currently adds the SlashingCertificate
+docs/N110_COMPLETE.md:146:   separate SlashingCertificateAnnounce struct for on-wire
+docs/N126_FINAL_BASELINE.md:30:5.  SlashingEvidenceBinding   = all certs have non-empty evidence_ids  REAL
+docs/PROJECT_INDEX.md:72:| constitution/PHASE6_NETWORK_LAYER_AND_BYZANTINE_HARDENING.md | Byzantine networking rules |
+docs/PROJECT_INDEX.md:98:| docs/SECURITY_MODEL.md | Security doctrine |
+docs/PROTOCOL_HARDENING_ROADMAP.md:7:- [ ] Byzantine fault tolerance tests
+docs/PROTOCOL_HARDENING_ROADMAP.md:29:- [ ] Slashing implementation
+docs/REPOSITORY_LAYOUT.md:22:| audit_reports/ | Security and validation reports |
+docs/REPOSITORY_LAYOUT.md:246:| SECURITY_MODEL.md | Security doctrine |
+docs/SECURITY_MODEL.md:1:# Security Model
+docs/SECURITY_MODEL.md:17:# Threat Classes
+docs/SECURITY_MODEL.md:29:## Byzantine Peers
+docs/SECURITY_MODEL.md:59:# Constitutional Security Principle
+docs/V0_3_COMPLETION.md:8:constitutional membership, rejects Byzantine attacks, and supports constitutional
+docs/V0_3_COMPLETION.md:17:| 4. Byzantine Immunity | Impersonation, conflicting QC, stale/foreign certificates | ✅ |
+docs/V3_005D_QC_CRYPTOGRAPHIC_PROOF.md:28:V3-006: Byzantine Constitutional Attacks – now that QCs carry real crypto,
+docs/V3_006D_FOREIGN_AUTHORITY.md:1:# V3-006D: Foreign Validator Set Attack – Final Byzantine Defense
+docs/V3_006D_FOREIGN_AUTHORITY.md:4:**Status:** Closed – Complete Byzantine Immunity
+docs/V3_006D_FOREIGN_AUTHORITY.md:7:The final Byzantine attack vector has been closed. A cryptographically valid
+docs/V3_006D_FOREIGN_AUTHORITY.md:17:## Complete Byzantine Defense Matrix
+docs/V3_006D_FOREIGN_AUTHORITY.md:18:| Attack | Detection | Consensus | Status |
+docs/V3_006D_FOREIGN_AUTHORITY.md:21:| V3-006B Conflicting QC Attack | ✅ 40 conflicts | ✅ 27/27 | Closed |
+docs/V3_006D_FOREIGN_AUTHORITY.md:22:| V3-006C Stale Certificate Attack | ✅ 13 rejections | ✅ 27/27 | Closed |
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:1:# V3-006: Byzantine Constitutional Attacks – All Rejected
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:6:## Attacks Tested
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:7:| Attack | Detection | Consensus | Result |
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:10:| V3-006B Conflicting QC Attack | 40 conflicts | 27/27 committed | ✅ |
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:11:| V3-006C Stale Certificate Attack | 13 rejections | 27/27 committed | ✅ |
+docs/V3_006_BYZANTINE_CONSTITUTIONAL_ATTACKS.md:15:detects and rejects all three classes of Byzantine attacks while preserving
+docs/VALIDATOR_ORDERING.md:9:- Slashing evidence
+docs/architecture/CRATE_CLASSIFICATION.md:37:- amun-test-byzantine - Byzantine simulation
+docs/architecture/PHASE_49_COMPLETE.md:44:6. **Byzantine Fault Model**: 5 fault types formally defined
+docs/architecture/PHASE_49_COMPLETE.md:49:### Security Audit Results (Remediated)
+docs/architecture/PHASE_49_COMPLETE.md:110:5. **Byzantine Evidence System** — canonical proof generation
+docs/architecture/PHASE_49_COMPLETE.md:124:- Byzantine-aware formal ordering guarantees
+docs/consensus/constitution.md:127:- Byzantine fault tolerance: 2f + 1 where f = floor((N-1)/3)
+docs/economics/ECONOMIC_LAYER_REVIEW.md:41:| Slashing Economics | Partial | Not verified |
+docs/economics/ECONOMIC_LAYER_REVIEW.md:95:| Slashing amount deduction | UNKNOWN | HIGH |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:307:| II | Consensus Hardening | Slashing framework, evidence system, recovery and snapshots |
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:308:| III | Constitutional Security | Constitutional proof system, identity and evidence roots |
+docs/reports/CCA_IMPL_4_FINAL_REPORT.md:182:# Security Impact
+docs/reports/CCA_IMPL_5A_REPORT.md:110:# Security Considerations

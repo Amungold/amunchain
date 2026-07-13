@@ -1,0 +1,28 @@
+[package]
+license = "Apache-2.0"
+name = "amun-consensus-network"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_bytes = "0.11"
+postcard = { version = "1", features = ["use-std"] }
+serde_json = "1.0.150"
+blake3.workspace = true
+amun-validator-identity = { path = "../amun-validator-identity" }
+amun-staking = { path = "../amun-staking" }
+amun-kernel-types = { path = "../amun-kernel-types" }
+rand = "0.8"
+ed25519-dalek = "2"
+tempfile = "3"
+hex = "0.4"
+
+[dev-dependencies]
+blake3.workspace = true
+amun-validator-identity = { path = "../amun-validator-identity" }
+amun-staking = { path = "../amun-staking" }
+amun-kernel-types = { path = "../amun-kernel-types" }
+amun-block-builder = { path = "../amun-block-builder" }
+amun-mempool = { path = "../amun-mempool" }
+hex = "0.4"

@@ -1,0 +1,67 @@
+layers:
+  - name: core
+    allowed_deps: []
+    crates:
+      - amun-core
+      - amun-crypto
+      - amun-codec
+      - amun-merkle
+  
+  - name: crypto
+    allowed_deps: [core]
+    crates:
+      - amun-bls
+      - amun-keystore
+  
+  - name: consensus
+    allowed_deps: [core, crypto]
+    crates:
+      - amun-consensus-core
+      - amun-consensus-qc
+      - amun-consensus-wal
+      - amun-consensus-pacemaker
+  
+  - name: constitution
+    allowed_deps: [core, crypto, consensus]
+    crates:
+      - amun-constitution-core
+      - amun-constitution-lineage
+      - amun-constitution-authority
+      - amun-constitution-semantics
+  
+  - name: execution
+    allowed_deps: [core, crypto, constitution]
+    crates:
+      - amun-execution-core
+      - amun-execution-stf
+      - amun-execution-runtime
+  
+  - name: storage
+    allowed_deps: [core, crypto, execution]
+    crates:
+      - amun-storage-core
+      - amun-storage-wal
+      - amun-storage-snapshot
+  
+  - name: network
+    allowed_deps: [core, crypto, storage]
+    crates:
+      - amun-network-core
+      - amun-network-gossip
+      - amun-network-rpc
+  
+  - name: test
+    allowed_deps: [all]
+    is_test_only: true
+    crates:
+      - amun-test-mocks
+      - amun-test-byzantine
+      - amun-test-replay
+
+forbidden_deps:
+  - from: execution
+    to: network
+  - from: storage
+    to: constitution
+  - from: network
+    to: consensus

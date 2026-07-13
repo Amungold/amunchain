@@ -1,0 +1,18 @@
+[package]
+name = "amun-consensus"
+version = "1.0.0"
+license = "MIT OR Apache-2.0"
+edition = "2021"
+
+[dependencies]
+amun-constitutional-enforcement = { path = "../amun-constitutional-enforcement" }
+amun-constitutional-commitments = { path = "../amun-constitutional-commitments" }
+serde = { version = "1.0", features = ["derive"] }
+serde_bytes = "0.11"
+blake3 = "1.5"
+
+# Internal dependencies
+
+[features]
+default = ["std"]
+std = []

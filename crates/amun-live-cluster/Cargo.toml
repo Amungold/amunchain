@@ -1,0 +1,49 @@
+[package]
+name = "amun-live-cluster"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Live multi-validator cluster running over real TCP"
+
+[dependencies]
+bytes = "1"
+tiny_http = "0.12"
+axum = "0.7"
+amun-replay-verifier = { path = "../amun-replay-verifier" }
+amun-constitutional-enforcement = { path = "../amun-constitutional-enforcement" }
+amun-accounts = { path = "../amun-accounts" }
+amun-staking = { path = "../amun-staking" }
+amun-kernel-types = { path = "../amun-kernel-types" }
+amun-consensus-network = { path = "../amun-consensus-network" }
+amun-chain-store = { path = "../amun-chain-store" }
+amun-sync = { path = "../amun-sync" }
+amun-rpc = { path = "../amun-rpc" }
+amun-network-transport = { path = "../amun-network-transport" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+postcard = { version = "1", features = ["use-std"] }
+tempfile = "3"
+hex = "0.4.3"
+
+amun-validator-identity = { path = "../amun-validator-identity" }
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand = "0.8"
+amun-networking = { path = "../amun-networking" }
+amun-authority-registry = { path = "../amun-authority-registry" }
+amun-mempool = { path = "../amun-mempool" }
+amun-block-builder = { path = "../amun-block-builder" }
+amun-tokenomics-ledger = { path = "../amun-tokenomics-ledger" }
+blake3.workspace = true
+amun-evidence-root = { version = "0.1.0", path = "../amun-evidence-root" }
+[[bin]]
+name = "validator"
+path = "src/bin/validator.rs"
+
+[[bin]]
+name = "e2e_test"
+path = "src/bin/e2e_test.rs"
+
+[[bin]]
+name = "rpc_server"
+path = "src/bin/rpc_server.rs"

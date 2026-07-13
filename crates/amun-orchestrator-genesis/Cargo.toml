@@ -1,0 +1,22 @@
+[package]
+name = "amun-orchestrator-genesis"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Genesis Engine — generate, validate, and dynamically update genesis"
+
+[dependencies]
+amun-orchestrator-core = { path = "../amun-orchestrator-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hex = "0.4"
+thiserror = "2"
+tracing = "0.1"
+tokio = { version = "1", features = ["fs", "time"] }
+async-trait = "0.1"
+sha2 = "0.10"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tempfile = "3"

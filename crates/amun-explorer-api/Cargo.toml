@@ -1,0 +1,21 @@
+[package]
+license = "Apache-2.0"
+name = "amun-explorer-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hex = "0.4"
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tower-http = { version = "0.6.11", features = ["cors"] }
+amun-live-cluster = { path = "../amun-live-cluster" }
+amun-consensus-network = { path = "../amun-consensus-network" }
+amun-chain-store = { path = "../amun-chain-store" }
+amun-evidence-engine = { path = "../amun-evidence-engine" }
+amun-constitutional-enforcement = { path = "../amun-constitutional-enforcement" }
+amun-governance = { path = "../amun-governance" }
+
+reqwest = { version = "0.12", default-features = false, features = ["json","rustls-tls"] }

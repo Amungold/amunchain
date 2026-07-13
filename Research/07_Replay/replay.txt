@@ -1,0 +1,188 @@
+crates/amun-audit/tests/audit_layer06_replay.rs:3:    use amun_storage_kernel::persistence::wal::{ReplayVerifier, WalEntry};
+crates/amun-audit/tests/audit_layer06_replay.rs:50:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer06_replay.rs:91:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer06_replay.rs:135:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer11_crash.rs:3:    use amun_storage_kernel::persistence::wal::{ReplayVerifier, WalEntry, WalIterator};
+crates/amun-audit/tests/audit_layer11_crash.rs:124:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer15_temporal.rs:3:    use amun_storage_kernel::persistence::wal::{ReplayVerifier, WalEntry};
+crates/amun-audit/tests/audit_layer15_temporal.rs:50:        let result1 = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer15_temporal.rs:51:        let result2 = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-byzantine-tests/tests/attack_suite.rs:9:use amun_replay_verifier::replay_verifier::ReplayVerifier;
+crates/amun-byzantine-tests/tests/attack_suite.rs:56:    let replay = ReplayVerifier::replay(&proof, &program, &mut fresh_reg, &[]);
+crates/amun-byzantine-tests/tests/attack_suite.rs:59:        amun_replay_verifier::replay_verifier::ReplayResult::Match { .. }
+crates/amun-certificate-network/src/distribution.rs:7:    CertificateInclusionProof, ConstitutionalStateRuntime, ReplayCertificate,
+crates/amun-certificate-network/src/distribution.rs:18:    CertificateResponse { certificate: ReplayCertificate },
+crates/amun-certificate-network/src/distribution.rs:49:    pub certificate: ReplayCertificate,
+crates/amun-certificate-network/src/distribution.rs:56:        certificate: ReplayCertificate,
+crates/amun-certificate-network/src/gossip.rs:2:use amun_constitutional_state::{CertificateInclusionProof, ReplayCertificate};
+crates/amun-certificate-network/src/gossip.rs:38:        certificates: Vec<ReplayCertificate>,
+crates/amun-certificate-network/src/gossip.rs:77:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-certificate-network/src/gossip.rs:88:    pub fn store_certificate(&mut self, cert: ReplayCertificate) {
+crates/amun-certificate-network/src/gossip.rs:117:    pub fn get_certificate(&self, hash: &[u8; 32]) -> Option<&ReplayCertificate> {
+crates/amun-certificate-network/src/gossip.rs:163:        ReplayCertificate,
+crates/amun-chain-checkpoint/src/lib.rs:47:/// of the AmunChain proof layers (ReplayCertificate, CertificateMerkleRoot, etc.).
+crates/amun-chain-checkpoint/src/lib.rs:136:    /// AmunChain proof layers (ReplayCertificate uses `AMUN_REPLAY_CERTIFICATE_V1`,
+crates/amun-consensus-network/tests/n121_2_deterministic_replay.rs:1:// N121.2 — Deterministic Replay of Slashing State
+crates/amun-constitutional-block/src/lib.rs:39:use amun_constitutional_state::{ConstitutionalStateRuntime, ReplayCertificate};
+crates/amun-constitutional-block/src/lib.rs:50:    cert: &ReplayCertificate,
+crates/amun-constitutional-block/src/lib.rs:85:///   - ReplayCertificate::verify() for journal↔state proof
+crates/amun-constitutional-block/src/lib.rs:86:pub fn verify_full_replay(
+crates/amun-constitutional-block/src/lib.rs:88:    cert: &ReplayCertificate,
+crates/amun-constitutional-block/src/lib.rs:107:/// the block header, a ReplayCertificate, and an inclusion proof.
+crates/amun-constitutional-block/src/lib.rs:118:    cert: &ReplayCertificate,
+crates/amun-constitutional-block/tests/block_tests.rs:253:    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:277:    assert!(verify_full_replay(&block, &cert, rt.journal()).is_ok());
+crates/amun-constitutional-block/tests/block_tests.rs:282:    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:309:    assert!(verify_full_replay(&block, &cert, &tampered).is_err());
+crates/amun-constitutional-block/tests/block_tests.rs:314:    use amun_constitutional_block::verify_full_replay;
+crates/amun-constitutional-block/tests/block_tests.rs:339:    assert!(verify_full_replay(&block, &cert, &rt.journal()[..1]).is_err());
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:19:    // N127A.3: From ReplayVerifier (N109.7 architectural guarantee)
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:115:/// Evidence sourced from ReplayVerifier or N109.7 architectural guarantee.
+crates/amun-constitutional-integration/src/lib.rs:71:            "forall rc in ReplayCertificate : exists ev in EvidenceRoot : ev.replay = rc",
+crates/amun-constitutional-state/src/lib.rs:197:pub struct ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:223:    ) -> ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:224:        ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:234:impl ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:277:impl ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:357:    /// Build a Merkle root from multiple ReplayCertificates.
+crates/amun-constitutional-state/src/lib.rs:359:    pub fn certificate_merkle_root(certificates: &[ReplayCertificate]) -> [u8; 32] {
+crates/amun-constitutional-state/src/lib.rs:404:/// A Merkle proof that a specific ReplayCertificate is included
+crates/amun-constitutional-state/src/lib.rs:418:        certificates: &[ReplayCertificate],
+crates/amun-constitutional/src/architectural_invariants.rs:24:/// A ReplayCertificate attests replay ADMISSIBILITY, not
+crates/amun-constitutional/src/execution_receipt.rs:15://!   The certificate_hash links to a ReplayCertificate that attests
+crates/amun-constitutional/src/execution_receipt.rs:42:/// `certificate_hash` links to a ReplayCertificate. The certificate model
+crates/amun-constitutional/src/hash_domains.rs:45:/// Domain: ReplayCertificate objects
+crates/amun-constitutional/src/lib.rs:121:pub use replay_certificate::ReplayCertificate;
+crates/amun-constitutional/src/replay_certificate.rs:1://! ReplayCertificate — cryptographically scoped admissibility envelope.
+crates/amun-constitutional/src/replay_certificate.rs:18:pub struct ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:32:impl ConstitutionalIdentity for ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:47:impl ConstitutionalObject for ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:130:impl ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:179:        parent: &ReplayCertificate,
+crates/amun-constitutional/src/replay_certificate.rs:205:    ) -> ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:206:        ReplayCertificate::new(
+crates/amun-constitutional/src/replay_certificate.rs:247:        let c = ReplayCertificate::new(
+crates/amun-constitutional/src/schema_registry.rs:69:    /// ReplayCertificate
+crates/amun-evidence-finality/src/evidence_finality.rs:7:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-evidence-finality/src/evidence_finality.rs:184:            let replay = ReplayVerifier::replay(&proof, program, &mut fresh_reg, &[]);
+crates/amun-evidence-finality/src/evidence_finality.rs:186:            let verified = matches!(replay, ReplayResult::Match { .. });
+crates/amun-experimental-framework/src/main.rs:6:use amun_replay_verifier::replay_verifier::ReplayVerifier;
+crates/amun-experimental-framework/src/main.rs:214:            ReplayVerifier::replay(&proof, &program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs:311:            ReplayVerifier::replay(&proof, program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs:371:                    ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
+crates/amun-replay-cert/src/certificate.rs:6:pub struct ReplayCertificate {
+crates/amun-replay-cert/src/certificate.rs:19:impl ReplayCertificate {
+crates/amun-replay-cert/src/verifier.rs:1:use crate::certificate::ReplayCertificate;
+crates/amun-replay-cert/src/verifier.rs:5:pub fn verify_certificate(cert: &ReplayCertificate) -> Result<(), &'static str> {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:5:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:56:            let replay = ReplayVerifier::replay(&proof, program, &mut fresh_reg, &[]);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:59:                ReplayResult::Match {
+crates/amun-replay-engine/src/equivalence.rs:15:pub struct ConstitutionalReplayResult {
+crates/amun-replay-engine/src/equivalence.rs:42:impl ConstitutionalReplayResult {
+crates/amun-replay-engine/src/lib.rs:26:    AuthorityProof, CheckpointResult, ConstitutionalReplayResult, ContinuityProof,
+crates/amun-replay-engine/src/lib.rs:61:    ) -> Result<ConstitutionalReplayResult, ReplayFailure> {
+crates/amun-replay-engine/src/lib.rs:77:        Ok(ConstitutionalReplayResult {
+crates/amun-replay-semantics/src/lib.rs:23:pub struct ReplayCertificate {
+crates/amun-replay-semantics/src/lib.rs:30:impl ReplayCertificate {
+crates/amun-replay-semantics/src/lib.rs:48:    pub fn verify(&self, a: &ReplayCertificate, b: &ReplayCertificate) -> bool {
+crates/amun-replay-semantics/src/lib.rs:49:        match self { ReplayEquivalence::Strict => a.certificate_hash == b.certificate_hash, ReplayEquivalence::Semantic => ReplayCertificate::prove_equivalence(a, b), ReplayEquivalence::EpochBounded(ep) => a.epoch.epoch_id == ep.epoch_id && b.epoch.epoch_id == ep.epoch_id && ReplayCertificate::prove_equivalence(a, b) }
+crates/amun-replay-semantics/src/lib.rs:67:pub struct ReplayWitness { pub start_sequence: u64, pub end_sequence: u64, pub pre_state_root: [u8; 32], pub post_state_root: [u8; 32], pub transcript_fragment_hash: [u8; 32], pub witness_data: Vec<u8> }
+crates/amun-replay-semantics/src/lib.rs:70:pub struct ReplayCheckpoint { pub sequence: u64, pub state_root: [u8; 32], pub transcript_chain_hash: [u8; 32], pub certificate: ReplayCertificate }
+crates/amun-replay-semantics/src/lib.rs:75:    pub fn replay_determinism(a: &ReplayCertificate, b: &ReplayCertificate) -> Result<(), ReplayFailure> {
+crates/amun-replay-semantics/src/lib.rs:87:    #[test] fn test_cert_self_verifying() { assert!(ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1).verify()); }
+crates/amun-replay-semantics/src/lib.rs:88:    #[test] fn test_cert_tamper_detected() { let mut c = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1); c.state_root = [0xFF;32]; assert!(!c.verify()); }
+crates/amun-replay-semantics/src/lib.rs:89:    #[test] fn test_equivalence_strict() { let c = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1); assert!(ReplayEquivalence::Strict.verify(&c, &c)); }
+crates/amun-replay-semantics/src/lib.rs:90:    #[test] fn test_law_determinism_divergence() { let a = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1); let b = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0xFF;32], [0x03;32], [0x04;32], tb(), 100, 1); assert!(laws::replay_determinism(&a, &b).is_err()); }
+crates/amun-replay-verifier/src/replay_verifier.rs:13:pub enum ReplayResult {
+crates/amun-replay-verifier/src/replay_verifier.rs:28:pub struct ReplayVerifier;
+crates/amun-replay-verifier/src/replay_verifier.rs:30:impl ReplayVerifier {
+crates/amun-replay-verifier/src/replay_verifier.rs:36:    ) -> ReplayResult {
+crates/amun-replay-verifier/src/replay_verifier.rs:86:                    return ReplayResult::Divergence {
+crates/amun-replay-verifier/src/replay_verifier.rs:93:                    return ReplayResult::Divergence {
+crates/amun-replay-verifier/src/replay_verifier.rs:100:                    return ReplayResult::Divergence {
+crates/amun-replay-verifier/src/replay_verifier.rs:106:                ReplayResult::Match {
+crates/amun-replay-verifier/src/replay_verifier.rs:111:            Ok(PipelineResult::Rejected { evidence, .. }) => ReplayResult::Error {
+crates/amun-replay-verifier/src/replay_verifier.rs:114:            Err(e) => ReplayResult::Error { reason: e },
+crates/amun-replay-verifier/src/replay_verifier.rs:155:            ReplayVerifier::replay(&proof, &p, &mut r2, &[]),
+crates/amun-replay-verifier/src/replay_verifier.rs:156:            ReplayResult::Match { .. }
+crates/amun-replay-verifier/src/replay_verifier.rs:186:            ReplayVerifier::replay(&proof, &p, &mut r2, &[]),
+crates/amun-replay-verifier/src/replay_verifier.rs:187:            ReplayResult::Match { .. }
+crates/amun-replay-verifier/src/replay_verifier.rs:217:                ReplayVerifier::replay(&proof, &p, &mut f, &[]),
+crates/amun-replay-verifier/src/replay_verifier.rs:218:                ReplayResult::Match { .. }
+crates/amun-replay/src/certificate.rs:1:use crate::validation::ReplayResult;
+crates/amun-replay/src/certificate.rs:6:pub struct ReplayCertificate {
+crates/amun-replay/src/certificate.rs:17:impl ReplayCertificate {
+crates/amun-replay/src/certificate.rs:19:        result: &ReplayResult,
+crates/amun-replay/src/certificate.rs:81:pub struct ReplayCertificateStore {
+crates/amun-replay/src/certificate.rs:82:    certificates: HashMap<[u8; 32], ReplayCertificate>,
+crates/amun-replay/src/certificate.rs:86:impl ReplayCertificateStore {
+crates/amun-replay/src/certificate.rs:91:    pub fn store(&mut self, cert: ReplayCertificate) -> Result<(), &'static str> {
+crates/amun-replay/src/certificate.rs:115:    pub fn latest(&self) -> Option<&ReplayCertificate> {
+crates/amun-replay/src/certificate.rs:126:    use crate::validation::{ReplayResult, ReplayValidator};
+crates/amun-replay/src/certificate.rs:139:    fn valid_result() -> ReplayResult {
+crates/amun-replay/src/certificate.rs:149:        let genesis = ReplayCertificate::genesis([0xAA; 32], 1000);
+crates/amun-replay/src/certificate.rs:157:        let mut store = ReplayCertificateStore::new();
+crates/amun-replay/src/certificate.rs:158:        let genesis = ReplayCertificate::genesis([0xAA; 32], 1000);
+crates/amun-replay/src/certificate.rs:162:        let cert1 = ReplayCertificate::issue(&result, 3, prev_id, [0xAA; 32], 2000).unwrap();
+crates/amun-replay/src/certificate.rs:165:        let cert2 = ReplayCertificate::issue(&result, 6, prev_id2, [0xAA; 32], 3000).unwrap();
+crates/amun-replay/src/certificate.rs:172:        let mut store = ReplayCertificateStore::new();
+crates/amun-replay/src/certificate.rs:173:        let genesis = ReplayCertificate::genesis([0xAA; 32], 1000);
+crates/amun-replay/src/certificate.rs:176:        let mut cert = ReplayCertificate::issue(&result, 3, [0xFF; 32], [0xAA; 32], 2000).unwrap();
+crates/amun-replay/src/certificate.rs:183:        let mut store = ReplayCertificateStore::new();
+crates/amun-replay/src/certificate.rs:184:        let genesis = ReplayCertificate::genesis([0xAA; 32], 1000);
+crates/amun-replay/src/certificate.rs:188:        let mut cert = ReplayCertificate::issue(&result, 3, prev_id, [0xAA; 32], 2000).unwrap();
+crates/amun-replay/src/certificate.rs:195:        let mut store = ReplayCertificateStore::new();
+crates/amun-replay/src/certificate.rs:197:            .store(ReplayCertificate::genesis([0xAA; 32], 1000))
+crates/amun-replay/src/certificate.rs:202:            .store(ReplayCertificate::issue(&r, 3, id1, [0xAA; 32], 2000).unwrap())
+crates/amun-replay/src/certificate.rs:206:            .store(ReplayCertificate::issue(&r, 6, id2, [0xAA; 32], 3000).unwrap())
+crates/amun-replay/src/lib.rs:36:pub use certificate::{ReplayCertificate, ReplayCertificateStore};
+crates/amun-replay/src/lib.rs:38:pub use validation::{ReplayResult, ReplayValidator};
+crates/amun-replay/src/store.rs:1:use amun_constitutional_state::ReplayCertificate;
+crates/amun-replay/src/store.rs:4:/// Stores ReplayCertificates keyed by their certificate_hash.
+crates/amun-replay/src/store.rs:7:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-replay/src/store.rs:18:    pub fn insert(&mut self, cert: ReplayCertificate) {
+crates/amun-replay/src/store.rs:24:    pub fn get(&self, hash: &[u8; 32]) -> Option<&ReplayCertificate> {
+crates/amun-replay/src/store.rs:50:/// A generic interface for retrieving ReplayCertificates by hash.
+crates/amun-replay/src/store.rs:52:    fn get_certificate(&self, hash: &[u8; 32]) -> Option<ReplayCertificate>;
+crates/amun-replay/src/store.rs:56:    fn get_certificate(&self, hash: &[u8; 32]) -> Option<ReplayCertificate> {
+crates/amun-replay/src/validation.rs:4:pub struct ReplayResult {
+crates/amun-replay/src/validation.rs:11:impl ReplayResult {
+crates/amun-replay/src/validation.rs:34:    pub fn validate(commits: &[StateCommit]) -> ReplayResult {
+crates/amun-replay/src/validation.rs:36:            return ReplayResult::success([0u8; 32], 0);
+crates/amun-replay/src/validation.rs:42:                return ReplayResult::failure(prev.new_root, curr.previous_root, i);
+crates/amun-replay/src/validation.rs:48:        ReplayResult::success(last.new_root, commits.len())
+crates/amun-replay/src/validation.rs:51:    pub fn validate_log(log: &CommitLog) -> ReplayResult {
+crates/amun-state-root/src/lib.rs:13:pub use replay::{ReplayCertificate, ReplayEquivalenceProof, ReplayTranscript};
+crates/amun-state-root/src/replay.rs:42:pub struct ReplayCertificate {
+crates/amun-state-root/src/replay.rs:47:impl CanonicalEncode for ReplayCertificate {
+crates/amun-stateless-sync/src/lib.rs:34:use amun_constitutional_state::{CertificateInclusionProof, ReplayCertificate};
+crates/amun-stateless-sync/src/lib.rs:59:        certificates: Vec<ReplayCertificate>,
+crates/amun-stateless-sync/src/lib.rs:80:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-stateless-sync/src/lib.rs:105:    pub fn import_certificate(&mut self, cert: ReplayCertificate) {
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:33:| StateRootMismatch | ReplayVerifier divergence | Quarantine state, resync from trusted peer |
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:83:pub struct ReplayVerifier;
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:84:impl ReplayVerifier {
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:85:    pub fn verify_full_replay(wal_path: &str) -> Result<([u8; 32], u64), String> {
+crates/amun-storage-kernel/src/persistence/wal/mod.rs:5:pub use iterator::{ReplayVerifier, WalIterator};
+crates/amun-storage-kernel/tests/replay_equivalence.rs:4:        persistence::wal::{ReplayVerifier, WalEntry},
+crates/amun-storage-kernel/tests/replay_equivalence.rs:54:            ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap()).unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs:94:        let result = ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap());
+crates/amun-storage-kernel/tests/replay_equivalence.rs:136:        let result = ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap());
+crates/amun-testnet-sim/tests/adversarial_tests.rs:7:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-testnet-sim/tests/adversarial_tests.rs:209:                                                    // Actually, ReplayVerifier::replay calls execute() which starts
+crates/amun-testnet-sim/tests/adversarial_tests.rs:212:                let replay = ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:213:                if !matches!(replay, ReplayResult::Match { .. }) {
+crates/amun-transcript-semantics/src/lib.rs:59:pub struct ImmutableReplayCertificate { inner: CertifiedEnvelope }
+crates/amun-transcript-semantics/src/lib.rs:62:impl ImmutableReplayCertificate {
+crates/amun-transcript-semantics/src/lib.rs:78:pub enum ReplayWitness {
+crates/amun-transcript-semantics/src/lib.rs:83:    CompositeWitness { witnesses: Vec<ReplayWitness>, composite_hash: [u8; 32] },
+crates/amun-transcript-semantics/src/lib.rs:85:impl ReplayWitness {
+crates/amun-transcript-semantics/src/lib.rs:88:        match self { ReplayWitness::MerkleWitness { leaf_hash, proof_hashes, leaf_index } => { h.update(b"MERKLE"); h.update(leaf_hash); h.update(leaf_index.to_le_bytes()); for ph in proof_hashes { h.update(ph); } } ReplayWitness::ExecutionWitness { block_hash, trace_hash, step_count } => { h.update(b"EXECUTION"); h.update(block_hash); h.update(trace_hash); h.update(step_count.to_le_bytes()); } ReplayWitness::TranscriptWitness { start_sequence, end_sequence, fragment_hash } => { h.update(b"TRANSCRIPT"); h.update(start_sequence.to_le_bytes()); h.update(end_sequence.to_le_bytes()); h.update(fragment_hash); } ReplayWitness::ReceiptWitness { receipt_hashes, chain_root } => { h.update(b"RECEIPT"); for rh in receipt_hashes { h.update(rh); } h.update(chain_root); } ReplayWitness::CompositeWitness { composite_hash, .. } => { h.update(b"COMPOSITE"); h.update(composite_hash); } }
+crates/amun-transcript-semantics/src/lib.rs:104:    #[test] fn test_immutable_cert() { let c = ImmutableReplayCertificate::new(ReplayDomain::Consensus,[0xBB;32],[0x01;32],[0x02;32],[0x03;32],[0x04;32],100,1); assert!(c.verify()); let h1 = c.certificate_hash(); let h2 = c.certificate_hash(); assert_eq!(h1, h2); }
+crates/amun-transcript-semantics/src/lib.rs:105:    #[test] fn test_witness_hash() { let w = ReplayWitness::MerkleWitness { leaf_hash: [0x01;32], proof_hashes: vec![[0x02;32]], leaf_index: 0 }; assert_ne!(w.witness_hash(), [0;32]); }
+crates/amun_state_machine/src/certification/mod.rs:61:pub struct ReplayCertificate {
+crates/amun_state_machine/src/certification/mod.rs:70:impl ReplayCertificate {
+crates/amun_state_machine/src/lib.rs:24:pub use certification::{ExecutionCertificate, ReplayCertificate, compute_execution_fingerprint};
+docs/N126_FINAL_BASELINE.md:45:1. ReplayVerifier integration (ReplayDeterminism)
+docs/REPLAY_LAW.md:3:## Phase 81 — Deterministic Replay Constitution
+docs/constitutional/phase84_freeze.md:54:- ReplayVerifier checks every frame's state_root against reconstructed state

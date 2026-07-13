@@ -1,0 +1,1500 @@
+crates/amun-consensus-network/src/staking_adapter.rs-328-        let result1 = adapter.try_slash(&validator_id).unwrap();
+crates/amun-consensus-network/src/staking_adapter.rs-329-        assert!(result1.amount_slashed > 0);
+crates/amun-consensus-network/src/staking_adapter.rs-330-
+crates/amun-consensus-network/src/staking_adapter.rs-331-        // More offenses → score increases → should be slashable again
+crates/amun-consensus-network/src/staking_adapter.rs-332-        adapter.registry.record_misbehavior(
+crates/amun-consensus-network/src/staking_adapter.rs-333-            &validator_id,
+crates/amun-consensus-network/src/staking_adapter.rs-334-            &[0xD4; 32],
+crates/amun-consensus-network/src/staking_adapter.rs:335:            &EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/staking_adapter.rs-336-            4,
+crates/amun-consensus-network/src/staking_adapter.rs-337-        );
+crates/amun-consensus-network/src/staking_adapter.rs-338-        adapter.registry.record_misbehavior(
+crates/amun-consensus-network/src/staking_adapter.rs-339-            &validator_id,
+crates/amun-consensus-network/src/staking_adapter.rs-340-            &[0xD5; 32],
+crates/amun-consensus-network/src/staking_adapter.rs:341:            &EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/staking_adapter.rs-342-            5,
+crates/amun-consensus-network/src/staking_adapter.rs-343-        );
+crates/amun-consensus-network/src/staking_adapter.rs-344-        adapter.registry.record_misbehavior(
+crates/amun-consensus-network/src/staking_adapter.rs-345-            &validator_id,
+crates/amun-consensus-network/src/staking_adapter.rs-346-            &[0xD6; 32],
+crates/amun-consensus-network/src/staking_adapter.rs:347:            &EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/staking_adapter.rs-348-            6,
+crates/amun-consensus-network/src/staking_adapter.rs-349-        );
+crates/amun-consensus-network/src/staking_adapter.rs-350-
+crates/amun-consensus-network/src/staking_adapter.rs-351-        let result2 = adapter.try_slash(&validator_id).unwrap();
+crates/amun-consensus-network/src/staking_adapter.rs-352-        assert!(result2.amount_slashed > 0);
+crates/amun-consensus-network/src/staking_adapter.rs-353-        assert!(
+crates/amun-consensus-network/src/staking_adapter.rs-354-            result2.offense_count > result1.offense_count,
+crates/amun-consensus-network/src/staking_adapter.rs-355-            "Second slash should have higher offense_count"
+--
+crates/amun-consensus-network/src/staking_adapter.rs-369-
+crates/amun-consensus-network/src/staking_adapter.rs-370-        let registry =
+crates/amun-consensus-network/src/staking_adapter.rs-371-            MisbehaviorRegistry::new(crate::misbehavior_registry::MisbehaviorThresholds::default());
+crates/amun-consensus-network/src/staking_adapter.rs-372-        let mut adapter = StakingAdapter::new(registry, staking);
+crates/amun-consensus-network/src/staking_adapter.rs-373-
+crates/amun-consensus-network/src/staking_adapter.rs-374-        // Validator 1: commit offenses
+crates/amun-consensus-network/src/staking_adapter.rs-375-        adapter
+crates/amun-consensus-network/src/staking_adapter.rs-376-            .registry
+crates/amun-consensus-network/src/staking_adapter.rs:377:            .record_misbehavior(&[1u8; 32], &[0xE1; 32], &EvidenceType::DoubleVote, 1);
+crates/amun-consensus-network/src/staking_adapter.rs-378-        adapter
+crates/amun-consensus-network/src/staking_adapter.rs-379-            .registry
+crates/amun-consensus-network/src/staking_adapter.rs:380:            .record_misbehavior(&[1u8; 32], &[0xE2; 32], &EvidenceType::DoubleVote, 2);
+crates/amun-consensus-network/src/staking_adapter.rs-381-        adapter
+crates/amun-consensus-network/src/staking_adapter.rs-382-            .registry
+crates/amun-consensus-network/src/staking_adapter.rs:383:            .record_misbehavior(&[1u8; 32], &[0xE3; 32], &EvidenceType::DoubleVote, 3);
+crates/amun-consensus-network/src/staking_adapter.rs-384-
+crates/amun-consensus-network/src/staking_adapter.rs-385-        // Validator 1 should be slashed
+crates/amun-consensus-network/src/staking_adapter.rs-386-        let r1 = adapter.try_slash(&[1u8; 32]);
+crates/amun-consensus-network/src/staking_adapter.rs-387-        assert!(r1.is_some());
+crates/amun-consensus-network/src/staking_adapter.rs-388-
+crates/amun-consensus-network/src/staking_adapter.rs-389-        // Validator 2 should NOT be slashed (no offenses)
+crates/amun-consensus-network/src/staking_adapter.rs-390-        let r2 = adapter.try_slash(&[2u8; 32]);
+crates/amun-consensus-network/src/staking_adapter.rs-391-        assert!(r2.is_none());
+--
+crates/amun-consensus-network/src/staking_adapter.rs-397-    /// N115: Unsigned certificate is rejected before slash execution
+crates/amun-consensus-network/src/staking_adapter.rs-398-    #[test]
+crates/amun-consensus-network/src/staking_adapter.rs-399-    fn n115_unsigned_certificate_rejected_before_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs-400-        let mut staking = SimulatedStaking::new();
+crates/amun-consensus-network/src/staking_adapter.rs-401-        let validator_id = [0x42; 32];
+crates/amun-consensus-network/src/staking_adapter.rs-402-        staking.set_stake(validator_id, 100_000);
+crates/amun-consensus-network/src/staking_adapter.rs-403-
+crates/amun-consensus-network/src/staking_adapter.rs-404-        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+crates/amun-consensus-network/src/staking_adapter.rs:405:        registry.record_misbehavior(&validator_id, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+crates/amun-consensus-network/src/staking_adapter.rs:406:        registry.record_misbehavior(&validator_id, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+crates/amun-consensus-network/src/staking_adapter.rs:407:        registry.record_misbehavior(&validator_id, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+crates/amun-consensus-network/src/staking_adapter.rs-408-
+crates/amun-consensus-network/src/staking_adapter.rs-409-        let mut adapter = StakingAdapter::new(registry, staking);
+crates/amun-consensus-network/src/staking_adapter.rs-410-
+crates/amun-consensus-network/src/staking_adapter.rs-411-        // Create an unsigned certificate
+crates/amun-consensus-network/src/staking_adapter.rs-412-        let cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs-413-            validator_id,
+crates/amun-consensus-network/src/staking_adapter.rs-414-            30,
+crates/amun-consensus-network/src/staking_adapter.rs-415-            vec![[0xA1; 32]],
+--
+crates/amun-consensus-network/src/staking_adapter.rs-433-    /// N115: Signed certificate executes slash successfully
+crates/amun-consensus-network/src/staking_adapter.rs-434-    #[test]
+crates/amun-consensus-network/src/staking_adapter.rs-435-    fn n115_signed_certificate_executes_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs-436-        let mut staking = SimulatedStaking::new();
+crates/amun-consensus-network/src/staking_adapter.rs-437-        let validator_id = [0x42; 32];
+crates/amun-consensus-network/src/staking_adapter.rs-438-        staking.set_stake(validator_id, 100_000);
+crates/amun-consensus-network/src/staking_adapter.rs-439-
+crates/amun-consensus-network/src/staking_adapter.rs-440-        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+crates/amun-consensus-network/src/staking_adapter.rs:441:        registry.record_misbehavior(&validator_id, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+crates/amun-consensus-network/src/staking_adapter.rs:442:        registry.record_misbehavior(&validator_id, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+crates/amun-consensus-network/src/staking_adapter.rs:443:        registry.record_misbehavior(&validator_id, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+crates/amun-consensus-network/src/staking_adapter.rs-444-
+crates/amun-consensus-network/src/staking_adapter.rs-445-        let mut adapter = StakingAdapter::new(registry, staking);
+crates/amun-consensus-network/src/staking_adapter.rs-446-
+crates/amun-consensus-network/src/staking_adapter.rs-447-        // Create and sign a certificate
+crates/amun-consensus-network/src/staking_adapter.rs-448-        let mut cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs-449-            validator_id,
+crates/amun-consensus-network/src/staking_adapter.rs-450-            30,
+crates/amun-consensus-network/src/staking_adapter.rs-451-            vec![[0xA1; 32]],
+--
+crates/amun-consensus-network/src/staking_adapter.rs-476-    /// N115: Tampered certificate is rejected
+crates/amun-consensus-network/src/staking_adapter.rs-477-    #[test]
+crates/amun-consensus-network/src/staking_adapter.rs-478-    fn n115_tampered_certificate_rejected_before_slash() {
+crates/amun-consensus-network/src/staking_adapter.rs-479-        let mut staking = SimulatedStaking::new();
+crates/amun-consensus-network/src/staking_adapter.rs-480-        let validator_id = [0x42; 32];
+crates/amun-consensus-network/src/staking_adapter.rs-481-        staking.set_stake(validator_id, 100_000);
+crates/amun-consensus-network/src/staking_adapter.rs-482-
+crates/amun-consensus-network/src/staking_adapter.rs-483-        let mut registry = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+crates/amun-consensus-network/src/staking_adapter.rs:484:        registry.record_misbehavior(&validator_id, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+crates/amun-consensus-network/src/staking_adapter.rs:485:        registry.record_misbehavior(&validator_id, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+crates/amun-consensus-network/src/staking_adapter.rs:486:        registry.record_misbehavior(&validator_id, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+crates/amun-consensus-network/src/staking_adapter.rs-487-
+crates/amun-consensus-network/src/staking_adapter.rs-488-        let mut adapter = StakingAdapter::new(registry, staking);
+crates/amun-consensus-network/src/staking_adapter.rs-489-
+crates/amun-consensus-network/src/staking_adapter.rs-490-        let mut cert = crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs-491-            validator_id,
+crates/amun-consensus-network/src/staking_adapter.rs-492-            30,
+crates/amun-consensus-network/src/staking_adapter.rs-493-            vec![[0xA1; 32]],
+crates/amun-consensus-network/src/staking_adapter.rs-494-            vec![],
+--
+crates/amun-consensus-network/src/staking_adapter.rs-514-    }
+crates/amun-consensus-network/src/staking_adapter.rs-515-
+crates/amun-consensus-network/src/staking_adapter.rs-516-    #[test]
+crates/amun-consensus-network/src/staking_adapter.rs-517-    fn n118_2a_unfinalized_certificate_rejected() {
+crates/amun-consensus-network/src/staking_adapter.rs-518-        let mut staking = SimulatedStaking::new();
+crates/amun-consensus-network/src/staking_adapter.rs-519-        let vid = [0x42; 32];
+crates/amun-consensus-network/src/staking_adapter.rs-520-        staking.set_stake(vid, 100_000);
+crates/amun-consensus-network/src/staking_adapter.rs-521-        let mut reg = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+crates/amun-consensus-network/src/staking_adapter.rs:522:        reg.record_misbehavior(&vid, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+crates/amun-consensus-network/src/staking_adapter.rs:523:        reg.record_misbehavior(&vid, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+crates/amun-consensus-network/src/staking_adapter.rs:524:        reg.record_misbehavior(&vid, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+crates/amun-consensus-network/src/staking_adapter.rs-525-        let mut adapter = StakingAdapter::new(reg, staking);
+crates/amun-consensus-network/src/staking_adapter.rs-526-        let mut cert = crate::MultiSignerCertificate::new(
+crates/amun-consensus-network/src/staking_adapter.rs-527-            crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs-528-                vid,
+crates/amun-consensus-network/src/staking_adapter.rs-529-                30,
+crates/amun-consensus-network/src/staking_adapter.rs-530-                vec![[0xA1; 32]],
+crates/amun-consensus-network/src/staking_adapter.rs-531-                vec![],
+crates/amun-consensus-network/src/staking_adapter.rs-532-                1500,
+--
+crates/amun-consensus-network/src/staking_adapter.rs-550-    }
+crates/amun-consensus-network/src/staking_adapter.rs-551-
+crates/amun-consensus-network/src/staking_adapter.rs-552-    #[test]
+crates/amun-consensus-network/src/staking_adapter.rs-553-    fn n118_2b_finalized_certificate_executes() {
+crates/amun-consensus-network/src/staking_adapter.rs-554-        let mut staking = SimulatedStaking::new();
+crates/amun-consensus-network/src/staking_adapter.rs-555-        let vid = [0x42; 32];
+crates/amun-consensus-network/src/staking_adapter.rs-556-        staking.set_stake(vid, 100_000);
+crates/amun-consensus-network/src/staking_adapter.rs-557-        let mut reg = MisbehaviorRegistry::new(MisbehaviorThresholds::default());
+crates/amun-consensus-network/src/staking_adapter.rs:558:        reg.record_misbehavior(&vid, &[0xA1; 32], &EvidenceType::DoubleVote, 1);
+crates/amun-consensus-network/src/staking_adapter.rs:559:        reg.record_misbehavior(&vid, &[0xA2; 32], &EvidenceType::DoubleVote, 2);
+crates/amun-consensus-network/src/staking_adapter.rs:560:        reg.record_misbehavior(&vid, &[0xA3; 32], &EvidenceType::DoubleVote, 3);
+crates/amun-consensus-network/src/staking_adapter.rs-561-        let mut adapter = StakingAdapter::new(reg, staking);
+crates/amun-consensus-network/src/staking_adapter.rs-562-        let mut cert = crate::MultiSignerCertificate::new(
+crates/amun-consensus-network/src/staking_adapter.rs-563-            crate::SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/staking_adapter.rs-564-                vid,
+crates/amun-consensus-network/src/staking_adapter.rs-565-                30,
+crates/amun-consensus-network/src/staking_adapter.rs-566-                vec![[0xA1; 32]],
+crates/amun-consensus-network/src/staking_adapter.rs-567-                vec![],
+crates/amun-consensus-network/src/staking_adapter.rs-568-                1500,
+--
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-1-// ============================================================================
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:2:// N111.6 — Certificate Evidence Validation
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-3-// ============================================================================
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-4-// Enforces that a SlashingCertificate is only accepted when ALL evidence
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:5:// IDs it references are present in the local EvidenceStore.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-6-//
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-7-// This closes the critical limitation documented in v0.4.0-N110:
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:8:// "Evidence propagation is not yet network-wide."
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-9-//
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-10-// After N111.6:
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-11-//   - Certificate with missing evidence → rejected
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:12://   - Missing evidence → MissingEvidenceRequest sent to peers
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:13://   - Evidence received → certificate retried → accepted
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-14-// ============================================================================
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-15-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:16:use crate::evidence_store::EvidenceStore;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:17:use crate::messages::{MissingEvidenceRequest, MissingEvidenceResponse};
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-18-use crate::slashing_certificate::SlashingCertificate;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-19-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-20-/// N111.6: Result of validating a certificate's evidence availability.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-21-#[derive(Debug, Clone, PartialEq)]
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:22:pub enum EvidenceValidationResult {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-23-    /// All evidence IDs are present locally — certificate can be accepted.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-24-    AllPresent,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-25-    /// Some evidence IDs are missing — request them from peers.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:26:    MissingEvidence { missing_ids: Vec<[u8; 32]> },
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-27-}
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-28-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-29-/// N111.6: Check that every evidence_id referenced by a certificate
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:30:/// exists in the local EvidenceStore.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-31-pub fn validate_certificate_evidence(
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-32-    cert: &SlashingCertificate,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:33:    evidence_store: &EvidenceStore,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:34:) -> EvidenceValidationResult {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-35-    let mut missing = Vec::new();
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-36-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-37-    for evidence_id in &cert.evidence_ids {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-38-        if evidence_store.get_by_id(evidence_id).is_none() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-39-            missing.push(*evidence_id);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-40-        }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-41-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-42-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-43-    if missing.is_empty() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:44:        EvidenceValidationResult::AllPresent
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-45-    } else {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:46:        EvidenceValidationResult::MissingEvidence {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-47-            missing_ids: missing,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-48-        }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-49-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-50-}
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-51-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:52:/// N111.6: Build a MissingEvidenceRequest for the given evidence IDs.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-53-pub fn build_missing_evidence_request(
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-54-    requester_id: [u8; 32],
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-55-    missing_ids: Vec<[u8; 32]>,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:56:) -> MissingEvidenceRequest {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:57:    MissingEvidenceRequest {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-58-        requester_id,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-59-        evidence_ids: missing_ids,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-60-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-61-}
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-62-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:63:/// N111.6: Process a MissingEvidenceResponse by extracting the evidence
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-64-/// records from the serialized data.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-65-/// Returns the number of evidence records successfully imported.
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-66-pub fn process_evidence_response(
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:67:    response: &MissingEvidenceResponse,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:68:    evidence_store: &mut EvidenceStore,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-69-) -> Result<usize, String> {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-70-    let mut imported = 0;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-71-    for data in &response.evidence_data {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:72:        let record: crate::evidence_store::EvidenceRecord = postcard::from_bytes(data)
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-73-            .map_err(|e| format!("Failed to decode evidence record: {}", e))?;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-74-        if evidence_store.store_evidence(record) {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-75-            imported += 1;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-76-        }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-77-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-78-    Ok(imported)
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-79-}
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-80-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-81-#[cfg(test)]
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-82-mod tests {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-83-    use super::*;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:84:    use crate::evidence_store::{EvidenceRecord, EvidenceStore, EvidenceType};
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-85-    use crate::misbehavior_registry::ValidatorStatus;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:86:    use crate::slashing_certificate::{EvidenceCount, SlashingCertificate};
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-87-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-88-    fn make_cert_with_evidence_ids(ids: Vec<[u8; 32]>) -> SlashingCertificate {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-89-        SlashingCertificate::from_slash_result(
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-90-            [0x42; 32],
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-91-            30,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-92-            ids,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:93:            vec![EvidenceCount {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:94:                evidence_type: EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-95-                count: 3,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-96-                weight: 30,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-97-            }],
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-98-            1500,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-99-            15000,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-100-            85000,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-101-            3,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-102-            ValidatorStatus::SlashEligible,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-103-            100,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-104-        )
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-105-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-106-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-107-    /// N111.6 GATEKEEPER: Certificate rejected when evidence is missing
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-108-    #[test]
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-109-    fn n111_6_certificate_rejected_when_evidence_missing() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:110:        let store = EvidenceStore::new();
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-111-        let cert = make_cert_with_evidence_ids(vec![[0xA1; 32], [0xA2; 32]]);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-112-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-113-        let result = validate_certificate_evidence(&cert, &store);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-114-        match result {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:115:            EvidenceValidationResult::MissingEvidence { missing_ids } => {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-116-                assert_eq!(missing_ids.len(), 2);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-117-                assert!(missing_ids.contains(&[0xA1; 32]));
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-118-                assert!(missing_ids.contains(&[0xA2; 32]));
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-119-            }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:120:            _ => panic!("Expected MissingEvidence, got {:?}", result),
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-121-        }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-122-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-123-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-124-    /// N111.6: Certificate accepted when all evidence is present
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-125-    #[test]
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-126-    fn n111_6_certificate_accepted_after_evidence_sync() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:127:        let mut store = EvidenceStore::new();
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-128-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-129-        // Store the required evidence
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:130:        let e1 = EvidenceRecord::new([0x42; 32], 1, EvidenceType::DoubleVote, 1000, vec![1]);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:131:        let e2 = EvidenceRecord::new([0x42; 32], 2, EvidenceType::DoubleVote, 2000, vec![2]);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-132-        let id1 = e1.evidence_id;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-133-        let id2 = e2.evidence_id;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-134-        store.store_evidence(e1);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-135-        store.store_evidence(e2);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-136-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-137-        let cert = make_cert_with_evidence_ids(vec![id1, id2]);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-138-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-139-        let result = validate_certificate_evidence(&cert, &store);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:140:        assert_eq!(result, EvidenceValidationResult::AllPresent);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-141-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-142-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-143-    /// N111.6: Partial evidence → still rejected
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-144-    #[test]
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-145-    fn n111_6_partial_evidence_still_rejected() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:146:        let mut store = EvidenceStore::new();
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:147:        let e1 = EvidenceRecord::new([0x42; 32], 1, EvidenceType::DoubleVote, 1000, vec![1]);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-148-        let id1 = e1.evidence_id;
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-149-        store.store_evidence(e1);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-150-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-151-        let cert = make_cert_with_evidence_ids(vec![id1, [0xFF; 32]]);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-152-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-153-        let result = validate_certificate_evidence(&cert, &store);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-154-        match result {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:155:            EvidenceValidationResult::MissingEvidence { missing_ids } => {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-156-                assert_eq!(missing_ids.len(), 1);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-157-                assert!(missing_ids.contains(&[0xFF; 32]));
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-158-            }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:159:            _ => panic!("Expected MissingEvidence"),
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-160-        }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-161-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-162-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-163-    /// N111.6: Build missing evidence request
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-164-    #[test]
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-165-    fn n111_6_build_missing_evidence_request() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-166-        let req = build_missing_evidence_request([0xAA; 32], vec![[0xB1; 32], [0xB2; 32]]);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-167-        assert_eq!(req.requester_id, [0xAA; 32]);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-168-        assert_eq!(req.evidence_ids.len(), 2);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-169-    }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-170-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-171-    /// N111.6: Process evidence response imports records
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-172-    #[test]
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-173-    fn n111_6_process_evidence_response() {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:174:        let mut store = EvidenceStore::new();
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:175:        let evidence = EvidenceRecord::new(
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-176-            [0x42; 32],
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-177-            5,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:178:            EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-179-            5000,
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-180-            vec![7, 8, 9],
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-181-        );
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-182-        let encoded = postcard::to_stdvec(&evidence).unwrap();
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-183-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:184:        let response = MissingEvidenceResponse {
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-185-            responder_id: [0xCC; 32],
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-186-            evidence_data: vec![encoded],
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-187-        };
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-188-
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-189-        let imported = process_evidence_response(&response, &mut store).unwrap();
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-190-        assert_eq!(imported, 1);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-191-        assert_eq!(store.len(), 1);
+crates/amun-consensus-network/src/certificate_evidence_validation.rs-192-    }
+--
+crates/amun-consensus-network/src/evidence_push_processor.rs:1:// N112.3 — Automatic Peer Evidence Propagation
+crates/amun-consensus-network/src/evidence_push_processor.rs-2-// ==============================================
+crates/amun-consensus-network/src/evidence_push_processor.rs:3:// When a node receives an EvidencePushMessage, it automatically
+crates/amun-consensus-network/src/evidence_push_processor.rs:4:// imports the evidence records into its EvidenceStore without
+crates/amun-consensus-network/src/evidence_push_processor.rs:5:// requiring a MissingEvidenceRequest.  This eliminates the pull
+crates/amun-consensus-network/src/evidence_push_processor.rs-6-// dependency for evidence that peers proactively push.
+crates/amun-consensus-network/src/evidence_push_processor.rs-7-
+crates/amun-consensus-network/src/evidence_push_processor.rs:8:use crate::evidence_gossip::EvidenceGossip;
+crates/amun-consensus-network/src/evidence_push_processor.rs:9:use crate::evidence_push::EvidencePush;
+crates/amun-consensus-network/src/evidence_push_processor.rs:10:use crate::evidence_store::{EvidenceRecord, EvidenceStore};
+crates/amun-consensus-network/src/evidence_push_processor.rs-11-
+crates/amun-consensus-network/src/evidence_push_processor.rs-12-/// Result of processing an incoming evidence push.
+crates/amun-consensus-network/src/evidence_push_processor.rs-13-#[derive(Debug, Clone, PartialEq)]
+crates/amun-consensus-network/src/evidence_push_processor.rs-14-pub struct PushProcessResult {
+crates/amun-consensus-network/src/evidence_push_processor.rs-15-    pub total_received: usize,
+crates/amun-consensus-network/src/evidence_push_processor.rs-16-    pub newly_imported: usize,
+crates/amun-consensus-network/src/evidence_push_processor.rs-17-    pub duplicates: usize,
+crates/amun-consensus-network/src/evidence_push_processor.rs-18-}
+crates/amun-consensus-network/src/evidence_push_processor.rs-19-
+crates/amun-consensus-network/src/evidence_push_processor.rs:20:/// N112.3: Process an incoming EvidencePushMessage.
+crates/amun-consensus-network/src/evidence_push_processor.rs:21:/// Decodes each serialized EvidenceRecord and stores it locally.
+crates/amun-consensus-network/src/evidence_push_processor.rs-22-/// Records that already exist (deduplication) are counted but not
+crates/amun-consensus-network/src/evidence_push_processor.rs-23-/// re-stored.
+crates/amun-consensus-network/src/evidence_push_processor.rs-24-pub fn process_incoming_evidence_push(
+crates/amun-consensus-network/src/evidence_push_processor.rs-25-    serialized_records: &[Vec<u8>],
+crates/amun-consensus-network/src/evidence_push_processor.rs:26:    evidence_store: &mut EvidenceStore,
+crates/amun-consensus-network/src/evidence_push_processor.rs:27:    gossip: &mut EvidenceGossip,
+crates/amun-consensus-network/src/evidence_push_processor.rs:28:    push: &mut EvidencePush,
+crates/amun-consensus-network/src/evidence_push_processor.rs-29-) -> Result<PushProcessResult, String> {
+crates/amun-consensus-network/src/evidence_push_processor.rs-30-    let mut result = PushProcessResult {
+crates/amun-consensus-network/src/evidence_push_processor.rs-31-        total_received: serialized_records.len(),
+crates/amun-consensus-network/src/evidence_push_processor.rs-32-        newly_imported: 0,
+crates/amun-consensus-network/src/evidence_push_processor.rs-33-        duplicates: 0,
+crates/amun-consensus-network/src/evidence_push_processor.rs-34-    };
+crates/amun-consensus-network/src/evidence_push_processor.rs-35-
+crates/amun-consensus-network/src/evidence_push_processor.rs-36-    for data in serialized_records {
+crates/amun-consensus-network/src/evidence_push_processor.rs:37:        let record: EvidenceRecord = postcard::from_bytes(data)
+crates/amun-consensus-network/src/evidence_push_processor.rs-38-            .map_err(|e| format!("Failed to decode evidence record: {}", e))?;
+crates/amun-consensus-network/src/evidence_push_processor.rs-39-
+crates/amun-consensus-network/src/evidence_push_processor.rs:40:        // Store in EvidenceStore
+crates/amun-consensus-network/src/evidence_push_processor.rs-41-        if evidence_store.store_evidence(record.clone()) {
+crates/amun-consensus-network/src/evidence_push_processor.rs-42-            result.newly_imported += 1;
+crates/amun-consensus-network/src/evidence_push_processor.rs-43-
+crates/amun-consensus-network/src/evidence_push_processor.rs-44-            // Update gossip tracking
+crates/amun-consensus-network/src/evidence_push_processor.rs:45:            gossip.receive_announcement(crate::evidence_gossip::EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_push_processor.rs-46-                evidence_id: record.evidence_id,
+crates/amun-consensus-network/src/evidence_push_processor.rs-47-                validator_id: record.validator_id,
+crates/amun-consensus-network/src/evidence_push_processor.rs-48-                evidence_type: record.evidence_type.clone(),
+crates/amun-consensus-network/src/evidence_push_processor.rs-49-                height: record.height,
+crates/amun-consensus-network/src/evidence_push_processor.rs-50-                timestamp: record.timestamp,
+crates/amun-consensus-network/src/evidence_push_processor.rs-51-            });
+crates/amun-consensus-network/src/evidence_push_processor.rs-52-
+crates/amun-consensus-network/src/evidence_push_processor.rs-53-            // Mark as pushed so we don't re-push it ourselves
+--
+crates/amun-consensus-network/src/evidence_push_processor.rs-58-    }
+crates/amun-consensus-network/src/evidence_push_processor.rs-59-
+crates/amun-consensus-network/src/evidence_push_processor.rs-60-    Ok(result)
+crates/amun-consensus-network/src/evidence_push_processor.rs-61-}
+crates/amun-consensus-network/src/evidence_push_processor.rs-62-
+crates/amun-consensus-network/src/evidence_push_processor.rs-63-#[cfg(test)]
+crates/amun-consensus-network/src/evidence_push_processor.rs-64-mod tests {
+crates/amun-consensus-network/src/evidence_push_processor.rs-65-    use super::*;
+crates/amun-consensus-network/src/evidence_push_processor.rs:66:    use crate::evidence_gossip::EvidenceGossip;
+crates/amun-consensus-network/src/evidence_push_processor.rs:67:    use crate::evidence_push::EvidencePush;
+crates/amun-consensus-network/src/evidence_push_processor.rs:68:    use crate::evidence_store::{EvidenceRecord, EvidenceStore, EvidenceType};
+crates/amun-consensus-network/src/evidence_push_processor.rs-69-
+crates/amun-consensus-network/src/evidence_push_processor.rs:70:    fn make_evidence_record(id: u8) -> EvidenceRecord {
+crates/amun-consensus-network/src/evidence_push_processor.rs:71:        EvidenceRecord::new(
+crates/amun-consensus-network/src/evidence_push_processor.rs-72-            [0x42; 32],
+crates/amun-consensus-network/src/evidence_push_processor.rs-73-            id as u64,
+crates/amun-consensus-network/src/evidence_push_processor.rs:74:            EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/evidence_push_processor.rs-75-            1000 * (id as u64),
+crates/amun-consensus-network/src/evidence_push_processor.rs-76-            vec![id; 8],
+crates/amun-consensus-network/src/evidence_push_processor.rs-77-        )
+crates/amun-consensus-network/src/evidence_push_processor.rs-78-    }
+crates/amun-consensus-network/src/evidence_push_processor.rs-79-
+crates/amun-consensus-network/src/evidence_push_processor.rs-80-    #[test]
+crates/amun-consensus-network/src/evidence_push_processor.rs-81-    fn n112_3_process_push_imports_all_records() {
+crates/amun-consensus-network/src/evidence_push_processor.rs:82:        let mut store = EvidenceStore::new();
+crates/amun-consensus-network/src/evidence_push_processor.rs:83:        let mut gossip = EvidenceGossip::new();
+crates/amun-consensus-network/src/evidence_push_processor.rs:84:        let mut push = EvidencePush::default();
+crates/amun-consensus-network/src/evidence_push_processor.rs-85-
+crates/amun-consensus-network/src/evidence_push_processor.rs-86-        let records: Vec<_> = (1..=3).map(make_evidence_record).collect();
+crates/amun-consensus-network/src/evidence_push_processor.rs-87-        let serialized: Vec<_> = records
+crates/amun-consensus-network/src/evidence_push_processor.rs-88-            .iter()
+crates/amun-consensus-network/src/evidence_push_processor.rs-89-            .map(|r| postcard::to_stdvec(r).unwrap())
+crates/amun-consensus-network/src/evidence_push_processor.rs-90-            .collect();
+crates/amun-consensus-network/src/evidence_push_processor.rs-91-
+crates/amun-consensus-network/src/evidence_push_processor.rs-92-        let result =
+--
+crates/amun-consensus-network/src/evidence_push_processor.rs-96-        assert_eq!(result.total_received, 3);
+crates/amun-consensus-network/src/evidence_push_processor.rs-97-        assert_eq!(result.newly_imported, 3);
+crates/amun-consensus-network/src/evidence_push_processor.rs-98-        assert_eq!(result.duplicates, 0);
+crates/amun-consensus-network/src/evidence_push_processor.rs-99-        assert_eq!(store.len(), 3);
+crates/amun-consensus-network/src/evidence_push_processor.rs-100-    }
+crates/amun-consensus-network/src/evidence_push_processor.rs-101-
+crates/amun-consensus-network/src/evidence_push_processor.rs-102-    #[test]
+crates/amun-consensus-network/src/evidence_push_processor.rs-103-    fn n112_3_duplicate_records_counted_but_not_reimported() {
+crates/amun-consensus-network/src/evidence_push_processor.rs:104:        let mut store = EvidenceStore::new();
+crates/amun-consensus-network/src/evidence_push_processor.rs:105:        let mut gossip = EvidenceGossip::new();
+crates/amun-consensus-network/src/evidence_push_processor.rs:106:        let mut push = EvidencePush::default();
+crates/amun-consensus-network/src/evidence_push_processor.rs-107-
+crates/amun-consensus-network/src/evidence_push_processor.rs-108-        let record = make_evidence_record(1);
+crates/amun-consensus-network/src/evidence_push_processor.rs-109-        let serialized = postcard::to_stdvec(&record).unwrap();
+crates/amun-consensus-network/src/evidence_push_processor.rs-110-
+crates/amun-consensus-network/src/evidence_push_processor.rs-111-        // First push
+crates/amun-consensus-network/src/evidence_push_processor.rs-112-        let result1 = process_incoming_evidence_push(
+crates/amun-consensus-network/src/evidence_push_processor.rs-113-            std::slice::from_ref(&serialized),
+crates/amun-consensus-network/src/evidence_push_processor.rs-114-            &mut store,
+--
+crates/amun-consensus-network/src/evidence_push_processor.rs-125-                .unwrap();
+crates/amun-consensus-network/src/evidence_push_processor.rs-126-        assert_eq!(result2.duplicates, 1);
+crates/amun-consensus-network/src/evidence_push_processor.rs-127-        assert_eq!(result2.newly_imported, 0);
+crates/amun-consensus-network/src/evidence_push_processor.rs-128-        assert_eq!(store.len(), 1, "Store must not grow on duplicates");
+crates/amun-consensus-network/src/evidence_push_processor.rs-129-    }
+crates/amun-consensus-network/src/evidence_push_processor.rs-130-
+crates/amun-consensus-network/src/evidence_push_processor.rs-131-    #[test]
+crates/amun-consensus-network/src/evidence_push_processor.rs-132-    fn n112_3_push_updates_gossip_tracking() {
+crates/amun-consensus-network/src/evidence_push_processor.rs:133:        let mut store = EvidenceStore::new();
+crates/amun-consensus-network/src/evidence_push_processor.rs:134:        let mut gossip = EvidenceGossip::new();
+crates/amun-consensus-network/src/evidence_push_processor.rs:135:        let mut push = EvidencePush::default();
+crates/amun-consensus-network/src/evidence_push_processor.rs-136-
+crates/amun-consensus-network/src/evidence_push_processor.rs-137-        let record = make_evidence_record(1);
+crates/amun-consensus-network/src/evidence_push_processor.rs-138-        let serialized = postcard::to_stdvec(&record).unwrap();
+crates/amun-consensus-network/src/evidence_push_processor.rs-139-
+crates/amun-consensus-network/src/evidence_push_processor.rs-140-        process_incoming_evidence_push(&[serialized], &mut store, &mut gossip, &mut push).unwrap();
+crates/amun-consensus-network/src/evidence_push_processor.rs-141-
+crates/amun-consensus-network/src/evidence_push_processor.rs-142-        assert!(gossip.has_evidence(&record.evidence_id));
+crates/amun-consensus-network/src/evidence_push_processor.rs-143-        assert!(push.has_been_pushed(&record.evidence_id));
+--
+crates/amun-consensus-network/src/evidence_gossip.rs-1-// ============================================================================
+crates/amun-consensus-network/src/evidence_gossip.rs:2:// N111.2 — Evidence Gossip
+crates/amun-consensus-network/src/evidence_gossip.rs-3-// ============================================================================
+crates/amun-consensus-network/src/evidence_gossip.rs-4-// Propagates evidence records across the network so that every node
+crates/amun-consensus-network/src/evidence_gossip.rs-5-// possesses the evidence referenced by a SlashingCertificate.
+crates/amun-consensus-network/src/evidence_gossip.rs-6-//
+crates/amun-consensus-network/src/evidence_gossip.rs-7-// Without this layer, a node that did not witness the original
+crates/amun-consensus-network/src/evidence_gossip.rs-8-// misbehaviour will reject a certificate that references unknown
+crates/amun-consensus-network/src/evidence_gossip.rs-9-// evidence IDs (the critical limitation documented in v0.4.0-N110).
+crates/amun-consensus-network/src/evidence_gossip.rs-10-//
+crates/amun-consensus-network/src/evidence_gossip.rs-11-// The gossip layer:
+crates/amun-consensus-network/src/evidence_gossip.rs:12://   1. Receives an EvidenceAnnouncement from the network
+crates/amun-consensus-network/src/evidence_gossip.rs-13-//   2. Validates and stores the announcement
+crates/amun-consensus-network/src/evidence_gossip.rs-14-//   3. Tracks broadcast state to avoid infinite loops
+crates/amun-consensus-network/src/evidence_gossip.rs-15-// ============================================================================
+crates/amun-consensus-network/src/evidence_gossip.rs-16-
+crates/amun-consensus-network/src/evidence_gossip.rs:17:use crate::evidence_store::EvidenceType;
+crates/amun-consensus-network/src/evidence_gossip.rs-18-use std::collections::HashMap;
+crates/amun-consensus-network/src/evidence_gossip.rs-19-
+crates/amun-consensus-network/src/evidence_gossip.rs-20-/// N111.1: Lightweight announcement of new evidence.
+crates/amun-consensus-network/src/evidence_gossip.rs-21-/// Carries the evidence_id and metadata so peers can request
+crates/amun-consensus-network/src/evidence_gossip.rs:22:/// the full EvidenceRecord if they need it.
+crates/amun-consensus-network/src/evidence_gossip.rs-23-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+crates/amun-consensus-network/src/evidence_gossip.rs:24:pub struct EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_gossip.rs-25-    pub evidence_id: [u8; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs-26-    pub validator_id: [u8; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:27:    pub evidence_type: EvidenceType,
+crates/amun-consensus-network/src/evidence_gossip.rs-28-    pub height: u64,
+crates/amun-consensus-network/src/evidence_gossip.rs-29-    pub timestamp: u64,
+crates/amun-consensus-network/src/evidence_gossip.rs-30-}
+crates/amun-consensus-network/src/evidence_gossip.rs-31-
+crates/amun-consensus-network/src/evidence_gossip.rs-32-/// N111.2: Manages received evidence announcements.
+crates/amun-consensus-network/src/evidence_gossip.rs:33:pub struct EvidenceGossip {
+crates/amun-consensus-network/src/evidence_gossip.rs-34-    /// Announcements indexed by evidence_id
+crates/amun-consensus-network/src/evidence_gossip.rs:35:    pub announcements: HashMap<[u8; 32], EvidenceAnnouncement>,
+crates/amun-consensus-network/src/evidence_gossip.rs-36-    /// Set of evidence_ids already broadcast to prevent loops
+crates/amun-consensus-network/src/evidence_gossip.rs-37-    pub broadcasted: HashMap<[u8; 32], bool>,
+crates/amun-consensus-network/src/evidence_gossip.rs-38-}
+crates/amun-consensus-network/src/evidence_gossip.rs-39-
+crates/amun-consensus-network/src/evidence_gossip.rs:40:impl EvidenceGossip {
+crates/amun-consensus-network/src/evidence_gossip.rs-41-    pub fn new() -> Self {
+crates/amun-consensus-network/src/evidence_gossip.rs-42-        Self {
+crates/amun-consensus-network/src/evidence_gossip.rs-43-            announcements: HashMap::new(),
+crates/amun-consensus-network/src/evidence_gossip.rs-44-            broadcasted: HashMap::new(),
+crates/amun-consensus-network/src/evidence_gossip.rs-45-        }
+crates/amun-consensus-network/src/evidence_gossip.rs-46-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-47-
+crates/amun-consensus-network/src/evidence_gossip.rs-48-    /// Receive an evidence announcement from the network.
+crates/amun-consensus-network/src/evidence_gossip.rs-49-    /// Returns true if the announcement is new.
+crates/amun-consensus-network/src/evidence_gossip.rs:50:    pub fn receive_announcement(&mut self, announcement: EvidenceAnnouncement) -> bool {
+crates/amun-consensus-network/src/evidence_gossip.rs-51-        let id = announcement.evidence_id;
+crates/amun-consensus-network/src/evidence_gossip.rs-52-        if self.announcements.contains_key(&id) {
+crates/amun-consensus-network/src/evidence_gossip.rs-53-            return false; // already have it
+crates/amun-consensus-network/src/evidence_gossip.rs-54-        }
+crates/amun-consensus-network/src/evidence_gossip.rs-55-        self.announcements.insert(id, announcement);
+crates/amun-consensus-network/src/evidence_gossip.rs-56-        true
+crates/amun-consensus-network/src/evidence_gossip.rs-57-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-58-
+--
+crates/amun-consensus-network/src/evidence_gossip.rs-72-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-73-
+crates/amun-consensus-network/src/evidence_gossip.rs-74-    pub fn len(&self) -> usize {
+crates/amun-consensus-network/src/evidence_gossip.rs-75-        self.announcements.len()
+crates/amun-consensus-network/src/evidence_gossip.rs-76-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-77-
+crates/amun-consensus-network/src/evidence_gossip.rs-78-    /// N111.4: Verify an incoming evidence announcement before accepting it.
+crates/amun-consensus-network/src/evidence_gossip.rs-79-    pub fn verify_announcement(
+crates/amun-consensus-network/src/evidence_gossip.rs:80:        announcement: &EvidenceAnnouncement,
+crates/amun-consensus-network/src/evidence_gossip.rs-81-        current_height: u64,
+crates/amun-consensus-network/src/evidence_gossip.rs-82-    ) -> Result<(), String> {
+crates/amun-consensus-network/src/evidence_gossip.rs-83-        // Height must not be in the far future
+crates/amun-consensus-network/src/evidence_gossip.rs-84-        if announcement.height > current_height + 100 {
+crates/amun-consensus-network/src/evidence_gossip.rs-85-            return Err(format!(
+crates/amun-consensus-network/src/evidence_gossip.rs-86-                "N111.4: evidence height {} is too far in the future (current={})",
+crates/amun-consensus-network/src/evidence_gossip.rs-87-                announcement.height, current_height
+crates/amun-consensus-network/src/evidence_gossip.rs-88-            ));
+--
+crates/amun-consensus-network/src/evidence_gossip.rs-98-        Ok(())
+crates/amun-consensus-network/src/evidence_gossip.rs-99-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-100-
+crates/amun-consensus-network/src/evidence_gossip.rs-101-    pub fn is_empty(&self) -> bool {
+crates/amun-consensus-network/src/evidence_gossip.rs-102-        self.announcements.is_empty()
+crates/amun-consensus-network/src/evidence_gossip.rs-103-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-104-}
+crates/amun-consensus-network/src/evidence_gossip.rs-105-
+crates/amun-consensus-network/src/evidence_gossip.rs:106:impl Default for EvidenceGossip {
+crates/amun-consensus-network/src/evidence_gossip.rs-107-    fn default() -> Self {
+crates/amun-consensus-network/src/evidence_gossip.rs-108-        Self::new()
+crates/amun-consensus-network/src/evidence_gossip.rs-109-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-110-}
+crates/amun-consensus-network/src/evidence_gossip.rs-111-
+crates/amun-consensus-network/src/evidence_gossip.rs-112-#[cfg(test)]
+crates/amun-consensus-network/src/evidence_gossip.rs-113-mod tests {
+crates/amun-consensus-network/src/evidence_gossip.rs-114-    use super::*;
+crates/amun-consensus-network/src/evidence_gossip.rs-115-
+crates/amun-consensus-network/src/evidence_gossip.rs-116-    #[test]
+crates/amun-consensus-network/src/evidence_gossip.rs-117-    fn n111_2_receive_new_announcement() {
+crates/amun-consensus-network/src/evidence_gossip.rs:118:        let mut gossip = EvidenceGossip::new();
+crates/amun-consensus-network/src/evidence_gossip.rs:119:        let ann = EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_gossip.rs-120-            evidence_id: [0xA1; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs-121-            validator_id: [0x42; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:122:            evidence_type: EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/evidence_gossip.rs-123-            height: 10,
+crates/amun-consensus-network/src/evidence_gossip.rs-124-            timestamp: 1000,
+crates/amun-consensus-network/src/evidence_gossip.rs-125-        };
+crates/amun-consensus-network/src/evidence_gossip.rs-126-        assert!(gossip.receive_announcement(ann));
+crates/amun-consensus-network/src/evidence_gossip.rs-127-        assert_eq!(gossip.len(), 1);
+crates/amun-consensus-network/src/evidence_gossip.rs-128-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-129-
+crates/amun-consensus-network/src/evidence_gossip.rs-130-    #[test]
+crates/amun-consensus-network/src/evidence_gossip.rs-131-    fn n111_2_duplicate_ignored() {
+crates/amun-consensus-network/src/evidence_gossip.rs:132:        let mut gossip = EvidenceGossip::new();
+crates/amun-consensus-network/src/evidence_gossip.rs:133:        let ann = EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_gossip.rs-134-            evidence_id: [0xA1; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs-135-            validator_id: [0x42; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:136:            evidence_type: EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/evidence_gossip.rs-137-            height: 10,
+crates/amun-consensus-network/src/evidence_gossip.rs-138-            timestamp: 1000,
+crates/amun-consensus-network/src/evidence_gossip.rs-139-        };
+crates/amun-consensus-network/src/evidence_gossip.rs-140-        assert!(gossip.receive_announcement(ann.clone()));
+crates/amun-consensus-network/src/evidence_gossip.rs-141-        assert!(!gossip.receive_announcement(ann));
+crates/amun-consensus-network/src/evidence_gossip.rs-142-        assert_eq!(gossip.len(), 1);
+crates/amun-consensus-network/src/evidence_gossip.rs-143-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-144-
+crates/amun-consensus-network/src/evidence_gossip.rs-145-    #[test]
+crates/amun-consensus-network/src/evidence_gossip.rs-146-    fn n111_2_broadcast_tracking() {
+crates/amun-consensus-network/src/evidence_gossip.rs:147:        let mut gossip = EvidenceGossip::new();
+crates/amun-consensus-network/src/evidence_gossip.rs-148-        let id = [0xB1; 32];
+crates/amun-consensus-network/src/evidence_gossip.rs-149-        assert!(gossip.should_broadcast(&id));
+crates/amun-consensus-network/src/evidence_gossip.rs-150-        gossip.mark_broadcasted(&id);
+crates/amun-consensus-network/src/evidence_gossip.rs-151-        assert!(!gossip.should_broadcast(&id));
+crates/amun-consensus-network/src/evidence_gossip.rs-152-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-153-
+crates/amun-consensus-network/src/evidence_gossip.rs-154-    #[test]
+crates/amun-consensus-network/src/evidence_gossip.rs-155-    fn n111_2_has_evidence() {
+crates/amun-consensus-network/src/evidence_gossip.rs:156:        let mut gossip = EvidenceGossip::new();
+crates/amun-consensus-network/src/evidence_gossip.rs-157-        let id = [0xC1; 32];
+crates/amun-consensus-network/src/evidence_gossip.rs-158-        assert!(!gossip.has_evidence(&id));
+crates/amun-consensus-network/src/evidence_gossip.rs:159:        gossip.receive_announcement(EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_gossip.rs-160-            evidence_id: id,
+crates/amun-consensus-network/src/evidence_gossip.rs-161-            validator_id: [0x42; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:162:            evidence_type: EvidenceType::StateRootMismatch,
+crates/amun-consensus-network/src/evidence_gossip.rs-163-            height: 5,
+crates/amun-consensus-network/src/evidence_gossip.rs-164-            timestamp: 2000,
+crates/amun-consensus-network/src/evidence_gossip.rs-165-        });
+crates/amun-consensus-network/src/evidence_gossip.rs-166-        assert!(gossip.has_evidence(&id));
+crates/amun-consensus-network/src/evidence_gossip.rs-167-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-168-
+crates/amun-consensus-network/src/evidence_gossip.rs-169-    #[test]
+crates/amun-consensus-network/src/evidence_gossip.rs-170-    fn n111_4_valid_announcement_passes() {
+crates/amun-consensus-network/src/evidence_gossip.rs:171:        let ann = EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_gossip.rs-172-            evidence_id: [0xA1; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs-173-            validator_id: [0x42; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:174:            evidence_type: EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/evidence_gossip.rs-175-            height: 10,
+crates/amun-consensus-network/src/evidence_gossip.rs-176-            timestamp: 1000,
+crates/amun-consensus-network/src/evidence_gossip.rs-177-        };
+crates/amun-consensus-network/src/evidence_gossip.rs:178:        assert!(EvidenceGossip::verify_announcement(&ann, 50).is_ok());
+crates/amun-consensus-network/src/evidence_gossip.rs-179-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-180-
+crates/amun-consensus-network/src/evidence_gossip.rs-181-    #[test]
+crates/amun-consensus-network/src/evidence_gossip.rs-182-    fn n111_4_future_height_rejected() {
+crates/amun-consensus-network/src/evidence_gossip.rs:183:        let ann = EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_gossip.rs-184-            evidence_id: [0xA1; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs-185-            validator_id: [0x42; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:186:            evidence_type: EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/evidence_gossip.rs-187-            height: 200,
+crates/amun-consensus-network/src/evidence_gossip.rs-188-            timestamp: 1000,
+crates/amun-consensus-network/src/evidence_gossip.rs-189-        };
+crates/amun-consensus-network/src/evidence_gossip.rs:190:        let err = EvidenceGossip::verify_announcement(&ann, 50).unwrap_err();
+crates/amun-consensus-network/src/evidence_gossip.rs-191-        assert!(err.contains("too far in the future"));
+crates/amun-consensus-network/src/evidence_gossip.rs-192-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-193-
+crates/amun-consensus-network/src/evidence_gossip.rs-194-    #[test]
+crates/amun-consensus-network/src/evidence_gossip.rs-195-    fn n111_4_zero_evidence_id_rejected() {
+crates/amun-consensus-network/src/evidence_gossip.rs:196:        let ann = EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_gossip.rs-197-            evidence_id: [0u8; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs-198-            validator_id: [0x42; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:199:            evidence_type: EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/evidence_gossip.rs-200-            height: 10,
+crates/amun-consensus-network/src/evidence_gossip.rs-201-            timestamp: 1000,
+crates/amun-consensus-network/src/evidence_gossip.rs-202-        };
+crates/amun-consensus-network/src/evidence_gossip.rs:203:        assert!(EvidenceGossip::verify_announcement(&ann, 50).is_err());
+crates/amun-consensus-network/src/evidence_gossip.rs-204-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-205-
+crates/amun-consensus-network/src/evidence_gossip.rs-206-    #[test]
+crates/amun-consensus-network/src/evidence_gossip.rs-207-    fn n111_4_zero_validator_id_rejected() {
+crates/amun-consensus-network/src/evidence_gossip.rs:208:        let ann = EvidenceAnnouncement {
+crates/amun-consensus-network/src/evidence_gossip.rs-209-            evidence_id: [0xA1; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs-210-            validator_id: [0u8; 32],
+crates/amun-consensus-network/src/evidence_gossip.rs:211:            evidence_type: EvidenceType::DoubleVote,
+crates/amun-consensus-network/src/evidence_gossip.rs-212-            height: 10,
+crates/amun-consensus-network/src/evidence_gossip.rs-213-            timestamp: 1000,
+crates/amun-consensus-network/src/evidence_gossip.rs-214-        };
+crates/amun-consensus-network/src/evidence_gossip.rs:215:        assert!(EvidenceGossip::verify_announcement(&ann, 50).is_err());
+crates/amun-consensus-network/src/evidence_gossip.rs-216-    }
+crates/amun-consensus-network/src/evidence_gossip.rs-217-}
+--
+crates/amun-constitution-builder/tests/determinism_tests.rs-1-use amun_constitution_builder::*;
+crates/amun-constitution-builder/tests/determinism_tests.rs-2-
+crates/amun-constitution-builder/tests/determinism_tests.rs-3-#[test]
+crates/amun-constitution-builder/tests/determinism_tests.rs-4-fn test_manifest_determinism() {
+crates/amun-constitution-builder/tests/determinism_tests.rs-5-    let gen = "genesis_hash".to_string();
+crates/amun-constitution-builder/tests/determinism_tests.rs-6-    let spec = "spec_hash".to_string();
+crates/amun-constitution-builder/tests/determinism_tests.rs-7-    let ts = "2026-05-28T00:00:00Z".to_string();
+crates/amun-constitution-builder/tests/determinism_tests.rs-8-
+crates/amun-constitution-builder/tests/determinism_tests.rs:9:    let m1 = ConstitutionalManifest::new(gen.clone(), spec.clone(), ts.clone());
+crates/amun-constitution-builder/tests/determinism_tests.rs:10:    let m2 = ConstitutionalManifest::new(gen, spec, ts);
+crates/amun-constitution-builder/tests/determinism_tests.rs-11-
+crates/amun-constitution-builder/tests/determinism_tests.rs-12-    VerificationEngine::verify_replay(&m1, &m2).expect("Manifests must be identical");
+crates/amun-constitution-builder/tests/determinism_tests.rs-13-    assert_eq!(m1.canonical_bytes(), m2.canonical_bytes());
+crates/amun-constitution-builder/tests/determinism_tests.rs-14-}
+crates/amun-constitution-builder/tests/determinism_tests.rs-15-
+crates/amun-constitution-builder/tests/determinism_tests.rs-16-#[test]
+crates/amun-constitution-builder/tests/determinism_tests.rs-17-fn test_federation_determinism() {
+crates/amun-constitution-builder/tests/determinism_tests.rs-18-    let ts = "2026-05-28T00:00:00Z".to_string();
+--
+crates/amun-constitution-builder/src/digest.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/digest.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/digest.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/digest.rs-4-
+crates/amun-constitution-builder/src/digest.rs-5-use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/digest.rs-6-use blake3::Hasher;
+crates/amun-constitution-builder/src/digest.rs-7-
+crates/amun-constitution-builder/src/digest.rs-8-pub trait ArtifactDigest: CanonicalSerialize {
+crates/amun-constitution-builder/src/digest.rs-9-    /// Domain separator for constitutional hashing (prevents cross-artifact collisions).
+crates/amun-constitution-builder/src/digest.rs-10-    fn domain_separator(&self) -> &'static [u8];
+crates/amun-constitution-builder/src/digest.rs-11-
+--
+crates/amun-constitution-builder/src/verify.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/verify.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/verify.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/verify.rs-4-
+crates/amun-constitution-builder/src/verify.rs-5-use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/verify.rs-6-
+crates/amun-constitution-builder/src/verify.rs-7-pub struct VerificationEngine;
+crates/amun-constitution-builder/src/verify.rs-8-
+crates/amun-constitution-builder/src/verify.rs-9-impl VerificationEngine {
+crates/amun-constitution-builder/src/verify.rs-10-    /// Verifies two artifacts are structurally identical and produce identical byte representations.
+crates/amun-constitution-builder/src/verify.rs-11-    pub fn verify_replay<T: CanonicalSerialize + PartialEq>(
+--
+crates/amun-constitution-builder/src/canonical_bytes.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/canonical_bytes.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/canonical_bytes.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/canonical_bytes.rs-4-
+crates/amun-constitution-builder/src/canonical_bytes.rs-5-pub trait CanonicalSerialize {
+crates/amun-constitution-builder/src/canonical_bytes.rs-6-    fn canonical_bytes(&self) -> Vec<u8>;
+crates/amun-constitution-builder/src/canonical_bytes.rs-7-}
+--
+crates/amun-constitution-builder/src/treaty.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/treaty.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/treaty.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/treaty.rs-4-
+crates/amun-constitution-builder/src/treaty.rs-5-use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/treaty.rs-6-use crate::digest::ArtifactDigest;
+crates/amun-constitution-builder/src/treaty.rs-7-use crate::emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/treaty.rs-8-use crate::normalize::DeterministicNormalizer;
+crates/amun-constitution-builder/src/treaty.rs-9-use serde::{Deserialize, Serialize};
+crates/amun-constitution-builder/src/treaty.rs-10-
+crates/amun-constitution-builder/src/treaty.rs-11-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+--
+crates/amun-constitution-builder/src/lib.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/lib.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/lib.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/lib.rs-4-
+crates/amun-constitution-builder/src/lib.rs-5-pub mod canonical_bytes;
+crates/amun-constitution-builder/src/lib.rs-6-pub mod certificate;
+crates/amun-constitution-builder/src/lib.rs-7-pub mod digest;
+crates/amun-constitution-builder/src/lib.rs-8-pub mod emitter;
+crates/amun-constitution-builder/src/lib.rs-9-pub mod federation;
+crates/amun-constitution-builder/src/lib.rs-10-pub mod hashing;
+crates/amun-constitution-builder/src/lib.rs-11-pub mod manifest;
+--
+crates/amun-constitution-builder/src/lib.rs-15-pub mod verify;
+crates/amun-constitution-builder/src/lib.rs-16-
+crates/amun-constitution-builder/src/lib.rs-17-pub use canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/lib.rs-18-pub use certificate::FreezeCertificate;
+crates/amun-constitution-builder/src/lib.rs-19-pub use digest::ArtifactDigest;
+crates/amun-constitution-builder/src/lib.rs-20-pub use emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/lib.rs-21-pub use federation::FederationArtifact;
+crates/amun-constitution-builder/src/lib.rs-22-pub use hashing::{compute_all_hashes, compute_specification_hash, SpecificationHashes};
+crates/amun-constitution-builder/src/lib.rs:23:pub use manifest::ConstitutionalManifest;
+crates/amun-constitution-builder/src/lib.rs-24-pub use normalize::DeterministicNormalizer;
+crates/amun-constitution-builder/src/lib.rs-25-pub use treaty::TreatyArtifact;
+crates/amun-constitution-builder/src/lib.rs-26-pub use types::*;
+crates/amun-constitution-builder/src/lib.rs-27-pub use verify::VerificationEngine;
+--
+crates/amun-constitution-builder/src/emitter.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/emitter.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/emitter.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/emitter.rs-4-
+crates/amun-constitution-builder/src/emitter.rs-5-pub trait CanonicalEmit {
+crates/amun-constitution-builder/src/emitter.rs-6-    fn emit_canonical(&self) -> String;
+crates/amun-constitution-builder/src/emitter.rs-7-}
+--
+crates/amun-constitution-builder/src/hashing.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/hashing.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/hashing.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/hashing.rs-4-
+crates/amun-constitution-builder/src/hashing.rs-5-use blake3::Hasher;
+crates/amun-constitution-builder/src/hashing.rs-6-use std::fs;
+crates/amun-constitution-builder/src/hashing.rs-7-use std::path::Path;
+crates/amun-constitution-builder/src/hashing.rs-8-
+crates/amun-constitution-builder/src/hashing.rs-9-#[derive(Debug, Clone)]
+crates/amun-constitution-builder/src/hashing.rs-10-pub struct SpecificationHashes {
+crates/amun-constitution-builder/src/hashing.rs-11-    pub semantic_hash: String,
+--
+crates/amun-constitution-builder/src/certificate.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/certificate.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/certificate.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/certificate.rs-4-
+crates/amun-constitution-builder/src/certificate.rs-5-use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/certificate.rs-6-use crate::digest::ArtifactDigest;
+crates/amun-constitution-builder/src/certificate.rs-7-use crate::emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/certificate.rs-8-use crate::normalize::DeterministicNormalizer;
+crates/amun-constitution-builder/src/certificate.rs-9-use serde::{Deserialize, Serialize};
+crates/amun-constitution-builder/src/certificate.rs-10-
+crates/amun-constitution-builder/src/certificate.rs-11-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+--
+crates/amun-constitution-builder/src/certificate.rs-63-        lines.push("".to_string());
+crates/amun-constitution-builder/src/certificate.rs-64-        lines.push(format!("Schema Version: {}", self.schema_version));
+crates/amun-constitution-builder/src/certificate.rs-65-        lines.push(format!("Civilization: {}", self.civilization));
+crates/amun-constitution-builder/src/certificate.rs-66-        lines.push(format!("Release: {}", self.release_version));
+crates/amun-constitution-builder/src/certificate.rs-67-        lines.push(format!("Timestamp: {}", self.timestamp));
+crates/amun-constitution-builder/src/certificate.rs-68-        lines.push("".to_string());
+crates/amun-constitution-builder/src/certificate.rs-69-        lines.push(format!("Specification Hash: {}", self.specification_hash));
+crates/amun-constitution-builder/src/certificate.rs-70-        lines.push("".to_string());
+crates/amun-constitution-builder/src/certificate.rs:71:        lines.push("Frozen Constitutional Properties:".to_string());
+crates/amun-constitution-builder/src/certificate.rs-72-        for prop in &self.frozen_properties {
+crates/amun-constitution-builder/src/certificate.rs-73-            lines.push(format!("- {}", prop));
+crates/amun-constitution-builder/src/certificate.rs-74-        }
+crates/amun-constitution-builder/src/certificate.rs-75-        lines.push("".to_string());
+crates/amun-constitution-builder/src/certificate.rs-76-        lines.push("Any semantic modification changes constitutional identity.".to_string());
+crates/amun-constitution-builder/src/certificate.rs-77-        DeterministicNormalizer::normalize(&lines.join("\n"))
+crates/amun-constitution-builder/src/certificate.rs-78-    }
+crates/amun-constitution-builder/src/certificate.rs-79-}
+--
+crates/amun-constitution-builder/src/manifest.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/manifest.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/manifest.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/manifest.rs-4-
+crates/amun-constitution-builder/src/manifest.rs-5-use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/manifest.rs-6-use crate::digest::ArtifactDigest;
+crates/amun-constitution-builder/src/manifest.rs-7-use crate::emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/manifest.rs-8-use crate::normalize::DeterministicNormalizer;
+crates/amun-constitution-builder/src/manifest.rs-9-use serde::{Deserialize, Serialize};
+crates/amun-constitution-builder/src/manifest.rs-10-
+crates/amun-constitution-builder/src/manifest.rs-11-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+crates/amun-constitution-builder/src/manifest.rs-12-#[serde(rename_all = "snake_case")]
+crates/amun-constitution-builder/src/manifest.rs:13:pub struct ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs-14-    pub schema_version: u32,
+crates/amun-constitution-builder/src/manifest.rs-15-    pub civilization: String,
+crates/amun-constitution-builder/src/manifest.rs-16-    pub genesis_hash: String,
+crates/amun-constitution-builder/src/manifest.rs-17-    pub specification_hash: String,
+crates/amun-constitution-builder/src/manifest.rs-18-    pub constitution_version: u32,
+crates/amun-constitution-builder/src/manifest.rs-19-    pub codec_version: u32,
+crates/amun-constitution-builder/src/manifest.rs-20-    pub proof_version: u32,
+crates/amun-constitution-builder/src/manifest.rs-21-    pub hash_algorithm: String,
+crates/amun-constitution-builder/src/manifest.rs-22-    pub endianness: String,
+crates/amun-constitution-builder/src/manifest.rs-23-    pub smt_depth: u32,
+crates/amun-constitution-builder/src/manifest.rs-24-    pub timestamp: String,
+crates/amun-constitution-builder/src/manifest.rs-25-}
+crates/amun-constitution-builder/src/manifest.rs-26-
+crates/amun-constitution-builder/src/manifest.rs:27:impl ArtifactDigest for ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs-28-    fn domain_separator(&self) -> &'static [u8] {
+crates/amun-constitution-builder/src/manifest.rs-29-        b"AMUN_MANIFEST_V1"
+crates/amun-constitution-builder/src/manifest.rs-30-    }
+crates/amun-constitution-builder/src/manifest.rs-31-}
+crates/amun-constitution-builder/src/manifest.rs-32-
+crates/amun-constitution-builder/src/manifest.rs:33:impl ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs-34-    pub fn new(genesis_hash: String, specification_hash: String, timestamp: String) -> Self {
+crates/amun-constitution-builder/src/manifest.rs-35-        Self {
+crates/amun-constitution-builder/src/manifest.rs-36-            schema_version: 1,
+crates/amun-constitution-builder/src/manifest.rs-37-            civilization: "AmunChain".into(),
+crates/amun-constitution-builder/src/manifest.rs-38-            genesis_hash,
+crates/amun-constitution-builder/src/manifest.rs-39-            specification_hash,
+crates/amun-constitution-builder/src/manifest.rs-40-            constitution_version: 1,
+crates/amun-constitution-builder/src/manifest.rs-41-            codec_version: 1,
+--
+crates/amun-constitution-builder/src/manifest.rs-43-            hash_algorithm: "BLAKE3".into(),
+crates/amun-constitution-builder/src/manifest.rs-44-            endianness: "little".into(),
+crates/amun-constitution-builder/src/manifest.rs-45-            smt_depth: 256,
+crates/amun-constitution-builder/src/manifest.rs-46-            timestamp,
+crates/amun-constitution-builder/src/manifest.rs-47-        }
+crates/amun-constitution-builder/src/manifest.rs-48-    }
+crates/amun-constitution-builder/src/manifest.rs-49-}
+crates/amun-constitution-builder/src/manifest.rs-50-
+crates/amun-constitution-builder/src/manifest.rs:51:impl CanonicalEmit for ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs-52-    fn emit_canonical(&self) -> String {
+crates/amun-constitution-builder/src/manifest.rs-53-        let mut lines: Vec<String> = Vec::new();
+crates/amun-constitution-builder/src/manifest.rs:54:        lines.push("# Genesis Constitutional Manifest".to_string());
+crates/amun-constitution-builder/src/manifest.rs-55-        lines.push("".to_string());
+crates/amun-constitution-builder/src/manifest.rs-56-        lines.push("## Civilization Identity".to_string());
+crates/amun-constitution-builder/src/manifest.rs-57-        lines.push("".to_string());
+crates/amun-constitution-builder/src/manifest.rs-58-        lines.push("| Property | Value |".to_string());
+crates/amun-constitution-builder/src/manifest.rs-59-        lines.push("|---|---|".to_string());
+crates/amun-constitution-builder/src/manifest.rs-60-        lines.push(format!("| Schema Version | {} |", self.schema_version));
+crates/amun-constitution-builder/src/manifest.rs-61-        lines.push(format!("| Civilization Name | {} |", self.civilization));
+crates/amun-constitution-builder/src/manifest.rs-62-        lines.push(format!("| Genesis Hash | {} |", self.genesis_hash));
+crates/amun-constitution-builder/src/manifest.rs-63-        lines.push(format!(
+crates/amun-constitution-builder/src/manifest.rs-64-            "| Specification Hash | {} |",
+crates/amun-constitution-builder/src/manifest.rs-65-            self.specification_hash
+crates/amun-constitution-builder/src/manifest.rs-66-        ));
+crates/amun-constitution-builder/src/manifest.rs-67-        lines.push(format!(
+crates/amun-constitution-builder/src/manifest.rs:68:            "| Constitution Version | {} |",
+crates/amun-constitution-builder/src/manifest.rs-69-            self.constitution_version
+crates/amun-constitution-builder/src/manifest.rs-70-        ));
+crates/amun-constitution-builder/src/manifest.rs-71-        lines.push(format!("| Codec Version | {} |", self.codec_version));
+crates/amun-constitution-builder/src/manifest.rs-72-        lines.push(format!("| Proof Version | {} |", self.proof_version));
+crates/amun-constitution-builder/src/manifest.rs-73-        lines.push(format!("| Hash Algorithm | {} |", self.hash_algorithm));
+crates/amun-constitution-builder/src/manifest.rs-74-        lines.push(format!("| Endianness | {} |", self.endianness));
+crates/amun-constitution-builder/src/manifest.rs-75-        lines.push(format!("| SMT Depth | {} |", self.smt_depth));
+crates/amun-constitution-builder/src/manifest.rs-76-        lines.push(format!("| Timestamp | {} |", self.timestamp));
+crates/amun-constitution-builder/src/manifest.rs-77-        lines.push("".to_string());
+crates/amun-constitution-builder/src/manifest.rs-78-        DeterministicNormalizer::normalize(&lines.join("\n"))
+crates/amun-constitution-builder/src/manifest.rs-79-    }
+crates/amun-constitution-builder/src/manifest.rs-80-}
+crates/amun-constitution-builder/src/manifest.rs-81-
+crates/amun-constitution-builder/src/manifest.rs:82:impl CanonicalSerialize for ConstitutionalManifest {
+crates/amun-constitution-builder/src/manifest.rs-83-    fn canonical_bytes(&self) -> Vec<u8> {
+crates/amun-constitution-builder/src/manifest.rs-84-        serde_json::to_vec(self).expect("Canonical serialization must not fail")
+crates/amun-constitution-builder/src/manifest.rs-85-    }
+crates/amun-constitution-builder/src/manifest.rs-86-}
+--
+crates/amun-constitution-builder/src/types.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/types.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/types.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/types.rs-4-
+crates/amun-constitution-builder/src/types.rs-5-pub type GenesisHash = String;
+crates/amun-constitution-builder/src/types.rs-6-pub type SpecificationHash = String;
+crates/amun-constitution-builder/src/types.rs-7-pub type CivilizationId = String;
+crates/amun-constitution-builder/src/types.rs-8-pub type Timestamp = String;
+--
+crates/amun-constitution-builder/src/normalize.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/normalize.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/normalize.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/normalize.rs-4-
+crates/amun-constitution-builder/src/normalize.rs-5-pub struct DeterministicNormalizer;
+crates/amun-constitution-builder/src/normalize.rs-6-
+crates/amun-constitution-builder/src/normalize.rs-7-impl DeterministicNormalizer {
+crates/amun-constitution-builder/src/normalize.rs-8-    /// Ensures uniform newlines (LF), trims trailing whitespace,
+crates/amun-constitution-builder/src/normalize.rs-9-    /// and guarantees a trailing newline.
+crates/amun-constitution-builder/src/normalize.rs-10-    pub fn normalize(input: &str) -> String {
+crates/amun-constitution-builder/src/normalize.rs-11-        let mut out = input
+--
+crates/amun-constitution-builder/src/federation.rs-1-// Copyright (c) 2026 Amungold Global
+crates/amun-constitution-builder/src/federation.rs-2-// SPDX-License-Identifier: AGPL-3.0-or-later
+crates/amun-constitution-builder/src/federation.rs:3:// Licensed under the GNU AGPLv3 with Constitutional Sovereignty Addendum.
+crates/amun-constitution-builder/src/federation.rs-4-
+crates/amun-constitution-builder/src/federation.rs-5-use crate::canonical_bytes::CanonicalSerialize;
+crates/amun-constitution-builder/src/federation.rs-6-use crate::digest::ArtifactDigest;
+crates/amun-constitution-builder/src/federation.rs-7-use crate::emitter::CanonicalEmit;
+crates/amun-constitution-builder/src/federation.rs-8-use crate::normalize::DeterministicNormalizer;
+crates/amun-constitution-builder/src/federation.rs-9-use serde::{Deserialize, Serialize};
+crates/amun-constitution-builder/src/federation.rs-10-
+crates/amun-constitution-builder/src/federation.rs-11-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+--
+crates/amun-evolution/src/transition.rs-2-// Bridges evolution layer with WAL, consensus, and snapshot boundaries.
+crates/amun-evolution/src/transition.rs-3-
+crates/amun-evolution/src/transition.rs-4-use amun_lineage::lineage::CivilizationId;
+crates/amun-evolution/src/transition.rs-5-
+crates/amun-evolution/src/transition.rs-6-use super::certificate::EvolutionActivationCertificate;
+crates/amun-evolution/src/transition.rs-7-
+crates/amun-evolution/src/transition.rs-8-/// A constitutional checkpoint in the state transition pipeline.
+crates/amun-evolution/src/transition.rs-9-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-evolution/src/transition.rs:10:pub struct ConstitutionalCheckpoint {
+crates/amun-evolution/src/transition.rs-11-    pub epoch: u64,
+crates/amun-evolution/src/transition.rs-12-    pub generation: u64,
+crates/amun-evolution/src/transition.rs-13-    pub state_root: [u8; 32],
+crates/amun-evolution/src/transition.rs-14-    pub civilization_id: CivilizationId,
+crates/amun-evolution/src/transition.rs-15-    pub active_certificate_hash: Option<[u8; 32]>,
+crates/amun-evolution/src/transition.rs-16-    pub checkpoint_hash: [u8; 32],
+crates/amun-evolution/src/transition.rs-17-}
+crates/amun-evolution/src/transition.rs-18-
+crates/amun-evolution/src/transition.rs:19:impl ConstitutionalCheckpoint {
+crates/amun-evolution/src/transition.rs-20-    pub fn new(
+crates/amun-evolution/src/transition.rs-21-        epoch: u64,
+crates/amun-evolution/src/transition.rs-22-        generation: u64,
+crates/amun-evolution/src/transition.rs-23-        state_root: [u8; 32],
+crates/amun-evolution/src/transition.rs-24-        civilization_id: CivilizationId,
+crates/amun-evolution/src/transition.rs-25-        active_certificate: Option<&EvolutionActivationCertificate>,
+crates/amun-evolution/src/transition.rs-26-    ) -> Self {
+crates/amun-evolution/src/transition.rs-27-        let cert_hash = active_certificate.map(|c| c.certificate_hash);
+--
+crates/amun-evolution/src/transition.rs-54-    }
+crates/amun-evolution/src/transition.rs-55-}
+crates/amun-evolution/src/transition.rs-56-
+crates/amun-evolution/src/transition.rs-57-/// Transition validation result.
+crates/amun-evolution/src/transition.rs-58-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-evolution/src/transition.rs-59-pub enum TransitionResult {
+crates/amun-evolution/src/transition.rs-60-    /// Transition is valid and can proceed.
+crates/amun-evolution/src/transition.rs-61-    Valid {
+crates/amun-evolution/src/transition.rs:62:        checkpoint: ConstitutionalCheckpoint,
+crates/amun-evolution/src/transition.rs-63-    },
+crates/amun-evolution/src/transition.rs-64-    /// Transition requires an evolution certificate.
+crates/amun-evolution/src/transition.rs-65-    RequiresCertificate { reason: String },
+crates/amun-evolution/src/transition.rs-66-    /// Transition would violate constitutional physics.
+crates/amun-evolution/src/transition.rs-67-    PhysicsViolation { field: String, reason: String },
+crates/amun-evolution/src/transition.rs-68-    /// Transition rejected by governance.
+crates/amun-evolution/src/transition.rs-69-    GovernanceRejection { reason: String },
+crates/amun-evolution/src/transition.rs-70-}
+--
+crates/amun-evolution/src/lib.rs-1-#![allow(clippy::pedantic)]
+crates/amun-evolution/src/lib.rs-2-#![allow(clippy::nursery)]
+crates/amun-evolution/src/lib.rs-3-pub mod certificate;
+crates/amun-evolution/src/lib.rs-4-pub mod executor;
+crates/amun-evolution/src/lib.rs-5-pub mod signatures;
+crates/amun-evolution/src/lib.rs-6-pub mod transition;
+crates/amun-evolution/src/lib.rs-7-pub mod validator;
+crates/amun-evolution/src/lib.rs-8-
+crates/amun-evolution/src/lib.rs:9:pub use certificate::{ConstitutionalPhysicsProof, EvolutionActivationCertificate};
+crates/amun-evolution/src/lib.rs-10-pub use executor::{EvolutionError, EvolutionExecutor};
+crates/amun-evolution/src/lib.rs-11-pub use signatures::{
+crates/amun-evolution/src/lib.rs:12:    AggregatedSignature, ConstitutionalSignature, SIGNATURE_DOMAIN_ACTIVATION,
+crates/amun-evolution/src/lib.rs-13-    SIGNATURE_DOMAIN_AMENDMENT, SIGNATURE_DOMAIN_RATIFICATION,
+crates/amun-evolution/src/lib.rs-14-};
+crates/amun-evolution/src/lib.rs:15:pub use transition::{ConstitutionalCheckpoint, TransitionResult};
+crates/amun-evolution/src/lib.rs-16-pub use validator::EvolutionValidator;
+--
+crates/amun-evolution/src/signatures.rs:1:// Cryptographic Signature Domain for Constitutional Evolution
+crates/amun-evolution/src/signatures.rs-2-// Defines signing domains, aggregation rules, and anti-replay protection.
+crates/amun-evolution/src/signatures.rs-3-
+crates/amun-evolution/src/signatures.rs-4-use amun_canonical_codec::CanonicalHasher;
+crates/amun-evolution/src/signatures.rs-5-
+crates/amun-evolution/src/signatures.rs-6-pub const SIGNATURE_DOMAIN_AMENDMENT: &[u8] = b"AMUN_SIG_AMENDMENT_V1";
+crates/amun-evolution/src/signatures.rs-7-pub const SIGNATURE_DOMAIN_RATIFICATION: &[u8] = b"AMUN_SIG_RATIFY_V1";
+crates/amun-evolution/src/signatures.rs-8-pub const SIGNATURE_DOMAIN_ACTIVATION: &[u8] = b"AMUN_SIG_ACTIVATE_V1";
+crates/amun-evolution/src/signatures.rs-9-
+crates/amun-evolution/src/signatures.rs-10-/// A constitutional signature with domain separation.
+crates/amun-evolution/src/signatures.rs-11-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-evolution/src/signatures.rs:12:pub struct ConstitutionalSignature {
+crates/amun-evolution/src/signatures.rs-13-    pub signer_identity: [u8; 32],
+crates/amun-evolution/src/signatures.rs-14-    pub signing_domain: Vec<u8>,
+crates/amun-evolution/src/signatures.rs-15-    pub payload_hash: [u8; 32],
+crates/amun-evolution/src/signatures.rs-16-    pub signature_data: Vec<u8>,
+crates/amun-evolution/src/signatures.rs-17-    pub signature_hash: [u8; 32],
+crates/amun-evolution/src/signatures.rs-18-}
+crates/amun-evolution/src/signatures.rs-19-
+crates/amun-evolution/src/signatures.rs:20:impl ConstitutionalSignature {
+crates/amun-evolution/src/signatures.rs-21-    pub fn new(
+crates/amun-evolution/src/signatures.rs-22-        signer: [u8; 32],
+crates/amun-evolution/src/signatures.rs-23-        domain: &[u8],
+crates/amun-evolution/src/signatures.rs-24-        payload_hash: [u8; 32],
+crates/amun-evolution/src/signatures.rs-25-        signature_data: Vec<u8>,
+crates/amun-evolution/src/signatures.rs-26-    ) -> Self {
+crates/amun-evolution/src/signatures.rs-27-        let mut sig = Self {
+crates/amun-evolution/src/signatures.rs-28-            signer_identity: signer,
+--
+crates/amun-evolution/src/signatures.rs-48-    pub fn verify_structure(&self) -> bool {
+crates/amun-evolution/src/signatures.rs-49-        self.compute_hash() == self.signature_hash
+crates/amun-evolution/src/signatures.rs-50-    }
+crates/amun-evolution/src/signatures.rs-51-}
+crates/amun-evolution/src/signatures.rs-52-
+crates/amun-evolution/src/signatures.rs-53-/// Aggregated signatures for quorum-based ratification.
+crates/amun-evolution/src/signatures.rs-54-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-evolution/src/signatures.rs-55-pub struct AggregatedSignature {
+crates/amun-evolution/src/signatures.rs:56:    pub signatures: Vec<ConstitutionalSignature>,
+crates/amun-evolution/src/signatures.rs-57-    pub quorum_reached: bool,
+crates/amun-evolution/src/signatures.rs-58-    pub total_signers: u64,
+crates/amun-evolution/src/signatures.rs-59-    pub required_quorum: u64,
+crates/amun-evolution/src/signatures.rs-60-    pub aggregate_hash: [u8; 32],
+crates/amun-evolution/src/signatures.rs-61-}
+crates/amun-evolution/src/signatures.rs-62-
+crates/amun-evolution/src/signatures.rs-63-impl AggregatedSignature {
+crates/amun-evolution/src/signatures.rs:64:    pub fn new(signatures: Vec<ConstitutionalSignature>, required_quorum: u64) -> Self {
+crates/amun-evolution/src/signatures.rs-65-        let total = signatures.len() as u64;
+crates/amun-evolution/src/signatures.rs-66-        let quorum = total >= required_quorum;
+crates/amun-evolution/src/signatures.rs-67-        let mut agg = Self {
+crates/amun-evolution/src/signatures.rs-68-            signatures,
+crates/amun-evolution/src/signatures.rs-69-            quorum_reached: quorum,
+crates/amun-evolution/src/signatures.rs-70-            total_signers: total,
+crates/amun-evolution/src/signatures.rs-71-            required_quorum,
+crates/amun-evolution/src/signatures.rs-72-            aggregate_hash: [0u8; 32],
+--
+crates/amun-evolution/src/certificate.rs-1-use amun_canonical_codec::CanonicalHasher;
+crates/amun-evolution/src/certificate.rs-2-use amun_lineage::record::{
+crates/amun-evolution/src/certificate.rs-3-    ContinuityClass, GovernanceGuarantee, ProofGuarantee, ReplayGuarantee, SnapshotGuarantee,
+crates/amun-evolution/src/certificate.rs-4-};
+crates/amun-evolution/src/certificate.rs-5-
+crates/amun-evolution/src/certificate.rs-6-pub const CERTIFICATE_DOMAIN: &[u8] = b"AMUN_EVOLUTION_CERT_V1";
+crates/amun-evolution/src/certificate.rs-7-
+crates/amun-evolution/src/certificate.rs-8-#[derive(Debug, Clone, PartialEq, Eq)]
+crates/amun-evolution/src/certificate.rs:9:pub struct ConstitutionalPhysicsProof {
+crates/amun-evolution/src/certificate.rs-10-    pub preserves_empty_root: bool,
+crates/amun-evolution/src/certificate.rs-11-    pub preserves_max_depth: bool,
+crates/amun-evolution/src/certificate.rs-12-    pub preserves_proof_semantics: bool,
+crates/amun-evolution/src/certificate.rs-13-    pub preserves_replay_determinism: bool,
+crates/amun-evolution/src/certificate.rs-14-    pub preserves_hash_domains: bool,
+crates/amun-evolution/src/certificate.rs-15-    pub proof_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs-16-}
+crates/amun-evolution/src/certificate.rs-17-
+crates/amun-evolution/src/certificate.rs:18:impl ConstitutionalPhysicsProof {
+crates/amun-evolution/src/certificate.rs-19-    pub fn new(
+crates/amun-evolution/src/certificate.rs-20-        preserves_empty_root: bool,
+crates/amun-evolution/src/certificate.rs-21-        preserves_max_depth: bool,
+crates/amun-evolution/src/certificate.rs-22-        preserves_proof_semantics: bool,
+crates/amun-evolution/src/certificate.rs-23-        preserves_replay_determinism: bool,
+crates/amun-evolution/src/certificate.rs-24-        preserves_hash_domains: bool,
+crates/amun-evolution/src/certificate.rs-25-    ) -> Self {
+crates/amun-evolution/src/certificate.rs-26-        let mut proof = Self {
+--
+crates/amun-evolution/src/certificate.rs-64-    pub parent_lineage_id: [u8; 32],
+crates/amun-evolution/src/certificate.rs-65-    pub parent_certificate_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs-66-    pub head_set_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs-67-    pub replay_guarantee: ReplayGuarantee,
+crates/amun-evolution/src/certificate.rs-68-    pub snapshot_guarantee: SnapshotGuarantee,
+crates/amun-evolution/src/certificate.rs-69-    pub proof_guarantee: ProofGuarantee,
+crates/amun-evolution/src/certificate.rs-70-    pub governance_guarantee: GovernanceGuarantee,
+crates/amun-evolution/src/certificate.rs-71-    pub continuity_class: ContinuityClass,
+crates/amun-evolution/src/certificate.rs:72:    pub physics_proof: ConstitutionalPhysicsProof,
+crates/amun-evolution/src/certificate.rs-73-    pub certificate_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs-74-}
+crates/amun-evolution/src/certificate.rs-75-
+crates/amun-evolution/src/certificate.rs-76-impl EvolutionActivationCertificate {
+crates/amun-evolution/src/certificate.rs-77-    #[allow(clippy::too_many_arguments)]
+crates/amun-evolution/src/certificate.rs-78-    pub fn new(
+crates/amun-evolution/src/certificate.rs-79-        parent: [u8; 32],
+crates/amun-evolution/src/certificate.rs-80-        child: [u8; 32],
+--
+crates/amun-evolution/src/certificate.rs-88-        parent_lineage_id: [u8; 32],
+crates/amun-evolution/src/certificate.rs-89-        parent_certificate_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs-90-        head_set_hash: [u8; 32],
+crates/amun-evolution/src/certificate.rs-91-        replay: ReplayGuarantee,
+crates/amun-evolution/src/certificate.rs-92-        snapshot: SnapshotGuarantee,
+crates/amun-evolution/src/certificate.rs-93-        proof: ProofGuarantee,
+crates/amun-evolution/src/certificate.rs-94-        governance: GovernanceGuarantee,
+crates/amun-evolution/src/certificate.rs-95-        continuity: ContinuityClass,
+crates/amun-evolution/src/certificate.rs:96:        physics_proof: ConstitutionalPhysicsProof,
+crates/amun-evolution/src/certificate.rs-97-    ) -> Self {
+crates/amun-evolution/src/certificate.rs-98-        let mut cert = Self {
+crates/amun-evolution/src/certificate.rs-99-            parent_constitution: parent,
+crates/amun-evolution/src/certificate.rs-100-            child_constitution: child,
+crates/amun-evolution/src/certificate.rs-101-            activation_epoch: epoch,
+crates/amun-evolution/src/certificate.rs-102-            ratification_proof,
+crates/amun-evolution/src/certificate.rs-103-            validator_set_hash,
+crates/amun-evolution/src/certificate.rs-104-            certificate_signature_root: signature_root,
+--
+crates/amun-experimental-framework/src/main.rs-1-use amun_bytecode::opcodes::OpCode;
+crates/amun-experimental-framework/src/main.rs:2:use amun_bytecode::program::ConstitutionalProgram;
+crates/amun-experimental-framework/src/main.rs:3:use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
+crates/amun-experimental-framework/src/main.rs-4-use amun_proof_archive::hot_store::HotProofStore;
+crates/amun-experimental-framework/src/main.rs-5-use amun_proof_archive::proof_archive::ProofArchive;
+crates/amun-experimental-framework/src/main.rs:6:use amun_replay_verifier::replay_verifier::ReplayVerifier;
+crates/amun-experimental-framework/src/main.rs-7-use amun_resource_core::{
+crates/amun-experimental-framework/src/main.rs-8-    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-experimental-framework/src/main.rs-9-    ResourceState,
+crates/amun-experimental-framework/src/main.rs-10-};
+crates/amun-experimental-framework/src/main.rs-11-use amun_vm_kernel::execution_context::ExecutionContext;
+crates/amun-experimental-framework/src/main.rs-12-use std::time::Instant;
+crates/amun-experimental-framework/src/main.rs-13-
+crates/amun-experimental-framework/src/main.rs-14-fn make_id(seed: u64) -> ResourceId {
+--
+crates/amun-experimental-framework/src/main.rs-108-        )
+crates/amun-experimental-framework/src/main.rs-109-        .unwrap();
+crates/amun-experimental-framework/src/main.rs-110-        parent = child;
+crates/amun-experimental-framework/src/main.rs-111-    }
+crates/amun-experimental-framework/src/main.rs-112-    (reg, parent)
+crates/amun-experimental-framework/src/main.rs-113-}
+crates/amun-experimental-framework/src/main.rs-114-
+crates/amun-experimental-framework/src/main.rs-115-/// Workload A: Halt — baseline overhead.
+crates/amun-experimental-framework/src/main.rs:116:fn workload_halt() -> ConstitutionalProgram {
+crates/amun-experimental-framework/src/main.rs:117:    ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt])
+crates/amun-experimental-framework/src/main.rs-118-}
+crates/amun-experimental-framework/src/main.rs-119-
+crates/amun-experimental-framework/src/main.rs-120-/// Workload B: Push10 — compute overhead.
+crates/amun-experimental-framework/src/main.rs:121:fn workload_push10() -> ConstitutionalProgram {
+crates/amun-experimental-framework/src/main.rs:122:    ConstitutionalProgram::new(
+crates/amun-experimental-framework/src/main.rs-123-        1,
+crates/amun-experimental-framework/src/main.rs-124-        0,
+crates/amun-experimental-framework/src/main.rs-125-        0,
+crates/amun-experimental-framework/src/main.rs-126-        vec![
+crates/amun-experimental-framework/src/main.rs-127-            OpCode::Push(1),
+crates/amun-experimental-framework/src/main.rs-128-            OpCode::Push(2),
+crates/amun-experimental-framework/src/main.rs-129-            OpCode::Push(3),
+crates/amun-experimental-framework/src/main.rs-130-            OpCode::Push(4),
+--
+crates/amun-experimental-framework/src/main.rs-135-            OpCode::Push(9),
+crates/amun-experimental-framework/src/main.rs-136-            OpCode::Push(10),
+crates/amun-experimental-framework/src/main.rs-137-            OpCode::Halt,
+crates/amun-experimental-framework/src/main.rs-138-        ],
+crates/amun-experimental-framework/src/main.rs-139-    )
+crates/amun-experimental-framework/src/main.rs-140-}
+crates/amun-experimental-framework/src/main.rs-141-
+crates/amun-experimental-framework/src/main.rs-142-/// Workload C: Transform — single resource transformation.
+crates/amun-experimental-framework/src/main.rs:143:fn workload_transform() -> ConstitutionalProgram {
+crates/amun-experimental-framework/src/main.rs:144:    ConstitutionalProgram::new(
+crates/amun-experimental-framework/src/main.rs-145-        2,
+crates/amun-experimental-framework/src/main.rs-146-        0,
+crates/amun-experimental-framework/src/main.rs-147-        0,
+crates/amun-experimental-framework/src/main.rs-148-        vec![
+crates/amun-experimental-framework/src/main.rs-149-            OpCode::Transform {
+crates/amun-experimental-framework/src/main.rs-150-                src_handle: 0,
+crates/amun-experimental-framework/src/main.rs-151-                type_idx: 0,
+crates/amun-experimental-framework/src/main.rs-152-            },
+crates/amun-experimental-framework/src/main.rs-153-            OpCode::Halt,
+crates/amun-experimental-framework/src/main.rs-154-        ],
+crates/amun-experimental-framework/src/main.rs-155-    )
+crates/amun-experimental-framework/src/main.rs-156-}
+crates/amun-experimental-framework/src/main.rs-157-
+crates/amun-experimental-framework/src/main.rs-158-/// Workload D: Split — split one asset into 5 children.
+crates/amun-experimental-framework/src/main.rs:159:fn workload_split() -> ConstitutionalProgram {
+crates/amun-experimental-framework/src/main.rs:160:    ConstitutionalProgram::new(
+crates/amun-experimental-framework/src/main.rs-161-        2,
+crates/amun-experimental-framework/src/main.rs-162-        0,
+crates/amun-experimental-framework/src/main.rs-163-        0,
+crates/amun-experimental-framework/src/main.rs-164-        vec![
+crates/amun-experimental-framework/src/main.rs-165-            OpCode::Push(0),
+crates/amun-experimental-framework/src/main.rs-166-            OpCode::Split {
+crates/amun-experimental-framework/src/main.rs-167-                handle: 0,
+crates/amun-experimental-framework/src/main.rs-168-                amount_count: 5,
+--
+crates/amun-experimental-framework/src/main.rs-187-            block_height: 1,
+crates/amun-experimental-framework/src/main.rs-188-            block_hash: [0u8; 32],
+crates/amun-experimental-framework/src/main.rs-189-            transaction_hash: [0xaa; 32],
+crates/amun-experimental-framework/src/main.rs-190-            pre_state_root: reg.compute_state_root(),
+crates/amun-experimental-framework/src/main.rs-191-            authority: [2u8; 32],
+crates/amun-experimental-framework/src/main.rs-192-        };
+crates/amun-experimental-framework/src/main.rs-193-        let mut hot = HotProofStore::new(1000);
+crates/amun-experimental-framework/src/main.rs-194-        let mut archive = ProofArchive::new();
+crates/amun-experimental-framework/src/main.rs:195:        let result = ConstitutionalRuntime::execute(
+crates/amun-experimental-framework/src/main.rs-196-            &program,
+crates/amun-experimental-framework/src/main.rs-197-            &ctx,
+crates/amun-experimental-framework/src/main.rs-198-            &mut reg,
+crates/amun-experimental-framework/src/main.rs-199-            &[],
+crates/amun-experimental-framework/src/main.rs-200-            100_000,
+crates/amun-experimental-framework/src/main.rs-201-            &mut hot,
+crates/amun-experimental-framework/src/main.rs-202-            &mut archive,
+crates/amun-experimental-framework/src/main.rs-203-        )
+--
+crates/amun-experimental-framework/src/main.rs-206-            PipelineResult::Committed {
+crates/amun-experimental-framework/src/main.rs-207-                transition_proof, ..
+crates/amun-experimental-framework/src/main.rs-208-            } => transition_proof,
+crates/amun-experimental-framework/src/main.rs-209-            _ => panic!("Expected Committed"),
+crates/amun-experimental-framework/src/main.rs-210-        };
+crates/amun-experimental-framework/src/main.rs-211-
+crates/amun-experimental-framework/src/main.rs-212-        let stats = measure_us(&format!("replay_{}_active", size), 5, 30, || {
+crates/amun-experimental-framework/src/main.rs-213-            let mut fresh = ResourceRegistry::new((size * 2) as usize);
+crates/amun-experimental-framework/src/main.rs:214:            ReplayVerifier::replay(&proof, &program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs-215-        });
+crates/amun-experimental-framework/src/main.rs-216-        rows.push(vec![
+crates/amun-experimental-framework/src/main.rs-217-            size.to_string(),
+crates/amun-experimental-framework/src/main.rs-218-            format!("{:.4}", stats.mean),
+crates/amun-experimental-framework/src/main.rs-219-            format!("{:.4}", stats.ci95),
+crates/amun-experimental-framework/src/main.rs-220-        ]);
+crates/amun-experimental-framework/src/main.rs-221-    }
+crates/amun-experimental-framework/src/main.rs-222-    write_csv(
+--
+crates/amun-experimental-framework/src/main.rs-224-        &["active_resources", "replay_time_us", "ci95_us"],
+crates/amun-experimental-framework/src/main.rs-225-        &rows,
+crates/amun-experimental-framework/src/main.rs-226-    );
+crates/amun-experimental-framework/src/main.rs-227-}
+crates/amun-experimental-framework/src/main.rs-228-
+crates/amun-experimental-framework/src/main.rs-229-// ── Experiment 2: Replay vs Execution (all workloads) ───────
+crates/amun-experimental-framework/src/main.rs-230-fn exp2_replay_vs_execute() {
+crates/amun-experimental-framework/src/main.rs-231-    println!("\n=== Experiment 2: Replay vs Execution ===");
+crates/amun-experimental-framework/src/main.rs:232:    let workloads: Vec<(&str, ConstitutionalProgram)> = vec![
+crates/amun-experimental-framework/src/main.rs-233-        ("halt", workload_halt()),
+crates/amun-experimental-framework/src/main.rs-234-        ("push10", workload_push10()),
+crates/amun-experimental-framework/src/main.rs-235-        ("transform", workload_transform()),
+crates/amun-experimental-framework/src/main.rs-236-        ("split", workload_split()),
+crates/amun-experimental-framework/src/main.rs-237-    ];
+crates/amun-experimental-framework/src/main.rs-238-    let size = 10_000u64;
+crates/amun-experimental-framework/src/main.rs-239-    let mut rows: Vec<Vec<String>> = vec![];
+crates/amun-experimental-framework/src/main.rs-240-
+--
+crates/amun-experimental-framework/src/main.rs-252-
+crates/amun-experimental-framework/src/main.rs-253-        // Measure execution
+crates/amun-experimental-framework/src/main.rs-254-        let mut hot = HotProofStore::new(1000);
+crates/amun-experimental-framework/src/main.rs-255-        let mut archive = ProofArchive::new();
+crates/amun-experimental-framework/src/main.rs-256-        let exec_stats = measure_us(&format!("execute_{}", name), 5, 30, || {
+crates/amun-experimental-framework/src/main.rs-257-            let mut r = reg.clone();
+crates/amun-experimental-framework/src/main.rs-258-            let mut h = hot.clone();
+crates/amun-experimental-framework/src/main.rs-259-            let mut a = archive.clone();
+crates/amun-experimental-framework/src/main.rs:260:            match ConstitutionalRuntime::execute(
+crates/amun-experimental-framework/src/main.rs-261-                program,
+crates/amun-experimental-framework/src/main.rs-262-                &ctx,
+crates/amun-experimental-framework/src/main.rs-263-                &mut r,
+crates/amun-experimental-framework/src/main.rs-264-                &[],
+crates/amun-experimental-framework/src/main.rs-265-                100_000,
+crates/amun-experimental-framework/src/main.rs-266-                &mut h,
+crates/amun-experimental-framework/src/main.rs-267-                &mut a,
+crates/amun-experimental-framework/src/main.rs-268-            ) {
+crates/amun-experimental-framework/src/main.rs-269-                Ok(_) => {}
+crates/amun-experimental-framework/src/main.rs-270-                Err(e) => {
+crates/amun-experimental-framework/src/main.rs-271-                    println!("  {} execution failed: {}", name, e);
+crates/amun-experimental-framework/src/main.rs-272-                }
+crates/amun-experimental-framework/src/main.rs-273-            }
+crates/amun-experimental-framework/src/main.rs-274-        });
+crates/amun-experimental-framework/src/main.rs-275-
+crates/amun-experimental-framework/src/main.rs-276-        // Get proof
+crates/amun-experimental-framework/src/main.rs:277:        let result = ConstitutionalRuntime::execute(
+crates/amun-experimental-framework/src/main.rs-278-            program,
+crates/amun-experimental-framework/src/main.rs-279-            &ctx,
+crates/amun-experimental-framework/src/main.rs-280-            &mut reg,
+crates/amun-experimental-framework/src/main.rs-281-            &[],
+crates/amun-experimental-framework/src/main.rs-282-            100_000,
+crates/amun-experimental-framework/src/main.rs-283-            &mut hot,
+crates/amun-experimental-framework/src/main.rs-284-            &mut archive,
+crates/amun-experimental-framework/src/main.rs-285-        );
+--
+crates/amun-experimental-framework/src/main.rs-303-                ]);
+crates/amun-experimental-framework/src/main.rs-304-                continue;
+crates/amun-experimental-framework/src/main.rs-305-            }
+crates/amun-experimental-framework/src/main.rs-306-        };
+crates/amun-experimental-framework/src/main.rs-307-
+crates/amun-experimental-framework/src/main.rs-308-        // Measure replay
+crates/amun-experimental-framework/src/main.rs-309-        let replay_stats = measure_us(&format!("replay_{}", name), 5, 30, || {
+crates/amun-experimental-framework/src/main.rs-310-            let mut fresh = ResourceRegistry::new((size * 2) as usize);
+crates/amun-experimental-framework/src/main.rs:311:            ReplayVerifier::replay(&proof, program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs-312-        });
+crates/amun-experimental-framework/src/main.rs-313-
+crates/amun-experimental-framework/src/main.rs-314-        let speedup = exec_stats.mean / replay_stats.mean;
+crates/amun-experimental-framework/src/main.rs-315-        println!("  speedup({}) = {:.2}x", name, speedup);
+crates/amun-experimental-framework/src/main.rs-316-        rows.push(vec![
+crates/amun-experimental-framework/src/main.rs-317-            name.to_string(),
+crates/amun-experimental-framework/src/main.rs-318-            format!("{:.4}", exec_stats.mean),
+crates/amun-experimental-framework/src/main.rs-319-            format!("{:.4}", replay_stats.mean),
+--
+crates/amun-experimental-framework/src/main.rs-348-                    transaction_hash: {
+crates/amun-experimental-framework/src/main.rs-349-                        let mut h = [0u8; 32];
+crates/amun-experimental-framework/src/main.rs-350-                        h[0..8].copy_from_slice(&i.to_le_bytes());
+crates/amun-experimental-framework/src/main.rs-351-                        h
+crates/amun-experimental-framework/src/main.rs-352-                    },
+crates/amun-experimental-framework/src/main.rs-353-                    pre_state_root: reg.compute_state_root(),
+crates/amun-experimental-framework/src/main.rs-354-                    authority: [2u8; 32],
+crates/amun-experimental-framework/src/main.rs-355-                };
+crates/amun-experimental-framework/src/main.rs:356:                let result = ConstitutionalRuntime::execute(
+crates/amun-experimental-framework/src/main.rs-357-                    &program,
+crates/amun-experimental-framework/src/main.rs-358-                    &ctx,
+crates/amun-experimental-framework/src/main.rs-359-                    &mut reg,
+crates/amun-experimental-framework/src/main.rs-360-                    &[],
+crates/amun-experimental-framework/src/main.rs-361-                    100_000,
+crates/amun-experimental-framework/src/main.rs-362-                    &mut hot,
+crates/amun-experimental-framework/src/main.rs-363-                    &mut archive,
+crates/amun-experimental-framework/src/main.rs-364-                )
+crates/amun-experimental-framework/src/main.rs-365-                .unwrap();
+crates/amun-experimental-framework/src/main.rs-366-                if let PipelineResult::Committed {
+crates/amun-experimental-framework/src/main.rs-367-                    transition_proof, ..
+crates/amun-experimental-framework/src/main.rs-368-                } = result
+crates/amun-experimental-framework/src/main.rs-369-                {
+crates/amun-experimental-framework/src/main.rs-370-                    let mut fresh = ResourceRegistry::new(10000);
+crates/amun-experimental-framework/src/main.rs:371:                    ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs-372-                }
+crates/amun-experimental-framework/src/main.rs-373-            }
+crates/amun-experimental-framework/src/main.rs-374-        });
+crates/amun-experimental-framework/src/main.rs-375-        rows.push(vec![
+crates/amun-experimental-framework/src/main.rs-376-            n.to_string(),
+crates/amun-experimental-framework/src/main.rs-377-            format!("{:.4}", stats.mean),
+crates/amun-experimental-framework/src/main.rs-378-            format!("{:.4}", stats.ci95),
+crates/amun-experimental-framework/src/main.rs-379-        ]);
+--
+crates/amun-experimental-framework/src/main.rs-418-    }
+crates/amun-experimental-framework/src/main.rs-419-    write_csv(
+crates/amun-experimental-framework/src/main.rs-420-        "cycle_detection.csv",
+crates/amun-experimental-framework/src/main.rs-421-        &["depth", "time_us", "ci95_us"],
+crates/amun-experimental-framework/src/main.rs-422-        &rows,
+crates/amun-experimental-framework/src/main.rs-423-    );
+crates/amun-experimental-framework/src/main.rs-424-}
+crates/amun-experimental-framework/src/main.rs-425-
+crates/amun-experimental-framework/src/main.rs:426:// ── Experiment 5: Witness Bundle Size ───────────────────────
+crates/amun-experimental-framework/src/main.rs-427-fn exp5_witness_size() {
+crates/amun-experimental-framework/src/main.rs:428:    println!("\n=== Experiment 5: Witness Bundle Size ===");
+crates/amun-experimental-framework/src/main.rs-429-    let sizes = [1u64, 10, 100, 1000];
+crates/amun-experimental-framework/src/main.rs:430:    let workloads: Vec<(&str, ConstitutionalProgram)> = vec![
+crates/amun-experimental-framework/src/main.rs-431-        ("halt", workload_halt()),
+crates/amun-experimental-framework/src/main.rs-432-        ("transform", workload_transform()),
+crates/amun-experimental-framework/src/main.rs-433-    ];
+crates/amun-experimental-framework/src/main.rs-434-    let mut rows: Vec<Vec<String>> = vec![];
+crates/amun-experimental-framework/src/main.rs-435-
+crates/amun-experimental-framework/src/main.rs-436-    for (name, program) in &workloads {
+crates/amun-experimental-framework/src/main.rs-437-        for &size in &sizes {
+crates/amun-experimental-framework/src/main.rs-438-            let mut reg = build_registry(size);
+--
+crates/amun-experimental-framework/src/main.rs-442-                block_height: 1,
+crates/amun-experimental-framework/src/main.rs-443-                block_hash: [0u8; 32],
+crates/amun-experimental-framework/src/main.rs-444-                transaction_hash: [0xaa; 32],
+crates/amun-experimental-framework/src/main.rs-445-                pre_state_root: reg.compute_state_root(),
+crates/amun-experimental-framework/src/main.rs-446-                authority: [2u8; 32],
+crates/amun-experimental-framework/src/main.rs-447-            };
+crates/amun-experimental-framework/src/main.rs-448-            let mut hot = HotProofStore::new(1000);
+crates/amun-experimental-framework/src/main.rs-449-            let mut archive = ProofArchive::new();
+crates/amun-experimental-framework/src/main.rs:450:            let result = ConstitutionalRuntime::execute(
+crates/amun-experimental-framework/src/main.rs-451-                program,
+crates/amun-experimental-framework/src/main.rs-452-                &ctx,
+crates/amun-experimental-framework/src/main.rs-453-                &mut reg,
+crates/amun-experimental-framework/src/main.rs-454-                &[],
+crates/amun-experimental-framework/src/main.rs-455-                100_000,
+crates/amun-experimental-framework/src/main.rs-456-                &mut hot,
+crates/amun-experimental-framework/src/main.rs-457-                &mut archive,
+crates/amun-experimental-framework/src/main.rs-458-            )
+--
+crates/amun-execution-receipt/src/lib.rs:1://! # Constitutional Execution Receipts
+crates/amun-execution-receipt/src/lib.rs-2-//!
+crates/amun-execution-receipt/src/lib.rs-3-//! This crate defines the **immutable evidence** produced by every
+crates/amun-execution-receipt/src/lib.rs-4-//! state transition. It is the bridge between execution and truth.
+crates/amun-execution-receipt/src/lib.rs-5-//!
+crates/amun-execution-receipt/src/lib.rs:6://! ## Constitutional Invariants
+crates/amun-execution-receipt/src/lib.rs-7-//! - Every receipt is immutable after creation.
+crates/amun-execution-receipt/src/lib.rs-8-//! - If `state_changed` is true, `pre_root != post_root`.
+crates/amun-execution-receipt/src/lib.rs-9-//! - If `state_changed` is false, `pre_root == post_root`.
+crates/amun-execution-receipt/src/lib.rs-10-//! - Receipts are hash‑linked into an append‑only chain.
+crates/amun-execution-receipt/src/lib.rs-11-//! - Transcripts verify both individual receipts and chain continuity.
+crates/amun-execution-receipt/src/lib.rs-12-
+crates/amun-execution-receipt/src/lib.rs-13-use amun_kernel::canonical::{CanonicalEncode, CanonicalEncoder};
+crates/amun-execution-receipt/src/lib.rs-14-use amun_kernel::hashing::domain_tags;
+--
+crates/amun-execution-receipt/src/lib.rs-87-        CanonicalEncoder::hash_value(self, domain_tags::EXECUTION_RECEIPT)
+crates/amun-execution-receipt/src/lib.rs-88-    }
+crates/amun-execution-receipt/src/lib.rs-89-
+crates/amun-execution-receipt/src/lib.rs-90-    /// Verify a critical constitutional invariant:
+crates/amun-execution-receipt/src/lib.rs-91-    /// - If roots are equal, `state_changed` must be false.
+crates/amun-execution-receipt/src/lib.rs-92-    /// - If roots differ, `state_changed` must be true.
+crates/amun-execution-receipt/src/lib.rs-93-    pub fn verify_consistency(&self) -> Result<(), &'static str> {
+crates/amun-execution-receipt/src/lib.rs-94-        if self.pre_state_root == self.post_state_root && self.state_changed {
+crates/amun-execution-receipt/src/lib.rs:95:            return Err("Constitutional anomaly: state unchanged but execution claims mutation");
+crates/amun-execution-receipt/src/lib.rs-96-        }
+crates/amun-execution-receipt/src/lib.rs-97-        if self.pre_state_root != self.post_state_root && !self.state_changed {
+crates/amun-execution-receipt/src/lib.rs:98:            return Err("Constitutional anomaly: state mutated but execution claims no mutation");
+crates/amun-execution-receipt/src/lib.rs-99-        }
+crates/amun-execution-receipt/src/lib.rs-100-        Ok(())
+crates/amun-execution-receipt/src/lib.rs-101-    }
+crates/amun-execution-receipt/src/lib.rs-102-}
+crates/amun-execution-receipt/src/lib.rs-103-
+crates/amun-execution-receipt/src/lib.rs-104-/// A sequence of execution receipts, forming a deterministic transcript.
+crates/amun-execution-receipt/src/lib.rs-105-#[derive(Debug, Clone)]
+crates/amun-execution-receipt/src/lib.rs-106-pub struct ExecutionTranscript {
+--
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-4-fn n171_fuzz_deploy_10000() {
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-5-    let result = fuzz_contract_deploy(10000);
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-6-    println!(
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-7-        "Deploy fuzz: {} deploys, {} failed, {} evidence mismatches",
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-8-        result.successful_deploys, result.failed_deploys, result.evidence_mismatches
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-9-    );
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-10-    assert!(
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-11-        result.passed(),
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs:12:        "Evidence mismatches: {}",
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-13-        result.evidence_mismatches
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-14-    );
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-15-    assert!(result.successful_deploys > 0, "No successful deploys");
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-16-}
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-17-
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-18-#[test]
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-19-fn n171_fuzz_call_5000() {
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-20-    let result = fuzz_contract_call(5000);
+--
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-22-        "Call fuzz: {} calls, {} failed, {} gas exhaustions, {} evidence mismatches",
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-23-        result.successful_calls,
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-24-        result.failed_calls,
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-25-        result.gas_exhaustions,
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-26-        result.evidence_mismatches
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-27-    );
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-28-    assert!(
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-29-        result.passed(),
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs:30:        "Evidence mismatches: {}",
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-31-        result.evidence_mismatches
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-32-    );
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-33-}
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-34-
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-35-#[test]
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-36-fn n171_fuzz_gas_limits_5000() {
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-37-    let result = fuzz_gas_limits(5000);
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-38-    println!(
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-39-        "Gas fuzz: {} calls, {} failed, {} gas exhaustions, {} evidence mismatches",
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-40-        result.successful_calls,
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-41-        result.failed_calls,
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-42-        result.gas_exhaustions,
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-43-        result.evidence_mismatches
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-44-    );
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-45-    assert!(
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-46-        result.passed(),
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs:47:        "Evidence mismatches: {}",
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-48-        result.evidence_mismatches
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-49-    );
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-50-    assert!(result.gas_exhaustions > 0, "No gas exhaustions detected");
+crates/amun-contract-fuzzing/tests/n171_fuzzing_tests.rs-51-}
+--
+crates/amun-proof-archive/src/hot_store.rs:1:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-proof-archive/src/hot_store.rs-2-use std::collections::HashMap;
+crates/amun-proof-archive/src/hot_store.rs-3-
+crates/amun-proof-archive/src/hot_store.rs-4-#[derive(Debug, Clone, Default)]
+crates/amun-proof-archive/src/hot_store.rs-5-pub struct HotProofStore {
+crates/amun-proof-archive/src/hot_store.rs:6:    proofs: HashMap<[u8; 32], TransitionProof>,
+crates/amun-proof-archive/src/hot_store.rs-7-    stored_at: HashMap<[u8; 32], u64>,
+crates/amun-proof-archive/src/hot_store.rs-8-    retention_blocks: u64,
+crates/amun-proof-archive/src/hot_store.rs-9-}
+crates/amun-proof-archive/src/hot_store.rs-10-
+crates/amun-proof-archive/src/hot_store.rs-11-impl HotProofStore {
+crates/amun-proof-archive/src/hot_store.rs-12-    pub fn new(retention_blocks: u64) -> Self {
+crates/amun-proof-archive/src/hot_store.rs-13-        Self {
+crates/amun-proof-archive/src/hot_store.rs-14-            proofs: HashMap::new(),
+crates/amun-proof-archive/src/hot_store.rs-15-            stored_at: HashMap::new(),
+crates/amun-proof-archive/src/hot_store.rs-16-            retention_blocks,
+crates/amun-proof-archive/src/hot_store.rs-17-        }
+crates/amun-proof-archive/src/hot_store.rs-18-    }
+crates/amun-proof-archive/src/hot_store.rs-19-
+crates/amun-proof-archive/src/hot_store.rs:20:    pub fn store(&mut self, proof: TransitionProof, block_height: u64) {
+crates/amun-proof-archive/src/hot_store.rs-21-        let hash = proof.proof_hash;
+crates/amun-proof-archive/src/hot_store.rs-22-        self.proofs.insert(hash, proof);
+crates/amun-proof-archive/src/hot_store.rs-23-        self.stored_at.insert(hash, block_height);
+crates/amun-proof-archive/src/hot_store.rs-24-    }
+crates/amun-proof-archive/src/hot_store.rs-25-
+crates/amun-proof-archive/src/hot_store.rs:26:    pub fn get(&self, proof_hash: &[u8; 32]) -> Option<&TransitionProof> {
+crates/amun-proof-archive/src/hot_store.rs-27-        self.proofs.get(proof_hash)
+crates/amun-proof-archive/src/hot_store.rs-28-    }
+crates/amun-proof-archive/src/hot_store.rs-29-
+crates/amun-proof-archive/src/hot_store.rs-30-    pub fn total(&self) -> usize {
+crates/amun-proof-archive/src/hot_store.rs-31-        self.proofs.len()
+crates/amun-proof-archive/src/hot_store.rs-32-    }
+crates/amun-proof-archive/src/hot_store.rs-33-
+crates/amun-proof-archive/src/hot_store.rs-34-    pub fn prune(&mut self, current_block: u64) -> usize {
+--
+crates/amun-proof-archive/src/hot_store.rs-58-    use amun_resource_core::ResourceId;
+crates/amun-proof-archive/src/hot_store.rs-59-
+crates/amun-proof-archive/src/hot_store.rs-60-    fn make_id(seed: u8) -> ResourceId {
+crates/amun-proof-archive/src/hot_store.rs-61-        let mut h = [0u8; 32];
+crates/amun-proof-archive/src/hot_store.rs-62-        h[0] = seed;
+crates/amun-proof-archive/src/hot_store.rs-63-        ResourceId(h)
+crates/amun-proof-archive/src/hot_store.rs-64-    }
+crates/amun-proof-archive/src/hot_store.rs-65-
+crates/amun-proof-archive/src/hot_store.rs:66:    fn make_proof(tx_hash: [u8; 32]) -> TransitionProof {
+crates/amun-proof-archive/src/hot_store.rs:67:        TransitionProof::new(
+crates/amun-proof-archive/src/hot_store.rs-68-            tx_hash,
+crates/amun-proof-archive/src/hot_store.rs-69-            make_id(1),
+crates/amun-proof-archive/src/hot_store.rs-70-            1,

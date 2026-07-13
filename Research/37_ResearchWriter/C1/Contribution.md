@@ -1,0 +1,658 @@
+# Constitutional Verification
+
+## Formal Objects
+9:crates/amun-codec/src/writer.rs:115:                ConstitutionalFault::InvalidStateTransition,
+10:crates/amun-codec/src/writer.rs:128:                ConstitutionalFault::InvalidStateTransition,
+25:crates/amun-consensus-types/src/errors.rs:19:            ConstitutionalFault::InvalidStateTransition,
+34:crates/amun-constitutional-enforcement/src/lib.rs:112:                ConstitutionalLaw::StateTransitionValidity,
+35:crates/amun-constitutional-enforcement/src/lib.rs:179:                &ConstitutionalLaw::StateTransitionValidity,
+37:crates/amun-constitutional-enforcement/src/proof_engine.rs:194:                law: ConstitutionalLaw::StateTransitionValidity,
+40:crates/amun-constitutional-enforcement/src/state_transition.rs:178:                    .any(|v| v.law == ConstitutionalLaw::StateTransitionValidity));
+42:crates/amun-constitutional-enforcement/src/state_transition.rs:70:                law: ConstitutionalLaw::StateTransitionValidity,
+46:crates/amun-constitutional-geometry/src/flow_dynamics.rs:61:                ConstitutionalForce::InvariantForce { strength, .. } => {
+187:crates/amun-constitutional-proof/src/certification.rs:1:use crate::{ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult};
+554:crates/amun-constitutional-proof/src/report_generator.rs:3:use crate::{ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult};
+560:crates/amun-constitutional-proof/src/verdict_evaluator.rs:3:    ConstitutionalVerdict, ObligationResult, ObligationResultStatus, ObligationSeverity,
+617:crates/amun-evidence-engine/src/evidence_engine.rs:153:        archive.insert(ConstitutionalEvidence::InvariantViolation {
+619:crates/amun-evidence-engine/src/evidence_engine.rs:34:                ConstitutionalEvidence::InvariantViolation {
+623:crates/amun-execution-receipt/src/lib.rs:6://! ## Constitutional Invariants
+627:crates/amun-failure/src/tests.rs:32:    assert!(!ConstitutionalFault::InvalidStateTransition.should_halt());
+638:crates/amun-invariant-engine/src/invariant_engine.rs:135:            ConstitutionalEvidence::InvariantViolation { obligation_id, .. } => {
+648:crates/amun-invariant-engine/src/invariant_engine.rs:194:                ConstitutionalEvidence::InvariantViolation { state_root: sr, .. } => {
+650:crates/amun-invariant-engine/src/invariant_engine.rs:19:    ) -> (Vec<InvariantResult>, Vec<ConstitutionalEvidence>)
+653:crates/amun-invariant-engine/src/invariant_engine.rs:35:                evidence.push(ConstitutionalEvidence::InvariantViolation {
+726:crates/amun-networking/tests/n18_node_rejoin.rs:73:// N18.5 — Constitutional Invariant REJOIN-001
+803:crates/amun-self-preservation/src/lib.rs:15:pub use action_principle::{ConstitutionalAction, LeastInvariantViolation};
+813:crates/amun-state-machine/src/axioms.rs:30:impl ConstitutionalAxiom {
+817:crates/amun-state-machine/src/axioms.rs:57:        axiom: ConstitutionalAxiom,
+818:crates/amun-state-machine/src/axioms.rs:5:pub enum ConstitutionalAxiom {
+819:crates/amun-state-machine/src/axioms.rs:62:/// The ConstitutionalAxiomEngine verifies that all axioms hold for a given state.
+820:crates/amun-state-machine/src/axioms.rs:63:pub struct ConstitutionalAxiomEngine;
+821:crates/amun-state-machine/src/axioms.rs:65:impl ConstitutionalAxiomEngine {
+834:crates/amun-state-machine/src/derivation.rs:1:use super::axioms::ConstitutionalAxiom;
+836:crates/amun-state-machine/src/derivation.rs:35:    Axiom(ConstitutionalAxiom),
+838:crates/amun-state-machine/src/derivation.rs:43:    pub axioms_checked: Vec<ConstitutionalAxiom>,
+840:crates/amun-state-machine/src/derivation.rs:8:    pub depends_on: Vec<ConstitutionalAxiom>,
+841:crates/amun-state-machine/src/engine.rs:123:        invariants: &[ConstitutionalInvariant],
+842:crates/amun-state-machine/src/engine.rs:130:                ConstitutionalInvariant::NoImpossibleState => {
+843:crates/amun-state-machine/src/engine.rs:137:                ConstitutionalInvariant::TransitionHistoryAcyclic => {
+844:crates/amun-state-machine/src/engine.rs:142:                ConstitutionalInvariant::LineageIntact
+847:crates/amun-state-machine/src/engine.rs:2:use super::invariants::ConstitutionalInvariant;
+862:crates/amun-state-machine/src/invariants.rs:3:pub enum ConstitutionalInvariant {
+864:crates/amun-state-machine/src/lib.rs:30:pub use axioms::{AxiomVerification, ConstitutionalAxiom, ConstitutionalAxiomEngine};
+867:crates/amun-state-machine/src/lib.rs:44:pub use invariants::ConstitutionalInvariant;
+876:crates/amun-state-machine/src/verifier.rs:104:                ConstitutionalInvariant::TransitionHistoryAcyclic => {
+877:crates/amun-state-machine/src/verifier.rs:109:                ConstitutionalInvariant::LineageIntact
+878:crates/amun-state-machine/src/verifier.rs:1:use super::invariants::ConstitutionalInvariant;
+879:crates/amun-state-machine/src/verifier.rs:92:        invariants: &[ConstitutionalInvariant],
+880:crates/amun-state-machine/src/verifier.rs:97:                ConstitutionalInvariant::NoImpossibleState => {
+884:crates/amun-storage-kernel/CONSTITUTION.md:108:Ratified upon verification of all 10 Constitutional Theorems.
+912:docs/CCS_Core_Specification_v1.0.md:158:**Constitutional Authority Uniqueness Theorem:**
+915:docs/CCS_Core_Specification_v1.0.md:79:### Axiom 2: Constitutional Determinism
+917:docs/CCS_Core_Specification_v1.0.md:91:### Axiom 4: Constitutional Recoverability
+920:docs/CCS_Core_Specification_v1.1.md:143:Axiom 2 (Constitutional Determinism).
+925:docs/CCS_Core_Specification_v1.1.md:77:### Axiom 2: Constitutional Determinism (Foundational Axiom)
+926:docs/CCS_Core_Specification_v1.1.md:86:### Axiom 3: Constitutional Recoverability
+937:docs/V6_001_GEOMETRY_OF_AUTHORITY.md:58:## 3. Axioms of Constitutional Space
+953:docs/V6_003_CANONICALIZATION.md:75:### Axiom 2: Constitutional Determinism (Final Form)
+955:docs/V6_003_CANONICALIZATION.md:86:### Axiom 4: Constitutional Monotonicity
+957:docs/V6_004_CONSTITUTIONAL_SELECTION_PRINCIPLE.md:42:**Constitutional Authority Theorem:**
+964:docs/V6_005_CONTINUITY_ORDERING.md:81:**Constitutional Authority Theorem (Order Version):**
+966:docs/V6_006_CONSTITUTIONAL_CONVERGENCE.md:54:**Constitutional Convergence Theorem:**
+968:docs/V6_007_CONSTITUTIONAL_PREFERENCE.md:50:**Constitutional Preference Theorem:**
+978:docs/V6_008_CONSTITUTIONAL_RESOLUTION.md:85:**Constitutional Resolution Theorem:**
+980:docs/V6_009_CONSTITUTIONAL_META_RESOLUTION.md:61:**Constitutional Meta-Resolution Theorem:**
+982:docs/V6_010_CONSTITUTIONAL_CONSTRAINT_PRINCIPLE.md:70:**Constitutional Finality Theorem:**
+986:docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:144:**Constitutional Completeness Theorem:**
+987:docs/V7_001_CONSTITUTIONAL_DERIVABILITY.md:50:## 2. Axioms of Constitutional Derivability
+998:docs/V7_003_CONSTITUTIONAL_REDUCTION.md:35:## 2. Axioms of Constitutional Reduction
+1004:docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:27:## 1. Axioms of Constitutional Confluence
+1008:docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:46:### Axiom CF4: Constitutional Confluence
+1011:docs/V7_004_CONSTITUTIONAL_CONFLUENCE.md:63:**Constitutional Church-Rosser Theorem:**
+1012:docs/V7_005_CONSTITUTIONAL_PRUNING.md:43:## 2. Axioms of Constitutional Pruning
+1019:docs/V7_005_CONSTITUTIONAL_PRUNING.md:79:**Constitutional Pruning Theorem:**
+1020:docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:39:## 2. Axioms of Constitutional Exclusion
+1027:docs/V7_006_CONSTITUTIONAL_EXCLUSION.md:73:**Constitutional Exclusion Theorem:**
+1029:docs/V7_007_DERIVABILITY_AND_EXCLUSION.md:125:**Constitutional Completeness Theorem:**
+1039:docs/V7_008_CONSTITUTIONAL_CLOSURE.md:50:**Axiom C1: Constitutional Decidability**
+1045:docs/V7_008_CONSTITUTIONAL_CLOSURE.md:82:**Constitutional Closure Theorem:**
+1053:docs/V7_010_SINGLE_HISTORY_PRINCIPLE.md:55:**Constitutional Closure Theorem (Final Version):**
+1057:docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:126:| Constitutional Comparability (CC) | Axiom |
+1061:docs/V8_002_CONSTITUTIONAL_COMPARABILITY.md:48:**Axiom CC: Constitutional Comparability**
+1094:docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:254:## 12. Consensus Invariants
+1095:docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:258:**Invariant 1:** `constitutional_root == BLAKE3("AMUN_CONSTITUTIONAL_ROOT_V1" || identity_root || evidence_root || governance_root || economic_root)`
+1096:docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:260:**Invariant 2:** `constitutional_commitment_root == BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || CanonicalSerialization(ConstitutionalCommitment))`
+1097:docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:262:**Invariant 3:** `state_root` must include `constitutional_commitment_root` as a leaf in its Merkle tree computation.
+1098:docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:264:**Invariant 4:** The `AppHash` MUST commit to `state_root`. For CCA v1.0, this is defined as `AppHash = state_root`. Future versions may introduce additional roots (such as `execution_root` or `receipt_root`) into the `AppHash` computation, in which case the invariant will be updated to reflect the new hash composition while preserving the requirement that `state_root` remains a committed input.
+1099:docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:266:**Invariant 5:** Given identical state transition inputs (same genesis, same transactions up to height N), all validators must compute identical values for all roots defined in this specification.
+1100:docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:33:12. Consensus Invariants
+1101:docs/protocol/FREEZE_CERTIFICATE_v1.md:29:### Constitutional Invariants (FROZEN)
+
+## Algorithms
+5:crates/amun-audit/tests/audit_layer03_snapshot.rs:4:        CompatibilityEngine, CompatibilityLevel, ConstitutionalIdentity, SnapshotHeader,
+9:crates/amun-audit/tests/audit_layer04_byzantine.rs:4:        ByzantineSyncEngine, ConstitutionalIdentity, PeerManifest, SnapshotManifest, SyncDecision,
+21:crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:4:        ByzantineSyncEngine, ConstitutionalIdentity, PeerManifest, SnapshotManifest, SyncDecision,
+134:crates/amun-compatibility/src/lib.rs:1:// Constitutional Compatibility Engine
+144:crates/amun-consensus-integration/src/consensus_types.rs:88:    pub fn issue(block: &ConstitutionalBlock, qc: ConstitutionalQC) -> Self {
+243:crates/amun-constitutional-authority/tests/authority_tests.rs:7:fn build_root(key: &ConstitutionalKeyPair) -> ConstitutionalCertificate {
+252:crates/amun-constitutional-block/src/lib.rs:36:pub use block::{BlockBuilder, ConstitutionalBlock};
+284:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:141:// N127A.1 — Constitutional Evidence Builder
+285:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:144:pub struct ConstitutionalEvidenceBuilder;
+286:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:146:impl ConstitutionalEvidenceBuilder {
+290:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:201:        let evidence = ConstitutionalEvidenceBuilder::build(exec, replay, gov, qc, true, true);
+301:crates/amun-constitutional-enforcement/src/proof_engine.rs:11:impl ConstitutionalProofEngine {
+303:crates/amun-constitutional-enforcement/src/proof_engine.rs:1:// N124 — Constitutional Proof Engine
+304:crates/amun-constitutional-enforcement/src/proof_engine.rs:223:        let verdict = ConstitutionalProofEngine::run_constitutional_review(
+306:crates/amun-constitutional-enforcement/src/proof_engine.rs:256:        let verdict = ConstitutionalProofEngine::run_constitutional_review(
+307:crates/amun-constitutional-enforcement/src/proof_engine.rs:282:        let verdict = ConstitutionalProofEngine::run_constitutional_review(
+316:crates/amun-constitutional-enforcement/src/proof_engine.rs:9:pub struct ConstitutionalProofEngine;
+319:crates/amun-constitutional-enforcement/src/state_transition.rs:46:    pub fn verify(&self, height: u64) -> ConstitutionalVerdict {
+328:crates/amun-constitutional-proof/src/certification.rs:127:    fn gate_c4_all_phase_verdicts_issued(verdicts: &[ConstitutionalVerdict]) -> GateResult {
+391:crates/amun-constitutional-sim/tests/phase_116_engineering_map.rs:31:    println!("\n=== Phase 116C: Constitutional Engineering Map ===");
+403:crates/amun-constitutional-verifier/src/lib.rs:11:impl Default for ConstitutionalVerifier {
+404:crates/amun-constitutional-verifier/src/lib.rs:17:impl ConstitutionalVerifier {
+405:crates/amun-constitutional-verifier/src/lib.rs:5:// AmunChain Constitutional Verifier
+406:crates/amun-constitutional-verifier/src/lib.rs:9:pub struct ConstitutionalVerifier;
+411:crates/amun-constitutional/src/artifact_graph.rs:132:    pub fn verify_all_edges(&self) -> Result<(), ConstitutionalFailure> {
+412:crates/amun-constitutional/src/causal_edge.rs:110:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+414:crates/amun-constitutional/src/causal_edge.rs:75:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+415:crates/amun-constitutional/src/causal_edge.rs:97:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+416:crates/amun-constitutional/src/causality_chain.rs:102:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+417:crates/amun-constitutional/src/causality_chain.rs:115:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+418:crates/amun-constitutional/src/causality_chain.rs:128:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+420:crates/amun-constitutional/src/causality_chain.rs:77:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+434:crates/amun-constitutional/src/constitutional_object.rs:11:    fn verify(&self) -> Result<(), ConstitutionalFailure> {
+436:crates/amun-constitutional/src/constitutional_object.rs:5:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure>;
+437:crates/amun-constitutional/src/constitutional_object.rs:6:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure>;
+438:crates/amun-constitutional/src/constitutional_object.rs:7:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure>;
+439:crates/amun-constitutional/src/constitutional_object.rs:8:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+441:crates/amun-constitutional/src/constitutional_witness.rs:125:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+442:crates/amun-constitutional/src/constitutional_witness.rs:147:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+443:crates/amun-constitutional/src/constitutional_witness.rs:160:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+444:crates/amun-constitutional/src/constitutional_witness.rs:173:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+445:crates/amun-constitutional/src/continuation_chain.rs:103:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+446:crates/amun-constitutional/src/continuation_chain.rs:116:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+450:crates/amun-constitutional/src/continuation_chain.rs:90:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+451:crates/amun-constitutional/src/divergence_point.rs:106:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+452:crates/amun-constitutional/src/divergence_point.rs:119:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+455:crates/amun-constitutional/src/divergence_point.rs:93:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+456:crates/amun-constitutional/src/divergence_resolution.rs:100:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+457:crates/amun-constitutional/src/divergence_resolution.rs:113:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+458:crates/amun-constitutional/src/divergence_resolution.rs:126:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+460:crates/amun-constitutional/src/execution_boundary.rs:107:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+463:crates/amun-constitutional/src/execution_boundary.rs:63:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+464:crates/amun-constitutional/src/execution_boundary.rs:95:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+468:crates/amun-constitutional/src/execution_context.rs:50:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+469:crates/amun-constitutional/src/execution_context.rs:62:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+470:crates/amun-constitutional/src/execution_context.rs:74:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+473:crates/amun-constitutional/src/execution_journal.rs:174:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+474:crates/amun-constitutional/src/execution_journal.rs:186:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+475:crates/amun-constitutional/src/execution_journal.rs:198:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+478:crates/amun-constitutional/src/execution_journal.rs:54:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+479:crates/amun-constitutional/src/execution_journal.rs:66:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+480:crates/amun-constitutional/src/execution_journal.rs:78:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+481:crates/amun-constitutional/src/execution_limits.rs:114:    pub fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+482:crates/amun-constitutional/src/execution_limits.rs:126:    pub fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+483:crates/amun-constitutional/src/execution_limits.rs:138:    pub fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+484:crates/amun-constitutional/src/execution_limits.rs:150:    pub fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+485:crates/amun-constitutional/src/execution_limits.rs:180:    pub fn verify(&self) -> Result<(), ConstitutionalFailure> {
+487:crates/amun-constitutional/src/execution_receipt.rs:120:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+488:crates/amun-constitutional/src/execution_receipt.rs:133:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+489:crates/amun-constitutional/src/execution_receipt.rs:146:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+490:crates/amun-constitutional/src/execution_receipt.rs:159:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+492:crates/amun-constitutional/src/replay_certificate.rs:101:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+493:crates/amun-constitutional/src/replay_certificate.rs:114:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+497:crates/amun-constitutional/src/replay_certificate.rs:66:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+498:crates/amun-constitutional/src/replay_certificate.rs:88:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+499:crates/amun-constitutional/src/restoration_point.rs:103:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+500:crates/amun-constitutional/src/restoration_point.rs:116:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+502:crates/amun-constitutional/src/restoration_point.rs:90:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+505:crates/amun-constitutional/src/snapshot.rs:104:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+506:crates/amun-constitutional/src/snapshot.rs:126:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+507:crates/amun-constitutional/src/snapshot.rs:139:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+508:crates/amun-constitutional/src/snapshot.rs:152:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+514:crates/amun-constitutional/src/state_anchor.rs:120:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+515:crates/amun-constitutional/src/state_anchor.rs:133:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+516:crates/amun-constitutional/src/state_anchor.rs:146:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+519:crates/amun-constitutional/src/state_anchor.rs:98:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+526:crates/amun-constitutional/src/transition_commitment.rs:52:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+527:crates/amun-constitutional/src/transition_commitment.rs:64:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+528:crates/amun-constitutional/src/transition_commitment.rs:76:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+531:crates/amun-constitutional/src/transition_evidence.rs:55:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+532:crates/amun-constitutional/src/transition_evidence.rs:67:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+533:crates/amun-constitutional/src/transition_evidence.rs:79:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+660:crates/amun-finality-certificate/src/lib.rs:111:    fn issue_cert(h: u64) -> ConstitutionalFinalityCertificate {
+674:crates/amun-gas-engine/src/gas_engine.rs:20:    ) -> (GasEngineResult, Option<ConstitutionalEvidence>)
+701:crates/amun-light-client/src/constitutional_client.rs:37:    pub fn verify_certificate(&self, cert: &ConstitutionalFinalityCertificate) -> bool {
+704:crates/amun-light-client/src/constitutional_client.rs:87:    pub fn verify_checkpoint(checkpoint: &ConstitutionalCheckpoint) -> bool {
+742:crates/amun-networking/src/quarantine.rs:39:/// Constitutional Quarantine Engine.
+945:crates/amun-peer-identity/tests/peer_identity_tests.rs:2:use amun_peer_identity::{ConstitutionalPeerId, IdentityVerifier, PeerCertificate, PeerRegistry};
+980:crates/amun-replay-engine/src/canonical.rs:178:    pub fn finalize(&self) -> ConstitutionalHash {
+1109:crates/amun-snapshot-engine/src/verifier.rs:1:// Snapshot Verifier - Constitutional verification of snapshots
+1116:crates/amun-snapshot-engine/tests/constitutional_tests.rs:4:        CompatibilityEngine, CompatibilityLevel, ConstitutionalHash, ConstitutionalIdentity,
+1135:crates/amun-state-machine/src/axioms.rs:62:/// The ConstitutionalAxiomEngine verifies that all axioms hold for a given state.
+1136:crates/amun-state-machine/src/axioms.rs:63:pub struct ConstitutionalAxiomEngine;
+1137:crates/amun-state-machine/src/axioms.rs:65:impl ConstitutionalAxiomEngine {
+1139:crates/amun-state-machine/src/engine.rs:10:pub struct ConstitutionalPolicyEngine;
+1140:crates/amun-state-machine/src/engine.rs:117:/// ConstitutionalProofEngine: determines WHY a transition is valid.
+1141:crates/amun-state-machine/src/engine.rs:118:pub struct ConstitutionalProofEngine;
+1142:crates/amun-state-machine/src/engine.rs:120:impl ConstitutionalProofEngine {
+1144:crates/amun-state-machine/src/engine.rs:12:impl ConstitutionalPolicyEngine {
+1146:crates/amun-state-machine/src/engine.rs:22:/// ConstitutionalExecutionEngine: determines HOW to execute.
+1147:crates/amun-state-machine/src/engine.rs:23:pub struct ConstitutionalExecutionEngine {
+1149:crates/amun-state-machine/src/engine.rs:28:impl Default for ConstitutionalExecutionEngine {
+1150:crates/amun-state-machine/src/engine.rs:34:impl ConstitutionalExecutionEngine {
+1152:crates/amun-state-machine/src/engine.rs:58:        if !ConstitutionalPolicyEngine::is_legal(from.state_tag, transition_type) {
+1153:crates/amun-state-machine/src/engine.rs:8:/// ConstitutionalPolicyEngine: determines WHAT is legal.
+1160:crates/amun-state-machine/src/lib.rs:30:pub use axioms::{AxiomVerification, ConstitutionalAxiom, ConstitutionalAxiomEngine};
+1161:crates/amun-state-machine/src/lib.rs:36:    ConstitutionalExecutionEngine, ConstitutionalPolicyEngine, ConstitutionalProofEngine,
+1167:crates/amun-state-machine/src/meta_amendment.rs:40:/// The Meta-Constitutional Amendment Engine.
+1172:crates/amun-state-machine/src/reconciliation.rs:20:/// The Constitutional Reconciliation Engine.
+1184:crates/amun-state-root/src/continuity.rs:6:    pub fn verify_link(parent_hash: &[u8; 32], child: &ConstitutionalSnapshot) -> bool {
+
+## Tests
+1034:crates/amun-constitutional-commitment/tests/state.rs:133:    assert!(ConstitutionalState::load(&[0u8; 10]).is_none());
+1035:crates/amun-constitutional-commitment/tests/state.rs:134:    assert!(ConstitutionalState::load(&[0u8; 200]).is_none());
+1036:crates/amun-constitutional-commitment/tests/state.rs:135:    assert!(ConstitutionalState::load(&[]).is_none());
+1096:crates/amun-constitutional-enforcement/src/lib.rs:252:                assert_eq!(violations[0].law, ConstitutionalLaw::StateRootIntegrity);
+1102:crates/amun-constitutional-enforcement/src/proof_engine.rs:276:        assert_eq!(verdict, ConstitutionalVerdict::Constitutional);
+1104:crates/amun-constitutional-enforcement/src/state_transition.rs:138:        assert_eq!(verdict, ConstitutionalVerdict::Constitutional);
+1175:crates/amun-constitutional-proof/src/lib.rs:1415:        assert!(md.contains("N47 Constitutional Validation Report"));
+1402:crates/amun-constitutional/src/causality_type.rs:109:        assert!(!CausalityType::ConstitutionalDependency.is_non_causal());
+1403:crates/amun-constitutional/src/causality_type.rs:113:        assert!(CausalityType::ConstitutionalDependency.is_hard_dependency());
+1406:crates/amun-constitutional/src/causality_type.rs:97:        assert!(CausalityType::ConstitutionalDependency.is_constitutional_dependency());
+1456:crates/amun-constitutional/src/divergence_type.rs:75:        assert!(DivergenceType::ConstitutionalFork.is_admissible());
+1458:crates/amun-constitutional/src/divergence_type.rs:77:        assert!(DivergenceType::ConstitutionalSupersession.is_admissible());
+1461:crates/amun-constitutional/src/divergence_type.rs:83:        assert!(!DivergenceType::ConstitutionalFork.is_error());
+1494:crates/amun-constitutional/src/replay_outcome.rs:74:        assert!(!ReplayOutcome::ConstitutionalFailure.is_admitted());
+1498:crates/amun-constitutional/src/replay_outcome.rs:82:        assert!(ReplayOutcome::ConstitutionalFailure.is_failure());
+1713:crates/amun-failure/src/tests.rs:10:    assert!(ConstitutionalFault::ConstitutionalViolation.should_halt());
+1715:crates/amun-failure/src/tests.rs:11:    assert!(ConstitutionalFault::InvalidQuorum.should_halt());
+1718:crates/amun-failure/src/tests.rs:12:    assert!(ConstitutionalFault::SignatureInvalid.should_halt());
+1719:crates/amun-failure/src/tests.rs:13:    assert!(ConstitutionalFault::MerkleProofInvalid.should_halt());
+1720:crates/amun-failure/src/tests.rs:14:    assert!(ConstitutionalFault::DurabilityViolation.should_halt());
+1721:crates/amun-failure/src/tests.rs:15:    assert!(ConstitutionalFault::JournalHashMismatch.should_halt());
+1722:crates/amun-failure/src/tests.rs:16:    assert!(ConstitutionalFault::ArithmeticOverflow.should_halt());
+1723:crates/amun-failure/src/tests.rs:17:    assert!(ConstitutionalFault::ArithmeticUnderflow.should_halt());
+1724:crates/amun-failure/src/tests.rs:18:    assert!(ConstitutionalFault::DecodeBudgetExceeded.should_halt());
+1725:crates/amun-failure/src/tests.rs:19:    assert!(ConstitutionalFault::CryptoBudgetExceeded.should_halt());
+1726:crates/amun-failure/src/tests.rs:24:    assert!(!ConstitutionalFault::BufferTooSmall.should_halt());
+1727:crates/amun-failure/src/tests.rs:25:    assert!(!ConstitutionalFault::CapacityExceeded.should_halt());
+1728:crates/amun-failure/src/tests.rs:26:    assert!(!ConstitutionalFault::TableFull.should_halt());
+1729:crates/amun-failure/src/tests.rs:27:    assert!(!ConstitutionalFault::MemoryBudgetExhausted.should_halt());
+1730:crates/amun-failure/src/tests.rs:32:    assert!(!ConstitutionalFault::InvalidStateTransition.should_halt());
+1731:crates/amun-failure/src/tests.rs:33:    assert!(!ConstitutionalFault::UninitializedAccess.should_halt());
+1732:crates/amun-failure/src/tests.rs:34:    assert!(!ConstitutionalFault::DoubleInitialization.should_halt());
+1733:crates/amun-failure/src/tests.rs:35:    assert!(!ConstitutionalFault::TemporalViolation.should_halt());
+1734:crates/amun-failure/src/tests.rs:36:    assert!(!ConstitutionalFault::ReplayViolation.should_halt());
+1735:crates/amun-failure/src/tests.rs:37:    assert!(!ConstitutionalFault::SequenceMismatch.should_halt());
+1736:crates/amun-failure/src/tests.rs:47:    assert_eq!(ctx.fault, ConstitutionalFault::CapacityExceeded);
+1742:crates/amun-failure/src/tests.rs:83:        assert_eq!(fault, ConstitutionalFault::EquivocationDetected);
+1744:crates/amun-failure/src/tests.rs:8:    assert!(ConstitutionalFault::EquivocationDetected.should_halt());
+1749:crates/amun-failure/src/tests.rs:9:    assert!(ConstitutionalFault::UnsafeContractViolation.should_halt());
+1924:crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:53:    assert_eq!(verdict, ConstitutionalVerdict::Constitutional);
+2850:crates/amun-snapshot-engine/tests/constitutional_tests.rs:66:        assert!(matches!(rel, ConstitutionalRelationship::Identical));
+
+## Traceability
+1:crates/amun-accounts/src/lib.rs:127:    pub fn constitutional_roots(&self) -> ConstitutionalRoots {
+2:crates/amun-accounts/src/lib.rs:133:    pub fn constitutional_roots_with_ledger(&self, ledger: &EconomicLedger) -> ConstitutionalRoots {
+3:crates/amun-accounts/src/lib.rs:137:        let identity = ConstitutionalIdentity::new(raw_root);
+4:crates/amun-accounts/src/lib.rs:145:            ConstitutionalRoots::from_commitment(
+5:crates/amun-accounts/src/lib.rs:153:            ConstitutionalRoots {
+6:crates/amun-accounts/src/lib.rs:2:    ConstitutionalRoots, EconomicSnapshot, EndBlockPipeline, Hash32,
+7:crates/amun-accounts/src/lib.rs:4:use amun_snapshot_engine::ConstitutionalIdentity;
+8:crates/amun-amendments/src/lib.rs:3:// Constitutional Amendment System
+9:crates/amun-amendments/src/proposal.rs:25:    ConstitutionalCourt,
+10:crates/amun-amendments/src/proposal.rs:38:    Constitution,
+11:crates/amun-amendments/src/proposal.rs:61:    ConstitutionalText,
+12:crates/amun-amendments/src/proposal.rs:78:            AmendmentType::ConstitutionalText => AmendmentClass::Constitution,
+13:crates/amun-amendments/src/proposal.rs:89:            AmendmentType::ConstitutionalText => 3,
+14:crates/amun-amendments/src/proposal.rs:99:                    AmendmentClass::Constitution => 3,
+15:crates/amun-audit/src/lib.rs:1:// Constitutional Audit Crate - Phase 84 Freeze Verification
+16:crates/amun-audit/tests/audit_layer03_snapshot.rs:4:        CompatibilityEngine, CompatibilityLevel, ConstitutionalIdentity, SnapshotHeader,
+17:crates/amun-audit/tests/audit_layer03_snapshot.rs:54:    // CONST-SNAP-003: Constitutional identity must be deterministic
+18:crates/amun-audit/tests/audit_layer03_snapshot.rs:57:        let id1 = ConstitutionalIdentity::new([0x42u8; 32]);
+19:crates/amun-audit/tests/audit_layer03_snapshot.rs:58:        let id2 = ConstitutionalIdentity::new([0x42u8; 32]);
+20:crates/amun-audit/tests/audit_layer03_snapshot.rs:72:        let id = ConstitutionalIdentity::new([0xAAu8; 32]);
+21:crates/amun-audit/tests/audit_layer04_byzantine.rs:10:        let identity = ConstitutionalIdentity::new([0x01u8; 32]);
+22:crates/amun-audit/tests/audit_layer04_byzantine.rs:4:        ByzantineSyncEngine, ConstitutionalIdentity, PeerManifest, SnapshotManifest, SyncDecision,
+23:crates/amun-audit/tests/audit_layer04_byzantine.rs:55:        let local = ConstitutionalIdentity::new([0xAAu8; 32]);
+24:crates/amun-audit/tests/audit_layer04_byzantine.rs:56:        let foreign = ConstitutionalIdentity::new([0xBBu8; 32]);
+25:crates/amun-audit/tests/audit_layer05_identity.rs:19:        let id = ConstitutionalIdentity::new([0xFFu8; 32]);
+26:crates/amun-audit/tests/audit_layer05_identity.rs:29:        let id = ConstitutionalIdentity::new([0xFFu8; 32]);
+27:crates/amun-audit/tests/audit_layer05_identity.rs:31:        let decoded = ConstitutionalIdentity::decode(&encoded)
+28:crates/amun-audit/tests/audit_layer05_identity.rs:3:    use amun_snapshot_engine::ConstitutionalIdentity;
+29:crates/amun-audit/tests/audit_layer05_identity.rs:46:        let id = ConstitutionalIdentity::new([0x13u8; 32]);
+30:crates/amun-audit/tests/audit_layer05_identity.rs:51:        if let Some(decoded) = ConstitutionalIdentity::decode(&encoded) {
+31:crates/amun-audit/tests/audit_layer05_identity.rs:8:        let id1 = ConstitutionalIdentity::new([0x01u8; 32]);
+32:crates/amun-audit/tests/audit_layer05_identity.rs:9:        let id2 = ConstitutionalIdentity::new([0x02u8; 32]);
+33:crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:10:        let identity = ConstitutionalIdentity::new([0x01u8; 32]);
+34:crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:4:        ByzantineSyncEngine, ConstitutionalIdentity, PeerManifest, SnapshotManifest, SyncDecision,
+35:crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:69:        let local = ConstitutionalIdentity::new([0xAAu8; 32]);
+36:crates/amun-audit/tests/audit_layer14_byzantine_mesh.rs:70:        let foreign = ConstitutionalIdentity::new([0xBBu8; 32]);
+37:crates/amun-authority-registry/src/authority.rs:13:impl ConstitutionalAuthority {
+38:crates/amun-authority-registry/src/authority.rs:37:        let a1 = ConstitutionalAuthority::new(pk, 1, 0);
+39:crates/amun-authority-registry/src/authority.rs:38:        let a2 = ConstitutionalAuthority::new(pk, 1, 0);
+40:crates/amun-authority-registry/src/authority.rs:44:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+41:crates/amun-authority-registry/src/authority.rs:45:        let a2 = ConstitutionalAuthority::new([2u8; 32], 1, 0);
+42:crates/amun-authority-registry/src/authority.rs:4:pub struct ConstitutionalAuthority {
+43:crates/amun-authority-registry/src/executor.rs:124:        reg.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+44:crates/amun-authority-registry/src/executor.rs:125:        reg.register(ConstitutionalAuthority::new([2u8; 32], 2, 0));
+45:crates/amun-authority-registry/src/executor.rs:1:use crate::authority::ConstitutionalAuthority;
+46:crates/amun-authority-registry/src/executor.rs:66:            let authority = ConstitutionalAuthority::new(
+47:crates/amun-authority-registry/src/lib.rs:35:pub use authority::ConstitutionalAuthority;
+48:crates/amun-authority-registry/src/recovery.rs:114:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+49:crates/amun-authority-registry/src/recovery.rs:156:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+50:crates/amun-authority-registry/src/recovery.rs:196:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+51:crates/amun-authority-registry/src/recovery.rs:233:            registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+52:crates/amun-authority-registry/src/recovery.rs:38:    use crate::authority::ConstitutionalAuthority;
+53:crates/amun-authority-registry/src/recovery.rs:76:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+54:crates/amun-authority-registry/src/registry.rs:175:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+55:crates/amun-authority-registry/src/registry.rs:183:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+56:crates/amun-authority-registry/src/registry.rs:192:        reg.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+57:crates/amun-authority-registry/src/registry.rs:193:        reg.register(ConstitutionalAuthority::new([2u8; 32], 2, 100));
+58:crates/amun-authority-registry/src/registry.rs:199:        let authority = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+59:crates/amun-authority-registry/src/registry.rs:1:use crate::authority::ConstitutionalAuthority;
+60:crates/amun-authority-registry/src/registry.rs:207:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+61:crates/amun-authority-registry/src/registry.rs:209:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 100);
+62:crates/amun-authority-registry/src/registry.rs:219:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+63:crates/amun-authority-registry/src/registry.rs:229:        reg.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+64:crates/amun-authority-registry/src/registry.rs:230:        reg.register(ConstitutionalAuthority::new([2u8; 32], 2, 100));
+65:crates/amun-authority-registry/src/registry.rs:231:        reg.register(ConstitutionalAuthority::new([3u8; 32], 3, 200));
+66:crates/amun-authority-registry/src/registry.rs:241:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+67:crates/amun-authority-registry/src/registry.rs:242:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 100);
+68:crates/amun-authority-registry/src/registry.rs:254:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+69:crates/amun-authority-registry/src/registry.rs:264:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+70:crates/amun-authority-registry/src/registry.rs:265:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+71:crates/amun-authority-registry/src/registry.rs:27:    pub fn active(&self) -> Option<&ConstitutionalAuthority> {
+72:crates/amun-authority-registry/src/registry.rs:281:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+73:crates/amun-authority-registry/src/registry.rs:282:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+74:crates/amun-authority-registry/src/registry.rs:305:        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+75:crates/amun-authority-registry/src/registry.rs:311:        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+76:crates/amun-authority-registry/src/registry.rs:31:    pub fn by_version(&self, version: u64) -> Option<&ConstitutionalAuthority> {
+77:crates/amun-authority-registry/src/registry.rs:346:        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+78:crates/amun-authority-registry/src/registry.rs:352:        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+79:crates/amun-authority-registry/src/registry.rs:35:    pub fn register(&mut self, authority: ConstitutionalAuthority) {
+80:crates/amun-authority-registry/src/registry.rs:385:        let v1 = ConstitutionalAuthority::new(v1_kp.verifying_key.to_bytes(), 1, 0);
+81:crates/amun-authority-registry/src/registry.rs:390:        let v2 = ConstitutionalAuthority::new(v2_pk, 2, 100);
+82:crates/amun-authority-registry/src/registry.rs:425:        let v1 = ConstitutionalAuthority::new(v1_pk, 1, 0);
+83:crates/amun-authority-registry/src/registry.rs:448:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+84:crates/amun-authority-registry/src/registry.rs:449:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+85:crates/amun-authority-registry/src/registry.rs:465:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+86:crates/amun-authority-registry/src/registry.rs:466:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+87:crates/amun-authority-registry/src/registry.rs:483:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+88:crates/amun-authority-registry/src/registry.rs:484:        let a2 = ConstitutionalAuthority::new([2u8; 32], 2, 0);
+89:crates/amun-authority-registry/src/registry.rs:500:        let a1 = ConstitutionalAuthority::new([1u8; 32], 1, 0);
+90:crates/amun-authority-registry/src/registry.rs:50:    pub fn from_genesis(authority: ConstitutionalAuthority) -> Self {
+91:crates/amun-authority-registry/src/registry.rs:61:    pub fn activate(&mut self, authority: ConstitutionalAuthority) {
+92:crates/amun-authority-registry/src/registry.rs:81:    pub fn valid_authorities_at(&self, height: u64) -> Vec<&ConstitutionalAuthority> {
+93:crates/amun-authority-registry/src/registry.rs:8:    authorities: BTreeMap<u64, ConstitutionalAuthority>,
+94:crates/amun-authority-registry/src/transaction.rs:141:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+95:crates/amun-authority-registry/src/transaction.rs:219:        registry.register(ConstitutionalAuthority::new([1u8; 32], 1, 0));
+96:crates/amun-authority-registry/src/transaction.rs:95:    use crate::authority::ConstitutionalAuthority;
+97:crates/amun-authority-registry/src/wal.rs:129:        registry.register(crate::authority::ConstitutionalAuthority::new(
+98:crates/amun-block/src/block.rs:46:    /// Constitutional block hash — using the same hashing domain as the rest of AmunChain.
+99:crates/amun-block/src/block.rs:47:    /// For now uses a deterministic multi-field hash; will integrate ConstitutionalHasher.
+100:crates/amun-block/src/body.rs:3:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+101:crates/amun-block/src/body.rs:47:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0007, 0x0110)
+102:crates/amun-block/src/body.rs:50:            FailureContext::new(ConstitutionalFault::ArithmeticOverflow, 0x0007, 0x0111)
+103:crates/amun-block/src/body.rs:72:                ConstitutionalFault::BufferTooSmall,
+104:crates/amun-block/src/body.rs:81:                ConstitutionalFault::CapacityExceeded,
+105:crates/amun-block/src/body.rs:91:                    ConstitutionalFault::BufferTooSmall,
+106:crates/amun-block/src/body.rs:99:                FailureContext::new(ConstitutionalFault::CapacityExceeded, 0x0007, 0x0103)
+107:crates/amun-block/src/header.rs:3:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+108:crates/amun-block/src/header.rs:72:                ConstitutionalFault::BufferTooSmall,
+109:crates/amun-block/src/limits.rs:1:// Constitutional block limits. SINGLE SOURCE OF TRUTH.
+110:crates/amun-bls/src/aggregate.rs:23:        return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0011, 0x0002));
+111:crates/amun-bls/src/aggregate.rs:2:use amun_failure::{AmunResult, ConstitutionalFault, FailureContext};
+112:crates/amun-bls/src/aggregate.rs:8:        return Err(FailureContext::new(ConstitutionalFault::InvalidInput, 0x0011, 0x0001));
+113:crates/amun-bytecode/src/interpreter.rs:56:        program: &ConstitutionalProgram,
+114:crates/amun-bytecode/src/interpreter.rs:8:use crate::program::ConstitutionalProgram;
+115:crates/amun-bytecode/src/lib.rs:24:        let p1 = ConstitutionalProgram::new(1, 0, 0, code.clone());
+116:crates/amun-bytecode/src/lib.rs:25:        let p2 = ConstitutionalProgram::new(1, 0, 0, code);
+117:crates/amun-bytecode/src/lib.rs:33:        let program = ConstitutionalProgram::new(1, 0, 0, code);
+118:crates/amun-bytecode/src/lib.rs:58:        let program = ConstitutionalProgram::new(1, 0, 0, code);
+119:crates/amun-bytecode/src/opcodes.rs:13:    // Constitutional operations
+120:crates/amun-bytecode/src/opcodes.rs:3:/// Constitutional bytecode opcodes as defined in N48.5-E Section 3.2.
+121:crates/amun-bytecode/src/program.rs:20:impl ConstitutionalProgram {
+122:crates/amun-bytecode/src/program.rs:7:pub struct ConstitutionalProgram {
+123:crates/amun-byzantine-tests/tests/attack_suite.rs:25:    let program = ConstitutionalProgram::new(1, 0, 0, vec![OpCode::Halt]);
+124:crates/amun-byzantine-tests/tests/attack_suite.rs:299:        ConstitutionalEvidence::ConstitutionalViolation { law, .. } => {
+125:crates/amun-byzantine-tests/tests/attack_suite.rs:2:use amun_bytecode::program::ConstitutionalProgram;
+126:crates/amun-byzantine-tests/tests/attack_suite.rs:38:    let result = ConstitutionalRuntime::execute(
+127:crates/amun-byzantine-tests/tests/attack_suite.rs:3:use amun_constitutional_runtime::runtime_pipeline::{ConstitutionalRuntime, PipelineResult};
+128:crates/amun-byzantine-tests/tests/attack_suite.rs:6:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+129:crates/amun-canonical-collections/src/lib.rs:16:// ─── Constitutional Traits ─────────────────────────────────
+130:crates/amun-canonical-collections/src/lib.rs:4://! Constitutional guarantees:
+131:crates/amun-certificate-network/src/distribution.rs:103:        block: ConstitutionalBlock,
+132:crates/amun-certificate-network/src/distribution.rs:104:        rt: &ConstitutionalStateRuntime,
+133:crates/amun-certificate-network/src/distribution.rs:111:            ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash)?;
+134:crates/amun-certificate-network/src/distribution.rs:129:        let mut rt = ConstitutionalStateRuntime::new();
+135:crates/amun-certificate-network/src/distribution.rs:133:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+136:crates/amun-certificate-network/src/distribution.rs:136:            ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+137:crates/amun-certificate-network/src/distribution.rs:137:        let block = ConstitutionalBlock::new(
+138:crates/amun-certificate-network/src/distribution.rs:231:        let mut rt = ConstitutionalStateRuntime::new();
+139:crates/amun-certificate-network/src/distribution.rs:234:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(
+140:crates/amun-certificate-network/src/distribution.rs:237:        let block = ConstitutionalBlock::new(
+141:crates/amun-certificate-network/src/distribution.rs:48:    pub block_header: ConstitutionalBlock,
+142:crates/amun-certificate-network/src/distribution.rs:55:        block_header: ConstitutionalBlock,
+143:crates/amun-certificate-network/src/distribution.rs:5:use amun_constitutional_block::ConstitutionalBlock;
+144:crates/amun-certificate-network/src/distribution.rs:7:    CertificateInclusionProof, ConstitutionalStateRuntime, ReplayCertificate,
+145:crates/amun-certificate-network/src/gossip.rs:159:    use amun_constitutional_block::ConstitutionalBlock;
+146:crates/amun-certificate-network/src/gossip.rs:160:    use amun_constitutional_state::ConstitutionalStateRuntime;
+147:crates/amun-certificate-network/src/gossip.rs:167:        let mut rt = ConstitutionalStateRuntime::new();
+148:crates/amun-certificate-network/src/gossip.rs:171:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+149:crates/amun-certificate-network/src/gossip.rs:173:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+150:crates/amun-certificate-network/src/gossip.rs:174:        let block = ConstitutionalBlock::new(
+151:crates/amun-chain-checkpoint/src/bootstrap.rs:24:        let rt = ConstitutionalStateRuntime::new();
+152:crates/amun-chain-checkpoint/src/bootstrap.rs:2:use amun_constitutional_state::ConstitutionalStateRuntime;
+153:crates/amun-chain-checkpoint/src/bootstrap.rs:46:    use amun_constitutional_block::ConstitutionalBlock;
+154:crates/amun-chain-checkpoint/src/bootstrap.rs:47:    use amun_constitutional_state::ConstitutionalStateRuntime;
+155:crates/amun-chain-checkpoint/src/bootstrap.rs:50:        let mut rt = ConstitutionalStateRuntime::new();
+156:crates/amun-chain-checkpoint/src/bootstrap.rs:54:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+157:crates/amun-chain-checkpoint/src/bootstrap.rs:56:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+158:crates/amun-chain-checkpoint/src/bootstrap.rs:57:        let block = ConstitutionalBlock::new(
+159:crates/amun-chain-checkpoint/src/chain.rs:51:    use amun_constitutional_block::ConstitutionalBlock;
+160:crates/amun-chain-checkpoint/src/chain.rs:52:    use amun_constitutional_state::ConstitutionalStateRuntime;
+161:crates/amun-chain-checkpoint/src/chain.rs:55:        let mut rt = ConstitutionalStateRuntime::new();
+162:crates/amun-chain-checkpoint/src/chain.rs:59:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+163:crates/amun-chain-checkpoint/src/chain.rs:61:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+164:crates/amun-chain-checkpoint/src/chain.rs:62:        let block = ConstitutionalBlock::new(
+165:crates/amun-chain-checkpoint/src/inclusion.rs:105:    use amun_constitutional_block::ConstitutionalBlock;
+166:crates/amun-chain-checkpoint/src/inclusion.rs:106:    use amun_constitutional_state::ConstitutionalStateRuntime;
+167:crates/amun-chain-checkpoint/src/inclusion.rs:109:        let mut rt = ConstitutionalStateRuntime::new();
+168:crates/amun-chain-checkpoint/src/inclusion.rs:113:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+169:crates/amun-chain-checkpoint/src/inclusion.rs:115:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+170:crates/amun-chain-checkpoint/src/inclusion.rs:116:        let block = ConstitutionalBlock::new(
+171:crates/amun-chain-checkpoint/src/lib.rs:234:    use amun_constitutional_block::ConstitutionalBlock;
+172:crates/amun-chain-checkpoint/src/lib.rs:235:    use amun_constitutional_state::ConstitutionalStateRuntime;
+173:crates/amun-chain-checkpoint/src/lib.rs:239:        let mut rt = ConstitutionalStateRuntime::new();
+174:crates/amun-chain-checkpoint/src/lib.rs:243:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+175:crates/amun-chain-checkpoint/src/lib.rs:245:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+176:crates/amun-chain-checkpoint/src/lib.rs:246:        let block = ConstitutionalBlock::new(
+177:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:100:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+178:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:108:        let block = ConstitutionalBlock::new(
+179:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:133:    let mut rt_check = ConstitutionalStateRuntime::new();
+180:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:138:    let mut rt_verify = ConstitutionalStateRuntime::new();
+181:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:13:    let mut rt_a = ConstitutionalStateRuntime::new();
+182:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:21:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+183:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:23:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+184:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:31:        let block = ConstitutionalBlock::new(
+185:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:69:    let mut rt_b = ConstitutionalStateRuntime::new();
+186:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:8:use amun_constitutional_block::ConstitutionalBlock;
+187:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:90:    let mut rt = ConstitutionalStateRuntime::new();
+188:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:98:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+189:crates/amun-chain-checkpoint/tests/n15_constitutional_join.rs:9:use amun_constitutional_state::ConstitutionalStateRuntime;
+190:crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:14:    let mut rt = ConstitutionalStateRuntime::new();
+191:crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:22:        let merkle_root = hex::encode(ConstitutionalStateRuntime::certificate_merkle_root(&certs));
+192:crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:24:        let proof = ConstitutionalStateRuntime::prove_certificate_inclusion(&certs, &hash).unwrap();
+193:crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:32:        let block = ConstitutionalBlock::new(
+194:crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:7:use amun_constitutional_block::ConstitutionalBlock;
+195:crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:8:use amun_constitutional_state::ConstitutionalStateRuntime;
+196:crates/amun-chain-store/src/record.rs:18:    /// CCA v1.0: Constitutional commitment root (hash of serialized commitment)
+197:crates/amun-chain-store/src/record.rs:20:    /// CCA v1.0: Constitutional root (hash of identity, evidence, governance, economic)
+198:crates/amun-civilizational-relations/src/relation.rs:1:use amun_snapshot_engine::ConstitutionalIdentity;
+199:crates/amun-civilizational-relations/src/relation.rs:38:    pub fn classify(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> Self {
+200:crates/amun-codec/src/budget.rs:24:                ConstitutionalFault::DecodeBudgetExceeded,
+
+## Dependencies
+76:crates/amun-byzantine-tests/tests/attack_suite.rs:299:        ConstitutionalEvidence::ConstitutionalViolation { law, .. } => {
+81:crates/amun-byzantine-tests/tests/attack_suite.rs:6:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+93:crates/amun-certificate-network/src/distribution.rs:7:    CertificateInclusionProof, ConstitutionalStateRuntime, ReplayCertificate,
+105:crates/amun-codec/src/versioned.rs:79:                ConstitutionalFault::ReplayViolation,
+115:crates/amun-consensus-integration/src/consensus_integrator.rs:82:    ) -> Result<ConstitutionalFinalityCertificate, String> {
+116:crates/amun-consensus-integration/src/consensus_integrator.rs:96:        Ok(ConstitutionalFinalityCertificate::issue(block, qc))
+117:crates/amun-consensus-integration/src/consensus_integrator.rs:9:    ConstitutionalBlock, ConstitutionalFinalityCertificate, ConstitutionalQC,
+120:crates/amun-consensus-integration/src/consensus_types.rs:78:pub struct ConstitutionalFinalityCertificate {
+121:crates/amun-consensus-integration/src/consensus_types.rs:87:impl ConstitutionalFinalityCertificate {
+620:crates/amun-constitutional-block/src/lib.rs:39:use amun_constitutional_state::{ConstitutionalStateRuntime, ReplayCertificate};
+634:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:12:pub struct ConstitutionalEvidence {
+638:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:141:// N127A.1 — Constitutional Evidence Builder
+639:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:143:/// Assembles evidence from all adapters into a single ConstitutionalEvidence.
+640:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:144:pub struct ConstitutionalEvidenceBuilder;
+641:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:146:impl ConstitutionalEvidenceBuilder {
+646:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:154:    ) -> ConstitutionalEvidence {
+647:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:155:        ConstitutionalEvidence {
+648:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:177:            ConstitutionalEvidence::new(true, true, true, true, true, true, true, true, true, true);
+654:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:201:        let evidence = ConstitutionalEvidenceBuilder::build(exec, replay, gov, qc, true, true);
+655:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:214:        let evidence = ConstitutionalEvidence::new(
+657:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:2:// N127A — Constitutional Evidence Interface
+658:crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:34:impl ConstitutionalEvidence {
+680:crates/amun-constitutional-enforcement/src/evidence_providers.rs:4:// ConstitutionalEvidence, replacing DELEGATED/PARTIAL placeholders.
+689:crates/amun-constitutional-enforcement/src/evidence_providers.rs:7:    ConstitutionalEvidence, ExecutionEvidence, GovernanceEvidence, QcEvidence, ReplayEvidence,
+690:crates/amun-constitutional-enforcement/src/evidence_providers.rs:85:) -> ConstitutionalEvidence {
+695:crates/amun-constitutional-enforcement/src/evidence_providers.rs:95:    ConstitutionalEvidence::new(
+701:crates/amun-constitutional-enforcement/src/evidence_records.rs:121:impl ConstitutionalEvidenceRecord {
+714:crates/amun-constitutional-enforcement/src/evidence_records.rs:218:        let record = ConstitutionalEvidenceRecord::new(
+719:crates/amun-constitutional-enforcement/src/evidence_records.rs:238:        let mut record = ConstitutionalEvidenceRecord::new(
+730:crates/amun-constitutional-enforcement/src/evidence_records.rs:98:pub struct ConstitutionalEvidenceRecord {
+731:crates/amun-constitutional-enforcement/src/lib.rs:108:                ConstitutionalLaw::SlashingEvidenceBinding,
+732:crates/amun-constitutional-enforcement/src/lib.rs:110:                ConstitutionalLaw::ReplayDeterminism,
+733:crates/amun-constitutional-enforcement/src/lib.rs:111:                ConstitutionalLaw::FinalitySupermajority,
+734:crates/amun-constitutional-enforcement/src/lib.rs:113:                ConstitutionalLaw::EvidenceValidity,
+735:crates/amun-constitutional-enforcement/src/lib.rs:159:                &ConstitutionalLaw::SlashingEvidenceBinding,
+736:crates/amun-constitutional-enforcement/src/lib.rs:169:                &ConstitutionalLaw::ReplayDeterminism,
+738:crates/amun-constitutional-enforcement/src/lib.rs:174:                &ConstitutionalLaw::FinalitySupermajority,
+739:crates/amun-constitutional-enforcement/src/lib.rs:184:                &ConstitutionalLaw::EvidenceValidity,
+744:crates/amun-constitutional-enforcement/src/lib.rs:83:        evidence: &crate::constitutional_evidence::ConstitutionalEvidence,
+746:crates/amun-constitutional-enforcement/src/proof_engine.rs:155:                law: ConstitutionalLaw::SlashingEvidenceBinding,
+748:crates/amun-constitutional-enforcement/src/proof_engine.rs:173:                law: ConstitutionalLaw::ReplayDeterminism,
+751:crates/amun-constitutional-enforcement/src/proof_engine.rs:182:                law: ConstitutionalLaw::FinalitySupermajority,
+754:crates/amun-constitutional-enforcement/src/proof_engine.rs:203:                law: ConstitutionalLaw::EvidenceValidity,
+756:crates/amun-constitutional-enforcement/src/proof_engine.rs:306:                    .any(|v| v.law == ConstitutionalLaw::FinalitySupermajority));
+757:crates/amun-constitutional-enforcement/src/state_transition.rs:158:                    .any(|v| v.law == ConstitutionalLaw::ReplayDeterminism));
+759:crates/amun-constitutional-enforcement/src/state_transition.rs:57:                law: ConstitutionalLaw::ReplayDeterminism,
+761:crates/amun-constitutional-evidence/src/lib.rs:1://! # Constitutional Evidence Module
+762:crates/amun-constitutional-evidence/src/lib.rs:34:pub struct ConstitutionalEvidence {
+764:crates/amun-constitutional-evidence/src/lib.rs:52:    evidence: &ConstitutionalEvidence,
+775:crates/amun-constitutional-geometry/src/flow_dynamics.rs:61:                ConstitutionalForce::InvariantForce { strength, .. } => {
+776:crates/amun-constitutional-geometry/src/flow_dynamics.rs:64:                ConstitutionalForce::ReplayForce { strength } => {
+836:crates/amun-constitutional-integration/src/lib.rs:2:    ConstitutionalReport, ConstitutionalVerdict, EvidenceArchive, EvidenceRecord, EvidenceStatus,
+850:crates/amun-constitutional-integration/src/lib.rs:419:        ClaimStatus, ClaimType, ConstitutionalClaim, Evidence as VKEvidence,
+882:crates/amun-constitutional-proof/src/certification.rs:1:use crate::{ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult};
+1092:crates/amun-constitutional-proof/src/report_generator.rs:3:use crate::{ConstitutionalVerdict, EvidenceArchive, ObligationRegistry, VerdictResult};
+1114:crates/amun-constitutional-runtime/src/certificate_chain.rs:101:    use crate::finality_certificate::ConstitutionalFinalityCertificate;
+1116:crates/amun-constitutional-runtime/src/certificate_chain.rs:116:    ) -> ConstitutionalFinalityCertificate {
+1118:crates/amun-constitutional-runtime/src/certificate_chain.rs:12:        certificates: Vec<crate::finality_certificate::ConstitutionalFinalityCertificate>,
+1119:crates/amun-constitutional-runtime/src/certificate_chain.rs:139:        let mut cert = ConstitutionalFinalityCertificate::issue(
+1120:crates/amun-constitutional-runtime/src/certificate_chain.rs:5:    pub certificates: Vec<crate::finality_certificate::ConstitutionalFinalityCertificate>,
+1121:crates/amun-constitutional-runtime/src/certificate_chain.rs:71:    pub fn tip(&self) -> &crate::finality_certificate::ConstitutionalFinalityCertificate {
+1122:crates/amun-constitutional-runtime/src/certificate_chain.rs:75:    pub fn genesis(&self) -> &crate::finality_certificate::ConstitutionalFinalityCertificate {
+1123:crates/amun-constitutional-runtime/src/certificate_chain.rs:80:        certs: &[crate::finality_certificate::ConstitutionalFinalityCertificate],
+1131:crates/amun-constitutional-runtime/src/finality_certificate.rs:186:        let cert = ConstitutionalFinalityCertificate::issue(
+1133:crates/amun-constitutional-runtime/src/finality_certificate.rs:208:        let c1 = ConstitutionalFinalityCertificate::issue(&br, vec![], [0xaa; 32], 1, [0xbb; 32]);
+1134:crates/amun-constitutional-runtime/src/finality_certificate.rs:209:        let c2 = ConstitutionalFinalityCertificate::issue(&br, vec![], [0xaa; 32], 1, [0xbb; 32]);
+1135:crates/amun-constitutional-runtime/src/finality_certificate.rs:225:            ConstitutionalFinalityCertificate::issue(&br, vec![], [0xaa; 32], 1, [0xbb; 32]);
+1136:crates/amun-constitutional-runtime/src/finality_certificate.rs:22:impl ConstitutionalFinalityCertificate {
+1138:crates/amun-constitutional-runtime/src/finality_certificate.rs:7:pub struct ConstitutionalFinalityCertificate {
+1139:crates/amun-constitutional-runtime/src/history_root.rs:108:    ) -> ConstitutionalFinalityCertificate {
+1141:crates/amun-constitutional-runtime/src/history_root.rs:131:        let mut cert = ConstitutionalFinalityCertificate::issue(
+1142:crates/amun-constitutional-runtime/src/history_root.rs:93:    use crate::finality_certificate::ConstitutionalFinalityCertificate;
+1144:crates/amun-constitutional-runtime/src/runtime_pipeline.rs:100:            let evidence: Vec<ConstitutionalEvidence> = vec![];
+1159:crates/amun-constitutional-runtime/src/runtime_pipeline.rs:187:            let evidence = ConstitutionalEvidence::ExecutionFailure {
+1165:crates/amun-constitutional-runtime/src/runtime_pipeline.rs:25:        evidence: Vec<ConstitutionalEvidence>,
+1172:crates/amun-constitutional-runtime/src/runtime_pipeline.rs:30:/// The Constitutional Runtime Pipeline with integrated PCCV.
+1176:crates/amun-constitutional-runtime/src/runtime_pipeline.rs:3:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+1181:crates/amun-constitutional-runtime/src/runtime_pipeline.rs:68:            let evidence = ConstitutionalEvidence::ExecutionFailure {
+1250:crates/amun-constitutional/src/canonical_witness.rs:142:        use crate::constitutional_witness::ConstitutionalWitness;
+1253:crates/amun-constitutional/src/canonical_witness.rs:147:        let w = ConstitutionalWitness::new(1, 1, 1, [0xAA; 32], [0xAB; 32], entries);
+1255:crates/amun-constitutional/src/canonical_witness.rs:155:        use crate::constitutional_witness::ConstitutionalWitness;
+1258:crates/amun-constitutional/src/canonical_witness.rs:160:        let w = ConstitutionalWitness::new(1, 1, 1, [0xAA; 32], [0xAB; 32], entries);
+1268:crates/amun-constitutional/src/canonical_witness.rs:55:    witness: &crate::constitutional_witness::ConstitutionalWitness,
+1269:crates/amun-constitutional/src/canonical_witness.rs:56:) -> crate::constitutional_witness::ConstitutionalWitness {
+1270:crates/amun-constitutional/src/canonical_witness.rs:59:    crate::constitutional_witness::ConstitutionalWitness::new(
+1304:crates/amun-constitutional/src/constitutional_witness.rs:106:impl ConstitutionalObject for ConstitutionalWitness {
+1308:crates/amun-constitutional/src/constitutional_witness.rs:198:impl ConstitutionalWitness {
+1309:crates/amun-constitutional/src/constitutional_witness.rs:1://! ConstitutionalWitness — a formally sufficient constitutional proof surface.
+1317:crates/amun-constitutional/src/constitutional_witness.rs:261:        let w = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], entries);
+1323:crates/amun-constitutional/src/constitutional_witness.rs:275:        let w = ConstitutionalWitness::new(1, 1, 1, [0xEE; 32], [0xAB; 32], entries);
+1327:crates/amun-constitutional/src/constitutional_witness.rs:288:        let w = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], entries);
+1328:crates/amun-constitutional/src/constitutional_witness.rs:296:        let w = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], vec![]);
+1330:crates/amun-constitutional/src/constitutional_witness.rs:303:        let mut w = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], entries);
+1333:crates/amun-constitutional/src/constitutional_witness.rs:315:        let w1 = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], e1);
+1337:crates/amun-constitutional/src/constitutional_witness.rs:320:        let w2 = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], e2);
+1340:crates/amun-constitutional/src/constitutional_witness.rs:32:    pub fn new(artifact_hash: ConstitutionalHash, witness_type: WitnessType) -> Self {
+1343:crates/amun-constitutional/src/constitutional_witness.rs:334:        let w1 = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], e1);
+1344:crates/amun-constitutional/src/constitutional_witness.rs:335:        let w2 = ConstitutionalWitness::new(1, 1, 1, [0xDD; 32], [0xAB; 32], e2);
+1349:crates/amun-constitutional/src/constitutional_witness.rs:66:pub struct ConstitutionalWitness {
+1352:crates/amun-constitutional/src/constitutional_witness.rs:91:impl ConstitutionalIdentity for ConstitutionalWitness {
+1369:crates/amun-constitutional/src/execution_receipt.rs:278:            ReplayOutcome::ConstitutionalFailure,
+1370:crates/amun-constitutional/src/execution_receipt.rs:292:            ReplayOutcome::ConstitutionalFailure,
+1384:crates/amun-constitutional/src/lib.rs:107:pub use constitutional_witness::{ConstitutionalWitness, WitnessEntry};
+1414:crates/amun-constitutional/src/replay_certificate.rs:32:impl ConstitutionalIdentity for ReplayCertificate {
+1415:crates/amun-constitutional/src/replay_certificate.rs:47:impl ConstitutionalObject for ReplayCertificate {
+1427:crates/amun-constitutional/src/replay_outcome.rs:74:        assert!(!ReplayOutcome::ConstitutionalFailure.is_admitted());
+1431:crates/amun-constitutional/src/replay_outcome.rs:82:        assert!(ReplayOutcome::ConstitutionalFailure.is_failure());
+1434:crates/amun-constitutional/src/schema_registry.rs:83:    /// CausalEdge — FIXED: was 0x0014 colliding with ConstitutionalWitness
+1435:crates/amun-constitutional/src/schema_registry.rs:85:    /// ConstitutionalWitness — FIXED: now 0x0015 (was 0x0014)
+1441:crates/amun-constitutional/src/transition_evidence.rs:26:impl ConstitutionalIdentity for TransitionEvidence {
+1442:crates/amun-constitutional/src/transition_evidence.rs:41:impl ConstitutionalObject for TransitionEvidence {
+1515:crates/amun-cross-contract/src/transfer_registry.rs:114:            ConstitutionalEvidence::ConstitutionalViolation { law, .. } => {
+1516:crates/amun-cross-contract/src/transfer_registry.rs:28:    ) -> Result<(), Box<ConstitutionalEvidence>> {
+1517:crates/amun-cross-contract/src/transfer_registry.rs:30:            return Err(Box::new(ConstitutionalEvidence::ConstitutionalViolation {
+1518:crates/amun-cross-contract/src/transfer_registry.rs:3:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+1577:crates/amun-evidence-engine/src/evidence_archive.rs:17:    pub fn insert(&mut self, evidence: ConstitutionalEvidence) -> [u8; 32] {
+1578:crates/amun-evidence-engine/src/evidence_archive.rs:23:    pub fn get(&self, id: &[u8; 32]) -> Option<&ConstitutionalEvidence> {
+1579:crates/amun-evidence-engine/src/evidence_archive.rs:31:    pub fn by_category(&self, category: &str) -> Vec<&ConstitutionalEvidence> {
+1580:crates/amun-evidence-engine/src/evidence_archive.rs:38:    pub fn violations(&self) -> Vec<&ConstitutionalEvidence> {
+1581:crates/amun-evidence-engine/src/evidence_archive.rs:3:use crate::evidence_types::ConstitutionalEvidence;
+1582:crates/amun-evidence-engine/src/evidence_archive.rs:41:            .filter(|e| matches!(e, ConstitutionalEvidence::ConstitutionalViolation { .. }))
+1583:crates/amun-evidence-engine/src/evidence_archive.rs:45:    pub fn failures(&self) -> Vec<&ConstitutionalEvidence> {
+1584:crates/amun-evidence-engine/src/evidence_archive.rs:48:            .filter(|e| matches!(e, ConstitutionalEvidence::ExecutionFailure { .. }))
+1587:crates/amun-evidence-engine/src/evidence_archive.rs:9:    records: BTreeMap<[u8; 32], ConstitutionalEvidence>,
+1589:crates/amun-evidence-engine/src/evidence_engine.rs:103:        let evidence = ConstitutionalEvidence::ExecutionFailure {
+1590:crates/amun-evidence-engine/src/evidence_engine.rs:119:        let e1 = ConstitutionalEvidence::ExecutionFailure {
+1592:crates/amun-evidence-engine/src/evidence_engine.rs:126:        let e2 = ConstitutionalEvidence::ExecutionFailure {
+1594:crates/amun-evidence-engine/src/evidence_engine.rs:139:        archive.insert(ConstitutionalEvidence::ExecutionFailure {
+1595:crates/amun-evidence-engine/src/evidence_engine.rs:146:        archive.insert(ConstitutionalEvidence::ConstitutionalViolation {
+1596:crates/amun-evidence-engine/src/evidence_engine.rs:153:        archive.insert(ConstitutionalEvidence::InvariantViolation {
+1597:crates/amun-evidence-engine/src/evidence_engine.rs:15:    ) -> ConstitutionalEvidence {
+1598:crates/amun-evidence-engine/src/evidence_engine.rs:17:            VMEvidence::ExecutionFailure { reason } => ConstitutionalEvidence::ExecutionFailure {
+1599:crates/amun-evidence-engine/src/evidence_engine.rs:24:            VMEvidence::ConstitutionalViolation { law, resource_ids } => {
+1600:crates/amun-evidence-engine/src/evidence_engine.rs:25:                ConstitutionalEvidence::ConstitutionalViolation {
+1603:crates/amun-evidence-engine/src/evidence_engine.rs:34:                ConstitutionalEvidence::InvariantViolation {
+1604:crates/amun-evidence-engine/src/evidence_engine.rs:45:    pub fn archive(evidence: ConstitutionalEvidence, archive: &mut VMEvidenceArchive) -> [u8; 32] {
+1606:crates/amun-evidence-engine/src/evidence_engine.rs:5:use crate::evidence_types::ConstitutionalEvidence;
+1609:crates/amun-evidence-engine/src/evidence_engine.rs:70:            ConstitutionalEvidence::ExecutionFailure {
+1611:crates/amun-evidence-engine/src/evidence_engine.rs:84:        let vm_ev = VMEvidence::ConstitutionalViolation {
+1613:crates/amun-evidence-engine/src/evidence_engine.rs:90:            ConstitutionalEvidence::ConstitutionalViolation {
+1616:crates/amun-evidence-engine/src/evidence_types.rs:33:impl ConstitutionalEvidence {
+1618:crates/amun-evidence-engine/src/evidence_types.rs:6:pub enum ConstitutionalEvidence {
+1632:crates/amun-evidence-finality/src/evidence_finality.rs:21:    pub evidence: Vec<ConstitutionalEvidence>,
+1634:crates/amun-evidence-finality/src/evidence_finality.rs:231:    ) -> Result<ConstitutionalFinalityCertificate, String> {
+1636:crates/amun-evidence-finality/src/evidence_finality.rs:256:        Ok(ConstitutionalFinalityCertificate::issue(block, qc))
+1638:crates/amun-evidence-finality/src/evidence_finality.rs:26:    pub fn compute_evidence_root(evidence: &[ConstitutionalEvidence]) -> [u8; 32] {
+1649:crates/amun-evidence-finality/src/evidence_finality.rs:4:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+1653:crates/amun-evidence-finality/src/evidence_finality.rs:83:pub struct ConstitutionalFinalityCertificate {
+1656:crates/amun-evidence-finality/src/evidence_finality.rs:94:impl ConstitutionalFinalityCertificate {
+1700:crates/amun-execution-receipt/src/lib.rs:6://! ## Constitutional Invariants
+1731:crates/amun-explorer-api/src/services/constitutional_service.rs:2:use crate::types::{ConstitutionalDashboard, ConstitutionalVerdictSummary, EvidenceRecordSummary};
+1756:crates/amun-failure/src/tests.rs:36:    assert!(!ConstitutionalFault::ReplayViolation.should_halt());
+1757:crates/amun-finality-certificate/src/lib.rs:102:    pub fn latest(&self) -> Option<&ConstitutionalFinalityCertificate> {
+1758:crates/amun-finality-certificate/src/lib.rs:10:pub struct ConstitutionalFinalityCertificate {
+1759:crates/amun-finality-certificate/src/lib.rs:111:    fn issue_cert(h: u64) -> ConstitutionalFinalityCertificate {
+1760:crates/amun-finality-certificate/src/lib.rs:112:        ConstitutionalFinalityCertificate::issue(
+1762:crates/amun-finality-certificate/src/lib.rs:155:        let c1 = ConstitutionalFinalityCertificate::issue(
+1763:crates/amun-finality-certificate/src/lib.rs:160:        let c2 = ConstitutionalFinalityCertificate::issue(
+1764:crates/amun-finality-certificate/src/lib.rs:22:impl ConstitutionalFinalityCertificate {
+1766:crates/amun-finality-certificate/src/lib.rs:73:    certificates: HashMap<[u8; 32], ConstitutionalFinalityCertificate>,
+1768:crates/amun-finality-certificate/src/lib.rs:82:    pub fn append(&mut self, cert: ConstitutionalFinalityCertificate) -> Result<(), &'static str> {
+1773:crates/amun-gas-engine/src/gas_engine.rs:20:    ) -> (GasEngineResult, Option<ConstitutionalEvidence>)
+1774:crates/amun-gas-engine/src/gas_engine.rs:28:                    let ev = ConstitutionalEvidence::ExecutionFailure {
+1775:crates/amun-gas-engine/src/gas_engine.rs:2:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+1776:crates/amun-gas-engine/src/gas_engine.rs:52:                let ev = ConstitutionalEvidence::ExecutionFailure {
+1780:crates/amun-handle-resolver/src/handle_resolver.rs:183:            ConstitutionalEvidence::ExecutionFailure { reason, .. } => {
+1781:crates/amun-handle-resolver/src/handle_resolver.rs:18:    ) -> (bool, Vec<ConstitutionalEvidence>) {
+1782:crates/amun-handle-resolver/src/handle_resolver.rs:1:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+1783:crates/amun-handle-resolver/src/handle_resolver.rs:58:                leaks.push(ConstitutionalEvidence::ExecutionFailure {
+1784:crates/amun-handle-resolver/src/handle_resolver.rs:80:    ) -> (bool, Vec<ConstitutionalEvidence>) {
+1785:crates/amun-handle-resolver/src/handle_resolver.rs:98:                    violations.push(ConstitutionalEvidence::ExecutionFailure {
+1797:crates/amun-invariant-engine/src/invariant_engine.rs:135:            ConstitutionalEvidence::InvariantViolation { obligation_id, .. } => {
+1807:crates/amun-invariant-engine/src/invariant_engine.rs:194:                ConstitutionalEvidence::InvariantViolation { state_root: sr, .. } => {
+1809:crates/amun-invariant-engine/src/invariant_engine.rs:19:    ) -> (Vec<InvariantResult>, Vec<ConstitutionalEvidence>)
+1810:crates/amun-invariant-engine/src/invariant_engine.rs:1:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+1813:crates/amun-invariant-engine/src/invariant_engine.rs:35:                evidence.push(ConstitutionalEvidence::InvariantViolation {
+1877:crates/amun-light-client/src/constitutional_client.rs:106:    use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+1879:crates/amun-light-client/src/constitutional_client.rs:122:    ) -> ConstitutionalFinalityCertificate {
+1881:crates/amun-light-client/src/constitutional_client.rs:145:        let mut cert = ConstitutionalFinalityCertificate::issue(
+1882:crates/amun-light-client/src/constitutional_client.rs:37:    pub fn verify_certificate(&self, cert: &ConstitutionalFinalityCertificate) -> bool {
+1883:crates/amun-light-client/src/constitutional_client.rs:4:use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+1884:crates/amun-light-client/tests/light_client_tests.rs:22:) -> ConstitutionalFinalityCertificate {
+1886:crates/amun-light-client/tests/light_client_tests.rs:3:use amun_constitutional_runtime::finality_certificate::ConstitutionalFinalityCertificate;
+1887:crates/amun-light-client/tests/light_client_tests.rs:45:    let mut cert = ConstitutionalFinalityCertificate::issue(
+1910:crates/amun-live-cluster/src/validator.rs:14:        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence, ReplayEvidence,
+1913:crates/amun-live-cluster/src/validator.rs:568:                    // N126.3: Evidence-Based Constitutional Verification
+1917:crates/amun-live-cluster/src/validator.rs:648:                        // N129.2: Build ConstitutionalEvidenceRecord from real evidence data
+1922:crates/amun-live-cluster/src/validator.rs:663:                        let evidence_record = ConstitutionalEvidenceRecord::new(
+1940:crates/amun-live-cluster/tests/n126_3_unconstitutional_block_rejected.rs:39:                    .any(|v| v.law == ConstitutionalLaw::FinalitySupermajority),
+1961:crates/amun-networking/src/risk.rs:61:            ConstitutionalRisk::ReplayInstability { .. } => {
+1966:crates/amun-networking/tests/n18_node_rejoin.rs:73:// N18.5 — Constitutional Invariant REJOIN-001
+2024:crates/amun-nft-evidence/src/lib.rs:4:/// Constitutional Evidence Kernel (CEK) for NFT operations.
+2316:crates/amun-pccv/src/transition_proof_engine.rs:37:        let evidence: Vec<amun_evidence_engine::evidence_types::ConstitutionalEvidence> = buffer
+2387:crates/amun-proof-archive/src/proof_archive.rs:21:    pub fn archive_evidence(&mut self, evidence: ConstitutionalEvidence) {
+2389:crates/amun-proof-archive/src/proof_archive.rs:2:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+2394:crates/amun-proof-archive/src/proof_archive.rs:90:        let ev = ConstitutionalEvidence::ExecutionFailure {
+2395:crates/amun-proof-archive/src/proof_archive.rs:9:    evidence: Vec<ConstitutionalEvidence>,
+2474:crates/amun-replay-engine/src/byzantine_witness_filter.rs:13:use amun_constitutional::ConstitutionalWitness;
+2483:crates/amun-replay-engine/src/byzantine_witness_filter.rs:42:pub fn filter_incoming_witness(witness: &ConstitutionalWitness) -> FilterResult {
+2488:crates/amun-replay-engine/src/byzantine_witness_filter.rs:87:    fn make_witness(entries: Vec<WitnessEntry>) -> ConstitutionalWitness {

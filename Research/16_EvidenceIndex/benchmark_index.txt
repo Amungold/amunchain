@@ -1,0 +1,86 @@
+crates/amun-bench/tests/n161_state_root_bench.rs:1:use amun_bench::time_op;
+crates/amun-bench/tests/n161_state_root_bench.rs:9:fn n161_bench_state_root_10k_nft() {
+crates/amun-bench/tests/n162_snapshot_bench.rs:1:use amun_bench::time_op;
+crates/amun-bench/tests/n162_snapshot_bench.rs:9:fn n162_bench_snapshot_build_and_restore() {
+crates/amun-bench/tests/n163_wal_bench.rs:1:use amun_bench::time_op;
+crates/amun-bench/tests/n163_wal_bench.rs:5:fn n163_bench_wal_write_and_read() {
+crates/amun-bench/tests/n163_wal_bench.rs:6:    let path = "/tmp/amun-bench-wal.log";
+crates/amun-benchmarks/benches/consensus_bench.rs:18:fn bench_single_round(c: &mut Criterion) {
+crates/amun-benchmarks/benches/consensus_bench.rs:19:    c.bench_function("consensus_single_round_4_validators", |b| {
+crates/amun-benchmarks/benches/consensus_bench.rs:34:fn bench_multi_round_10(c: &mut Criterion) {
+crates/amun-benchmarks/benches/consensus_bench.rs:35:    c.bench_function("consensus_10_rounds_4_validators", |b| {
+crates/amun-benchmarks/benches/consensus_bench.rs:3:use criterion::{black_box, criterion_group, criterion_main, Criterion};
+crates/amun-benchmarks/benches/consensus_bench.rs:58:fn bench_vote_serialization(c: &mut Criterion) {
+crates/amun-benchmarks/benches/consensus_bench.rs:60:    c.bench_function("vote_serialize_deserialize", |b| {
+crates/amun-benchmarks/benches/consensus_bench.rs:69:criterion_group!(
+crates/amun-benchmarks/benches/consensus_bench.rs:70:    benches,
+crates/amun-benchmarks/benches/consensus_bench.rs:71:    bench_single_round,
+crates/amun-benchmarks/benches/consensus_bench.rs:72:    bench_multi_round_10,
+crates/amun-benchmarks/benches/consensus_bench.rs:73:    bench_vote_serialization
+crates/amun-benchmarks/benches/consensus_bench.rs:75:criterion_main!(benches);
+crates/amun-benchmarks/benches/storage_bench.rs:25:fn bench_append_100_records(c: &mut Criterion) {
+crates/amun-benchmarks/benches/storage_bench.rs:26:    c.bench_function("chain_store_append_100", |b| {
+crates/amun-benchmarks/benches/storage_bench.rs:38:fn bench_read_100_records(c: &mut Criterion) {
+crates/amun-benchmarks/benches/storage_bench.rs:3:use criterion::{black_box, criterion_group, criterion_main, Criterion};
+crates/amun-benchmarks/benches/storage_bench.rs:45:    c.bench_function("chain_store_read_100", |b| {
+crates/amun-benchmarks/benches/storage_bench.rs:55:fn bench_record_serialization(c: &mut Criterion) {
+crates/amun-benchmarks/benches/storage_bench.rs:57:    c.bench_function("record_serialize_deserialize", |b| {
+crates/amun-benchmarks/benches/storage_bench.rs:66:criterion_group!(
+crates/amun-benchmarks/benches/storage_bench.rs:67:    benches,
+crates/amun-benchmarks/benches/storage_bench.rs:68:    bench_append_100_records,
+crates/amun-benchmarks/benches/storage_bench.rs:69:    bench_read_100_records,
+crates/amun-benchmarks/benches/storage_bench.rs:70:    bench_record_serialization
+crates/amun-benchmarks/benches/storage_bench.rs:72:criterion_main!(benches);
+crates/amun-benchmarks/benches/sync_bench.rs:30:fn bench_snapshot_create_1k(c: &mut Criterion) {
+crates/amun-benchmarks/benches/sync_bench.rs:32:    c.bench_function("snapshot_create_1k_resources", |b| {
+crates/amun-benchmarks/benches/sync_bench.rs:3:use criterion::{black_box, criterion_group, criterion_main, Criterion};
+crates/amun-benchmarks/benches/sync_bench.rs:40:fn bench_snapshot_import_1k(c: &mut Criterion) {
+crates/amun-benchmarks/benches/sync_bench.rs:44:    c.bench_function("snapshot_import_1k_resources", |b| {
+crates/amun-benchmarks/benches/sync_bench.rs:52:fn bench_snapshot_create_10k(c: &mut Criterion) {
+crates/amun-benchmarks/benches/sync_bench.rs:54:    c.bench_function("snapshot_create_10k_resources", |b| {
+crates/amun-benchmarks/benches/sync_bench.rs:62:criterion_group!(
+crates/amun-benchmarks/benches/sync_bench.rs:63:    benches,
+crates/amun-benchmarks/benches/sync_bench.rs:64:    bench_snapshot_create_1k,
+crates/amun-benchmarks/benches/sync_bench.rs:65:    bench_snapshot_import_1k,
+crates/amun-benchmarks/benches/sync_bench.rs:66:    bench_snapshot_create_10k
+crates/amun-benchmarks/benches/sync_bench.rs:68:criterion_main!(benches);
+crates/amun-constitutional-integration/src/lib.rs:128:            ObligationId::new(ObligationNamespace::Performance, 1),
+crates/amun-constitutional-integration/src/lib.rs:138:            ObligationId::new(ObligationNamespace::Performance, 2),
+crates/amun-constitutional-integration/src/lib.rs:140:            "Latency percentiles documented",
+crates/amun-constitutional-integration/src/lib.rs:148:            ObligationId::new(ObligationNamespace::Performance, 3),
+crates/amun-constitutional-proof/src/lib.rs:157:            ObligationNamespace::Performance,
+crates/amun-constitutional-proof/src/lib.rs:217:            ObligationId::new(ObligationNamespace::Performance, 1),
+crates/amun-constitutional-proof/src/lib.rs:828:            ObligationId::new(ObligationNamespace::Performance, 1),
+crates/amun-constitutional-proof/src/lib.rs:855:            ObligationId::new(ObligationNamespace::Performance, 2),
+crates/amun-constitutional-proof/src/lib.rs:940:            ObligationId::new(ObligationNamespace::Performance, 3),
+crates/amun-constitutional-proof/src/obligation_namespace.rs:22:    Performance,
+crates/amun-constitutional-proof/src/obligation_namespace.rs:35:            Self::Performance => "PERFORMANCE",
+crates/amun-constitutional-proof/src/obligation_namespace.rs:53:            "PERFORMANCE" => Ok(Self::Performance),
+crates/amun-live-cluster/src/bin/benchmark_10.rs:30:                data_dir: format!("/tmp/amun-bench10-{}", i),
+crates/amun-live-cluster/src/bin/benchmark_10_event.rs:30:                data_dir: format!("/tmp/amun-bench10e-{}", i),
+crates/amun-load-generator/src/main.rs:70:        println!("  P50 Latency:    {}", self.p50());
+crates/amun-load-generator/src/main.rs:71:        println!("  P95 Latency:    {}", self.p95());
+crates/amun-load-generator/src/main.rs:72:        println!("  P99 Latency:    {}", self.p99());
+crates/amun-load-generator/src/main.rs:73:        println!("  Min Latency:    {}", self.min_lat_str());
+crates/amun-load-generator/src/main.rs:74:        println!("  Max Latency:    {}", self.max_lat_str());
+crates/amun-network-fastpath/src/lib.rs:61:pub fn benchmark_batching(message_count: u64, batch_size: usize) -> FastPathResult {
+crates/amun-network-fastpath/tests/n164_fastpath_tests.rs:19:    println!("Throughput ratio = {:.3}", ratio);
+crates/amun-network-fastpath/tests/n164_fastpath_tests.rs:30:    let result = benchmark_batching(100_000, 50);
+crates/amun-network-fastpath/tests/n164_fastpath_tests.rs:5:    let result_batched = benchmark_batching(1_000_000, 100);
+crates/amun-network-fastpath/tests/n164_fastpath_tests.rs:6:    let result_unbatched = benchmark_batching(1_000_000, 1);
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:122:fn n152_benchmark_state_root_10k() {
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:16:fn n152_benchmark_mint_10k_nfts() {
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:63:fn n152_benchmark_rapid_trades() {
+crates/amun-runtime-benchmarks/benches/runtime_benchmarks.rs:1:// Bench harness placeholder — the real benchmark binary is defined as [[bin]]
+crates/amun-verification-kernel/src/lib.rs:22:    Performance,
+crates/amun-verification-kernel/src/lib.rs:51:    Benchmark,
+crates/constitutional-linter/src/edge_semantics.rs:11:    /// Dev-only dependency (tests/benches only)
+docs/DOCS_INDEX.md:452:Test & Benchmark Artifacts
+docs/DOCS_INDEX.md:455:    N102.3 benchmark results.
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:39:The Config and ClusterPeer types in amun-live-cluster are updated. ClusterPeer gains a certificate_path field of type Option string with the serde default attribute so that existing code that constructs ClusterPeer literals can omit the field and receive None. A free function set_cert_paths populates the field from the crate testdata certs directory using the CARGO_MANIFEST_DIR environment variable. The localhost_cluster and test_cluster constructors call set_cert_paths after building the cluster vector. The benchmark binaries benchmark_10.rs and benchmark_10_event.rs are updated to include certificate_path: None in their ClusterPeer literals.
+docs/N105_CRYPTOGRAPHIC_VALIDATOR_IDENTITY.md:59:## Performance Characteristics
+docs/N106_N107_CONSTITUTIONAL_AUTHORITY_AND_GOVERNANCE.md:219:## Performance Characteristics
+docs/N106_N107_CONSTITUTIONAL_AUTHORITY_AND_GOVERNANCE.md:43:public key and version. Updates to the test cluster constructors and benchmark binaries
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:63:| L1 | Benchmarks are single-machine microbenchmarks | Network benchmarks planned for N61 |
+docs/constitutional-mathematics/PHASE_112_SIMULATION_SPECIFICATION.md:87:## Benchmark Scenarios
+docs/reports/CCA_IMPL_5B_FINAL_REPORT.md:69:- benchmarks

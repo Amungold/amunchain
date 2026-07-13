@@ -1,0 +1,1276 @@
+crates/amun-audit/src/lib.rs:2:// Invariant ownership map:
+crates/amun-audit/tests/audit_layer06_replay.rs:135:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer06_replay.rs:3:    use amun_storage_kernel::persistence::wal::{ReplayVerifier, WalEntry};
+crates/amun-audit/tests/audit_layer06_replay.rs:50:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer06_replay.rs:91:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer11_crash.rs:124:        let result = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer11_crash.rs:3:    use amun_storage_kernel::persistence::wal::{ReplayVerifier, WalEntry, WalIterator};
+crates/amun-audit/tests/audit_layer15_temporal.rs:3:    use amun_storage_kernel::persistence::wal::{ReplayVerifier, WalEntry};
+crates/amun-audit/tests/audit_layer15_temporal.rs:50:        let result1 = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-audit/tests/audit_layer15_temporal.rs:51:        let result2 = ReplayVerifier::verify_full_replay(path.to_str().unwrap());
+crates/amun-bench/tests/n161_state_root_bench.rs:10:    let mut reg = ResourceRegistry::new(20000);
+crates/amun-bench/tests/n161_state_root_bench.rs:16:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-bench/tests/n161_state_root_bench.rs:32:                lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+crates/amun-bench/tests/n161_state_root_bench.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-bench/tests/n162_snapshot_bench.rs:10:    let mut reg = ResourceRegistry::new(20000);
+crates/amun-bench/tests/n162_snapshot_bench.rs:16:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-bench/tests/n162_snapshot_bench.rs:32:                lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+crates/amun-bench/tests/n162_snapshot_bench.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-benchmarks/benches/sync_bench.rs:1:use amun_resource_core::ResourceRegistry;
+crates/amun-benchmarks/benches/sync_bench.rs:21:            lineage: ResourceLineage::genesis(id),
+crates/amun-benchmarks/benches/sync_bench.rs:5:fn create_test_registry(size: u64) -> ResourceRegistry {
+crates/amun-benchmarks/benches/sync_bench.rs:6:    let mut reg = ResourceRegistry::new(size as usize * 2);
+crates/amun-benchmarks/benches/sync_bench.rs:7:    use amun_resource_core::resource_lineage::ResourceLineage;
+crates/amun-bytecode/src/interpreter.rs:116:                        lineage: ResourceLineage::genesis(id),
+crates/amun-bytecode/src/interpreter.rs:129:                        lineage: ResourceLineage::genesis(child_id),
+crates/amun-bytecode/src/interpreter.rs:150:                        lineage: ResourceLineage::genesis(child_id),
+crates/amun-bytecode/src/interpreter.rs:218:                OpCode::CheckInvariant { .. } => {
+crates/amun-bytecode/src/interpreter.rs:2:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-bytecode/src/interpreter.rs:95:                                lineage: ResourceLineage::genesis(id),
+crates/amun-bytecode/src/opcodes.rs:14:    CheckInvariant { invariant_idx: u32 },
+crates/amun-bytecode/src/opcodes.rs:40:            OpCode::CheckInvariant { .. } => "OP_CHECK_INVARIANT",
+crates/amun-bytecode/src/opcodes.rs:63:            OpCode::CheckInvariant { .. } => 50,
+crates/amun-bytecode/src/opcodes.rs:94:            OpCode::CheckInvariant { .. } | OpCode::EmitClaim { .. }
+crates/amun-byzantine-tests/tests/attack_suite.rs:101:            lineage: ResourceLineage::single_ancestor(b, a, hash_a, 2),
+crates/amun-byzantine-tests/tests/attack_suite.rs:107:    let hash_b = ResourceRegistry::hash_resource(reg.get(&b).unwrap());
+crates/amun-byzantine-tests/tests/attack_suite.rs:116:                lineage: ResourceLineage::single_ancestor(c, b, hash_b, 3),
+crates/amun-byzantine-tests/tests/attack_suite.rs:11:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-byzantine-tests/tests/attack_suite.rs:126:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-byzantine-tests/tests/attack_suite.rs:132:        lineage: ResourceLineage::genesis(parent_id),
+crates/amun-byzantine-tests/tests/attack_suite.rs:137:    let parent_hash = ResourceRegistry::hash_resource(reg.get(&parent_id).unwrap());
+crates/amun-byzantine-tests/tests/attack_suite.rs:144:            lineage: ResourceLineage::single_ancestor(make_id(2), parent_id, parent_hash, 1),
+crates/amun-byzantine-tests/tests/attack_suite.rs:14:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-byzantine-tests/tests/attack_suite.rs:154:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-byzantine-tests/tests/attack_suite.rs:160:        lineage: ResourceLineage::genesis(parent_id),
+crates/amun-byzantine-tests/tests/attack_suite.rs:172:            lineage: ResourceLineage::single_ancestor(make_id(2), parent_id, forged_hash, 2),
+crates/amun-byzantine-tests/tests/attack_suite.rs:182:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-byzantine-tests/tests/attack_suite.rs:188:        lineage: ResourceLineage::genesis(ev),
+crates/amun-byzantine-tests/tests/attack_suite.rs:193:    let parent_hash = ResourceRegistry::hash_resource(reg.get(&ev).unwrap());
+crates/amun-byzantine-tests/tests/attack_suite.rs:200:            lineage: ResourceLineage::single_ancestor(make_id(2), ev, parent_hash, 2),
+crates/amun-byzantine-tests/tests/attack_suite.rs:210:    let mut reg = ResourceRegistry::new(100_000);
+crates/amun-byzantine-tests/tests/attack_suite.rs:216:        lineage: ResourceLineage::genesis(root),
+crates/amun-byzantine-tests/tests/attack_suite.rs:224:        let hash = ResourceRegistry::hash_resource(reg.get(&parent).unwrap());
+crates/amun-byzantine-tests/tests/attack_suite.rs:232:                lineage: ResourceLineage::single_ancestor(child, parent, hash, version),
+crates/amun-byzantine-tests/tests/attack_suite.rs:245:    let mut reg = ResourceRegistry::new(200_000);
+crates/amun-byzantine-tests/tests/attack_suite.rs:252:            lineage: ResourceLineage::genesis(id),
+crates/amun-byzantine-tests/tests/attack_suite.rs:263:    let proof = TransitionProof::new(
+crates/amun-byzantine-tests/tests/attack_suite.rs:299:        ConstitutionalEvidence::ConstitutionalViolation { law, .. } => {
+crates/amun-byzantine-tests/tests/attack_suite.rs:37:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-byzantine-tests/tests/attack_suite.rs:55:    let mut fresh_reg = ResourceRegistry::new(1000);
+crates/amun-byzantine-tests/tests/attack_suite.rs:56:    let replay = ReplayVerifier::replay(&proof, &program, &mut fresh_reg, &[]);
+crates/amun-byzantine-tests/tests/attack_suite.rs:6:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-byzantine-tests/tests/attack_suite.rs:82:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-byzantine-tests/tests/attack_suite.rs:89:        lineage: ResourceLineage::genesis(a),
+crates/amun-byzantine-tests/tests/attack_suite.rs:94:    let hash_a = ResourceRegistry::hash_resource(reg.get(&a).unwrap());
+crates/amun-byzantine-tests/tests/attack_suite.rs:9:use amun_replay_verifier::replay_verifier::ReplayVerifier;
+crates/amun-certificate-network/src/distribution.rs:18:    CertificateResponse { certificate: ReplayCertificate },
+crates/amun-certificate-network/src/distribution.rs:49:    pub certificate: ReplayCertificate,
+crates/amun-certificate-network/src/distribution.rs:56:        certificate: ReplayCertificate,
+crates/amun-certificate-network/src/distribution.rs:7:    CertificateInclusionProof, ConstitutionalStateRuntime, ReplayCertificate,
+crates/amun-certificate-network/src/gossip.rs:117:    pub fn get_certificate(&self, hash: &[u8; 32]) -> Option<&ReplayCertificate> {
+crates/amun-certificate-network/src/gossip.rs:163:        ReplayCertificate,
+crates/amun-certificate-network/src/gossip.rs:2:use amun_constitutional_state::{CertificateInclusionProof, ReplayCertificate};
+crates/amun-certificate-network/src/gossip.rs:38:        certificates: Vec<ReplayCertificate>,
+crates/amun-certificate-network/src/gossip.rs:77:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-certificate-network/src/gossip.rs:88:    pub fn store_certificate(&mut self, cert: ReplayCertificate) {
+crates/amun-chain-checkpoint/src/lib.rs:136:    /// AmunChain proof layers (ReplayCertificate uses `AMUN_REPLAY_CERTIFICATE_V1`,
+crates/amun-chain-checkpoint/src/lib.rs:47:/// of the AmunChain proof layers (ReplayCertificate, CertificateMerkleRoot, etc.).
+crates/amun-consensus-execution/src/block_dag.rs:215:        // Invariant assertions
+crates/amun-consensus-integration/src/consensus_integrator.rs:114:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:140:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:167:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:17:        registry: &mut ResourceRegistry,
+crates/amun-consensus-integration/src/consensus_integrator.rs:192:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:219:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-consensus-integration/src/consensus_integrator.rs:5:use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-consensus-integration/src/consensus_types.rs:12:    pub transitions: Vec<TransitionProof>,
+crates/amun-consensus-integration/src/consensus_types.rs:2:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-consensus-law/src/invariants.rs:1:use amun_invariants::kernel::IrreducibleInvariants;
+crates/amun-consensus-law/src/invariants.rs:35:        IrreducibleInvariants::kernel_hash()
+crates/amun-consensus-law/src/invariants.rs:3:pub struct ConsensusInvariants;
+crates/amun-consensus-law/src/invariants.rs:5:impl ConsensusInvariants {
+crates/amun-consensus-law/src/lib.rs:8:pub use invariants::ConsensusInvariants;
+crates/amun-constitutional-block/src/lib.rs:107:/// the block header, a ReplayCertificate, and an inclusion proof.
+crates/amun-constitutional-block/src/lib.rs:118:    cert: &ReplayCertificate,
+crates/amun-constitutional-block/src/lib.rs:39:use amun_constitutional_state::{ConstitutionalStateRuntime, ReplayCertificate};
+crates/amun-constitutional-block/src/lib.rs:50:    cert: &ReplayCertificate,
+crates/amun-constitutional-block/src/lib.rs:85:///   - ReplayCertificate::verify() for journal↔state proof
+crates/amun-constitutional-block/src/lib.rs:88:    cert: &ReplayCertificate,
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:115:/// Evidence sourced from ReplayVerifier or N109.7 architectural guarantee.
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:12:pub struct ConstitutionalEvidence {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:143:/// Assembles evidence from all adapters into a single ConstitutionalEvidence.
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:144:pub struct ConstitutionalEvidenceBuilder;
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:146:impl ConstitutionalEvidenceBuilder {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:154:    ) -> ConstitutionalEvidence {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:155:        ConstitutionalEvidence {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:177:            ConstitutionalEvidence::new(true, true, true, true, true, true, true, true, true, true);
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:19:    // N127A.3: From ReplayVerifier (N109.7 architectural guarantee)
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:201:        let evidence = ConstitutionalEvidenceBuilder::build(exec, replay, gov, qc, true, true);
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:214:        let evidence = ConstitutionalEvidence::new(
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:34:impl ConstitutionalEvidence {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:4:// ConstitutionalEvidence, replacing DELEGATED/PARTIAL placeholders.
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:7:    ConstitutionalEvidence, ExecutionEvidence, GovernanceEvidence, QcEvidence, ReplayEvidence,
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:85:) -> ConstitutionalEvidence {
+crates/amun-constitutional-enforcement/src/evidence_providers.rs:95:    ConstitutionalEvidence::new(
+crates/amun-constitutional-enforcement/src/evidence_records.rs:121:impl ConstitutionalEvidenceRecord {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:218:        let record = ConstitutionalEvidenceRecord::new(
+crates/amun-constitutional-enforcement/src/evidence_records.rs:238:        let mut record = ConstitutionalEvidenceRecord::new(
+crates/amun-constitutional-enforcement/src/evidence_records.rs:98:pub struct ConstitutionalEvidenceRecord {
+crates/amun-constitutional-enforcement/src/lib.rs:83:        evidence: &crate::constitutional_evidence::ConstitutionalEvidence,
+crates/amun-constitutional-evidence/src/lib.rs:34:pub struct ConstitutionalEvidence {
+crates/amun-constitutional-evidence/src/lib.rs:52:    evidence: &ConstitutionalEvidence,
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:25:    /// Invariant mass creates an inescapable region
+crates/amun-constitutional-geometry/src/emergent_horizons.rs:26:    InvariantSingularity,
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:24:    InvariantForce {
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:61:                ConstitutionalForce::InvariantForce { strength, .. } => {
+crates/amun-constitutional-geometry/src/stability.rs:48:    InvariantAttractor,
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:134:) -> Result<HashMap<String, VerificationCertificate>, Box<dyn std::error::Error>> {
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:151:            let cert: VerificationCertificate = serde_json::from_str(&content)?;
+crates/amun-constitutional-integration/src/bin/n47_8_production_replay.rs:3:use amun_verification_kernel::VerificationCertificate;
+crates/amun-constitutional-integration/src/lib.rs:107:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:117:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:127:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:137:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:147:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:159:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:173:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:17:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:186:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:199:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:212:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:225:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:239:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:254:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:267:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:27:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:281:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:294:            ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:311:        cert: &VerificationCertificate,
+crates/amun-constitutional-integration/src/lib.rs:334:        phase_certificates: HashMap<String, VerificationCertificate>,
+crates/amun-constitutional-integration/src/lib.rs:355:            let obligations: Vec<ProofObligation> = registry
+crates/amun-constitutional-integration/src/lib.rs:370:            let obligations: Vec<ProofObligation> = registry
+crates/amun-constitutional-integration/src/lib.rs:37:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:423:    fn make_cert(phase: &str) -> VerificationCertificate {
+crates/amun-constitutional-integration/src/lib.rs:424:        VerificationCertificate::issue(
+crates/amun-constitutional-integration/src/lib.rs:47:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:4:    ObligationResult, ObligationResultStatus, ObligationSeverity, ProofObligation,
+crates/amun-constitutional-integration/src/lib.rs:57:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:67:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:71:            "forall rc in ReplayCertificate : exists ev in EvidenceRoot : ev.replay = rc",
+crates/amun-constitutional-integration/src/lib.rs:77:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:7:use amun_verification_kernel::VerificationCertificate;
+crates/amun-constitutional-integration/src/lib.rs:87:        reg.register(ProofObligation::new(
+crates/amun-constitutional-integration/src/lib.rs:97:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1365:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1430:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1495:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1532:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1643:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:1737:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:173:    // --- ProofObligation tests (S1) ---
+crates/amun-constitutional-proof/src/lib.rs:178:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:198:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:216:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:231:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:242:        let obl2: ProofObligation = serde_json::from_str(&json).unwrap();
+crates/amun-constitutional-proof/src/lib.rs:258:        let obl: ProofObligation = serde_json::from_str(json).unwrap();
+crates/amun-constitutional-proof/src/lib.rs:352:    fn simple_obl(id: ObligationId) -> ProofObligation {
+crates/amun-constitutional-proof/src/lib.rs:353:        ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:396:        let obl = ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:417:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:426:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:443:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:452:        reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:473:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:500:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:518:            reg.register(ProofObligation::new(
+crates/amun-constitutional-proof/src/lib.rs:735:    fn make_obl(id: ObligationId, severity: ObligationSeverity) -> ProofObligation {
+crates/amun-constitutional-proof/src/lib.rs:736:        ProofObligation::new(
+crates/amun-constitutional-proof/src/obligation_registry.rs:10:    obligations: BTreeMap<ObligationId, ProofObligation>,
+crates/amun-constitutional-proof/src/obligation_registry.rs:24:    pub fn register(&mut self, obligation: ProofObligation) -> Result<(), RegistryError> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:5:    ProofObligation, RegistryError,
+crates/amun-constitutional-proof/src/obligation_registry.rs:72:    pub fn get(&self, id: &ObligationId) -> Option<&ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:76:    pub fn all_obligations(&self) -> impl Iterator<Item = &ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:80:    pub fn by_namespace(&self, ns: ObligationSeverity) -> Vec<&ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:87:    pub fn by_severity(&self, severity: ObligationSeverity) -> Vec<&ProofObligation> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:94:    pub fn by_phase(&self, phase: &str) -> Vec<&ProofObligation> {
+crates/amun-constitutional-proof/src/proof_obligation.rs:11:pub struct ProofObligation {
+crates/amun-constitutional-proof/src/proof_obligation.rs:24:impl ProofObligation {
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:27:        obligations: &[ProofObligation],
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:48:        obligations: &[ProofObligation],
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:4:    ProofObligation, VerdictResult,
+crates/amun-constitutional-runtime/src/block_validator.rs:102:        let mut registry = ResourceRegistry::new(1000);
+crates/amun-constitutional-runtime/src/block_validator.rs:138:        let mut registry = ResourceRegistry::new(1000);
+crates/amun-constitutional-runtime/src/block_validator.rs:148:                lineage: ResourceLineage::genesis(id),
+crates/amun-constitutional-runtime/src/block_validator.rs:183:        let mut registry = ResourceRegistry::new(1000);
+crates/amun-constitutional-runtime/src/block_validator.rs:2:use amun_invariant_engine::invariant_types::InvariantDeclaration;
+crates/amun-constitutional-runtime/src/block_validator.rs:31:        registry: &mut ResourceRegistry,
+crates/amun-constitutional-runtime/src/block_validator.rs:32:        invariants: &[InvariantDeclaration],
+crates/amun-constitutional-runtime/src/block_validator.rs:5:use amun_resource_core::ResourceRegistry;
+crates/amun-constitutional-runtime/src/block_validator.rs:91:        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-constitutional-runtime/src/certificate_chain.rs:103:    use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-constitutional-runtime/src/certificate_chain.rs:126:        let transitions = vec![TransitionProof::new(
+crates/amun-constitutional-runtime/src/finality_certificate.rs:109:    pub fn compute_evidence_root(transitions: &[TransitionProof]) -> [u8; 32] {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:117:    pub fn compute_pccv_root(transitions: &[TransitionProof]) -> [u8; 32] {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:140:    use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-constitutional-runtime/src/finality_certificate.rs:151:        let mut registry = ResourceRegistry::new(1000);
+crates/amun-constitutional-runtime/src/finality_certificate.rs:173:        let transitions = vec![TransitionProof::new(
+crates/amun-constitutional-runtime/src/finality_certificate.rs:17:    pub transitions: Vec<TransitionProof>,
+crates/amun-constitutional-runtime/src/finality_certificate.rs:1:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-constitutional-runtime/src/finality_certificate.rs:25:        transitions: Vec<TransitionProof>,
+crates/amun-constitutional-runtime/src/history_root.rs:118:        let transitions = vec![TransitionProof::new(
+crates/amun-constitutional-runtime/src/history_root.rs:95:    use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:100:            let evidence: Vec<ConstitutionalEvidence> = vec![];
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:104:            let proof = TransitionProof::new(
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:10:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:135:        // Phase 5: Invariant Evaluation
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:136:        let (_invariant_results, invariant_evidence) = InvariantEngine::evaluate(
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:149:        // Phase 6: Build TransitionProof via ProofBuilder
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:163:        use amun_pccv::transition_proof_engine::TransitionProofEngine as PCCVEngine;
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:175:        let pccv_result = amun_pccv::pccv_verifier::PCCVVerifier::verify(&enhanced_proof, registry);
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:187:            let evidence = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:195:            let proof = TransitionProof::new(
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:20:        transition_proof: TransitionProof,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:230:    use amun_resource_core::{ResourceArchetype, ResourceLineage, ResourceMetadata, ResourceState};
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:240:        let mut registry = ResourceRegistry::new(1000);
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:25:        evidence: Vec<ConstitutionalEvidence>,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:26:        transition_proof: TransitionProof,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:282:        let mut registry = ResourceRegistry::new(1000);
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:316:        let mut registry = ResourceRegistry::new(1000);
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:326:                lineage: ResourceLineage::genesis(id),
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:36:    /// → Invariants → Evidence → TransitionProof → PCCV → Archive
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:3:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:40:        registry: &mut ResourceRegistry,
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:41:        invariants: &[InvariantDeclaration],
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:4:use amun_invariant_engine::invariant_engine::InvariantEngine;
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:5:use amun_invariant_engine::invariant_types::InvariantDeclaration;
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:68:            let evidence = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:76:            let proof = TransitionProof::new(
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:8:use amun_resource_core::{ResourceMetadata, ResourceRegistry};
+crates/amun-constitutional-state/src/lib.rs:197:pub struct ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:223:    ) -> ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:224:        ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:234:impl ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:277:impl ReplayCertificate {
+crates/amun-constitutional-state/src/lib.rs:357:    /// Build a Merkle root from multiple ReplayCertificates.
+crates/amun-constitutional-state/src/lib.rs:359:    pub fn certificate_merkle_root(certificates: &[ReplayCertificate]) -> [u8; 32] {
+crates/amun-constitutional-state/src/lib.rs:404:/// A Merkle proof that a specific ReplayCertificate is included
+crates/amun-constitutional-state/src/lib.rs:418:        certificates: &[ReplayCertificate],
+crates/amun-constitutional/src/architectural_invariants.rs:1://! Architectural Invariants — constitutional laws of the kernel.
+crates/amun-constitutional/src/architectural_invariants.rs:24:/// A ReplayCertificate attests replay ADMISSIBILITY, not
+crates/amun-constitutional/src/architectural_invariants.rs:424:            assert!(!invariant.is_empty(), "Invariant must be documented");
+crates/amun-constitutional/src/execution_limits.rs:25:pub struct InvariantLimits {
+crates/amun-constitutional/src/execution_limits.rs:47:    pub invariant: InvariantLimits,
+crates/amun-constitutional/src/execution_limits.rs:78:            invariant: InvariantLimits {
+crates/amun-constitutional/src/execution_receipt.rs:15://!   The certificate_hash links to a ReplayCertificate that attests
+crates/amun-constitutional/src/execution_receipt.rs:42:/// `certificate_hash` links to a ReplayCertificate. The certificate model
+crates/amun-constitutional/src/hash_domains.rs:45:/// Domain: ReplayCertificate objects
+crates/amun-constitutional/src/lib.rs:121:pub use replay_certificate::ReplayCertificate;
+crates/amun-constitutional/src/replay_certificate.rs:130:impl ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:179:        parent: &ReplayCertificate,
+crates/amun-constitutional/src/replay_certificate.rs:18:pub struct ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:1://! ReplayCertificate — cryptographically scoped admissibility envelope.
+crates/amun-constitutional/src/replay_certificate.rs:205:    ) -> ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:206:        ReplayCertificate::new(
+crates/amun-constitutional/src/replay_certificate.rs:247:        let c = ReplayCertificate::new(
+crates/amun-constitutional/src/replay_certificate.rs:32:impl ConstitutionalIdentity for ReplayCertificate {
+crates/amun-constitutional/src/replay_certificate.rs:47:impl ConstitutionalObject for ReplayCertificate {
+crates/amun-constitutional/src/schema_registry.rs:69:    /// ReplayCertificate
+crates/amun-contract-fuzzing/src/lib.rs:133:        let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-fuzzing/src/lib.rs:4:use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-contract-fuzzing/src/lib.rs:61:        let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-fuzzing/src/lib.rs:89:        let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-integration/src/lib.rs:14:        registry: &mut ResourceRegistry,
+crates/amun-contract-integration/src/lib.rs:31:            lineage: ResourceLineage::genesis(contract_id),
+crates/amun-contract-integration/src/lib.rs:45:        registry: &mut ResourceRegistry,
+crates/amun-contract-integration/src/lib.rs:5:    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+crates/amun-contract-integration/src/lib.rs:6:    ResourceRegistry, ResourceState,
+crates/amun-contract-integration/src/lib.rs:93:    pub fn compute_contract_evidence_root(registry: &ResourceRegistry) -> [u8; 32] {
+crates/amun-contract-integration/tests/n167_contract_integration_tests.rs:39:    let mut reg1 = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n167_contract_integration_tests.rs:3:use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-contract-integration/tests/n167_contract_integration_tests.rs:40:    let mut reg2 = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n167_contract_integration_tests.rs:53:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n167_contract_integration_tests.rs:61:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n167_contract_integration_tests.rs:7:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n169_contract_nft_defi_tests.rs:10:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n169_contract_nft_defi_tests.rs:25:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-contract-integration/tests/n169_contract_nft_defi_tests.rs:40:            lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+crates/amun-contract-integration/tests/n169_contract_nft_defi_tests.rs:4:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-contract-integration/tests/n169_contract_nft_defi_tests.rs:54:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n169_contract_nft_defi_tests.rs:74:    let mut reg1 = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n169_contract_nft_defi_tests.rs:75:    let mut reg2 = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n172_cross_contract_tests.rs:33:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-integration/tests/n172_cross_contract_tests.rs:3:use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-contract-integration/tests/n172_cross_contract_tests.rs:7:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-registry/src/lib.rs:40:        registry: &mut ResourceRegistry,
+crates/amun-contract-registry/src/lib.rs:50:            lineage: ResourceLineage::genesis(contract_id),
+crates/amun-contract-registry/src/lib.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-contract-sdk/src/lib.rs:14:            registry: ResourceRegistry::new(1000),
+crates/amun-contract-sdk/src/lib.rs:4:use amun_resource_core::{RegistryError, ResourceArchetype, ResourceId, ResourceRegistry};
+crates/amun-contract-sdk/src/lib.rs:7:    pub registry: ResourceRegistry,
+crates/amun-contract-security/src/lib.rs:104:    let mut reg1 = ResourceRegistry::new(100);
+crates/amun-contract-security/src/lib.rs:105:    let mut reg2 = ResourceRegistry::new(100);
+crates/amun-contract-security/src/lib.rs:123:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-security/src/lib.rs:135:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-security/src/lib.rs:13:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-security/src/lib.rs:49:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-security/src/lib.rs:4:use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-contract-security/src/lib.rs:82:    let mut reg = ResourceRegistry::new(100);
+crates/amun-contract-upgrade/src/lib.rs:16:        _registry: &mut ResourceRegistry,
+crates/amun-contract-upgrade/src/lib.rs:3:use amun_resource_core::{RegistryError, ResourceArchetype, ResourceId, ResourceRegistry};
+crates/amun-contract-upgrade/tests/n174_upgrade_tests.rs:5:use amun_resource_core::ResourceRegistry;
+crates/amun-contract-upgrade/tests/n174_upgrade_tests.rs:9:    let mut reg = ResourceRegistry::new(100);
+crates/amun-core-optimization/src/lib.rs:10:    pub registry: ResourceRegistry,
+crates/amun-core-optimization/src/lib.rs:18:            registry: ResourceRegistry::new(max_lineage_depth),
+crates/amun-core-optimization/src/lib.rs:1:use amun_resource_core::ResourceRegistry;
+crates/amun-core-optimization/tests/n161_optimization_tests.rs:11:    let mut reg = ResourceRegistry::new(20000);
+crates/amun-core-optimization/tests/n161_optimization_tests.rs:21:                lineage: ResourceLineage::genesis(col_id),
+crates/amun-core-optimization/tests/n161_optimization_tests.rs:36:            lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+crates/amun-core-optimization/tests/n161_optimization_tests.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-cross-contract/src/transfer_registry.rs:114:            ConstitutionalEvidence::ConstitutionalViolation { law, .. } => {
+crates/amun-cross-contract/src/transfer_registry.rs:28:    ) -> Result<(), Box<ConstitutionalEvidence>> {
+crates/amun-cross-contract/src/transfer_registry.rs:30:            return Err(Box::new(ConstitutionalEvidence::ConstitutionalViolation {
+crates/amun-cross-contract/src/transfer_registry.rs:3:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-defi-amm/src/lib.rs:27:        registry: &mut ResourceRegistry,
+crates/amun-defi-amm/src/lib.rs:38:            lineage: ResourceLineage::genesis(pool_id),
+crates/amun-defi-amm/src/lib.rs:3:    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+crates/amun-defi-amm/src/lib.rs:4:    ResourceRegistry, ResourceState,
+crates/amun-defi-amm/tests/n153_amm_tests.rs:20:    let mut reg1 = ResourceRegistry::new(100);
+crates/amun-defi-amm/tests/n153_amm_tests.rs:21:    let mut reg2 = ResourceRegistry::new(100);
+crates/amun-defi-amm/tests/n153_amm_tests.rs:2:use amun_resource_core::ResourceRegistry;
+crates/amun-defi-amm/tests/n153_amm_tests.rs:37:    let mut reg = ResourceRegistry::new(100);
+crates/amun-defi-amm/tests/n153_amm_tests.rs:6:    let mut reg = ResourceRegistry::new(100);
+crates/amun-defi-lending-engine/src/lib.rs:2:use amun_resource_core::{RegistryError, ResourceId, ResourceRegistry};
+crates/amun-defi-lending-engine/src/lib.rs:38:        _registry: &mut ResourceRegistry,
+crates/amun-defi-lending-engine/tests/n154_lending_tests.rs:10:            &mut amun_resource_core::ResourceRegistry::new(100),
+crates/amun-defi-lending-engine/tests/n154_lending_tests.rs:30:            &mut amun_resource_core::ResourceRegistry::new(100),
+crates/amun-defi-lending-engine/tests/n154_lending_tests.rs:49:            &mut amun_resource_core::ResourceRegistry::new(100),
+crates/amun-defi-lending-engine/tests/n154_lending_tests.rs:68:            &mut amun_resource_core::ResourceRegistry::new(100),
+crates/amun-defi-lending-engine/tests/n154_lending_tests.rs:88:            &mut amun_resource_core::ResourceRegistry::new(100),
+crates/amun-defi-lending-engine/tests/n154_lending_tests.rs:99:            &mut amun_resource_core::ResourceRegistry::new(100),
+crates/amun-defi-stablecoin/src/lib.rs:1:use amun_resource_core::{RegistryError, ResourceId, ResourceRegistry};
+crates/amun-defi-stablecoin/src/lib.rs:34:        _registry: &mut ResourceRegistry,
+crates/amun-defi-stablecoin/tests/n155_stablecoin_tests.rs:17:    let mut reg = ResourceRegistry::new(10);
+crates/amun-defi-stablecoin/tests/n155_stablecoin_tests.rs:25:    let mut reg1 = ResourceRegistry::new(10);
+crates/amun-defi-stablecoin/tests/n155_stablecoin_tests.rs:26:    let mut reg2 = ResourceRegistry::new(10);
+crates/amun-defi-stablecoin/tests/n155_stablecoin_tests.rs:2:use amun_resource_core::ResourceRegistry;
+crates/amun-defi-stablecoin/tests/n155_stablecoin_tests.rs:6:    let mut reg = ResourceRegistry::new(10);
+crates/amun-defi-stress/src/lib.rs:106:        let mut reg = ResourceRegistry::new(100);
+crates/amun-defi-stress/src/lib.rs:130:        let mut reg = ResourceRegistry::new(100);
+crates/amun-defi-stress/src/lib.rs:137:            lineage: ResourceLineage::genesis(token_id),
+crates/amun-defi-stress/src/lib.rs:43:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-defi-stress/src/lib.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-defi-stress/src/lib.rs:73:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-dual-verification/src/dual_verifier.rs:17:        registry: &mut ResourceRegistry,
+crates/amun-dual-verification/src/dual_verifier.rs:18:        invariants: &[InvariantDeclaration],
+crates/amun-dual-verification/src/dual_verifier.rs:3:use amun_invariant_engine::invariant_types::InvariantDeclaration;
+crates/amun-dual-verification/src/dual_verifier.rs:4:use amun_pccv::pccv_verifier::{PCCVResult, PCCVVerifier};
+crates/amun-dual-verification/src/dual_verifier.rs:53:                let pccv_result = PCCVVerifier::verify(&enhanced_proof, registry);
+crates/amun-dual-verification/src/dual_verifier.rs:5:use amun_pccv::transition_proof_engine::TransitionProofEngine as PCCVEngine;
+crates/amun-dual-verification/src/dual_verifier.rs:8:use amun_resource_core::ResourceRegistry;
+crates/amun-evidence-engine/src/evidence_archive.rs:17:    pub fn insert(&mut self, evidence: ConstitutionalEvidence) -> [u8; 32] {
+crates/amun-evidence-engine/src/evidence_archive.rs:23:    pub fn get(&self, id: &[u8; 32]) -> Option<&ConstitutionalEvidence> {
+crates/amun-evidence-engine/src/evidence_archive.rs:31:    pub fn by_category(&self, category: &str) -> Vec<&ConstitutionalEvidence> {
+crates/amun-evidence-engine/src/evidence_archive.rs:38:    pub fn violations(&self) -> Vec<&ConstitutionalEvidence> {
+crates/amun-evidence-engine/src/evidence_archive.rs:3:use crate::evidence_types::ConstitutionalEvidence;
+crates/amun-evidence-engine/src/evidence_archive.rs:41:            .filter(|e| matches!(e, ConstitutionalEvidence::ConstitutionalViolation { .. }))
+crates/amun-evidence-engine/src/evidence_archive.rs:45:    pub fn failures(&self) -> Vec<&ConstitutionalEvidence> {
+crates/amun-evidence-engine/src/evidence_archive.rs:48:            .filter(|e| matches!(e, ConstitutionalEvidence::ExecutionFailure { .. }))
+crates/amun-evidence-engine/src/evidence_archive.rs:9:    records: BTreeMap<[u8; 32], ConstitutionalEvidence>,
+crates/amun-evidence-engine/src/evidence_engine.rs:103:        let evidence = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-evidence-engine/src/evidence_engine.rs:119:        let e1 = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-evidence-engine/src/evidence_engine.rs:126:        let e2 = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-evidence-engine/src/evidence_engine.rs:139:        archive.insert(ConstitutionalEvidence::ExecutionFailure {
+crates/amun-evidence-engine/src/evidence_engine.rs:146:        archive.insert(ConstitutionalEvidence::ConstitutionalViolation {
+crates/amun-evidence-engine/src/evidence_engine.rs:153:        archive.insert(ConstitutionalEvidence::InvariantViolation {
+crates/amun-evidence-engine/src/evidence_engine.rs:15:    ) -> ConstitutionalEvidence {
+crates/amun-evidence-engine/src/evidence_engine.rs:17:            VMEvidence::ExecutionFailure { reason } => ConstitutionalEvidence::ExecutionFailure {
+crates/amun-evidence-engine/src/evidence_engine.rs:25:                ConstitutionalEvidence::ConstitutionalViolation {
+crates/amun-evidence-engine/src/evidence_engine.rs:33:            VMEvidence::InvariantViolation { obligation_id } => {
+crates/amun-evidence-engine/src/evidence_engine.rs:34:                ConstitutionalEvidence::InvariantViolation {
+crates/amun-evidence-engine/src/evidence_engine.rs:45:    pub fn archive(evidence: ConstitutionalEvidence, archive: &mut VMEvidenceArchive) -> [u8; 32] {
+crates/amun-evidence-engine/src/evidence_engine.rs:5:use crate::evidence_types::ConstitutionalEvidence;
+crates/amun-evidence-engine/src/evidence_engine.rs:70:            ConstitutionalEvidence::ExecutionFailure {
+crates/amun-evidence-engine/src/evidence_engine.rs:90:            ConstitutionalEvidence::ConstitutionalViolation {
+crates/amun-evidence-engine/src/evidence_types.rs:24:    InvariantViolation {
+crates/amun-evidence-engine/src/evidence_types.rs:33:impl ConstitutionalEvidence {
+crates/amun-evidence-engine/src/evidence_types.rs:57:            Self::InvariantViolation {
+crates/amun-evidence-engine/src/evidence_types.rs:6:pub enum ConstitutionalEvidence {
+crates/amun-evidence-engine/src/evidence_types.rs:77:            Self::InvariantViolation { .. } => "invariant_violation",
+crates/amun-evidence-finality/src/evidence_finality.rs:143:pub struct EvidenceBackedConsensus;
+crates/amun-evidence-finality/src/evidence_finality.rs:145:impl EvidenceBackedConsensus {
+crates/amun-evidence-finality/src/evidence_finality.rs:148:        registry: &mut ResourceRegistry,
+crates/amun-evidence-finality/src/evidence_finality.rs:183:            let mut fresh_reg = ResourceRegistry::new(10000);
+crates/amun-evidence-finality/src/evidence_finality.rs:184:            let replay = ReplayVerifier::replay(&proof, program, &mut fresh_reg, &[]);
+crates/amun-evidence-finality/src/evidence_finality.rs:21:    pub evidence: Vec<ConstitutionalEvidence>,
+crates/amun-evidence-finality/src/evidence_finality.rs:235:        let mut qc = EvidenceBackedQC {
+crates/amun-evidence-finality/src/evidence_finality.rs:26:    pub fn compute_evidence_root(evidence: &[ConstitutionalEvidence]) -> [u8; 32] {
+crates/amun-evidence-finality/src/evidence_finality.rs:286:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-evidence-finality/src/evidence_finality.rs:297:        let block = EvidenceBackedConsensus::execute_and_verify(
+crates/amun-evidence-finality/src/evidence_finality.rs:306:        let cert = EvidenceBackedConsensus::form_consensus(&block, 5, sigs).unwrap();
+crates/amun-evidence-finality/src/evidence_finality.rs:313:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-evidence-finality/src/evidence_finality.rs:324:        let block = EvidenceBackedConsensus::execute_and_verify(
+crates/amun-evidence-finality/src/evidence_finality.rs:333:        let cert = EvidenceBackedConsensus::form_consensus(&block, 5, sigs).unwrap();
+crates/amun-evidence-finality/src/evidence_finality.rs:344:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-evidence-finality/src/evidence_finality.rs:355:        let block = EvidenceBackedConsensus::execute_and_verify(
+crates/amun-evidence-finality/src/evidence_finality.rs:364:        let c1 = EvidenceBackedConsensus::form_consensus(&block, 5, sigs.clone()).unwrap();
+crates/amun-evidence-finality/src/evidence_finality.rs:365:        let c2 = EvidenceBackedConsensus::form_consensus(&block, 5, sigs).unwrap();
+crates/amun-evidence-finality/src/evidence_finality.rs:4:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-evidence-finality/src/evidence_finality.rs:63:pub struct EvidenceBackedQC {
+crates/amun-evidence-finality/src/evidence_finality.rs:75:impl EvidenceBackedQC {
+crates/amun-evidence-finality/src/evidence_finality.rs:7:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-evidence-finality/src/evidence_finality.rs:8:use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-evidence-finality/src/evidence_finality.rs:90:    pub qc: EvidenceBackedQC,
+crates/amun-evidence-finality/src/evidence_finality.rs:95:    pub fn issue(block: &EvidenceVerifiedBlock, qc: EvidenceBackedQC) -> Self {
+crates/amun-execution-receipt/src/lib.rs:6://! ## Constitutional Invariants
+crates/amun-experimental-framework/src/main.rs:104:                lineage: ResourceLineage::single_ancestor(child, parent, hash, version),
+crates/amun-experimental-framework/src/main.rs:213:            let mut fresh = ResourceRegistry::new((size * 2) as usize);
+crates/amun-experimental-framework/src/main.rs:214:            ReplayVerifier::replay(&proof, &program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs:310:            let mut fresh = ResourceRegistry::new((size * 2) as usize);
+crates/amun-experimental-framework/src/main.rs:311:            ReplayVerifier::replay(&proof, program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs:339:            let mut reg = ResourceRegistry::new((n * 10) as usize);
+crates/amun-experimental-framework/src/main.rs:370:                    let mut fresh = ResourceRegistry::new(10000);
+crates/amun-experimental-framework/src/main.rs:371:                    ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
+crates/amun-experimental-framework/src/main.rs:398:            let tip_hash = ResourceRegistry::hash_resource(tip_meta);
+crates/amun-experimental-framework/src/main.rs:407:                    lineage: ResourceLineage::single_ancestor(new_id, tip, tip_hash, version),
+crates/amun-experimental-framework/src/main.rs:65:fn build_registry(size: u64) -> ResourceRegistry {
+crates/amun-experimental-framework/src/main.rs:66:    let mut reg = ResourceRegistry::new((size * 2) as usize);
+crates/amun-experimental-framework/src/main.rs:6:use amun_replay_verifier::replay_verifier::ReplayVerifier;
+crates/amun-experimental-framework/src/main.rs:72:            lineage: ResourceLineage::genesis(make_id(i)),
+crates/amun-experimental-framework/src/main.rs:81:fn build_deep_chain(depth: u64) -> (ResourceRegistry, ResourceId) {
+crates/amun-experimental-framework/src/main.rs:82:    let mut reg = ResourceRegistry::new((depth * 2) as usize);
+crates/amun-experimental-framework/src/main.rs:88:        lineage: ResourceLineage::genesis(root),
+crates/amun-experimental-framework/src/main.rs:8:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-experimental-framework/src/main.rs:96:        let hash = ResourceRegistry::hash_resource(reg.get(&parent).unwrap());
+crates/amun-failure/src/taxonomy.rs:27:    // Contract & Invariant (0x6XXX)
+crates/amun-formal/src/invariants.rs:1:pub struct FormalInvariants;
+crates/amun-formal/src/invariants.rs:3:impl FormalInvariants {
+crates/amun-formal/src/lib.rs:2:pub use invariants::FormalInvariants;
+crates/amun-gas-engine/src/gas_engine.rs:20:    ) -> (GasEngineResult, Option<ConstitutionalEvidence>)
+crates/amun-gas-engine/src/gas_engine.rs:28:                    let ev = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-gas-engine/src/gas_engine.rs:2:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-gas-engine/src/gas_engine.rs:52:                let ev = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-gas-engine/src/opcode_costs.rs:22:            OpCode::CheckInvariant { .. } => 50,
+crates/amun-handle-resolver/src/handle_resolver.rs:127:    use amun_resource_core::{ResourceArchetype, ResourceLineage, ResourceMetadata, ResourceState};
+crates/amun-handle-resolver/src/handle_resolver.rs:141:            lineage: ResourceLineage::genesis(id),
+crates/amun-handle-resolver/src/handle_resolver.rs:183:            ConstitutionalEvidence::ExecutionFailure { reason, .. } => {
+crates/amun-handle-resolver/src/handle_resolver.rs:18:    ) -> (bool, Vec<ConstitutionalEvidence>) {
+crates/amun-handle-resolver/src/handle_resolver.rs:1:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-handle-resolver/src/handle_resolver.rs:58:                leaks.push(ConstitutionalEvidence::ExecutionFailure {
+crates/amun-handle-resolver/src/handle_resolver.rs:80:    ) -> (bool, Vec<ConstitutionalEvidence>) {
+crates/amun-handle-resolver/src/handle_resolver.rs:98:                    violations.push(ConstitutionalEvidence::ExecutionFailure {
+crates/amun-invariant-engine/src/invariant_engine.rs:107:        let (results, evidence) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:115:        assert!(InvariantEngine::all_passed(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:116:        assert!(!InvariantEngine::has_critical_failure(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:123:        let (results, evidence) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:131:        assert!(!InvariantEngine::all_passed(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:132:        assert!(InvariantEngine::has_critical_failure(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:135:            ConstitutionalEvidence::InvariantViolation { obligation_id, .. } => {
+crates/amun-invariant-engine/src/invariant_engine.rs:138:            _ => panic!("Expected InvariantViolation"),
+crates/amun-invariant-engine/src/invariant_engine.rs:13:        invariants: &[InvariantDeclaration],
+crates/amun-invariant-engine/src/invariant_engine.rs:145:        let (results, evidence) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:153:        assert!(!InvariantEngine::all_passed(&results));
+crates/amun-invariant-engine/src/invariant_engine.rs:154:        assert!(!InvariantEngine::has_critical_failure(&results)); // No Critical failed
+crates/amun-invariant-engine/src/invariant_engine.rs:161:        let (results, _) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:170:            InvariantEngine::count_by_severity(&results, InvariantSeverity::Critical),
+crates/amun-invariant-engine/src/invariant_engine.rs:174:            InvariantEngine::count_by_severity(&results, InvariantSeverity::Minor),
+crates/amun-invariant-engine/src/invariant_engine.rs:183:        let (_, evidence) = InvariantEngine::evaluate(
+crates/amun-invariant-engine/src/invariant_engine.rs:194:                ConstitutionalEvidence::InvariantViolation { state_root: sr, .. } => {
+crates/amun-invariant-engine/src/invariant_engine.rs:197:                _ => panic!("Expected InvariantViolation"),
+crates/amun-invariant-engine/src/invariant_engine.rs:19:    ) -> (Vec<InvariantResult>, Vec<ConstitutionalEvidence>)
+crates/amun-invariant-engine/src/invariant_engine.rs:1:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-invariant-engine/src/invariant_engine.rs:21:        F: Fn(&InvariantDeclaration) -> bool,
+crates/amun-invariant-engine/src/invariant_engine.rs:28:            results.push(InvariantResult {
+crates/amun-invariant-engine/src/invariant_engine.rs:35:                evidence.push(ConstitutionalEvidence::InvariantViolation {
+crates/amun-invariant-engine/src/invariant_engine.rs:49:    pub fn count_by_severity(results: &[InvariantResult], severity: InvariantSeverity) -> usize {
+crates/amun-invariant-engine/src/invariant_engine.rs:4:use crate::invariant_types::{InvariantDeclaration, InvariantResult, InvariantSeverity};
+crates/amun-invariant-engine/src/invariant_engine.rs:57:    pub fn has_critical_failure(results: &[InvariantResult]) -> bool {
+crates/amun-invariant-engine/src/invariant_engine.rs:60:            .any(|r| r.severity == InvariantSeverity::Critical && !r.passed)
+crates/amun-invariant-engine/src/invariant_engine.rs:64:    pub fn all_passed(results: &[InvariantResult]) -> bool {
+crates/amun-invariant-engine/src/invariant_engine.rs:72:    use crate::invariant_types::{InvariantDeclaration, InvariantScope};
+crates/amun-invariant-engine/src/invariant_engine.rs:7:pub struct InvariantEngine;
+crates/amun-invariant-engine/src/invariant_engine.rs:81:    fn sample_invariants() -> Vec<InvariantDeclaration> {
+crates/amun-invariant-engine/src/invariant_engine.rs:83:            InvariantDeclaration {
+crates/amun-invariant-engine/src/invariant_engine.rs:86:                severity: InvariantSeverity::Critical,
+crates/amun-invariant-engine/src/invariant_engine.rs:87:                scope: InvariantScope::State,
+crates/amun-invariant-engine/src/invariant_engine.rs:89:            InvariantDeclaration {
+crates/amun-invariant-engine/src/invariant_engine.rs:92:                severity: InvariantSeverity::Critical,
+crates/amun-invariant-engine/src/invariant_engine.rs:93:                scope: InvariantScope::State,
+crates/amun-invariant-engine/src/invariant_engine.rs:95:            InvariantDeclaration {
+crates/amun-invariant-engine/src/invariant_engine.rs:98:                severity: InvariantSeverity::Minor,
+crates/amun-invariant-engine/src/invariant_engine.rs:99:                scope: InvariantScope::Local,
+crates/amun-invariant-engine/src/invariant_engine.rs:9:impl InvariantEngine {
+crates/amun-invariant-engine/src/invariant_types.rs:18:pub enum InvariantScope {
+crates/amun-invariant-engine/src/invariant_types.rs:31:pub struct InvariantDeclaration {
+crates/amun-invariant-engine/src/invariant_types.rs:34:    pub severity: InvariantSeverity,
+crates/amun-invariant-engine/src/invariant_types.rs:35:    pub scope: InvariantScope,
+crates/amun-invariant-engine/src/invariant_types.rs:40:pub struct InvariantResult {
+crates/amun-invariant-engine/src/invariant_types.rs:43:    pub severity: InvariantSeverity,
+crates/amun-invariant-engine/src/invariant_types.rs:5:pub enum InvariantSeverity {
+crates/amun-invariants/src/kernel.rs:13:    pub severity: InvariantSeverity,
+crates/amun-invariants/src/kernel.rs:20:pub struct IrreducibleInvariants;
+crates/amun-invariants/src/kernel.rs:22:impl IrreducibleInvariants {
+crates/amun-invariants/src/kernel.rs:23:    pub const SINGLE_TRUTH: InvariantDef = InvariantDef {
+crates/amun-invariants/src/kernel.rs:27:        severity: InvariantSeverity::Fatal,
+crates/amun-invariants/src/kernel.rs:2:pub enum InvariantSeverity {
+crates/amun-invariants/src/kernel.rs:34:    pub const SINGLE_FINALITY: InvariantDef = InvariantDef {
+crates/amun-invariants/src/kernel.rs:38:        severity: InvariantSeverity::Fatal,
+crates/amun-invariants/src/kernel.rs:45:    pub const EVENTUAL_PROGRESS: InvariantDef = InvariantDef {
+crates/amun-invariants/src/kernel.rs:49:        severity: InvariantSeverity::Critical,
+crates/amun-invariants/src/kernel.rs:56:    pub const FAILURE_MEMORY: InvariantDef = InvariantDef {
+crates/amun-invariants/src/kernel.rs:60:        severity: InvariantSeverity::Degraded,
+crates/amun-invariants/src/kernel.rs:67:    pub fn all() -> [InvariantDef; 4] {
+crates/amun-invariants/src/kernel.rs:9:pub struct InvariantDef {
+crates/amun-invariants/src/lib.rs:6:pub use kernel::{InvariantDef, InvariantSeverity, IrreducibleInvariants};
+crates/amun-invariants/src/lib.rs:7:pub use registry::{InvariantHealth, InvariantRegistry};
+crates/amun-invariants/src/lib.rs:8:pub use status::InvariantStatus;
+crates/amun-invariants/src/registry.rs:11:impl InvariantRegistry {
+crates/amun-invariants/src/registry.rs:16:        for inv in IrreducibleInvariants::all().iter() {
+crates/amun-invariants/src/registry.rs:18:            statuses.push(InvariantStatus::new(inv.id));
+crates/amun-invariants/src/registry.rs:1:use crate::kernel::{InvariantDef, InvariantSeverity, IrreducibleInvariants};
+crates/amun-invariants/src/registry.rs:27:    pub fn register(&mut self, inv: InvariantDef) -> Result<(), &'static str> {
+crates/amun-invariants/src/registry.rs:2:use crate::status::InvariantStatus;
+crates/amun-invariants/src/registry.rs:35:        self.statuses.push(InvariantStatus::new(inv.id));
+crates/amun-invariants/src/registry.rs:56:    pub fn overall_health(&self) -> InvariantHealth {
+crates/amun-invariants/src/registry.rs:6:pub struct InvariantRegistry {
+crates/amun-invariants/src/registry.rs:70:                    .any(|i| i.id == s.invariant_id && i.severity == InvariantSeverity::Fatal)
+crates/amun-invariants/src/registry.rs:75:            InvariantHealth::Critical
+crates/amun-invariants/src/registry.rs:77:            InvariantHealth::Degraded
+crates/amun-invariants/src/registry.rs:79:            InvariantHealth::Unknown
+crates/amun-invariants/src/registry.rs:7:    invariants: Vec<InvariantDef>,
+crates/amun-invariants/src/registry.rs:81:            InvariantHealth::AllInvariantsHold
+crates/amun-invariants/src/registry.rs:87:pub enum InvariantHealth {
+crates/amun-invariants/src/registry.rs:88:    AllInvariantsHold,
+crates/amun-invariants/src/registry.rs:8:    statuses: Vec<InvariantStatus>,
+crates/amun-invariants/src/status.rs:12:impl InvariantStatus {
+crates/amun-invariants/src/status.rs:4:pub struct InvariantStatus {
+crates/amun-light-client/src/constitutional_client.rs:109:    use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-light-client/src/constitutional_client.rs:132:        let transitions = vec![TransitionProof::new(
+crates/amun-light-client/tests/light_client_tests.rs:32:    let transitions = vec![TransitionProof::new(
+crates/amun-light-client/tests/light_client_tests.rs:9:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-live-cluster/src/validator.rs:14:        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence, ReplayEvidence,
+crates/amun-live-cluster/src/validator.rs:648:                        // N129.2: Build ConstitutionalEvidenceRecord from real evidence data
+crates/amun-live-cluster/src/validator.rs:663:                        let evidence_record = ConstitutionalEvidenceRecord::new(
+crates/amun-networking/tests/n18_node_rejoin.rs:5:// N18.2 — Lifecycle Invariants
+crates/amun-networking/tests/n18_node_rejoin.rs:73:// N18.5 — Constitutional Invariant REJOIN-001
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:103:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:112:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:124:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:12:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:135:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:21:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:35:            lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:48:            lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:58:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:69:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:84:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-adversarial/tests/n149_adversarial_tests.rs:91:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:123:    let mut reg = ResourceRegistry::new(20000);
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:129:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:145:                lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:17:    let mut reg = ResourceRegistry::new(20000);
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:23:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:40:                lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:64:    let mut reg = ResourceRegistry::new(2000);
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:70:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-benchmark/tests/n152_benchmark_tests.rs:87:                lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-collateral/src/lib.rs:2:use amun_resource_core::{RegistryError, ResourceId, ResourceRegistry};
+crates/amun-nft-collateral/src/lib.rs:34:        registry: &ResourceRegistry,
+crates/amun-nft-collateral/src/lib.rs:67:        registry: &mut ResourceRegistry,
+crates/amun-nft-collateral/src/lib.rs:95:        _registry: &mut ResourceRegistry,
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:109:    let mut reg1 = ResourceRegistry::new(100);
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:10:    let mut reg = ResourceRegistry::new(100);
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:110:    let mut reg2 = ResourceRegistry::new(100);
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:118:        lineage: ResourceLineage::genesis(token_id1),
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:127:        lineage: ResourceLineage::genesis(token_id2),
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:17:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:35:    let mut reg = ResourceRegistry::new(100);
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:42:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:4:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:61:    let mut reg = ResourceRegistry::new(100);
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:68:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:81:    let mut reg = ResourceRegistry::new(100);
+crates/amun-nft-collateral/tests/n156_nft_collateral_tests.rs:88:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-evidence/src/lib.rs:114:        registry: &ResourceRegistry,
+crates/amun-nft-evidence/src/lib.rs:131:        registry: &ResourceRegistry,
+crates/amun-nft-evidence/src/lib.rs:2:use amun_resource_core::{RegistryError, ResourceId, ResourceRegistry, ResourceState};
+crates/amun-nft-evidence/src/lib.rs:32:        registry: &ResourceRegistry,
+crates/amun-nft-evidence/src/lib.rs:47:        registry: &ResourceRegistry,
+crates/amun-nft-evidence/src/lib.rs:9:    pub registry: &'a ResourceRegistry,
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:12:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:131:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:138:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:19:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:57:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:66:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:78:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-evidence/tests/n131_evidence_tests.rs:85:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-explorer/src/lib.rs:113:pub fn start_explorer_server(registry: Arc<Mutex<ResourceRegistry>>, bind_addr: &str) {
+crates/amun-nft-explorer/src/lib.rs:145:fn handle_request(path: &str, registry: &ResourceRegistry) -> String {
+crates/amun-nft-explorer/src/lib.rs:2:use amun_resource_core::{ResourceArchetype, ResourceId, ResourceRegistry};
+crates/amun-nft-explorer/src/lib.rs:44:    pub fn get_collections(registry: &ResourceRegistry) -> Vec<ExplorerCollection> {
+crates/amun-nft-explorer/src/lib.rs:59:    pub fn get_nft(registry: &ResourceRegistry, token_id: &ResourceId) -> Option<ExplorerNft> {
+crates/amun-nft-explorer/src/lib.rs:70:    pub fn get_owner_nfts(registry: &ResourceRegistry, owner: &[u8; 32]) -> ExplorerOwner {
+crates/amun-nft-explorer/src/lib.rs:86:        registry: &ResourceRegistry,
+crates/amun-nft-explorer/tests/n135_explorer_tests.rs:15:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-explorer/tests/n135_explorer_tests.rs:28:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-explorer/tests/n135_explorer_tests.rs:34:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-explorer/tests/n135_explorer_tests.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-explorer/tests/n135_explorer_tests.rs:46:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-explorer/tests/n135_explorer_tests.rs:54:        lineage: ResourceLineage::genesis(id1),
+crates/amun-nft-explorer/tests/n135_explorer_tests.rs:63:        lineage: ResourceLineage::genesis(id2),
+crates/amun-nft-explorer/tests/n135_explorer_tests.rs:9:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-fuzz/src/lib.rs:109:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-nft-fuzz/src/lib.rs:119:            lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-fuzz/src/lib.rs:156:        // Invariant: marketplace should not crash the registry
+crates/amun-nft-fuzz/src/lib.rs:178:        // Invariant: royalty cannot exceed sale price
+crates/amun-nft-fuzz/src/lib.rs:206:        // Invariant: after revoke, cannot propose or veto
+crates/amun-nft-fuzz/src/lib.rs:247:        // Invariant: bridge root should be deterministic
+crates/amun-nft-fuzz/src/lib.rs:2:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-fuzz/src/lib.rs:35:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-nft-fuzz/src/lib.rs:44:                lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-fuzz/src/lib.rs:70:                        lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-fuzz/src/lib.rs:86:        // Invariant: collection must remain active
+crates/amun-nft-fuzz/src/lib.rs:93:        // Invariant: active count >= minted NFTs
+crates/amun-nft-marketplace/src/lib.rs:133:        registry: &mut ResourceRegistry,
+crates/amun-nft-marketplace/src/lib.rs:176:            lineage: ResourceLineage::single_ancestor(new_id, *token_id, parent_hash, version),
+crates/amun-nft-marketplace/src/lib.rs:215:        registry: &ResourceRegistry,
+crates/amun-nft-marketplace/src/lib.rs:281:        registry: &mut ResourceRegistry,
+crates/amun-nft-marketplace/src/lib.rs:2:    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+crates/amun-nft-marketplace/src/lib.rs:309:            lineage: ResourceLineage::single_ancestor(new_id, *token_id, parent_hash, version),
+crates/amun-nft-marketplace/src/lib.rs:3:    ResourceRegistry, ResourceState,
+crates/amun-nft-marketplace/src/lib.rs:93:        registry: &ResourceRegistry,
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:101:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:118:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:126:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:141:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:149:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:165:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:173:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:18:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:38:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:46:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:62:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:72:        lineage: ResourceLineage::genesis(token_id),
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:91:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-marketplace/tests/n134_marketplace_tests.rs:9:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-mining/src/lib.rs:3:    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+crates/amun-nft-mining/src/lib.rs:4:    ResourceRegistry, ResourceState,
+crates/amun-nft-mining/src/lib.rs:63:    registry: &mut ResourceRegistry,
+crates/amun-nft-mining/src/lib.rs:74:        lineage: ResourceLineage::genesis(reward_id),
+crates/amun-nft-mining/src/lib.rs:89:        lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-mining/tests/n133_mining_tests.rs:18:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-mining/tests/n133_mining_tests.rs:26:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-mining/tests/n133_mining_tests.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-mining/tests/n133_mining_tests.rs:55:    let mut reg = ResourceRegistry::new(10);
+crates/amun-nft-mining/tests/n133_mining_tests.rs:62:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-persistence/tests/n150_persistence_tests.rs:17:    ResourceRegistry,
+crates/amun-nft-persistence/tests/n150_persistence_tests.rs:22:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-nft-persistence/tests/n150_persistence_tests.rs:32:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-persistence/tests/n150_persistence_tests.rs:49:                lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-persistence/tests/n150_persistence_tests.rs:5:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-sdk/src/lib.rs:106:            lineage: ResourceLineage::single_ancestor(new_id, tid, parent_hash, version),
+crates/amun-nft-sdk/src/lib.rs:13:    pub registry: Arc<Mutex<ResourceRegistry>>,
+crates/amun-nft-sdk/src/lib.rs:29:            registry: Arc::new(Mutex::new(ResourceRegistry::new(1000))),
+crates/amun-nft-sdk/src/lib.rs:46:            lineage: ResourceLineage::genesis(ResourceId(id)),
+crates/amun-nft-sdk/src/lib.rs:6:    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+crates/amun-nft-sdk/src/lib.rs:76:            lineage: ResourceLineage::single_ancestor(tok_id, col_id, parent_hash, version),
+crates/amun-nft-sdk/src/lib.rs:7:    ResourceRegistry, ResourceState,
+crates/amun-nft-sdk/tests/n145_sdk_tests.rs:103:            lineage: amun_resource_core::ResourceLineage::genesis(ResourceId(token)),
+crates/amun-nft-sdk/tests/n145_sdk_tests.rs:56:            lineage: amun_resource_core::ResourceLineage::genesis(ResourceId(token)),
+crates/amun-nft-sdk/tests/n145_sdk_tests.rs:79:            lineage: amun_resource_core::ResourceLineage::genesis(ResourceId(token)),
+crates/amun-nft-snapshot/tests/n151_snapshot_tests.rs:178:            lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-snapshot/tests/n151_snapshot_tests.rs:18:    ResourceRegistry,
+crates/amun-nft-snapshot/tests/n151_snapshot_tests.rs:31:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-nft-snapshot/tests/n151_snapshot_tests.rs:42:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-nft-snapshot/tests/n151_snapshot_tests.rs:59:                lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-snapshot/tests/n151_snapshot_tests.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-stress/src/lib.rs:16:    registry: &mut ResourceRegistry,
+crates/amun-nft-stress/src/lib.rs:29:            lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-stress/src/lib.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-stress/src/lib.rs:56:    registry: &mut ResourceRegistry,
+crates/amun-nft-stress/tests/n146_stress_tests.rs:107:        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-stress/tests/n146_stress_tests.rs:111:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-nft-stress/tests/n146_stress_tests.rs:129:        lineage: ResourceLineage::genesis(ResourceId(col_id)),
+crates/amun-nft-stress/tests/n146_stress_tests.rs:143:            lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-stress/tests/n146_stress_tests.rs:18:    let mut reg = ResourceRegistry::new(10000);
+crates/amun-nft-stress/tests/n146_stress_tests.rs:24:        lineage: ResourceLineage::genesis(ResourceId(col_id)),
+crates/amun-nft-stress/tests/n146_stress_tests.rs:37:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-nft-stress/tests/n146_stress_tests.rs:43:        lineage: ResourceLineage::genesis(ResourceId(col_id)),
+crates/amun-nft-stress/tests/n146_stress_tests.rs:4:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-nft-stress/tests/n146_stress_tests.rs:55:                lineage: ResourceLineage::single_ancestor(
+crates/amun-nft-stress/tests/n146_stress_tests.rs:77:    let mut reg1 = ResourceRegistry::new(1000);
+crates/amun-nft-stress/tests/n146_stress_tests.rs:78:    let mut reg2 = ResourceRegistry::new(1000);
+crates/amun-nft-stress/tests/n146_stress_tests.rs:85:            lineage: ResourceLineage::genesis(ResourceId(col_id)),
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:7:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_checkpoint_rejoin.rs:93:                                lineage: ResourceLineage::genesis(rid),
+crates/amun-node/src/bin/test_constitutional_multi_block.rs:40:                lineage: ResourceLineage::genesis(resource_id),
+crates/amun-node/src/bin/test_constitutional_multi_block.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_constitutional_stress.rs:39:                lineage: ResourceLineage::genesis(resource_id),
+crates/amun-node/src/bin/test_constitutional_stress.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_crash_recovery.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_crash_recovery.rs:89:                                lineage: ResourceLineage::genesis(rid),
+crates/amun-node/src/bin/test_crash_recovery_7.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_crash_recovery_7.rs:87:                                lineage: ResourceLineage::genesis(rid),
+crates/amun-node/src/bin/test_multi_byzantine.rs:112:                                lineage: ResourceLineage::genesis(rid),
+crates/amun-node/src/bin/test_multi_byzantine.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_multi_height_determinism.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_multi_height_determinism.rs:40:                    lineage: ResourceLineage::genesis(id),
+crates/amun-node/src/bin/test_network_state_convergence.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_network_state_convergence.rs:92:                            lineage: ResourceLineage::genesis(resource_id),
+crates/amun-node/src/bin/test_persistence_determinism.rs:34:                    lineage: ResourceLineage::genesis(id),
+crates/amun-node/src/bin/test_persistence_determinism.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_post_rejoin_convergence.rs:91:                                lineage: ResourceLineage::genesis(rid),
+crates/amun-node/src/bin/test_replay_determinism.rs:33:                lineage: ResourceLineage::genesis(id),
+crates/amun-node/src/bin/test_replay_determinism.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_replay_stress.rs:103:                lineage: ResourceLineage::genesis(*resource_id),
+crates/amun-node/src/bin/test_replay_stress.rs:32:            lineage: ResourceLineage::genesis(resource_id),
+crates/amun-node/src/bin/test_replay_stress.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_runtime_mutation_integration.rs:2:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_runtime_mutation_integration.rs:41:                    lineage: ResourceLineage::genesis(id),
+crates/amun-node/src/bin/test_state_determinism.rs:35:                lineage: ResourceLineage::genesis(id),
+crates/amun-node/src/bin/test_state_determinism.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_state_evolution.rs:29:            lineage: ResourceLineage::genesis(id),
+crates/amun-node/src/bin/test_state_evolution.rs:3:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_state_recovery_rejoin.rs:94:                                lineage: ResourceLineage::genesis(rid),
+crates/amun-node/src/bin/test_sync_rejoin.rs:6:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-node/src/bin/test_sync_rejoin.rs:90:                                lineage: ResourceLineage::genesis(rid),
+crates/amun-operations/src/backup_recovery.rs:118:        let mut reg = ResourceRegistry::new(100);
+crates/amun-operations/src/backup_recovery.rs:124:                lineage: ResourceLineage::genesis(make_id(i)),
+crates/amun-operations/src/backup_recovery.rs:1:use amun_resource_core::ResourceRegistry;
+crates/amun-operations/src/backup_recovery.rs:57:    pub fn restore(&self) -> Result<ResourceRegistry, String> {
+crates/amun-operations/src/backup_recovery.rs:61:                let mut registry = ResourceRegistry::new(self.sync_package.total_resources() * 2);
+crates/amun-operations/src/backup_recovery.rs:80:        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-operations/src/backup_recovery.rs:92:        let mut reg = ResourceRegistry::new(100);
+crates/amun-operations/src/backup_recovery.rs:98:                lineage: ResourceLineage::genesis(make_id(i)),
+crates/amun-pccv/src/lib.rs:104:        p.proof_hash = PCCVVerifier::compute_proof_hash(&p);
+crates/amun-pccv/src/lib.rs:105:        let result = PCCVVerifier::verify(&p, &reg);
+crates/amun-pccv/src/lib.rs:111:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/lib.rs:117:            lineage: ResourceLineage::genesis(parent),
+crates/amun-pccv/src/lib.rs:122:        let proof = EnhancedTransitionProof {
+crates/amun-pccv/src/lib.rs:134:                lineage: ResourceLineage::single_ancestor(make_id(2), parent, [0u8; 32], 1),
+crates/amun-pccv/src/lib.rs:142:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:149:                    lineage: ResourceLineage::genesis(parent),
+crates/amun-pccv/src/lib.rs:156:        p.proof_hash = PCCVVerifier::compute_proof_hash(&p);
+crates/amun-pccv/src/lib.rs:157:        let result = PCCVVerifier::verify(&p, &reg);
+crates/amun-pccv/src/lib.rs:15:        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-pccv/src/lib.rs:163:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/lib.rs:169:            lineage: ResourceLineage::genesis(ev),
+crates/amun-pccv/src/lib.rs:174:        let proof = EnhancedTransitionProof {
+crates/amun-pccv/src/lib.rs:186:                lineage: ResourceLineage::transformation(make_id(2), ev, [0u8; 32], 2),
+crates/amun-pccv/src/lib.rs:194:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:201:                    lineage: ResourceLineage::genesis(ev),
+crates/amun-pccv/src/lib.rs:208:        p.proof_hash = PCCVVerifier::compute_proof_hash(&p);
+crates/amun-pccv/src/lib.rs:209:        let result = PCCVVerifier::verify(&p, &reg);
+crates/amun-pccv/src/lib.rs:215:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/lib.rs:222:            lineage: ResourceLineage::genesis(parent),
+crates/amun-pccv/src/lib.rs:227:        let parent_hash = ResourceRegistry::hash_resource(reg.get(&parent).unwrap());
+crates/amun-pccv/src/lib.rs:228:        let proof = EnhancedTransitionProof {
+crates/amun-pccv/src/lib.rs:240:                lineage: ResourceLineage::transformation(child, parent, parent_hash, 2),
+crates/amun-pccv/src/lib.rs:252:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:259:                    lineage: ResourceLineage::genesis(parent),
+crates/amun-pccv/src/lib.rs:266:        p.proof_hash = PCCVVerifier::compute_proof_hash(&p);
+crates/amun-pccv/src/lib.rs:267:        let result = PCCVVerifier::verify(&p, &reg);
+crates/amun-pccv/src/lib.rs:28:        let proof = EnhancedTransitionProof {
+crates/amun-pccv/src/lib.rs:41:            witness: WitnessBundle {
+crates/amun-pccv/src/lib.rs:48:        p.proof_hash = PCCVVerifier::compute_proof_hash(&p);
+crates/amun-pccv/src/lib.rs:49:        let reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/lib.rs:50:        let result = PCCVVerifier::verify(&p, &reg);
+crates/amun-pccv/src/lib.rs:56:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/lib.rs:62:            lineage: ResourceLineage::genesis(id),
+crates/amun-pccv/src/lib.rs:67:        let proof = EnhancedTransitionProof {
+crates/amun-pccv/src/lib.rs:80:                    lineage: ResourceLineage::genesis(id),
+crates/amun-pccv/src/lib.rs:88:                    lineage: ResourceLineage::genesis(id),
+crates/amun-pccv/src/lib.rs:97:            witness: WitnessBundle {
+crates/amun-pccv/src/pccv_verifier.rs:148:    pub fn compute_proof_hash(proof: &EnhancedTransitionProof) -> [u8; 32] {
+crates/amun-pccv/src/pccv_verifier.rs:17:pub struct PCCVVerifier;
+crates/amun-pccv/src/pccv_verifier.rs:19:impl PCCVVerifier {
+crates/amun-pccv/src/pccv_verifier.rs:1:use crate::enhanced_proof::EnhancedTransitionProof;
+crates/amun-pccv/src/pccv_verifier.rs:20:    pub fn verify(proof: &EnhancedTransitionProof, _registry: &ResourceRegistry) -> PCCVResult {
+crates/amun-pccv/src/pccv_verifier.rs:3:    ResourceArchetype, ResourceRegistry, ResourceState, TransformationMatrix,
+crates/amun-pccv/src/transition_proof_engine.rs:101:    use crate::enhanced_proof::EnhancedTransitionProof;
+crates/amun-pccv/src/transition_proof_engine.rs:102:    use crate::enhanced_proof::WitnessBundle;
+crates/amun-pccv/src/transition_proof_engine.rs:104:    use crate::PCCVVerifier;
+crates/amun-pccv/src/transition_proof_engine.rs:105:    use crate::TransitionProofEngine;
+crates/amun-pccv/src/transition_proof_engine.rs:107:        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-pccv/src/transition_proof_engine.rs:11:impl TransitionProofEngine {
+crates/amun-pccv/src/transition_proof_engine.rs:120:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/transition_proof_engine.rs:127:            lineage: ResourceLineage::genesis(parent),
+crates/amun-pccv/src/transition_proof_engine.rs:133:        let parent_hash = ResourceRegistry::hash_resource(reg.get(&parent).unwrap());
+crates/amun-pccv/src/transition_proof_engine.rs:140:            lineage: ResourceLineage::transformation(child_id, parent, parent_hash, 2),
+crates/amun-pccv/src/transition_proof_engine.rs:14:        registry: &ResourceRegistry,
+crates/amun-pccv/src/transition_proof_engine.rs:154:        let proof = TransitionProofEngine::build_proof(
+crates/amun-pccv/src/transition_proof_engine.rs:165:        let result = PCCVVerifier::verify(&proof, &reg);
+crates/amun-pccv/src/transition_proof_engine.rs:171:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/transition_proof_engine.rs:178:            lineage: ResourceLineage::genesis(ev),
+crates/amun-pccv/src/transition_proof_engine.rs:184:        let parent_hash = ResourceRegistry::hash_resource(reg.get(&ev).unwrap());
+crates/amun-pccv/src/transition_proof_engine.rs:191:            lineage: ResourceLineage::transformation(child_id, ev, parent_hash, 2),
+crates/amun-pccv/src/transition_proof_engine.rs:209:            lineage: ResourceLineage::transformation(child_id, ev, parent_hash, 2),
+crates/amun-pccv/src/transition_proof_engine.rs:213:        let witness = WitnessBundle {
+crates/amun-pccv/src/transition_proof_engine.rs:218:        let mut proof = EnhancedTransitionProof {
+crates/amun-pccv/src/transition_proof_engine.rs:22:    ) -> EnhancedTransitionProof {
+crates/amun-pccv/src/transition_proof_engine.rs:233:        proof.proof_hash = PCCVVerifier::compute_proof_hash(&proof);
+crates/amun-pccv/src/transition_proof_engine.rs:234:        let result = PCCVVerifier::verify(&proof, &reg);
+crates/amun-pccv/src/transition_proof_engine.rs:240:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/transition_proof_engine.rs:246:            lineage: ResourceLineage::genesis(parent),
+crates/amun-pccv/src/transition_proof_engine.rs:253:        let proof1 = TransitionProofEngine::build_proof(
+crates/amun-pccv/src/transition_proof_engine.rs:264:        let proof2 = TransitionProofEngine::build_proof(
+crates/amun-pccv/src/transition_proof_engine.rs:2:use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
+crates/amun-pccv/src/transition_proof_engine.rs:37:        let evidence: Vec<amun_evidence_engine::evidence_types::ConstitutionalEvidence> = buffer
+crates/amun-pccv/src/transition_proof_engine.rs:52:        let mut proof = EnhancedTransitionProof {
+crates/amun-pccv/src/transition_proof_engine.rs:5:use crate::enhanced_proof::EnhancedTransitionProof;
+crates/amun-pccv/src/transition_proof_engine.rs:68:        proof.proof_hash = PCCVVerifier::compute_proof_hash(&proof);
+crates/amun-pccv/src/transition_proof_engine.rs:6:use crate::pccv_verifier::{PCCVResult, PCCVVerifier};
+crates/amun-pccv/src/transition_proof_engine.rs:74:        registry: &ResourceRegistry,
+crates/amun-pccv/src/transition_proof_engine.rs:82:    ) -> (EnhancedTransitionProof, PCCVResult) {
+crates/amun-pccv/src/transition_proof_engine.rs:94:        let result = PCCVVerifier::verify(&proof, registry);
+crates/amun-pccv/src/transition_proof_engine.rs:9:pub struct TransitionProofEngine;
+crates/amun-pccv/src/witness_builder.rs:105:    fn build_lineage_proof(registry: &ResourceRegistry, resource_id: &ResourceId) -> LineageProof {
+crates/amun-pccv/src/witness_builder.rs:11:    ) -> WitnessBundle {
+crates/amun-pccv/src/witness_builder.rs:136:    use amun_resource_core::{ResourceArchetype, ResourceLineage, ResourceMetadata, ResourceState};
+crates/amun-pccv/src/witness_builder.rs:146:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/witness_builder.rs:152:            lineage: ResourceLineage::genesis(id),
+crates/amun-pccv/src/witness_builder.rs:167:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/witness_builder.rs:176:            lineage: ResourceLineage::genesis(root),
+crates/amun-pccv/src/witness_builder.rs:182:        let root_hash = ResourceRegistry::hash_resource(reg.get(&root).unwrap());
+crates/amun-pccv/src/witness_builder.rs:189:                lineage: ResourceLineage::single_ancestor(child, root, root_hash, 2),
+crates/amun-pccv/src/witness_builder.rs:196:        let child_hash = ResourceRegistry::hash_resource(reg.get(&child).unwrap());
+crates/amun-pccv/src/witness_builder.rs:1:use crate::enhanced_proof::{LineageProof, MerkleProof, WitnessBundle};
+crates/amun-pccv/src/witness_builder.rs:203:                lineage: ResourceLineage::single_ancestor(grandchild, child, child_hash, 3),
+crates/amun-pccv/src/witness_builder.rs:220:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/src/witness_builder.rs:226:                lineage: ResourceLineage::genesis(make_id(i)),
+crates/amun-pccv/src/witness_builder.rs:26:        WitnessBundle {
+crates/amun-pccv/src/witness_builder.rs:2:use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
+crates/amun-pccv/src/witness_builder.rs:34:        registry: &ResourceRegistry,
+crates/amun-pccv/src/witness_builder.rs:47:        registry: &ResourceRegistry,
+crates/amun-pccv/src/witness_builder.rs:62:                    .map(|meta| (ResourceRegistry::hash_resource(meta), *id))
+crates/amun-pccv/src/witness_builder.rs:8:        registry: &ResourceRegistry,
+crates/amun-pccv/tests/replay_equivalence.rs:100:    let result1 = amun_pccv::pccv_verifier::PCCVVerifier::verify(&proof1, &reg1);
+crates/amun-pccv/tests/replay_equivalence.rs:101:    let result2 = amun_pccv::pccv_verifier::PCCVVerifier::verify(&proof2, &reg2);
+crates/amun-pccv/tests/replay_equivalence.rs:108:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-pccv/tests/replay_equivalence.rs:113:        lineage: ResourceLineage::genesis(make_id(1)),
+crates/amun-pccv/tests/replay_equivalence.rs:119:    let parent_hash = ResourceRegistry::hash_resource(reg.get(&make_id(1)).unwrap());
+crates/amun-pccv/tests/replay_equivalence.rs:128:        lineage: ResourceLineage::transformation(child_id, make_id(1), parent_hash, 2),
+crates/amun-pccv/tests/replay_equivalence.rs:144:            TransitionProofEngine::build_proof(
+crates/amun-pccv/tests/replay_equivalence.rs:17:    let mut reg1 = ResourceRegistry::new(1000);
+crates/amun-pccv/tests/replay_equivalence.rs:18:    let mut reg2 = ResourceRegistry::new(1000);
+crates/amun-pccv/tests/replay_equivalence.rs:24:        lineage: ResourceLineage::genesis(make_id(1)),
+crates/amun-pccv/tests/replay_equivalence.rs:2:use amun_pccv::transition_proof_engine::TransitionProofEngine;
+crates/amun-pccv/tests/replay_equivalence.rs:37:    let parent_hash = ResourceRegistry::hash_resource(reg1.get(&make_id(1)).unwrap());
+crates/amun-pccv/tests/replay_equivalence.rs:42:        lineage: ResourceLineage::transformation(child_id, make_id(1), parent_hash, 2),
+crates/amun-pccv/tests/replay_equivalence.rs:4:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-pccv/tests/replay_equivalence.rs:73:    let proof1 = TransitionProofEngine::build_proof(
+crates/amun-pccv/tests/replay_equivalence.rs:84:    let proof2 = TransitionProofEngine::build_proof(
+crates/amun-persistent-node/src/persistent_store.rs:112:    pub fn registry(&self) -> &ResourceRegistry {
+crates/amun-persistent-node/src/persistent_store.rs:115:    pub fn registry_mut(&mut self) -> &mut ResourceRegistry {
+crates/amun-persistent-node/src/persistent_store.rs:130:        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-persistent-node/src/persistent_store.rs:158:                    lineage: ResourceLineage::genesis(make_id(i)),
+crates/amun-persistent-node/src/persistent_store.rs:186:                    lineage: ResourceLineage::genesis(make_id(i)),
+crates/amun-persistent-node/src/persistent_store.rs:25:                registry: ResourceRegistry::new(1_000_000),
+crates/amun-persistent-node/src/persistent_store.rs:2:use amun_resource_core::{ResourceMetadata, ResourceRegistry};
+crates/amun-persistent-node/src/persistent_store.rs:9:    registry: ResourceRegistry,
+crates/amun-proof-archive/src/hot_store.rs:1:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-proof-archive/src/hot_store.rs:20:    pub fn store(&mut self, proof: TransitionProof, block_height: u64) {
+crates/amun-proof-archive/src/hot_store.rs:26:    pub fn get(&self, proof_hash: &[u8; 32]) -> Option<&TransitionProof> {
+crates/amun-proof-archive/src/hot_store.rs:66:    fn make_proof(tx_hash: [u8; 32]) -> TransitionProof {
+crates/amun-proof-archive/src/hot_store.rs:67:        TransitionProof::new(
+crates/amun-proof-archive/src/hot_store.rs:6:    proofs: HashMap<[u8; 32], TransitionProof>,
+crates/amun-proof-archive/src/proof_archive.rs:17:    pub fn archive_permanent(&mut self, proof: TransitionProof) {
+crates/amun-proof-archive/src/proof_archive.rs:21:    pub fn archive_evidence(&mut self, evidence: ConstitutionalEvidence) {
+crates/amun-proof-archive/src/proof_archive.rs:25:    pub fn get_permanent(&self, proof_hash: &[u8; 32]) -> Option<&TransitionProof> {
+crates/amun-proof-archive/src/proof_archive.rs:2:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-proof-archive/src/proof_archive.rs:3:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-proof-archive/src/proof_archive.rs:61:    fn make_proof(tx_hash: [u8; 32]) -> TransitionProof {
+crates/amun-proof-archive/src/proof_archive.rs:62:        TransitionProof::new(
+crates/amun-proof-archive/src/proof_archive.rs:8:    permanent: HashMap<[u8; 32], TransitionProof>,
+crates/amun-proof-archive/src/proof_archive.rs:90:        let ev = ConstitutionalEvidence::ExecutionFailure {
+crates/amun-proof-archive/src/proof_archive.rs:9:    evidence: Vec<ConstitutionalEvidence>,
+crates/amun-replay-cert/src/certificate.rs:19:impl ReplayCertificate {
+crates/amun-replay-cert/src/certificate.rs:6:pub struct ReplayCertificate {
+crates/amun-replay-cert/src/verifier.rs:1:use crate::certificate::ReplayCertificate;
+crates/amun-replay-cert/src/verifier.rs:5:pub fn verify_certificate(cert: &ReplayCertificate) -> Result<(), &'static str> {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:140:    fn compute_proof_root(transitions: &[TransitionProof]) -> [u8; 32] {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:167:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:193:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:219:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:23:        registry: &mut ResourceRegistry,
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:247:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:274:        let mut registry = ResourceRegistry::new(10000);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:55:            let mut fresh_reg = ResourceRegistry::new(10000);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:56:            let replay = ReplayVerifier::replay(&proof, program, &mut fresh_reg, &[]);
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:5:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:6:use amun_resource_core::{ResourceId, ResourceRegistry};
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:7:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-replay-consensus/src/replay_backed_types.rs:1:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-replay-consensus/src/replay_backed_types.rs:29:    pub transitions: Vec<TransitionProof>,
+crates/amun-replay-engine/src/constitutional_governance.rs:125:        // Invariants 1-25 are all constitutional law.
+crates/amun-replay-engine/src/constitutional_governance.rs:68:    InvariantViolation {
+crates/amun-replay-engine/src/isolation_boundary.rs:7://! is a constitutional requirement (Invariant 15).
+crates/amun-replay-semantics/src/lib.rs:23:pub struct ReplayCertificate {
+crates/amun-replay-semantics/src/lib.rs:30:impl ReplayCertificate {
+crates/amun-replay-semantics/src/lib.rs:48:    pub fn verify(&self, a: &ReplayCertificate, b: &ReplayCertificate) -> bool {
+crates/amun-replay-semantics/src/lib.rs:49:        match self { ReplayEquivalence::Strict => a.certificate_hash == b.certificate_hash, ReplayEquivalence::Semantic => ReplayCertificate::prove_equivalence(a, b), ReplayEquivalence::EpochBounded(ep) => a.epoch.epoch_id == ep.epoch_id && b.epoch.epoch_id == ep.epoch_id && ReplayCertificate::prove_equivalence(a, b) }
+crates/amun-replay-semantics/src/lib.rs:70:pub struct ReplayCheckpoint { pub sequence: u64, pub state_root: [u8; 32], pub transcript_chain_hash: [u8; 32], pub certificate: ReplayCertificate }
+crates/amun-replay-semantics/src/lib.rs:75:    pub fn replay_determinism(a: &ReplayCertificate, b: &ReplayCertificate) -> Result<(), ReplayFailure> {
+crates/amun-replay-semantics/src/lib.rs:87:    #[test] fn test_cert_self_verifying() { assert!(ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1).verify()); }
+crates/amun-replay-semantics/src/lib.rs:88:    #[test] fn test_cert_tamper_detected() { let mut c = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1); c.state_root = [0xFF;32]; assert!(!c.verify()); }
+crates/amun-replay-semantics/src/lib.rs:89:    #[test] fn test_equivalence_strict() { let c = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1); assert!(ReplayEquivalence::Strict.verify(&c, &c)); }
+crates/amun-replay-semantics/src/lib.rs:90:    #[test] fn test_law_determinism_divergence() { let a = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0x02;32], [0x03;32], [0x04;32], tb(), 100, 1); let b = ReplayCertificate::new(ReplayDomain::Consensus, te(), [0x01;32], [0xFF;32], [0x03;32], [0x04;32], tb(), 100, 1); assert!(laws::replay_determinism(&a, &b).is_err()); }
+crates/amun-replay-verifier/src/replay_verifier.rs:132:        let mut r1 = ResourceRegistry::new(1000);
+crates/amun-replay-verifier/src/replay_verifier.rs:133:        let mut r2 = ResourceRegistry::new(1000);
+crates/amun-replay-verifier/src/replay_verifier.rs:155:            ReplayVerifier::replay(&proof, &p, &mut r2, &[]),
+crates/amun-replay-verifier/src/replay_verifier.rs:162:        let mut r = ResourceRegistry::new(1000);
+crates/amun-replay-verifier/src/replay_verifier.rs:184:        let mut r2 = ResourceRegistry::new(1000);
+crates/amun-replay-verifier/src/replay_verifier.rs:186:            ReplayVerifier::replay(&proof, &p, &mut r2, &[]),
+crates/amun-replay-verifier/src/replay_verifier.rs:205:        let mut r = ResourceRegistry::new(1000);
+crates/amun-replay-verifier/src/replay_verifier.rs:215:            let mut f = ResourceRegistry::new(1000);
+crates/amun-replay-verifier/src/replay_verifier.rs:217:                ReplayVerifier::replay(&proof, &p, &mut f, &[]),
+crates/amun-replay-verifier/src/replay_verifier.rs:28:pub struct ReplayVerifier;
+crates/amun-replay-verifier/src/replay_verifier.rs:30:impl ReplayVerifier {
+crates/amun-replay-verifier/src/replay_verifier.rs:32:        proof: &TransitionProof,
+crates/amun-replay-verifier/src/replay_verifier.rs:34:        registry: &mut ResourceRegistry,
+crates/amun-replay-verifier/src/replay_verifier.rs:35:        invariants: &[InvariantDeclaration],
+crates/amun-replay-verifier/src/replay_verifier.rs:3:use amun_invariant_engine::invariant_types::InvariantDeclaration;
+crates/amun-replay-verifier/src/replay_verifier.rs:50:                    lineage: ResourceLineage::genesis(meta.lineage.parent_resource_ids[0]),
+crates/amun-replay-verifier/src/replay_verifier.rs:7:    ResourceArchetype, ResourceLineage, ResourceMetadata, ResourceRegistry, ResourceState,
+crates/amun-replay-verifier/src/replay_verifier.rs:9:use amun_transition_proof::transition_proof::TransitionProof;
+crates/amun-replay/src/certificate.rs:115:    pub fn latest(&self) -> Option<&ReplayCertificate> {
+crates/amun-replay/src/certificate.rs:149:        let genesis = ReplayCertificate::genesis([0xAA; 32], 1000);
+crates/amun-replay/src/certificate.rs:157:        let mut store = ReplayCertificateStore::new();
+crates/amun-replay/src/certificate.rs:158:        let genesis = ReplayCertificate::genesis([0xAA; 32], 1000);
+crates/amun-replay/src/certificate.rs:162:        let cert1 = ReplayCertificate::issue(&result, 3, prev_id, [0xAA; 32], 2000).unwrap();
+crates/amun-replay/src/certificate.rs:165:        let cert2 = ReplayCertificate::issue(&result, 6, prev_id2, [0xAA; 32], 3000).unwrap();
+crates/amun-replay/src/certificate.rs:172:        let mut store = ReplayCertificateStore::new();
+crates/amun-replay/src/certificate.rs:173:        let genesis = ReplayCertificate::genesis([0xAA; 32], 1000);
+crates/amun-replay/src/certificate.rs:176:        let mut cert = ReplayCertificate::issue(&result, 3, [0xFF; 32], [0xAA; 32], 2000).unwrap();
+crates/amun-replay/src/certificate.rs:17:impl ReplayCertificate {
+crates/amun-replay/src/certificate.rs:183:        let mut store = ReplayCertificateStore::new();
+crates/amun-replay/src/certificate.rs:184:        let genesis = ReplayCertificate::genesis([0xAA; 32], 1000);
+crates/amun-replay/src/certificate.rs:188:        let mut cert = ReplayCertificate::issue(&result, 3, prev_id, [0xAA; 32], 2000).unwrap();
+crates/amun-replay/src/certificate.rs:195:        let mut store = ReplayCertificateStore::new();
+crates/amun-replay/src/certificate.rs:197:            .store(ReplayCertificate::genesis([0xAA; 32], 1000))
+crates/amun-replay/src/certificate.rs:202:            .store(ReplayCertificate::issue(&r, 3, id1, [0xAA; 32], 2000).unwrap())
+crates/amun-replay/src/certificate.rs:206:            .store(ReplayCertificate::issue(&r, 6, id2, [0xAA; 32], 3000).unwrap())
+crates/amun-replay/src/certificate.rs:6:pub struct ReplayCertificate {
+crates/amun-replay/src/certificate.rs:81:pub struct ReplayCertificateStore {
+crates/amun-replay/src/certificate.rs:82:    certificates: HashMap<[u8; 32], ReplayCertificate>,
+crates/amun-replay/src/certificate.rs:86:impl ReplayCertificateStore {
+crates/amun-replay/src/certificate.rs:91:    pub fn store(&mut self, cert: ReplayCertificate) -> Result<(), &'static str> {
+crates/amun-replay/src/lib.rs:36:pub use certificate::{ReplayCertificate, ReplayCertificateStore};
+crates/amun-replay/src/store.rs:18:    pub fn insert(&mut self, cert: ReplayCertificate) {
+crates/amun-replay/src/store.rs:1:use amun_constitutional_state::ReplayCertificate;
+crates/amun-replay/src/store.rs:24:    pub fn get(&self, hash: &[u8; 32]) -> Option<&ReplayCertificate> {
+crates/amun-replay/src/store.rs:4:/// Stores ReplayCertificates keyed by their certificate_hash.
+crates/amun-replay/src/store.rs:50:/// A generic interface for retrieving ReplayCertificates by hash.
+crates/amun-replay/src/store.rs:52:    fn get_certificate(&self, hash: &[u8; 32]) -> Option<ReplayCertificate>;
+crates/amun-replay/src/store.rs:56:    fn get_certificate(&self, hash: &[u8; 32]) -> Option<ReplayCertificate> {
+crates/amun-replay/src/store.rs:7:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-resource-core/src/resource_lineage.rs:19:pub struct ResourceLineage {
+crates/amun-resource-core/src/resource_lineage.rs:28:impl ResourceLineage {
+crates/amun-resource-core/src/resource_registry.rs:31:    pub lineage: ResourceLineage,
+crates/amun-resource-core/src/resource_registry.rs:358:            lineage: ResourceLineage::genesis(id),
+crates/amun-resource-core/src/resource_registry.rs:366:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:376:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:387:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:394:            lineage: ResourceLineage::genesis(parent_id),
+crates/amun-resource-core/src/resource_registry.rs:399:        let parent_hash = ResourceRegistry::hash_resource(reg.get(&parent_id).unwrap());
+crates/amun-resource-core/src/resource_registry.rs:404:            lineage: ResourceLineage::transformation(child_id, parent_id, parent_hash, 2),
+crates/amun-resource-core/src/resource_registry.rs:415:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:420:        let parent_hash = ResourceRegistry::hash_resource(reg.get(&parent_id).unwrap());
+crates/amun-resource-core/src/resource_registry.rs:425:            lineage: ResourceLineage::transformation(child_id, parent_id, parent_hash, 2),
+crates/amun-resource-core/src/resource_registry.rs:434:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:439:        let hash_a = ResourceRegistry::hash_resource(reg.get(&a).unwrap());
+crates/amun-resource-core/src/resource_registry.rs:444:            lineage: ResourceLineage::single_ancestor(b, a, hash_a, 2),
+crates/amun-resource-core/src/resource_registry.rs:449:        let hash_b = ResourceRegistry::hash_resource(reg.get(&b).unwrap());
+crates/amun-resource-core/src/resource_registry.rs:454:            lineage: ResourceLineage::single_ancestor(make_id(3), b, hash_b, 3),
+crates/amun-resource-core/src/resource_registry.rs:463:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:470:            let hash = ResourceRegistry::hash_resource(reg.get(&current_parent).unwrap());
+crates/amun-resource-core/src/resource_registry.rs:475:                lineage: ResourceLineage::single_ancestor(child, current_parent, hash, i),
+crates/amun-resource-core/src/resource_registry.rs:487:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:501:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:510:        let mut reg2 = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:519:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-resource-core/src/resource_registry.rs:5:use crate::{DerivationType, ResourceArchetype, ResourceId, ResourceLineage, TransformationMatrix};
+crates/amun-resource-core/src/resource_registry.rs:66:pub struct ResourceRegistry {
+crates/amun-resource-core/src/resource_registry.rs:73:impl ResourceRegistry {
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:115:    let mut reg1 = ResourceRegistry::new(10);
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:116:    let mut reg2 = ResourceRegistry::new(10);
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:119:    let setup = |reg: &mut ResourceRegistry| {
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:124:            lineage: ResourceLineage::genesis(col_id),
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:142:                    lineage: ResourceLineage::single_ancestor(id, col_id, hash, version + 1),
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:16:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:2:    RegistryError, ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata,
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:31:        lineage: ResourceLineage::single_ancestor(token1, col_id, parent_hash, parent_version + 1),
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:3:    ResourceRegistry, ResourceState,
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:45:    let mut reg = ResourceRegistry::new(10);
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:51:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:62:        lineage: ResourceLineage::single_ancestor(ResourceId([3u8; 32]), col_id, bad_hash, 2),
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:74:    let mut reg = ResourceRegistry::new(10);
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:80:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:8:    let mut reg = ResourceRegistry::new(10);
+crates/amun-resource-core/tests/n130_constitutional_nft.rs:96:            lineage: ResourceLineage::single_ancestor(
+crates/amun-resource-core/tests/stress_tests.rs:107:                ResourceRegistry::hash_resource(parent),
+crates/amun-resource-core/tests/stress_tests.rs:115:            lineage: ResourceLineage::single_ancestor(child_id, parent_id, parent_hash, version),
+crates/amun-resource-core/tests/stress_tests.rs:133:    let mut reg = ResourceRegistry::new(200_000);
+crates/amun-resource-core/tests/stress_tests.rs:149:    let mut reg = ResourceRegistry::new(200_000);
+crates/amun-resource-core/tests/stress_tests.rs:174:    let mut reg = ResourceRegistry::new(200_000);
+crates/amun-resource-core/tests/stress_tests.rs:186:                ResourceRegistry::hash_resource(parent),
+crates/amun-resource-core/tests/stress_tests.rs:18:        lineage: ResourceLineage::genesis(id),
+crates/amun-resource-core/tests/stress_tests.rs:194:            lineage: ResourceLineage::single_ancestor(child_id, parent_id, parent_hash, version),
+crates/amun-resource-core/tests/stress_tests.rs:211:        let parent_hash = ResourceRegistry::hash_resource(parent);
+crates/amun-resource-core/tests/stress_tests.rs:222:    let mut reg = ResourceRegistry::new(200_000);
+crates/amun-resource-core/tests/stress_tests.rs:234:                ResourceRegistry::hash_resource(parent),
+crates/amun-resource-core/tests/stress_tests.rs:242:            lineage: ResourceLineage::single_ancestor(child_id, parent_id, parent_hash, version),
+crates/amun-resource-core/tests/stress_tests.rs:254:            ResourceRegistry::hash_resource(tip),
+crates/amun-resource-core/tests/stress_tests.rs:262:        lineage: ResourceLineage::single_ancestor(make_id(99999), parent_id, tip_hash, version),
+crates/amun-resource-core/tests/stress_tests.rs:26:    let mut reg = ResourceRegistry::new(100_000);
+crates/amun-resource-core/tests/stress_tests.rs:2:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-resource-core/tests/stress_tests.rs:45:    let mut reg = ResourceRegistry::new(10_000);
+crates/amun-resource-core/tests/stress_tests.rs:58:                ResourceRegistry::hash_resource(parent),
+crates/amun-resource-core/tests/stress_tests.rs:66:            lineage: ResourceLineage::single_ancestor(child_id, parent_id, parent_hash, version),
+crates/amun-resource-core/tests/stress_tests.rs:89:    let mut reg = ResourceRegistry::new(100_000);
+crates/amun-self-preservation/src/action_principle.rs:47:pub struct LeastInvariantViolation;
+crates/amun-self-preservation/src/action_principle.rs:49:impl LeastInvariantViolation {
+crates/amun-self-preservation/src/consistency.rs:24:        invariant: super::legitimacy_guards::GuardedInvariant,
+crates/amun-self-preservation/src/legitimacy_guards.rs:13:pub enum GuardedInvariant {
+crates/amun-self-preservation/src/legitimacy_guards.rs:27:    InvariantBroken {
+crates/amun-self-preservation/src/legitimacy_guards.rs:28:        invariant: GuardedInvariant,
+crates/amun-self-preservation/src/legitimacy_guards.rs:38:    pub fn new(invariant: GuardedInvariant, max_violations: u64) -> Self {
+crates/amun-self-preservation/src/legitimacy_guards.rs:63:        Some(GuardViolation::InvariantBroken {
+crates/amun-self-preservation/src/legitimacy_guards.rs:6:    pub protects: GuardedInvariant,
+crates/amun-self-preservation/src/legitimacy_guards.rs:71:    pub fn can_guard(invariant: &GuardedInvariant) -> bool {
+crates/amun-self-preservation/src/legitimacy_guards.rs:72:        !matches!(invariant, GuardedInvariant::MetaAmendmentBounds)
+crates/amun-self-preservation/src/lib.rs:15:pub use action_principle::{ConstitutionalAction, LeastInvariantViolation};
+crates/amun-smt/src/node.rs:3://! # Invariants (enforced by tree, verified by validator)
+crates/amun-smt/src/tree.rs:3://! # Core Invariant
+crates/amun-smt/src/validator.rs:117:            // Invariant: maximal skip (canonical minimality)
+crates/amun-smt/src/validator.rs:46:            // Invariant: no empty children
+crates/amun-smt/src/validator.rs:51:            // Invariant: skip_len within bounds
+crates/amun-snapshot-optimization/src/lib.rs:1:use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
+crates/amun-snapshot-optimization/src/lib.rs:23:    pub fn apply_to(&self, registry: &mut ResourceRegistry) {
+crates/amun-snapshot-optimization/src/lib.rs:34:pub fn compress_snapshot(registry: &ResourceRegistry) -> (Vec<ResourceMetadata>, [u8; 32]) {
+crates/amun-snapshot-optimization/src/lib.rs:44:pub fn restore_from_compressed(compressed: &[ResourceMetadata]) -> ResourceRegistry {
+crates/amun-snapshot-optimization/src/lib.rs:45:    let mut reg = ResourceRegistry::new(compressed.len() * 2);
+crates/amun-snapshot-optimization/tests/n162_snapshot_optimization_tests.rs:11:    let mut reg = ResourceRegistry::new(10000);
+crates/amun-snapshot-optimization/tests/n162_snapshot_optimization_tests.rs:17:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-snapshot-optimization/tests/n162_snapshot_optimization_tests.rs:2:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-snapshot-optimization/tests/n162_snapshot_optimization_tests.rs:33:                lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+crates/amun-snapshot-optimization/tests/n162_snapshot_optimization_tests.rs:69:    let mut reg = ResourceRegistry::new(1000);
+crates/amun-snapshot-optimization/tests/n162_snapshot_optimization_tests.rs:75:        lineage: ResourceLineage::genesis(col_id),
+crates/amun-snapshot-optimization/tests/n162_snapshot_optimization_tests.rs:91:                lineage: ResourceLineage::single_ancestor(token_id, col_id, parent_hash, version),
+crates/amun-soak-full/src/lib.rs:110:                        lineage: ResourceLineage::single_ancestor(
+crates/amun-soak-full/src/lib.rs:40:    pub registry: ResourceRegistry,
+crates/amun-soak-full/src/lib.rs:55:        let mut reg = ResourceRegistry::new(10000);
+crates/amun-soak-full/src/lib.rs:61:            lineage: ResourceLineage::genesis(col_id),
+crates/amun-soak-full/src/lib.rs:7:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-soak-test/src/lib.rs:13:    pub registry: Arc<Mutex<ResourceRegistry>>,
+crates/amun-soak-test/src/lib.rs:23:            registry: Arc::new(Mutex::new(ResourceRegistry::new(5000))),
+crates/amun-soak-test/src/lib.rs:45:                lineage: ResourceLineage::genesis(col_id),
+crates/amun-soak-test/src/lib.rs:4:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-soak-test/src/lib.rs:75:                        lineage: ResourceLineage::single_ancestor(
+crates/amun-state-machine/src/absolute_invariants.rs:29:impl AbsoluteInvariant {
+crates/amun-state-machine/src/absolute_invariants.rs:36:    pub fn all() -> Vec<AbsoluteInvariant> {
+crates/amun-state-machine/src/absolute_invariants.rs:6:pub enum AbsoluteInvariant {
+crates/amun-state-machine/src/axioms.rs:21:    EmptyRootInvariant,
+crates/amun-state-machine/src/axioms.rs:44:            Self::EmptyRootInvariant => "Empty root is invariant across protocol versions",
+crates/amun-state-machine/src/engine.rs:123:        invariants: &[ConstitutionalInvariant],
+crates/amun-state-machine/src/engine.rs:130:                ConstitutionalInvariant::NoImpossibleState => {
+crates/amun-state-machine/src/engine.rs:137:                ConstitutionalInvariant::TransitionHistoryAcyclic => {
+crates/amun-state-machine/src/engine.rs:142:                ConstitutionalInvariant::LineageIntact
+crates/amun-state-machine/src/engine.rs:1:use super::historical_invariants::HistoricalInvariantEngine;
+crates/amun-state-machine/src/engine.rs:24:    pub history: HistoricalInvariantEngine,
+crates/amun-state-machine/src/engine.rs:2:use super::invariants::ConstitutionalInvariant;
+crates/amun-state-machine/src/engine.rs:37:            history: HistoricalInvariantEngine::new(),
+crates/amun-state-machine/src/historical_invariants.rs:125:            HistoricalInvariant::MaxFreezeUnfreezeCycles {
+crates/amun-state-machine/src/historical_invariants.rs:129:            HistoricalInvariant::MaxAmendmentsPerEpoch {
+crates/amun-state-machine/src/historical_invariants.rs:133:            HistoricalInvariant::MaxReplayDivergence {
+crates/amun-state-machine/src/historical_invariants.rs:137:            HistoricalInvariant::MinGovernanceCompatibility {
+crates/amun-state-machine/src/historical_invariants.rs:23:impl HistoricalInvariant {
+crates/amun-state-machine/src/historical_invariants.rs:26:            HistoricalInvariant::MaxFreezeUnfreezeCycles {
+crates/amun-state-machine/src/historical_invariants.rs:37:            HistoricalInvariant::MaxAmendmentsPerEpoch {
+crates/amun-state-machine/src/historical_invariants.rs:3:pub enum HistoricalInvariant {
+crates/amun-state-machine/src/historical_invariants.rs:48:            HistoricalInvariant::MaxReplayDivergence {
+crates/amun-state-machine/src/historical_invariants.rs:59:            HistoricalInvariant::MinGovernanceCompatibility {
+crates/amun-state-machine/src/historical_invariants.rs:77:pub struct HistoricalInvariantEngine {
+crates/amun-state-machine/src/historical_invariants.rs:85:impl Default for HistoricalInvariantEngine {
+crates/amun-state-machine/src/historical_invariants.rs:91:impl HistoricalInvariantEngine {
+crates/amun-state-machine/src/invariants.rs:3:pub enum ConstitutionalInvariant {
+crates/amun-state-machine/src/lib.rs:29:pub use absolute_invariants::AbsoluteInvariant;
+crates/amun-state-machine/src/lib.rs:42:pub use historical_invariants::{HistoricalInvariant, HistoricalInvariantEngine};
+crates/amun-state-machine/src/lib.rs:44:pub use invariants::ConstitutionalInvariant;
+crates/amun-state-machine/src/lib.rs:55:    Transition, TransitionAlgebra, TransitionId, TransitionProof, TransitionType,
+crates/amun-state-machine/src/meta_amendment.rs:1:use super::absolute_invariants::AbsoluteInvariant;
+crates/amun-state-machine/src/meta_amendment.rs:47:        absolute_invariants: &[AbsoluteInvariant],
+crates/amun-state-machine/src/meta_amendment.rs:57:                        AbsoluteInvariant::ReplayDeterminismAbsolute => {
+crates/amun-state-machine/src/meta_amendment.rs:65:                        AbsoluteInvariant::ProvableTransitionAbsolute => {
+crates/amun-state-machine/src/meta_amendment.rs:9:    pub absolute_invariants_untouchable: Vec<AbsoluteInvariant>,
+crates/amun-state-machine/src/postconditions.rs:16:    InvariantsPreserved,
+crates/amun-state-machine/src/transitions.rs:202:pub struct TransitionProof {
+crates/amun-state-machine/src/verifier.rs:104:                ConstitutionalInvariant::TransitionHistoryAcyclic => {
+crates/amun-state-machine/src/verifier.rs:109:                ConstitutionalInvariant::LineageIntact
+crates/amun-state-machine/src/verifier.rs:1:use super::invariants::ConstitutionalInvariant;
+crates/amun-state-machine/src/verifier.rs:92:        invariants: &[ConstitutionalInvariant],
+crates/amun-state-machine/src/verifier.rs:97:                ConstitutionalInvariant::NoImpossibleState => {
+crates/amun-state-pruning/src/lib.rs:13:            registry: ResourceRegistry::new(max_lineage_depth),
+crates/amun-state-pruning/src/lib.rs:1:use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
+crates/amun-state-pruning/src/lib.rs:5:    pub registry: ResourceRegistry,
+crates/amun-state-pruning/tests/n166_pruning_tests.rs:120:                lineage: ResourceLineage::genesis(col_id),
+crates/amun-state-pruning/tests/n166_pruning_tests.rs:137:                        lineage: ResourceLineage::single_ancestor(
+crates/amun-state-pruning/tests/n166_pruning_tests.rs:16:            lineage: ResourceLineage::genesis(col_id),
+crates/amun-state-pruning/tests/n166_pruning_tests.rs:2:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceState,
+crates/amun-state-pruning/tests/n166_pruning_tests.rs:33:                    lineage: ResourceLineage::single_ancestor(
+crates/amun-state-pruning/tests/n166_pruning_tests.rs:66:            lineage: ResourceLineage::genesis(col_id),
+crates/amun-state-pruning/tests/n166_pruning_tests.rs:83:                    lineage: ResourceLineage::single_ancestor(
+crates/amun-state-root/src/lib.rs:13:pub use replay::{ReplayCertificate, ReplayEquivalenceProof, ReplayTranscript};
+crates/amun-state-root/src/replay.rs:42:pub struct ReplayCertificate {
+crates/amun-state-root/src/replay.rs:47:impl CanonicalEncode for ReplayCertificate {
+crates/amun-state-sync/src/lib.rs:132:        let mut reg = ResourceRegistry::new(1000);
+crates/amun-state-sync/src/lib.rs:204:        let mut reg = ResourceRegistry::new(100);
+crates/amun-state-sync/src/lib.rs:238:        let mut reg = ResourceRegistry::new(100);
+crates/amun-state-sync/src/lib.rs:46:        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-state-sync/src/lib.rs:61:            lineage: ResourceLineage::genesis(id),
+crates/amun-state-sync/src/stateless_verifier.rs:1:use amun_resource_core::ResourceRegistry;
+crates/amun-state-sync/src/stateless_verifier.rs:87:        let mut temp_reg = ResourceRegistry::new(all_resources.len() * 2);
+crates/amun-state-sync/src/sync_protocol.rs:100:    ) -> Result<ResourceRegistry, String> {
+crates/amun-state-sync/src/sync_protocol.rs:147:                let mut registry = ResourceRegistry::new(snapshot.total_resources as usize * 2);
+crates/amun-state-sync/src/sync_protocol.rs:165:        registry: &ResourceRegistry,
+crates/amun-state-sync/src/sync_protocol.rs:187:        registry: &mut ResourceRegistry,
+crates/amun-state-sync/src/sync_protocol.rs:205:        registry: &ResourceRegistry,
+crates/amun-state-sync/src/sync_protocol.rs:234:    use amun_resource_core::resource_lineage::ResourceLineage;
+crates/amun-state-sync/src/sync_protocol.rs:251:            lineage: ResourceLineage::genesis(id),
+crates/amun-state-sync/src/sync_protocol.rs:257:    fn create_test_registry(n: u64) -> ResourceRegistry {
+crates/amun-state-sync/src/sync_protocol.rs:258:        let mut r = ResourceRegistry::new(n as usize * 2);
+crates/amun-state-sync/src/sync_protocol.rs:5:use amun_resource_core::{ResourceMetadata, ResourceRegistry};
+crates/amun-state-sync/src/sync_protocol.rs:60:        registry: &ResourceRegistry,
+crates/amun-stateless-sync/src/lib.rs:105:    pub fn import_certificate(&mut self, cert: ReplayCertificate) {
+crates/amun-stateless-sync/src/lib.rs:34:use amun_constitutional_state::{CertificateInclusionProof, ReplayCertificate};
+crates/amun-stateless-sync/src/lib.rs:59:        certificates: Vec<ReplayCertificate>,
+crates/amun-stateless-sync/src/lib.rs:80:    certificates: BTreeMap<[u8; 32], ReplayCertificate>,
+crates/amun-storage-kernel/CONSTITUTION.md:85:**Section 5.1: Uniqueness Invariant**
+crates/amun-storage-kernel/VALIDITY_HIERARCHY.md:33:| StateRootMismatch | ReplayVerifier divergence | Quarantine state, resync from trusted peer |
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:83:pub struct ReplayVerifier;
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:84:impl ReplayVerifier {
+crates/amun-storage-kernel/src/persistence/wal/mod.rs:5:pub use iterator::{ReplayVerifier, WalIterator};
+crates/amun-storage-kernel/tests/replay_equivalence.rs:136:        let result = ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap());
+crates/amun-storage-kernel/tests/replay_equivalence.rs:4:        persistence::wal::{ReplayVerifier, WalEntry},
+crates/amun-storage-kernel/tests/replay_equivalence.rs:54:            ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap()).unwrap();
+crates/amun-storage-kernel/tests/replay_equivalence.rs:94:        let result = ReplayVerifier::verify_full_replay(wal_path.to_str().unwrap());
+crates/amun-storage-kernel/tests/specification_compliance.rs:67:    // THEOREM 4: Proof Depth Invariant
+crates/amun-survival-console/src/dashboard.rs:10:    invariant_registry: InvariantRegistry,
+crates/amun-survival-console/src/dashboard.rs:27:        invariant_registry: InvariantRegistry,
+crates/amun-survival-console/src/dashboard.rs:59:        let invariants_hold = health == InvariantHealth::AllInvariantsHold;
+crates/amun-survival-console/src/dashboard.rs:6:use amun_invariants::registry::{InvariantHealth, InvariantRegistry};
+crates/amun-testnet-sim/tests/adversarial_tests.rs:209:                                                    // Actually, ReplayVerifier::replay calls execute() which starts
+crates/amun-testnet-sim/tests/adversarial_tests.rs:212:                let replay = ReplayVerifier::replay(&transition_proof, &program, &mut fresh, &[]);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:22:fn build_registry(count: u64) -> ResourceRegistry {
+crates/amun-testnet-sim/tests/adversarial_tests.rs:23:    let mut reg = ResourceRegistry::new((count * 2) as usize);
+crates/amun-testnet-sim/tests/adversarial_tests.rs:29:            lineage: ResourceLineage::genesis(make_id(i)),
+crates/amun-testnet-sim/tests/adversarial_tests.rs:7:use amun_replay_verifier::replay_verifier::{ReplayResult, ReplayVerifier};
+crates/amun-testnet-sim/tests/adversarial_tests.rs:9:    ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-transcript-semantics/src/lib.rs:104:    #[test] fn test_immutable_cert() { let c = ImmutableReplayCertificate::new(ReplayDomain::Consensus,[0xBB;32],[0x01;32],[0x02;32],[0x03;32],[0x04;32],100,1); assert!(c.verify()); let h1 = c.certificate_hash(); let h2 = c.certificate_hash(); assert_eq!(h1, h2); }
+crates/amun-transcript-semantics/src/lib.rs:59:pub struct ImmutableReplayCertificate { inner: CertifiedEnvelope }
+crates/amun-transcript-semantics/src/lib.rs:62:impl ImmutableReplayCertificate {
+crates/amun-transition-proof/src/enhanced_proof.rs:15:        let leaf_hash = ResourceRegistry::hash_resource(metadata);
+crates/amun-transition-proof/src/enhanced_proof.rs:1:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-transition-proof/src/enhanced_proof.rs:2:use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
+crates/amun-transition-proof/src/enhanced_proof.rs:58:pub struct WitnessBundle {
+crates/amun-transition-proof/src/enhanced_proof.rs:64:impl WitnessBundle {
+crates/amun-transition-proof/src/enhanced_proof.rs:77:pub struct EnhancedTransitionProof {
+crates/amun-transition-proof/src/enhanced_proof.rs:87:    pub evidence: Vec<ConstitutionalEvidence>,
+crates/amun-transition-proof/src/enhanced_proof.rs:90:    pub witness: WitnessBundle,
+crates/amun-transition-proof/src/proof_builder.rs:119:        registry: &ResourceRegistry,
+crates/amun-transition-proof/src/proof_builder.rs:131:    fn compute_siblings(registry: &ResourceRegistry, rid: &ResourceId) -> Vec<([u8; 32], bool)> {
+crates/amun-transition-proof/src/proof_builder.rs:142:                    .map(|m| (ResourceRegistry::hash_resource(m), *id))
+crates/amun-transition-proof/src/proof_builder.rs:178:    fn build_lineage_proof(registry: &ResourceRegistry, rid: &ResourceId) -> LineageProof {
+crates/amun-transition-proof/src/proof_builder.rs:203:    fn compute_enhanced_hash(proof: &EnhancedTransitionProof) -> [u8; 32] {
+crates/amun-transition-proof/src/proof_builder.rs:22:    ) -> TransitionProof {
+crates/amun-transition-proof/src/proof_builder.rs:34:        let evidence: Vec<ConstitutionalEvidence> = buffer
+crates/amun-transition-proof/src/proof_builder.rs:39:        TransitionProof::new(
+crates/amun-transition-proof/src/proof_builder.rs:3:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-transition-proof/src/proof_builder.rs:4:use amun_resource_core::{ResourceId, ResourceMetadata, ResourceRegistry};
+crates/amun-transition-proof/src/proof_builder.rs:56:        registry: &ResourceRegistry,
+crates/amun-transition-proof/src/proof_builder.rs:64:    ) -> EnhancedTransitionProof {
+crates/amun-transition-proof/src/proof_builder.rs:76:        let evidence: Vec<ConstitutionalEvidence> = buffer
+crates/amun-transition-proof/src/proof_builder.rs:7:use crate::enhanced_proof::{EnhancedTransitionProof, LineageProof, MerkleProof, WitnessBundle};
+crates/amun-transition-proof/src/proof_builder.rs:8:use crate::transition_proof::TransitionProof;
+crates/amun-transition-proof/src/proof_builder.rs:93:        let witness = WitnessBundle {
+crates/amun-transition-proof/src/proof_builder.rs:99:        let mut proof = EnhancedTransitionProof {
+crates/amun-transition-proof/src/transition_proof.rs:13:pub struct TransitionProof {
+crates/amun-transition-proof/src/transition_proof.rs:23:    pub evidence: Vec<ConstitutionalEvidence>,
+crates/amun-transition-proof/src/transition_proof.rs:28:impl TransitionProof {
+crates/amun-transition-proof/src/transition_proof.rs:2:use amun_evidence_engine::evidence_types::ConstitutionalEvidence;
+crates/amun-transition-proof/src/transition_proof.rs:40:        evidence: Vec<ConstitutionalEvidence>,
+crates/amun-validator-networking/src/lib.rs:48:        ResourceArchetype, ResourceId, ResourceLineage, ResourceMetadata, ResourceRegistry,
+crates/amun-validator-networking/src/lib.rs:58:    fn build_registry(count: u8) -> ResourceRegistry {
+crates/amun-validator-networking/src/lib.rs:59:        let mut reg = ResourceRegistry::new(10000);
+crates/amun-validator-networking/src/lib.rs:65:                lineage: ResourceLineage::genesis(make_id(i)),
+crates/amun-validator-networking/src/rejoin_protocol.rs:27:        peer_registry: &ResourceRegistry,
+crates/amun-validator-networking/src/rejoin_protocol.rs:2:use amun_resource_core::ResourceRegistry;
+crates/amun-validator-networking/src/sync_transport.rs:11:        registry: &ResourceRegistry,
+crates/amun-validator-networking/src/sync_transport.rs:1:use amun_resource_core::ResourceRegistry;
+crates/amun-validator-networking/src/sync_transport.rs:45:    ) -> Result<ResourceRegistry, String> {
+crates/amun-validator-networking/src/sync_transport.rs:52:                let mut registry = ResourceRegistry::new(package.total_resources() * 2);
+crates/amun-verification-kernel/src/lib.rs:132:    pub certificates: Vec<VerificationCertificate>,
+crates/amun-verification-kernel/src/lib.rs:140:    pub fn register(&mut self, cert: VerificationCertificate) -> Result<(), String> {
+crates/amun-verification-kernel/src/lib.rs:148:    pub fn phase_certificate(&self, phase: &str) -> Option<&VerificationCertificate> {
+crates/amun-verification-kernel/src/lib.rs:191:        let cert = VerificationCertificate::issue("N46", claims, evidence, "verifier-1", 1000);
+crates/amun-verification-kernel/src/lib.rs:199:        let mut cert = VerificationCertificate::issue(
+crates/amun-verification-kernel/src/lib.rs:213:        let cert = VerificationCertificate::issue(
+crates/amun-verification-kernel/src/lib.rs:227:        let mut cert = VerificationCertificate::issue(
+crates/amun-verification-kernel/src/lib.rs:241:        let cert = VerificationCertificate::issue(
+crates/amun-verification-kernel/src/lib.rs:59:pub struct VerificationCertificate {
+crates/amun-verification-kernel/src/lib.rs:69:impl VerificationCertificate {
+crates/amun-vm-kernel/src/pending_buffer.rs:30:    InvariantViolation {
+crates/amun-vm-kernel/src/vm_kernel.rs:108:        registry: &mut ResourceRegistry,
+crates/amun-vm-kernel/src/vm_kernel.rs:1:use amun_resource_core::{RegistryError, ResourceMetadata, ResourceRegistry, TransformationMatrix};
+crates/amun-vm-kernel/src/vm_kernel.rs:30:    pub fn verify(buffer: &mut PendingBuffer, registry: &ResourceRegistry) -> bool {
+crates/amun-vm-kernel/src/vm_kernel.rs:77:                    let actual_hash = amun_resource_core::ResourceRegistry::hash_resource(parent);
+crates/amun_state_machine/src/certification/mod.rs:61:pub struct ReplayCertificate {
+crates/amun_state_machine/src/certification/mod.rs:70:impl ReplayCertificate {
+crates/amun_state_machine/src/lib.rs:24:pub use certification::{ExecutionCertificate, ReplayCertificate, compute_execution_fingerprint};
+docs/CCS_RUNTIME_MAPPING.md:25:3. No standalone `ConstitutionalEvidence` module – logic scattered across
+docs/N126_FINAL_BASELINE.md:45:1. ReplayVerifier integration (ReplayDeterminism)
+docs/PHASE_84_UNIFICATION.md:17:### 2. Constitutional Evidence (`ConstitutionalEvidence`)
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:32:| Forged TransitionProof | byz_001 | ✅ Rejected |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:3:## 1. Invariant-to-Test Traceability
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:5:| Invariant | Description | Test ID | Crate | Status |
+docs/audit/AUDIT_EVIDENCE_BUNDLE.md:80:| Invariant Engine | amun-invariant-engine | 5 | ✅ |
+docs/audit/SECURITY_INVARIANTS.md:10:| R4 | Certificates are terminal | TransformationMatrix::is_terminal | PCCVVerifier |
+docs/audit/SECURITY_INVARIANTS.md:12:| R6 | Version monotonicity | ResourceRegistry::consume_and_derive | WitnessBuilder |
+docs/audit/SECURITY_INVARIANTS.md:15:## Execution Invariants
+docs/audit/SECURITY_INVARIANTS.md:17:| ID | Invariant | Enforcement |
+docs/audit/SECURITY_INVARIANTS.md:1:# AmunChain Security Invariants Catalog
+docs/audit/SECURITY_INVARIANTS.md:25:## Consensus Invariants
+docs/audit/SECURITY_INVARIANTS.md:27:| ID | Invariant | Enforcement |
+docs/audit/SECURITY_INVARIANTS.md:34:## Cryptographic Invariants
+docs/audit/SECURITY_INVARIANTS.md:36:| ID | Invariant | Enforcement |
+docs/audit/SECURITY_INVARIANTS.md:3:## Resource Invariants (R1–R6 + X1)
+docs/audit/SECURITY_INVARIANTS.md:5:| ID | Invariant | Enforcement | Verification |
+docs/audit/SECURITY_INVARIANTS.md:7:| R1 | No duplicate active resource IDs | ResourceRegistry::register_genesis | PCCVVerifier |
+docs/audit/SECURITY_INVARIANTS.md:8:| R2 | Consumed resources cannot be used | VMKernel::verify | ReplayVerifier |
+docs/audit/SECURITY_INVARIANTS.md:9:| R3 | Child requires consumed parent | ResourceRegistry::consume_and_derive | WitnessBuilder |
+docs/audit/THREAT_MODEL.md:14:| Execution | Forged TransitionProof | Proof hash verification (Theorem 1) |
+docs/consensus/I1_translation.md:12:## Semantic Invariants (from CSA-6)
+docs/consensus/I2_extension.md:12:## Semantic Invariants (from CSA-6)
+docs/consensus/I3_reframing.md:22:## Semantic Invariants (from CSA-6)
+docs/consensus/I4_drift.md:21:## Semantic Invariants (from CSA-6)
+docs/consensus/origin.md:3:## Semantic Invariants (from CSA-6)
+docs/constitutional/phase84_freeze.md:2:## Frozen Invariants for Sovereign State Replication
+docs/constitutional/phase84_freeze.md:54:- ReplayVerifier checks every frame's state_root against reconstructed state
+docs/federation/FEDERATION_ARCHITECTURE.md:53:## Invariant
+docs/federation/TRUST_GRAPH.md:51:## Invariant
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:254:## 12. Consensus Invariants
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:258:**Invariant 1:** `constitutional_root == BLAKE3("AMUN_CONSTITUTIONAL_ROOT_V1" || identity_root || evidence_root || governance_root || economic_root)`
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:260:**Invariant 2:** `constitutional_commitment_root == BLAKE3("AMUN_CONSTITUTIONAL_COMMITMENT_V1" || CanonicalSerialization(ConstitutionalCommitment))`
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:262:**Invariant 3:** `state_root` must include `constitutional_commitment_root` as a leaf in its Merkle tree computation.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:264:**Invariant 4:** The `AppHash` MUST commit to `state_root`. For CCA v1.0, this is defined as `AppHash = state_root`. Future versions may introduce additional roots (such as `execution_root` or `receipt_root`) into the `AppHash` computation, in which case the invariant will be updated to reflect the new hash composition while preserving the requirement that `state_root` remains a committed input.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:266:**Invariant 5:** Given identical state transition inputs (same genesis, same transactions up to height N), all validators must compute identical values for all roots defined in this specification.
+docs/protocol/CCA_v1.0_Constitutional_Consensus_Architecture.md:33:12. Consensus Invariants
+docs/protocol/FREEZE_CERTIFICATE_v1.md:29:### Constitutional Invariants (FROZEN)
+docs/protocol/replay_physics_v1.md:13:### 2.2 Ordering Invariant

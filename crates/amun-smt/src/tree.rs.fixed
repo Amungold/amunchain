@@ -1,0 +1,39 @@
+// Fix delete_at to properly handle collapse returning empty
+fn delete_at(&mut self, depth: usize, node_hash: Hash, key_hash: &[u8; 32]) -> Result<Hash, SmtError> {
+    if depth > 255 { return Err(SmtError::DepthOverflow { depth }); }
+    if node_hash == *EMPTY_NODE_HASH { return Ok(*EMPTY_NODE_HASH); }
+    let node = self.ctx.get_node(&node_hash)?;
+    match node.as_ref() {
+        Node::Leaf { key_hash: ek, .. } => {
+            if ek == key_hash { Ok(*EMPTY_NODE_HASH) } else { Ok(node_hash) }
+        }
+        Node::Branch { skip_len, prefix, left, right } => {
+            if !prefix_matches(key_hash, depth, *skip_len, prefix) { return Ok(node_hash); }
+            let next_depth = depth + *skip_len as usize;
+            if next_depth >= 256 { return Err(SmtError::DepthOverflow { depth: next_depth }); }
+            let dec = bit(key_hash, next_depth);
+            let (child, sibling) = if dec == 0 { (*left, *right) } else { (*right, *left) };
+            let new_child = self.delete_at(next_depth + 1, child, key_hash)?;
+            let (new_left, new_right) = if dec == 0 { (new_child, sibling) } else { (sibling, new_child) };
+            
+            // If both children empty, return empty
+            if new_left == *EMPTY_NODE_HASH && new_right == *EMPTY_NODE_HASH {
+                return Ok(*EMPTY_NODE_HASH);
+            }
+            
+            // If one side empty, collapse
+            if new_left == *EMPTY_NODE_HASH {
+                return self.collapse_child(depth, new_right, *skip_len, prefix, bit(key_hash, next_depth));
+            }
+            if new_right == *EMPTY_NODE_HASH {
+                return self.collapse_child(depth, new_left, *skip_len, prefix, 1 - bit(key_hash, next_depth)));
+            }
+            
+            // Both children non-empty: create new branch
+            let mut p = *prefix;
+            canonicalize_prefix(&mut p, *skip_len);
+            let b = Node::Branch { skip_len: *skip_len, prefix: p, left: new_left, right: new_right };
+            Ok(self.ctx_mut().intern(b)?.hash())
+        }
+    }
+}

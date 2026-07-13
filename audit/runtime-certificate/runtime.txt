@@ -1,0 +1,433 @@
+==================================================
+crates/amun-node/src/certificate_loader.rs
+==================================================
+     1	use crate::genesis::Genesis;
+     2	use amun_networking::validator_certificate::ValidatorCertificate;
+     3	
+     4	pub fn load_validator_certificate(
+     5	    path: &str,
+     6	    genesis: &Genesis,
+     7	) -> Result<ValidatorCertificate, String> {
+     8	    let cert_json =
+     9	        std::fs::read_to_string(path).map_err(|e| format!("Cannot read certificate: {}", e))?;
+    10	    let cert: ValidatorCertificate =
+    11	        serde_json::from_str(&cert_json).map_err(|e| format!("Invalid certificate JSON: {}", e))?;
+    12	
+    13	    // public_key هو [u8; 32] مباشرة
+    14	    let pk_hex = hex::encode(cert.public_key);
+    15	
+    16	    let found = genesis
+    17	        .validators
+    18	        .iter()
+    19	        .any(|v| hex::encode(v.public_key.0) == pk_hex)
+    20	        || genesis.trust_anchors.iter().any(|t| t.id == pk_hex);
+    21	
+    22	    if !found {
+    23	        return Err("Certificate public key not found in genesis".into());
+    24	    }
+    25	
+    26	    Ok(cert)
+    27	}
+
+==================================================
+crates/amun-node/src/peer_handshake.rs
+==================================================
+     1	#![allow(dead_code)]
+     2	use amun_networking::crypto_identity::PeerKeyPair;
+     3	use amun_networking::peer_identity::PeerId;
+     4	use amun_networking::validator_certificate::ValidatorCertificate;
+     5	use serde::{Deserialize, Serialize};
+     6	
+     7	/// Handshake message sent when two nodes establish a connection.
+     8	#[derive(Debug, Clone, Serialize, Deserialize)]
+     9	pub struct HandshakeMessage {
+    10	    pub peer_id: PeerId,
+    11	    pub public_key: [u8; 32],
+    12	    pub certificate: ValidatorCertificate,
+    13	    pub genesis_hash: [u8; 32],
+    14	    pub protocol_version: u32,
+    15	    pub node_name: String,
+    16	    pub listen_port: u16,
+    17	}
+    18	
+    19	impl HandshakeMessage {
+    20	    pub fn new(
+    21	        keypair: &PeerKeyPair,
+    22	        certificate: &ValidatorCertificate,
+    23	        genesis_hash: [u8; 32],
+    24	        node_name: &str,
+    25	        listen_port: u16,
+    26	    ) -> Self {
+    27	        Self {
+    28	            peer_id: keypair.peer_id(),
+    29	            public_key: keypair.verifying_key.to_bytes(),
+    30	            certificate: certificate.clone(),
+    31	            genesis_hash,
+    32	            protocol_version: 1,
+    33	            node_name: node_name.to_string(),
+    34	            listen_port,
+    35	        }
+    36	    }
+    37	
+    38	    /// Verify the handshake message against our genesis and certificate expectations.
+    39	    pub fn verify(&self, our_genesis_hash: &[u8; 32]) -> Result<(), String> {
+    40	        // Verify genesis hash matches
+    41	        if self.genesis_hash != *our_genesis_hash {
+    42	            return Err(format!(
+    43	                "Genesis hash mismatch: peer has {} but we have {}",
+    44	                hex::encode(self.genesis_hash),
+    45	                hex::encode(*our_genesis_hash)
+    46	            ));
+    47	        }
+    48	
+    49	        // Verify certificate is self-consistent
+    50	        if self.certificate.validator_id != self.peer_id {
+    51	            return Err("Certificate validator_id does not match peer_id".into());
+    52	        }
+    53	
+    54	        if self.certificate.public_key != self.public_key {
+    55	            return Err("Certificate public_key does not match handshake public_key".into());
+    56	        }
+    57	
+    58	        // Verify certificate signature
+    59	        if !self.certificate.verify(&self.public_key) {
+    60	            return Err("Certificate signature verification failed".into());
+    61	        }
+    62	
+    63	        Ok(())
+    64	    }
+    65	}
+    66	
+    67	/// Result of a successful peer handshake.
+    68	#[derive(Debug, Clone)]
+    69	pub struct AuthenticatedPeer {
+    70	    pub peer_id: PeerId,
+    71	    pub public_key: [u8; 32],
+    72	    pub node_name: String,
+    73	    pub listen_port: u16,
+    74	    pub protocol_version: u32,
+    75	}
+    76	
+    77	impl AuthenticatedPeer {
+    78	    pub fn from_handshake(handshake: &HandshakeMessage) -> Self {
+    79	        Self {
+    80	            peer_id: handshake.peer_id,
+    81	            public_key: handshake.public_key,
+    82	            node_name: handshake.node_name.clone(),
+    83	            listen_port: handshake.listen_port,
+    84	            protocol_version: handshake.protocol_version,
+    85	        }
+    86	    }
+    87	}
+    88	
+    89	#[cfg(test)]
+    90	mod tests {
+    91	    use super::*;
+    92	    use amun_networking::crypto_identity::PeerKeyPair;
+    93	
+    94	    fn create_test_handshake() -> (HandshakeMessage, [u8; 32]) {
+    95	        let keypair = PeerKeyPair::generate();
+    96	        let genesis_hash = [0x42u8; 32];
+    97	        let cert = ValidatorCertificate::issue(
+    98	            keypair.peer_id(),
+    99	            keypair.verifying_key.to_bytes(),
+   100	            &keypair,
+   101	            0,
+   102	            0,
+   103	        );
+   104	        let handshake = HandshakeMessage::new(&keypair, &cert, genesis_hash, "test-node", 4001);
+   105	        (handshake, genesis_hash)
+   106	    }
+   107	
+   108	    #[test]
+   109	    fn n22_5_valid_handshake_accepted() {
+   110	        let (handshake, genesis_hash) = create_test_handshake();
+   111	        assert!(handshake.verify(&genesis_hash).is_ok());
+   112	    }
+   113	
+   114	    #[test]
+   115	    fn n22_5_genesis_mismatch_rejected() {
+   116	        let (handshake, _) = create_test_handshake();
+   117	        let wrong_genesis = [0x99u8; 32];
+   118	        assert!(handshake.verify(&wrong_genesis).is_err());
+   119	    }
+   120	
+   121	    #[test]
+   122	    fn n22_5_tampered_certificate_rejected() {
+   123	        let (mut handshake, genesis_hash) = create_test_handshake();
+   124	        handshake.certificate.valid_from = 99999;
+   125	        assert!(handshake.verify(&genesis_hash).is_err());
+   126	    }
+   127	
+   128	    #[test]
+   129	    fn n22_5_authenticated_peer_creation() {
+   130	        let (handshake, genesis_hash) = create_test_handshake();
+   131	        handshake.verify(&genesis_hash).unwrap();
+   132	        let peer = AuthenticatedPeer::from_handshake(&handshake);
+   133	        assert_eq!(peer.peer_id, handshake.peer_id);
+   134	        assert_eq!(peer.node_name, "test-node");
+   135	    }
+   136	}
+
+==================================================
+crates/amun-node/src/bootstrap.rs
+==================================================
+     1	use std::fs;
+     2	use std::path::{Path, PathBuf};
+     3	
+     4	use amun_networking::handshake::ConstitutionInfo;
+     5	use amun_networking::node::NetworkNode;
+     6	use amun_networking::tcp_transport::TcpTransport;
+     7	use amun_networking::validator_certificate::ValidatorCertificate;
+     8	
+     9	use crate::config::Config;
+    10	use crate::error::{io_err, NodeError};
+    11	use crate::genesis::Genesis;
+    12	
+    13	#[allow(dead_code)]
+    14	pub struct BootstrapContext {
+    15	    pub transport: TcpTransport,
+    16	    pub node: NetworkNode,
+    17	    pub cert: ValidatorCertificate,
+    18	    pub genesis: Genesis,
+    19	    pub genesis_hash: [u8; 32],
+    20	    pub peer_id_bytes: [u8; 32],
+    21	    pub config: Config,
+    22	    pub config_dir: PathBuf,
+    23	}
+    24	
+    25	pub fn initialize(config_path: &str) -> Result<BootstrapContext, NodeError> {
+    26	    let config = Config::load(config_path)?;
+    27	    let config_dir = Path::new(config_path).parent().unwrap_or(Path::new("."));
+    28	    tracing::info!(node = %config.node.name, "Node configured");
+    29	
+    30	    // Identity
+    31	    let key_path = config_dir.join(&config.identity.key_file);
+    32	    let keypair = crate::identity::load_or_create_keypair(key_path.to_str().unwrap())?;
+    33	    let peer_id = keypair.peer_id();
+    34	    tracing::info!(peer_id = %hex::encode(peer_id.0), "Identity loaded");
+    35	
+    36	    // Genesis
+    37	    let genesis_path = config_dir.join(&config.genesis.file);
+    38	    let genesis_str = fs::read_to_string(&genesis_path).map_err(|e| io_err(&genesis_path, e))?;
+    39	    let genesis: Genesis = serde_json::from_str(&genesis_str).map_err(|e| NodeError::Json {
+    40	        path: genesis_path.clone(),
+    41	        source: e,
+    42	    })?;
+    43	
+    44	    if !amun_orchestrator_genesis::validator::validate(&genesis) {
+    45	        return Err(NodeError::Genesis("Genesis validation failed".into()));
+    46	    }
+    47	
+    48	    let genesis_hash = {
+    49	        let mut gen = genesis.clone();
+    50	        amun_orchestrator_genesis::generator::recompute_hash(&mut gen);
+    51	        hex::decode(&gen.genesis_hash)
+    52	            .map_err(|e| NodeError::Genesis(format!("Invalid genesis hash: {}", e)))?
+    53	            .try_into()
+    54	            .map_err(|_| NodeError::Genesis("Genesis hash must be 32 bytes".into()))?
+    55	    };
+    56	
+    57	    tracing::info!(
+    58	        path = %genesis_path.display(),
+    59	        hash = %hex::encode(genesis_hash),
+    60	        "Genesis loaded and validated"
+    61	    );
+    62	
+    63	    // Certificate
+    64	    let cert_path = config_dir.join("validator.crt");
+    65	    let cert = crate::certificate_loader::load_validator_certificate(
+    66	        cert_path.to_str().unwrap(),
+    67	        &genesis,
+    68	    )
+    69	    .map_err(NodeError::Certificate)?;
+    70	    tracing::info!("Validator certificate verified");
+    71	
+    72	    // Extract SigningKey from the loaded keypair
+    73	    // Use the existing seed() method and SigningKey::from_bytes()
+    74	    let seed = keypair.to_seed();
+    75	    let signing_key = ed25519_dalek::SigningKey::from_bytes(&seed);
+    76	
+    77	    // Network ID: SHA-256 of chain_id
+    78	    let network_id = {
+    79	        use sha2::{Digest, Sha256};
+    80	        let mut hasher = Sha256::new();
+    81	        hasher.update(genesis.chain_id.as_bytes());
+    82	        hasher.finalize().into()
+    83	    };
+    84	
+    85	    // Constitution from genesis
+    86	    let constitution = ConstitutionInfo {
+    87	        version: 1,
+    88	        hash: genesis_hash,
+    89	        proof_system_version: 1,
+    90	        state_commitment_algorithm: "MerklePatricia".to_string(),
+    91	        accepted_features: vec!["sync".into(), "vote".into(), "block_range".into()],
+    92	    };
+    93	
+    94	    // REAL listen address from config
+    95	    let addr: std::net::SocketAddr =
+    96	        format!("{}:{}", config.node.listen_host, config.node.listen_port)
+    97	            .parse()
+    98	            .map_err(|_| {
+    99	                NodeError::InvalidAddress(format!(
+   100	                    "{}:{}",
+   101	                    config.node.listen_host, config.node.listen_port
+   102	                ))
+   103	            })?;
+   104	
+   105	    // NodeNetwork with REAL identity
+   106	    let network = crate::network::NodeNetwork::new(
+   107	        addr,
+   108	        signing_key,
+   109	        peer_id.0,
+   110	        network_id,
+   111	        genesis_hash,
+   112	        constitution,
+   113	    )
+   114	    .map_err(NodeError::InvalidAddress)?;
+   115	
+   116	    let mut node = NetworkNode::new(peer_id.0);
+   117	    node.keypair = Some(keypair);
+   118	
+   119	    Ok(BootstrapContext {
+   120	        transport: network.transport,
+   121	        node,
+   122	        cert,
+   123	        genesis,
+   124	        genesis_hash,
+   125	        peer_id_bytes: peer_id.0,
+   126	        config,
+   127	        config_dir: config_dir.to_path_buf(),
+   128	    })
+   129	}
+
+==================================================
+crates/amun-networking/src/validator_registry.rs
+==================================================
+     1	use crate::peer_identity::PeerId;
+     2	use crate::trust_anchor::TrustAnchorRegistry;
+     3	use crate::validator_certificate::ValidatorCertificate;
+     4	use std::collections::BTreeMap;
+     5	
+     6	/// Registry of active validators with verified certificates.
+     7	#[derive(Debug, Clone, Default)]
+     8	pub struct ValidatorRegistry {
+     9	    validators: BTreeMap<PeerId, ValidatorCertificate>,
+    10	}
+    11	
+    12	impl ValidatorRegistry {
+    13	    pub fn new() -> Self {
+    14	        Self::default()
+    15	    }
+    16	
+    17	    /// Register a validator after verifying their certificate against trust anchors.
+    18	    pub fn register(
+    19	        &mut self,
+    20	        certificate: ValidatorCertificate,
+    21	        trust_anchors: &TrustAnchorRegistry,
+    22	    ) -> Result<(), &'static str> {
+    23	        // Verify the certificate was issued by a trusted authority
+    24	        let authority_key = trust_anchors
+    25	            .get_key(&certificate.issuer)
+    26	            .ok_or("Issuer is not a trusted authority")?;
+    27	
+    28	        if !certificate.verify(authority_key) {
+    29	            return Err("Certificate signature invalid");
+    30	        }
+    31	
+    32	        self.validators
+    33	            .insert(certificate.validator_id, certificate);
+    34	        Ok(())
+    35	    }
+    36	
+    37	    /// Remove a validator.
+    38	    pub fn remove(&mut self, validator_id: &PeerId) -> bool {
+    39	        self.validators.remove(validator_id).is_some()
+    40	    }
+    41	
+    42	    /// Check if a peer is a registered validator.
+    43	    pub fn is_validator(&self, peer_id: &PeerId) -> bool {
+    44	        self.validators.contains_key(peer_id)
+    45	    }
+    46	
+    47	    /// Check if the registry is empty.
+    48	    pub fn is_empty(&self) -> bool {
+    49	        self.validators.is_empty()
+    50	    }
+    51	
+    52	    /// Number of registered validators.
+    53	    pub fn len(&self) -> usize {
+    54	        self.validators.len()
+    55	    }
+    56	}
+    57	
+    58	#[cfg(test)]
+    59	mod tests {
+    60	    use super::*;
+    61	    use crate::crypto_identity::PeerKeyPair;
+    62	
+    63	    #[test]
+    64	    fn n21_validator_registration_with_valid_certificate() {
+    65	        let authority = PeerKeyPair::generate();
+    66	        let validator = PeerKeyPair::generate();
+    67	
+    68	        let mut trust_anchors = TrustAnchorRegistry::new();
+    69	        trust_anchors.register(authority.peer_id(), authority.verifying_key.to_bytes());
+    70	
+    71	        let cert = ValidatorCertificate::issue(
+    72	            validator.peer_id(),
+    73	            validator.verifying_key.to_bytes(),
+    74	            &authority,
+    75	            1000,
+    76	            0,
+    77	        );
+    78	
+    79	        let mut registry = ValidatorRegistry::new();
+    80	        assert!(registry.register(cert, &trust_anchors).is_ok());
+    81	        assert!(registry.is_validator(&validator.peer_id()));
+    82	        assert_eq!(registry.len(), 1);
+    83	    }
+    84	
+    85	    #[test]
+    86	    fn n21_validator_rejected_without_trust_anchor() {
+    87	        let authority = PeerKeyPair::generate();
+    88	        let validator = PeerKeyPair::generate();
+    89	
+    90	        let trust_anchors = TrustAnchorRegistry::new(); // empty
+    91	
+    92	        let cert = ValidatorCertificate::issue(
+    93	            validator.peer_id(),
+    94	            validator.verifying_key.to_bytes(),
+    95	            &authority,
+    96	            1000,
+    97	            0,
+    98	        );
+    99	
+   100	        let mut registry = ValidatorRegistry::new();
+   101	        assert!(registry.register(cert, &trust_anchors).is_err());
+   102	    }
+   103	
+   104	    #[test]
+   105	    fn n21_validator_rejected_with_forged_certificate() {
+   106	        let authority = PeerKeyPair::generate();
+   107	        let impostor = PeerKeyPair::generate();
+   108	        let validator = PeerKeyPair::generate();
+   109	
+   110	        let mut trust_anchors = TrustAnchorRegistry::new();
+   111	        trust_anchors.register(authority.peer_id(), authority.verifying_key.to_bytes());
+   112	
+   113	        // Impostor tries to issue a certificate pretending to be the authority
+   114	        let forged_cert = ValidatorCertificate::issue(
+   115	            validator.peer_id(),
+   116	            validator.verifying_key.to_bytes(),
+   117	            &impostor, // wrong key
+   118	            1000,
+   119	            0,
+   120	        );
+   121	
+   122	        let mut registry = ValidatorRegistry::new();
+   123	        assert!(registry.register(forged_cert, &trust_anchors).is_err());
+   124	    }
+   125	}
+

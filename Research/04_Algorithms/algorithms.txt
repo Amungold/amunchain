@@ -1,0 +1,717 @@
+crates/amun-accounts/src/lib.rs:80:    pub fn build_economic_snapshot(&self) -> EconomicSnapshot {
+crates/amun-accounts/src/lib.rs:86:    pub fn build_economic_snapshot_with_ledger(&self, ledger: &EconomicLedger) -> EconomicSnapshot {
+crates/amun-amendments/src/proposal.rs:144:    fn compute_id(&self) -> [u8; 32] {
+crates/amun-attestation/src/validator.rs:24:    pub fn verify(&self) -> bool {
+crates/amun-audit-trail/src/lib.rs:67:    pub fn verify(&self) -> bool {
+crates/amun-audit/tests/audit_layer06_replay.rs:27:    fn replay001_equivalence() {
+crates/amun-audit/tests/audit_layer06_replay.rs:69:    fn replay002_divergence_detection() {
+crates/amun-audit/tests/audit_layer06_replay.rs:100:    fn replay003_epoch_regression() {
+crates/amun-authority-registry/src/executor.rs:38:pub fn execute_governance(
+crates/amun-authority-registry/src/recovery.rs:43:    fn build_base_snapshot() -> (Vec<u8>, u64, [u8; 32]) {
+crates/amun-authority-registry/src/registry.rs:116:    pub fn verify_certificate_at(&self, cert: &ValidatorCertificate, height: u64) -> bool {
+crates/amun-authority-registry/src/transaction.rs:56:    pub fn finalize_block(
+crates/amun-authority-registry/src/wal.rs:32:    pub fn replay(&self) -> GovernanceState {
+crates/amun-authority-registry/src/wal.rs:41:    pub fn replay_and_finalize(
+crates/amun-block-builder/src/lib.rs:29:    pub fn verify_slashing_certificates(&self) -> Result<(), String> {
+crates/amun-block-builder/src/lib.rs:52:    pub fn verify_slashing_root(&self, expected_root: &[u8; 32]) -> Result<(), String> {
+crates/amun-block-builder/src/lib.rs:98:    pub fn build_block(
+crates/amun-block-builder/src/lib.rs:119:    pub fn build_block_with_certificates(
+crates/amun-block-builder/tests/n110_4b_slashing_certificate_verification.rs:29:fn build_test_block(certs: Vec<SlashingCertificate>) -> Block {
+crates/amun-block-builder/tests/n120_2_slashing_root.rs:5:fn build_block_with_root(root: [u8; 32]) -> Block {
+crates/amun-block/src/body.rs:43:    pub(crate) fn compute_encoded_size(&self) -> Result<usize, FailureContext> {
+crates/amun-block/src/chain.rs:21:    pub fn finalize_block(&mut self, block: Block) {
+crates/amun-bls/src/verify.rs:7:pub fn verify(message: &[u8], signature: &[u8; BLS_SIGNATURE_SIZE], _public_key: &PublicKey) -> AmunResult<bool> {
+crates/amun-bls/src/verify.rs:15:pub fn verify_aggregate(_message: &[u8], signature: &[u8; BLS_SIGNATURE_SIZE], public_keys: &[PublicKey]) -> AmunResult<bool> {
+crates/amun-bytecode/src/interpreter.rs:54:    pub fn execute(
+crates/amun-bytecode/src/program.rs:33:    pub fn compute_hash(&self) -> [u8; 32] {
+crates/amun-bytecode/src/program.rs:49:    pub fn verify(&self) -> bool {
+crates/amun-canonical-codec/src/hasher.rs:31:    pub fn finalize(self) -> [u8; 32] {
+crates/amun-canonical-collections/src/lib.rs:20:    fn verify_root(&self, expected: &[u8; 32]) -> bool { self.canonical_root() == *expected }
+crates/amun-canonical/src/enum_registry.rs:35:    pub fn validate(&self, name: &str, variant: u8, version: u32) -> bool {
+crates/amun-canonical/src/float_ban.rs:4:    pub fn verify_no_floats(code: &str) -> Result<(), Vec<&'static str>> {
+crates/amun-canonical/src/float_ban.rs:18:    pub fn verify_type<T: 'static>() -> Result<(), &'static str> {
+crates/amun-certificate-network/src/distribution.rs:66:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-certificate-network/src/distribution.rs:102:    pub fn build_from_runtime(
+crates/amun-chain-checkpoint/src/bootstrap.rs:22:    pub fn verify_complete_chain(&self, expected_state_root: &str) -> Result<(), String> {
+crates/amun-chain-checkpoint/src/chain.rs:12:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-chain-checkpoint/src/inclusion.rs:47:    pub fn verify(&self) -> bool {
+crates/amun-chain-checkpoint/src/inclusion.rs:73:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-chain-checkpoint/src/inclusion.rs:82:pub fn verify_checkpoint_sequence(
+crates/amun-chain-checkpoint/src/lib.rs:138:    pub fn compute_hash(&self) -> String {
+crates/amun-chain-checkpoint/src/lib.rs:157:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:10:fn build_checkpoint_bundle(
+crates/amun-chain-checkpoint/tests/n16_adversarial_bootstrap.rs:57:fn build_bundle(start: u64, end: u64) -> (CheckpointBundle, [u8; 32]) {
+crates/amun-chain-context/src/lib.rs:44:    pub fn verify_binding(&self) -> bool {
+crates/amun-chain-position/src/lib.rs:42:    pub fn verify(&self) -> bool {
+crates/amun-chain-store/src/snapshot.rs:70:pub fn verify_snapshot(snapshot_dir: &Path) -> Result<SnapshotManifest, String> {
+crates/amun-chunked-snapshot/src/chunk.rs:43:    pub fn verify(&self, prev_hash: [u8; 32]) -> bool {
+crates/amun-chunked-snapshot/src/manifest.rs:39:    pub fn verify(&self) -> bool {
+crates/amun-chunked-snapshot/src/verifier.rs:5:pub fn verify_chunk(
+crates/amun-codec/src/writer.rs:31:    pub fn commit(&mut self) {}
+crates/amun-codec/src/writer.rs:125:    pub fn commit_transaction(&mut self) -> WriteResult {
+crates/amun-compatibility/src/matrix.rs:44:    pub fn compute(source: &ConstitutionalIdentity, target: &ConstitutionalIdentity) -> Self {
+crates/amun-consensus-execution/src/block_dag.rs:178:    pub fn commit_block(&mut self, hash: &[u8; 32]) {
+crates/amun-consensus-execution/src/block_dag.rs:226:    pub fn finalize_and_prune(&mut self, height: u64, finalized_block: [u8; 32]) {
+crates/amun-consensus-execution/src/commit.rs:140:    pub fn finalize(&mut self, height: u64) {
+crates/amun-consensus-execution/src/fork_choice.rs:160:    pub fn verify_lock_monotonicity(&self) -> bool {
+crates/amun-consensus-execution/src/persistent_state.rs:128:    pub fn validate_snapshot_binding(&self, snapshot: &SnapshotCheckpoint) -> Result<(), String> {
+crates/amun-consensus-execution/src/persistent_state.rs:149:    pub fn validate_authority(&self) -> Result<AuthorityValidation, String> {
+crates/amun-consensus-execution/src/proposal.rs:36:    pub fn verify(&self) -> bool {
+crates/amun-consensus-execution/src/proposer.rs:41:    pub fn verify(&self) -> bool {
+crates/amun-consensus-integration/src/consensus_integrator.rs:15:    pub fn execute_block(
+crates/amun-consensus-integration/src/consensus_types.rs:18:    pub fn compute_proof_root(&self) -> [u8; 32] {
+crates/amun-consensus-integration/src/consensus_types.rs:30:    pub fn verify_all_proofs(&self) -> bool {
+crates/amun-consensus-integration/src/consensus_types.rs:88:    pub fn issue(block: &ConstitutionalBlock, qc: ConstitutionalQC) -> Self {
+crates/amun-consensus-integration/src/consensus_types.rs:101:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-consensus-integration/src/consensus_types.rs:115:    pub fn verify(&self) -> bool {
+crates/amun-consensus-messages/src/message.rs:51:    pub fn verify(&self) -> bool {
+crates/amun-consensus-messages/src/proposal.rs:35:    pub fn verify(&self) -> bool {
+crates/amun-consensus-messages/src/vote.rs:26:    pub fn verify(&self) -> bool { self.message.verify() }
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:31:pub fn validate_certificate_evidence(
+crates/amun-consensus-network/src/certificate_evidence_validation.rs:53:pub fn build_missing_evidence_request(
+crates/amun-consensus-network/src/engine.rs:173:    pub fn finalize(&mut self, history_root: [u8; 32]) -> Option<FinalityCertificate> {
+crates/amun-consensus-network/src/engine.rs:550:    fn verify_qc_signatures(
+crates/amun-consensus-network/src/evidence_gossip.rs:79:    pub fn verify_announcement(
+crates/amun-consensus-network/src/evidence_store.rs:49:    pub fn compute_evidence_id(
+crates/amun-consensus-network/src/execution_commitment.rs:60:    pub fn compute_execution_root(
+crates/amun-consensus-network/src/execution_commitment.rs:105:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-consensus-network/src/finality_gate.rs:19:pub fn execute_if_finalized<F, T>(
+crates/amun-consensus-network/src/messages.rs:45:    pub fn verify_standalone(&self) -> Result<(), String> {
+crates/amun-consensus-network/src/messages.rs:81:    pub fn verify_quorum(&self) -> bool {
+crates/amun-consensus-network/src/messages.rs:85:    pub fn verify_consistency(&self) -> bool {
+crates/amun-consensus-network/src/messages.rs:91:    pub fn verify(&self) -> bool {
+crates/amun-consensus-network/src/messages.rs:94:    pub fn verify_strict(&self, validator_powers: &HashMap<[u8; 32], u64>) -> Result<(), String> {
+crates/amun-consensus-network/src/multi_signer_certificate.rs:47:    pub fn verify_approvals(&self) -> Result<usize, String> {
+crates/amun-consensus-network/src/re_executor.rs:7:pub fn verify_block_execution<F>(
+crates/amun-consensus-network/src/slashing_certificate.rs:112:    pub fn verify_signature(&self) -> Result<(), String> {
+crates/amun-consensus-network/src/slashing_certificate.rs:136:    pub fn compute_hash(&self) -> [u8; 32] {
+crates/amun-consensus-network/src/slashing_certificate.rs:204:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:69:    pub fn executed_at_height(mut self, v: u64) -> Self {
+crates/amun-consensus-network/src/slashing_certificate_builder.rs:74:    pub fn build(self) -> SlashingCertificate {
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:58:    fn compute_proof_id(&self) -> [u8; 32] {
+crates/amun-consensus-network/src/slashing_fraud_proof.rs:70:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:44:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-consensus-network/src/slashing_inclusion_proof.rs:94:pub fn build_inclusion_proof(
+crates/amun-consensus-network/src/slashing_ledger.rs:63:    pub fn execute<F, T>(&mut self, cert: &SlashingCertificate, execute_fn: F) -> Result<T, String>
+crates/amun-consensus-network/src/slashing_ledger.rs:96:    pub fn executed_count(&self) -> usize {
+crates/amun-consensus-network/src/slashing_state.rs:27:    pub fn execute<F, T>(
+crates/amun-consensus-network/src/slashing_state.rs:42:    pub fn verify_consistency(&self) -> Result<(), String> {
+crates/amun-consensus-network/src/slashing_state.rs:51:    pub fn executed_count(&self) -> usize {
+crates/amun-consensus-network/src/staking_adapter.rs:67:    pub fn execute_after_finality(
+crates/amun-consensus-network/src/staking_adapter.rs:113:    fn execute_slash(&mut self, validator_id: &[u8; 32]) -> SlashResult {
+crates/amun-consensus-network/src/validation.rs:5:    pub fn validate_basic(
+crates/amun-consensus-network/src/validator_identity.rs:59:    pub fn compute_binding(validator_id: &[u8; 32], public_key: &PublicKey) -> [u8; 32] {
+crates/amun-consensus-network/src/validator_identity.rs:68:    pub fn verify_binding(&self) -> bool {
+crates/amun-consensus-network/src/vote_binding.rs:18:pub fn verify_vote_binding(vote: &ConsensusVote) -> Result<(), String> {
+crates/amun-consensus-network/tests/n109_8_execution_commitment.rs:52:fn compute_execution_root(
+crates/amun-consensus-network/tests/n109_block_propagation.rs:73:fn validate_basic_testable(
+crates/amun-consensus-network/tests/n109_deterministic_execution.rs:51:fn verify_block_execution<F>(
+crates/amun-consensus/src/action.rs:26:    pub fn compute_hash(&self) -> [u8; 32] {
+crates/amun-consensus/src/action.rs:81:    pub fn verify(&self) -> bool {
+crates/amun-consensus/src/action.rs:137:    pub fn verify(&self) -> bool {
+crates/amun-consensus/src/round_state_machine.rs:126:    pub fn finalize_commit(&mut self) -> Result<QuorumCertificate, &'static str> {
+crates/amun-consensus/src/state.rs:51:    pub fn commit(&mut self) -> Result<(), &'static str> {
+crates/amun-constitution-builder/src/hashing.rs:17:pub fn compute_specification_hash(root: &Path) -> Result<String, String> {
+crates/amun-constitution-builder/src/hashing.rs:23:pub fn compute_all_hashes(root: &Path) -> Result<SpecificationHashes, String> {
+crates/amun-constitution-builder/src/hashing.rs:41:fn compute_hash_for_extensions(root: &Path, extensions: &[&str]) -> Result<String, String> {
+crates/amun-constitution-builder/src/verify.rs:11:    pub fn verify_replay<T: CanonicalSerialize + PartialEq>(
+crates/amun-constitution-core/src/ordering.rs:16:pub fn validate_ordering(ids: &[u64]) -> Result<(), &'static str> {
+crates/amun-constitution/src/canonical_form.rs:24:    pub fn compute_hash(&self) -> Hash<ConstitutionDomain> {
+crates/amun-constitution/src/capacity.rs:25:    pub fn verify_compatible(&self, other: &Self) -> Result<(), &'static str> {
+crates/amun-constitution/src/execution_semantics.rs:51:    fn execute_transaction(&self, ctx: &ExecutionContext, tx: &Transaction) -> ExecutionResult;
+crates/amun-constitution/src/execution_semantics.rs:53:    fn execute_block(
+crates/amun-constitution/src/freeze_validator.rs:28:    pub fn validate_change(
+crates/amun-constitution/src/liveness.rs:42:    pub fn verify(&self, params: &LogicalLivenessParameters) -> Result<(), &'static str> {
+crates/amun-constitution/src/operational_semantics.rs:25:pub fn execute_semantics(_initial: Configuration) -> Configuration {
+crates/amun-constitution/src/quorum_transition.rs:19:    pub fn verify_safety(&self) -> Result<(), &'static str> {
+crates/amun-constitution/src/stake_quorum.rs:51:    pub fn verify_weighted_transition(&self, new_set: &Self) -> Result<(), &'static str> {
+crates/amun-constitution/src/synchrony.rs:23:    pub fn verify(&self) -> Result<(), &'static str> {
+crates/amun-constitutional-authority-semantics/src/capability.rs:52:    fn compute_id(&self) -> String {
+crates/amun-constitutional-authority-semantics/src/delegation.rs:30:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-constitutional-authority/src/certificate.rs:114:    fn compute_id(&self) -> String {
+crates/amun-constitutional-authority/src/chain.rs:47:    pub fn validate(&self, revocation: &RevocationRegistry) -> Result<(), String> {
+crates/amun-constitutional-authority/src/rotation.rs:17:    pub fn validate_rotation(
+crates/amun-constitutional-authority/src/trust.rs:33:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-constitutional-authority/tests/authority_tests.rs:7:fn build_root(key: &ConstitutionalKeyPair) -> ConstitutionalCertificate {
+crates/amun-constitutional-authority/tests/authority_tests.rs:17:fn build_child(
+crates/amun-constitutional-block/src/block.rs:54:    pub fn compute_hash(&self) -> String {
+crates/amun-constitutional-block/src/block.rs:73:    pub fn build(
+crates/amun-constitutional-block/src/chain.rs:45:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-constitutional-block/src/chain.rs:61:    pub fn verify_block_evidence(
+crates/amun-constitutional-block/src/chain.rs:81:    pub fn verify_chain_evidence(
+crates/amun-constitutional-block/src/finalizer.rs:19:    pub fn finalize(
+crates/amun-constitutional-block/src/lib.rs:48:pub fn verify_block_provenance(
+crates/amun-constitutional-block/src/lib.rs:86:pub fn verify_full_replay(
+crates/amun-constitutional-block/src/lib.rs:116:pub fn verify_light_client_proof(
+crates/amun-constitutional-commitment/src/apphash.rs:8:    pub fn compute_state_root(
+crates/amun-constitutional-commitment/src/economic_tree.rs:24:fn build_merkle_root(mut hashes: Vec<Hash32>) -> Hash32 {
+crates/amun-constitutional-commitment/src/endblock.rs:10:    pub fn execute(
+crates/amun-constitutional-commitment/src/roots.rs:8:pub fn compute_constitutional_root(
+crates/amun-constitutional-commitment/src/roots.rs:23:pub fn commitment_root(commitment: &ConstitutionalCommitment) -> Hash32 {
+crates/amun-constitutional-commitment/src/verify.rs:18:    pub fn verify(
+crates/amun-constitutional-commitment/tests/state.rs:53:fn commitment_root_from_stored_bytes() {
+crates/amun-constitutional-commitments/src/smt.rs:84:    pub fn verify(&self, root: &[u8; 32], proof: &MerkleProof) -> bool {
+crates/amun-constitutional-commitments/src/smt.rs:131:    fn build(&self, depth: usize, keys: &[[u8; 32]]) -> [u8; 32] {
+crates/amun-constitutional-commitments/tests/commitment_tests.rs:3:fn build_domain_roots() -> ([u8; 32], [u8; 32], [u8; 32]) {
+crates/amun-constitutional-enforcement/src/constitutional_evidence.rs:147:    pub fn build(
+crates/amun-constitutional-enforcement/src/evidence_records.rs:156:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-constitutional-enforcement/src/evidence_records.rs:168:    pub fn verify(&self) -> bool {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:14:    pub fn verify_state_root_integrity(
+crates/amun-constitutional-enforcement/src/proof_engine.rs:22:    pub fn verify_chain_continuity(block_parent: &[u8; 32], tip_hash: &[u8; 32]) -> bool {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:29:    pub fn verify_signatures(transactions: &[([u8; 32], Vec<u8>, [u8; 64])]) -> bool {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:41:    pub fn verify_no_double_spend(sender_nonce_pairs: &[([u8; 32], u64)]) -> bool {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:52:    pub fn verify_slashing_evidence_binding(
+crates/amun-constitutional-enforcement/src/proof_engine.rs:60:    pub fn verify_validator_governance(governance_approved: bool) -> bool {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:65:    pub fn verify_replay_determinism(original_root: &[u8; 32], replay_root: &[u8; 32]) -> bool {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:70:    pub fn verify_finality_supermajority(approval_power: u64, total_power: u64) -> bool {
+crates/amun-constitutional-enforcement/src/proof_engine.rs:75:    pub fn verify_state_transition(
+crates/amun-constitutional-enforcement/src/proof_engine.rs:84:    pub fn verify_evidence_validity(evidence_hash_valid: bool) -> bool {
+crates/amun-constitutional-enforcement/src/state_transition.rs:46:    pub fn verify(&self, height: u64) -> ConstitutionalVerdict {
+crates/amun-constitutional-enforcement/src/state_transition.rs:95:pub fn verify_state_transition<F, R, S>(
+crates/amun-constitutional-geometry/src/flow_dynamics.rs:57:    pub fn compute_total_force(&mut self) {
+crates/amun-constitutional-geometry/src/metrics.rs:75:    pub fn compute(local: &ConstitutionalIdentity, remote: &ConstitutionalIdentity) -> Self {
+crates/amun-constitutional-governance/src/capability.rs:64:    fn compute_id(&self) -> String {
+crates/amun-constitutional-governance/src/delegation.rs:10:pub fn verify_delegation_chain(
+crates/amun-constitutional-governance/src/voting.rs:56:    fn compute_id(&self) -> String {
+crates/amun-constitutional-governance/src/voting.rs:92:    pub fn compute(proposal: &Proposal, ballots: &[Ballot], eligible_voters: &[String]) -> Self {
+crates/amun-constitutional-integration/src/lib.rs:13:    pub fn build_obligation_registry() -> ObligationRegistry {
+crates/amun-constitutional-kernel/src/receipt.rs:53:    fn compute_id(&self) -> String {
+crates/amun-constitutional-kernel/tests/kernel_tests.rs:12:fn build_test_context() -> (
+crates/amun-constitutional-proof/src/article_i_certificate.rs:32:    pub fn issue(registry: &ObligationRegistry, issued_at: u64) -> Option<Self> {
+crates/amun-constitutional-proof/src/article_iii_certificate.rs:23:    pub fn issue(archive: &EvidenceArchive, issued_at: u64) -> Option<Self> {
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:77:    pub fn verify(&self) -> bool {
+crates/amun-constitutional-proof/src/constitutional_verdict.rs:88:    fn compute_hash(&self) -> String {
+crates/amun-constitutional-proof/src/dependency_graph.rs:79:    pub fn validate_derived_terminate_in_primary(
+crates/amun-constitutional-proof/src/evidence_archive.rs:82:    pub fn verify(&mut self, evidence_id: &str) -> Result<(), String> {
+crates/amun-constitutional-proof/src/obligation_registry.rs:116:    fn build_graph_from_registry(&self) -> DependencyGraph {
+crates/amun-constitutional-proof/src/publication_package.rs:88:    pub fn verify(&self) -> bool {
+crates/amun-constitutional-proof/src/publication_package.rs:104:    fn compute_package_hash(&self) -> String {
+crates/amun-constitutional-proof/src/verdict_evaluator.rs:47:    pub fn compute_overall_result(
+crates/amun-constitutional-quarantine/src/pipeline.rs:34:    pub fn verify_physics(&mut self, snapshot_root: [u8; 32], passed: bool) {
+crates/amun-constitutional-quarantine/src/pipeline.rs:47:    pub fn verify_replay(&mut self, snapshot_root: [u8; 32], passed: bool) {
+crates/amun-constitutional-quarantine/src/pipeline.rs:61:    pub fn verify_lineage(&mut self, snapshot_root: [u8; 32], passed: bool) {
+crates/amun-constitutional-runtime/src/block_validator.rs:29:    pub fn validate_block(
+crates/amun-constitutional-runtime/src/certificate_chain.rs:44:    pub fn verify_chain(&self) -> bool {
+crates/amun-constitutional-runtime/src/certificate_chain.rs:79:    fn compute_chain_root(
+crates/amun-constitutional-runtime/src/finality_certificate.rs:23:    pub fn issue(
+crates/amun-constitutional-runtime/src/finality_certificate.rs:58:    pub fn verify(&self) -> bool {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:66:    pub fn compute_hash(&self) -> [u8; 32] {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:83:    pub fn compute_merkle_root(hashes: Vec<[u8; 32]>) -> [u8; 32] {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:109:    pub fn compute_evidence_root(transitions: &[TransitionProof]) -> [u8; 32] {
+crates/amun-constitutional-runtime/src/finality_certificate.rs:117:    pub fn compute_pccv_root(transitions: &[TransitionProof]) -> [u8; 32] {
+crates/amun-constitutional-runtime/src/history_root.rs:52:    pub fn verify_chain(&self, chain: &CertificateChain) -> bool {
+crates/amun-constitutional-runtime/src/history_root.rs:68:    fn compute_history_root(chain: &CertificateChain) -> [u8; 32] {
+crates/amun-constitutional-runtime/src/runtime_pipeline.rs:37:    pub fn execute(
+crates/amun-constitutional-semantics/src/lib.rs:22:    pub fn verify_events(&self, events: &[TranscriptEntry]) -> bool { let r = Self::new_sequential(events, self.epoch_id); r.root == self.root && r.event_count == self.event_count }
+crates/amun-constitutional-semantics/src/lib.rs:23:    pub fn verify_boundary(&self, boundary: &ReplayBoundary) -> bool { self.start_sequence >= boundary.finalized_sequence }
+crates/amun-constitutional-semantics/src/lib.rs:43:    pub fn verify_binding(&self, event_authority: EventAuthority) -> bool { self.authority == event_authority }
+crates/amun-constitutional-semantics/src/lib.rs:44:    pub fn verify_epoch(&self, current_epoch: &[u8; 32]) -> bool { self.authority_epoch == *current_epoch }
+crates/amun-constitutional-semantics/src/lib.rs:58:    pub fn verify_normalization(&self, witnesses: &[(ReplayDomain, u64, [u8; 32])]) -> bool { Self::normalize(witnesses).normalization_root == self.normalization_root }
+crates/amun-constitutional-signing/src/keys.rs:22:    pub fn verifying_key_hex(&self) -> String {
+crates/amun-constitutional-signing/src/keys.rs:31:    pub fn verifying_key(&self) -> &VerifyingKey {
+crates/amun-constitutional-signing/src/signed_artifact.rs:24:    pub fn verify(&self) -> Result<(), String> {
+crates/amun-constitutional-sim/src/divergence.rs:60:    pub fn compute(s1: &SimulationState, s2: &SimulationState) -> f64 {
+crates/amun-constitutional-sim/src/effectiveness.rs:7:    pub fn compute(claim: &LegitimacyClaim, state: &SimulationState) -> f64 {
+crates/amun-constitutional-state/src/lib.rs:83:    pub fn replay(records: &[StateTransitionRecord]) -> Self {
+crates/amun-constitutional-state/src/lib.rs:236:    pub fn verify(&self, records: &[StateTransitionRecord]) -> bool {
+crates/amun-constitutional-state/src/lib.rs:442:    pub fn verify(&self) -> bool {
+crates/amun-constitutional-verifier/src/verifier.rs:6:pub fn verify_qc(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+crates/amun-constitutional-verifier/src/verifier.rs:36:pub fn verify_vote(vote: &ConsensusVote, validator_set: &ValidatorSet) -> bool {
+crates/amun-constitutional-verifier/src/verifier.rs:59:pub fn verify_vote_uniqueness(qc: &QuorumCertificate) -> bool {
+crates/amun-constitutional/src/artifact_graph.rs:132:    pub fn verify_all_edges(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/causal_edge.rs:56:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/causal_edge.rs:75:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/causal_edge.rs:97:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/causal_edge.rs:110:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/causality_chain.rs:56:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/causality_chain.rs:77:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/causality_chain.rs:102:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/causality_chain.rs:115:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/causality_chain.rs:128:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/certificate_scope.rs:156:    pub fn verify_against_parent(
+crates/amun-constitutional/src/constitutional_failure.rs:111:    pub fn verify_structure(&self) -> Result<(), Self> {
+crates/amun-constitutional/src/constitutional_failure.rs:132:    pub fn verify_semantics(&self) -> Result<(), Self> {
+crates/amun-constitutional/src/constitutional_failure.rs:144:    pub fn verify_provenance(&self) -> Result<(), Self> {
+crates/amun-constitutional/src/constitutional_failure.rs:159:    pub fn verify_admissibility_graph(&self) -> Result<(), Self> {
+crates/amun-constitutional/src/constitutional_failure.rs:174:    pub fn verify_constitutional(&self) -> Result<(), Self> {
+crates/amun-constitutional/src/constitutional_failure.rs:178:    pub fn verify(&self) -> Result<(), Self> {
+crates/amun-constitutional/src/constitutional_hasher.rs:72:    pub fn finalize(self) -> [u8; 32] {
+crates/amun-constitutional/src/constitutional_object.rs:5:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure>;
+crates/amun-constitutional/src/constitutional_object.rs:6:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure>;
+crates/amun-constitutional/src/constitutional_object.rs:7:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure>;
+crates/amun-constitutional/src/constitutional_object.rs:8:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/constitutional_object.rs:11:    fn verify(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/constitutional_object.rs:24:    fn replay_revision(&self) -> u32;
+crates/amun-constitutional/src/constitutional_witness.rs:101:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/constitutional_witness.rs:125:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/constitutional_witness.rs:147:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/constitutional_witness.rs:160:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/constitutional_witness.rs:173:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/continuation_chain.rs:69:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/continuation_chain.rs:90:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/continuation_chain.rs:103:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/continuation_chain.rs:116:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/continuation_chain.rs:162:    pub fn verify_continuation(
+crates/amun-constitutional/src/divergence_point.rs:69:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/divergence_point.rs:93:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/divergence_point.rs:106:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/divergence_point.rs:119:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/divergence_resolution.rs:78:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/divergence_resolution.rs:100:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/divergence_resolution.rs:113:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/divergence_resolution.rs:126:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_boundary.rs:39:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_boundary.rs:63:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_boundary.rs:95:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_boundary.rs:107:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_context.rs:32:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_context.rs:50:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_context.rs:62:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_context.rs:74:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs:35:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_journal.rs:54:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs:66:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs:78:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs:157:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_journal.rs:174:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs:186:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_journal.rs:198:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_limits.rs:114:    pub fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_limits.rs:126:    pub fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_limits.rs:138:    pub fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_limits.rs:150:    pub fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_limits.rs:180:    pub fn verify(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_receipt.rs:97:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/execution_receipt.rs:120:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_receipt.rs:133:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_receipt.rs:146:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/execution_receipt.rs:159:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/replay_certificate.rs:42:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/replay_certificate.rs:66:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/replay_certificate.rs:88:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/replay_certificate.rs:101:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/replay_certificate.rs:114:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/replay_certificate.rs:177:    pub fn verify_scope_against_parent(
+crates/amun-constitutional/src/restoration_point.rs:68:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/restoration_point.rs:90:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/restoration_point.rs:103:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/restoration_point.rs:116:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/schema_registry.rs:89:    pub const fn verify_uniqueness() -> bool {
+crates/amun-constitutional/src/schema_registry.rs:125:    pub const fn verify_range() -> bool {
+crates/amun-constitutional/src/snapshot.rs:74:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/snapshot.rs:104:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/snapshot.rs:126:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/snapshot.rs:139:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/snapshot.rs:152:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/snapshot.rs:225:    pub fn verify_against_parent(
+crates/amun-constitutional/src/snapshot_scope.rs:153:    pub fn verify_against_parent(
+crates/amun-constitutional/src/state_anchor.rs:69:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/state_anchor.rs:98:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs:120:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs:133:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs:146:    fn verify_constitutional(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/state_anchor.rs:208:    pub fn verify_against_parent(
+crates/amun-constitutional/src/state_anchor_scope.rs:123:    pub fn verify_against_parent(
+crates/amun-constitutional/src/transition_commitment.rs:33:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/transition_commitment.rs:52:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/transition_commitment.rs:64:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/transition_commitment.rs:76:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/transition_evidence.rs:36:    fn replay_revision(&self) -> u32 {
+crates/amun-constitutional/src/transition_evidence.rs:55:    fn verify_structure(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/transition_evidence.rs:67:    fn verify_semantics(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-constitutional/src/transition_evidence.rs:79:    fn verify_provenance(&self) -> Result<(), ConstitutionalFailure> {
+crates/amun-contract-events/src/lib.rs:67:    pub fn compute_events_root(&self) -> [u8; 32] {
+crates/amun-contract-integration/src/lib.rs:93:    pub fn compute_contract_evidence_root(registry: &ResourceRegistry) -> [u8; 32] {
+crates/amun-contract-registry/src/lib.rs:84:    pub fn compute_registry_root(&self) -> [u8; 32] {
+crates/amun-contract-sdk/src/lib.rs:59:    pub fn compute_root(&self) -> [u8; 32] {
+crates/amun-core-optimization/src/lib.rs:24:    pub fn compute_state_root(&mut self) -> [u8; 32] {
+crates/amun-crash-recovery/src/checkpoint.rs:25:    pub fn verify(&self) -> bool {
+crates/amun-crash-recovery/src/recovery.rs:16:    pub fn verify_recovery(&self) -> Result<bool, String> {
+crates/amun-cross-contract/src/transfer_proof.rs:59:    pub fn verify(&self) -> bool {
+crates/amun-crypto-hardening/src/key_rotation.rs:30:    pub fn verify(&self) -> bool {
+crates/amun-crypto-hardening/src/key_rotation.rs:98:    pub fn verify_chain(&self) -> bool {
+crates/amun-crypto-hardening/src/production_keys.rs:45:    pub fn verify(&self, message: &[u8], signature: &[u8; 64]) -> bool {
+crates/amun-crypto/src/audit.rs:19:    pub fn verify_entropy(&mut self, epoch: u64) -> bool {
+crates/amun-crypto/src/ed25519.rs:54:    pub fn verify(
+crates/amun-defi-amm/src/lib.rs:71:    pub fn compute_evidence_root(&self) -> [u8; 32] {
+crates/amun-defi-core/src/lib.rs:77:    pub fn compute_pool_id(token_a: [u8; 32], token_b: [u8; 32]) -> [u8; 32] {
+crates/amun-defi-governance/src/lib.rs:95:    pub fn execute(&mut self, proposal_id: &[u8; 32]) -> bool {
+crates/amun-defi-governance/src/lib.rs:115:    pub fn compute_governance_root(&self) -> [u8; 32] {
+crates/amun-defi-lending-core/src/lib.rs:31:    pub fn compute_interest(principal: u64, rate_bps: u64, blocks_elapsed: u64) -> u64 {
+crates/amun-defi-lending-core/src/lib.rs:39:    pub fn compute_health_factor(collateral: u64, debt: u64, liquidation_threshold: u64) -> u64 {
+crates/amun-defi-lending-engine/src/lib.rs:154:    pub fn compute_lending_root(&self) -> [u8; 32] {
+crates/amun-defi-stablecoin/src/lib.rs:78:    pub fn compute_stablecoin_root(&self) -> [u8; 32] {
+crates/amun-deterministic-scheduler/src/scheduler.rs:59:    pub fn execute_batch(&mut self, max_tasks: usize) -> Vec<ExecutedTask> {
+crates/amun-dual-verification/src/dual_verifier.rs:14:    pub fn execute_and_verify(
+crates/amun-entropy-transcript/src/transcript.rs:33:    pub fn verify_replay(&self, other: &EntropyTranscript) -> bool {
+crates/amun-epoch-transition/src/transition.rs:43:    pub fn verify(&self) -> bool {
+crates/amun-evidence-finality/src/evidence_finality.rs:26:    pub fn compute_evidence_root(evidence: &[ConstitutionalEvidence]) -> [u8; 32] {
+crates/amun-evidence-finality/src/evidence_finality.rs:38:    pub fn compute_block_hash(
+crates/amun-evidence-finality/src/evidence_finality.rs:95:    pub fn issue(block: &EvidenceVerifiedBlock, qc: EvidenceBackedQC) -> Self {
+crates/amun-evidence-finality/src/evidence_finality.rs:110:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-evidence-finality/src/evidence_finality.rs:126:    pub fn verify(&self) -> bool {
+crates/amun-evidence-finality/src/evidence_finality.rs:146:    pub fn execute_and_verify(
+crates/amun-evidence-root/src/lib.rs:23:    pub fn compute(
+crates/amun-evidence-root/src/lib.rs:56:    pub fn verify(&self) -> bool {
+crates/amun-evidence-root/src/lib.rs:100:    pub fn verify(&self) -> bool {
+crates/amun-evidence/src/equivocation.rs:11:    pub fn verify(&self, chain_id: u64) -> bool {
+crates/amun-evidence/src/equivocation.rs:31:    pub fn compute_id(&self) -> [u8; 32] {
+crates/amun-evidence/src/evidence.rs:61:    pub fn compute_hash(&self) -> BlockHash {
+crates/amun-evidence/src/evidence.rs:70:    pub fn verify(&self) -> Result<(), &'static str> {
+crates/amun-evolution/src/certificate.rs:38:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-evolution/src/certificate.rs:48:    pub fn verify(&self) -> bool {
+crates/amun-evolution/src/certificate.rs:123:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-evolution/src/certificate.rs:146:    pub fn verify(&self) -> bool {
+crates/amun-evolution/src/executor.rs:10:    pub fn validate(
+crates/amun-evolution/src/signatures.rs:38:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-evolution/src/signatures.rs:48:    pub fn verify_structure(&self) -> bool {
+crates/amun-evolution/src/signatures.rs:78:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-evolution/src/signatures.rs:88:    pub fn verify(&self) -> bool {
+crates/amun-evolution/src/transition.rs:40:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-evolution/src/transition.rs:52:    pub fn verify(&self) -> bool {
+crates/amun-evolution/src/validator.rs:9:    pub fn verify_consistency(
+crates/amun-execution-receipt/src/lib.rs:93:    pub fn verify_consistency(&self) -> Result<(), &'static str> {
+crates/amun-execution-receipt/src/lib.rs:143:    pub fn verify_against_initial_root(
+crates/amun-execution-receipt/src/lib.rs:162:    pub fn verify_transcript(&self) -> Result<(), Vec<String>> {
+crates/amun-execution/src/executor.rs:18:    pub fn execute_wasm(&mut self, code: &[u8], input: &[u8]) -> AmunResult<Vec<u8>> {
+crates/amun-execution/src/lib.rs:23:    pub fn execute(&mut self, tx: &Transaction) -> TransactionReceipt {
+crates/amun-execution/src/lib.rs:108:    pub fn execute_block(&mut self, txs: &[Transaction]) -> Vec<TransactionReceipt> {
+crates/amun-execution/src/lib.rs:116:    pub fn finalize_block(&self) -> EconomicSnapshot {
+crates/amun-execution/src/verified_interpreter.rs:31:    pub fn execute(
+crates/amun-execution/src/wasm_deterministic.rs:46:    pub fn verify_deterministic_wasm(_module: &[u8]) -> Result<(), &'static str> {
+crates/amun-execution/src/wasm_profile.rs:78:    pub fn verify_module(&self, _module: &[u8]) -> Result<(), &'static str> {
+crates/amun-experimental-framework/src/main.rs:26:fn compute_stats(times: &[f64]) -> Stats {
+crates/amun-experimental-framework/src/main.rs:65:fn build_registry(size: u64) -> ResourceRegistry {
+crates/amun-experimental-framework/src/main.rs:81:fn build_deep_chain(depth: u64) -> (ResourceRegistry, ResourceId) {
+crates/amun-explorer-api/src/server.rs:4:pub fn build_app() -> Router {
+crates/amun-finality-certificate/src/lib.rs:24:    pub fn issue(
+crates/amun-finality-certificate/src/lib.rs:49:    fn compute_id(&self) -> [u8; 32] {
+crates/amun-finality-certificate/src/lib.rs:63:    pub fn verify(&self) -> bool {
+crates/amun-finality-certificate/src/lib.rs:111:    fn issue_cert(h: u64) -> ConstitutionalFinalityCertificate {
+crates/amun-gas-engine/src/gas_engine.rs:14:    pub fn execute_with_gas<F>(
+crates/amun-genesis/src/block.rs:41:    pub fn verify_integrity(&self) -> bool {
+crates/amun-genesis/src/validator.rs:26:pub fn compute_validator_set_hash(validators: &[GenesisValidator]) -> [u8; 32] {
+crates/amun-handle-resolver/src/handle_resolver.rs:75:    pub fn validate_handle_safety(
+crates/amun-host/src/boundary.rs:7:    pub fn validate_ingress(payload: &[u8], max_size: usize) -> Result<&[u8], &'static str> {
+crates/amun-light-client/src/constitutional_client.rs:37:    pub fn verify_certificate(&self, cert: &ConstitutionalFinalityCertificate) -> bool {
+crates/amun-light-client/src/constitutional_client.rs:41:    pub fn verify_chain_extension(&self, chain: &CertificateChain) -> bool {
+crates/amun-light-client/src/constitutional_client.rs:55:    pub fn verify_history_root(
+crates/amun-light-client/src/constitutional_client.rs:87:    pub fn verify_checkpoint(checkpoint: &ConstitutionalCheckpoint) -> bool {
+crates/amun-lineage-law/src/ancestry.rs:80:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage-law/src/ancestry.rs:91:    pub fn verify(&self) -> bool {
+crates/amun-lineage-law/src/compatibility.rs:52:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage-law/src/compatibility.rs:64:    pub fn verify(&self) -> bool {
+crates/amun-lineage-law/src/lineage.rs:41:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage-law/src/lineage.rs:53:    pub fn verify(&mut self, parent_golden_root: &[u8; 32], child_golden_root: &[u8; 32]) -> bool {
+crates/amun-lineage-law/src/lineage.rs:81:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage-law/src/lineage.rs:89:    pub fn verify(&self) -> bool {
+crates/amun-lineage-law/src/lineage.rs:99:    pub fn verify_chain(chain: &[LineageProof]) -> bool {
+crates/amun-lineage-law/src/migration.rs:42:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage-law/src/migration.rs:53:    pub fn verify(&self) -> bool {
+crates/amun-lineage-law/src/migration.rs:78:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage-law/src/migration.rs:86:    pub fn verify(&self) -> bool {
+crates/amun-lineage-law/src/migration.rs:123:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage-law/src/migration.rs:134:    pub fn verify(&self) -> bool {
+crates/amun-lineage/src/record.rs:149:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage/src/record.rs:160:    pub fn verify(&self) -> bool {
+crates/amun-lineage/src/record.rs:201:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-lineage/src/record.rs:213:    pub fn verify(&self) -> bool {
+crates/amun-mempool-gossip/src/messages.rs:38:    pub fn compute_hash(&self) -> [u8; 32] {
+crates/amun-mempool-gossip/src/messages.rs:51:    pub fn verify_hash(&self) -> bool {
+crates/amun-merkle/src/proof.rs:41:    pub fn verify(&self, leaf: &PublicHash32, root: &PublicHash32) -> bool {
+crates/amun-merkle/src/tree.rs:26:    pub fn compute_root(leaves: &[PublicHash32]) -> PublicHash32 {
+crates/amun-network-fastpath/src/lib.rs:28:    pub fn finalize(&mut self) -> [u8; 32] {
+crates/amun-network-scheduler/src/scheduler.rs:60:    pub fn compute_delay(&self, msg_hash: &[u8; 32]) -> u64 {
+crates/amun-networking/src/crypto_identity.rs:49:    pub fn verify(key: &[u8; 32], message: &[u8], signature: &[u8]) -> bool {
+crates/amun-networking/src/crypto_identity.rs:84:    pub fn verify(&self) -> bool {
+crates/amun-networking/src/peer_discovery.rs:30:    pub fn verify(announcement: &Self, signed: &SignedMessage) -> bool {
+crates/amun-networking/src/signed_envelope.rs:28:    pub fn verify(&self) -> bool {
+crates/amun-networking/src/sovereignty.rs:70:    pub fn verify_physics(&mut self) {
+crates/amun-networking/src/validator_certificate.rs:28:    pub fn issue(
+crates/amun-networking/src/validator_certificate.rs:65:    pub fn verify(&self, authority_public_key: &[u8; 32]) -> bool {
+crates/amun-networking/src/validator_certificate.rs:76:    pub fn issue_v2(
+crates/amun-networking/src/verification.rs:30:    pub fn verify_remote(
+crates/amun-networking/tests/harness/handlers.rs:5:pub fn build_proposal_envelope(node_id: &str, leader_id: [u8; 32], round: u64) -> Envelope {
+crates/amun-networking/tests/harness/handlers.rs:22:pub fn build_prevote_envelope(
+crates/amun-networking/tests/harness/handlers.rs:45:pub fn build_precommit_envelope(
+crates/amun-networking/tests/n18_checkpoint_sync.rs:13:fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
+crates/amun-networking/tests/n18_full_rejoin.rs:13:fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
+crates/amun-networking/tests/n19_adversarial_rejoin.rs:11:fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
+crates/amun-networking/tests/n20_10_multi_machine_testnet.rs:85:fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
+crates/amun-networking/tests/n20_8_bootstrap_over_tcp.rs:13:fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
+crates/amun-networking/tests/n20_9_rejoin_over_tcp.rs:12:fn build_checkpoint(start: u64, end: u64) -> CheckpointCertificate {
+crates/amun-nft-bridge/src/lib.rs:85:    pub fn compute_bridge_root(&self) -> [u8; 32] {
+crates/amun-nft-bridge/src/lib.rs:96:fn compute_lock_id(lock: &BridgeLock) -> [u8; 32] {
+crates/amun-nft-collateral/src/lib.rs:124:    pub fn compute_evidence_root(&self) -> [u8; 32] {
+crates/amun-nft-constitutional-enforcement/src/lib.rs:99:fn compute_lock_id(lock: &amun_nft_bridge::BridgeLock) -> [u8; 32] {
+crates/amun-nft-constitutional-registry/src/lib.rs:45:    pub fn compute_constitutional_root(&self) -> [u8; 32] {
+crates/amun-nft-core/src/lib.rs:67:    pub fn compute_hash(&self) -> [u8; 32] {
+crates/amun-nft-evidence/src/lib.rs:31:    pub fn verify_ownership(
+crates/amun-nft-evidence/src/lib.rs:46:    pub fn verify_non_duplicate(
+crates/amun-nft-evidence/src/lib.rs:57:    pub fn verify_metadata_hash(
+crates/amun-nft-evidence/src/lib.rs:68:    pub fn verify_replay_protection(
+crates/amun-nft-evidence/src/lib.rs:88:    pub fn verify_mint(ctx: MintVerificationContext) -> Result<(), CekError> {
+crates/amun-nft-evidence/src/lib.rs:113:    pub fn verify_transfer(
+crates/amun-nft-evidence/src/lib.rs:130:    pub fn verify_burn(
+crates/amun-nft-governance-execution/src/lib.rs:115:    pub fn execute(&mut self, proposal_id: &[u8; 32], current_height: u64) -> bool {
+crates/amun-nft-governance-execution/src/lib.rs:129:    pub fn compute_execution_root(&self) -> [u8; 32] {
+crates/amun-nft-governance/src/lib.rs:64:    pub fn compute_governance_root(&self) -> [u8; 32] {
+crates/amun-nft-indexer/src/lib.rs:148:    pub fn compute_index_root(&self) -> [u8; 32] {
+crates/amun-nft-marketplace/src/lib.rs:333:    pub fn compute_evidence_root(&self) -> [u8; 32] {
+crates/amun-nft-mining/src/lib.rs:62:pub fn issue_mining_reward(
+crates/amun-nft-persistence/tests/n150_persistence_tests.rs:16:fn build_full_state() -> (
+crates/amun-nft-rights-enforcement/src/lib.rs:19:    pub fn validate_transfer(
+crates/amun-nft-rights-enforcement/src/lib.rs:105:fn compute_lock_id(lock: &amun_nft_bridge::BridgeLock) -> [u8; 32] {
+crates/amun-nft-royalty-accounting/src/lib.rs:38:    pub fn compute_accounting_root(&self) -> [u8; 32] {
+crates/amun-nft-royalty-settlement/src/lib.rs:51:    pub fn compute_settlement_root(&self) -> [u8; 32] {
+crates/amun-nft-royalty/src/lib.rs:28:    pub fn compute_royalty(sale_price: u64, royalty_bps: u16) -> u64 {
+crates/amun-nft-snapshot/tests/n151_snapshot_tests.rs:30:fn build_state() -> SnapshotTestState {
+crates/amun-node/src/certificate_loader.rs:28:pub fn verify_certificate_against_genesis(
+crates/amun-node/src/certificate_loader.rs:55:pub fn verify_validator_membership(
+crates/amun-node/src/genesis.rs:49:    pub fn validate(&self) -> Result<(), String> {
+crates/amun-node/src/peer_handshake.rs:39:    pub fn verify(&self, our_genesis_hash: &[u8; 32]) -> Result<(), String> {
+crates/amun-operations/src/backup_recovery.rs:39:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-operations/src/backup_recovery.rs:53:    pub fn verify(&self) -> bool {
+crates/amun-pccv/src/pccv_verifier.rs:20:    pub fn verify(proof: &EnhancedTransitionProof, _registry: &ResourceRegistry) -> PCCVResult {
+crates/amun-pccv/src/pccv_verifier.rs:148:    pub fn compute_proof_hash(proof: &EnhancedTransitionProof) -> [u8; 32] {
+crates/amun-pccv/src/transition_proof_engine.rs:12:    pub fn build_proof(
+crates/amun-pccv/src/witness_builder.rs:7:    pub fn build(
+crates/amun-pccv/src/witness_builder.rs:33:    fn build_merkle_proof(
+crates/amun-pccv/src/witness_builder.rs:46:    fn compute_siblings(
+crates/amun-pccv/src/witness_builder.rs:105:    fn build_lineage_proof(registry: &ResourceRegistry, resource_id: &ResourceId) -> LineageProof {
+crates/amun-peer-identity/src/verifier.rs:7:    pub fn verify(cert: &PeerCertificate, trusted_genesis: &str) -> Result<(), String> {
+crates/amun-proof-carrying/src/verifier.rs:14:    pub fn verify_receipt(receipt: &ProofCarryingReceipt) -> Result<(), String> {
+crates/amun-protocol-event/src/transcript.rs:38:    pub fn verify_continuity(&self) -> bool {
+crates/amun-qc-canonical/src/validator.rs:5:pub fn validate_qc_validators(
+crates/amun-quorum-certificate/src/certificate.rs:42:    pub fn verify(&self) -> bool {
+crates/amun-quorum-certificate/src/verifier.rs:5:pub fn verify_quorum(
+crates/amun-replay-cert/src/certificate.rs:59:    pub fn verify(&self) -> bool {
+crates/amun-replay-cert/src/transcript.rs:55:    pub fn finalize(&mut self, root: [u8; 32]) {
+crates/amun-replay-cert/src/transcript.rs:59:    pub fn verify_continuity(&self) -> bool {
+crates/amun-replay-cert/src/verifier.rs:5:pub fn verify_certificate(cert: &ReplayCertificate) -> Result<(), &'static str> {
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:21:    pub fn execute_and_replay(
+crates/amun-replay-consensus/src/replay_backed_consensus.rs:140:    fn compute_proof_root(transitions: &[TransitionProof]) -> [u8; 32] {
+crates/amun-replay-consensus/src/replay_backed_types.rs:36:    pub fn compute_replay_root(&self) -> [u8; 32] {
+crates/amun-replay-consensus/src/replay_backed_types.rs:97:    pub fn issue(block: &ReplayVerifiedBlock, qc: ReplayBackedQC) -> Self {
+crates/amun-replay-consensus/src/replay_backed_types.rs:111:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-replay-consensus/src/replay_backed_types.rs:125:    pub fn verify(&self) -> bool {
+crates/amun-replay-engine/src/adaptive_relay.rs:63:    pub fn compute(frontiers: &[(u64, &DerivationalFrontier)]) -> Self {
+crates/amun-replay-engine/src/canonical.rs:178:    pub fn finalize(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/constitutional_economics.rs:74:    pub fn execute(&mut self) -> bool {
+crates/amun-replay-engine/src/constitutional_economics.rs:121:    pub fn verify_no_semantic_reward(&self) -> bool {
+crates/amun-replay-engine/src/constitutional_governance.rs:51:    fn compute_hash(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/cross_constitution_federation.rs:104:    pub fn verify_sovereignty(&self) -> bool {
+crates/amun-replay-engine/src/derivational_equivalence.rs:24:    pub fn compute(target_artifact: ConstitutionalHash, can_derive: bool, context_hash: ConstitutionalHash) -> Self {
+crates/amun-replay-engine/src/derivational_equivalence.rs:83:    fn compute_class_hash(&self) -> [u8; 32] {
+crates/amun-replay-engine/src/deterministic.rs:52:    pub fn execute_step(
+crates/amun-replay-engine/src/deterministic.rs:77:    pub fn execute_with_trace(
+crates/amun-replay-engine/src/deterministic.rs:94:    pub fn compute_transcript_hash(entries: &[TranscriptEntry]) -> ConstitutionalHash {
+crates/amun-replay-engine/src/deterministic.rs:113:    pub fn verify_integrity(&self) -> bool {
+crates/amun-replay-engine/src/equivalence.rs:43:    pub fn verify(&self) -> bool {
+crates/amun-replay-engine/src/equivalence.rs:67:    pub fn execute_and_self_verify(
+crates/amun-replay-engine/src/equivalence.rs:116:    fn execute_and_self_verify_produces_valid_proof() {
+crates/amun-replay-engine/src/frontier_reconciliation.rs:79:pub fn compute_closure_delta(source: &DerivationalFrontier, target: &DerivationalFrontier) -> Vec<ConstitutionalHash> {
+crates/amun-replay-engine/src/lib.rs:58:    pub fn replay(
+crates/amun-replay-engine/src/operational_hasher.rs:37:    pub fn finalize(self) -> [u8; 32] { self.inner.finalize().into() }
+crates/amun-replay-engine/src/runtime_receipt.rs:38:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-replay-engine/src/witness_envelope.rs:83:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-replay-engine/src/zk_adapters.rs:52:    fn compute_hash(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/zk_adapters.rs:99:    fn compute_commitment(&self) -> ConstitutionalHash {
+crates/amun-replay-engine/src/zk_adapters.rs:168:    fn compute_binding(&self) -> ConstitutionalHash {
+crates/amun-replay-optimization/src/lib.rs:70:    pub fn compute_cache_root(&self) -> [u8; 32] {
+crates/amun-replay-semantics/src/lib.rs:36:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-replay-semantics/src/lib.rs:42:    pub fn verify(&self) -> bool { self.certificate_hash == self.compute_hash() }
+crates/amun-replay-semantics/src/lib.rs:48:    pub fn verify(&self, a: &ReplayCertificate, b: &ReplayCertificate) -> bool {
+crates/amun-replay-semantics/src/lib.rs:71:impl ReplayCheckpoint { pub fn verify(&self, boundary: &ReplayBoundary) -> bool { self.sequence >= boundary.finalized_sequence && self.certificate.verify() && self.certificate.boundary.boundary_chain_hash == boundary.boundary_chain_hash } }
+crates/amun-replay-semantics/src/lib.rs:75:    pub fn replay_determinism(a: &ReplayCertificate, b: &ReplayCertificate) -> Result<(), ReplayFailure> {
+crates/amun-replay-store/src/lib.rs:70:    pub fn verify_chain(&self) -> Result<bool, String> {
+crates/amun-replay-verifier/src/replay_verifier.rs:31:    pub fn replay(
+crates/amun-replay/src/certificate.rs:18:    pub fn issue(
+crates/amun-replay/src/certificate.rs:62:    fn compute_id(&self) -> [u8; 32] {
+crates/amun-replay/src/certificate.rs:75:    pub fn verify(&self) -> bool {
+crates/amun-replay/src/commit_log.rs:15:    pub fn commit_hash(&self) -> [u8; 32] {
+crates/amun-replay/src/validation.rs:34:    pub fn validate(commits: &[StateCommit]) -> ReplayResult {
+crates/amun-replay/src/validation.rs:51:    pub fn validate_log(log: &CommitLog) -> ReplayResult {
+crates/amun-resource-core/src/resource_id.rs:13:    pub fn compute(
+crates/amun-resource-core/src/resource_registry.rs:212:    pub fn compute_state_root(&self) -> [u8; 32] {
+crates/amun-rpc/src/auth.rs:24:    pub fn validate(&self, token: &str) -> bool {
+crates/amun-rpc/src/lib.rs:181:pub fn build_app(state: AppState) -> Router {
+crates/amun-runtime-law/src/law.rs:13:    pub fn verify_code(code: &str) -> Result<(), Vec<&'static str>> {
+crates/amun-runtime/src/executor.rs:16:    pub fn execute_batch(
+crates/amun-safety-laws/src/equivocation.rs:23:    pub fn verify(&self) -> bool {
+crates/amun-sdk-layer/src/transaction_builder.rs:8:    pub fn build_transfer(chain_id: u64, nonce: u64, sender: PublicKey, recipient: PublicHash32, amount: u128, gas: u64) -> SdkResult<UnsignedTransaction> {
+crates/amun-sdk-layer/src/transaction_builder.rs:15:    pub fn build_stake(chain_id: u64, nonce: u64, sender: PublicKey, validator: PublicHash32, amount: u128, gas: u64) -> SdkResult<UnsignedTransaction> {
+crates/amun-self-preservation/src/action_principle.rs:63:    pub fn verify_principle(
+crates/amun-self-preservation/src/consistency.rs:47:    pub fn verify_consistency(
+crates/amun-self-preservation/src/self_modeling.rs:52:    pub fn verify_amendment(model: &SelfModel, new_depth: u64) -> Result<(), String> {
+crates/amun-serialization-audit/src/verifier.rs:6:    pub fn verify_determinism(data: &[&[u8]]) -> bool {
+crates/amun-serialization-audit/src/verifier.rs:21:    pub fn verify_roundtrip(original: &[u8]) -> bool {
+crates/amun-signature-engine/src/verifier.rs:9:    pub fn verify(
+crates/amun-smt/src/proof.rs:123:    pub fn verify(&self, state_root: &Hash) -> Result<bool, SmtError> {
+crates/amun-smt/src/tree.rs:665:    fn build_canonical_subtree(
+crates/amun-smt/src/validator.rs:13:pub fn validate_tree(root: &Hash, ctx: &Context) -> Result<(), SmtError> {
+crates/amun-smt/src/validator.rs:21:fn validate_node(
+crates/amun-smt/tests/validator.rs:5:fn validate_empty_tree() {
+crates/amun-smt/tests/validator.rs:11:fn validate_after_inserts() {
+crates/amun-smt/tests/validator.rs:22:fn validate_after_delete() {
+crates/amun-snapshot-constitution/src/snapshot.rs:112:    pub fn verify(&self) -> bool {
+crates/amun-snapshot-engine/src/byzantine_sync.rs:118:    pub fn verify_peer_identity(&self, peer: &PeerManifest) -> bool {
+crates/amun-snapshot-engine/src/chunk.rs:34:    fn compute_hash(index: u64, nodes: &[SerializedNode]) -> [u8; 32] {
+crates/amun-snapshot-engine/src/chunk.rs:45:    pub fn verify(&self) -> bool {
+crates/amun-snapshot-engine/src/chunk.rs:87:    pub fn build(mut self) -> ChunkIndex {
+crates/amun-snapshot-engine/src/chunk.rs:118:    fn compute_merkle_root(chunks: &[SnapshotChunk]) -> [u8; 32] {
+crates/amun-snapshot-engine/src/chunk.rs:142:    pub fn verify(&self) -> bool {
+crates/amun-snapshot-engine/src/chunk_proof.rs:75:    pub fn verify(&self) -> bool {
+crates/amun-snapshot-engine/src/compatibility.rs:54:    pub fn compute(
+crates/amun-snapshot-engine/src/constitutional_hash.rs:14:    pub fn compute(
+crates/amun-snapshot-engine/src/constitutional_hash.rs:34:    pub fn verify(
+crates/amun-snapshot-engine/src/constitutional_identity.rs:38:    fn compute_identity_hash(&self) -> [u8; 32] {
+crates/amun-snapshot-engine/src/constitutional_identity.rs:52:    pub fn verify(&self) -> bool {
+crates/amun-snapshot-engine/src/manifest.rs:65:    fn compute_self_hash(&self) -> [u8; 32] {
+crates/amun-snapshot-engine/src/manifest.rs:84:    pub fn verify(&self) -> bool {
+crates/amun-snapshot-engine/src/manifest.rs:209:    pub fn build(self) -> Option<SnapshotManifest> {
+crates/amun-snapshot-engine/src/replay_continuity.rs:30:    pub fn verify_continuity(
+crates/amun-snapshot-engine/src/replay_continuity.rs:87:    pub fn verify_roundtrip(chunks: &ChunkIndex, expected_root: [u8; 32]) -> Result<bool, String> {
+crates/amun-snapshot-engine/src/snapshot.rs:130:    pub fn build(self) -> SnapshotData {
+crates/amun-snapshot-engine/src/structural_verifier.rs:81:    pub fn verify(
+crates/amun-snapshot-engine/src/structural_verifier.rs:175:    pub fn verify_unique_root(
+crates/amun-snapshot-engine/src/verifier.rs:20:    pub fn verify_manifest(manifest: &SnapshotManifest) -> VerificationResult {
+crates/amun-snapshot-engine/src/verifier.rs:38:    pub fn verify_chunks(chunks: &ChunkIndex, manifest: &SnapshotManifest) -> VerificationResult {
+crates/amun-snapshot-engine/src/verifier.rs:52:    pub fn verify_header(header: &SnapshotHeader) -> VerificationResult {
+crates/amun-snapshot-engine/src/verifier.rs:62:    pub fn verify_roundtrip(
+crates/amun-snapshot/src/state.rs:42:    pub fn verify(&self, chain_id: u64) -> bool {
+crates/amun-state-machine/src/axioms.rs:66:    pub fn verify_all() -> Vec<AxiomVerification> {
+crates/amun-state-machine/src/delta_algebra.rs:66:    pub fn compute_hash(&self) -> [u8; 32] {
+crates/amun-state-machine/src/engine.rs:43:    pub fn execute(
+crates/amun-state-machine/src/fork_merge.rs:52:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-state-machine/src/fork_merge.rs:127:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-state-machine/src/meta_amendment.rs:45:    pub fn validate_amendment_scope(
+crates/amun-state-machine/src/preconditions.rs:23:    pub fn verify_legal(
+crates/amun-state-machine/src/preconditions.rs:38:    pub fn verify_all(
+crates/amun-state-machine/src/reconciliation.rs:40:    pub fn verify_reconciliation(
+crates/amun-state-machine/src/replay_log.rs:32:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-state-machine/src/replay_log.rs:82:    pub fn verify_dag(&self) -> bool {
+crates/amun-state-machine/src/states.rs:70:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-state-machine/src/states.rs:86:    pub fn verify(&self) -> bool {
+crates/amun-state-machine/src/transitions.rs:164:    fn compute_id(&self) -> [u8; 32] {
+crates/amun-state-machine/src/transitions.rs:183:    pub fn verify_monotonicity(&self) -> Result<(), String> {
+crates/amun-state-machine/src/verifier.rs:21:    pub fn verify_transition(
+crates/amun-state-machine/src/verifier.rs:89:    pub fn verify_invariants(
+crates/amun-state-pruning/src/lib.rs:56:    pub fn compute_pruned_root(&self) -> [u8; 32] {
+crates/amun-state-root/src/continuity.rs:6:    pub fn verify_link(parent_hash: &[u8; 32], child: &ConstitutionalSnapshot) -> bool {
+crates/amun-state-root/src/identity.rs:26:    pub fn compute(&self) -> [u8; 32] {
+crates/amun-state-root/src/proofs.rs:10:    pub fn verify(&self, expected_root: &[u8; 32]) -> bool {
+crates/amun-state-root/src/snapshot.rs:35:    pub fn verify(&self) -> bool {
+crates/amun-state-root/src/snapshot.rs:75:    pub fn verify_constitutional_integrity(&self) -> bool {
+crates/amun-state-sync/src/snapshot_certificate.rs:49:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-state-sync/src/snapshot_certificate.rs:67:    pub fn verify(&self) -> bool {
+crates/amun-state-sync/src/state_chunk.rs:21:    pub fn compute_chunk_hash(chunk_id: u32, resources: &[ResourceMetadata]) -> [u8; 32] {
+crates/amun-state-sync/src/state_chunk.rs:38:    pub fn verify(&self) -> bool {
+crates/amun-state-sync/src/state_chunk.rs:56:    pub fn verify(&self) -> bool {
+crates/amun-state-sync/src/state_chunk.rs:75:pub fn build_chunk_merkle_tree(chunks: &[StateChunk]) -> ([u8; 32], Vec<ChunkMerkleProof>) {
+crates/amun-state-sync/src/state_chunk.rs:94:fn compute_merkle_root(leaves: &[[u8; 32]]) -> [u8; 32] {
+crates/amun-state-sync/src/state_chunk.rs:120:fn compute_merkle_siblings(leaves: &[[u8; 32]], target_idx: usize) -> Vec<([u8; 32], bool)> {
+crates/amun-state-sync/src/stateless_verifier.rs:19:    pub fn verify(
+crates/amun-state-sync/src/sync_package.rs:31:    fn compute_hash(&self) -> [u8; 32] {
+crates/amun-state-sync/src/sync_package.rs:45:    pub fn verify(&self) -> bool {
+crates/amun-state-transition/src/journal.rs:84:    pub fn verify_continuity(&self) -> bool {
+crates/amun-state-transition/src/state.rs:48:    pub fn commit_to(self, target: &mut DeterministicMap<[u8; 32], Vec<u8>>) {
+crates/amun-state-transition/src/state.rs:86:    pub fn execute_transition(
+crates/amun-state-transition/src/state.rs:128:    pub fn execute(
+crates/amun-state-transition/src/state.rs:144:    pub fn compute_root(
+crates/amun-state-transition/src/state.rs:161:    pub fn compute_root_with_overlay(
+crates/amun-state-types/src/transitions.rs:35:    pub fn verify<F, E>(self, f: F) -> Result<State<T, Verified, D, C>, (Self, E)>
+crates/amun-state-types/src/transitions.rs:52:    pub fn commit(self) -> State<T, Committed, D, C> {
+crates/amun-state-types/src/transitions.rs:63:    pub fn finalize(self) -> State<T, Finalized, D, C> {
+crates/amun-stateless-sync/src/lib.rs:118:    pub fn verify_height(&self, height: u64) -> Result<(), String> {
+crates/amun-stateless-sync/src/lib.rs:135:    pub fn verify_chain(&self) -> Result<(), String> {
+crates/amun-stf/src/nonce.rs:27:    pub fn validate_nonce<S: StateStore>(
+crates/amun-stf/src/stf.rs:46:    pub fn commit(&mut self) -> AmunResult<PublicHash32> {
+crates/amun-stf/src/stf.rs:62:    fn compute_root(&self) -> PublicHash32 {
+crates/amun-stf/src/transition_result.rs:14:pub fn execute_transition_with_receipt(
+crates/amun-stf/tests/replay_equivalence.rs:11:fn execute_block(txs: &[[u8; 32]]) -> (ExecutionTranscript, Vec<u8>, [u8; 32]) {
+crates/amun-storage-engine/src/checkpoint.rs:16:    pub fn commit(&mut self) {
+crates/amun-storage-kernel/src/lib.rs:94:    pub fn verify_lineage_continuity(
+crates/amun-storage-kernel/src/lib.rs:123:    pub fn verify_epoch_transition(
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:61:    pub fn verify_chain(&self, expected_prev: &[u8; 32]) -> bool {
+crates/amun-storage-kernel/src/persistence/wal/entry.rs:80:    fn compute_hash(
+crates/amun-storage-kernel/src/persistence/wal/iterator.rs:85:    pub fn verify_full_replay(wal_path: &str) -> Result<([u8; 32], u64), String> {
+crates/amun-storage-kernel/src/smt/proof.rs:90:    pub fn verify(&self, root: [u8; 32]) -> bool {
+crates/amun-storage-kernel/src/smt/proof.rs:312:    pub fn verify(proof: &MerkleProof, root: [u8; 32]) -> bool {
+crates/amun-storage-kernel/src/smt/tree.rs:23:    fn build_empty_ladder() -> Vec<NodeHash> {
+crates/amun-storage-kernel/src/smt/tree.rs:171:    fn build_canonical_branch(
+crates/amun-storage-kernel/tests/replay_equivalence.rs:28:    fn replay_equivalence_passes() {
+crates/amun-storage-kernel/tests/replay_equivalence.rs:61:    fn replay_detects_divergence() {
+crates/amun-storage-kernel/tests/replay_equivalence.rs:100:    fn replay_detects_epoch_regression() {
+crates/amun-testnet-sim/tests/adversarial_tests.rs:22:fn build_registry(count: u64) -> ResourceRegistry {
+crates/amun-timeout-aggregator/src/timeout_cert.rs:38:    pub fn verify(&self) -> bool {
+crates/amun-timeout-law/src/timeout.rs:37:    pub fn verify(&self) -> bool {
+crates/amun-tls/src/pinning.rs:19:    pub fn verify(&self, cert_der: &[u8]) -> bool {
+crates/amun-tokenomics-ledger/src/lib.rs:86:    pub fn issued_supply(&self) -> u64 {
+crates/amun-tokenomics-ledger/src/lib.rs:155:    pub fn compute_economic_root(&self) -> [u8; 32] {
+crates/amun-tokenomics-ledger/src/lib.rs:170:    pub fn compute_ledger_root(&self) -> [u8; 32] {
+crates/amun-tokenomics/src/lib.rs:36:    pub fn compute_epoch_rewards(total_supply: u64) -> u64 {
+crates/amun-tokenomics/src/lib.rs:40:    pub fn compute_distribution(reward: u64) -> (u64, u64, u64) {
+crates/amun-transaction/src/tx.rs:116:    fn build(
+crates/amun-transaction/src/tx.rs:160:    pub fn validate_basic(&self) -> AmunResult<()> {
+crates/amun-transactions/src/lib.rs:54:    pub fn verify(&self) -> bool {
+crates/amun-transcript-semantics/src/lib.rs:14:    pub fn verify_causal_chain(&self, parent: &EventIdentity) -> bool { self.causal_parent == parent.event_hash && self.transcript_position == parent.transcript_position + 1 }
+crates/amun-transcript-semantics/src/lib.rs:68:    fn compute(env: &CertifiedEnvelope) -> [u8; 32] { let mut h = Sha256::new(); h.update(b"AMUN|IMMUTABLE_CERT|V1"); h.update((env.domain as u8).to_le_bytes()); h.update(env.epoch_id); h.update(env.transcript_root); h.update(env.state_root); h.update(env.receipt_root); h.update(env.ordering_root); h.update(env.event_count.to_le_bytes()); h.update(env.replay_version.to_le_bytes()); h.finalize().into() }
+crates/amun-transcript-semantics/src/lib.rs:72:    pub fn verify(&self) -> bool { self.inner.certificate_hash == Self::compute(&self.inner) }
+crates/amun-transition-proof/src/enhanced_proof.rs:14:    pub fn verify(&self, metadata: &ResourceMetadata) -> bool {
+crates/amun-transition-proof/src/enhanced_proof.rs:42:    pub fn verify(&self) -> bool {
+crates/amun-transition-proof/src/proof_builder.rs:13:    pub fn build(
+crates/amun-transition-proof/src/proof_builder.rs:54:    pub fn build_enhanced(
+crates/amun-transition-proof/src/proof_builder.rs:118:    fn build_merkle_proof(
+crates/amun-transition-proof/src/proof_builder.rs:131:    fn compute_siblings(registry: &ResourceRegistry, rid: &ResourceId) -> Vec<([u8; 32], bool)> {
+crates/amun-transition-proof/src/proof_builder.rs:178:    fn build_lineage_proof(registry: &ResourceRegistry, rid: &ResourceId) -> LineageProof {
+crates/amun-transition-proof/src/proof_builder.rs:203:    fn compute_enhanced_hash(proof: &EnhancedTransitionProof) -> [u8; 32] {
+crates/amun-transition-proof/src/transition_proof.rs:63:    pub fn compute_hash(&self) -> [u8; 32] {
+crates/amun-transition-proof/src/transition_proof.rs:93:    pub fn verify_integrity(&self) -> bool {
+crates/amun-transition-proof/src/transition_proof.rs:100:    pub fn verify_state_transition(&self) -> bool {
+crates/amun-truth-engine/src/engine.rs:73:    fn commit_transition(
+crates/amun-truth-engine/src/engine.rs:96:    pub fn execute_live(
+crates/amun-truth-engine/src/engine.rs:248:    pub fn compute_chain_root_until(&self, until: ChainPosition) -> Result<[u8; 32], ReplayError> {
+crates/amun-truth-engine/src/engine.rs:276:    pub fn compute_chain_root(&self, target_tx_count: u64) -> Result<[u8; 32], ReplayError> {
+crates/amun-unlock-law/src/lib.rs:13:pub fn verify_unlock_condition(qc: &QuorumCertificate, validator_set: &ValidatorSet) -> bool {
+crates/amun-unlock-law/src/unlock.rs:33:    pub fn verify(&self) -> bool {
+crates/amun-unsigned-messages/src/proposal.rs:53:    pub fn verify_hash(&self) -> bool {
+crates/amun-unsigned-messages/src/proposal.rs:155:    pub fn verify_unsigned(&self) -> bool {
+crates/amun-unsigned-messages/src/vote.rs:51:    pub fn verify_hash(&self) -> bool {
+crates/amun-unsigned-messages/src/vote.rs:149:    pub fn verify_unsigned(&self) -> bool {
+crates/amun-validator-attestation/src/attestation.rs:35:    pub fn verify(&self) -> bool {
+crates/amun-validator-identity/src/signature.rs:32:pub fn verify_ed25519(pk: &[u8; 32], payload: &[u8], signature: &[u8; 64]) -> bool {
+crates/amun-validator-networking/src/lib.rs:58:    fn build_registry(count: u8) -> ResourceRegistry {
+crates/amun-verification-kernel/src/lib.rs:71:    pub fn issue(
+crates/amun-verification-kernel/src/lib.rs:92:    fn compute_id(&self) -> String {
+crates/amun-verification-kernel/src/lib.rs:104:    fn compute_hash(&self) -> String {
+crates/amun-verification-kernel/src/lib.rs:119:    pub fn verify(&self) -> bool {
+crates/amun-verified-pipeline/src/vote_pipeline.rs:40:    pub fn verify(&self, registry: &ValidatorRegistry, chain_id: u64) -> Option<VerifiedVote> {
+crates/amun-verifier-node/src/report.rs:29:    pub fn finalize(&mut self) {
+crates/amun-verifier-node/src/verifier.rs:8:    pub fn verify_block(
+crates/amun-verifier-node/src/verifier.rs:60:    pub fn verify_chain(
+crates/amun-view-change/src/new_view.rs:34:    pub fn verify(&self) -> bool {
+crates/amun-view-change/src/view_change.rs:49:    pub fn verify(&self) -> bool {
+crates/amun-vm-kernel/src/vm_kernel.rs:22:    pub fn execute(
+crates/amun-vm-kernel/src/vm_kernel.rs:30:    pub fn verify(buffer: &mut PendingBuffer, registry: &ResourceRegistry) -> bool {
+crates/amun-vm-kernel/src/vm_kernel.rs:106:    pub fn commit(
+crates/amun-wal/src/authority_index.rs:22:    pub fn build_from_entries(entries: &[super::WALEntry]) -> Self {
+crates/amun-wal/src/authority_index.rs:47:    pub fn verify_snapshot_anchor(
+crates/amun-wal/src/frame.rs:34:    pub fn verify(&self, prev_hash: [u8; 32]) -> bool {
+crates/amun-wal/src/lib.rs:604:    pub fn verify_chain_continuity(entries: &[WALEntry]) -> Result<(), String> {
+crates/amun-wal/src/lib.rs:748:    pub fn validate_authority_chain(&self) -> Result<AuthorityValidation, String> {
+crates/amun-wal/src/lib.rs:848:    pub fn build_manifest(&self) -> WALManifest {
+crates/amun-wal/src/wal.rs:40:    fn validate_header(header: &[u8; FRAME_HEADER_SIZE]) -> bool {
+crates/amun-wal/src/wal.rs:44:    fn replay_frames(&mut self) -> std::io::Result<()> {
+crates/amun-wallet-api/src/routes/transactions.rs:5:async fn build_transaction(
+crates/amun-wallet-api/src/server.rs:4:pub fn build_app() -> Router {
+crates/amun-wallet-api/src/services/transaction_service.rs:12:    pub fn build_transaction(req: BuildTransactionRequest) -> ApiResult<BuildTransactionResponse> {
+crates/amun-wallet-management/src/signer.rs:13:pub fn verify_signature(public_key: &[u8; 32], message: &[u8], signature: &[u8]) -> bool {
+crates/amun_state_machine/src/certification/mod.rs:55:    pub fn verify(&self) -> bool {
+crates/amun_state_machine/src/certification/mod.rs:107:pub fn compute_execution_fingerprint() -> [u8; 32] {
+crates/amun_state_machine/src/scheduler.rs:33:    pub fn execute_next(&mut self, state: &mut ConstitutionalState) -> Option<[u8; 32]> {
+crates/amun_state_machine/src/scheduler.rs:49:    pub fn execute_all(&mut self, state: &mut ConstitutionalState) -> usize {
+crates/amun_state_machine/src/scheduler.rs:79:    pub fn executed_count(&self) -> usize {
+crates/amun_state_machine/src/snapshot.rs:35:    pub fn verify_chain(&self, previous: &StateSnapshot) -> bool {
+crates/amun_state_machine/src/snapshot.rs:67:    pub fn verify_all(&self) -> bool {
+crates/amun_state_machine/src/transition.rs:42:fn validate_amount(amount_raw: i64) -> Result<Fixed, ErrorCode> {

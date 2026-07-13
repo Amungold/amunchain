@@ -1,0 +1,772 @@
+================ verify() ================
+158-                peer_id: validator_id,
+159-                public_key,
+160-                authority_id: [0u8; 32],
+161-                authority_version: 0,
+162-                valid_from,
+163-                valid_until,
+164-                authority_signature: Vec::new(),
+165-            },
+166-        };
+167-        // Sign the certificate fields (excluding signature itself)
+168-        let payload = cert.serialize_for_signing();
+169-        cert.authority_signature = issuer_keypair.sign(&payload);
+170-        cert.runtime.authority_signature = cert.authority_signature.clone();
+171-        cert
+172-    }
+173-
+174-    /// Serialize certificate fields for signing (excludes the signature).
+175-    fn serialize_for_signing(&self) -> Vec<u8> {
+176-        let mut data = Vec::new();
+177-        data.extend_from_slice(&self.validator_id.0);
+178-        data.extend_from_slice(&self.public_key);
+179-        data.extend_from_slice(&self.authority_version.to_le_bytes());
+180-        data.extend_from_slice(&self.authority_id);
+181-        data.extend_from_slice(&self.issuer.0);
+182-        data.extend_from_slice(&self.valid_from.to_le_bytes());
+183-        data.extend_from_slice(&self.valid_until.to_le_bytes());
+184-        data
+185-    }
+186-
+187-    /// Verify the authority's signature on this certificate.
+188:    pub fn verify(&self, authority_public_key: &[u8; 32]) -> bool {
+189-        let payload = self.serialize_for_signing();
+190-        PeerKeyPair::verify(authority_public_key, &payload, &self.authority_signature)
+191-    }
+192-
+193-    /// Check if the certificate is currently valid.
+194-    pub fn is_valid_at(&self, timestamp: u64) -> bool {
+195-        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+196-    }
+197-
+198-    /// Create a new certificate with explicit authority version and id.
+199-    pub fn issue_v2(
+200-        validator_id: PeerId,
+201-        public_key: [u8; 32],
+202-        authority_version: u64,
+203-        authority_id: [u8; 32],
+204-        issuer_keypair: &PeerKeyPair,
+205-        valid_from: u64,
+206-        valid_until: u64,
+207-    ) -> Self {
+208-        let mut cert = Self {
+209-            validator_id,
+210-            public_key,
+211-
+212-            authority_version,
+213-            authority_id,
+214-
+215-            issuer: issuer_keypair.peer_id(),
+216-
+217-            valid_from,
+218-            valid_until,
+219-
+220-            authority_signature: Vec::new(),
+221-
+222-            constitutional: None,
+223-
+224-            runtime: RuntimeCertificateView {
+225-                peer_id: validator_id,
+226-                public_key,
+227-
+228-                authority_id,
+229-                authority_version,
+230-
+231-                valid_from,
+232-                valid_until,
+233-
+234-                authority_signature: Vec::new(),
+235-            },
+236-        };
+237-        let payload = cert.serialize_for_signing();
+238-        cert.authority_signature = issuer_keypair.sign(&payload);
+239-        cert
+240-    }
+241-}
+242-
+243-impl ValidatorCertificate {
+244-    /// Returns the attached constitutional certificate, if present.
+245-    pub fn constitutional(&self) -> Option<&SignedArtifact<ConstitutionalCertificate>> {
+246-        self.constitutional.as_ref()
+247-    }
+248-
+249-    /// Attach the constitutional certificate to this runtime object.
+250-    #[deprecated(note = "Use ValidatorCertificate::from_constitutional() instead")]
+251-    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+252-        // Transitional API.
+253-        // New code should construct ValidatorCertificate directly
+254-        // using from_constitutional().
+255-        self.constitutional = Some(cert);
+256-    }
+257-
+258-    /// Administrative validation only.
+259-    ///
+260-    /// Runtime networking verification continues to use the existing
+261-    /// ValidatorCertificate::verify() cryptographic path.
+262:    pub fn verify_administrative(&self) -> Result<(), String> {
+263-        match &self.constitutional {
+264-            Some(cert) => cert.verify(),
+265-            None => Err("No constitutional certificate attached".into()),
+266-        }
+267-    }
+268-
+269-    // ============================================================
+270-    // Runtime Administrative Facade
+271-    // ============================================================
+272-
+273-    pub fn validator_id(&self) -> &PeerId {
+274-        &self.runtime.peer_id
+275-    }
+276-
+277-    pub fn public_key(&self) -> &[u8; 32] {
+278-        &self.runtime.public_key
+279-    }
+280-
+281-    pub fn issuer(&self) -> &PeerId {
+282-        // TODO(PR-2): derive from constitutional certificate.
+283-        &self.issuer
+284-    }
+285-
+286-    pub fn authority_id(&self) -> &[u8; 32] {
+287-        &self.runtime.authority_id
+288-    }
+289-
+290-    pub fn authority_version(&self) -> u64 {
+291-        self.runtime.authority_version
+292-    }
+293-
+294-    pub fn valid_from(&self) -> u64 {
+295-        self.runtime.valid_from
+296-    }
+297-
+298-    pub fn valid_until(&self) -> u64 {
+299-        self.runtime.valid_until
+300-    }
+301-
+302-    pub fn authority_signature(&self) -> &[u8] {
+303-        &self.runtime.authority_signature
+304-    }
+305-
+306-    pub fn has_constitutional(&self) -> bool {
+307-        self.constitutional.is_some()
+308-    }
+309-}
+310-
+311-#[cfg(test)]
+312-mod tests {
+313-    use super::*;
+314-
+315-    #[test]
+316-    fn n21_validator_certificate_issue_and_verify() {
+317-        let authority = PeerKeyPair::generate();
+318-        let validator = PeerKeyPair::generate();
+319-
+320-        let cert = ValidatorCertificate::issue(
+321-            validator.peer_id(),
+322-            validator.verifying_key.to_bytes(),
+323-            &authority,
+324-            1000,
+325-            2000,
+326-        );
+327-
+328-        assert!(cert.verify(&authority.verifying_key.to_bytes()));
+329-        assert_eq!(cert.validator_id, validator.peer_id());
+330-        assert_eq!(cert.issuer, authority.peer_id());
+331-    }
+332-
+333-    #[test]
+334-    fn n21_certificate_rejects_wrong_authority() {
+335-        let authority = PeerKeyPair::generate();
+336-        let impostor = PeerKeyPair::generate();
+337-        let validator = PeerKeyPair::generate();
+338-
+339-        let cert = ValidatorCertificate::issue(
+340-            validator.peer_id(),
+341-            validator.verifying_key.to_bytes(),
+342-            &authority,
+343-            1000,
+344-            2000,
+345-        );
+346-
+347-        // Impostor tries to verify — must fail
+348-        assert!(!cert.verify(&impostor.verifying_key.to_bytes()));
+349-    }
+350-
+351-    #[test]
+352-    fn n21_certificate_tampered_fields_rejected() {
+353-        let authority = PeerKeyPair::generate();
+354-        let validator = PeerKeyPair::generate();
+355-
+356-        let mut cert = ValidatorCertificate::issue(
+357-            validator.peer_id(),
+358-            validator.verifying_key.to_bytes(),
+359-            &authority,
+360-            1000,
+361-            2000,
+362-        );
+363-
+364-        // Tamper with validity period
+365-        cert.valid_from = 500;
+366-        assert!(!cert.verify(&authority.verifying_key.to_bytes()));
+367-    }
+368-
+369-    #[test]
+370-    fn n21_certificate_validity_window() {
+371-        let authority = PeerKeyPair::generate();
+372-        let validator = PeerKeyPair::generate();
+373-
+374-        let cert = ValidatorCertificate::issue(
+375-            validator.peer_id(),
+376-            validator.verifying_key.to_bytes(),
+377-            &authority,
+378-            1000,
+379-            2000,
+380-        );
+381-
+382-        assert!(!cert.is_valid_at(500));
+
+================ authority_signature ================
+10-
+11-// ======================================================================
+12-// Runtime Administrative View
+13-//
+14-// This structure is the networking/runtime projection of a constitutional
+15-// certificate. It is intentionally optimized for runtime access and should
+16-// never be considered the source of truth.
+17-// ======================================================================
+18-
+19-#[derive(Debug, Clone, Serialize, Deserialize)]
+20-pub struct RuntimeCertificateView {
+21-    pub peer_id: PeerId,
+22-    pub public_key: [u8; 32],
+23-
+24-    pub authority_id: [u8; 32],
+25-    pub authority_version: u64,
+26-
+27-    pub valid_from: u64,
+28-    pub valid_until: u64,
+29-
+30:    pub authority_signature: Vec<u8>,
+31-}
+32-
+33-impl RuntimeCertificateView {
+34-    pub fn empty() -> Self {
+35-        Self {
+36-            peer_id: PeerId([0u8; 32]),
+37-            public_key: [0u8; 32],
+38-            authority_id: [0u8; 32],
+39-            authority_version: 0,
+40-            valid_from: 0,
+41-            valid_until: 0,
+42:            authority_signature: Vec::new(),
+43-        }
+44-    }
+45-}
+46-
+47-#[derive(Debug, Clone, Serialize, Deserialize)]
+48-pub struct ValidatorCertificate {
+49-    /// The validator's peer identity.
+50-    pub validator_id: PeerId,
+51-    /// The validator's public key (for message verification).
+52-    pub public_key: [u8; 32],
+53-    /// The authority that issued this certificate.
+54-    pub issuer: PeerId,
+55-    /// When this certificate becomes valid.
+56-    pub authority_id: [u8; 32],
+57-    pub authority_version: u64,
+58-    pub valid_from: u64,
+59-    /// When this certificate expires (0 = never).
+60-    pub valid_until: u64,
+61-    /// The authority's signature over the certificate fields.
+62:    pub authority_signature: Vec<u8>,
+63-    #[serde(skip_serializing_if = "Option::is_none")]
+64-    pub constitutional: Option<SignedArtifact<ConstitutionalCertificate>>,
+65-
+66-    #[serde(skip, default = "RuntimeCertificateView::empty")]
+67-    pub runtime: RuntimeCertificateView,
+68-}
+69-
+70-impl ValidatorCertificate {
+71-    /// Build an administrative runtime certificate directly from a
+72-    /// constitutional certificate.
+73-    ///
+74-    /// This constructor will gradually replace issue()/issue_v2().
+75-    pub fn from_constitutional(
+76-        constitutional: SignedArtifact<ConstitutionalCertificate>,
+77-        runtime: RuntimeCertificateView,
+78-        issuer: PeerId,
+79-    ) -> Self {
+80-        Self {
+81-            validator_id: runtime.peer_id,
+82-            public_key: runtime.public_key,
+83-            issuer,
+84-
+85-            authority_id: runtime.authority_id,
+86-            authority_version: runtime.authority_version,
+87-
+88-            valid_from: runtime.valid_from,
+89-            valid_until: runtime.valid_until,
+90-
+91:            authority_signature: runtime.authority_signature.clone(),
+92-
+93-            constitutional: Some(constitutional),
+94-            runtime,
+95-        }
+96-    }
+97-
+98-    // ============================================================
+99-    // Constitutional Administrative View
+100-    // ============================================================
+101-
+102-    pub fn constitutional_subject_key_hex(&self) -> Option<&str> {
+103-        self.constitutional
+104-            .as_ref()
+105-            .map(|c| c.artifact.subject_verifying_key_hex.as_str())
+106-    }
+107-
+108-    pub fn constitutional_certificate_id(&self) -> Option<&str> {
+109-        self.constitutional
+110-            .as_ref()
+111-            .map(|c| c.artifact.certificate_id.as_str())
+112-    }
+113-
+114-    pub fn constitutional_issuer_id(&self) -> Option<&str> {
+115-        self.constitutional
+116-            .as_ref()
+117-            .map(|c| c.artifact.issuer.as_str())
+118-    }
+119-
+120-    pub fn constitutional_scope(&self) -> Option<&str> {
+121-        self.constitutional
+122-            .as_ref()
+123-            .map(|c| c.artifact.constitutional_scope.as_str())
+124-    }
+125-
+126-    pub fn constitutional_epoch_start(&self) -> Option<&str> {
+127-        self.constitutional
+128-            .as_ref()
+129-            .map(|c| c.artifact.epoch_start.as_str())
+130-    }
+131-
+--
+134-            .as_ref()
+135-            .map(|c| c.artifact.epoch_end.as_str())
+136-    }
+137-
+138-    /// Create a new certificate signed by an authority.
+139-    pub fn issue(
+140-        validator_id: PeerId,
+141-        public_key: [u8; 32],
+142-        issuer_keypair: &PeerKeyPair,
+143-        valid_from: u64,
+144-        valid_until: u64,
+145-    ) -> Self {
+146-        let mut cert = Self {
+147-            validator_id,
+148-            public_key,
+149-            authority_id: [0u8; 32],
+150-            authority_version: 0,
+151-            issuer: issuer_keypair.peer_id(),
+152-            valid_from,
+153-            valid_until,
+154:            authority_signature: Vec::new(),
+155-            constitutional: None,
+156-
+157-            runtime: RuntimeCertificateView {
+158-                peer_id: validator_id,
+159-                public_key,
+160-                authority_id: [0u8; 32],
+161-                authority_version: 0,
+162-                valid_from,
+163-                valid_until,
+164:                authority_signature: Vec::new(),
+165-            },
+166-        };
+167-        // Sign the certificate fields (excluding signature itself)
+168-        let payload = cert.serialize_for_signing();
+169:        cert.authority_signature = issuer_keypair.sign(&payload);
+170:        cert.runtime.authority_signature = cert.authority_signature.clone();
+171-        cert
+172-    }
+173-
+174-    /// Serialize certificate fields for signing (excludes the signature).
+175-    fn serialize_for_signing(&self) -> Vec<u8> {
+176-        let mut data = Vec::new();
+177-        data.extend_from_slice(&self.validator_id.0);
+178-        data.extend_from_slice(&self.public_key);
+179-        data.extend_from_slice(&self.authority_version.to_le_bytes());
+180-        data.extend_from_slice(&self.authority_id);
+181-        data.extend_from_slice(&self.issuer.0);
+182-        data.extend_from_slice(&self.valid_from.to_le_bytes());
+183-        data.extend_from_slice(&self.valid_until.to_le_bytes());
+184-        data
+185-    }
+186-
+187-    /// Verify the authority's signature on this certificate.
+188-    pub fn verify(&self, authority_public_key: &[u8; 32]) -> bool {
+189-        let payload = self.serialize_for_signing();
+190:        PeerKeyPair::verify(authority_public_key, &payload, &self.authority_signature)
+191-    }
+192-
+193-    /// Check if the certificate is currently valid.
+194-    pub fn is_valid_at(&self, timestamp: u64) -> bool {
+195-        timestamp >= self.valid_from && (self.valid_until == 0 || timestamp <= self.valid_until)
+196-    }
+197-
+198-    /// Create a new certificate with explicit authority version and id.
+199-    pub fn issue_v2(
+200-        validator_id: PeerId,
+201-        public_key: [u8; 32],
+202-        authority_version: u64,
+203-        authority_id: [u8; 32],
+204-        issuer_keypair: &PeerKeyPair,
+205-        valid_from: u64,
+206-        valid_until: u64,
+207-    ) -> Self {
+208-        let mut cert = Self {
+209-            validator_id,
+210-            public_key,
+211-
+212-            authority_version,
+213-            authority_id,
+214-
+215-            issuer: issuer_keypair.peer_id(),
+216-
+217-            valid_from,
+218-            valid_until,
+219-
+220:            authority_signature: Vec::new(),
+221-
+222-            constitutional: None,
+223-
+224-            runtime: RuntimeCertificateView {
+225-                peer_id: validator_id,
+226-                public_key,
+227-
+228-                authority_id,
+229-                authority_version,
+230-
+231-                valid_from,
+232-                valid_until,
+233-
+234:                authority_signature: Vec::new(),
+235-            },
+236-        };
+237-        let payload = cert.serialize_for_signing();
+238:        cert.authority_signature = issuer_keypair.sign(&payload);
+239-        cert
+240-    }
+241-}
+242-
+243-impl ValidatorCertificate {
+244-    /// Returns the attached constitutional certificate, if present.
+245-    pub fn constitutional(&self) -> Option<&SignedArtifact<ConstitutionalCertificate>> {
+246-        self.constitutional.as_ref()
+247-    }
+248-
+249-    /// Attach the constitutional certificate to this runtime object.
+250-    #[deprecated(note = "Use ValidatorCertificate::from_constitutional() instead")]
+251-    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+252-        // Transitional API.
+253-        // New code should construct ValidatorCertificate directly
+254-        // using from_constitutional().
+255-        self.constitutional = Some(cert);
+256-    }
+257-
+258-    /// Administrative validation only.
+259-    ///
+260-    /// Runtime networking verification continues to use the existing
+261-    /// ValidatorCertificate::verify() cryptographic path.
+262-    pub fn verify_administrative(&self) -> Result<(), String> {
+263-        match &self.constitutional {
+264-            Some(cert) => cert.verify(),
+265-            None => Err("No constitutional certificate attached".into()),
+266-        }
+267-    }
+268-
+269-    // ============================================================
+270-    // Runtime Administrative Facade
+271-    // ============================================================
+272-
+273-    pub fn validator_id(&self) -> &PeerId {
+274-        &self.runtime.peer_id
+275-    }
+276-
+277-    pub fn public_key(&self) -> &[u8; 32] {
+278-        &self.runtime.public_key
+--
+282-        // TODO(PR-2): derive from constitutional certificate.
+283-        &self.issuer
+284-    }
+285-
+286-    pub fn authority_id(&self) -> &[u8; 32] {
+287-        &self.runtime.authority_id
+288-    }
+289-
+290-    pub fn authority_version(&self) -> u64 {
+291-        self.runtime.authority_version
+292-    }
+293-
+294-    pub fn valid_from(&self) -> u64 {
+295-        self.runtime.valid_from
+296-    }
+297-
+298-    pub fn valid_until(&self) -> u64 {
+299-        self.runtime.valid_until
+300-    }
+301-
+302:    pub fn authority_signature(&self) -> &[u8] {
+303:        &self.runtime.authority_signature
+304-    }
+305-
+306-    pub fn has_constitutional(&self) -> bool {
+307-        self.constitutional.is_some()
+308-    }
+309-}
+310-
+311-#[cfg(test)]
+312-mod tests {
+313-    use super::*;
+314-
+315-    #[test]
+316-    fn n21_validator_certificate_issue_and_verify() {
+317-        let authority = PeerKeyPair::generate();
+318-        let validator = PeerKeyPair::generate();
+319-
+320-        let cert = ValidatorCertificate::issue(
+321-            validator.peer_id(),
+322-            validator.verifying_key.to_bytes(),
+323-            &authority,
+324-            1000,
+325-            2000,
+326-        );
+327-
+328-        assert!(cert.verify(&authority.verifying_key.to_bytes()));
+329-        assert_eq!(cert.validator_id, validator.peer_id());
+330-        assert_eq!(cert.issuer, authority.peer_id());
+331-    }
+332-
+333-    #[test]
+334-    fn n21_certificate_rejects_wrong_authority() {
+335-        let authority = PeerKeyPair::generate();
+336-        let impostor = PeerKeyPair::generate();
+337-        let validator = PeerKeyPair::generate();
+338-
+339-        let cert = ValidatorCertificate::issue(
+340-            validator.peer_id(),
+341-            validator.verifying_key.to_bytes(),
+342-            &authority,
+343-            1000,
+
+================ RuntimeCertificateView ================
+1-use crate::crypto_identity::PeerKeyPair;
+2-use crate::peer_identity::PeerId;
+3-use amun_constitutional_authority::ConstitutionalCertificate;
+4-use amun_constitutional_signing::SignedArtifact;
+5-use serde::{Deserialize, Serialize};
+6-
+7-/// A constitutional certificate binding a validator's identity to their public key.
+8-///
+9-/// Signed by a constitutional authority to establish trust.
+10-
+11-// ======================================================================
+12-// Runtime Administrative View
+13-//
+14-// This structure is the networking/runtime projection of a constitutional
+15-// certificate. It is intentionally optimized for runtime access and should
+16-// never be considered the source of truth.
+17-// ======================================================================
+18-
+19-#[derive(Debug, Clone, Serialize, Deserialize)]
+20:pub struct RuntimeCertificateView {
+21-    pub peer_id: PeerId,
+22-    pub public_key: [u8; 32],
+23-
+24-    pub authority_id: [u8; 32],
+25-    pub authority_version: u64,
+26-
+27-    pub valid_from: u64,
+28-    pub valid_until: u64,
+29-
+30-    pub authority_signature: Vec<u8>,
+31-}
+32-
+33:impl RuntimeCertificateView {
+34-    pub fn empty() -> Self {
+35-        Self {
+36-            peer_id: PeerId([0u8; 32]),
+37-            public_key: [0u8; 32],
+38-            authority_id: [0u8; 32],
+39-            authority_version: 0,
+40-            valid_from: 0,
+41-            valid_until: 0,
+42-            authority_signature: Vec::new(),
+43-        }
+44-    }
+45-}
+46-
+47-#[derive(Debug, Clone, Serialize, Deserialize)]
+48-pub struct ValidatorCertificate {
+49-    /// The validator's peer identity.
+50-    pub validator_id: PeerId,
+51-    /// The validator's public key (for message verification).
+52-    pub public_key: [u8; 32],
+53-    /// The authority that issued this certificate.
+54-    pub issuer: PeerId,
+55-    /// When this certificate becomes valid.
+56-    pub authority_id: [u8; 32],
+57-    pub authority_version: u64,
+58-    pub valid_from: u64,
+59-    /// When this certificate expires (0 = never).
+60-    pub valid_until: u64,
+61-    /// The authority's signature over the certificate fields.
+62-    pub authority_signature: Vec<u8>,
+63-    #[serde(skip_serializing_if = "Option::is_none")]
+64-    pub constitutional: Option<SignedArtifact<ConstitutionalCertificate>>,
+65-
+66:    #[serde(skip, default = "RuntimeCertificateView::empty")]
+67:    pub runtime: RuntimeCertificateView,
+68-}
+69-
+70-impl ValidatorCertificate {
+71-    /// Build an administrative runtime certificate directly from a
+72-    /// constitutional certificate.
+73-    ///
+74-    /// This constructor will gradually replace issue()/issue_v2().
+75-    pub fn from_constitutional(
+76-        constitutional: SignedArtifact<ConstitutionalCertificate>,
+77:        runtime: RuntimeCertificateView,
+78-        issuer: PeerId,
+79-    ) -> Self {
+80-        Self {
+81-            validator_id: runtime.peer_id,
+82-            public_key: runtime.public_key,
+83-            issuer,
+84-
+85-            authority_id: runtime.authority_id,
+86-            authority_version: runtime.authority_version,
+87-
+88-            valid_from: runtime.valid_from,
+89-            valid_until: runtime.valid_until,
+90-
+91-            authority_signature: runtime.authority_signature.clone(),
+92-
+93-            constitutional: Some(constitutional),
+94-            runtime,
+95-        }
+96-    }
+97-
+98-    // ============================================================
+99-    // Constitutional Administrative View
+100-    // ============================================================
+101-
+102-    pub fn constitutional_subject_key_hex(&self) -> Option<&str> {
+103-        self.constitutional
+104-            .as_ref()
+105-            .map(|c| c.artifact.subject_verifying_key_hex.as_str())
+106-    }
+107-
+--
+137-
+138-    /// Create a new certificate signed by an authority.
+139-    pub fn issue(
+140-        validator_id: PeerId,
+141-        public_key: [u8; 32],
+142-        issuer_keypair: &PeerKeyPair,
+143-        valid_from: u64,
+144-        valid_until: u64,
+145-    ) -> Self {
+146-        let mut cert = Self {
+147-            validator_id,
+148-            public_key,
+149-            authority_id: [0u8; 32],
+150-            authority_version: 0,
+151-            issuer: issuer_keypair.peer_id(),
+152-            valid_from,
+153-            valid_until,
+154-            authority_signature: Vec::new(),
+155-            constitutional: None,
+156-
+157:            runtime: RuntimeCertificateView {
+158-                peer_id: validator_id,
+159-                public_key,
+160-                authority_id: [0u8; 32],
+161-                authority_version: 0,
+162-                valid_from,
+163-                valid_until,
+164-                authority_signature: Vec::new(),
+165-            },
+166-        };
+167-        // Sign the certificate fields (excluding signature itself)
+168-        let payload = cert.serialize_for_signing();
+169-        cert.authority_signature = issuer_keypair.sign(&payload);
+170-        cert.runtime.authority_signature = cert.authority_signature.clone();
+171-        cert
+172-    }
+173-
+174-    /// Serialize certificate fields for signing (excludes the signature).
+175-    fn serialize_for_signing(&self) -> Vec<u8> {
+176-        let mut data = Vec::new();
+177-        data.extend_from_slice(&self.validator_id.0);
+178-        data.extend_from_slice(&self.public_key);
+179-        data.extend_from_slice(&self.authority_version.to_le_bytes());
+180-        data.extend_from_slice(&self.authority_id);
+181-        data.extend_from_slice(&self.issuer.0);
+182-        data.extend_from_slice(&self.valid_from.to_le_bytes());
+183-        data.extend_from_slice(&self.valid_until.to_le_bytes());
+184-        data
+185-    }
+186-
+187-    /// Verify the authority's signature on this certificate.
+--
+204-        issuer_keypair: &PeerKeyPair,
+205-        valid_from: u64,
+206-        valid_until: u64,
+207-    ) -> Self {
+208-        let mut cert = Self {
+209-            validator_id,
+210-            public_key,
+211-
+212-            authority_version,
+213-            authority_id,
+214-
+215-            issuer: issuer_keypair.peer_id(),
+216-
+217-            valid_from,
+218-            valid_until,
+219-
+220-            authority_signature: Vec::new(),
+221-
+222-            constitutional: None,
+223-
+224:            runtime: RuntimeCertificateView {
+225-                peer_id: validator_id,
+226-                public_key,
+227-
+228-                authority_id,
+229-                authority_version,
+230-
+231-                valid_from,
+232-                valid_until,
+233-
+234-                authority_signature: Vec::new(),
+235-            },
+236-        };
+237-        let payload = cert.serialize_for_signing();
+238-        cert.authority_signature = issuer_keypair.sign(&payload);
+239-        cert
+240-    }
+241-}
+242-
+243-impl ValidatorCertificate {
+244-    /// Returns the attached constitutional certificate, if present.
+245-    pub fn constitutional(&self) -> Option<&SignedArtifact<ConstitutionalCertificate>> {
+246-        self.constitutional.as_ref()
+247-    }
+248-
+249-    /// Attach the constitutional certificate to this runtime object.
+250-    #[deprecated(note = "Use ValidatorCertificate::from_constitutional() instead")]
+251-    pub fn attach_constitutional(&mut self, cert: SignedArtifact<ConstitutionalCertificate>) {
+252-        // Transitional API.
+253-        // New code should construct ValidatorCertificate directly
+254-        // using from_constitutional().
