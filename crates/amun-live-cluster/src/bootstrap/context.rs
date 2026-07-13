@@ -27,7 +27,7 @@ impl BootstrapContext {
 
         let certs = load_cluster_certificates(&self.config)?;
 
-        build_registry(engine, &self.authority_registry, &certs)?;
+        build_registry(&mut engine.registry_mut.as_ref().unwrap().lock().unwrap(), &self.authority_registry, &certs)?;
 
         Ok(())
     }
