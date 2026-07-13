@@ -196,3 +196,51 @@ pub struct DoubleVoteEvidence {
     pub vote_a: crate::messages::ConsensusVote,
     pub vote_b: crate::messages::ConsensusVote,
 }
+
+
+
+impl ConsensusRound {
+    /// Try to form QC using ValidatorRead trait.
+    pub fn try_form_qc_with_registry(
+        &mut self,
+        total_validators: usize,
+        registry: &dyn amun_validator_registry::ValidatorRead,
+    ) -> Option<QuorumCertificate> {
+        let approvals: Vec<crate::messages::ConsensusVote> =
+            self.votes.iter().filter(|v| v.approve).cloned().collect();
+        let total_voting_power = registry.total_voting_power();
+        let approval_power: u64 = approvals
+            .iter()
+            .map(|v| {
+                let id = amun_validator_registry::ValidatorId(v.voter_id);
+                registry.get_voting_power(&id)
+            })
+            .sum();
+        let quorum_met = if total_voting_power > 0 {
+            approval_power * 3 > total_voting_power * 2
+        } else {
+            approvals.len() as u64 * 3 > total_validators as u64 * 2
+        };
+        if !quorum_met {
+            return None;
+        }
+        let qc = QuorumCertificate {
+            height: self.height,
+            block_hash: self.proposed_block_hash?,
+            state_root: self.proposed_state_root?,
+            votes: approvals,
+            approval_power,
+            total_voting_power: if total_voting_power > 0 {
+                total_voting_power
+            } else {
+                total_validators as u64
+            },
+        };
+        if let Err(e) = qc.verify_with_registry(registry) {
+            eprintln!("QC_VERIFY_FAILED: {}", e);
+            return None;
+        }
+        self.qc = Some(qc.clone());
+        Some(qc)
+    }
+}

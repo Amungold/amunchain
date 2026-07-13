@@ -563,3 +563,41 @@ pub struct N109ConsensusVote {
     /// with a signature that can be verified independently.
     pub commitment: ExecutionCommitment,
 }
+
+
+
+impl QuorumCertificate {
+    /// Verify QC using ValidatorRead trait.
+    pub fn verify_with_registry(&self, registry: &dyn amun_validator_registry::ValidatorRead) -> Result<(), String> {
+        if !self.verify_consistency() {
+            return Err("QC consistency failed".into());
+        }
+        let mut seen = std::collections::HashSet::new();
+        let mut computed_power = 0u64;
+        for vote in &self.votes {
+            if !seen.insert(vote.voter_id) {
+                return Err(format!("Duplicate validator in QC {:?}", &vote.voter_id[..4]));
+            }
+            let id = amun_validator_registry::ValidatorId(vote.voter_id);
+            let power = registry.get_voting_power(&id);
+            if power == 0 {
+                return Err(format!("Unknown validator {:?}", &vote.voter_id[..4]));
+            }
+            if !vote.approve {
+                return Err("QC contains reject vote".into());
+            }
+            computed_power += power;
+        }
+        if computed_power != self.approval_power {
+            return Err(format!(
+                "Approval power mismatch stored={} computed={}",
+                self.approval_power, computed_power
+            ));
+        }
+        let total = registry.total_voting_power();
+        if total > 0 && computed_power * 3 <= total * 2 {
+            return Err("Insufficient quorum".into());
+        }
+        Ok(())
+    }
+}
