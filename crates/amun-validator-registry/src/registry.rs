@@ -117,3 +117,28 @@ impl ValidatorRegistryTrait for ValidatorRegistry {
         self.record_count()
     }
 }
+
+// N133: Implement read-only trait for consensus queries
+use crate::traits::ValidatorRead;
+
+impl ValidatorRead for ValidatorRegistry {
+    fn get_public_key(&self, id: &ValidatorId) -> Option<[u8; 32]> {
+        self.records.get(id).map(|r| r.public_key.0)
+    }
+
+    fn get_voting_power(&self, id: &ValidatorId) -> u64 {
+        self.records.get(id).map(|r| r.voting_power).unwrap_or(0)
+    }
+
+    fn is_active(&self, id: &ValidatorId) -> bool {
+        self.records.get(id).map(|r| r.active).unwrap_or(false)
+    }
+
+    fn total_voting_power(&self) -> u64 {
+        self.records.values().map(|r| r.voting_power).sum()
+    }
+
+    fn validator_count(&self) -> usize {
+        self.records.len()
+    }
+}

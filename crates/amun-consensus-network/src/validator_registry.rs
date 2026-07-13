@@ -27,3 +27,40 @@ impl ConsensusEngine {
         self.total_voting_power += voting_power;
     }
 }
+
+impl ConsensusEngine {
+    /// Get voting power for a validator, preferring the canonical registry.
+    pub fn get_validator_voting_power(&self, validator_id: &[u8; 32]) -> u64 {
+        if let Some(ref reg) = self.validator_registry {
+            let id = amun_validator_registry::ValidatorId(*validator_id);
+            return reg.get_voting_power(&id);
+        }
+        self.validator_powers.get(validator_id).copied().unwrap_or(0)
+    }
+
+    /// Get total voting power, preferring the canonical registry.
+    pub fn get_total_voting_power(&self) -> u64 {
+        if let Some(ref reg) = self.validator_registry {
+            return reg.total_voting_power();
+        }
+        self.total_voting_power
+    }
+
+    /// Check if a validator is active, preferring the canonical registry.
+    pub fn is_validator_active(&self, validator_id: &[u8; 32]) -> bool {
+        if let Some(ref reg) = self.validator_registry {
+            let id = amun_validator_registry::ValidatorId(*validator_id);
+            return reg.is_active(&id);
+        }
+        self.validator_powers.contains_key(validator_id)
+    }
+
+    /// Get public key for a validator, preferring the canonical registry.
+    pub fn get_validator_public_key(&self, validator_id: &[u8; 32]) -> Option<[u8; 32]> {
+        if let Some(ref reg) = self.validator_registry {
+            let id = amun_validator_registry::ValidatorId(*validator_id);
+            return reg.get_public_key(&id);
+        }
+        self.validator_keys.get(validator_id).copied()
+    }
+}

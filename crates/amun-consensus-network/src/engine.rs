@@ -1,3 +1,4 @@
+use amun_validator_registry::ValidatorRead;
 use crate::engine_metrics::EngineMetrics;
 use crate::lifecycle::NodeState;
 use crate::messages::{
@@ -26,6 +27,7 @@ pub struct ConsensusEngine {
     pub validator_keys: ValidatorKeyRegistry,
     pub validator_powers: HashMap<[u8; 32], u64>,
     pub total_voting_power: u64,
+    pub validator_registry: Option<std::sync::Arc<dyn ValidatorRead + Send + Sync>>,
     finality_chain: Vec<FinalityCertificate>,
 }
 
@@ -48,6 +50,7 @@ impl ConsensusEngine {
             validator_keys: ValidatorKeyRegistry::new(),
             validator_powers: HashMap::new(),
             total_voting_power: 0,
+            validator_registry: None,
             finality_chain: Vec::new(),
         }
     }
