@@ -1,4 +1,3 @@
-use amun_validator_registry::ValidatorRead;
 use crate::engine_metrics::EngineMetrics;
 use crate::lifecycle::NodeState;
 use crate::messages::{
@@ -8,6 +7,7 @@ use crate::misbehavior_registry::MisbehaviorRegistry;
 use crate::round::ConsensusRound;
 use crate::validator_status::ValidatorStatusRegistry;
 use amun_validator_identity::ValidatorKeyRegistry;
+use amun_validator_registry::ValidatorRead;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -218,7 +218,11 @@ impl ConsensusEngine {
         let round = self.rounds.get_mut(&height)?;
 
         if round.qc.is_none() {
-        round.try_form_qc(active, &self.validator_powers, tvp)?;
+            if let Some(ref reg) = self.validator_registry {
+                round.try_form_qc_with_registry(active, reg.as_ref())?;
+            } else {
+                round.try_form_qc(active, &self.validator_powers, tvp)?;
+            }
         }
 
         let qc = round.qc.as_ref()?;
