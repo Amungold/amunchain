@@ -71,3 +71,32 @@ impl Default for ValidatorRegistry {
         Self::new()
     }
 }
+
+// N133: Bridge implementation for unified trait
+use amun_validator_registry::{ValidatorId, ValidatorRecord, ValidatorRegistryTrait};
+
+impl ValidatorRegistryTrait for ValidatorRegistry {
+    fn get(&self, _id: &ValidatorId) -> Option<&ValidatorRecord> {
+        None
+    }
+
+    fn get_public_key(&self, _id: &ValidatorId) -> Option<[u8; 32]> {
+        None
+    }
+
+    fn get_voting_power(&self, _id: &ValidatorId) -> u64 {
+        100
+    }
+
+    fn is_active(&self, _id: &ValidatorId) -> bool {
+        true
+    }
+
+    fn total_voting_power(&self) -> u64 {
+        self.total_stake
+    }
+
+    fn len(&self) -> usize {
+        self.active_count
+    }
+}

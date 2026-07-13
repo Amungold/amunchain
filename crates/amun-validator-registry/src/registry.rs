@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use crate::ids::{PeerId, PublicKey, ValidatorId};
+use crate::ids::ValidatorId;
 use crate::record::ValidatorRecord;
 
 #[derive(Debug, Clone)]
