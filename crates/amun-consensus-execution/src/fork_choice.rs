@@ -14,6 +14,18 @@ pub struct ForkChoice {
     pub lock_history: Vec<(u64, [u8; 32])>,
 }
 
+/// Lightweight metadata extracted from a verified QuorumCertificate.
+/// Contains only the fields that ForkChoice actually uses for state updates.
+/// This allows WAL replay to rebuild fork choice state without constructing
+/// a full QuorumCertificate with synthetic fields.
+#[derive(Debug, Clone)]
+pub struct QcMetadata {
+    pub block_hash: [u8; 32],
+    pub parent_hash: [u8; 32],
+    pub round: u64,
+    pub height: u64,
+}
+
 impl ForkChoice {
     pub fn new() -> Self {
         Self {

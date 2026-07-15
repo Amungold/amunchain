@@ -205,6 +205,17 @@ impl PersistentConsensusState {
                     None,
                     bh,
                 ));
+
+                // R1: Rebuild fork choice state from WAL metadata.
+                // Both live execution (via record_qc -> update_qc) and WAL replay
+                // now use the same apply_qc_core() path through ForkChoice.
+                let metadata = crate::fork_choice::QcMetadata {
+                    block_hash: bh,
+                    parent_hash: ph,
+                    round: e.round,
+                    height: e.height,
+                };
+                self.fork_choice.apply_qc_core(&metadata, &self.dag);
             }
             "COMMIT" => {
                 let e: CommitEvent =
