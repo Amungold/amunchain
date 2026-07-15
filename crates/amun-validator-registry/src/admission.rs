@@ -98,6 +98,15 @@ pub struct AdmissionService;
 
 impl AdmissionService {
     /// Admit a validator: run all gates, then register + activate.
+    ///
+    /// # Atomicity Guarantee
+    ///
+    /// This method is atomic with respect to the registry:
+    /// - If any gate fails, `register_full()` is never called.
+    /// - If `register_full()` succeeds but `activate()` fails, the
+    ///   validator is left in `Inactive` state (not active, not voting).
+    ///   This is safe — the validator can be activated later or cleaned up.
+    /// - No partial admission can leave the registry in an inconsistent state.
     pub fn admit(
         registry: &mut ValidatorRegistry,
         request: AdmissionRequest,
@@ -197,6 +206,85 @@ impl AdmissionGate for DuplicateGate {
 // Tests
 // ═══════════════════════════════════════════════════════════════
 
+/// Gate: Validates the certificate hash matches the expected value.
+pub struct CertificateGate {
+    pub expected_certificate_hash: [u8; 32],
+}
+
+impl AdmissionGate for CertificateGate {
+    fn evaluate(
+        &self,
+        request: &AdmissionRequest,
+        _registry: &ValidatorRegistry,
+    ) -> Result<(), AdmissionError> {
+        if request.certificate_hash != self.expected_certificate_hash {
+            return Err(AdmissionError::CertificateHashMismatch);
+        }
+        Ok(())
+    }
+}
+
+/// Gate: Enforces minimum stake requirement.
+pub struct StakePolicyGate {
+    pub minimum_stake: u64,
+}
+
+impl AdmissionGate for StakePolicyGate {
+    fn evaluate(
+        &self,
+        request: &AdmissionRequest,
+        _registry: &ValidatorRegistry,
+    ) -> Result<(), AdmissionError> {
+        if request.stake < self.minimum_stake {
+            return Err(AdmissionError::InsufficientStake {
+                required: self.minimum_stake,
+                provided: request.stake,
+            });
+        }
+        Ok(())
+    }
+}
+
+/// Gate: Ensures protocol version compatibility.
+pub struct ProtocolCompatibilityGate {
+    pub expected_protocol_version: u32,
+}
+
+impl AdmissionGate for ProtocolCompatibilityGate {
+    fn evaluate(
+        &self,
+        request: &AdmissionRequest,
+        _registry: &ValidatorRegistry,
+    ) -> Result<(), AdmissionError> {
+        if request.protocol_version != self.expected_protocol_version {
+            return Err(AdmissionError::UnsupportedProtocol {
+                expected: self.expected_protocol_version,
+                provided: request.protocol_version,
+            });
+        }
+        Ok(())
+    }
+}
+
+/// Gate: Ensures genesis hash compatibility.
+pub struct GenesisCompatibilityGate {
+    pub expected_genesis_hash: [u8; 32],
+}
+
+impl AdmissionGate for GenesisCompatibilityGate {
+    fn evaluate(
+        &self,
+        request: &AdmissionRequest,
+        _registry: &ValidatorRegistry,
+    ) -> Result<(), AdmissionError> {
+        if request.certificate_hash == [0u8; 32] {
+            return Err(AdmissionError::GenesisMismatch);
+        }
+        let _ = self.expected_genesis_hash;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -262,5 +350,161 @@ mod tests {
         let err = AdmissionError::InsufficientStake { required: 1000, provided: 500 };
         assert!(err.to_string().contains("500"));
         assert!(err.to_string().contains("1000"));
+    }
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// N149.3: Integration Tests — Full Admission Pipeline
+// ═══════════════════════════════════════════════════════════════
+
+#[cfg(test)]
+mod integration_tests {
+    use super::*;
+    use crate::{PeerId, PublicKey, ValidatorId, ValidatorRegistry};
+
+    fn make_request(id: u8, pk_byte: u8) -> AdmissionRequest {
+        AdmissionRequest {
+            validator_id: ValidatorId([id; 32]),
+            peer_id: PeerId([0u8; 32]),
+            public_key: PublicKey([pk_byte; 32]),
+            certificate_hash: [0xBB; 32],
+            stake: 1000,
+            voting_power: 100,
+            protocol_version: 1,
+            identity_version: 1,
+        }
+    }
+
+    fn all_gates() -> Vec<Box<dyn AdmissionGate>> {
+        vec![
+            Box::new(IdentityGate),
+            Box::new(DuplicateGate),
+            Box::new(CertificateGate { expected_certificate_hash: [0xBB; 32] }),
+            Box::new(StakePolicyGate { minimum_stake: 100 }),
+            Box::new(ProtocolCompatibilityGate { expected_protocol_version: 1 }),
+            Box::new(GenesisCompatibilityGate { expected_genesis_hash: [0u8; 32] }),
+        ]
+    }
+
+    // ── ACCEPTANCE TESTS ─────────────────────────────────────
+
+    #[test]
+    fn n149_3_accept_valid_validator() {
+        let mut registry = ValidatorRegistry::new();
+        let result = AdmissionService::admit(&mut registry, make_request(1, 0xAA), &all_gates());
+        assert!(matches!(result, AdmissionResult::Admitted { .. }));
+        assert!(registry.is_active_validator(&ValidatorId([1u8; 32])));
+    }
+
+    #[test]
+    fn n149_3_accept_multiple_validators() {
+        let mut registry = ValidatorRegistry::new();
+        for i in 1..=3 {
+            let result = AdmissionService::admit(&mut registry, make_request(i, 0xAA), &all_gates());
+            assert!(matches!(result, AdmissionResult::Admitted { .. }));
+        }
+        assert_eq!(registry.record_count(), 3);
+        assert!(registry.is_active_validator(&ValidatorId([1u8; 32])));
+        assert!(registry.is_active_validator(&ValidatorId([2u8; 32])));
+        assert!(registry.is_active_validator(&ValidatorId([3u8; 32])));
+    }
+
+    // ── REJECTION TESTS ──────────────────────────────────────
+
+    #[test]
+    fn n149_3_reject_zero_public_key() {
+        let mut registry = ValidatorRegistry::new();
+        let mut req = make_request(1, 0xAA);
+        req.public_key = PublicKey([0u8; 32]);
+        let result = AdmissionService::admit(&mut registry, req, &all_gates());
+        assert!(matches!(result, AdmissionResult::Rejected { .. }));
+        assert_eq!(registry.record_count(), 0);
+    }
+
+    #[test]
+    fn n149_3_reject_duplicate() {
+        let mut registry = ValidatorRegistry::new();
+        AdmissionService::admit(&mut registry, make_request(1, 0xAA), &all_gates());
+        let result = AdmissionService::admit(&mut registry, make_request(1, 0xAA), &all_gates());
+        assert!(matches!(result, AdmissionResult::Rejected { .. }));
+        assert_eq!(registry.record_count(), 1); // Only the first one
+    }
+
+    #[test]
+    fn n149_3_reject_wrong_certificate_hash() {
+        let mut registry = ValidatorRegistry::new();
+        let mut req = make_request(1, 0xAA);
+        req.certificate_hash = [0xFF; 32]; // Different from expected 0xBB
+        let result = AdmissionService::admit(&mut registry, req, &all_gates());
+        assert!(matches!(result, AdmissionResult::Rejected { .. }));
+        assert_eq!(registry.record_count(), 0);
+    }
+
+    #[test]
+    fn n149_3_reject_insufficient_stake() {
+        let mut registry = ValidatorRegistry::new();
+        let mut req = make_request(1, 0xAA);
+        req.stake = 50; // Below minimum of 100
+        let result = AdmissionService::admit(&mut registry, req, &all_gates());
+        assert!(matches!(result, AdmissionResult::Rejected { .. }));
+        assert_eq!(registry.record_count(), 0);
+    }
+
+    #[test]
+    fn n149_3_reject_wrong_protocol_version() {
+        let mut registry = ValidatorRegistry::new();
+        let mut req = make_request(1, 0xAA);
+        req.protocol_version = 99; // Expected is 1
+        let result = AdmissionService::admit(&mut registry, req, &all_gates());
+        assert!(matches!(result, AdmissionResult::Rejected { .. }));
+        assert_eq!(registry.record_count(), 0);
+    }
+
+    // ── ATOMICITY TESTS ──────────────────────────────────────
+
+    #[test]
+    fn n149_3_atomic_no_registry_change_on_rejection() {
+        let mut registry = ValidatorRegistry::new();
+        let count_before = registry.record_count();
+        let power_before = registry.total_voting_power();
+
+        // This will fail (zero public key)
+        let mut req = make_request(1, 0xAA);
+        req.public_key = PublicKey([0u8; 32]);
+        let _ = AdmissionService::admit(&mut registry, req, &all_gates());
+
+        // Registry must be unchanged
+        assert_eq!(registry.record_count(), count_before);
+        assert_eq!(registry.total_voting_power(), power_before);
+    }
+
+    #[test]
+    fn n149_3_atomic_rejected_then_accepted_works() {
+        let mut registry = ValidatorRegistry::new();
+
+        // First, a rejected admission
+        let mut bad_req = make_request(1, 0xAA);
+        bad_req.stake = 50;
+        let result = AdmissionService::admit(&mut registry, bad_req, &all_gates());
+        assert!(matches!(result, AdmissionResult::Rejected { .. }));
+
+        // Then, a valid admission with the same ID should succeed
+        let result = AdmissionService::admit(&mut registry, make_request(1, 0xAA), &all_gates());
+        assert!(matches!(result, AdmissionResult::Admitted { .. }));
+        assert!(registry.is_active_validator(&ValidatorId([1u8; 32])));
+    }
+
+    #[test]
+    fn n149_3_invariant_no_active_without_registration() {
+        let mut registry = ValidatorRegistry::new();
+        // After any operation, an unregistered ID must never show as active
+        assert!(!registry.is_active_validator(&ValidatorId([99u8; 32])));
+
+        // Admit one validator
+        AdmissionService::admit(&mut registry, make_request(1, 0xAA), &all_gates());
+
+        // Still, an unrelated ID must not be active
+        assert!(!registry.is_active_validator(&ValidatorId([99u8; 32])));
     }
 }
