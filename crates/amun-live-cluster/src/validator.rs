@@ -538,7 +538,7 @@ impl LiveValidator {
                 }
 
                 // Send vote to peers
-                let vote_data = postcard::to_stdvec(&my_vote).unwrap();
+                let vote_data = postcard::to_stdvec(&my_vote).expect("Vote serialization failed");
                 let vote_len = vote_data.len() as u32;
                 for peer in &peers {
                     for _retry in 0..10 {

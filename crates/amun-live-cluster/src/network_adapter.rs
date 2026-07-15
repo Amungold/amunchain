@@ -21,7 +21,7 @@ impl ValidatorNetworkAdapter {
 
     pub fn broadcast_vote(&self, vote: Vec<u8>) {
         let frame = NetworkFrame::new(FrameKind::Vote, vote.into());
-        let bytes = postcard::to_stdvec(&frame).unwrap();
+        let bytes = postcard::to_stdvec(&frame).expect("Frame serialization failed");
         let data: Arc<[u8]> = Arc::from(bytes.into_boxed_slice());
         let t = self.transport.lock().expect("mutex poisoned");
         t.broadcast(data);
