@@ -1,8 +1,10 @@
+pub mod admission;
 pub mod ids;
 pub mod record;
 pub mod registry;
 pub mod traits;
 
+pub use admission::{AdmissionRequest, AdmissionResult, AdmissionService};
 pub use ids::{PeerId, PublicKey, ValidatorId};
 pub use record::{ValidatorRecord, ValidatorStatus};
 pub use registry::ValidatorRegistry;
