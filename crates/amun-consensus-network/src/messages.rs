@@ -170,7 +170,7 @@ pub struct FinalityCertificate {
 // N144: These imports are used by test helper functions within mod tests.
 #[cfg(test)]
 #[allow(unused_imports)]
-use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
+use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry, ValidatorStatus};
 mod tests {
     #[allow(unused_imports)]
     use super::*;
