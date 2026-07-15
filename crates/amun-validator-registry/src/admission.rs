@@ -1,14 +1,69 @@
-// N149.1: Admission Service — single entry point for validator admission.
+// N149: Admission Service — single entry point for validator admission.
 //
-// This is an orchestration layer. It does NOT introduce new verification
-// logic. It wraps the existing register_full() + activate() sequence
-// behind a single admit() call.
+// N149.1: Orchestration layer (admit() wraps register_full + activate).
+// N149.2: Policy framework (AdmissionGate trait, AdmissionPipeline).
 //
-// Verification gates (certificate validation, stake policy, protocol
-// compatibility, genesis compatibility) will be added in N149.2.
+// Verification gates are composable and independently testable.
 
 use crate::registry::ValidatorRegistry;
 use crate::ValidatorId;
+
+// ═══════════════════════════════════════════════════════════════
+// N149.2.1: AdmissionError — structured rejection reasons
+// ═══════════════════════════════════════════════════════════════
+
+/// Structured error for admission rejection.
+/// Replaces String-based reasons for type-safe matching and audit.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AdmissionError {
+    InvalidIdentity,
+    InvalidCertificate,
+    CertificateHashMismatch,
+    DuplicateValidator,
+    AlreadyRegistered,
+    InsufficientStake { required: u64, provided: u64 },
+    UnsupportedProtocol { expected: u32, provided: u32 },
+    GenesisMismatch,
+    AuthorityRejected,
+    RegistryError(String),
+}
+
+impl std::fmt::Display for AdmissionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AdmissionError::InvalidIdentity => write!(f, "Invalid validator identity"),
+            AdmissionError::InvalidCertificate => write!(f, "Invalid certificate"),
+            AdmissionError::CertificateHashMismatch => write!(f, "Certificate hash mismatch"),
+            AdmissionError::DuplicateValidator => write!(f, "Validator already exists"),
+            AdmissionError::AlreadyRegistered => write!(f, "Validator already registered"),
+            AdmissionError::InsufficientStake { required, provided } => {
+                write!(f, "Insufficient stake: required={} provided={}", required, provided)
+            }
+            AdmissionError::UnsupportedProtocol { expected, provided } => {
+                write!(f, "Unsupported protocol: expected={} provided={}", expected, provided)
+            }
+            AdmissionError::GenesisMismatch => write!(f, "Genesis hash mismatch"),
+            AdmissionError::AuthorityRejected => write!(f, "Rejected by authority"),
+            AdmissionError::RegistryError(e) => write!(f, "Registry error: {}", e),
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// N149.2.1: AdmissionGate trait — composable policy checks
+// ═══════════════════════════════════════════════════════════════
+
+/// A single admission policy check.
+/// Each gate evaluates one aspect of a validator admission request.
+pub trait AdmissionGate: Send + Sync {
+    /// Evaluate this gate. Returns Ok(()) if the request passes,
+    /// or Err(AdmissionError) if it fails.
+    fn evaluate(
+        &self,
+        request: &AdmissionRequest,
+        registry: &ValidatorRegistry,
+    ) -> Result<(), AdmissionError>;
+}
 
 /// A request to admit a new validator into the active set.
 #[derive(Debug, Clone)]
@@ -31,33 +86,31 @@ pub enum AdmissionResult {
     /// Validator was rejected for a specific reason.
     Rejected {
         validator_id: ValidatorId,
-        reason: String,
+        error: AdmissionError,
     },
 }
 
 /// Service that orchestrates validator admission.
 ///
 /// Owns no state — delegates storage to ValidatorRegistry and
-/// verification to identity/certificate providers (future N149.2).
+/// verification to the configured AdmissionGates.
 pub struct AdmissionService;
 
 impl AdmissionService {
-    /// Admit a validator: verify, register, activate.
-    ///
-    /// Currently performs:
-    ///   1. Identity verification (delegates to verify_ed25519)
-    ///   2. Registration via register_full()
-    ///   3. Activation via activate()
-    ///
-    /// Verification gates are minimal in N149.1 — they will be
-    /// expanded in N149.2.
-    pub fn admit(registry: &mut ValidatorRegistry, request: AdmissionRequest) -> AdmissionResult {
-        // Step 1: Identity verification (basic — checks existence of key material)
-        if !Self::verify_identity(&request) {
-            return AdmissionResult::Rejected {
-                validator_id: request.validator_id,
-                reason: "Identity verification failed".into(),
-            };
+    /// Admit a validator: run all gates, then register + activate.
+    pub fn admit(
+        registry: &mut ValidatorRegistry,
+        request: AdmissionRequest,
+        gates: &[Box<dyn AdmissionGate>],
+    ) -> AdmissionResult {
+        // Step 1: Run all admission gates
+        for gate in gates {
+            if let Err(error) = gate.evaluate(&request, registry) {
+                return AdmissionResult::Rejected {
+                    validator_id: request.validator_id,
+                    error,
+                };
+            }
         }
 
         // Step 2: Register the validator (inactive state)
@@ -82,7 +135,7 @@ impl AdmissionService {
         if let Err(e) = registry.register_full(record) {
             return AdmissionResult::Rejected {
                 validator_id: request.validator_id,
-                reason: format!("Registration failed: {}", e),
+                error: AdmissionError::RegistryError(e.to_string()),
             };
         }
 
@@ -90,7 +143,7 @@ impl AdmissionService {
         if let Err(e) = registry.activate(&request.validator_id) {
             return AdmissionResult::Rejected {
                 validator_id: request.validator_id,
-                reason: format!("Activation failed: {}", e),
+                error: AdmissionError::RegistryError(e.to_string()),
             };
         }
 
@@ -98,34 +151,60 @@ impl AdmissionService {
             validator_id: request.validator_id,
         }
     }
+}
 
-    /// Verify the identity of a prospective validator.
-    ///
-    /// N149.1: Minimal check — verifies public key is non-zero and
-    /// certificate hash is present. Full certificate chain validation
-    /// will be added in N149.2.
-    fn verify_identity(request: &AdmissionRequest) -> bool {
-        // Basic sanity: public key must not be zero
+// ═══════════════════════════════════════════════════════════════
+// N149.2.2: Built-in Admission Gates
+// ═══════════════════════════════════════════════════════════════
+
+/// Gate: Rejects validators with zero public key or empty certificate hash.
+pub struct IdentityGate;
+
+impl AdmissionGate for IdentityGate {
+    fn evaluate(
+        &self,
+        request: &AdmissionRequest,
+        _registry: &ValidatorRegistry,
+    ) -> Result<(), AdmissionError> {
         if request.public_key.0 == [0u8; 32] {
-            return false;
+            return Err(AdmissionError::InvalidIdentity);
         }
-        // Certificate hash must be present
         if request.certificate_hash == [0u8; 32] {
-            return false;
+            return Err(AdmissionError::InvalidIdentity);
         }
-        true
+        Ok(())
     }
 }
+
+/// Gate: Rejects duplicate validator IDs already in the registry.
+pub struct DuplicateGate;
+
+impl AdmissionGate for DuplicateGate {
+    fn evaluate(
+        &self,
+        request: &AdmissionRequest,
+        registry: &ValidatorRegistry,
+    ) -> Result<(), AdmissionError> {
+        let short_id = u64::from_le_bytes(request.validator_id.0[..8].try_into().unwrap_or([0u8; 8]));
+        if registry.contains(short_id) {
+            return Err(AdmissionError::DuplicateValidator);
+        }
+        Ok(())
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Tests
+// ═══════════════════════════════════════════════════════════════
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
     use crate::{PeerId, PublicKey, ValidatorId, ValidatorRegistry, ValidatorStatus};
 
-    #[test]
-    fn n149_admit_valid_validator() {
-        let mut registry = ValidatorRegistry::new();
-        let request = AdmissionRequest {
+    fn make_request() -> AdmissionRequest {
+        AdmissionRequest {
             validator_id: ValidatorId([1u8; 32]),
             peer_id: PeerId([0u8; 32]),
             public_key: PublicKey([0xAA; 32]),
@@ -134,48 +213,54 @@ mod tests {
             voting_power: 100,
             protocol_version: 1,
             identity_version: 1,
-        };
+        }
+    }
 
-        let result = AdmissionService::admit(&mut registry, request);
+    fn default_gates() -> Vec<Box<dyn AdmissionGate>> {
+        vec![Box::new(IdentityGate), Box::new(DuplicateGate)]
+    }
+
+    #[test]
+    fn n149_admit_valid_validator() {
+        let mut registry = ValidatorRegistry::new();
+        let result = AdmissionService::admit(&mut registry, make_request(), &default_gates());
         assert!(matches!(result, AdmissionResult::Admitted { .. }));
-
-        // Verify the validator is now active
         assert!(registry.is_active_validator(&ValidatorId([1u8; 32])));
     }
 
     #[test]
     fn n149_reject_zero_public_key() {
         let mut registry = ValidatorRegistry::new();
-        let request = AdmissionRequest {
-            validator_id: ValidatorId([1u8; 32]),
-            peer_id: PeerId([0u8; 32]),
-            public_key: PublicKey([0u8; 32]), // zero key — should reject
-            certificate_hash: [0xBB; 32],
-            stake: 100,
-            voting_power: 100,
-            protocol_version: 1,
-            identity_version: 1,
-        };
-
-        let result = AdmissionService::admit(&mut registry, request);
+        let mut req = make_request();
+        req.public_key = PublicKey([0u8; 32]);
+        let result = AdmissionService::admit(&mut registry, req, &default_gates());
         assert!(matches!(result, AdmissionResult::Rejected { .. }));
     }
 
     #[test]
     fn n149_reject_empty_certificate_hash() {
         let mut registry = ValidatorRegistry::new();
-        let request = AdmissionRequest {
-            validator_id: ValidatorId([1u8; 32]),
-            peer_id: PeerId([0u8; 32]),
-            public_key: PublicKey([0xAA; 32]),
-            certificate_hash: [0u8; 32], // empty — should reject
-            stake: 100,
-            voting_power: 100,
-            protocol_version: 1,
-            identity_version: 1,
-        };
-
-        let result = AdmissionService::admit(&mut registry, request);
+        let mut req = make_request();
+        req.certificate_hash = [0u8; 32];
+        let result = AdmissionService::admit(&mut registry, req, &default_gates());
         assert!(matches!(result, AdmissionResult::Rejected { .. }));
+    }
+
+    #[test]
+    fn n149_reject_duplicate_validator() {
+        let mut registry = ValidatorRegistry::new();
+        // First admission succeeds
+        let result = AdmissionService::admit(&mut registry, make_request(), &default_gates());
+        assert!(matches!(result, AdmissionResult::Admitted { .. }));
+        // Second admission of same validator fails
+        let result = AdmissionService::admit(&mut registry, make_request(), &default_gates());
+        assert!(matches!(result, AdmissionResult::Rejected { .. }));
+    }
+
+    #[test]
+    fn n149_error_display() {
+        let err = AdmissionError::InsufficientStake { required: 1000, provided: 500 };
+        assert!(err.to_string().contains("500"));
+        assert!(err.to_string().contains("1000"));
     }
 }
