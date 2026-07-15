@@ -135,11 +135,9 @@ impl LiveValidator {
             let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
                 serde_json::from_str(&cert_json)
                     .unwrap_or_else(|_| panic!("Invalid certificate JSON in {}", cert_path));
-            // FIXME: Peer certificate verification temporarily disabled
-            // until all certificates are issued by the unified genesis authority key.
-            // if !registry.verify_certificate_at(&peer_cert, 0) {
-            //     panic!("Peer certificate verification failed for {}", cert_path);
-            // }
+            if !registry.verify_certificate_at(&peer_cert, 0) {
+                panic!("Peer certificate verification failed for {}", cert_path);
+            }
             let peer_pk = peer_cert.public_key;
             let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
             engine.register_validator_identity(peer_cert.validator_id.0, peer_id, peer_pk, 100);
