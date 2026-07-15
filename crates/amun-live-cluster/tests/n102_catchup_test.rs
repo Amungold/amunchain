@@ -21,7 +21,7 @@ fn n102_3_catchup_after_50_block_gap() {
         .map(|i| {
             let mut config = ValidatorConfig::test_cluster(i, &ports).with_quorum(3);
             config.data_dir = dirs[i].clone();
-            LiveValidator::new(config).unwrap().unwrap()
+            LiveValidator::new(config).unwrap()
         })
         .collect();
 
@@ -92,7 +92,7 @@ fn n102_3_catchup_after_50_block_gap() {
     println!("=== Restarting validator 3 ===");
     let mut config = ValidatorConfig::test_cluster(3, &ports).with_quorum(3);
     config.data_dir = dirs[3].clone();
-    let v3_new = LiveValidator::new(config).unwrap().unwrap();
+    let v3_new = LiveValidator::new(config).unwrap();
     v3_new.start().unwrap();
     validators[3] = v3_new;
 
