@@ -81,6 +81,27 @@ impl ValidatorRegistry {
     pub fn record_count(&self) -> usize {
         self.records.len()
     }
+
+    /// Activate a previously registered validator.
+    /// Sets active=true. Returns error if not found.
+    /// NOTE: ValidatorRecord in the registry crate does not have a `status`
+    /// field. When the two ValidatorRecord types are unified with the API
+    /// crate, status synchronization (status=Active) will be added here.
+    pub fn activate(&mut self, id: &ValidatorId) -> Result<(), &'static str> {
+        if let Some(record) = self.records.get_mut(id) {
+            record.active = true;
+            Ok(())
+        } else {
+            Err("validator not found")
+        }
+    }
+
+    /// Deactivate an active validator.
+    /// Sets active=false. Returns error if not found.
+    /// NOTE: When record types are unified, status=Inactive will be added.
+    pub fn deactivate_validator(&mut self, id: &ValidatorId) -> Result<(), &'static str> {
+        self.deactivate(id)
+    }
 }
 
 impl Default for ValidatorRegistry {
@@ -160,6 +181,15 @@ impl ValidatorAdmin for ValidatorRegistry {
     fn update_voting_power(&mut self, id: &ValidatorId, power: u64) -> Result<(), &'static str> {
         if let Some(record) = self.records.get_mut(id) {
             record.voting_power = power;
+            Ok(())
+        } else {
+            Err("validator not found")
+        }
+    }
+
+    fn activate(&mut self, id: &ValidatorId) -> Result<(), &'static str> {
+        if let Some(record) = self.records.get_mut(id) {
+            record.active = true;
             Ok(())
         } else {
             Err("validator not found")

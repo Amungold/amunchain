@@ -31,6 +31,7 @@ pub trait ValidatorRead {
 pub trait ValidatorAdmin {
     fn register(&mut self, record: crate::record::ValidatorRecord) -> Result<(), &'static str>;
     fn update_voting_power(&mut self, id: &ValidatorId, power: u64) -> Result<(), &'static str>;
+    fn activate(&mut self, id: &ValidatorId) -> Result<(), &'static str>;
     fn deactivate(&mut self, id: &ValidatorId) -> Result<(), &'static str>;
     fn remove(&mut self, id: &ValidatorId) -> Result<(), &'static str>;
 }
