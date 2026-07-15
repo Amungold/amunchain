@@ -29,7 +29,8 @@ pub fn initialize(config_path: &str) -> Result<BootstrapContext, NodeError> {
 
     // Identity
     let key_path = config_dir.join(&config.identity.key_file);
-    let keypair = crate::identity::load_or_create_keypair(key_path.to_str().unwrap())?;
+    let key_path_str = key_path.to_str().ok_or_else(|| NodeError::InvalidAddress("Invalid key path encoding".into()))?;
+    let keypair = crate::identity::load_or_create_keypair(key_path_str)?;
     let peer_id = keypair.peer_id();
     tracing::info!(peer_id = %hex::encode(peer_id.0), "Identity loaded");
 
@@ -63,7 +64,7 @@ pub fn initialize(config_path: &str) -> Result<BootstrapContext, NodeError> {
     // Certificate
     let cert_path = config_dir.join("validator.crt");
     let cert = crate::certificate_loader::load_validator_certificate(
-        cert_path.to_str().unwrap(),
+        cert_path.to_str().ok_or_else(|| NodeError::InvalidAddress("Invalid cert path encoding".into()))?,
         &genesis,
     )
     .map_err(NodeError::Certificate)?;

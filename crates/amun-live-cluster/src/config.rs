@@ -54,7 +54,7 @@ impl ValidatorConfig {
             .map(|i| ClusterPeer {
                 validator_id: ids[i],
                 certificate_path: None,
-                address: format!("127.0.0.1:{}", base_port + i).parse().unwrap(),
+                address: format!("127.0.0.1:{}", base_port + i).parse().expect("valid localhost address"),
             })
             .collect();
         set_cert_paths(&mut cluster);
@@ -79,7 +79,7 @@ impl ValidatorConfig {
             .map(|i| ClusterPeer {
                 validator_id: ids[i],
                 certificate_path: None,
-                address: format!("127.0.0.1:{}", ports[i]).parse().unwrap(),
+                address: format!("127.0.0.1:{}", ports[i]).parse().expect("valid localhost address"),
             })
             .collect();
         set_cert_paths(&mut cluster);
@@ -126,6 +126,7 @@ fn set_cert_paths(cluster: &mut [ClusterPeer]) {
         .join("certs");
     for (i, peer) in cluster.iter_mut().enumerate() {
         let path = cert_dir.join(format!("validator_{}.crt", i + 1));
-        peer.certificate_path = Some(path.to_str().unwrap().to_string());
+        // Safe: testdata cert paths are always valid UTF-8
+        peer.certificate_path = Some(path.to_str().expect("valid cert path").to_string());
     }
 }
