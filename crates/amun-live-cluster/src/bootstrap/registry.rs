@@ -30,6 +30,12 @@ pub fn build_registry(
             active: true,
             slash_count: 0,
             registered_at: 0,
+            registered_epoch: 0,
+            last_seen: 0,
+            status: ValidatorStatus::Active,
+            stake_epoch: 0,
+            protocol_version: 1,
+            identity_version: 1,
         };
         registry.register_full(record)?;
     }

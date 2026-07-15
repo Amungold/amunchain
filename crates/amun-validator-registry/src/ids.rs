@@ -1,26 +1,4 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
-pub struct ValidatorId(pub [u8; 32]);
+// N147.1: Registry now re-exports types from amun-validator-api (SSOT).
+// The local definitions are removed. All consumers use the same types.
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
-pub struct PeerId(pub [u8; 32]);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
-pub struct PublicKey(pub [u8; 32]);
-
-impl ValidatorId {
-    pub fn as_bytes(&self) -> &[u8; 32] {
-        &self.0
-    }
-}
-
-impl PeerId {
-    pub fn as_bytes(&self) -> &[u8; 32] {
-        &self.0
-    }
-}
-
-impl PublicKey {
-    pub fn as_bytes(&self) -> &[u8; 32] {
-        &self.0
-    }
-}
+pub use amun_validator_api::types::id::{PeerId, PublicKey, ValidatorId};

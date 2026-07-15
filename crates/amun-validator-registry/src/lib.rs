@@ -4,6 +4,6 @@ pub mod registry;
 pub mod traits;
 
 pub use ids::{PeerId, PublicKey, ValidatorId};
-pub use record::ValidatorRecord;
+pub use record::{ValidatorRecord, ValidatorStatus};
 pub use registry::ValidatorRegistry;
 pub use traits::{ValidatorAdmin, ValidatorRead, ValidatorRegistryTrait};

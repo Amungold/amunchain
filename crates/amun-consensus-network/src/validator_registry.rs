@@ -28,6 +28,12 @@ impl ConsensusEngine {
                     active: true,
                     slash_count: 0,
                     registered_at: 0,
+                    registered_epoch: 0,
+                    last_seen: 0,
+                    status: amun_validator_registry::ValidatorStatus::Active,
+                    stake_epoch: 0,
+                    protocol_version: 1,
+                    identity_version: 1,
                 };
                 let _ = reg.register_full(record);
             }

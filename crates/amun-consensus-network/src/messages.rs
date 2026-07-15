@@ -241,6 +241,12 @@ mod tests {
                 active: true,
                 slash_count: 0,
                 registered_at: 0,
+                registered_epoch: 0,
+                last_seen: 0,
+                status: ValidatorStatus::Active,
+                stake_epoch: 0,
+                protocol_version: 1,
+                identity_version: 1,
             })
             .unwrap();
         assert!(qc.verify_with_registry(&registry).is_err());
@@ -275,6 +281,12 @@ mod tests {
                     active: true,
                     slash_count: 0,
                     registered_at: 0,
+                    registered_epoch: 0,
+                    last_seen: 0,
+                    status: ValidatorStatus::Active,
+                    stake_epoch: 0,
+                    protocol_version: 1,
+                    identity_version: 1,
                 })
                 .unwrap();
         }
