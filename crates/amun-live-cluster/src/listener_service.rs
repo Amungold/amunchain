@@ -39,7 +39,7 @@ impl ListenerService {
                         if peek_buf[0] == MSG_TIP_REQUEST {
                             let _ = stream.read_exact(&mut [0u8; 1]);
 
-                            let store_g = store_listen.lock().unwrap();
+                            let store_g = store_listen.lock().expect("mutex poisoned");
                             let tip = store_g.load_tip();
 
                             let height = tip.as_ref().map(|r| r.height).unwrap_or(0);
@@ -65,7 +65,7 @@ impl ListenerService {
 
                                 eprintln!("SYNC_SERVED: block_range_request {}..{}", start, end);
 
-                                let store_g = store_listen.lock().unwrap();
+                                let store_g = store_listen.lock().expect("mutex poisoned");
 
                                 let mut records = Vec::new();
 
@@ -102,7 +102,7 @@ impl ListenerService {
                                         if let Ok(vote) =
                                             postcard::from_bytes::<ConsensusVote>(&buf)
                                         {
-                                            let mut eng = engine_listen.lock().unwrap();
+                                            let mut eng = engine_listen.lock().expect("mutex poisoned");
 
                                             if let Err(e) = eng.process_vote(&vote) {
                                                 if e != "Duplicate vote from validator" {

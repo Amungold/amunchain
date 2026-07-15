@@ -53,7 +53,7 @@ impl MessageDispatcher {
 
     fn handle_tip_request(&self, peer: SocketAddr, frame: &NetworkFrame) {
         if let Ok(request) = postcard::from_bytes::<TipRequestPayload>(&frame.payload) {
-            let store = self.store.lock().unwrap();
+            let store = self.store.lock().expect("mutex poisoned");
             let tip = store.load_tip();
             let height = tip.as_ref().map(|r| r.height).unwrap_or(0);
             let hash = tip.map(|r| r.block_hash).unwrap_or([0u8; 32]);
@@ -95,7 +95,7 @@ impl MessageDispatcher {
                 return;
             }
 
-            let store = self.store.lock().unwrap();
+            let store = self.store.lock().expect("mutex poisoned");
             let records = store.load_height_range(request.start, request.end);
             let encoded: Vec<Vec<u8>> = records.iter().map(|r| r.encode()).collect();
 
@@ -129,7 +129,7 @@ impl MessageDispatcher {
         if let Ok(vote) =
             postcard::from_bytes::<amun_consensus_network::messages::ConsensusVote>(&frame.payload)
         {
-            let mut eng = self.engine.lock().unwrap();
+            let mut eng = self.engine.lock().expect("mutex poisoned");
             let _ = eng.process_vote(&vote);
         }
     }

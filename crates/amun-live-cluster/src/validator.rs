@@ -219,7 +219,7 @@ impl LiveValidator {
                         if peek_buf[0] == MSG_TIP_REQUEST {
                             // Consume the type byte
                             let _ = stream.read_exact(&mut [0u8; 1]);
-                            let store_g = store_listen.lock().unwrap();
+                            let store_g = store_listen.lock().expect("mutex poisoned");
                             let tip = store_g.load_tip();
                             let height = tip.as_ref().map(|r| r.height).unwrap_or(0);
                             let hash = tip.map(|r| r.block_hash).unwrap_or([0u8; 32]);
@@ -238,7 +238,7 @@ impl LiveValidator {
                                 let start = u64::from_be_bytes(range_buf[0..8].try_into().unwrap());
                                 let end = u64::from_be_bytes(range_buf[8..16].try_into().unwrap());
                                 eprintln!("SYNC_SERVED: block_range_request {}..{}", start, end);
-                                let store_g = store_listen.lock().unwrap();
+                                let store_g = store_listen.lock().expect("mutex poisoned");
                                 let mut records: Vec<Vec<u8>> = Vec::new();
                                 for h in start..=end {
                                     if let Some(record) = store_g.load_height(h) {
@@ -268,7 +268,7 @@ impl LiveValidator {
                                         if let Ok(vote) =
                                             postcard::from_bytes::<ConsensusVote>(&buf)
                                         {
-                                            let mut eng = engine_listen.lock().unwrap();
+                                            let mut eng = engine_listen.lock().expect("mutex poisoned");
                                             if let Err(e) = eng.process_vote(&vote) {
                                                 if e != "Duplicate vote from validator" {
                                                     eprintln!("VOTE REJECTED: {}", e);
@@ -316,17 +316,17 @@ impl LiveValidator {
                     let peers_addr: Vec<std::net::SocketAddr> =
                         peers.iter().map(|p| p.address).collect();
 
-                    let current_h = { store_consensus.lock().unwrap().latest_height() };
+                    let current_h = { store_consensus.lock().expect("mutex poisoned").latest_height() };
 
                     if let Ok(records) = download_missing_records(current_h, &peers_addr) {
                         if !records.is_empty() {
-                            let mut store_g = store_consensus.lock().unwrap();
+                            let mut store_g = store_consensus.lock().expect("mutex poisoned");
 
                             let new_h = append_missing_records(&mut store_g, current_h, records)
                                 .unwrap_or(current_h);
 
                             if new_h > current_h {
-                                let mut eng = engine_consensus.lock().unwrap();
+                                let mut eng = engine_consensus.lock().expect("mutex poisoned");
 
                                 eng.fast_forward(new_h);
 
@@ -346,7 +346,7 @@ impl LiveValidator {
 
                 let _round_timer = crate::perf_timer::PerfTimer::new("consensus_round");
                 let (height, needs_sync) = {
-                    let eng = engine_consensus.lock().unwrap();
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
                     let h = eng.current_height + 1;
                     let sync = eng.needs_catchup.load(std::sync::atomic::Ordering::SeqCst);
                     eng.needs_catchup
@@ -356,14 +356,14 @@ impl LiveValidator {
                 if needs_sync {
                     let peers_addr: Vec<std::net::SocketAddr> =
                         peers.iter().map(|p| p.address).collect();
-                    let current_h = store_consensus.lock().unwrap().latest_height();
+                    let current_h = store_consensus.lock().expect("mutex poisoned").latest_height();
                     if let Ok(records) = download_missing_records(current_h, &peers_addr) {
                         if !records.is_empty() {
-                            let mut store_g = store_consensus.lock().unwrap();
+                            let mut store_g = store_consensus.lock().expect("mutex poisoned");
                             let new_h = append_missing_records(&mut store_g, current_h, records)
                                 .unwrap_or(current_h);
                             if new_h > current_h {
-                                let mut eng2 = engine_consensus.lock().unwrap();
+                                let mut eng2 = engine_consensus.lock().expect("mutex poisoned");
                                 eng2.fast_forward(new_h);
                                 eng2.reset_rounds();
                                 if let Some(tip) = store_g.load_tip() {
@@ -377,7 +377,7 @@ impl LiveValidator {
                 }
 
                 let proposer_idx = {
-                    let eng = engine_consensus.lock().unwrap();
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
                     eng.proposer_for(height)
                 };
                 let is_proposer = my_index == proposer_idx;
@@ -388,16 +388,16 @@ impl LiveValidator {
 
                 // Proposer builds a real block from mempool transactions
                 let already_proposed = {
-                    let eng = engine_consensus.lock().unwrap();
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
                     eng.rounds
                         .get(&height)
                         .and_then(|r| r.proposed_block_hash)
                         .is_some()
                 };
                 let (block_hash, state_root) = if is_proposer && !already_proposed {
-                    let mut mp = mempool_consensus.lock().unwrap();
-                    let mut bld = builder_consensus.lock().unwrap();
-                    let parent = engine_consensus.lock().unwrap().history_root;
+                    let mut mp = mempool_consensus.lock().expect("mutex poisoned");
+                    let mut bld = builder_consensus.lock().expect("mutex poisoned");
+                    let parent = engine_consensus.lock().expect("mutex poisoned").history_root;
                     // N110.4b: Collect pending certificates from gossip
                     let pending_certs: Vec<amun_consensus_network::SlashingCertificate> =
                         certificate_gossip_clone
@@ -418,12 +418,12 @@ impl LiveValidator {
                     );
                     // N120.4: Compute and set the slashing root from the ledger
                     {
-                        let ledger = slashing_ledger_clone.lock().unwrap();
+                        let ledger = slashing_ledger_clone.lock().expect("mutex poisoned");
                         block.slashing_root = amun_consensus_network::merkle_root(&ledger.history);
                     }
                     // Recompute hash after setting slashing_root (N120.2 requires it in hash)
                     {
-                        let mut roots_map = block_roots_map.lock().unwrap();
+                        let mut roots_map = block_roots_map.lock().expect("mutex poisoned");
                         roots_map.insert(
                             height,
                             BlockRootsContext {
@@ -437,14 +437,14 @@ impl LiveValidator {
                     }
                     let hash = block.block_hash();
                     let root = block.state_root;
-                    let mut eng = engine_consensus.lock().unwrap();
+                    let mut eng = engine_consensus.lock().expect("mutex poisoned");
                     eng.start_round(height, validator_id);
                     if let Some(round) = eng.round_mut(height) {
                         round.propose(hash, root);
                     }
                     (hash, root)
                 } else if is_proposer && already_proposed {
-                    let eng = engine_consensus.lock().unwrap();
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
                     let round = eng.rounds.get(&height);
                     let round = match round {
                         Some(r) => r,
@@ -467,7 +467,7 @@ impl LiveValidator {
                     let deadline = Instant::now() + Duration::from_secs(2);
                     loop {
                         {
-                            let eng = engine_consensus.lock().unwrap();
+                            let eng = engine_consensus.lock().expect("mutex poisoned");
                             if let Some(round) = eng.rounds.get(&height) {
                                 if round.proposed_block_hash.is_some() {
                                     break;
@@ -479,7 +479,7 @@ impl LiveValidator {
                         }
                         thread::sleep(Duration::from_millis(2));
                     }
-                    let eng = engine_consensus.lock().unwrap();
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
                     if let Some(round) = eng.rounds.get(&height) {
                         if let (Some(h), Some(r)) =
                             (round.proposed_block_hash, round.proposed_state_root)
@@ -524,7 +524,7 @@ impl LiveValidator {
 
                 // Process own vote — with fallback proposal if proposer is silent
                 {
-                    let mut eng = engine_consensus.lock().unwrap();
+                    let mut eng = engine_consensus.lock().expect("mutex poisoned");
                     if !eng.rounds.contains_key(&height) {
                         eng.start_round(height, [(proposer_idx + 1) as u8; 32]);
                     }
@@ -557,7 +557,7 @@ impl LiveValidator {
                 let vote_deadline = Instant::now() + Duration::from_millis(500);
                 loop {
                     let quorum_reached = {
-                        let eng = engine_consensus.lock().unwrap();
+                        let eng = engine_consensus.lock().expect("mutex poisoned");
                         if let Some(round) = eng.rounds.get(&height) {
                             let approvals = round.votes.iter().filter(|v| v.approve).count();
                             approvals * 3 > eng.total_validators * 2
@@ -577,19 +577,19 @@ impl LiveValidator {
                 // append() is idempotent — safe for all validators to call.
                 let history_root = state_root;
                 let cert = {
-                    let mut eng = engine_consensus.lock().unwrap();
+                    let mut eng = engine_consensus.lock().expect("mutex poisoned");
                     eng.try_advance(height, history_root)
                 };
                 if let Some(cert) = cert {
                     // Execute any approved governance proposals
-                    let mut gov = governance_consensus.lock().unwrap();
-                    let mut reg = authority_registry_consensus.lock().unwrap();
+                    let mut gov = governance_consensus.lock().expect("mutex poisoned");
+                    let mut reg = authority_registry_consensus.lock().expect("mutex poisoned");
                     let _ = gov.finalize_block(4, &mut reg);
 
                     // N129.2: record will be created after hashing
                     // N126.3: Evidence-Based Constitutional Verification
                     {
-                        let mut kernel = constitutional_kernel_clone.lock().unwrap();
+                        let mut kernel = constitutional_kernel_clone.lock().expect("mutex poisoned");
 
                         // Real data from the finalized certificate
                         let state_root_valid = cert.state_root != [0u8; 32];
@@ -603,7 +603,7 @@ impl LiveValidator {
 
                         // Slashing evidence: certificates have non-empty evidence_ids
                         let slashing_bound = {
-                            let gossip = certificate_gossip_clone.lock().unwrap();
+                            let gossip = certificate_gossip_clone.lock().expect("mutex poisoned");
                             gossip
                                 .get_pending()
                                 .iter()
@@ -619,13 +619,13 @@ impl LiveValidator {
 
                         // N126.3: Finality supermajority from QC voting power
                         let finality_supermajority = {
-                            let eng = engine_consensus.lock().unwrap();
+                            let eng = engine_consensus.lock().expect("mutex poisoned");
                             eng.get_total_voting_power() > 0
                         };
 
                         // Evidence validity: all certificates pass .verify()
                         let evidence_valid = {
-                            let gossip = certificate_gossip_clone.lock().unwrap();
+                            let gossip = certificate_gossip_clone.lock().expect("mutex poisoned");
                             gossip.get_pending().iter().all(|c| c.verify().is_ok())
                         };
 
@@ -699,7 +699,7 @@ impl LiveValidator {
                         let evidence_record_hash = evidence_record.evidence_hash;
 
                         // N129.3: Compute EvidenceRoot with constitutional continuity
-                        let mut prev_root = previous_evidence_root_clone.lock().unwrap();
+                        let mut prev_root = previous_evidence_root_clone.lock().expect("mutex poisoned");
                         let evidence_root_obj = EvidenceRoot::compute(
                             cert.state_root,
                             cert.block_hash,
@@ -711,7 +711,7 @@ impl LiveValidator {
                         let evidence_root = evidence_root_obj.root;
                         *prev_root = evidence_root;
 
-                        let roots_ctx = block_roots_map.lock().unwrap().remove(&height);
+                        let roots_ctx = block_roots_map.lock().expect("mutex poisoned").remove(&height);
                         let record = FinalizedChainRecord {
                             height,
                             block_hash: cert.block_hash,
@@ -753,7 +753,7 @@ impl LiveValidator {
                             pending_records.push(record);
                             // Flush batch every 10 blocks or when buffer is large
                             if pending_records.len() >= 10 {
-                                let mut store_g = store_consensus.lock().unwrap();
+                                let mut store_g = store_consensus.lock().expect("mutex poisoned");
                                 let count =
                                     store_g.append_batch(std::mem::take(&mut pending_records));
                                 if count > 0 {
@@ -767,13 +767,13 @@ impl LiveValidator {
                     {
                         // Clone pending certs to avoid borrow conflict
                         let pending: Vec<amun_consensus_network::SlashingCertificate> = {
-                            let gossip = certificate_gossip_clone.lock().unwrap();
+                            let gossip = certificate_gossip_clone.lock().expect("mutex poisoned");
                             gossip.get_pending().iter().map(|c| (*c).clone()).collect()
                         };
 
-                        let mut adapter = staking_adapter_clone.lock().unwrap();
+                        let mut adapter = staking_adapter_clone.lock().expect("mutex poisoned");
                         let mut applied_hashes: Vec<[u8; 32]> = Vec::new();
-                        let mut applied = applied_certs_clone.lock().unwrap();
+                        let mut applied = applied_certs_clone.lock().expect("mutex poisoned");
 
                         for cert in &pending {
                             // N110.4c.1: Replay protection
@@ -806,7 +806,7 @@ impl LiveValidator {
 
                         // Mark as included after releasing adapter borrow
                         if !applied_hashes.is_empty() {
-                            let mut gossip = certificate_gossip_clone.lock().unwrap();
+                            let mut gossip = certificate_gossip_clone.lock().expect("mutex poisoned");
                             for hash in &applied_hashes {
                                 gossip.mark_included(hash);
                             }
@@ -818,21 +818,21 @@ impl LiveValidator {
             }
             // PERF-4B: Flush remaining records on exit
             if !pending_records.is_empty() {
-                let mut store_g = store_consensus.lock().unwrap();
+                let mut store_g = store_consensus.lock().expect("mutex poisoned");
                 let count = store_g.append_batch(std::mem::take(&mut pending_records));
                 eprintln!("PERF final_flush: {} blocks", count);
             }
         });
 
-        self.handles.lock().unwrap().push(h1);
-        self.handles.lock().unwrap().push(h2);
+        self.handles.lock().expect("mutex poisoned").push(h1);
+        self.handles.lock().expect("mutex poisoned").push(h2);
         Ok(())
     }
 
     pub fn stop(&self) {
         self.running.store(false, Ordering::SeqCst);
         let handles: Vec<JoinHandle<()>> = {
-            let mut h = self.handles.lock().unwrap();
+            let mut h = self.handles.lock().expect("mutex poisoned");
             std::mem::take(&mut *h)
         };
         for h in handles {
@@ -841,15 +841,15 @@ impl LiveValidator {
     }
 
     pub fn current_height(&self) -> u64 {
-        self.engine.lock().unwrap().current_height
+        self.engine.lock().expect("mutex poisoned").current_height
     }
     pub fn history_root(&self) -> [u8; 32] {
-        self.engine.lock().unwrap().history_root
+        self.engine.lock().expect("mutex poisoned").history_root
     }
     pub fn store_len(&self) -> usize {
-        self.store.lock().unwrap().len()
+        self.store.lock().expect("mutex poisoned").len()
     }
     pub fn metrics_summary(&self) -> String {
-        self.engine.lock().unwrap().metrics.summary()
+        self.engine.lock().expect("mutex poisoned").metrics.summary()
     }
 }
