@@ -7,7 +7,7 @@ use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 ///
 /// Both the new API (IdentityService) and the compatibility layer (compat.rs)
 /// delegate to this module. No other module owns this logic.
-
+///
 /// Verify an Ed25519 signature using real ed25519-dalek verification.
 pub fn verify_ed25519(public_key: &[u8; 32], message: &[u8], signature: &[u8; 64]) -> bool {
     // Reject obviously invalid inputs

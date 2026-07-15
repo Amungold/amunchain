@@ -167,14 +167,20 @@ mod tests {
     }
     #[test]
     fn test_max_peers() {
-        let c = NetworkConfig { max_peers: 0, ..NetworkConfig::default() };
+        let c = NetworkConfig {
+            max_peers: 0,
+            ..NetworkConfig::default()
+        };
         assert!(NetworkService::new(id(), c)
             .connect_to_peer("t:8000")
             .is_err());
     }
     #[test]
     fn test_discover() {
-        let c = NetworkConfig { bootstrap_peers: vec!["s:9000".into()], ..NetworkConfig::default() };
+        let c = NetworkConfig {
+            bootstrap_peers: vec!["s:9000".into()],
+            ..NetworkConfig::default()
+        };
         let s = NetworkService::new(id(), c);
         s.discover_peers().unwrap();
         assert!(s.peer_table.count() >= 1);

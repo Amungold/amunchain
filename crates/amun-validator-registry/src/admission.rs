@@ -27,9 +27,7 @@ pub struct AdmissionRequest {
 #[derive(Debug, Clone)]
 pub enum AdmissionResult {
     /// Validator was registered and activated successfully.
-    Admitted {
-        validator_id: ValidatorId,
-    },
+    Admitted { validator_id: ValidatorId },
     /// Validator was rejected for a specific reason.
     Rejected {
         validator_id: ValidatorId,
@@ -53,10 +51,7 @@ impl AdmissionService {
     ///
     /// Verification gates are minimal in N149.1 — they will be
     /// expanded in N149.2.
-    pub fn admit(
-        registry: &mut ValidatorRegistry,
-        request: AdmissionRequest,
-    ) -> AdmissionResult {
+    pub fn admit(registry: &mut ValidatorRegistry, request: AdmissionRequest) -> AdmissionResult {
         // Step 1: Identity verification (basic — checks existence of key material)
         if !Self::verify_identity(&request) {
             return AdmissionResult::Rejected {

@@ -78,7 +78,10 @@ mod tests {
     #[test]
     fn test_max() {
         let t = Arc::new(PeerTable::new());
-        let c = NetworkConfig { max_peers: 0, ..NetworkConfig::default() };
+        let c = NetworkConfig {
+            max_peers: 0,
+            ..NetworkConfig::default()
+        };
         assert!(ConnectionManager::new(t, c)
             .connect(&PeerId([1u8; 32]), "a")
             .is_err());
