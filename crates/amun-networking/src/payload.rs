@@ -1,7 +1,7 @@
 use bytes::Bytes;
 
 /// Network payload type — zero-copy reference counted bytes.
-/// Replaces Vec<u8> throughout the networking layer.
+/// Replaces `Vec<u8>` throughout the networking layer.
 pub type Payload = Bytes;
 
 /// Create a Payload from static data (no allocation).

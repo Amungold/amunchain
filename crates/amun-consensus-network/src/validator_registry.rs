@@ -83,6 +83,6 @@ impl ConsensusEngine {
             let id = amun_validator_registry::ValidatorId(*validator_id);
             return reg.get_public_key(&id);
         }
-        self.validator_keys.get(validator_id).copied()
+        self.validator_keys.get(validator_id)
     }
 }

@@ -7,11 +7,23 @@ pub struct GenesisAuthority {
     pub authority_version: u64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct GenesisFile {
+    trust_anchors: Vec<GenesisAuthority>,
+}
+
 /// Load genesis authority from a JSON file.
 /// The file must exist; there is no fallback.
 pub fn load_genesis_authority(path: &str) -> GenesisAuthority {
     let json = std::fs::read_to_string(path).expect("Genesis authority file missing");
-    serde_json::from_str(&json).expect("Invalid genesis authority JSON")
+
+    let genesis: GenesisFile = serde_json::from_str(&json).expect("Invalid genesis authority JSON");
+
+    genesis
+        .trust_anchors
+        .into_iter()
+        .next()
+        .expect("Genesis contains no trust anchors")
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

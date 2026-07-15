@@ -1,5 +1,5 @@
 [package]
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0"
 name = "amun-consensus-network"
 version = "0.1.0"
 edition = "2021"
@@ -13,9 +13,12 @@ blake3.workspace = true
 amun-validator-identity = { path = "../amun-validator-identity" }
 amun-staking = { path = "../amun-staking" }
 amun-kernel-types = { path = "../amun-kernel-types" }
+amun-validator-api = { path = "../amun-validator-api" }
+amun-consensus-types = { path = "../amun-consensus-types" }
 amun-validator-registry = { path = "../amun-validator-registry" }
+amun-validator-network = { path = "../amun-validator-network" }
 rand = "0.8"
-ed25519-dalek = "2"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
 tempfile = "3"
 hex = "0.4"
 

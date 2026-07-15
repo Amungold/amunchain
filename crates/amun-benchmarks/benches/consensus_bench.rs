@@ -18,10 +18,8 @@ fn make_vote(voter: u8, height: u64, block_hash: [u8; 32]) -> ConsensusVote {
         &validator_id,
         amun_validator_identity::signature::DEFAULT_CHAIN_ID,
         height,
+        0, // round
         &block_hash,
-        &state_root,
-        approve,
-        timestamp,
     );
 
     let sig = sk.sign(&payload);

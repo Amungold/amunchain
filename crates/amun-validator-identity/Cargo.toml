@@ -3,12 +3,8 @@ name = "amun-validator-identity"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "Validator identity: key derivation, registry, and vote signature verification"
+description = "AmunChain Validator Identity Service — single source of truth for identity, keys, and authorities"
 
 [dependencies]
-amun-identity-core = { path = "../amun-identity-core" }
-blake3 = "1"
+amun-validator-api = { path = "../amun-validator-api" }
 ed25519-dalek = { version = "2", features = ["rand_core"] }
-serde = { version = "1", features = ["derive"] }
-
-rand = "0.8"

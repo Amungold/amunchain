@@ -221,6 +221,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-codec"
+version = "1.0.0"
+dependencies = [
+ "amun-failure",
+ "amun-kernel-types",
+ "blake3",
+ "heapless 0.8.0",
+]
+
+[[package]]
 name = "amun-compatibility"
 version = "1.0.0"
 dependencies = [
@@ -263,10 +273,13 @@ name = "amun-consensus-network"
 version = "0.1.0"
 dependencies = [
  "amun-block-builder",
+ "amun-consensus-types",
  "amun-kernel-types",
  "amun-mempool",
  "amun-staking",
+ "amun-validator-api",
  "amun-validator-identity",
+ "amun-validator-network",
  "amun-validator-registry",
  "blake3",
  "ed25519-dalek",
@@ -277,6 +290,17 @@ dependencies = [
  "serde_bytes",
  "serde_json",
  "tempfile",
+]
+
+[[package]]
+name = "amun-consensus-types"
+version = "1.0.0"
+dependencies = [
+ "amun-codec",
+ "amun-failure",
+ "amun-kernel-types",
+ "amun-state-types",
+ "heapless 0.8.0",
 ]
 
 [[package]]
@@ -2017,6 +2041,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-state-types"
+version = "1.0.0"
+
+[[package]]
 name = "amun-stateless-sync"
 version = "0.1.0"
 dependencies = [
@@ -2126,14 +2154,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-validator-api"
+version = "0.1.0"
+
+[[package]]
+name = "amun-validator-bootstrap"
+version = "0.1.0"
+dependencies = [
+ "amun-validator-api",
+ "amun-validator-identity",
+ "amun-validator-runtime",
+]
+
+[[package]]
 name = "amun-validator-identity"
 version = "0.1.0"
 dependencies = [
- "amun-identity-core",
- "blake3",
+ "amun-validator-api",
  "ed25519-dalek",
- "rand 0.8.6",
+]
+
+[[package]]
+name = "amun-validator-network"
+version = "0.1.0"
+dependencies = [
+ "amun-validator-api",
+ "amun-validator-identity",
  "serde",
+ "tempfile",
 ]
 
 [[package]]
@@ -2162,20 +2210,18 @@ dependencies = [
 name = "amun-validator-runtime"
 version = "0.1.0"
 dependencies = [
- "amun-bytecode",
- "amun-constitutional-runtime",
- "amun-operations",
- "amun-persistent-node",
- "amun-proof-archive",
- "amun-replay-consensus",
- "amun-resource-core",
- "amun-vm-kernel",
- "blake3",
+ "amun-validator-api",
+]
+
+[[package]]
+name = "amun-validator-storage"
+version = "0.1.0"
+dependencies = [
+ "amun-validator-api",
  "hex",
  "serde",
  "serde_json",
  "tempfile",
- "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -2869,9 +2915,9 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-epoch"
-version = "0.9.18"
+version = "0.9.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
+checksum = "2d6914041f254d6e9176c01941b21115dcfb7089e55135a35411081bd106ef3f"
 dependencies = [
  "crossbeam-utils",
 ]

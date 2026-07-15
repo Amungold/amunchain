@@ -31,6 +31,7 @@ pub mod misbehavior_registry;
 pub mod multi_signer_certificate;
 pub mod re_executor;
 pub mod real_staking_adapter;
+pub mod runtime_types;
 pub mod slashing_certificate;
 pub mod slashing_certificate_builder;
 pub mod slashing_fraud_proof;

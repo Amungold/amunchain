@@ -28,7 +28,8 @@ pub struct ConsensusEngine {
     pub validator_powers: HashMap<[u8; 32], u64>,
     pub total_voting_power: u64,
     pub validator_registry: Option<std::sync::Arc<dyn ValidatorRead + Send + Sync>>,
-    pub(crate) registry_mut: Option<std::sync::Arc<std::sync::Mutex<amun_validator_registry::ValidatorRegistry>>>, 
+    pub(crate) registry_mut:
+        Option<std::sync::Arc<std::sync::Mutex<amun_validator_registry::ValidatorRegistry>>>,
     finality_chain: Vec<FinalityCertificate>,
 }
 
@@ -317,13 +318,11 @@ impl ConsensusEngine {
             &vote.voter_id,
             amun_validator_identity::signature::DEFAULT_CHAIN_ID,
             vote.height,
+            0, // ConsensusVote has no round field; round tracking is per-engine
             &vote.block_hash,
-            &vote.state_root,
-            vote.approve,
-            vote.timestamp,
         );
 
-        if !amun_validator_identity::verify_ed25519(pk, &payload, &vote.signature) {
+        if !amun_validator_identity::verify_ed25519(&pk, &payload, &vote.signature) {
             return Err(format!("Invalid signature from {:?}", &vote.voter_id[..4]));
         }
 
@@ -348,8 +347,10 @@ impl ConsensusEngine {
     }
 }
 #[cfg(test)]
-use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
+// N144: Cleaned unused test imports — kept only needed types.
+use amun_validator_registry::ValidatorRegistry;
 mod tests {
+    #[allow(unused_imports)]
     use super::*;
 
     #[test]
@@ -496,11 +497,11 @@ mod tests {
     #[test]
     fn n105_signature_required_when_registry_populated() {
         use ed25519_dalek::{Signer, SigningKey};
-        use rand::rngs::OsRng;
+        // N144: OsRng no longer needed — SigningKey uses from_bytes() directly.
         let mut engine = ConsensusEngine::new([0u8; 32], 4);
 
         // Generate a keypair, derive validator id
-        let sk = SigningKey::generate(&mut OsRng);
+        let sk = SigningKey::from_bytes(&[0x42; 32]); // ed25519-dalek 2.x: generate() removed
         let pk = sk.verifying_key().to_bytes();
         let vid = amun_validator_identity::derive_validator_id(&pk);
         // Register this validator
@@ -513,10 +514,8 @@ mod tests {
             &vid,
             amun_validator_identity::signature::DEFAULT_CHAIN_ID,
             1,
+            0,
             &[0xAA; 32],
-            &[0xBB; 32],
-            true,
-            1000,
         );
 
         let sig_ok = sk.sign(&payload_ok).to_bytes();
@@ -547,8 +546,10 @@ mod tests {
     }
 }
 
+#[cfg(test)]
 mod n130_tests {
-    use super::*;
+    use crate::messages::ConsensusVote;
+    use crate::round::ConsensusRound;
 
     #[test]
     fn n130_vote_before_proposal_is_recovered() {

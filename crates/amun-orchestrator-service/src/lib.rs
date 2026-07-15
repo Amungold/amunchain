@@ -139,6 +139,7 @@ impl ServiceManager {
 #[async_trait]
 impl ProcessManager for ServiceManager {
     async fn start(&self, service_name: &str, args: &[String]) -> Result<u32, OrchestratorError> {
+        println!("START service={} args={:?}", service_name, args);
         let command = args
             .first()
             .cloned()

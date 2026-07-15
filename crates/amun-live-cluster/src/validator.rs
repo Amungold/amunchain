@@ -316,7 +316,7 @@ impl LiveValidator {
                     let peers_addr: Vec<std::net::SocketAddr> =
                         peers.iter().map(|p| p.address).collect();
 
-                    let current_h = { engine_consensus.lock().unwrap().current_height };
+                    let current_h = { store_consensus.lock().unwrap().latest_height() };
 
                     if let Ok(records) = download_missing_records(current_h, &peers_addr) {
                         if !records.is_empty() {
@@ -356,7 +356,7 @@ impl LiveValidator {
                 if needs_sync {
                     let peers_addr: Vec<std::net::SocketAddr> =
                         peers.iter().map(|p| p.address).collect();
-                    let current_h = engine_consensus.lock().unwrap().current_height;
+                    let current_h = store_consensus.lock().unwrap().latest_height();
                     if let Ok(records) = download_missing_records(current_h, &peers_addr) {
                         if !records.is_empty() {
                             let mut store_g = store_consensus.lock().unwrap();
@@ -506,10 +506,8 @@ impl LiveValidator {
                     &validator_id,
                     amun_validator_identity::signature::DEFAULT_CHAIN_ID,
                     height,
+                    0, // round
                     &block_hash,
-                    &state_root,
-                    true,
-                    timestamp,
                 );
 
                 let sig = signing_key.sign(&payload).to_bytes();

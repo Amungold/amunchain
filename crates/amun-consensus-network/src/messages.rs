@@ -167,11 +167,15 @@ pub struct FinalityCertificate {
     pub timestamp: u64,
 }
 
+// N144: These imports are used by test helper functions within mod tests.
 #[cfg(test)]
+#[allow(unused_imports)]
 use amun_validator_registry::{PeerId, PublicKey, ValidatorId, ValidatorRecord, ValidatorRegistry};
 mod tests {
+    #[allow(unused_imports)]
     use super::*;
 
+    #[cfg(test)]
     fn make_vote(voter: u8, height: u64, block_hash: [u8; 32], approve: bool) -> ConsensusVote {
         ConsensusVote {
             voter_id: [voter; 32],
@@ -185,6 +189,7 @@ mod tests {
         }
     }
 
+    #[cfg(test)]
     fn make_signed_vote(voter: u8, height: u64, block_hash: [u8; 32], round: u64) -> SignedVote {
         let mut vote = make_vote(voter, height, block_hash, true);
         vote.timestamp = round;
@@ -213,7 +218,6 @@ mod tests {
 
     #[test]
     fn n131_duplicate_validator_in_qc_rejected() {
-
         let hash = [0xAA; 32];
 
         let qc = QuorumCertificate {
@@ -243,7 +247,6 @@ mod tests {
     }
     #[test]
     fn n131_tampered_approval_power_rejected() {
-
         let hash = [0xAA; 32];
 
         let qc = QuorumCertificate {
@@ -439,6 +442,7 @@ pub struct BlockProposal {
     pub timestamp: u64,
 }
 
+#[cfg(test)]
 mod n104_1_tests {
     use super::*;
 

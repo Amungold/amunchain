@@ -15,8 +15,8 @@ impl ProcessHandle {
     ) -> Result<Self, OrchestratorError> {
         let child = Command::new(command)
             .args(args)
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit())
             .stdin(Stdio::null())
             .spawn()
             .map_err(|e| OrchestratorError::Process {
