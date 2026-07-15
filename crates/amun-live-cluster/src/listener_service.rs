@@ -60,8 +60,10 @@ impl ListenerService {
                             let mut range_buf = [0u8; 16];
 
                             if stream.read_exact(&mut range_buf).is_ok() {
-                                let start = u64::from_be_bytes(range_buf[0..8].try_into().unwrap());
-                                let end = u64::from_be_bytes(range_buf[8..16].try_into().unwrap());
+                                // SAFETY: range_buf is [0u8; 16] populated by read_exact above.
+                                // The slice [0..8] is always exactly 8 bytes.
+                                let start = u64::from_be_bytes(range_buf[0..8].try_into().expect("8-byte slice"));
+                                let end = u64::from_be_bytes(range_buf[8..16].try_into().expect("8-byte slice"));
 
                                 eprintln!("SYNC_SERVED: block_range_request {}..{}", start, end);
 
