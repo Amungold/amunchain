@@ -230,25 +230,27 @@ mod tests {
         };
 
         let mut registry = ValidatorRegistry::new();
+        let vid = ValidatorId([1u8; 32]);
         registry
             .register_full(ValidatorRecord {
-                validator_id: ValidatorId([1u8; 32]),
+                validator_id: vid,
                 peer_id: PeerId([0u8; 32]),
                 public_key: PublicKey([0u8; 32]),
                 certificate_hash: [0u8; 32],
                 stake: 0,
                 voting_power: 1,
-                active: true,
+                active: false,
                 slash_count: 0,
                 registered_at: 0,
                 registered_epoch: 0,
                 last_seen: 0,
-                status: ValidatorStatus::Active,
+                status: ValidatorStatus::Inactive,
                 stake_epoch: 0,
                 protocol_version: 1,
                 identity_version: 1,
             })
             .unwrap();
+        registry.activate(&vid).unwrap();
         assert!(qc.verify_with_registry(&registry).is_err());
     }
     #[test]
@@ -270,25 +272,27 @@ mod tests {
 
         let mut registry = ValidatorRegistry::new();
         for id in [1u8, 2u8, 3u8].iter() {
+            let vid = ValidatorId([*id; 32]);
             registry
                 .register_full(ValidatorRecord {
-                    validator_id: ValidatorId([*id; 32]),
+                    validator_id: vid,
                     peer_id: PeerId([0u8; 32]),
                     public_key: PublicKey([0u8; 32]),
                     certificate_hash: [0u8; 32],
                     stake: 0,
                     voting_power: 1,
-                    active: true,
+                    active: false,
                     slash_count: 0,
                     registered_at: 0,
                     registered_epoch: 0,
                     last_seen: 0,
-                    status: ValidatorStatus::Active,
+                    status: ValidatorStatus::Inactive,
                     stake_epoch: 0,
                     protocol_version: 1,
                     identity_version: 1,
                 })
                 .unwrap();
+            registry.activate(&vid).unwrap();
         }
         assert!(qc.verify_with_registry(&registry).is_err());
     }

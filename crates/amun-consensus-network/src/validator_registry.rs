@@ -15,7 +15,7 @@ impl ConsensusEngine {
         public_key: [u8; 32],
         voting_power: u64,
     ) {
-        // N136: Write to canonical registry when available
+        // N136 + N148: Write to canonical registry, then explicitly activate
         if let Some(ref mutex) = self.registry_mut {
             if let Ok(mut reg) = mutex.lock() {
                 let record = amun_validator_registry::ValidatorRecord {
@@ -25,17 +25,19 @@ impl ConsensusEngine {
                     certificate_hash: [0u8; 32],
                     stake: voting_power,
                     voting_power,
-                    active: true,
+                    active: false,
                     slash_count: 0,
                     registered_at: 0,
                     registered_epoch: 0,
                     last_seen: 0,
-                    status: amun_validator_registry::ValidatorStatus::Active,
+                    status: amun_validator_registry::ValidatorStatus::Inactive,
                     stake_epoch: 0,
                     protocol_version: 1,
                     identity_version: 1,
                 };
+                let validator_id_copy = record.validator_id;
                 let _ = reg.register_full(record);
+                let _ = reg.activate(&validator_id_copy);
             }
         }
 

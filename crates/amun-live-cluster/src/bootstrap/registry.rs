@@ -27,17 +27,19 @@ pub fn build_registry(
             certificate_hash: [0u8; 32],
             stake: 100,
             voting_power: 100,
-            active: true,
+            active: false,
             slash_count: 0,
             registered_at: 0,
             registered_epoch: 0,
             last_seen: 0,
-            status: ValidatorStatus::Active,
+            status: ValidatorStatus::Inactive,
             stake_epoch: 0,
             protocol_version: 1,
             identity_version: 1,
         };
+        let validator_id_copy = record.validator_id;
         registry.register_full(record)?;
+        registry.activate(&validator_id_copy)?;
     }
 
     Ok(())
