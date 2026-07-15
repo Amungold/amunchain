@@ -9,7 +9,7 @@ use std::time::{Duration, Instant};
 fn main() {
     let ports = [9400, 9401, 9402, 9403];
     let validators: Vec<LiveValidator> = (0..4)
-        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)).unwrap())
         .collect();
 
     for v in &validators {

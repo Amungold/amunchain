@@ -70,9 +70,10 @@ pub struct LiveValidator {
 }
 
 impl LiveValidator {
-    pub fn new(config: ValidatorConfig) -> Self {
+    pub fn new(config: ValidatorConfig) -> Result<Self, String> {
         let store = ChainStore::open(&config.data_dir)
-            .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").unwrap());
+            .or_else(|_| ChainStore::open("/tmp/amun-fallback"))
+            .map_err(|e| format!("Failed to open chain store: {}", e))?;
         let recovered_height = store.latest_height();
         let recovered_root = store
             .load_tip()
@@ -103,7 +104,7 @@ impl LiveValidator {
             0,
         );
         let registry = AuthorityRegistry::from_genesis(authority);
-        let active_authority = registry.active().expect("No active authority");
+        let active_authority = registry.active().ok_or("No active authority")?;
 
         // Create self certificate and verify it
         let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
@@ -129,20 +130,20 @@ impl LiveValidator {
             let cert_path = peer
                 .certificate_path
                 .as_ref()
-                .expect("Peer certificate_path not set");
+                .ok_or("Peer certificate_path not set")?;
             let cert_json = std::fs::read_to_string(cert_path)
-                .unwrap_or_else(|_| panic!("Failed to read certificate {}", cert_path));
+                .map_err(|e| format!("Failed to read certificate {}: {}", cert_path, e))?;
             let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
                 serde_json::from_str(&cert_json)
-                    .unwrap_or_else(|_| panic!("Invalid certificate JSON in {}", cert_path));
+                    .map_err(|e| format!("Invalid certificate JSON in {}: {}", cert_path, e))?;
             if !registry.verify_certificate_at(&peer_cert, 0) {
-                panic!("Peer certificate verification failed for {}", cert_path);
+                return Err(format!("Peer certificate verification failed for {}", cert_path));
             }
             let peer_pk = peer_cert.public_key;
             let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
             engine.register_validator_identity(peer_cert.validator_id.0, peer_id, peer_pk, 100);
         }
-        Self {
+        Ok(Self {
             config,
             engine: Arc::new(Mutex::new(engine)),
             store: Arc::new(Mutex::new(store)),
@@ -172,7 +173,7 @@ impl LiveValidator {
                     amun_staking::validator::ValidatorRegistry::new()
                 }),
             ))),
-        }
+        }) // Ok(Self { ... })
     }
 
     pub fn prepare(&self) -> Result<(), String> {

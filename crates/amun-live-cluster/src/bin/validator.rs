@@ -26,7 +26,7 @@ fn main() {
             .collect::<Vec<_>>()
     );
 
-    let validator = LiveValidator::new(config);
+    let validator = LiveValidator::new(config).unwrap();
     validator.start().unwrap();
 
     println!("Validator {} running. Press Ctrl+C to stop.", index);

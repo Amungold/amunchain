@@ -13,7 +13,7 @@ fn main() {
             let ports = [base_port, base_port + 1, base_port + 2, base_port + 3];
             ValidatorConfig::test_cluster(i, &ports).with_quorum(quorum)
         })
-        .map(LiveValidator::new)
+        .map(|c| LiveValidator::new(c).unwrap())
         .collect();
 
     for v in &validators {
@@ -59,8 +59,8 @@ fn main() {
     // Phase 3: heal partition — restart V2 and V3
     println!("\nPhase 3: Healing partition...");
     let ports = [base_port, base_port + 1, base_port + 2, base_port + 3];
-    let v2 = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(quorum));
-    let v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(quorum));
+    let v2 = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(quorum)).unwrap();
+    let v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(quorum)).unwrap();
     v2.start().unwrap();
     v3.start().unwrap();
     validators[2] = v2;

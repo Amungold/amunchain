@@ -68,7 +68,7 @@ fn main() {
             )
             .with_quorum(4);
             config.data_dir = data_dirs[i].clone();
-            LiveValidator::new(config)
+            LiveValidator::new(config).unwrap()
         })
         .collect();
 
@@ -98,7 +98,7 @@ fn main() {
         )
         .with_quorum(4);
         config.data_dir = data_dirs[target].clone();
-        let new_v = LiveValidator::new(config);
+        let new_v = LiveValidator::new(config).unwrap();
         new_v.start().unwrap();
         validators[target] = new_v;
 

@@ -20,7 +20,7 @@ async fn main() {
         config.all_peer_addresses()
     );
 
-    let validator = LiveValidator::new(config);
+    let validator = LiveValidator::new(config).unwrap();
     validator.start().unwrap();
 
     let state = AppState {

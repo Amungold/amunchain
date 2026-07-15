@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 fn main() {
     let ports = [9200, 9201, 9202, 9203];
     let mut validators: Vec<LiveValidator> = (0..4)
-        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)).unwrap())
         .collect();
 
     for v in &validators {
@@ -41,7 +41,7 @@ fn main() {
     }
 
     println!("=== Phase 3: Restarting validator 3 ===");
-    let new_v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(4));
+    let new_v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(4)).unwrap();
     new_v3.start().unwrap();
     validators[3] = new_v3;
 

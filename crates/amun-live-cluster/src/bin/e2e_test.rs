@@ -11,7 +11,7 @@ use tokio::net::TcpListener;
 async fn main() {
     let ports = [10001, 10002, 10003, 10004];
     let config = ValidatorConfig::test_cluster(0, &ports).with_quorum(1);
-    let validator = LiveValidator::new(config);
+    let validator = LiveValidator::new(config).unwrap();
     validator.start().unwrap();
 
     let state = AppState {

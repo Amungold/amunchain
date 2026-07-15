@@ -35,7 +35,7 @@ fn main() {
                 ))
                 .authority_public_key,
             };
-            LiveValidator::new(config)
+            LiveValidator::new(config).unwrap()
         })
         .collect();
 

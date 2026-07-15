@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 fn main() {
     let ports = [9300, 9301, 9302, 9303];
     let mut validators: Vec<LiveValidator> = (0..4)
-        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)).unwrap())
         .collect();
 
     for v in &validators {
@@ -39,8 +39,8 @@ fn main() {
     }
 
     println!("=== Phase 3: Heal partition — restart validators 2 & 3 (30s) ===");
-    let v2 = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(4));
-    let v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(4));
+    let v2 = LiveValidator::new(ValidatorConfig::test_cluster(2, &ports).with_quorum(4)).unwrap();
+    let v3 = LiveValidator::new(ValidatorConfig::test_cluster(3, &ports).with_quorum(4)).unwrap();
     v2.start().unwrap();
     v3.start().unwrap();
     validators[2] = v2;

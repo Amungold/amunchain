@@ -6,7 +6,7 @@ use std::time::Duration;
 fn main() {
     let ports = [9700, 9701, 9702, 9703];
     let validators: Vec<LiveValidator> = (0..4)
-        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)))
+        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)).unwrap())
         .collect();
 
     for v in &validators {

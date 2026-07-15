@@ -28,9 +28,16 @@ fn main() {
         let validator_cfg =
             cluster_builder::ClusterBuilder::build(&ctx).expect("LiveValidator configuration");
 
-        let validator = amun_live_cluster::validator::LiveValidator::new(validator_cfg);
+        let validator = amun_live_cluster::validator::LiveValidator::new(validator_cfg)
+            .unwrap_or_else(|e| {
+                eprintln!("Fatal: Failed to create LiveValidator: {e}");
+                std::process::exit(1);
+            });
 
-        validator.start().expect("Failed to start LiveValidator");
+        validator.start().unwrap_or_else(|e| {
+            eprintln!("Fatal: Failed to start LiveValidator: {e}");
+            std::process::exit(1);
+        });
 
         loop {
             std::thread::park();

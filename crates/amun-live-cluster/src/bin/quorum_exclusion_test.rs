@@ -15,7 +15,7 @@ fn main() {
             let ports = [base_port, base_port + 1, base_port + 2, base_port + 3];
             ValidatorConfig::test_cluster(i, &ports).with_quorum(quorum)
         })
-        .map(LiveValidator::new)
+        .map(|c| LiveValidator::new(c).unwrap())
         .collect();
 
     for v in &validators {

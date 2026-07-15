@@ -20,7 +20,7 @@ fn n129_4_evidence_continuity_audit() {
         .map(|i| {
             let mut config = ValidatorConfig::test_cluster(i, &ports).with_quorum(3);
             config.data_dir = dirs[i].clone();
-            LiveValidator::new(config)
+            LiveValidator::new(config).unwrap().unwrap()
         })
         .collect();
 
