@@ -27,7 +27,9 @@ impl BootstrapContext {
 
         let certs = load_cluster_certificates(&self.config)?;
 
-        build_registry(&mut engine.registry_mut.as_ref().unwrap().lock().unwrap(), &self.authority_registry, &certs)?;
+        // SAFETY: registry_mut is always initialized before bootstrap runs.
+        // This invariant is guaranteed by ConsensusEngine::new().
+        build_registry(&mut engine.registry_mut.as_ref().expect("registry_mut not initialized").lock().expect("registry_mut lock poisoned"), &self.authority_registry, &certs)?;
 
         Ok(())
     }
