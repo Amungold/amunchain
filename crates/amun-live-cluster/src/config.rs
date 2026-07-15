@@ -14,16 +14,18 @@ struct GenesisFile {
 
 /// Load genesis authority from a JSON file.
 /// The file must exist; there is no fallback.
-pub fn load_genesis_authority(path: &str) -> GenesisAuthority {
-    let json = std::fs::read_to_string(path).expect("Genesis authority file missing");
+pub fn load_genesis_authority(path: &str) -> Result<GenesisAuthority, String> {
+    let json = std::fs::read_to_string(path)
+        .map_err(|e| format!("Genesis authority file missing: {}", e))?;
 
-    let genesis: GenesisFile = serde_json::from_str(&json).expect("Invalid genesis authority JSON");
+    let genesis: GenesisFile = serde_json::from_str(&json)
+        .map_err(|e| format!("Invalid genesis authority JSON: {}", e))?;
 
     genesis
         .trust_anchors
         .into_iter()
         .next()
-        .expect("Genesis contains no trust anchors")
+        .ok_or_else(|| "Genesis contains no trust anchors".to_string())
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -65,6 +67,7 @@ impl ValidatorConfig {
                 env!("CARGO_MANIFEST_DIR"),
                 "/genesis/genesis_authority.json"
             ))
+            .expect("embedded test genesis")
             .authority_public_key,
             quorum_size: None,
         }
@@ -89,6 +92,7 @@ impl ValidatorConfig {
                 env!("CARGO_MANIFEST_DIR"),
                 "/genesis/genesis_authority.json"
             ))
+            .expect("embedded test genesis")
             .authority_public_key,
             quorum_size: None,
         }

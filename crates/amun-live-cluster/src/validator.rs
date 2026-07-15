@@ -97,7 +97,8 @@ impl LiveValidator {
         let genesis = load_genesis_authority(concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/genesis/genesis_authority.json"
-        ));
+        ))
+        .map_err(|e| format!("Failed to load genesis authority: {}", e))?;
         let authority = ConstitutionalAuthority::new(
             genesis.authority_public_key,
             genesis.authority_version,

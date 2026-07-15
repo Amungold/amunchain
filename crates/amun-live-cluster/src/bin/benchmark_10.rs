@@ -33,6 +33,7 @@ fn main() {
                     env!("CARGO_MANIFEST_DIR"),
                     "/genesis/genesis_authority.json"
                 ))
+                .expect("embedded test genesis")
                 .authority_public_key,
             };
             LiveValidator::new(config).unwrap()
