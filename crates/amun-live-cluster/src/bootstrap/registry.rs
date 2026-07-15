@@ -20,26 +20,24 @@ pub fn build_registry(
             .into());
         }
 
-        let record = ValidatorRecord {
+        use amun_validator_registry::{AdmissionRequest, AdmissionService};
+        let request = AdmissionRequest {
             validator_id: ValidatorId(cert.validator_id),
             peer_id: PeerId(cert.peer_id.0),
             public_key: PublicKey(cert.public_key),
             certificate_hash: [0u8; 32],
             stake: 100,
             voting_power: 100,
-            active: false,
-            slash_count: 0,
-            registered_at: 0,
-            registered_epoch: 0,
-            last_seen: 0,
-            status: ValidatorStatus::Inactive,
-            stake_epoch: 0,
             protocol_version: 1,
             identity_version: 1,
         };
-        let validator_id_copy = record.validator_id;
-        registry.register_full(record)?;
-        registry.activate(&validator_id_copy)?;
+        let gates = AdmissionService::mainnet_gates();
+        match AdmissionService::admit(&mut registry, request, &gates) {
+            amun_validator_registry::AdmissionResult::Admitted { .. } => {}
+            amun_validator_registry::AdmissionResult::Rejected { error, .. } => {
+                return Err(format!("Validator admission rejected: {}", error).into());
+            }
+        }
     }
 
     Ok(())

@@ -97,6 +97,20 @@ pub enum AdmissionResult {
 pub struct AdmissionService;
 
 impl AdmissionService {
+    /// Standard mainnet admission gates in recommended order.
+    /// All production paths should use these gates unless a specific
+    /// custom policy is required.
+    pub fn mainnet_gates() -> Vec<Box<dyn AdmissionGate>> {
+        vec![
+            Box::new(IdentityGate),
+            Box::new(DuplicateGate),
+            Box::new(CertificateGate { expected_certificate_hash: [0xBB; 32] }),
+            Box::new(StakePolicyGate { minimum_stake: 100 }),
+            Box::new(ProtocolCompatibilityGate { expected_protocol_version: 1 }),
+            Box::new(GenesisCompatibilityGate { expected_genesis_hash: [0u8; 32] }),
+        ]
+    }
+
     /// Admit a validator: run all gates, then register + activate.
     ///
     /// # Atomicity Guarantee

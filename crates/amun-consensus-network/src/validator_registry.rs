@@ -15,29 +15,22 @@ impl ConsensusEngine {
         public_key: [u8; 32],
         voting_power: u64,
     ) {
-        // N136 + N148: Write to canonical registry, then explicitly activate
+        // N150: Use AdmissionService as single entry point
         if let Some(ref mutex) = self.registry_mut {
             if let Ok(mut reg) = mutex.lock() {
-                let record = amun_validator_registry::ValidatorRecord {
-                    validator_id: amun_validator_registry::ValidatorId(validator_id),
-                    peer_id: amun_validator_registry::PeerId(peer_id),
-                    public_key: amun_validator_registry::PublicKey(public_key),
+                use amun_validator_registry::{AdmissionRequest, AdmissionService, PeerId, PublicKey, ValidatorId};
+                let request = AdmissionRequest {
+                    validator_id: ValidatorId(validator_id),
+                    peer_id: PeerId(peer_id),
+                    public_key: PublicKey(public_key),
                     certificate_hash: [0u8; 32],
                     stake: voting_power,
                     voting_power,
-                    active: false,
-                    slash_count: 0,
-                    registered_at: 0,
-                    registered_epoch: 0,
-                    last_seen: 0,
-                    status: amun_validator_registry::ValidatorStatus::Inactive,
-                    stake_epoch: 0,
                     protocol_version: 1,
                     identity_version: 1,
                 };
-                let validator_id_copy = record.validator_id;
-                let _ = reg.register_full(record);
-                let _ = reg.activate(&validator_id_copy);
+                let gates = AdmissionService::mainnet_gates();
+                let _ = AdmissionService::admit(&mut reg, request, &gates);
             }
         }
 
