@@ -96,6 +96,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-binary-codec"
+version = "1.0.0"
+dependencies = [
+ "amun-chain-position",
+]
+
+[[package]]
 name = "amun-block-builder"
 version = "0.1.0"
 dependencies = [
@@ -250,6 +257,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-consensus-execution"
+version = "1.0.0"
+dependencies = [
+ "amun-chain-position",
+ "amun-consensus-messages",
+ "amun-quorum-certificate",
+ "amun-validator-attestation",
+ "amun-wal",
+ "hex",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "tempfile",
+]
+
+[[package]]
 name = "amun-consensus-integration"
 version = "0.1.0"
 dependencies = [
@@ -266,6 +289,15 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.18",
+]
+
+[[package]]
+name = "amun-consensus-messages"
+version = "1.0.0"
+dependencies = [
+ "amun-binary-codec",
+ "amun-chain-position",
+ "blake3",
 ]
 
 [[package]]
@@ -1775,6 +1807,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "amun-quorum-certificate"
+version = "1.0.0"
+dependencies = [
+ "amun-chain-position",
+ "amun-consensus-messages",
+ "amun-validator-attestation",
+ "blake3",
+]
+
+[[package]]
 name = "amun-recovery"
 version = "0.1.0"
 dependencies = [
@@ -2158,6 +2200,15 @@ name = "amun-validator-api"
 version = "0.1.0"
 
 [[package]]
+name = "amun-validator-attestation"
+version = "1.0.0"
+dependencies = [
+ "amun-chain-position",
+ "amun-kernel-types",
+ "blake3",
+]
+
+[[package]]
 name = "amun-validator-bootstrap"
 version = "0.1.0"
 dependencies = [
@@ -2253,6 +2304,17 @@ version = "0.1.0"
 dependencies = [
  "amun-resource-core",
  "serde",
+]
+
+[[package]]
+name = "amun-wal"
+version = "1.0.0"
+dependencies = [
+ "crc32fast",
+ "hex",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
 ]
 
 [[package]]

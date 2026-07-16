@@ -150,6 +150,12 @@ impl BlockDAG {
         Ok(())
     }
 
+    /// Returns true if the block is present in the DAG.
+    #[inline]
+    pub fn contains_block(&self, hash: &[u8; 32]) -> bool {
+        self.blocks.contains_key(hash)
+    }
+
     pub fn get_block(&self, hash: &[u8; 32]) -> Option<&BlockNode> {
         self.blocks.get(hash)
     }
