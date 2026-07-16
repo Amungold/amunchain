@@ -14,7 +14,9 @@ fn r2_4_3_equivocate_100_percent_always_equivocates() {
     let fi = FaultInjector::equivocate(100);
     let mut count = 0;
     for _ in 0..200 {
-        if fi.should_equivocate() { count += 1; }
+        if fi.should_equivocate() {
+            count += 1;
+        }
     }
     assert_eq!(count, 200);
 }
@@ -34,13 +36,17 @@ fn r2_4_3_equivocate_is_deterministic() {
 #[test]
 fn r2_4_3_equivocate_does_not_drop() {
     let fi = FaultInjector::equivocate(100);
-    for _ in 0..500 { assert!(!fi.should_drop()); }
+    for _ in 0..500 {
+        assert!(!fi.should_drop());
+    }
 }
 
 #[test]
 fn r2_4_3_equivocate_does_not_delay() {
     let fi = FaultInjector::equivocate(100);
-    for _ in 0..500 { assert!(fi.should_delay().is_none()); }
+    for _ in 0..500 {
+        assert!(fi.should_delay().is_none());
+    }
 }
 
 #[test]
@@ -50,11 +56,19 @@ fn r2_4_3_equivocate_shared_across_threads() {
     let fi2 = Arc::clone(&fi);
     let h = thread::spawn(move || {
         let mut c = 0;
-        for _ in 0..500 { if fi2.should_equivocate() { c += 1; } }
+        for _ in 0..500 {
+            if fi2.should_equivocate() {
+                c += 1;
+            }
+        }
         c
     });
     let mut cm = 0;
-    for _ in 0..500 { if fi.should_equivocate() { cm += 1; } }
+    for _ in 0..500 {
+        if fi.should_equivocate() {
+            cm += 1;
+        }
+    }
     let total = cm + h.join().unwrap();
     let pct = (total as f64 / 1000.0) * 100.0;
     assert!((15.0..=35.0).contains(&pct));

@@ -46,6 +46,11 @@ use amun_networking::transport_trait::Transport;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 
+/// Buffered frame for reordering: (serialized_bytes, optional_peer).
+type BufferedFrame = (Vec<u8>, Option<SocketAddr>);
+/// Thread-safe reorder buffer.
+type ReorderBuffer = Arc<Mutex<std::collections::VecDeque<BufferedFrame>>>;
+
 #[derive(Clone)]
 pub struct ValidatorNetworkAdapter {
     transport: Arc<Mutex<TcpTransport>>,
@@ -54,7 +59,7 @@ pub struct ValidatorNetworkAdapter {
     fault_injector: Option<Arc<FaultInjector>>,
     /// Buffered frames for deterministic message reordering.
     /// (serialized frame, destination peer; None = broadcast)
-    reorder_buffer: Arc<Mutex<std::collections::VecDeque<(Vec<u8>, Option<SocketAddr>)>>>,
+    reorder_buffer: ReorderBuffer,
 }
 
 impl ValidatorNetworkAdapter {

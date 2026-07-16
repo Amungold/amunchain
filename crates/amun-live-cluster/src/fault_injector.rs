@@ -109,7 +109,6 @@ impl FaultInjector {
     }
 
     /// Returns true if the current message should be dropped.
-
     /// Create a fault injector that reorders `percent` of messages.
     pub fn reorder(percent: u8, buffer_size: usize) -> Self {
         assert!(percent <= 100, "Reorder percent must be 0..100");
