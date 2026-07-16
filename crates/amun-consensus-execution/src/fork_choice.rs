@@ -1,5 +1,6 @@
 use crate::block_dag::{BlockDAG, BlockNode, MAX_DAG_DEPTH};
 use amun_quorum_certificate::QuorumCertificate;
+use amun_chain_position::ChainPosition;
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Fork-choice rule with lock history for monotonicity verification
@@ -38,20 +39,38 @@ impl ForkChoice {
     }
 
     /// Update with a new QC
-    pub fn update_qc(&mut self, qc: QuorumCertificate, dag: &BlockDAG) {
-        let round = qc.round;
-
+    pub fn apply_qc_core(&mut self, metadata: &QcMetadata, dag: &BlockDAG) {
+        let qc = QuorumCertificate {
+            position: ChainPosition::new(0, metadata.height),
+            round: metadata.round,
+            block_hash: metadata.block_hash,
+            parent_hash: metadata.parent_hash,
+            votes: Vec::new(),
+            aggregated_signature: None,
+        };
         self.high_qcs
-            .entry(round)
+            .entry(metadata.round)
             .and_modify(|existing| {
                 if qc.position.sequence > existing.position.sequence {
                     *existing = qc.clone();
                 }
             })
             .or_insert_with(|| qc.clone());
-
         self.try_advance_lock_and_commit(&qc, dag);
         self.update_validated_qc(qc);
+    }
+
+    pub fn update_qc(&mut self, qc: QuorumCertificate, dag: &BlockDAG) {
+        if !dag.contains_block(&qc.block_hash) {
+            return;
+        }
+        let metadata = QcMetadata {
+            block_hash: qc.block_hash,
+            parent_hash: qc.parent_hash,
+            round: qc.round,
+            height: qc.position.sequence,
+        };
+        self.apply_qc_core(&metadata, dag);
     }
 
     /// Get the highest QC across all rounds

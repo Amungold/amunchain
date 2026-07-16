@@ -70,9 +70,23 @@ pub struct ConsensusStateDigest {
 
 impl PersistentConsensusState {
     pub fn open(wal_path: &str, genesis_hash: [u8; 32]) -> Result<Self, String> {
-        let wal_exists = std::path::Path::new(wal_path).exists();
-
-        if wal_exists {
+        let has_segments = std::fs::read_dir(
+            std::path::Path::new(wal_path).parent().unwrap_or(std::path::Path::new("."))
+        )
+        .map(|dir| {
+            let prefix = std::path::Path::new(wal_path)
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string();
+            dir.filter_map(|e| e.ok())
+                .any(|e| {
+                    e.file_name().to_string_lossy().starts_with(&prefix)
+                        && e.file_name().to_string_lossy().ends_with(".wal")
+                })
+        })
+        .unwrap_or(false);
+        if has_segments {
             Self::recover_from_wal(wal_path, genesis_hash, RecoveryMode::Strict)
         } else {
             Ok(Self::from_existing_wal(
@@ -255,7 +269,8 @@ impl PersistentConsensusState {
         };
         let json = serde_json::to_string(&ev).map_err(|e| format!("Ser: {}", e))?;
         let entry = self.wal.append_and_return_entry("QC", &json)?;
-        self.apply_wal_entry(&entry)
+        self.apply_wal_entry(&entry)?;
+        Ok(())
     }
     pub fn record_commit(&mut self, bh: [u8; 32], h: u64) -> Result<(), String> {
         let ev = CommitEvent {
