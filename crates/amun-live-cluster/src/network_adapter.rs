@@ -1,4 +1,45 @@
-use crate::fault_injector::FaultInjector;
+use crate::fault_injector::{CorruptKind, FaultInjector};
+
+/// Apply corruption to a NetworkFrame based on CorruptKind.
+fn apply_corruption(frame: &mut NetworkFrame, kind: &CorruptKind) {
+    // Convert Bytes to Vec<u8> for mutation, then set back
+    let mut raw = frame.payload.to_vec();
+    match kind {
+        CorruptKind::InvalidSignature => {
+            if raw.len() >= 64 {
+                let start = raw.len() - 64;
+                for b in &mut raw[start..] {
+                    *b = 0;
+                }
+            }
+        }
+        CorruptKind::BitFlip => {
+            if !raw.is_empty() {
+                raw[0] ^= 0xFF;
+            }
+        }
+        CorruptKind::WrongHeight => {
+            if raw.len() >= 8 {
+                raw[0..8].copy_from_slice(&999999u64.to_le_bytes());
+            }
+        }
+        CorruptKind::WrongBlockHash => {
+            if raw.len() >= 40 {
+                for b in &mut raw[8..40] {
+                    *b = 0;
+                }
+            }
+        }
+        CorruptKind::Truncated => {
+            let half = raw.len() / 2;
+            for b in &mut raw[half..] {
+                *b = 0;
+            }
+        }
+    }
+    frame.payload = raw.into();
+}
+
 use amun_networking::frame::{FrameKind, NetworkFrame};
 use amun_networking::tcp_transport::TcpTransport;
 use amun_networking::transport_trait::Transport;
@@ -43,8 +84,11 @@ impl ValidatorNetworkAdapter {
     }
 
     pub fn broadcast_vote(&self, vote: Vec<u8>) {
-        // R2.3: Fault injection — reorder, delay, then maybe drop
+        // R2.3 + R2.4: Fault injection
+        let mut corrupt_kind: Option<CorruptKind> = None;
         if let Some(ref fi) = self.fault_injector {
+            // Corrupt (R2.4)
+            corrupt_kind = fi.should_corrupt();
             // Reorder first
             if let Some(buffer_size) = fi.should_reorder() {
                 let frame = NetworkFrame::new(FrameKind::Vote, vote.into());
@@ -67,7 +111,11 @@ impl ValidatorNetworkAdapter {
                 return;
             }
         }
-        let frame = NetworkFrame::new(FrameKind::Vote, vote.into());
+        let mut frame = NetworkFrame::new(FrameKind::Vote, vote.into());
+        if let Some(kind) = &corrupt_kind {
+            eprintln!("FAULT_CORRUPT: broadcast_vote {:?}", kind);
+            apply_corruption(&mut frame, kind);
+        }
         let bytes = postcard::to_stdvec(&frame).expect("Frame serialization failed");
         let data: Arc<[u8]> = Arc::from(bytes.into_boxed_slice());
         let t = self.transport.lock().expect("mutex poisoned");
@@ -75,8 +123,11 @@ impl ValidatorNetworkAdapter {
     }
 
     pub fn send_to(&self, peer: SocketAddr, frame: NetworkFrame) -> Result<(), String> {
-        // R2.3: Fault injection — reorder, delay, then maybe drop
+        // R2.3 + R2.4: Fault injection
+        let mut corrupt_kind: Option<CorruptKind> = None;
         if let Some(ref fi) = self.fault_injector {
+            // Corrupt (R2.4)
+            corrupt_kind = fi.should_corrupt();
             // Reorder first
             if let Some(buffer_size) = fi.should_reorder() {
                 let bytes = postcard::to_stdvec(&frame).map_err(|e| format!("encode: {}", e))?;
@@ -97,6 +148,14 @@ impl ValidatorNetworkAdapter {
                 eprintln!("FAULT_DROP: send_to {} {:?}", peer, frame.kind);
                 return Ok(());
             }
+        }
+        let mut frame = frame.clone();
+        if let Some(kind) = &corrupt_kind {
+            eprintln!(
+                "FAULT_CORRUPT: send_to {} {:?} {:?}",
+                peer, frame.kind, kind
+            );
+            apply_corruption(&mut frame, kind);
         }
         let bytes = postcard::to_stdvec(&frame).map_err(|e| format!("encode: {}", e))?;
         let data: Arc<[u8]> = Arc::from(bytes.into_boxed_slice());

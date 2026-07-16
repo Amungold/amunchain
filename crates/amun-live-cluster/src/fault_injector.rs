@@ -16,6 +16,25 @@ pub enum FaultMode {
     },
     /// Reorder messages: buffer some, release in LIFO order.
     Reorder { percent: u8, buffer_size: usize },
+    /// Duplicate messages: send original + N extra copies.
+    Duplicate { percent: u8, count: u8 },
+    /// Corrupt message content.
+    Corrupt { percent: u8, kind: CorruptKind },
+}
+
+/// Type of corruption to apply to a message payload.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum CorruptKind {
+    /// Zero out the signature field.
+    InvalidSignature,
+    /// Flip a single byte in the payload.
+    BitFlip,
+    /// Replace the height field with a wrong value.
+    WrongHeight,
+    /// Replace the block hash with zeros.
+    WrongBlockHash,
+    /// Truncate the payload to half its size.
+    Truncated,
 }
 
 /// Thread-safe fault injector.
@@ -59,6 +78,25 @@ impl FaultInjector {
         }
     }
 
+    /// Create a fault injector that duplicates `percent` of messages `count` extra times.
+    pub fn duplicate(percent: u8, count: u8) -> Self {
+        assert!(percent <= 100, "Duplicate percent must be 0..100");
+        assert!(count > 0, "Duplicate count must be > 0");
+        Self {
+            mode: FaultMode::Duplicate { percent, count },
+            counter: AtomicU64::new(0),
+        }
+    }
+
+    /// Create a fault injector that corrupts `percent` of messages.
+    pub fn corrupt(percent: u8, kind: CorruptKind) -> Self {
+        assert!(percent <= 100, "Corrupt percent must be 0..100");
+        Self {
+            mode: FaultMode::Corrupt { percent, kind },
+            counter: AtomicU64::new(0),
+        }
+    }
+
     /// Returns true if the current message should be dropped.
 
     /// Create a fault injector that reorders `percent` of messages.
@@ -81,7 +119,10 @@ impl FaultInjector {
                 let n = self.counter.fetch_add(1, Ordering::Relaxed) % 100;
                 n < percent as u64
             }
-            FaultMode::Delay { .. } | FaultMode::Reorder { .. } => {
+            FaultMode::Delay { .. }
+            | FaultMode::Reorder { .. }
+            | FaultMode::Duplicate { .. }
+            | FaultMode::Corrupt { .. } => {
                 // Delay and Reorder don't drop — it delays. Always return false.
                 // But we still increment the counter for should_delay().
                 let _ = self.counter.fetch_add(1, Ordering::Relaxed);
@@ -112,7 +153,7 @@ impl FaultInjector {
                     None
                 }
             }
-            FaultMode::Reorder { .. } => {
+            FaultMode::Reorder { .. } | FaultMode::Duplicate { .. } | FaultMode::Corrupt { .. } => {
                 let _ = self.counter.fetch_add(1, Ordering::Relaxed);
                 None
             }
@@ -129,6 +170,36 @@ impl FaultInjector {
                 let n = self.counter.fetch_add(1, Ordering::Relaxed);
                 if (n % 100) < percent as u64 {
                     Some(buffer_size)
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
+    }
+
+    /// Returns Some(count) if this message should be duplicated (extra copies).
+    pub fn should_duplicate(&self) -> Option<u8> {
+        match self.mode {
+            FaultMode::Duplicate { percent, count } => {
+                let n = self.counter.fetch_add(1, Ordering::Relaxed);
+                if (n % 100) < percent as u64 {
+                    Some(count)
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
+    }
+
+    /// Returns Some(CorruptKind) if this message should be corrupted.
+    pub fn should_corrupt(&self) -> Option<CorruptKind> {
+        match self.mode {
+            FaultMode::Corrupt { percent, ref kind } => {
+                let n = self.counter.fetch_add(1, Ordering::Relaxed);
+                if (n % 100) < percent as u64 {
+                    Some(kind.clone())
                 } else {
                     None
                 }
