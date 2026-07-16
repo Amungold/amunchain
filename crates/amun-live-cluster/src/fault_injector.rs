@@ -20,6 +20,8 @@ pub enum FaultMode {
     Duplicate { percent: u8, count: u8 },
     /// Corrupt message content.
     Corrupt { percent: u8, kind: CorruptKind },
+    /// Equivocate: send conflicting votes for same height.
+    Equivocate { percent: u8 },
 }
 
 /// Type of corruption to apply to a message payload.
@@ -97,6 +99,15 @@ impl FaultInjector {
         }
     }
 
+    /// Create a fault injector that sends equivocating votes.
+    pub fn equivocate(percent: u8) -> Self {
+        assert!(percent <= 100, "Equivocate percent must be 0..100");
+        Self {
+            mode: FaultMode::Equivocate { percent },
+            counter: AtomicU64::new(0),
+        }
+    }
+
     /// Returns true if the current message should be dropped.
 
     /// Create a fault injector that reorders `percent` of messages.
@@ -122,9 +133,9 @@ impl FaultInjector {
             FaultMode::Delay { .. }
             | FaultMode::Reorder { .. }
             | FaultMode::Duplicate { .. }
-            | FaultMode::Corrupt { .. } => {
-                // Delay and Reorder don't drop — it delays. Always return false.
-                // But we still increment the counter for should_delay().
+            | FaultMode::Corrupt { .. }
+            | FaultMode::Equivocate { .. } => {
+                // Delay, Reorder, Duplicate, Corrupt, Equivocate don't drop.
                 let _ = self.counter.fetch_add(1, Ordering::Relaxed);
                 false
             }
@@ -153,7 +164,10 @@ impl FaultInjector {
                     None
                 }
             }
-            FaultMode::Reorder { .. } | FaultMode::Duplicate { .. } | FaultMode::Corrupt { .. } => {
+            FaultMode::Reorder { .. }
+            | FaultMode::Duplicate { .. }
+            | FaultMode::Corrupt { .. }
+            | FaultMode::Equivocate { .. } => {
                 let _ = self.counter.fetch_add(1, Ordering::Relaxed);
                 None
             }
@@ -205,6 +219,17 @@ impl FaultInjector {
                 }
             }
             _ => None,
+        }
+    }
+
+    /// Returns true if this vote should trigger an equivocation.
+    pub fn should_equivocate(&self) -> bool {
+        match self.mode {
+            FaultMode::Equivocate { percent } => {
+                let n = self.counter.fetch_add(1, Ordering::Relaxed);
+                (n % 100) < percent as u64
+            }
+            _ => false,
         }
     }
 

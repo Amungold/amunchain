@@ -14,7 +14,9 @@ fn r2_4_1_corrupt_100_percent_always_corrupts() {
     let fi = FaultInjector::corrupt(100, CorruptKind::InvalidSignature);
     let mut count = 0;
     for _ in 0..200 {
-        if fi.should_corrupt().is_some() { count += 1; }
+        if fi.should_corrupt().is_some() {
+            count += 1;
+        }
     }
     assert_eq!(count, 200);
 }
@@ -42,13 +44,17 @@ fn r2_4_1_corrupt_is_deterministic() {
 #[test]
 fn r2_4_1_corrupt_does_not_drop() {
     let fi = FaultInjector::corrupt(100, CorruptKind::Truncated);
-    for _ in 0..500 { assert!(!fi.should_drop()); }
+    for _ in 0..500 {
+        assert!(!fi.should_drop());
+    }
 }
 
 #[test]
 fn r2_4_1_corrupt_does_not_delay() {
     let fi = FaultInjector::corrupt(100, CorruptKind::WrongBlockHash);
-    for _ in 0..500 { assert!(fi.should_delay().is_none()); }
+    for _ in 0..500 {
+        assert!(fi.should_delay().is_none());
+    }
 }
 
 #[test]
@@ -58,11 +64,19 @@ fn r2_4_1_corrupt_shared_across_threads() {
     let fi2 = Arc::clone(&fi);
     let h = thread::spawn(move || {
         let mut c = 0;
-        for _ in 0..500 { if fi2.should_corrupt().is_some() { c += 1; } }
+        for _ in 0..500 {
+            if fi2.should_corrupt().is_some() {
+                c += 1;
+            }
+        }
         c
     });
     let mut cm = 0;
-    for _ in 0..500 { if fi.should_corrupt().is_some() { cm += 1; } }
+    for _ in 0..500 {
+        if fi.should_corrupt().is_some() {
+            cm += 1;
+        }
+    }
     let total = cm + h.join().unwrap();
     let pct = (total as f64 / 1000.0) * 100.0;
     assert!((15.0..=35.0).contains(&pct));
