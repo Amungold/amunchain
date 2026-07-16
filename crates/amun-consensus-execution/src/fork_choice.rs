@@ -1,6 +1,6 @@
 use crate::block_dag::{BlockDAG, BlockNode, MAX_DAG_DEPTH};
-use amun_quorum_certificate::QuorumCertificate;
 use amun_chain_position::ChainPosition;
+use amun_quorum_certificate::QuorumCertificate;
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Fork-choice rule with lock history for monotonicity verification

@@ -37,10 +37,18 @@ impl std::fmt::Display for AdmissionError {
             AdmissionError::DuplicateValidator => write!(f, "Validator already exists"),
             AdmissionError::AlreadyRegistered => write!(f, "Validator already registered"),
             AdmissionError::InsufficientStake { required, provided } => {
-                write!(f, "Insufficient stake: required={} provided={}", required, provided)
+                write!(
+                    f,
+                    "Insufficient stake: required={} provided={}",
+                    required, provided
+                )
             }
             AdmissionError::UnsupportedProtocol { expected, provided } => {
-                write!(f, "Unsupported protocol: expected={} provided={}", expected, provided)
+                write!(
+                    f,
+                    "Unsupported protocol: expected={} provided={}",
+                    expected, provided
+                )
             }
             AdmissionError::GenesisMismatch => write!(f, "Genesis hash mismatch"),
             AdmissionError::AuthorityRejected => write!(f, "Rejected by authority"),
@@ -104,10 +112,16 @@ impl AdmissionService {
         vec![
             Box::new(IdentityGate),
             Box::new(DuplicateGate),
-            Box::new(CertificateGate { expected_certificate_hash: [0xBB; 32] }),
+            Box::new(CertificateGate {
+                expected_certificate_hash: [0xBB; 32],
+            }),
             Box::new(StakePolicyGate { minimum_stake: 100 }),
-            Box::new(ProtocolCompatibilityGate { expected_protocol_version: 1 }),
-            Box::new(GenesisCompatibilityGate { expected_genesis_hash: [0u8; 32] }),
+            Box::new(ProtocolCompatibilityGate {
+                expected_protocol_version: 1,
+            }),
+            Box::new(GenesisCompatibilityGate {
+                expected_genesis_hash: [0u8; 32],
+            }),
         ]
     }
 
@@ -208,7 +222,8 @@ impl AdmissionGate for DuplicateGate {
         request: &AdmissionRequest,
         registry: &ValidatorRegistry,
     ) -> Result<(), AdmissionError> {
-        let short_id = u64::from_le_bytes(request.validator_id.0[..8].try_into().unwrap_or([0u8; 8]));
+        let short_id =
+            u64::from_le_bytes(request.validator_id.0[..8].try_into().unwrap_or([0u8; 8]));
         if registry.contains(short_id) {
             return Err(AdmissionError::DuplicateValidator);
         }
@@ -361,12 +376,14 @@ mod tests {
 
     #[test]
     fn n149_error_display() {
-        let err = AdmissionError::InsufficientStake { required: 1000, provided: 500 };
+        let err = AdmissionError::InsufficientStake {
+            required: 1000,
+            provided: 500,
+        };
         assert!(err.to_string().contains("500"));
         assert!(err.to_string().contains("1000"));
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 // N149.3: Integration Tests — Full Admission Pipeline
@@ -394,10 +411,16 @@ mod integration_tests {
         vec![
             Box::new(IdentityGate),
             Box::new(DuplicateGate),
-            Box::new(CertificateGate { expected_certificate_hash: [0xBB; 32] }),
+            Box::new(CertificateGate {
+                expected_certificate_hash: [0xBB; 32],
+            }),
             Box::new(StakePolicyGate { minimum_stake: 100 }),
-            Box::new(ProtocolCompatibilityGate { expected_protocol_version: 1 }),
-            Box::new(GenesisCompatibilityGate { expected_genesis_hash: [0u8; 32] }),
+            Box::new(ProtocolCompatibilityGate {
+                expected_protocol_version: 1,
+            }),
+            Box::new(GenesisCompatibilityGate {
+                expected_genesis_hash: [0u8; 32],
+            }),
         ]
     }
 
@@ -415,7 +438,8 @@ mod integration_tests {
     fn n149_3_accept_multiple_validators() {
         let mut registry = ValidatorRegistry::new();
         for i in 1..=3 {
-            let result = AdmissionService::admit(&mut registry, make_request(i, 0xAA), &all_gates());
+            let result =
+                AdmissionService::admit(&mut registry, make_request(i, 0xAA), &all_gates());
             assert!(matches!(result, AdmissionResult::Admitted { .. }));
         }
         assert_eq!(registry.record_count(), 3);

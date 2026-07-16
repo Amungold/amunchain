@@ -13,29 +13,37 @@ pub fn discover_peer_tip(peers: &[SocketAddr]) -> Option<PeerInfo> {
 
     for addr in peers {
         eprintln!("DISCOVERY trying {}", addr);
-        let stream =
-            std::net::TcpStream::connect_timeout(addr, std::time::Duration::from_millis(500));
-        if let Ok(mut stream) = stream {
-            eprintln!("DISCOVERY connected {}", addr);
-            if let Ok((tip_height, tip_hash)) = send_tip_request(&mut stream) {
-                eprintln!("DISCOVERY tip {} height={}", addr, tip_height);
-                match &best {
-                    None => {
-                        best = Some(PeerInfo {
-                            address: *addr,
-                            tip_height,
-                            tip_hash,
-                        });
+        match std::net::TcpStream::connect_timeout(addr, std::time::Duration::from_millis(500)) {
+            Ok(mut stream) => {
+                eprintln!("DISCOVERY connected {}", addr);
+                match send_tip_request(&mut stream) {
+                    Ok((tip_height, tip_hash)) => {
+                        eprintln!("DISCOVERY tip {} height={}", addr, tip_height);
+                        match &best {
+                            None => {
+                                best = Some(PeerInfo {
+                                    address: *addr,
+                                    tip_height,
+                                    tip_hash,
+                                });
+                            }
+                            Some(current) if tip_height > current.tip_height => {
+                                best = Some(PeerInfo {
+                                    address: *addr,
+                                    tip_height,
+                                    tip_hash,
+                                });
+                            }
+                            _ => {}
+                        }
                     }
-                    Some(current) if tip_height > current.tip_height => {
-                        best = Some(PeerInfo {
-                            address: *addr,
-                            tip_height,
-                            tip_hash,
-                        });
+                    Err(e) => {
+                        eprintln!("TIP_REQUEST FAILED {} : {:?}", addr, e);
                     }
-                    _ => {}
                 }
+            }
+            Err(e) => {
+                eprintln!("CONNECT FAILED {} : {:?}", addr, e);
             }
         }
     }

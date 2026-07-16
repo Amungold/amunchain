@@ -18,7 +18,9 @@ impl ConsensusEngine {
         // N150: Use AdmissionService as single entry point
         if let Some(ref mutex) = self.registry_mut {
             if let Ok(mut reg) = mutex.lock() {
-                use amun_validator_registry::{AdmissionRequest, AdmissionService, PeerId, PublicKey, ValidatorId};
+                use amun_validator_registry::{
+                    AdmissionRequest, AdmissionService, PeerId, PublicKey, ValidatorId,
+                };
                 let request = AdmissionRequest {
                     validator_id: ValidatorId(validator_id),
                     peer_id: PeerId(peer_id),

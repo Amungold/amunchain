@@ -54,7 +54,9 @@ impl ValidatorConfig {
             .map(|i| ClusterPeer {
                 validator_id: ids[i],
                 certificate_path: None,
-                address: format!("127.0.0.1:{}", base_port + i).parse().expect("valid localhost address"),
+                address: format!("127.0.0.1:{}", base_port + i)
+                    .parse()
+                    .expect("valid localhost address"),
             })
             .collect();
         set_cert_paths(&mut cluster);
@@ -79,7 +81,9 @@ impl ValidatorConfig {
             .map(|i| ClusterPeer {
                 validator_id: ids[i],
                 certificate_path: None,
-                address: format!("127.0.0.1:{}", ports[i]).parse().expect("valid localhost address"),
+                address: format!("127.0.0.1:{}", ports[i])
+                    .parse()
+                    .expect("valid localhost address"),
             })
             .collect();
         set_cert_paths(&mut cluster);

@@ -1,10 +1,15 @@
+use amun_chain_position::ChainPosition;
 use amun_consensus_execution::persistent_state::PersistentConsensusState;
 use amun_quorum_certificate::QuorumCertificate;
-use amun_chain_position::ChainPosition;
 use tempfile::TempDir;
 
 /// Helper: create a minimal QC for testing.
-fn make_qc(block_hash: [u8; 32], parent_hash: [u8; 32], round: u64, height: u64) -> QuorumCertificate {
+fn make_qc(
+    block_hash: [u8; 32],
+    parent_hash: [u8; 32],
+    round: u64,
+    height: u64,
+) -> QuorumCertificate {
     QuorumCertificate {
         position: ChainPosition::new(0, height),
         round,
@@ -16,13 +21,19 @@ fn make_qc(block_hash: [u8; 32], parent_hash: [u8; 32], round: u64, height: u64)
 }
 
 /// Helper: record a batch of QCs in sequence.
-fn record_qc_chain(state: &mut PersistentConsensusState, count: u64, start_round: u64, genesis: [u8; 32]) {
+fn record_qc_chain(
+    state: &mut PersistentConsensusState,
+    count: u64,
+    start_round: u64,
+    genesis: [u8; 32],
+) {
     for i in 0..count {
         let bh = [i as u8; 32];
         let ph = if i == 0 { genesis } else { [(i - 1) as u8; 32] };
         let qc = make_qc(bh, ph, start_round + i, i + 1);
         state.record_qc(&qc).unwrap();
-        let _d = state.state_digest();    }
+        let _d = state.state_digest();
+    }
 }
 
 #[test]
@@ -42,24 +53,42 @@ fn r1_linear_chain_live_equals_replay() {
     let replay_digest = replay.state_digest();
 
     // Assert equivalence
-    assert_eq!(live_digest.commit_index, replay_digest.commit_index,
-        "commit_index mismatch");
-    assert_eq!(live_digest.finalized_height, replay_digest.finalized_height,
-        "finalized_height mismatch");
-    assert_eq!(live_digest.locked_qc_block, replay_digest.locked_qc_block,
-        "locked_qc_block mismatch");
-    assert_eq!(live_digest.locked_qc_round, replay_digest.locked_qc_round,
-        "locked_qc_round mismatch");
-    assert_eq!(live_digest.canonical_tip, replay_digest.canonical_tip,
-        "canonical_tip mismatch");
-    assert_eq!(live_digest.dag_block_count, replay_digest.dag_block_count,
-        "dag_block_count mismatch");
-    assert_eq!(live_digest.spine_length, replay_digest.spine_length,
-        "spine_length mismatch");
-    assert_eq!(live_digest.fork_choice_high_qc_count, replay_digest.fork_choice_high_qc_count,
-        "fork_choice_high_qc_count mismatch");
-    assert_eq!(live_digest.applied_sequence_count, replay_digest.applied_sequence_count,
-        "applied_sequence_count mismatch");
+    assert_eq!(
+        live_digest.commit_index, replay_digest.commit_index,
+        "commit_index mismatch"
+    );
+    assert_eq!(
+        live_digest.finalized_height, replay_digest.finalized_height,
+        "finalized_height mismatch"
+    );
+    assert_eq!(
+        live_digest.locked_qc_block, replay_digest.locked_qc_block,
+        "locked_qc_block mismatch"
+    );
+    assert_eq!(
+        live_digest.locked_qc_round, replay_digest.locked_qc_round,
+        "locked_qc_round mismatch"
+    );
+    assert_eq!(
+        live_digest.canonical_tip, replay_digest.canonical_tip,
+        "canonical_tip mismatch"
+    );
+    assert_eq!(
+        live_digest.dag_block_count, replay_digest.dag_block_count,
+        "dag_block_count mismatch"
+    );
+    assert_eq!(
+        live_digest.spine_length, replay_digest.spine_length,
+        "spine_length mismatch"
+    );
+    assert_eq!(
+        live_digest.fork_choice_high_qc_count, replay_digest.fork_choice_high_qc_count,
+        "fork_choice_high_qc_count mismatch"
+    );
+    assert_eq!(
+        live_digest.applied_sequence_count, replay_digest.applied_sequence_count,
+        "applied_sequence_count mismatch"
+    );
 }
 
 #[test]
@@ -81,7 +110,10 @@ fn r1_replay_is_idempotent() {
 
     assert_eq!(digest1.commit_index, digest2.commit_index);
     assert_eq!(digest1.canonical_tip, digest2.canonical_tip);
-    assert_eq!(digest1.fork_choice_high_qc_count, digest2.fork_choice_high_qc_count);
+    assert_eq!(
+        digest1.fork_choice_high_qc_count,
+        digest2.fork_choice_high_qc_count
+    );
 }
 
 #[test]
@@ -109,5 +141,8 @@ fn r1_restart_midstream_preserves_state() {
 
     assert_eq!(continued_digest.commit_index, replay_digest.commit_index);
     assert_eq!(continued_digest.canonical_tip, replay_digest.canonical_tip);
-    assert_eq!(continued_digest.dag_block_count, replay_digest.dag_block_count);
+    assert_eq!(
+        continued_digest.dag_block_count,
+        replay_digest.dag_block_count
+    );
 }

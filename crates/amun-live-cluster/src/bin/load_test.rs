@@ -18,7 +18,9 @@ fn main() {
 
     let ports = [9100, 9101, 9102, 9103];
     let validators: Vec<LiveValidator> = (0..4)
-        .map(|i| LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)).unwrap())
+        .map(|i| {
+            LiveValidator::new(ValidatorConfig::test_cluster(i, &ports).with_quorum(4)).unwrap()
+        })
         .collect();
 
     for v in &validators {

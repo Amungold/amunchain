@@ -19,6 +19,7 @@ use amun_constitutional_enforcement::{
 use amun_evidence_root::EvidenceRoot;
 use amun_mempool::Mempool;
 use amun_sync::catch_up::{append_missing_records, download_missing_records};
+use amun_sync::peer_discovery::discover_peer_tip;
 use amun_sync::protocol::{
     MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE,
 };
@@ -389,7 +390,32 @@ impl LiveValidator {
                     }
                 }
 
+                let mut last_tip_check = Instant::now();
                 let _round_timer = crate::perf_timer::PerfTimer::new("consensus_round");
+                // R2.2: Periodic Tip Monitor
+                if last_tip_check.elapsed() >= Duration::from_secs(3) {
+                    last_tip_check = Instant::now();
+                    let peers_addr: Vec<std::net::SocketAddr> =
+                        peers.iter().map(|p| p.address).collect();
+                    let current_h = store_consensus
+                        .lock()
+                        .expect("mutex poisoned")
+                        .latest_height();
+                    if let Some(best_peer) = discover_peer_tip(&peers_addr) {
+                        if best_peer.tip_height > current_h {
+                            eprintln!(
+                                "TIP_MONITOR: local={} peer={} ({}), triggering catch-up",
+                                current_h, best_peer.tip_height, best_peer.address
+                            );
+                            engine_consensus
+                                .lock()
+                                .expect("mutex poisoned")
+                                .needs_catchup
+                                .store(true, std::sync::atomic::Ordering::SeqCst);
+                        }
+                    }
+                }
+
                 let (height, needs_sync) = {
                     let eng = engine_consensus.lock().expect("mutex poisoned");
                     let h = eng.current_height + 1;

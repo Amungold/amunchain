@@ -1,5 +1,5 @@
-use std::collections::BTreeMap;
 use amun_kernel_types::epoch::Epoch;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct ValidatorInfo {

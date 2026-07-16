@@ -71,7 +71,9 @@ pub struct ConsensusStateDigest {
 impl PersistentConsensusState {
     pub fn open(wal_path: &str, genesis_hash: [u8; 32]) -> Result<Self, String> {
         let has_segments = std::fs::read_dir(
-            std::path::Path::new(wal_path).parent().unwrap_or(std::path::Path::new("."))
+            std::path::Path::new(wal_path)
+                .parent()
+                .unwrap_or(std::path::Path::new(".")),
         )
         .map(|dir| {
             let prefix = std::path::Path::new(wal_path)
@@ -79,11 +81,10 @@ impl PersistentConsensusState {
                 .unwrap_or_default()
                 .to_string_lossy()
                 .to_string();
-            dir.filter_map(|e| e.ok())
-                .any(|e| {
-                    e.file_name().to_string_lossy().starts_with(&prefix)
-                        && e.file_name().to_string_lossy().ends_with(".wal")
-                })
+            dir.filter_map(|e| e.ok()).any(|e| {
+                e.file_name().to_string_lossy().starts_with(&prefix)
+                    && e.file_name().to_string_lossy().ends_with(".wal")
+            })
         })
         .unwrap_or(false);
         if has_segments {

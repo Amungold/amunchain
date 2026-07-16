@@ -25,11 +25,10 @@ fn main() {
         std::process::exit(1);
     });
     if ctx.config.validator.is_some() {
-        let validator_cfg =
-            cluster_builder::ClusterBuilder::build(&ctx).unwrap_or_else(|e| {
-                eprintln!("Fatal: Failed to build LiveValidator configuration: {e}");
-                std::process::exit(1);
-            });
+        let validator_cfg = cluster_builder::ClusterBuilder::build(&ctx).unwrap_or_else(|e| {
+            eprintln!("Fatal: Failed to build LiveValidator configuration: {e}");
+            std::process::exit(1);
+        });
 
         let validator = amun_live_cluster::validator::LiveValidator::new(validator_cfg)
             .unwrap_or_else(|e| {

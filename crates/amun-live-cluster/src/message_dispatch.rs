@@ -66,7 +66,9 @@ impl MessageDispatcher {
 
             let response = NetworkFrame::new(
                 FrameKind::TipResponse,
-                bytes::Bytes::from(postcard::to_stdvec(&response_payload).expect("Response serialization failed")),
+                bytes::Bytes::from(
+                    postcard::to_stdvec(&response_payload).expect("Response serialization failed"),
+                ),
             );
 
             if let Err(e) = self.network.send_to(peer, response) {
@@ -106,7 +108,9 @@ impl MessageDispatcher {
 
             let response = NetworkFrame::new(
                 FrameKind::BlockRangeResponse,
-                bytes::Bytes::from(postcard::to_stdvec(&response_payload).expect("Response serialization failed")),
+                bytes::Bytes::from(
+                    postcard::to_stdvec(&response_payload).expect("Response serialization failed"),
+                ),
             );
 
             if let Err(e) = self.network.send_to(peer, response) {
