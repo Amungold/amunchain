@@ -5,6 +5,8 @@ pub enum FrameKind {
     Ping,
     Pong,
     Vote,
+    /// Unified consensus message (proposal, vote, QC, finality).
+    ConsensusMessage,
     TipRequest,
     TipResponse,
     BlockRangeRequest,

@@ -1,5 +1,6 @@
 use crate::network_adapter::ValidatorNetworkAdapter;
 use amun_chain_store::store::ChainStore;
+use amun_consensus_network::consensus_message::ConsensusMessage;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_networking::frame::{FrameKind, NetworkFrame};
 use amun_sync::request_manager::SyncRequestManager;
@@ -47,6 +48,7 @@ impl MessageDispatcher {
             FrameKind::BlockRangeRequest => self.handle_block_range_request(peer, &frame),
             FrameKind::BlockRangeResponse => self.handle_block_range_response(peer, &frame),
             FrameKind::Vote => self.handle_vote(&frame),
+            FrameKind::ConsensusMessage => self.handle_consensus_message(&frame),
             _ => {}
         }
     }
@@ -126,6 +128,29 @@ impl MessageDispatcher {
                 request_id: response.request_id,
             };
             self.sync_requests.complete_request(key, frame.clone());
+        }
+    }
+
+    fn handle_consensus_message(&self, frame: &NetworkFrame) {
+        if let Ok(msg) = postcard::from_bytes::<ConsensusMessage>(&frame.payload) {
+            match msg {
+                ConsensusMessage::Vote(vote) => {
+                    let mut eng = self.engine.lock().expect("mutex poisoned");
+                    let _ = eng.process_vote(&vote);
+                }
+                ConsensusMessage::Proposal(_proposal) => {
+                    // R3.3: Proposal routing placeholder
+                    eprintln!("CONSENSUS_MSG: Proposal received (routing TBD)");
+                }
+                ConsensusMessage::QuorumCertificate(_qc) => {
+                    // R3.3: QC routing placeholder
+                    eprintln!("CONSENSUS_MSG: QC received (routing TBD)");
+                }
+                ConsensusMessage::Finality(_cert) => {
+                    // R3.3: Finality routing placeholder
+                    eprintln!("CONSENSUS_MSG: Finality received (routing TBD)");
+                }
+            }
         }
     }
 

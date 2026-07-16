@@ -20,6 +20,7 @@ pub mod validator_identity;
 pub use evidence_push::{EvidencePush, EvidencePushConfig};
 pub use evidence_push_processor::{process_incoming_evidence_push, PushProcessResult};
 pub use validator_identity::{ValidatorIdentity, ValidatorIdentityRegistry};
+pub mod consensus_message;
 pub mod engine_metrics;
 pub mod evidence_store;
 pub mod execution_commitment;
@@ -42,6 +43,7 @@ pub mod slashing_state;
 pub mod staking_adapter;
 pub mod validation;
 pub mod vote_binding;
+pub use consensus_message::ConsensusMessage;
 
 pub use certificate_evidence_validation::{
     build_missing_evidence_request, process_evidence_response, validate_certificate_evidence,

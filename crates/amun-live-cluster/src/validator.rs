@@ -631,7 +631,7 @@ impl LiveValidator {
                 }
 
                 // Wait for votes from peers - break early if quorum reached
-                let vote_deadline = Instant::now() + Duration::from_millis(500);
+                let vote_deadline = Instant::now() + Duration::from_millis(5000);
                 loop {
                     let quorum_reached = {
                         let eng = engine_consensus.lock().expect("mutex poisoned");

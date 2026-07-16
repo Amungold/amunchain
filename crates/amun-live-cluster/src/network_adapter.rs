@@ -1,4 +1,5 @@
 use crate::fault_injector::{CorruptKind, FaultInjector};
+use amun_consensus_network::consensus_message::ConsensusMessage;
 
 /// Apply corruption to a NetworkFrame based on CorruptKind.
 fn apply_corruption(frame: &mut NetworkFrame, kind: &CorruptKind) {
@@ -89,14 +90,36 @@ impl ValidatorNetworkAdapter {
     }
 
     pub fn broadcast_vote(&self, vote: Vec<u8>) {
+        // R3.4: Delegate to unified consensus message path
+        // Deserialize the raw vote bytes into ConsensusVote,
+        // wrap in ConsensusMessage::Vote, and send via unified path.
+        if let Ok(consensus_vote) =
+            postcard::from_bytes::<amun_consensus_network::messages::ConsensusVote>(&vote)
+        {
+            self.broadcast_consensus_message(ConsensusMessage::Vote(consensus_vote));
+        } else {
+            // Fallback: send as raw FrameKind::Vote (old path)
+            let frame = NetworkFrame::new(FrameKind::Vote, vote.into());
+            let bytes = postcard::to_stdvec(&frame).expect("Frame serialization failed");
+            let data: Arc<[u8]> = Arc::from(bytes.into_boxed_slice());
+            let t = self.transport.lock().expect("mutex poisoned");
+            t.broadcast(data);
+        }
+    }
+
+    /// Broadcast a unified consensus message (proposal, vote, QC, or finality).
+    pub fn broadcast_consensus_message(&self, msg: ConsensusMessage) {
         // R2.3 + R2.4: Fault injection
         let mut corrupt_kind: Option<CorruptKind> = None;
         if let Some(ref fi) = self.fault_injector {
-            // Corrupt (R2.4)
             corrupt_kind = fi.should_corrupt();
-            // Reorder first
             if let Some(buffer_size) = fi.should_reorder() {
-                let frame = NetworkFrame::new(FrameKind::Vote, vote.into());
+                let frame = NetworkFrame::new(
+                    FrameKind::ConsensusMessage,
+                    postcard::to_stdvec(&msg)
+                        .expect("ConsensusMessage serialization failed")
+                        .into(),
+                );
                 let bytes = postcard::to_stdvec(&frame).expect("Frame serialization failed");
                 {
                     let mut buffer = self.reorder_buffer.lock().expect("mutex poisoned");
@@ -105,20 +128,23 @@ impl ValidatorNetworkAdapter {
                 self.try_flush_reorder(buffer_size);
                 return;
             }
-            // Delay
             if let Some(ms) = fi.should_delay() {
-                eprintln!("FAULT_DELAY: broadcast_vote {}ms", ms);
+                eprintln!("FAULT_DELAY: broadcast_consensus {}ms", ms);
                 std::thread::sleep(std::time::Duration::from_millis(ms));
             }
-            // Drop
             if fi.should_drop() {
-                eprintln!("FAULT_DROP: broadcast_vote");
+                eprintln!("FAULT_DROP: broadcast_consensus");
                 return;
             }
         }
-        let mut frame = NetworkFrame::new(FrameKind::Vote, vote.into());
+        let mut frame = NetworkFrame::new(
+            FrameKind::ConsensusMessage,
+            postcard::to_stdvec(&msg)
+                .expect("ConsensusMessage serialization failed")
+                .into(),
+        );
         if let Some(kind) = &corrupt_kind {
-            eprintln!("FAULT_CORRUPT: broadcast_vote {:?}", kind);
+            eprintln!("FAULT_CORRUPT: broadcast_consensus {:?}", kind);
             apply_corruption(&mut frame, kind);
         }
         let bytes = postcard::to_stdvec(&frame).expect("Frame serialization failed");
