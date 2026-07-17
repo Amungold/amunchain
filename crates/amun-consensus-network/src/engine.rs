@@ -337,6 +337,11 @@ impl ConsensusEngine {
             .unwrap_or(0)
     }
 
+    /// Returns the number of active rounds in memory.
+    pub fn active_rounds(&self) -> usize {
+        self.rounds.len()
+    }
+
     /// Returns true if quorum has been reached at this height.
     pub fn quorum_reached(&self, height: u64) -> bool {
         let count = self.vote_count(height) as u64;

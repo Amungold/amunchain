@@ -144,7 +144,7 @@ async fn metrics(State(state): State<AppState>) -> Json<MetricsResponse> {
         qcs_formed: engine.metrics.qcs_formed,
         blocks_finalized: engine.metrics.blocks_finalized,
         votes_received: engine.metrics.votes_received,
-        rounds_active: engine.rounds.len(),
+        rounds_active: engine.active_rounds(),
         peer_count: engine.total_validators,
     })
 }
