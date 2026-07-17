@@ -61,11 +61,7 @@ impl NetworkConsensus {
 
         if is_proposer {
             let mut engine = self.engine.lock().unwrap();
-            engine.start_round(height, self.validator_id);
-            engine
-                .round_mut(height)
-                .unwrap()
-                .propose(block_hash, state_root);
+            engine.record_proposal(height, self.validator_id, block_hash, state_root);
         }
 
         let my_vote = ConsensusVote {
@@ -81,10 +77,17 @@ impl NetworkConsensus {
 
         {
             let mut engine = self.engine.lock().unwrap();
-            if !engine.rounds.contains_key(&height) {
-                engine.start_round(height, [(proposer_idx + 1) as u8; 32]);
+            if engine.has_proposal(height) {
+                engine.process_vote(&my_vote)?;
+            } else {
+                engine.record_proposal(
+                    height,
+                    [(proposer_idx + 1) as u8; 32],
+                    block_hash,
+                    state_root,
+                );
+                engine.process_vote(&my_vote)?;
             }
-            engine.process_vote(&my_vote)?;
         }
 
         let encoded = postcard::to_stdvec(&my_vote).map_err(|e| e.to_string())?;
@@ -94,7 +97,7 @@ impl NetworkConsensus {
 
         let mut engine = self.engine.lock().unwrap();
         engine
-            .try_advance(height, history_root)
+            .finalize_round(height, history_root)
             .ok_or_else(|| "Failed to form QC".into())
     }
 
@@ -184,8 +187,7 @@ mod tests {
     #[test]
     fn n68_network_consensus_single_validator() {
         let mut engine = ConsensusEngine::new([1u8; 32], 1);
-        engine.start_round(1, [1u8; 32]);
-        engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+        engine.record_proposal(1, [1u8; 32], [0xAA; 32], [0xBB; 32]);
         engine
             .process_vote(&ConsensusVote {
                 voter_id: [1u8; 32],
@@ -198,7 +200,7 @@ mod tests {
                 commitment: None,
             })
             .unwrap();
-        let cert = engine.try_advance(1, [0xCC; 32]).unwrap();
+        let cert = engine.finalize_round(1, [0xCC; 32]).unwrap();
         assert_eq!(cert.height, 1);
     }
 

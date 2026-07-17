@@ -3,7 +3,6 @@ pub mod lifecycle;
 pub mod messages;
 pub mod misbehavior;
 pub mod network_consensus;
-pub mod proposal;
 pub mod round;
 pub mod slashing;
 pub mod validator_registry;

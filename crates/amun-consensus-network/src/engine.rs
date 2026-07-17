@@ -206,11 +206,7 @@ impl ConsensusEngine {
     }
 
     /// Try to advance: form QC, finalize, update history.
-    pub fn try_advance(
-        &mut self,
-        height: u64,
-        history_root: [u8; 32],
-    ) -> Option<FinalityCertificate> {
+    fn try_advance(&mut self, height: u64, history_root: [u8; 32]) -> Option<FinalityCertificate> {
         let active = self.active_validator_count();
         eprintln!(
             "ADVANCE_DIAG: try_advance h={} active={}/{}",
@@ -289,6 +285,94 @@ impl ConsensusEngine {
     pub fn reset_rounds(&mut self) {
         self.rounds.clear();
     }
+
+    /// Returns the current finalized height (canonical read-only).
+    pub fn current_height(&self) -> u64 {
+        self.current_height
+    }
+
+    /// Returns the canonical history root (canonical read-only).
+    pub fn history_root(&self) -> [u8; 32] {
+        self.history_root
+    }
+
+    /// Returns true if a round already exists at this height.
+    pub fn has_round(&self, height: u64) -> bool {
+        self.rounds.contains_key(&height)
+    }
+
+    /// Returns the proposal (block_hash, state_root) for a round if available.
+    pub fn proposal(&self, height: u64) -> Option<([u8; 32], [u8; 32])> {
+        self.rounds.get(&height).and_then(|r| {
+            match (r.proposed_block_hash, r.proposed_state_root) {
+                (Some(hash), Some(root)) => Some((hash, root)),
+                _ => None,
+            }
+        })
+    }
+
+    /// Returns the block hash of the proposal at height, if any.
+    pub fn proposal_hash(&self, height: u64) -> Option<[u8; 32]> {
+        self.rounds.get(&height).and_then(|r| r.proposed_block_hash)
+    }
+
+    /// Returns the state root of the proposal at height, if any.
+    pub fn proposal_state_root(&self, height: u64) -> Option<[u8; 32]> {
+        self.rounds.get(&height).and_then(|r| r.proposed_state_root)
+    }
+
+    /// Returns true if a proposal exists at the given height.
+    pub fn has_proposal(&self, height: u64) -> bool {
+        self.rounds
+            .get(&height)
+            .and_then(|r| r.proposed_block_hash)
+            .is_some()
+    }
+
+    /// Returns the number of approving votes for a round.
+    pub fn vote_count(&self, height: u64) -> usize {
+        self.rounds
+            .get(&height)
+            .map(|r| r.votes.iter().filter(|v| v.approve).count())
+            .unwrap_or(0)
+    }
+
+    /// Returns true if quorum has been reached at this height.
+    pub fn quorum_reached(&self, height: u64) -> bool {
+        let count = self.vote_count(height) as u64;
+        count * 3 > self.total_validators as u64 * 2
+    }
+
+    /// Returns true if the round at this height is complete.
+    pub fn is_round_complete(&self, height: u64) -> bool {
+        self.rounds.get(&height).is_some_and(|r| r.complete)
+    }
+
+    /// High-level: record a proposal (block_hash, state_root) for a round.
+    /// Hides the internal round implementation from external callers.
+    pub fn record_proposal(
+        &mut self,
+        height: u64,
+        proposer: [u8; 32],
+        block_hash: [u8; 32],
+        state_root: [u8; 32],
+    ) {
+        self.start_round(height, proposer);
+        if let Some(round) = self.rounds.get_mut(&height) {
+            round.propose(block_hash, state_root);
+        }
+    }
+
+    /// High-level: finalize a round, returning the certificate if successful.
+    /// Hides try_advance() from external callers.
+    pub fn finalize_round(
+        &mut self,
+        height: u64,
+        history_root: [u8; 32],
+    ) -> Option<FinalityCertificate> {
+        self.try_advance(height, history_root)
+    }
+
     pub fn is_finalized(&self, height: u64) -> bool {
         self.rounds.get(&height).is_some_and(|r| r.complete)
     }
@@ -345,6 +429,19 @@ impl ConsensusEngine {
     pub fn process_votes(&mut self, votes: &[ConsensusVote]) -> Vec<Result<(), String>> {
         votes.iter().map(|v| self.process_vote(v)).collect()
     }
+
+    /// Internal: create a consensus round if it does not already exist.
+
+    #[cfg(test)]
+    fn round_mut(&mut self, height: u64) -> Option<&mut ConsensusRound> {
+        self.rounds.get_mut(&height)
+    }
+
+    fn start_round(&mut self, height: u64, proposer_id: [u8; 32]) {
+        self.rounds
+            .entry(height)
+            .or_insert_with(|| ConsensusRound::new(height, proposer_id));
+    }
 }
 #[cfg(test)]
 // N144: Cleaned unused test imports — kept only needed types.
@@ -358,8 +455,7 @@ mod tests {
         let mut engine = ConsensusEngine::new([0u8; 32], 4);
 
         let proposer = [1u8; 32];
-        engine.start_round(1, proposer);
-        engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+        engine.record_proposal(1, proposer, [0xAA; 32], [0xBB; 32]);
 
         // 3 validators approve (>2/3 of 4)
         for id in [1u8, 2, 3] {
@@ -387,8 +483,7 @@ mod tests {
     #[test]
     fn n68_insufficient_quorum_no_qc() {
         let mut engine = ConsensusEngine::new([0u8; 32], 4);
-        engine.start_round(1, [1u8; 32]);
-        engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+        engine.record_proposal(1, [1u8; 32], [0xAA; 32], [0xBB; 32]);
 
         // Only 2 approvals (50%, not >66%)
         for id in [1u8, 2] {
@@ -417,8 +512,7 @@ mod tests {
     #[test]
     fn n68_duplicate_vote_rejected() {
         let mut engine = ConsensusEngine::new([0u8; 32], 4);
-        engine.start_round(1, [1u8; 32]);
-        engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+        engine.record_proposal(1, [1u8; 32], [0xAA; 32], [0xBB; 32]);
 
         let vote = ConsensusVote {
             voter_id: [1u8; 32],
@@ -462,11 +556,7 @@ mod tests {
         for height in 1..=3 {
             let proposer_idx = engine.proposer_for(height);
             let proposer = [(proposer_idx + 1) as u8; 32];
-            engine.start_round(height, proposer);
-            engine
-                .round_mut(height)
-                .unwrap()
-                .propose([height as u8; 32], [0xBB; 32]);
+            engine.record_proposal(height, proposer, [height as u8; 32], [0xBB; 32]);
 
             for id in 1..=3 {
                 engine

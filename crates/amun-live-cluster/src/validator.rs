@@ -390,10 +390,36 @@ impl LiveValidator {
                     }
                 }
 
+                // R4.3: Ensure engine height stays in sync with store
+                {
+                    let eng_h = engine_consensus
+                        .lock()
+                        .expect("mutex poisoned")
+                        .current_height;
+                    let store_h = store_consensus
+                        .lock()
+                        .expect("mutex poisoned")
+                        .latest_height();
+                    if store_h > eng_h {
+                        eprintln!(
+                            "SYNC_GAP: engine={} store={}, fast-forwarding",
+                            eng_h, store_h
+                        );
+                        let mut eng = engine_consensus.lock().expect("mutex poisoned");
+                        eng.fast_forward(store_h);
+                        if let Some(tip) =
+                            store_consensus.lock().expect("mutex poisoned").load_tip()
+                        {
+                            eng.update_history_root(tip.history_root);
+                        }
+                        eng.reset_rounds();
+                    }
+                }
+
                 let mut last_tip_check = Instant::now();
                 let _round_timer = crate::perf_timer::PerfTimer::new("consensus_round");
                 // R2.2: Periodic Tip Monitor
-                if last_tip_check.elapsed() >= Duration::from_secs(3) {
+                if last_tip_check.elapsed() >= Duration::from_secs(1) {
                     last_tip_check = Instant::now();
                     let peers_addr: Vec<std::net::SocketAddr> =
                         peers.iter().map(|p| p.address).collect();
@@ -418,7 +444,7 @@ impl LiveValidator {
 
                 let (height, needs_sync) = {
                     let eng = engine_consensus.lock().expect("mutex poisoned");
-                    let h = eng.current_height + 1;
+                    let h = eng.current_height() + 1;
                     let sync = eng.needs_catchup.load(std::sync::atomic::Ordering::SeqCst);
                     eng.needs_catchup
                         .store(false, std::sync::atomic::Ordering::SeqCst);
@@ -463,10 +489,7 @@ impl LiveValidator {
                 // Proposer builds a real block from mempool transactions
                 let already_proposed = {
                     let eng = engine_consensus.lock().expect("mutex poisoned");
-                    eng.rounds
-                        .get(&height)
-                        .and_then(|r| r.proposed_block_hash)
-                        .is_some()
+                    eng.proposal(height).is_some()
                 };
                 let (block_hash, state_root) = if is_proposer && !already_proposed {
                     let mut mp = mempool_consensus.lock().expect("mutex poisoned");
@@ -474,7 +497,7 @@ impl LiveValidator {
                     let parent = engine_consensus
                         .lock()
                         .expect("mutex poisoned")
-                        .history_root;
+                        .history_root();
                     // N110.4b: Collect pending certificates from gossip
                     let pending_certs: Vec<amun_consensus_network::SlashingCertificate> =
                         certificate_gossip_clone
@@ -515,26 +538,17 @@ impl LiveValidator {
                     let hash = block.block_hash();
                     let root = block.state_root;
                     let mut eng = engine_consensus.lock().expect("mutex poisoned");
-                    eng.start_round(height, validator_id);
-                    if let Some(round) = eng.round_mut(height) {
-                        round.propose(hash, root);
-                    }
+                    eng.record_proposal(height, validator_id, hash, root);
                     (hash, root)
                 } else if is_proposer && already_proposed {
                     let eng = engine_consensus.lock().expect("mutex poisoned");
-                    let round = eng.rounds.get(&height);
-                    let round = match round {
-                        Some(r) => r,
+                    let (hash, _root) = match eng.proposal(height) {
+                        Some(v) => v,
                         None => continue,
                     };
 
-                    let hash = match round.proposed_block_hash {
-                        Some(h) => h,
-                        None => continue,
-                    };
-
-                    let root = match round.proposed_state_root {
-                        Some(r) => r,
+                    let (_hash, root) = match eng.proposal(height) {
+                        Some(v) => v,
                         None => continue,
                     };
 
@@ -545,36 +559,25 @@ impl LiveValidator {
                     loop {
                         {
                             let eng = engine_consensus.lock().expect("mutex poisoned");
-                            if let Some(round) = eng.rounds.get(&height) {
-                                if round.proposed_block_hash.is_some() {
-                                    break;
-                                }
+                            if eng.proposal(height).is_some() {
+                                break;
                             }
                         }
+
                         if Instant::now() >= deadline {
                             break;
                         }
+
                         thread::sleep(Duration::from_millis(2));
                     }
+
                     let eng = engine_consensus.lock().expect("mutex poisoned");
-                    if let Some(round) = eng.rounds.get(&height) {
-                        if let (Some(h), Some(r)) =
-                            (round.proposed_block_hash, round.proposed_state_root)
-                        {
-                            (h, r)
-                        } else {
-                            {
-                                eprintln!(
-                                    "No proposal received for height {}, skipping round",
-                                    height
-                                );
-                                continue;
-                            }
-                        }
-                    } else {
-                        {
-                            eprintln!("No proposal received for height {}, skipping round", height);
-                            continue;
+
+                    match eng.proposal(height) {
+                        Some((hash, root)) => (hash, root),
+                        None => {
+                            eprintln!("No proposal received for height {}, using fallback", height);
+                            ([0u8; 32], [0u8; 32])
                         }
                     }
                 };
@@ -602,8 +605,13 @@ impl LiveValidator {
                 // Process own vote — with fallback proposal if proposer is silent
                 {
                     let mut eng = engine_consensus.lock().expect("mutex poisoned");
-                    if !eng.rounds.contains_key(&height) {
-                        eng.start_round(height, [(proposer_idx + 1) as u8; 32]);
+                    if !eng.has_proposal(height) {
+                        eng.record_proposal(
+                            height,
+                            [(proposer_idx + 1) as u8; 32],
+                            block_hash,
+                            state_root,
+                        );
                     }
                     let _ = eng.process_vote(&my_vote);
                 }
@@ -631,16 +639,11 @@ impl LiveValidator {
                 }
 
                 // Wait for votes from peers - break early if quorum reached
-                let vote_deadline = Instant::now() + Duration::from_millis(5000);
+                let vote_deadline = Instant::now() + Duration::from_millis(500);
                 loop {
                     let quorum_reached = {
                         let eng = engine_consensus.lock().expect("mutex poisoned");
-                        if let Some(round) = eng.rounds.get(&height) {
-                            let approvals = round.votes.iter().filter(|v| v.approve).count();
-                            approvals * 3 > eng.total_validators * 2
-                        } else {
-                            false
-                        }
+                        eng.quorum_reached(height)
                     };
                     if quorum_reached {
                         break;
@@ -655,7 +658,7 @@ impl LiveValidator {
                 let history_root = state_root;
                 let cert = {
                     let mut eng = engine_consensus.lock().expect("mutex poisoned");
-                    eng.try_advance(height, history_root)
+                    eng.finalize_round(height, history_root)
                 };
                 if let Some(cert) = cert {
                     // Execute any approved governance proposals
