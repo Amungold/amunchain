@@ -5,6 +5,8 @@ use std::time::{Duration, Instant};
 
 #[test]
 fn r2_5_1_continuous_traffic_soak_10min() {
+    #[cfg(feature = "perf-profile")]
+    let _perf_guard = amun_consensus_network::perf::PerfSummaryGuard;
     // 4 validators, quorum=3, run for 10 minutes
     let ports = [9500, 9501, 9502, 9503];
     let mut validators: Vec<LiveValidator> = (0..4)

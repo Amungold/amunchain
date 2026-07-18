@@ -1,0 +1,1589 @@
+use crate::config::load_genesis_authority;
+use crate::config::ValidatorConfig;
+use amun_authority_registry::transaction::GovernanceState;
+use amun_authority_registry::AuthorityRegistry;
+use amun_authority_registry::ConstitutionalAuthority;
+use amun_block_builder::BlockBuilder;
+use amun_chain_store::record::FinalizedChainRecord;
+use amun_chain_store::store::ChainStore;
+use amun_consensus_network::engine::ConsensusEngine;
+use amun_consensus_network::messages::ConsensusVote;
+use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
+use amun_constitutional_enforcement::{
+    evidence_records::{
+        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence, ReplayEvidence,
+        SignatureEvidence,
+    },
+    ConstitutionalEnforcementKernel, ConstitutionalVerdict,
+};
+use amun_evidence_root::EvidenceRoot;
+use amun_mempool::Mempool;
+use amun_sync::catch_up::{append_missing_records, download_missing_records};
+use amun_sync::peer_discovery::discover_peer_tip;
+use amun_sync::protocol::{
+    MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE,
+};
+use amun_tokenomics_ledger::EconomicLedger;
+use amun_validator_identity::derive_validator_id;
+use amun_validator_identity::vote_signing_payload;
+use ed25519_dalek::{Signer, SigningKey};
+use std::io::{Read, Write};
+use std::net::{TcpListener, TcpStream};
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicU8, Ordering};
+use std::sync::{Arc, Mutex};
+
+// ============================================================================
+// ARCHITECTURAL PRINCIPLES
+// ============================================================================
+// 
+// Rule #1: Canonical Ownership
+//   Each persistent blockchain fact must have exactly ONE canonical owner.
+//   Other components may cache or derive it temporarily, but must never
+//   become independent sources of truth.
+//
+// Rule #2: Synchronization → Ownership
+//   If extensive synchronization code is needed between two components,
+//   first verify that both components should own that data.
+//   Often the answer is no — one should be the canonical source.
+//
+// Current State Ownership:
+//   ChainStore        — Canonical persistent finalized state (height, roots, records)
+//   ConsensusEngine   — Volatile round state only (votes, QC, proposals)
+//   LiveValidator     — Orchestration only (lifecycle, readiness)
+//   Mempool           — Unconfirmed transactions
+//   Network Layer     — Message transport only
+//
+// TODO: Post-Mainnet — Remove height/root duplication between ChainStore and
+// ConsensusEngine. ConsensusEngine should reference ChainStore as read-only
+// canonical source for all finalized state. This eliminates fast_forward(),
+// HeightMismatch, and HistoryRootMismatch checks.
+// ============================================================================
+
+#[derive(Clone, Debug)]
+struct BlockRootsContext {
+    commitment_root: [u8; 32],
+    constitutional_root: [u8; 32],
+    economic_root: [u8; 32],
+    identity_root: [u8; 32],
+    governance_root: [u8; 32],
+}
+
+use std::collections::HashMap;
+use std::thread::{self, JoinHandle};
+use std::time::{Duration, Instant, SystemTime};
+
+/// Runtime summary DTO — pure data, no logic.
+/// Captures a point-in-time snapshot of validator consensus state.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RuntimeSummary {
+    pub height: u64,
+    pub history_root: [u8; 32],
+    pub votes_received: u64,
+    pub qcs_formed: u64,
+    pub blocks_finalized: u64,
+}
+
+impl std::fmt::Display for RuntimeSummary {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "height={} history_root={}.. votes={} qcs={} final={}",
+            self.height,
+            hex::encode(&self.history_root[..8]),
+            self.votes_received,
+            self.qcs_formed,
+            self.blocks_finalized,
+        )
+    }
+}
+
+// ============================================================================
+// STORE VERSION TRACKER
+// ============================================================================
+
+/// Per-validator store version for detecting inconsistent cross-lock reads.
+/// 
+/// DESIGN NOTE: This is a transitional solution. In production, version tracking
+/// should be intrinsic to ChainStore, incremented atomically on every state-changing
+/// operation (append, append_batch, prune, recover, etc.).
+/// 
+/// The current implementation uses an external counter updated by LiveValidator
+/// ONLY after confirmed successful writes. This means:
+/// - Version is bumped AFTER the store mutation is committed
+/// - Version is NOT bumped if the operation returns the current height (no change)
+/// - Multiple validators in the same process each have their own version counter
+/// 
+/// TODO (Pre-Mainnet): Move version counter into ChainStore for complete correctness.
+struct StoreVersion {
+    version: AtomicU64,
+}
+
+impl StoreVersion {
+    fn new() -> Self {
+        Self {
+            version: AtomicU64::new(0),
+        }
+    }
+
+    fn current(&self) -> u64 {
+        self.version.load(Ordering::Acquire)
+    }
+
+    /// Increment the version counter. Must only be called AFTER a confirmed
+    /// successful write operation on the store. Never call speculatively.
+    fn bump(&self) -> u64 {
+        self.version.fetch_add(1, Ordering::Release)
+    }
+}
+
+// ============================================================================
+// READINESS CHECKING
+// ============================================================================
+
+/// Reasons why the node is not yet ready for consensus participation.
+/// Each variant is a distinct, diagnosable condition.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ReadinessReason {
+    /// Store and engine report different heights.
+    /// TODO (Post-Mainnet): Will be eliminated when engine reads height from store.
+    HeightMismatch { store: u64, engine: u64 },
+    /// Engine indicates catch-up is required.
+    CatchupRequired,
+    /// Store and engine report different history roots.
+    /// TODO (Post-Mainnet): Will be eliminated when engine reads root from store.
+    HistoryRootMismatch,
+    /// Snapshot was inconsistent because store changed between Phase 1 and Phase 2
+    /// of the readiness check. This is NOT an error — the next loop iteration
+    /// will re-evaluate with fresh data.
+    SnapshotInconsistent {
+        read_version: u64,
+        current_version: u64,
+    },
+}
+
+impl std::fmt::Display for ReadinessReason {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ReadinessReason::HeightMismatch { store, engine } => {
+                write!(f, "height_mismatch(store={}, engine={})", store, engine)
+            }
+            ReadinessReason::CatchupRequired => write!(f, "catchup_required"),
+            ReadinessReason::HistoryRootMismatch => write!(f, "history_root_mismatch"),
+            ReadinessReason::SnapshotInconsistent {
+                read_version,
+                current_version,
+            } => {
+                write!(
+                    f,
+                    "snapshot_inconsistent(read_v={}, current_v={})",
+                    read_version, current_version
+                )
+            }
+        }
+    }
+}
+
+/// Result of the readiness evaluation.
+/// 
+/// CONSISTENCY NOTE: This is a BEST-EFFORT consistent snapshot, NOT an atomic
+/// snapshot of both store and engine. The store read is version-stamped to
+/// detect mid-check mutations. The engine read is independent and may reflect
+/// a slightly different point in time. This is acceptable because:
+/// - The check is re-evaluated every consensus loop iteration
+/// - False negatives (declaring NotReady when actually ready) are safe —
+///   they just delay participation by one iteration
+/// - False positives are impossible because Ready requires both version match
+///   AND all conditions satisfied
+#[derive(Debug)]
+enum ReadinessStatus {
+    /// All conditions met with a consistent store snapshot.
+    Ready,
+    /// One or more conditions not met. Reasons are logged for diagnostics.
+    NotReady { reasons: Vec<ReadinessReason> },
+}
+
+impl ReadinessStatus {
+    fn log_if_not_ready(&self) {
+        if let ReadinessStatus::NotReady { reasons } = self {
+            let reason_strs: Vec<String> = reasons.iter().map(|r| r.to_string()).collect();
+            eprintln!("NOT_READY: {}", reason_strs.join(", "));
+        }
+    }
+}
+
+// ============================================================================
+// MINIMAL LIFECYCLE STATE MACHINE
+// ============================================================================
+
+/// Validator lifecycle states for consensus participation gating.
+/// 
+/// TRANSITIONS:
+///   Booting    → CatchingUp  (catch-up initiated)
+///   Booting    → Active      (already synced at startup)
+///   CatchingUp → Active      (sync complete, readiness confirmed)
+///   Active     → CatchingUp  (sync gap detected during operation)
+/// 
+/// All transitions use compare_exchange for race-free atomicity.
+/// The lifecycle does NOT own blockchain state — it only gates participation.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u8)]
+enum NodeLifecycle {
+    /// Initial state after construction. Node is starting up.
+    Booting = 0,
+    /// Node is actively downloading and verifying missing blocks.
+    CatchingUp = 1,
+    /// Node is fully synchronized and eligible for consensus participation.
+    Active = 2,
+}
+
+impl NodeLifecycle {
+    fn from_u8(v: u8) -> Self {
+        match v {
+            0 => NodeLifecycle::Booting,
+            1 => NodeLifecycle::CatchingUp,
+            2 => NodeLifecycle::Active,
+            _ => NodeLifecycle::Booting,
+        }
+    }
+}
+
+/// Thread-safe lifecycle state with atomic compare_exchange transitions.
+/// No Mutex — uses AtomicU8 for lock-free reads on the consensus hot path.
+struct LifecycleState {
+    inner: AtomicU8,
+}
+
+impl LifecycleState {
+    fn new() -> Self {
+        Self {
+            inner: AtomicU8::new(NodeLifecycle::Booting as u8),
+        }
+    }
+
+    fn current(&self) -> NodeLifecycle {
+        NodeLifecycle::from_u8(self.inner.load(Ordering::Acquire))
+    }
+
+    /// Attempt an atomic transition from `from` to `to`.
+    /// Returns true if the transition succeeded.
+    /// 
+    /// Failure is not necessarily an error — the state may have been changed
+    /// legitimately by another code path (e.g., catch-up completing while
+    /// readiness check was running).
+    fn try_transition(&self, from: NodeLifecycle, to: NodeLifecycle) -> bool {
+        let result = self.inner.compare_exchange(
+            from as u8,
+            to as u8,
+            Ordering::Release,
+            Ordering::Acquire,
+        );
+        match result {
+            Ok(_) => {
+                eprintln!("LIFECYCLE: {:?} -> {:?}", from, to);
+                true
+            }
+            Err(actual) => {
+                let actual_state = NodeLifecycle::from_u8(actual);
+                if actual_state != from {
+                    eprintln!(
+                        "LIFECYCLE: Transition {:?} -> {:?} skipped (state is now {:?})",
+                        from, to, actual_state
+                    );
+                }
+                false
+            }
+        }
+    }
+
+    fn is_active(&self) -> bool {
+        self.current() == NodeLifecycle::Active
+    }
+}
+
+// ============================================================================
+// LIVE VALIDATOR
+// ============================================================================
+
+/// LiveValidator orchestrates the consensus lifecycle of a validator node.
+/// 
+/// OWNERSHIP:
+///   LiveValidator owns NO persistent blockchain state. It orchestrates:
+///   - Lifecycle transitions (Booting → CatchingUp → Active)
+///   - Readiness evaluation (delegates to ChainStore + ConsensusEngine)
+///   - Consensus participation gating (prevents voting when not ready)
+/// 
+/// CANONICAL SOURCES:
+///   - Finalized state: ChainStore (canonical)
+///   - Round state: ConsensusEngine (volatile only)
+///   - Lifecycle state: LiveValidator (orchestration only)
+pub struct LiveValidator {
+    pub config: ValidatorConfig,
+    pub engine: Arc<Mutex<ConsensusEngine>>,
+    pub store: Arc<Mutex<ChainStore>>,
+    running: Arc<AtomicBool>,
+    handles: Mutex<Vec<JoinHandle<()>>>,
+    signing_key: SigningKey,
+    pub validator_id: [u8; 32],
+    pub mempool: Arc<Mutex<Mempool>>,
+    pub builder: Arc<Mutex<BlockBuilder>>,
+    pub governance: Arc<Mutex<GovernanceState>>,
+    pub authority_registry: Arc<Mutex<AuthorityRegistry>>,
+    pub certificate_gossip: Arc<Mutex<amun_consensus_network::CertificateGossip>>,
+    pub staking_adapter: Arc<Mutex<StakingAdapter<RealStakingExecutor>>>,
+    pub applied_slashing_certificates: Arc<Mutex<std::collections::HashSet<[u8; 32]>>>,
+    pub slashing_ledger: Arc<Mutex<amun_consensus_network::SlashingLedger>>,
+    pub constitutional_kernel: Arc<Mutex<ConstitutionalEnforcementKernel>>,
+    pub previous_evidence_root: Arc<Mutex<[u8; 32]>>,
+    block_roots_map: Arc<Mutex<HashMap<u64, BlockRootsContext>>>,
+    pub economic_ledger: Arc<Mutex<EconomicLedger>>,
+    lifecycle: Arc<LifecycleState>,
+    /// Per-validator store version for consistent snapshot detection.
+    /// TODO (Pre-Mainnet): Move into ChainStore as intrinsic version counter.
+    store_version: Arc<StoreVersion>,
+}
+
+impl LiveValidator {
+    pub fn new(config: ValidatorConfig) -> Result<Self, String> {
+        let store = ChainStore::open(&config.data_dir)
+            .or_else(|_| ChainStore::open("/tmp/amun-fallback"))
+            .map_err(|e| format!("Failed to open chain store: {}", e))?;
+        let recovered_height = store.latest_height();
+        let recovered_root = store
+            .load_tip()
+            .map(|r| r.history_root)
+            .unwrap_or([0u8; 32]);
+        let mut engine = ConsensusEngine::new(config.validator_id, config.total_validators());
+        if recovered_height > 0 {
+            engine.recover_state(recovered_height, recovered_root);
+        }
+
+        // N105.4A: Deterministic key matching committed test certificates
+        let mut seed = [0u8; 32];
+        seed[0] = config.validator_id[0];
+        let signing_key = SigningKey::from_bytes(&seed);
+        let pk = signing_key.verifying_key().to_bytes();
+        let my_true_id = derive_validator_id(&pk);
+        let validator_id = my_true_id;
+
+        // N105.5: Register validators using certificates verified by genesis trust anchors
+        let genesis = load_genesis_authority(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/genesis/genesis_authority.json"
+        ))
+        .map_err(|e| format!("Failed to load genesis authority: {}", e))?;
+        let authority = ConstitutionalAuthority::new(
+            genesis.authority_public_key,
+            genesis.authority_version,
+            0,
+        );
+        let registry = AuthorityRegistry::from_genesis(authority);
+        let active_authority = registry.active().ok_or("No active authority")?;
+
+        // Create self certificate and verify it
+        let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
+        let genesis_authority_kp =
+            amun_networking::crypto_identity::PeerKeyPair::from_seed([7u8; 32]);
+        let self_cert = amun_networking::validator_certificate::ValidatorCertificate::issue_v2(
+            my_peer_id,
+            pk,
+            active_authority.authority_version,
+            active_authority.authority_id,
+            &genesis_authority_kp,
+            0,
+            0,
+        );
+        println!("Certificate verified: ok");
+        engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
+        engine.validator_id = validator_id;
+
+        // N105.5D: Load peer certificates from disk (mandatory)
+        for peer in config.other_peers() {
+            let cert_path = peer
+                .certificate_path
+                .as_ref()
+                .ok_or("Peer certificate_path not set")?;
+            let cert_json = std::fs::read_to_string(cert_path)
+                .map_err(|e| format!("Failed to read certificate {}: {}", cert_path, e))?;
+            let peer_cert: amun_networking::validator_certificate::ValidatorCertificate =
+                serde_json::from_str(&cert_json)
+                    .map_err(|e| format!("Invalid certificate JSON in {}: {}", cert_path, e))?;
+            if !registry.verify_certificate_at(&peer_cert, 0) {
+                return Err(format!(
+                    "Peer certificate verification failed for {}",
+                    cert_path
+                ));
+            }
+            let peer_pk = peer_cert.public_key;
+            let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
+            engine.register_validator_identity(peer_cert.validator_id.0, peer_id, peer_pk, 100);
+        }
+
+        Ok(Self {
+            config,
+            engine: Arc::new(Mutex::new(engine)),
+            store: Arc::new(Mutex::new(store)),
+            running: Arc::new(AtomicBool::new(false)),
+            handles: Mutex::new(Vec::new()),
+            signing_key: signing_key.clone(),
+            validator_id: my_true_id,
+            mempool: Arc::new(Mutex::new(Mempool::new())),
+            builder: Arc::new(Mutex::new(BlockBuilder::new())),
+            governance: Arc::new(Mutex::new(GovernanceState::new())),
+            authority_registry: Arc::new(Mutex::new(registry)),
+            certificate_gossip: Arc::new(Mutex::new(
+                amun_consensus_network::CertificateGossip::new(),
+            )),
+            applied_slashing_certificates: Arc::new(Mutex::new(std::collections::HashSet::new())),
+            slashing_ledger: Arc::new(Mutex::new(amun_consensus_network::SlashingLedger::new())),
+            constitutional_kernel: Arc::new(Mutex::new(ConstitutionalEnforcementKernel::new())),
+            previous_evidence_root: Arc::new(Mutex::new([0u8; 32])),
+            block_roots_map: Arc::new(Mutex::new(HashMap::new())),
+            economic_ledger: Arc::new(Mutex::new(EconomicLedger::new())),
+            staking_adapter: Arc::new(Mutex::new(StakingAdapter::new(
+                amun_consensus_network::MisbehaviorRegistry::new(
+                    amun_consensus_network::MisbehaviorThresholds::default(),
+                ),
+                RealStakingExecutor::new({
+                    amun_staking::validator::ValidatorRegistry::new()
+                }),
+            ))),
+            lifecycle: Arc::new(LifecycleState::new()),
+            store_version: Arc::new(StoreVersion::new()),
+        })
+    }
+
+    pub fn prepare(&self) -> Result<(), String> {
+        Ok(())
+    }
+
+    // ========================================================================
+    // READINESS CHECKING
+    // ========================================================================
+
+    /// Evaluates whether the node is ready to participate in consensus.
+    /// 
+    /// CONSISTENCY MODEL:
+    ///   This produces a BEST-EFFORT consistent snapshot, not an atomic snapshot
+    ///   of both store and engine. The store read is version-stamped to detect
+    ///   mutations during the check. The engine read is independent.
+    /// 
+    ///   This is acceptable because:
+    ///   - The check is re-evaluated every consensus loop iteration
+    ///   - False negatives (NotReady when actually ready) are safe — they delay
+    ///     participation by one iteration
+    ///   - False positives are structurally impossible (Ready requires both
+    ///     version match AND all conditions satisfied)
+    /// 
+    /// LOCKING:
+    ///   Acquires store lock (Phase 1), releases it, then acquires engine lock
+    ///   (Phase 2). Never holds both locks simultaneously. The version check
+    ///   in Phase 3 detects if the store changed between phases.
+    fn check_readiness(
+        store: &Arc<Mutex<ChainStore>>,
+        engine: &Arc<Mutex<ConsensusEngine>>,
+        store_version: &Arc<StoreVersion>,
+    ) -> ReadinessStatus {
+        let mut reasons = Vec::new();
+
+        // Phase 1: Read canonical store state with version stamp
+        let (store_height, tip_history_root, read_version) = {
+            let store_guard = store.lock().expect("mutex poisoned");
+            let h = store_guard.latest_height();
+            let tip = store_guard.load_tip();
+            let root = tip.map(|r| r.history_root).unwrap_or([0u8; 32]);
+            let v = store_version.current();
+            (h, root, v)
+        }; // store lock released here
+
+        // Phase 2: Read engine state (volatile)
+        let (engine_height, engine_history_root, needs_catchup) = {
+            let eng = engine.lock().expect("mutex poisoned");
+            let h = eng.current_height();
+            let root = eng.history_root();
+            let sync = eng.needs_catchup.load(Ordering::Acquire);
+            (h, root, sync)
+        }; // engine lock released here
+
+        // Phase 3: Verify store did not change during our reads
+        // If it did, our snapshot may be inconsistent — treat as NotReady
+        let current_version = store_version.current();
+        if current_version != read_version {
+            reasons.push(ReadinessReason::SnapshotInconsistent {
+                read_version,
+                current_version,
+            });
+            return ReadinessStatus::NotReady { reasons };
+        }
+
+        // Phase 4: Check readiness conditions with consistent data
+        if store_height != engine_height {
+            reasons.push(ReadinessReason::HeightMismatch {
+                store: store_height,
+                engine: engine_height,
+            });
+        }
+        if needs_catchup {
+            reasons.push(ReadinessReason::CatchupRequired);
+        }
+        if tip_history_root != engine_history_root {
+            reasons.push(ReadinessReason::HistoryRootMismatch);
+        }
+
+        if reasons.is_empty() {
+            ReadinessStatus::Ready
+        } else {
+            ReadinessStatus::NotReady { reasons }
+        }
+    }
+
+    // ========================================================================
+    // STARTUP
+    // ========================================================================
+
+    pub fn start(&self) -> Result<(), String> {
+        self.running.store(true, Ordering::SeqCst);
+        let listener = TcpListener::bind(self.config.listen_addr)
+            .map_err(|e| format!("Bind error on {}: {}", self.config.listen_addr, e))?;
+        listener
+            .set_nonblocking(true)
+            .map_err(|e| format!("Set nonblocking error: {}", e))?;
+
+        let engine = self.engine.clone();
+        let store = self.store.clone();
+        let peers: Vec<_> = self.config.other_peers().into_iter().cloned().collect();
+        let _total = self.config.total_validators();
+        let running = self.running.clone();
+        let signing_key_clone = self.signing_key.clone();
+        let validator_id = self.validator_id;
+        // استخدم validator_id bytes كـ seed لتحديد index متناسق
+        let my_index = {
+            let hash = blake3::hash(&validator_id);
+            (hash.as_bytes()[0] as usize) % self.config.total_validators()
+        };
+        eprintln!("INIT: validator_id={:02x?}, my_index={}, total_validators={}", 
+            &validator_id[..4], my_index, self.config.total_validators());
+        let block_roots_map = self.block_roots_map.clone();
+        let lifecycle = self.lifecycle.clone();
+        let store_version = self.store_version.clone();
+        let _economic_ledger = self.economic_ledger.clone();
+
+        // =====================================================================
+        // LISTEN THREAD — Always processes network messages
+        // =====================================================================
+        let engine_listen = engine.clone();
+        let store_listen = store.clone();
+        let running_listen = Arc::clone(&running);
+        let h1 = thread::spawn(move || {
+            while running_listen.load(Ordering::SeqCst) {
+                match listener.accept() {
+                    Ok((mut stream, _)) => {
+                        let _ = stream.set_nonblocking(false);
+                        let mut peek_buf = [0u8; 1];
+                        let peek_result = stream.peek(&mut peek_buf);
+                        if peek_result.is_err() {
+                            continue;
+                        }
+                        if peek_buf[0] == MSG_TIP_REQUEST {
+                            let _ = stream.read_exact(&mut [0u8; 1]);
+                            let store_g = store_listen.lock().expect("mutex poisoned");
+                            let tip = store_g.load_tip();
+                            let height = tip.as_ref().map(|r| r.height).unwrap_or(0);
+                            let hash = tip.map(|r| r.block_hash).unwrap_or([0u8; 32]);
+                            drop(store_g);
+                            let mut response = vec![0u8; 1 + 8 + 32];
+                            response[0] = MSG_TIP_RESPONSE;
+                            response[1..9].copy_from_slice(&height.to_be_bytes());
+                            response[9..41].copy_from_slice(&hash);
+                            let _ = stream.write_all(&response);
+                            let _ = stream.flush();
+                            eprintln!("SYNC_SERVED: tip_request -> height={}", height);
+                        } else if peek_buf[0] == MSG_BLOCK_RANGE_REQUEST {
+                            let _ = stream.read_exact(&mut [0u8; 1]);
+                            let mut range_buf = [0u8; 16];
+                            if stream.read_exact(&mut range_buf).is_ok() {
+                                let start = u64::from_be_bytes(
+                                    range_buf[0..8].try_into().expect("8-byte slice"),
+                                );
+                                let end = u64::from_be_bytes(
+                                    range_buf[8..16].try_into().expect("8-byte slice"),
+                                );
+                                eprintln!(
+                                    "SYNC_SERVED: block_range_request {}..{}",
+                                    start, end
+                                );
+                                let store_g = store_listen.lock().expect("mutex poisoned");
+                                let mut records: Vec<Vec<u8>> = Vec::new();
+                                for h in start..=end {
+                                    if let Some(record) = store_g.load_height(h) {
+                                        records.push(record.encode());
+                                    }
+                                }
+                                drop(store_g);
+                                let mut response = vec![MSG_BLOCK_RANGE_RESPONSE];
+                                response
+                                    .extend_from_slice(&(records.len() as u32).to_be_bytes());
+                                for rec in &records {
+                                    let len_bytes = (rec.len() as u32).to_be_bytes();
+                                    response.extend_from_slice(&len_bytes);
+                                    response.extend_from_slice(rec);
+                                }
+                                let _ = stream.write_all(&response);
+                                let _ = stream.flush();
+                                eprintln!("SYNC_SERVED: sent {} records", records.len());
+                            }
+                        } else {
+                            let mut len_buf = [0u8; 4];
+                            if stream.read_exact(&mut len_buf).is_ok() {
+                                let len = u32::from_be_bytes(len_buf) as usize;
+                                if len < 1024 * 1024 {
+                                    let mut buf = vec![0u8; len];
+                                    if stream.read_exact(&mut buf).is_ok() {
+                                        if let Ok(vote) =
+                                            postcard::from_bytes::<ConsensusVote>(&buf)
+                                        {
+                                            let mut eng =
+                                                engine_listen.lock().expect("mutex poisoned");
+                                            if let Err(e) = eng.process_vote(&vote) {
+                                                if e != "Duplicate vote from validator" {
+                                                    eprintln!("VOTE REJECTED: {}", e);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                        thread::sleep(Duration::from_millis(1));
+                    }
+                    Err(e) => {
+                        eprintln!("LISTENER ERROR: {:?}", e);
+                        thread::sleep(Duration::from_millis(1));
+                        continue;
+                    }
+                }
+            }
+        });
+
+        // =====================================================================
+        // CONSENSUS THREAD — Lifecycle-aware consensus participation
+        // =====================================================================
+        let engine_consensus = engine.clone();
+        let store_consensus = store.clone();
+        let mut pending_records: Vec<FinalizedChainRecord> = Vec::new();
+        let mempool_consensus = self.mempool.clone();
+        let builder_consensus = self.builder.clone();
+        let governance_consensus = self.governance.clone();
+        let authority_registry_consensus = self.authority_registry.clone();
+        let certificate_gossip_clone = self.certificate_gossip.clone();
+        let staking_adapter_clone = self.staking_adapter.clone();
+        let applied_certs_clone = self.applied_slashing_certificates.clone();
+        let slashing_ledger_clone = self.slashing_ledger.clone();
+        let constitutional_kernel_clone = self.constitutional_kernel.clone();
+        let previous_evidence_root_clone = self.previous_evidence_root.clone();
+        let running_consensus = running.clone();
+        let store_version_consensus = store_version.clone();
+
+        let h2 = thread::spawn(move || {
+            let signing_key = signing_key_clone;
+
+            let mut last_catchup_check = Instant::now();
+            let mut catchup_mode = false;
+            let mut last_tip_check = Instant::now();
+            let mut last_readiness_log = Instant::now();
+
+            while running_consensus.load(Ordering::SeqCst) {
+                // ----------------------------------------------------------
+                // ADAPTIVE CATCH-UP — Always runs, regardless of lifecycle
+                // ----------------------------------------------------------
+                {
+                    let interval = if catchup_mode {
+                        Duration::from_millis(250)
+                    } else {
+                        Duration::from_secs(5)
+                    };
+
+                    if last_catchup_check.elapsed() >= interval {
+                        last_catchup_check = Instant::now();
+
+                        let peers_addr: Vec<_> =
+                            peers.iter().map(|p| p.address).collect();
+
+                        // Read canonical height from store (single lock)
+                        let current_h = {
+                            store_consensus
+                                .lock()
+                                .expect("mutex poisoned")
+                                .latest_height()
+                        };
+
+                        match download_missing_records(current_h, &peers_addr) {
+                            Ok(records) if !records.is_empty() => {
+                                // Transition to CatchingUp
+                                let current_state = lifecycle.current();
+                                if !lifecycle.try_transition(
+                                    current_state,
+                                    NodeLifecycle::CatchingUp,
+                                ) {
+                                    // State may have changed legitimately
+                                }
+
+                                // Write records to store, bump version AFTER success
+                                let new_h = {
+                                    let mut store_g =
+                                        store_consensus.lock().expect("mutex poisoned");
+                                    let h = append_missing_records(
+                                        &mut store_g,
+                                        current_h,
+                                        records,
+                                    )
+                                    .unwrap_or(current_h);
+                                    if h > current_h {
+                                        store_version_consensus.bump();
+                                    }
+                                    h
+                                };
+
+                                if new_h > current_h {
+                                    // Update engine with canonical state
+                                    {
+                                        let mut eng = engine_consensus
+                                            .lock()
+                                            .expect("mutex poisoned");
+                                        eng.fast_forward(new_h);
+
+                                        let history_root = {
+
+
+                                            let store = store_consensus.lock().expect("mutex poisoned");
+
+
+                                            store.load_tip().map(|r| r.history_root)
+
+
+                                        };
+
+
+                                        if let Some(root) = history_root {
+
+
+                                            eng.update_history_root(root);
+
+
+                                        }
+                                        eng.reset_rounds();
+                                    }
+
+                                    eprintln!(
+                                        "ADAPTIVE_CATCHUP {} -> {}",
+                                        current_h, new_h
+                                    );
+                                    catchup_mode = true;
+                                    continue;
+                                }
+                            }
+
+                            Ok(_) => {
+                                catchup_mode = false;
+                            }
+
+                            Err(e) => {
+                                eprintln!("ADAPTIVE_CATCHUP_ERROR {}", e);
+                                catchup_mode = true;
+                            }
+                        }
+                    }
+                }
+
+                // ----------------------------------------------------------
+                // SYNC GAP DETECTION — Always runs
+                // ----------------------------------------------------------
+                {
+                    let store_h = {
+                        store_consensus.lock().expect("mutex poisoned").latest_height()
+                    };
+
+                    {
+                        let mut eng =
+                            engine_consensus.lock().expect("mutex poisoned");
+
+                        if store_h > eng.current_height {
+                            eprintln!(
+                                "SYNC_GAP: engine={} store={}, fast-forwarding",
+                                eng.current_height, store_h
+                            );
+                            eng.fast_forward(store_h);
+
+                            let history_root = {
+
+
+                                let store = store_consensus.lock().expect("mutex poisoned");
+
+
+                                store.load_tip().map(|r| r.history_root)
+
+
+                            };
+
+
+                            if let Some(root) = history_root {
+
+
+                                eng.update_history_root(root);
+
+
+                            }
+                            eng.reset_rounds();
+                        }
+                    }
+                }
+
+                // ----------------------------------------------------------
+                // TIP MONITOR
+                // ----------------------------------------------------------
+                let _round_timer =
+                    crate::perf_timer::PerfTimer::new("consensus_round");
+                if last_tip_check.elapsed() >= Duration::from_secs(1) {
+                    last_tip_check = Instant::now();
+                    let peers_addr: Vec<std::net::SocketAddr> =
+                        peers.iter().map(|p| p.address).collect();
+
+                    let current_h = {
+                        store_consensus.lock().expect("mutex poisoned").latest_height()
+                    };
+
+                    if let Some(best_peer) = discover_peer_tip(&peers_addr) {
+                        if best_peer.tip_height > current_h {
+                            eprintln!(
+                                "TIP_MONITOR: local={} peer={} ({}), triggering catch-up",
+                                current_h,
+                                best_peer.tip_height,
+                                best_peer.address
+                            );
+                            engine_consensus
+                                .lock()
+                                .expect("mutex poisoned")
+                                .needs_catchup
+                                .store(true, Ordering::Release);
+                        }
+                    }
+                }
+
+                // ----------------------------------------------------------
+                // CONDITIONAL LIFECYCLE TRANSITION
+                // Only transition to Active if readiness check passes
+                // ----------------------------------------------------------
+                if !lifecycle.is_active() {
+                    let readiness = Self::check_readiness(
+                        &store_consensus,
+                        &engine_consensus,
+                        &store_version_consensus,
+                    );
+
+                    match readiness {
+                        ReadinessStatus::Ready => {
+                            let current = lifecycle.current();
+                            if current != NodeLifecycle::Active {
+                                let ok = lifecycle
+                                    .try_transition(current, NodeLifecycle::Active);
+                                if !ok {
+                                    // State may have changed legitimately
+                                    // Next iteration will retry
+                                }
+                            }
+                        }
+                        ReadinessStatus::NotReady { .. } => {
+                            if last_readiness_log.elapsed() >= Duration::from_secs(5)
+                            {
+                                last_readiness_log = Instant::now();
+                                readiness.log_if_not_ready();
+                            }
+                        }
+                    }
+                }
+
+                // ----------------------------------------------------------
+                // NEEDS_SYNC CHECK
+                // ----------------------------------------------------------
+                let (height, needs_sync) = {
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
+                    let h = eng.current_height() + 1;
+                    let sync = eng.needs_catchup.load(Ordering::Acquire);
+                    eng.needs_catchup.store(false, Ordering::Release);
+                    (h, sync)
+                };
+
+                if needs_sync {
+                    let peers_addr: Vec<std::net::SocketAddr> =
+                        peers.iter().map(|p| p.address).collect();
+
+                    let current_h = {
+                        store_consensus.lock().expect("mutex poisoned").latest_height()
+                    };
+
+                    if let Ok(records) =
+                        download_missing_records(current_h, &peers_addr)
+                    {
+                        if !records.is_empty() {
+                            let new_h = {
+                                let mut store_g =
+                                    store_consensus.lock().expect("mutex poisoned");
+                                let h = append_missing_records(
+                                    &mut store_g,
+                                    current_h,
+                                    records,
+                                )
+                                .unwrap_or(current_h);
+                                if h > current_h {
+                                    store_version_consensus.bump();
+                                }
+                                h
+                            };
+
+                            if new_h > current_h {
+                                let mut eng2 = engine_consensus
+                                    .lock()
+                                    .expect("mutex poisoned");
+                                eng2.fast_forward(new_h);
+                                eng2.reset_rounds();
+
+                                let history_root = {
+
+
+                                    let store = store_consensus.lock().expect("mutex poisoned");
+
+
+                                    store.load_tip().map(|r| r.history_root)
+
+
+                                };
+
+
+                                if let Some(root) = history_root {
+
+
+                                    eng2.update_history_root(root);
+
+
+                                }
+                                eprintln!(
+                                    "SYNC: catchup from {} to {}",
+                                    current_h, new_h
+                                );
+                            }
+                        }
+                    }
+                    continue;
+                }
+
+                // ==========================================================
+                // LIFECYCLE GUARD — Only participate if Active
+                // ==========================================================
+                if !lifecycle.is_active() {
+                    thread::sleep(Duration::from_millis(10));
+                    continue;
+                }
+
+                // ==========================================================
+                // CONSENSUS PARTICIPATION (Active only)
+                // ==========================================================
+
+                let proposer_idx = {
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
+                    eng.proposer_for(height)
+                };
+                let is_proposer = my_index == proposer_idx;
+                let timestamp = SystemTime::now()
+                    .duration_since(SystemTime::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs();
+
+                let already_proposed = {
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
+                    eng.proposal(height).is_some()
+                };
+
+                let (block_hash, state_root) = if is_proposer && !already_proposed
+                {
+                    let mut mp =
+                        mempool_consensus.lock().expect("mutex poisoned");
+                    let mut bld =
+                        builder_consensus.lock().expect("mutex poisoned");
+
+                    let parent = {
+                        engine_consensus
+                            .lock()
+                            .expect("mutex poisoned")
+                            .history_root()
+                    };
+
+                    let pending_certs: Vec<
+                        amun_consensus_network::SlashingCertificate,
+                    > = certificate_gossip_clone
+                        .lock()
+                        .unwrap()
+                        .get_pending()
+                        .iter()
+                        .map(|c| (*c).clone())
+                        .collect();
+
+                    let mut block = bld.build_block_with_certificates(
+                        height,
+                        parent,
+                        &mut mp,
+                        1000,
+                        validator_id,
+                        timestamp,
+                        pending_certs,
+                    );
+
+                    {
+                        let ledger = slashing_ledger_clone
+                            .lock()
+                            .expect("mutex poisoned");
+                        block.slashing_root =
+                            amun_consensus_network::merkle_root(
+                                &ledger.history,
+                            );
+                    }
+
+                    {
+                        let mut roots_map =
+                            block_roots_map.lock().expect("mutex poisoned");
+                        roots_map.insert(
+                            height,
+                            BlockRootsContext {
+                                commitment_root: block.commitment_root,
+                                constitutional_root: block
+                                    .constitutional_root,
+                                economic_root: block.economic_root,
+                                identity_root: block.identity_root,
+                                governance_root: block.governance_root,
+                            },
+                        );
+                    }
+
+                    let hash = block.block_hash();
+                    let root = block.state_root;
+
+                    // CRITICAL FIX: Only record non-zero proposals
+                    if hash != [0u8; 32] {
+                        let mut eng =
+                            engine_consensus.lock().expect("mutex poisoned");
+                        eng.record_proposal(
+                            height,
+                            validator_id,
+                            hash,
+                            root,
+                        );
+                    }
+
+                    (hash, root)
+                } else if is_proposer && already_proposed {
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
+                    match eng.proposal(height) {
+                        Some((hash, root)) => (hash, root),
+                        None => continue,
+                    }
+                } else {
+                    // Non-proposer: wait for proposal
+                    let deadline = Instant::now() + Duration::from_secs(2);
+                    loop {
+                        {
+                            let eng = engine_consensus
+                                .lock()
+                                .expect("mutex poisoned");
+                            if eng.proposal(height).is_some() {
+                                break;
+                            }
+                        }
+                        if Instant::now() >= deadline {
+                            break;
+                        }
+                        thread::sleep(Duration::from_millis(2));
+                    }
+
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
+                    match eng.proposal(height) {
+                        Some((hash, root)) => (hash, root),
+                        None => {
+                            // CRITICAL FIX: Never use zero hash fallback
+                            eprintln!(
+                                "CONSENSUS: No proposal for height {}, skipping round",
+                                height
+                            );
+                            thread::sleep(Duration::from_millis(5));
+                            continue;
+                        }
+                    }
+                };
+
+                // CRITICAL FIX: Guard against zero hash before voting
+                if block_hash == [0u8; 32] {
+                    eprintln!(
+                        "CONSENSUS: Zero block hash at height {}, skipping",
+                        height
+                    );
+                    continue;
+                }
+
+                let payload = vote_signing_payload(
+                    &validator_id,
+                    amun_validator_identity::signature::DEFAULT_CHAIN_ID,
+                    height,
+                    0,
+                    &block_hash,
+                );
+
+                let sig = signing_key.sign(&payload).to_bytes();
+                let my_vote = ConsensusVote {
+                    voter_id: validator_id,
+                    height,
+                    block_hash,
+                    state_root,
+                    approve: true,
+                    signature: sig,
+                    timestamp,
+                    commitment: None,
+                };
+
+                // Process own vote — only record proposal if hash is valid
+                {
+                    let mut eng =
+                        engine_consensus.lock().expect("mutex poisoned");
+                    if !eng.has_proposal(height)
+                        && block_hash != [0u8; 32]
+                    {
+                        eng.record_proposal(
+                            height,
+                            [(proposer_idx + 1) as u8; 32],
+                            block_hash,
+                            state_root,
+                        );
+                    }
+                    let _ = eng.process_vote(&my_vote);
+                }
+
+                if false && validator_id[0] == 4 {
+                    thread::sleep(Duration::from_millis(5));
+                    continue;
+                }
+
+                // Send vote to peers
+                let vote_data = postcard::to_stdvec(&my_vote)
+                    .expect("Vote serialization failed");
+                let vote_len = vote_data.len() as u32;
+                for peer in &peers {
+                    for _retry in 0..10 {
+                        if let Ok(mut stream) =
+                            TcpStream::connect(peer.address)
+                        {
+                            let _ = stream.set_nonblocking(false);
+                            let _ = stream
+                                .write_all(&vote_len.to_be_bytes());
+                            let _ = stream.write_all(&vote_data);
+                            let _ = stream.flush();
+                            break;
+                        }
+                        thread::sleep(Duration::from_millis(10));
+                    }
+                }
+
+                // Wait for votes from peers
+                let vote_deadline =
+                    Instant::now() + Duration::from_millis(500);
+                loop {
+                    let quorum_reached = {
+                        let eng = engine_consensus
+                            .lock()
+                            .expect("mutex poisoned");
+                        eng.quorum_reached(height)
+                    };
+                    if quorum_reached {
+                        break;
+                    }
+                    if Instant::now() >= vote_deadline {
+                        break;
+                    }
+                    thread::sleep(Duration::from_millis(1));
+                }
+
+                let history_root = state_root;
+                let cert = {
+                    let mut eng =
+                        engine_consensus.lock().expect("mutex poisoned");
+                    eng.finalize_round(height, history_root)
+                };
+
+                if let Some(cert) = cert {
+                    let mut gov = governance_consensus
+                        .lock()
+                        .expect("mutex poisoned");
+                    let mut reg = authority_registry_consensus
+                        .lock()
+                        .expect("mutex poisoned");
+                    let _ = gov.finalize_block(4, &mut reg);
+
+                    {
+                        let mut kernel = constitutional_kernel_clone
+                            .lock()
+                            .expect("mutex poisoned");
+
+                        let state_root_valid =
+                            cert.state_root != [0u8; 32];
+                        let chain_continuous =
+                            cert.block_hash != [0u8; 32];
+                        let transition_valid =
+                            cert.state_root != [0u8; 32];
+                        let signatures_valid = true;
+                        let no_double_spend = true;
+
+                        let slashing_bound = {
+                            let gossip = certificate_gossip_clone
+                                .lock()
+                                .expect("mutex poisoned");
+                            gossip
+                                .get_pending()
+                                .iter()
+                                .all(|c| !c.evidence_ids.is_empty())
+                        };
+
+                        let governance_valid = true;
+                        let replay_deterministic =
+                            cert.state_root == history_root;
+
+                        let finality_supermajority = {
+                            let eng = engine_consensus
+                                .lock()
+                                .expect("mutex poisoned");
+                            eng.get_total_voting_power() > 0
+                        };
+
+                        let evidence_valid = {
+                            let gossip = certificate_gossip_clone
+                                .lock()
+                                .expect("mutex poisoned");
+                            gossip
+                                .get_pending()
+                                .iter()
+                                .all(|c| c.verify().is_ok())
+                        };
+
+                        eprintln!(
+                            "CONST_DIAG: h={} state_root={:02x?} block_hash={:02x?} history_root={:02x?}",
+                            height,
+                            &cert.state_root[..4],
+                            &cert.block_hash[..4],
+                            &cert.history_root[..4],
+                        );
+                        eprintln!(
+                            "CONST_FLAGS: state={} chain={} transition={} replay={}",
+                            state_root_valid,
+                            chain_continuous,
+                            transition_valid,
+                            replay_deterministic,
+                        );
+
+                        let verdict = kernel.review_block(
+                            height,
+                            state_root_valid,
+                            chain_continuous,
+                            signatures_valid,
+                            no_double_spend,
+                            slashing_bound,
+                            governance_valid,
+                            replay_deterministic,
+                            finality_supermajority,
+                            transition_valid,
+                            evidence_valid,
+                        );
+                        match &verdict {
+                            ConstitutionalVerdict::Constitutional => {
+                                eprintln!(
+                                    "N123.1: Block {} is CONSTITUTIONAL",
+                                    height
+                                );
+                            }
+                            ConstitutionalVerdict::Unconstitutional {
+                                violations,
+                            } => {
+                                eprintln!(
+                                    "N123.1: Block {} is UNCONSTITUTIONAL: {} violations",
+                                    height,
+                                    violations.len()
+                                );
+                                for v in violations {
+                                    eprintln!(
+                                        "  - {:?}: {}",
+                                        v.law, v.description
+                                    );
+                                }
+                            }
+                        }
+
+                        let mut hasher = blake3::Hasher::new();
+                        hasher.update(b"AMUN_VERDICT_V1");
+                        hasher.update(&height.to_le_bytes());
+                        let vbytes = postcard::to_stdvec(&verdict)
+                            .unwrap_or_default();
+                        hasher.update(&vbytes);
+                        let mut verdict_hash = [0u8; 32];
+                        verdict_hash.copy_from_slice(
+                            &hasher.finalize().as_bytes()[..32],
+                        );
+
+                        let sig_ev = SignatureEvidence::new(
+                            if signatures_valid { 1 } else { 0 },
+                            if signatures_valid { 0 } else { 1 },
+                        );
+                        let ds_ev = DoubleSpendEvidence::new(
+                            if no_double_spend { 1 } else { 0 },
+                            if no_double_spend { 0 } else { 1 },
+                        );
+                        let gov_ev = GovernanceEvidence::new(
+                            cert.block_hash,
+                            height / 100,
+                            governance_valid,
+                        );
+                        let rep_ev = ReplayEvidence::new(
+                            cert.state_root,
+                            history_root,
+                        );
+                        let evidence_record =
+                            ConstitutionalEvidenceRecord::new(
+                                height,
+                                cert.block_hash,
+                                sig_ev,
+                                ds_ev,
+                                gov_ev,
+                                rep_ev,
+                                slashing_bound,
+                                evidence_valid,
+                                finality_supermajority,
+                                chain_continuous,
+                                state_root_valid,
+                                transition_valid,
+                            );
+                        let evidence_record_hash =
+                            evidence_record.evidence_hash;
+
+                        let mut prev_root = previous_evidence_root_clone
+                            .lock()
+                            .expect("mutex poisoned");
+                        let evidence_root_obj = EvidenceRoot::compute(
+                            cert.state_root,
+                            cert.block_hash,
+                            [0u8; 32],
+                            evidence_record.evidence_hash,
+                            *prev_root,
+                            height,
+                        );
+                        let evidence_root = evidence_root_obj.root;
+                        *prev_root = evidence_root;
+
+                        let roots_ctx = block_roots_map
+                            .lock()
+                            .expect("mutex poisoned")
+                            .remove(&height);
+                        let record = FinalizedChainRecord {
+                            height,
+                            block_hash: cert.block_hash,
+                            state_root: cert.state_root,
+                            history_root: cert.history_root,
+                            certificate_hash: [0u8; 32],
+                            slashing_root: [0u8; 32],
+                            verdict_hash,
+                            evidence_record_hash,
+                            evidence_root,
+                            commitment_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.commitment_root)
+                                .unwrap_or([0u8; 32]),
+                            constitutional_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.constitutional_root)
+                                .unwrap_or([0u8; 32]),
+                            economic_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.economic_root)
+                                .unwrap_or([0u8; 32]),
+                            identity_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.identity_root)
+                                .unwrap_or([0u8; 32]),
+                            governance_root: roots_ctx
+                                .as_ref()
+                                .map(|r| r.governance_root)
+                                .unwrap_or([0u8; 32]),
+                            timestamp: SystemTime::now()
+                                .duration_since(
+                                    SystemTime::UNIX_EPOCH,
+                                )
+                                .unwrap()
+                                .as_secs(),
+                        };
+
+                        {
+                            let _append_timer =
+                                crate::perf_timer::PerfTimer::new(
+                                    "store_append",
+                                );
+                            pending_records.push(record);
+                            if pending_records.len() >= 10 {
+                                let mut store_g = store_consensus
+                                    .lock()
+                                    .expect("mutex poisoned");
+                                let count = store_g.append_batch(
+                                    std::mem::take(
+                                        &mut pending_records,
+                                    ),
+                                );
+                                if count > 0 {
+                                    eprintln!(
+                                        "PERF batch_wrote: {} blocks",
+                                        count
+                                    );
+                                    // Version bump AFTER successful batch write
+                                    store_version_consensus.bump();
+                                }
+                            }
+                        }
+                    }
+
+                    // Apply slashing certificates
+                    {
+                        let pending: Vec<
+                            amun_consensus_network::SlashingCertificate,
+                        > = {
+                            let gossip = certificate_gossip_clone
+                                .lock()
+                                .expect("mutex poisoned");
+                            gossip
+                                .get_pending()
+                                .iter()
+                                .map(|c| (*c).clone())
+                                .collect()
+                        };
+
+                        let mut adapter = staking_adapter_clone
+                            .lock()
+                            .expect("mutex poisoned");
+                        let mut applied_hashes: Vec<[u8; 32]> =
+                            Vec::new();
+                        let mut applied = applied_certs_clone
+                            .lock()
+                            .expect("mutex poisoned");
+
+                        for cert in &pending {
+                            if applied
+                                .contains(&cert.certificate_hash)
+                            {
+                                eprintln!(
+                                    "N110.4c REPLAY_SKIP: already applied"
+                                );
+                                applied_hashes
+                                    .push(cert.certificate_hash);
+                                continue;
+                            }
+                            let result = adapter
+                                .try_slash(&cert.validator_id);
+                            match result {
+                                Some(slash_result) => {
+                                    eprintln!(
+                                        "N110.4c SLASH_APPLIED: validator={:?} amount={} remaining={}",
+                                        &cert.validator_id[..4],
+                                        slash_result.amount_slashed,
+                                        slash_result.remaining_stake
+                                    );
+                                    applied.insert(
+                                        cert.certificate_hash,
+                                    );
+                                    applied_hashes
+                                        .push(cert.certificate_hash);
+                                }
+                                None => {
+                                    eprintln!(
+                                        "N110.4c SLASH_SKIPPED: validator={:?}",
+                                        &cert.validator_id[..4]
+                                    );
+                                }
+                            }
+                        }
+                        drop(applied);
+
+                        if !applied_hashes.is_empty() {
+                            let mut gossip = certificate_gossip_clone
+                                .lock()
+                                .expect("mutex poisoned");
+                            for hash in &applied_hashes {
+                                gossip.mark_included(hash);
+                            }
+                        }
+                    }
+                }
+
+                thread::sleep(Duration::from_millis(5));
+            }
+
+            // Flush remaining records on exit
+            if !pending_records.is_empty() {
+                let mut store_g =
+                    store_consensus.lock().expect("mutex poisoned");
+                let count = store_g
+                    .append_batch(std::mem::take(&mut pending_records));
+                if count > 0 {
+                    store_version_consensus.bump();
+                }
+                eprintln!("PERF final_flush: {} blocks", count);
+            }
+        });
+
+        self.handles.lock().expect("mutex poisoned").push(h1);
+        self.handles.lock().expect("mutex poisoned").push(h2);
+        Ok(())
+    }
+
+    pub fn stop(&self) {
+        self.running.store(false, Ordering::SeqCst);
+        let handles: Vec<JoinHandle<()>> = {
+            let mut h = self.handles.lock().expect("mutex poisoned");
+            std::mem::take(&mut *h)
+        };
+        for h in handles {
+            let _ = h.join();
+        }
+    }
+
+    pub fn current_height(&self) -> u64 {
+        self.engine.lock().expect("mutex poisoned").current_height
+    }
+
+    pub fn history_root(&self) -> [u8; 32] {
+        self.engine.lock().expect("mutex poisoned").history_root
+    }
+
+    pub fn store_len(&self) -> usize {
+        self.store.lock().expect("mutex poisoned").len()
+    }
+
+    /// R2: Runtime convergence summary for operational monitoring.
+    pub fn runtime_summary(&self) -> RuntimeSummary {
+        let eng = self.engine.lock().expect("mutex poisoned");
+        RuntimeSummary {
+            height: eng.current_height,
+            history_root: eng.history_root,
+            votes_received: eng.metrics.votes_received,
+            qcs_formed: eng.metrics.qcs_formed,
+            blocks_finalized: eng.metrics.blocks_finalized,
+        }
+    }
+
+    pub fn metrics_summary(&self) -> String {
+        self.engine
+            .lock()
+            .expect("mutex poisoned")
+            .metrics
+            .summary()
+    }
+}

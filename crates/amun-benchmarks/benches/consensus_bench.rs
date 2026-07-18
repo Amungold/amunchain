@@ -54,16 +54,15 @@ fn bench_single_round(c: &mut Criterion) {
 
             register(&mut engine);
 
-            engine.start_round(1, [1u8; 32]);
-            engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
+            engine.record_proposal(1, [1u8; 32], [0xAA; 32], [0xBB; 32]);
 
             for id in 1..=3 {
                 engine.process_vote(&make_vote(id, 1, [0xAA; 32])).unwrap();
             }
 
-            engine.try_advance(1, [0xCC; 32]).unwrap();
+            engine.finalize_round(1, [0xCC; 32]).unwrap();
 
-            black_box(engine.current_height);
+            black_box(engine.current_height());
         })
     });
 }
@@ -76,12 +75,7 @@ fn bench_multi_round_10(c: &mut Criterion) {
             register(&mut engine);
 
             for h in 1..=10 {
-                engine.start_round(h, [(h as u8 % 4) + 1; 32]);
-
-                engine
-                    .round_mut(h)
-                    .unwrap()
-                    .propose([h as u8; 32], [0xBB; 32]);
+                engine.record_proposal(h, [(h as u8 % 4) + 1; 32], [h as u8; 32], [0xBB; 32]);
 
                 for id in 1..=3 {
                     engine
@@ -89,10 +83,10 @@ fn bench_multi_round_10(c: &mut Criterion) {
                         .unwrap();
                 }
 
-                engine.try_advance(h, [h as u8; 32]).unwrap();
+                engine.finalize_round(h, [h as u8; 32]).unwrap();
             }
 
-            black_box(engine.current_height);
+            black_box(engine.current_height());
         })
     });
 }

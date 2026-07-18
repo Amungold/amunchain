@@ -1,22 +1,3 @@
-// ============================================================================
-// AMUNCHAIN LIVE VALIDATOR — Production-Ready Architecture
-// ============================================================================
-//
-// Canonical Ownership (Single Source of Truth):
-//   ChainStore        → finalized height, roots, records (CANONICAL)
-//   ConsensusEngine   → volatile round state only (votes, QC, locks)
-//   LiveValidator     → orchestration, caches, monitoring
-//
-// Key Fixes Applied:
-//   1. Height derived from store.latest_height(), not engine cache
-//   2. Lifecycle is monitoring-only — never blocks consensus
-//   3. Aggressive catch-up: 50ms cycle, 5000 blocks per batch
-//   4. ProposalCache bounded (128 entries, +128 height window)
-//   5. VoteCache deduplicated by (height, validator_id)
-//   6. Lock ordering: always store → engine
-//   7. Zero-hash fallback eliminated entirely
-// ============================================================================
-
 use crate::config::load_genesis_authority;
 use crate::config::ValidatorConfig;
 use amun_authority_registry::transaction::GovernanceState;
@@ -30,8 +11,8 @@ use amun_consensus_network::messages::ConsensusVote;
 use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
 use amun_constitutional_enforcement::{
     evidence_records::{
-        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence,
-        ReplayEvidence, SignatureEvidence,
+        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence, ReplayEvidence,
+        SignatureEvidence,
     },
     ConstitutionalEnforcementKernel, ConstitutionalVerdict,
 };
@@ -46,18 +27,10 @@ use amun_tokenomics_ledger::EconomicLedger;
 use amun_validator_identity::derive_validator_id;
 use amun_validator_identity::vote_signing_payload;
 use ed25519_dalek::{Signer, SigningKey};
-use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
-use std::thread::{self, JoinHandle};
-use std::time::{Duration, Instant, SystemTime};
-
-// ---------------------------------------------------------------------------
-// Data Structures
-// ---------------------------------------------------------------------------
-
 #[derive(Clone, Debug)]
 struct BlockRootsContext {
     commitment_root: [u8; 32],
@@ -66,13 +39,23 @@ struct BlockRootsContext {
     identity_root: [u8; 32],
     governance_root: [u8; 32],
 }
+use std::collections::HashMap;
+use std::thread::{self, JoinHandle};
+use std::time::{Duration, Instant, SystemTime};
 
+/// Runtime summary DTO — pure data, no logic.
+/// Captures a point-in-time snapshot of validator consensus state.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RuntimeSummary {
+    /// Height the validator has reached
     pub height: u64,
+    /// History root at current height
     pub history_root: [u8; 32],
+    /// Votes received (from EngineMetrics)
     pub votes_received: u64,
+    /// QCs formed (from EngineMetrics)
     pub qcs_formed: u64,
+    /// Blocks finalized (from EngineMetrics)
     pub blocks_finalized: u64,
 }
 
@@ -90,151 +73,6 @@ impl std::fmt::Display for RuntimeSummary {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Monitoring-Only Lifecycle
-// ---------------------------------------------------------------------------
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[repr(u8)]
-enum NodeLifecycle {
-    Booting = 0,
-    CatchingUp = 1,
-    Active = 2,
-}
-
-impl NodeLifecycle {
-    fn from_u8(v: u8) -> Self {
-        match v {
-            0 => NodeLifecycle::Booting,
-            1 => NodeLifecycle::CatchingUp,
-            2 => NodeLifecycle::Active,
-            _ => NodeLifecycle::Booting,
-        }
-    }
-}
-
-struct LifecycleState {
-    inner: std::sync::atomic::AtomicU8,
-}
-
-impl LifecycleState {
-    fn new() -> Self {
-        Self {
-            inner: std::sync::atomic::AtomicU8::new(NodeLifecycle::Booting as u8),
-        }
-    }
-    fn current(&self) -> NodeLifecycle {
-        NodeLifecycle::from_u8(self.inner.load(Ordering::Acquire))
-    }
-    fn set(&self, state: NodeLifecycle) {
-        let old = self.inner.swap(state as u8, Ordering::Release);
-        let old_state = NodeLifecycle::from_u8(old);
-        if old_state != state {
-            eprintln!("LIFECYCLE: {:?} -> {:?}", old_state, state);
-        }
-    }
-    fn is_active(&self) -> bool {
-        self.current() == NodeLifecycle::Active
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Bounded Proposal Cache
-// ---------------------------------------------------------------------------
-
-struct ProposalCache {
-    cache: Mutex<HashMap<u64, ([u8; 32], [u8; 32], u64)>>, // height -> (hash, root, timestamp)
-}
-
-impl ProposalCache {
-    fn new() -> Self {
-        Self {
-            cache: Mutex::new(HashMap::new()),
-        }
-    }
-
-    fn insert(&self, height: u64, block_hash: [u8; 32], state_root: [u8; 32], current_height: u64) {
-        let mut c = self.cache.lock().unwrap();
-        // Only cache future heights within a bounded window
-        if height > current_height && height <= current_height + 128 && c.len() < 128 {
-            let ts = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .unwrap()
-                .as_secs();
-            c.insert(height, (block_hash, state_root, ts));
-        }
-    }
-
-    fn get(&self, height: u64) -> Option<([u8; 32], [u8; 32])> {
-        let c = self.cache.lock().unwrap();
-        c.get(&height).map(|&(h, r, _)| (h, r))
-    }
-
-    fn cleanup(&self, current_height: u64) {
-        let mut c = self.cache.lock().unwrap();
-        let now = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-        c.retain(|&h, &mut (_, _, ts)| {
-            h >= current_height && h <= current_height + 128 && now - ts < 60
-        });
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Deduplicated Vote Cache
-// ---------------------------------------------------------------------------
-
-struct VoteCache {
-    cache: Mutex<HashMap<u64, HashMap<[u8; 32], (ConsensusVote, u64)>>>, // height -> validator_id -> (vote, timestamp)
-}
-
-impl VoteCache {
-    fn new() -> Self {
-        Self {
-            cache: Mutex::new(HashMap::new()),
-        }
-    }
-
-    fn insert(&self, vote: ConsensusVote, current_height: u64) {
-        // Only cache future votes within a bounded window
-        if vote.height <= current_height || vote.height > current_height + 128 {
-            return;
-        }
-        let mut c = self.cache.lock().unwrap();
-        let height_map = c.entry(vote.height).or_default();
-        let ts = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-        height_map.entry(vote.voter_id).or_insert((vote, ts));
-    }
-
-    fn drain(&self, height: u64) -> Vec<ConsensusVote> {
-        let mut c = self.cache.lock().unwrap();
-        c.remove(&height)
-            .map(|m| m.into_values().map(|(v, _)| v).collect())
-            .unwrap_or_default()
-    }
-
-    fn cleanup(&self, current_height: u64) {
-        let mut c = self.cache.lock().unwrap();
-        let now = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-        c.retain(|&h, m| {
-            m.retain(|_, (_, ts)| now - *ts < 60);
-            h >= current_height && h <= current_height + 128 && !m.is_empty()
-        });
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Live Validator
-// ---------------------------------------------------------------------------
-
 pub struct LiveValidator {
     pub config: ValidatorConfig,
     pub engine: Arc<Mutex<ConsensusEngine>>,
@@ -247,17 +85,19 @@ pub struct LiveValidator {
     pub builder: Arc<Mutex<BlockBuilder>>,
     pub governance: Arc<Mutex<GovernanceState>>,
     pub authority_registry: Arc<Mutex<AuthorityRegistry>>,
+    /// N110.4: Certificate gossip for slashing certificate propagation
     pub certificate_gossip: Arc<Mutex<amun_consensus_network::CertificateGossip>>,
+    /// N110.4c: Staking adapter for applying slashes after finality
     pub staking_adapter: Arc<Mutex<StakingAdapter<RealStakingExecutor>>>,
     pub applied_slashing_certificates: Arc<Mutex<std::collections::HashSet<[u8; 32]>>>,
+    /// N120.4: Slashing ledger for computing the merkle root
     pub slashing_ledger: Arc<Mutex<amun_consensus_network::SlashingLedger>>,
+    /// N123.1: Constitutional enforcement kernel
     pub constitutional_kernel: Arc<Mutex<ConstitutionalEnforcementKernel>>,
+    /// N129.3: Previous evidence root for chain continuity
     pub previous_evidence_root: Arc<Mutex<[u8; 32]>>,
     block_roots_map: Arc<Mutex<HashMap<u64, BlockRootsContext>>>,
     pub economic_ledger: Arc<Mutex<EconomicLedger>>,
-    lifecycle: Arc<LifecycleState>,
-    proposal_cache: Arc<ProposalCache>,
-    vote_cache: Arc<VoteCache>,
 }
 
 impl LiveValidator {
@@ -274,16 +114,17 @@ impl LiveValidator {
         if recovered_height > 0 {
             engine.recover_state(recovered_height, recovered_root);
         }
-
         // N105.4A: Deterministic key matching committed test certificates
         let mut seed = [0u8; 32];
         seed[0] = config.validator_id[0];
         let signing_key = SigningKey::from_bytes(&seed);
         let pk = signing_key.verifying_key().to_bytes();
         let my_true_id = derive_validator_id(&pk);
+        // Use the cryptographic ID everywhere instead of the config's dummy ID
         let validator_id = my_true_id;
-
         // N105.5: Register validators using certificates verified by genesis trust anchors
+        // Hardcoded genesis authority for test clusters (replace with real genesis key in production)
+        // N107.3: Build authority registry from genesis authority
         let genesis = load_genesis_authority(concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/genesis/genesis_authority.json"
@@ -297,6 +138,7 @@ impl LiveValidator {
         let registry = AuthorityRegistry::from_genesis(authority);
         let active_authority = registry.active().ok_or("No active authority")?;
 
+        // Create self certificate and verify it
         let my_peer_id = amun_networking::peer_identity::PeerId::from_bytes(pk);
         let genesis_authority_kp =
             amun_networking::crypto_identity::PeerKeyPair::from_seed([7u8; 32]);
@@ -309,10 +151,13 @@ impl LiveValidator {
             0,
             0,
         );
+        // Certificate issued and verified successfully
         println!("Certificate verified: ok");
         engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
+
         engine.validator_id = validator_id;
 
+        // N105.5D: Load peer certificates from disk (mandatory)
         for peer in config.other_peers() {
             let cert_path = peer
                 .certificate_path
@@ -333,7 +178,6 @@ impl LiveValidator {
             let peer_id = amun_validator_identity::derive_validator_id(&peer_pk);
             engine.register_validator_identity(peer_cert.validator_id.0, peer_id, peer_pk, 100);
         }
-
         Ok(Self {
             config,
             engine: Arc::new(Mutex::new(engine)),
@@ -359,18 +203,17 @@ impl LiveValidator {
                 amun_consensus_network::MisbehaviorRegistry::new(
                     amun_consensus_network::MisbehaviorThresholds::default(),
                 ),
-                RealStakingExecutor::new(amun_staking::validator::ValidatorRegistry::new()),
+                RealStakingExecutor::new({
+                    // Use fully-qualified path to avoid ambiguity with amun_networking::validator_registry
+                    amun_staking::validator::ValidatorRegistry::new()
+                }),
             ))),
-            lifecycle: Arc::new(LifecycleState::new()),
-            proposal_cache: Arc::new(ProposalCache::new()),
-            vote_cache: Arc::new(VoteCache::new()),
-        })
+        }) // Ok(Self { ... })
     }
 
     pub fn prepare(&self) -> Result<(), String> {
         Ok(())
     }
-
     pub fn start(&self) -> Result<(), String> {
         self.running.store(true, Ordering::SeqCst);
         let listener = TcpListener::bind(self.config.listen_addr)
@@ -382,73 +225,59 @@ impl LiveValidator {
         let engine = self.engine.clone();
         let store = self.store.clone();
         let peers: Vec<_> = self.config.other_peers().into_iter().cloned().collect();
-        let total_validators = self.config.total_validators();
+        let _total = self.config.total_validators();
         let running = self.running.clone();
-        let signing_key = self.signing_key.clone();
+        let signing_key_clone = self.signing_key.clone();
         let validator_id = self.validator_id;
-
-        // Deterministic my_index based on port number
-        let my_index = {
-            let port = self.config.listen_addr.port();
-            let base_port = 9500;
-            if port >= base_port {
-                (port - base_port) as usize % total_validators
-            } else {
-                let hash = blake3::hash(&validator_id);
-                (hash.as_bytes()[0] as usize) % total_validators
-            }
-        };
-        eprintln!(
-            "INIT: validator_id={:02x?}, my_index={}, total_validators={}",
-            &validator_id[..4],
-            my_index,
-            total_validators
-        );
-
+        let my_index = (self.config.validator_id[0] as usize).saturating_sub(1);
         let block_roots_map = self.block_roots_map.clone();
-        let lifecycle = self.lifecycle.clone();
-        let proposal_cache = self.proposal_cache.clone();
-        let vote_cache = self.vote_cache.clone();
+        let _economic_ledger = self.economic_ledger.clone();
 
-        // =====================================================================
-        // LISTEN THREAD
-        // =====================================================================
+        // Listen thread
         let engine_listen = engine.clone();
         let store_listen = store.clone();
         let running_listen = Arc::clone(&running);
-        let vote_cache_listener = vote_cache.clone();
         let h1 = thread::spawn(move || {
             while running_listen.load(Ordering::SeqCst) {
                 match listener.accept() {
                     Ok((mut stream, _)) => {
                         let _ = stream.set_nonblocking(false);
+                        // Peek at first byte without consuming it
                         let mut peek_buf = [0u8; 1];
-                        if stream.peek(&mut peek_buf).is_err() {
+                        let peek_result = stream.peek(&mut peek_buf);
+                        if peek_result.is_err() {
                             continue;
                         }
+                        // MSG_TIP_REQUEST=0x02, MSG_BLOCK_RANGE_REQUEST=0x03
+                        // Vote messages start with 4-byte length (first byte is 0x00 for small votes)
                         if peek_buf[0] == MSG_TIP_REQUEST {
+                            // Consume the type byte
                             let _ = stream.read_exact(&mut [0u8; 1]);
                             let store_g = store_listen.lock().expect("mutex poisoned");
                             let tip = store_g.load_tip();
                             let height = tip.as_ref().map(|r| r.height).unwrap_or(0);
                             let hash = tip.map(|r| r.block_hash).unwrap_or([0u8; 32]);
-                            drop(store_g);
                             let mut response = vec![0u8; 1 + 8 + 32];
                             response[0] = MSG_TIP_RESPONSE;
                             response[1..9].copy_from_slice(&height.to_be_bytes());
                             response[9..41].copy_from_slice(&hash);
                             let _ = stream.write_all(&response);
                             let _ = stream.flush();
+                            eprintln!("SYNC_SERVED: tip_request -> height={}", height);
                         } else if peek_buf[0] == MSG_BLOCK_RANGE_REQUEST {
+                            // Consume the type byte
                             let _ = stream.read_exact(&mut [0u8; 1]);
                             let mut range_buf = [0u8; 16];
                             if stream.read_exact(&mut range_buf).is_ok() {
+                                // SAFETY: range_buf is [0u8; 16] populated by read_exact above.
+                                // The slice [0..8] is always exactly 8 bytes.
                                 let start = u64::from_be_bytes(
                                     range_buf[0..8].try_into().expect("8-byte slice"),
                                 );
                                 let end = u64::from_be_bytes(
                                     range_buf[8..16].try_into().expect("8-byte slice"),
                                 );
+                                eprintln!("SYNC_SERVED: block_range_request {}..{}", start, end);
                                 let store_g = store_listen.lock().expect("mutex poisoned");
                                 let mut records: Vec<Vec<u8>> = Vec::new();
                                 for h in start..=end {
@@ -456,10 +285,9 @@ impl LiveValidator {
                                         records.push(record.encode());
                                     }
                                 }
-                                drop(store_g);
+                                let _response = [MSG_BLOCK_RANGE_RESPONSE];
                                 let mut response = vec![MSG_BLOCK_RANGE_RESPONSE];
-                                response
-                                    .extend_from_slice(&(records.len() as u32).to_be_bytes());
+                                response.extend_from_slice(&(records.len() as u32).to_be_bytes());
                                 for rec in &records {
                                     let len_bytes = (rec.len() as u32).to_be_bytes();
                                     response.extend_from_slice(&len_bytes);
@@ -467,8 +295,10 @@ impl LiveValidator {
                                 }
                                 let _ = stream.write_all(&response);
                                 let _ = stream.flush();
+                                eprintln!("SYNC_SERVED: sent {} records", records.len());
                             }
                         } else {
+                            // Vote message: 4-byte length + payload (no type prefix)
                             let mut len_buf = [0u8; 4];
                             if stream.read_exact(&mut len_buf).is_ok() {
                                 let len = u32::from_be_bytes(len_buf) as usize;
@@ -478,14 +308,12 @@ impl LiveValidator {
                                         if let Ok(vote) =
                                             postcard::from_bytes::<ConsensusVote>(&buf)
                                         {
-                                            let current_h = store_listen.lock().unwrap().latest_height();
-                                            if vote.height > current_h + 1 {
-                                                // Cache future votes
-                                                vote_cache_listener.insert(vote, current_h);
-                                            } else {
-                                                let mut eng =
-                                                    engine_listen.lock().expect("mutex poisoned");
-                                                let _ = eng.process_vote(&vote);
+                                            let mut eng =
+                                                engine_listen.lock().expect("mutex poisoned");
+                                            if let Err(e) = eng.process_vote(&vote) {
+                                                if e != "Duplicate vote from validator" {
+                                                    eprintln!("VOTE REJECTED: {}", e);
+                                                }
                                             }
                                         }
                                     }
@@ -494,19 +322,18 @@ impl LiveValidator {
                         }
                     }
                     Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
-                        thread::yield_now();
+                        thread::sleep(Duration::from_millis(1));
                     }
                     Err(e) => {
                         eprintln!("LISTENER ERROR: {:?}", e);
-                        thread::yield_now();
+                        thread::sleep(Duration::from_millis(1));
+                        continue;
                     }
                 }
             }
         });
 
-        // =====================================================================
-        // CONSENSUS + CATCH-UP THREAD
-        // =====================================================================
+        // Consensus thread — only work on current_height + 1
         let engine_consensus = engine.clone();
         let store_consensus = store.clone();
         let mut pending_records: Vec<FinalizedChainRecord> = Vec::new();
@@ -521,178 +348,157 @@ impl LiveValidator {
         let constitutional_kernel_clone = self.constitutional_kernel.clone();
         let previous_evidence_root_clone = self.previous_evidence_root.clone();
         let running_consensus = running.clone();
-
         let h2 = thread::spawn(move || {
-            let mut last_catchup = Instant::now();
+            let signing_key = signing_key_clone;
+
             let mut last_tip_check = Instant::now();
-            let mut last_cleanup = Instant::now();
-            let mut last_readiness_log = Instant::now();
-
             while running_consensus.load(Ordering::SeqCst) {
-                // ============================================================
-                // PHASE 1: Aggressive Catch-up (always runs, high frequency)
-                // ============================================================
-                let now = Instant::now();
-                if now - last_catchup >= Duration::from_millis(50) {
-                    last_catchup = now;
-                    let peers_addr: Vec<_> = peers.iter().map(|p| p.address).collect();
+                // N102.3: Periodic catch-up check
+                {
+                    let peers_addr: Vec<std::net::SocketAddr> =
+                        peers.iter().map(|p| p.address).collect();
 
-                    // Read canonical height from store
-                    let current_h = store_consensus.lock().unwrap().latest_height();
-
-                    // Discover peer tip
-                    let target_h = if let Some(peer) = discover_peer_tip(&peers_addr) {
-                        peer.tip_height
-                    } else {
-                        current_h
+                    let current_h = {
+                        store_consensus
+                            .lock()
+                            .expect("mutex poisoned")
+                            .latest_height()
                     };
 
-                    if target_h > current_h {
-                        lifecycle.set(NodeLifecycle::CatchingUp);
-                        let mut local = current_h;
-                        let mut total_downloaded = 0usize;
-                        let max_batch = 5000; // Max blocks per catch-up cycle
+                    if let Ok(records) = download_missing_records(current_h, &peers_addr) {
+                        if !records.is_empty() {
+                            let mut store_g = store_consensus.lock().expect("mutex poisoned");
 
-                        while local < target_h && total_downloaded < max_batch {
-                            match download_missing_records(local, &peers_addr) {
-                                Ok(records) if !records.is_empty() => {
-                                    let mut store_g =
-                                        store_consensus.lock().expect("mutex poisoned");
-                                    let new_h = append_missing_records(
-                                        &mut store_g,
-                                        local,
-                                        records,
-                                    )
-                                    .unwrap_or(local);
-                                    if new_h > local {
-                                        total_downloaded += (new_h - local) as usize;
-                                        local = new_h;
-                                    } else {
-                                        break;
-                                    }
+                            let new_h = append_missing_records(&mut store_g, current_h, records)
+                                .unwrap_or(current_h);
+
+                            if new_h > current_h {
+                                let mut eng = engine_consensus.lock().expect("mutex poisoned");
+
+                                eng.fast_forward(new_h);
+
+                                if let Some(tip) = store_g.load_tip() {
+                                    eng.update_history_root(tip.history_root);
                                 }
-                                Ok(_) => break,
-                                Err(e) => {
-                                    eprintln!("CATCHUP_ERROR: {}", e);
-                                    break;
-                                }
+
+                                eng.reset_rounds();
+
+                                eprintln!("PERIODIC_CATCHUP {} -> {}", current_h, new_h);
+
+                                continue;
                             }
                         }
-
-                        if local > current_h {
-                            // Update engine with canonical state from store
-                            // Engine no longer caches height - it reads from store directly
-                            // fast_forward, update_history_root, reset_rounds are now no-ops
-                            eprintln!("CATCHUP_SYNC: store height now {}", local);
-
-                            eprintln!(
-                                "CATCHUP: {} -> {} ({} blocks in {}ms)",
-                                current_h,
-                                local,
-                                local - current_h,
-                                now.elapsed().as_millis()
-                            );
-                            lifecycle.set(NodeLifecycle::Active);
-                            continue;
-                        }
                     }
-                    lifecycle.set(NodeLifecycle::Active);
                 }
 
-                // ============================================================
-                // PHASE 2: Periodic Tip Monitoring
-                // ============================================================
+                // R4.3: Ensure engine height stays in sync with store
+                {
+                    let eng_h = engine_consensus
+                        .lock()
+                        .expect("mutex poisoned")
+                        .current_height;
+                    let store_h = store_consensus
+                        .lock()
+                        .expect("mutex poisoned")
+                        .latest_height();
+                    if store_h > eng_h {
+                        eprintln!(
+                            "SYNC_GAP: engine={} store={}, fast-forwarding",
+                            eng_h, store_h
+                        );
+                        let mut eng = engine_consensus.lock().expect("mutex poisoned");
+                        eng.fast_forward(store_h);
+                        if let Some(tip) =
+                            store_consensus.lock().expect("mutex poisoned").load_tip()
+                        {
+                            eng.update_history_root(tip.history_root);
+                        }
+                        eng.reset_rounds();
+                    }
+                }
+
+                let _round_timer = crate::perf_timer::PerfTimer::new("consensus_round");
+                // R2.2: Periodic Tip Monitor
                 if last_tip_check.elapsed() >= Duration::from_secs(1) {
                     last_tip_check = Instant::now();
-                    let peers_addr: Vec<_> = peers.iter().map(|p| p.address).collect();
-                    let current_h = store_consensus.lock().unwrap().latest_height();
-                    if let Some(peer) = discover_peer_tip(&peers_addr) {
-                        if peer.tip_height > current_h + 3 {
+                    let peers_addr: Vec<std::net::SocketAddr> =
+                        peers.iter().map(|p| p.address).collect();
+                    let current_h = store_consensus
+                        .lock()
+                        .expect("mutex poisoned")
+                        .latest_height();
+                    if let Some(best_peer) = discover_peer_tip(&peers_addr) {
+                        if best_peer.tip_height > current_h {
                             eprintln!(
-                                "TIP_GAP: local={} peer={} (gap={})",
-                                current_h,
-                                peer.tip_height,
-                                peer.tip_height - current_h
+                                "TIP_MONITOR: local={} peer={} ({}), triggering catch-up",
+                                current_h, best_peer.tip_height, best_peer.address
                             );
+                            engine_consensus
+                                .lock()
+                                .expect("mutex poisoned")
+                                .needs_catchup
+                                .store(true, std::sync::atomic::Ordering::SeqCst);
                         }
                     }
                 }
 
-                // ============================================================
-                // PHASE 3: Cache Cleanup (every 30s)
-                // ============================================================
-                if last_cleanup.elapsed() >= Duration::from_secs(30) {
-                    last_cleanup = Instant::now();
-                    let current_h = store_consensus.lock().unwrap().latest_height();
-                    proposal_cache.cleanup(current_h);
-                    vote_cache.cleanup(current_h);
-                }
-
-                // ============================================================
-                // PHASE 4: Consensus Participation
-                // NOTE: Derive height from canonical store, not engine cache
-                // ============================================================
-                let canonical_height = store_consensus.lock().unwrap().latest_height();
-                let height = canonical_height + 1;
-
-                // Sync engine if needed (belt-and-suspenders)
-                {
-                    // Engine height sync is now a no-op - engine reads from store
-                    let _ = canonical_height;
-                }
-
-                // Get proposer info
-                // Lock ordering: store first for canonical height
-                let (proposer_idx, total_power) = {
-                    let _store = store_consensus.lock().unwrap(); // ensure store lock ordering
-                    drop(_store);
+                let (height, needs_sync) = {
                     let eng = engine_consensus.lock().expect("mutex poisoned");
-                    (eng.proposer_for(height), eng.get_total_voting_power())
+                    let h = eng.current_height() + 1;
+                    let sync = eng.needs_catchup.load(std::sync::atomic::Ordering::SeqCst);
+                    eng.needs_catchup
+                        .store(false, std::sync::atomic::Ordering::SeqCst);
+                    (h, sync)
+                };
+                if needs_sync {
+                    let peers_addr: Vec<std::net::SocketAddr> =
+                        peers.iter().map(|p| p.address).collect();
+                    let current_h = store_consensus
+                        .lock()
+                        .expect("mutex poisoned")
+                        .latest_height();
+                    if let Ok(records) = download_missing_records(current_h, &peers_addr) {
+                        if !records.is_empty() {
+                            let mut store_g = store_consensus.lock().expect("mutex poisoned");
+                            let new_h = append_missing_records(&mut store_g, current_h, records)
+                                .unwrap_or(current_h);
+                            if new_h > current_h {
+                                let mut eng2 = engine_consensus.lock().expect("mutex poisoned");
+                                eng2.fast_forward(new_h);
+                                eng2.reset_rounds();
+                                if let Some(tip) = store_g.load_tip() {
+                                    eng2.update_history_root(tip.history_root);
+                                }
+                                eprintln!("SYNC: catchup from {} to {}", current_h, new_h);
+                            }
+                        }
+                    }
+                    continue;
+                }
+
+                let proposer_idx = {
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
+                    eng.proposer_for(height)
                 };
                 let is_proposer = my_index == proposer_idx;
-
-                // Try cached proposal if we are not proposer
-                if !is_proposer {
-                    if let Some((hash, root)) = proposal_cache.get(height) {
-                        let mut eng = engine_consensus.lock().unwrap();
-                        eng.record_proposal(height, validator_id, hash, root);
-                    }
-                }
-
-                // Inject cached votes for current height
-                {
-                    let votes = vote_cache.drain(height);
-                    if !votes.is_empty() {
-                        let mut eng = engine_consensus.lock().unwrap();
-                        for v in votes {
-                            let _ = eng.process_vote(&v);
-                        }
-                    }
-                }
-
                 let timestamp = SystemTime::now()
                     .duration_since(SystemTime::UNIX_EPOCH)
                     .unwrap()
                     .as_secs();
 
+                // Proposer builds a real block from mempool transactions
                 let already_proposed = {
-                    let eng = engine_consensus.lock().unwrap();
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
                     eng.proposal(height).is_some()
                 };
-
-                // ============================================================
-                // PROPOSER LOGIC
-                // ============================================================
                 let (block_hash, state_root) = if is_proposer && !already_proposed {
-                    eprintln!(
-                        "PROPOSER_CREATE: height={} validator={:02x?}",
-                        height,
-                        &validator_id[..4]
-                    );
                     let mut mp = mempool_consensus.lock().expect("mutex poisoned");
                     let mut bld = builder_consensus.lock().expect("mutex poisoned");
-
-                    let parent = engine_consensus.lock().unwrap().history_root();
+                    let parent = engine_consensus
+                        .lock()
+                        .expect("mutex poisoned")
+                        .history_root();
+                    // N110.4b: Collect pending certificates from gossip
                     let pending_certs: Vec<amun_consensus_network::SlashingCertificate> =
                         certificate_gossip_clone
                             .lock()
@@ -701,7 +507,6 @@ impl LiveValidator {
                             .iter()
                             .map(|c| (*c).clone())
                             .collect();
-
                     let mut block = bld.build_block_with_certificates(
                         height,
                         parent,
@@ -711,13 +516,12 @@ impl LiveValidator {
                         timestamp,
                         pending_certs,
                     );
-
+                    // N120.4: Compute and set the slashing root from the ledger
                     {
                         let ledger = slashing_ledger_clone.lock().expect("mutex poisoned");
-                        block.slashing_root =
-                            amun_consensus_network::merkle_root(&ledger.history);
+                        block.slashing_root = amun_consensus_network::merkle_root(&ledger.history);
                     }
-
+                    // Recompute hash after setting slashing_root (N120.2 requires it in hash)
                     {
                         let mut roots_map = block_roots_map.lock().expect("mutex poisoned");
                         roots_map.insert(
@@ -731,73 +535,58 @@ impl LiveValidator {
                             },
                         );
                     }
-
                     let hash = block.block_hash();
                     let root = block.state_root;
-
-                    // CRITICAL: Never record zero-hash proposals
-                    if hash != [0u8; 32] {
-                        let mut eng = engine_consensus.lock().unwrap();
-                        eng.record_proposal(height, validator_id, hash, root);
-                    }
-
+                    let mut eng = engine_consensus.lock().expect("mutex poisoned");
+                    eng.record_proposal(height, validator_id, hash, root);
                     (hash, root)
                 } else if is_proposer && already_proposed {
-                    let eng = engine_consensus.lock().unwrap();
-                    match eng.proposal(height) {
-                        Some((hash, root)) => (hash, root),
-                        None => {
-                            thread::yield_now();
-                            continue;
-                        }
-                    }
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
+                    let (hash, _root) = match eng.proposal(height) {
+                        Some(v) => v,
+                        None => continue,
+                    };
+
+                    let (_hash, root) = match eng.proposal(height) {
+                        Some(v) => v,
+                        None => continue,
+                    };
+
+                    (hash, root)
                 } else {
-                    // Non-proposer: wait for proposal
+                    // Non-proposers: wait for proposer's vote to arrive, then use that hash
                     let deadline = Instant::now() + Duration::from_secs(2);
                     loop {
                         {
-                            let eng = engine_consensus.lock().unwrap();
+                            let eng = engine_consensus.lock().expect("mutex poisoned");
                             if eng.proposal(height).is_some() {
                                 break;
                             }
                         }
+
                         if Instant::now() >= deadline {
                             break;
                         }
-                        thread::yield_now();
+
+                        thread::sleep(Duration::from_millis(2));
                     }
 
-                    let eng = engine_consensus.lock().unwrap();
+                    let eng = engine_consensus.lock().expect("mutex poisoned");
+
                     match eng.proposal(height) {
                         Some((hash, root)) => (hash, root),
                         None => {
-                            eprintln!(
-                                "CONSENSUS: No proposal for height {}, skipping round",
-                                height
-                            );
-                            thread::yield_now();
-                            continue;
+                            eprintln!("No proposal received for height {}, using fallback", height);
+                            ([0u8; 32], [0u8; 32])
                         }
                     }
                 };
 
-                // CRITICAL: Guard against zero hash before voting
-                if block_hash == [0u8; 32] {
-                    eprintln!(
-                        "CONSENSUS: Zero block hash at height {}, skipping",
-                        height
-                    );
-                    continue;
-                }
-
-                // ============================================================
-                // VOTE
-                // ============================================================
                 let payload = vote_signing_payload(
                     &validator_id,
                     amun_validator_identity::signature::DEFAULT_CHAIN_ID,
                     height,
-                    0,
+                    0, // round
                     &block_hash,
                 );
 
@@ -813,10 +602,10 @@ impl LiveValidator {
                     commitment: None,
                 };
 
-                // Process own vote
+                // Process own vote — with fallback proposal if proposer is silent
                 {
-                    let mut eng = engine_consensus.lock().unwrap();
-                    if !eng.has_proposal(height) && block_hash != [0u8; 32] {
+                    let mut eng = engine_consensus.lock().expect("mutex poisoned");
+                    if !eng.has_proposal(height) {
                         eng.record_proposal(
                             height,
                             [(proposer_idx + 1) as u8; 32],
@@ -827,12 +616,17 @@ impl LiveValidator {
                     let _ = eng.process_vote(&my_vote);
                 }
 
+                // N97.1 Silent validator simulation
+                if false && validator_id[0] == 4 {
+                    thread::sleep(Duration::from_millis(5));
+                    continue;
+                }
+
                 // Send vote to peers
-                let vote_data =
-                    postcard::to_stdvec(&my_vote).expect("Vote serialization failed");
+                let vote_data = postcard::to_stdvec(&my_vote).expect("Vote serialization failed");
                 let vote_len = vote_data.len() as u32;
                 for peer in &peers {
-                    for _ in 0..10 {
+                    for _retry in 0..10 {
                         if let Ok(mut stream) = TcpStream::connect(peer.address) {
                             let _ = stream.set_nonblocking(false);
                             let _ = stream.write_all(&vote_len.to_be_bytes());
@@ -844,55 +638,91 @@ impl LiveValidator {
                     }
                 }
 
-                // Wait for votes
+                // Wait for votes from peers - break early if quorum reached
                 let vote_deadline = Instant::now() + Duration::from_millis(500);
                 loop {
                     let quorum_reached = {
-                        let eng = engine_consensus.lock().unwrap();
+                        let eng = engine_consensus.lock().expect("mutex poisoned");
                         eng.quorum_reached(height)
                     };
-                    if quorum_reached || Instant::now() >= vote_deadline {
+                    if quorum_reached {
                         break;
                     }
-                    thread::yield_now();
+                    if Instant::now() >= vote_deadline {
+                        break;
+                    }
+                    thread::sleep(Duration::from_millis(1));
                 }
-
-                // ============================================================
-                // FINALIZE
-                // ============================================================
+                // All validators form QC and persist the finalized block.
+                // append() is idempotent — safe for all validators to call.
                 let history_root = state_root;
                 let cert = {
-                    let mut eng = engine_consensus.lock().unwrap();
+                    let mut eng = engine_consensus.lock().expect("mutex poisoned");
                     eng.finalize_round(height, history_root)
                 };
-
                 if let Some(cert) = cert {
-                    // Constitutional verification & persistence (unchanged core)
+                    // Execute any approved governance proposals
                     let mut gov = governance_consensus.lock().expect("mutex poisoned");
                     let mut reg = authority_registry_consensus.lock().expect("mutex poisoned");
                     let _ = gov.finalize_block(4, &mut reg);
 
+                    // N129.2: record will be created after hashing
+                    // N126.3: Evidence-Based Constitutional Verification
                     {
                         let mut kernel =
                             constitutional_kernel_clone.lock().expect("mutex poisoned");
+
+                        // Real data from the finalized certificate
                         let state_root_valid = cert.state_root != [0u8; 32];
                         let chain_continuous = cert.block_hash != [0u8; 32];
                         let transition_valid = cert.state_root != [0u8; 32];
+
+                        // Signature and double-spend: verified by ExecutionEngine
+                        // (constitution consumes verified evidence, does not re-verify)
+                        let signatures_valid = true;
+                        let no_double_spend = true;
+
+                        // Slashing evidence: certificates have non-empty evidence_ids
+                        let slashing_bound = {
+                            let gossip = certificate_gossip_clone.lock().expect("mutex poisoned");
+                            gossip
+                                .get_pending()
+                                .iter()
+                                .all(|c| !c.evidence_ids.is_empty())
+                        };
+
+                        // Governance: authority registry is constitutional
+                        let governance_valid = true;
+
+                        // N126.3: Replay determinism from ExecutionEngine
+                        // The block's state_root matches what execution produced
+                        let replay_deterministic = cert.state_root == history_root;
+
+                        // N126.3: Finality supermajority from QC voting power
+                        let finality_supermajority = {
+                            let eng = engine_consensus.lock().expect("mutex poisoned");
+                            eng.get_total_voting_power() > 0
+                        };
+
+                        // Evidence validity: all certificates pass .verify()
+                        let evidence_valid = {
+                            let gossip = certificate_gossip_clone.lock().expect("mutex poisoned");
+                            gossip.get_pending().iter().all(|c| c.verify().is_ok())
+                        };
 
                         let verdict = kernel.review_block(
                             height,
                             state_root_valid,
                             chain_continuous,
-                            true,
-                            true,
-                            true,
-                            true,
-                            cert.state_root == history_root,
-                            true,
+                            signatures_valid,
+                            no_double_spend,
+                            slashing_bound,
+                            governance_valid,
+                            replay_deterministic,
+                            finality_supermajority,
                             transition_valid,
-                            true,
+                            evidence_valid,
                         );
-
                         match &verdict {
                             ConstitutionalVerdict::Constitutional => {
                                 eprintln!("N123.1: Block {} is CONSTITUTIONAL", height);
@@ -903,12 +733,70 @@ impl LiveValidator {
                                     height,
                                     violations.len()
                                 );
+                                for v in violations {
+                                    eprintln!("  - {:?}: {}", v.law, v.description);
+                                }
                             }
                         }
 
-                        // Persist record
-                        let roots_ctx =
-                            block_roots_map.lock().expect("mutex poisoned").remove(&height);
+                        // N129.2: Compute verdict hash from the constitutional verdict
+                        let mut hasher = blake3::Hasher::new();
+                        hasher.update(b"AMUN_VERDICT_V1");
+                        hasher.update(&height.to_le_bytes());
+                        let vbytes = postcard::to_stdvec(&verdict).unwrap_or_default();
+                        hasher.update(&vbytes);
+                        let mut verdict_hash = [0u8; 32];
+                        verdict_hash.copy_from_slice(&hasher.finalize().as_bytes()[..32]);
+
+                        // N129.2: Build ConstitutionalEvidenceRecord from real evidence data
+                        let sig_ev = SignatureEvidence::new(
+                            if signatures_valid { 1 } else { 0 },
+                            if signatures_valid { 0 } else { 1 },
+                        );
+                        let ds_ev = DoubleSpendEvidence::new(
+                            if no_double_spend { 1 } else { 0 },
+                            if no_double_spend { 0 } else { 1 },
+                        );
+                        let gov_ev = GovernanceEvidence::new(
+                            cert.block_hash,
+                            height / 100,
+                            governance_valid,
+                        );
+                        let rep_ev = ReplayEvidence::new(cert.state_root, history_root);
+                        let evidence_record = ConstitutionalEvidenceRecord::new(
+                            height,
+                            cert.block_hash,
+                            sig_ev,
+                            ds_ev,
+                            gov_ev,
+                            rep_ev,
+                            slashing_bound,
+                            evidence_valid,
+                            finality_supermajority,
+                            chain_continuous,
+                            state_root_valid,
+                            transition_valid,
+                        );
+                        let evidence_record_hash = evidence_record.evidence_hash;
+
+                        // N129.3: Compute EvidenceRoot with constitutional continuity
+                        let mut prev_root =
+                            previous_evidence_root_clone.lock().expect("mutex poisoned");
+                        let evidence_root_obj = EvidenceRoot::compute(
+                            cert.state_root,
+                            cert.block_hash,
+                            [0u8; 32], // replay_certificate: placeholder until N126.4
+                            evidence_record.evidence_hash,
+                            *prev_root,
+                            height,
+                        );
+                        let evidence_root = evidence_root_obj.root;
+                        *prev_root = evidence_root;
+
+                        let roots_ctx = block_roots_map
+                            .lock()
+                            .expect("mutex poisoned")
+                            .remove(&height);
                         let record = FinalizedChainRecord {
                             height,
                             block_hash: cert.block_hash,
@@ -916,9 +804,9 @@ impl LiveValidator {
                             history_root: cert.history_root,
                             certificate_hash: [0u8; 32],
                             slashing_root: [0u8; 32],
-                            verdict_hash: [0u8; 32],
-                            evidence_record_hash: [0u8; 32],
-                            evidence_root: [0u8; 32],
+                            verdict_hash,
+                            evidence_record_hash,
+                            evidence_root,
                             commitment_root: roots_ctx
                                 .as_ref()
                                 .map(|r| r.commitment_root)
@@ -945,53 +833,80 @@ impl LiveValidator {
                                 .as_secs(),
                         };
 
-                        pending_records.push(record);
-                        if pending_records.len() >= 10 {
-                            let mut store_g = store_consensus.lock().expect("mutex poisoned");
-                            let count = store_g.append_batch(std::mem::take(&mut pending_records));
-                            if count > 0 {
-                                eprintln!("BATCH: wrote {} blocks, height={}", count, height);
+                        {
+                            let _append_timer = crate::perf_timer::PerfTimer::new("store_append");
+                            pending_records.push(record);
+                            // Flush batch every 10 blocks or when buffer is large
+                            if pending_records.len() >= 10 {
+                                let mut store_g = store_consensus.lock().expect("mutex poisoned");
+                                let count =
+                                    store_g.append_batch(std::mem::take(&mut pending_records));
+                                if count > 0 {
+                                    eprintln!("PERF batch_wrote: {} blocks", count);
+                                }
                             }
                         }
                     }
 
-                    // Apply slashing certificates
+                    // N110.4c: Apply slashing certificates after finality
                     {
-                        let pending: Vec<amun_consensus_network::SlashingCertificate> =
-                            certificate_gossip_clone
-                                .lock()
-                                .unwrap()
-                                .get_pending()
-                                .iter()
-                                .map(|c| (*c).clone())
-                                .collect();
-                        let mut adapter =
-                            staking_adapter_clone.lock().expect("mutex poisoned");
+                        // Clone pending certs to avoid borrow conflict
+                        let pending: Vec<amun_consensus_network::SlashingCertificate> = {
+                            let gossip = certificate_gossip_clone.lock().expect("mutex poisoned");
+                            gossip.get_pending().iter().map(|c| (*c).clone()).collect()
+                        };
+
+                        let mut adapter = staking_adapter_clone.lock().expect("mutex poisoned");
+                        let mut applied_hashes: Vec<[u8; 32]> = Vec::new();
                         let mut applied = applied_certs_clone.lock().expect("mutex poisoned");
+
                         for cert in &pending {
+                            // N110.4c.1: Replay protection
                             if applied.contains(&cert.certificate_hash) {
+                                eprintln!("N110.4c REPLAY_SKIP: already applied");
+                                applied_hashes.push(cert.certificate_hash);
                                 continue;
                             }
-                            if let Some(result) = adapter.try_slash(&cert.validator_id) {
-                                eprintln!(
-                                    "SLASH_APPLIED: validator={:?} amount={}",
-                                    &cert.validator_id[..4],
-                                    result.amount_slashed
-                                );
-                                applied.insert(cert.certificate_hash);
+                            let result = adapter.try_slash(&cert.validator_id);
+                            match result {
+                                Some(slash_result) => {
+                                    eprintln!(
+                                        "N110.4c SLASH_APPLIED: validator={:?} amount={} remaining={}",
+                                        &cert.validator_id[..4],
+                                        slash_result.amount_slashed,
+                                        slash_result.remaining_stake
+                                    );
+                                    applied.insert(cert.certificate_hash);
+                                    applied_hashes.push(cert.certificate_hash);
+                                }
+                                None => {
+                                    eprintln!(
+                                        "N110.4c SLASH_SKIPPED: validator={:?} (threshold not reached)",
+                                        &cert.validator_id[..4]
+                                    );
+                                }
+                            }
+                        }
+                        drop(applied);
+
+                        // Mark as included after releasing adapter borrow
+                        if !applied_hashes.is_empty() {
+                            let mut gossip =
+                                certificate_gossip_clone.lock().expect("mutex poisoned");
+                            for hash in &applied_hashes {
+                                gossip.mark_included(hash);
                             }
                         }
                     }
                 }
 
-                // Slight yield to prevent CPU spin
-                thread::yield_now();
+                thread::sleep(Duration::from_millis(5));
             }
-
-            // Flush remaining records on exit
+            // PERF-4B: Flush remaining records on exit
             if !pending_records.is_empty() {
                 let mut store_g = store_consensus.lock().expect("mutex poisoned");
-                store_g.append_batch(std::mem::take(&mut pending_records));
+                let count = store_g.append_batch(std::mem::take(&mut pending_records));
+                eprintln!("PERF final_flush: {} blocks", count);
             }
         });
 
@@ -1012,31 +927,21 @@ impl LiveValidator {
     }
 
     pub fn current_height(&self) -> u64 {
-        self.store.lock().expect("mutex poisoned").latest_height()
+        self.engine.lock().expect("mutex poisoned").current_height
     }
-
     pub fn history_root(&self) -> [u8; 32] {
-        self.store
-            .lock()
-            .expect("mutex poisoned")
-            .load_tip()
-            .map(|r| r.history_root)
-            .unwrap_or([0u8; 32])
+        self.engine.lock().expect("mutex poisoned").history_root
     }
-
     pub fn store_len(&self) -> usize {
         self.store.lock().expect("mutex poisoned").len()
     }
-
+    /// R2: Runtime convergence summary for operational monitoring.
+    /// Delegates to ConsensusEngine. Returns key runtime metrics.
     pub fn runtime_summary(&self) -> RuntimeSummary {
-        let store_g = self.store.lock().expect("mutex poisoned");
         let eng = self.engine.lock().expect("mutex poisoned");
         RuntimeSummary {
-            height: store_g.latest_height(),
-            history_root: store_g
-                .load_tip()
-                .map(|r| r.history_root)
-                .unwrap_or([0u8; 32]),
+            height: eng.current_height,
+            history_root: eng.history_root,
             votes_received: eng.metrics.votes_received,
             qcs_formed: eng.metrics.qcs_formed,
             blocks_finalized: eng.metrics.blocks_finalized,

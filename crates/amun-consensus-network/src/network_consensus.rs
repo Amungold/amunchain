@@ -12,6 +12,7 @@ use std::sync::{Arc, Mutex};
 ///
 /// N144 note: Still uses ConsensusVote internally.
 /// RuntimeVote migration is deferred until engine.rs is ready.
+#[allow(dead_code)]
 pub struct NetworkConsensus {
     pub engine: Arc<Mutex<ConsensusEngine>>,
     pub validator_id: [u8; 32],
@@ -19,6 +20,7 @@ pub struct NetworkConsensus {
     pub validator_registry: Arc<dyn ValidatorRead>,
 }
 
+#[allow(dead_code)]
 impl NetworkConsensus {
     pub fn new(
         validator_id: [u8; 32],

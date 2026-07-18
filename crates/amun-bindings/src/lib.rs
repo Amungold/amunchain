@@ -37,15 +37,12 @@ pub extern "C" fn amun_sign(
 
     let seed = unsafe {
         let sk = slice::from_raw_parts(secret_key, 32);
-        if sk.len() != 32 {
-            return ERR_INVALID_LENGTH;
-        }
         let mut seed = [0u8; 32];
         seed.copy_from_slice(sk);
         seed
     };
 
-    let msg = unsafe { slice::from_raw_parts(message, message_len as usize) };
+    let msg = unsafe { slice::from_raw_parts(message, usize::try_from(message_len).unwrap_or(0)) };
     let signer = Ed25519Signer::from_seed(&seed);
 
     match signer.sign(msg, b"AMUN_FFI", 1) {
@@ -75,21 +72,15 @@ pub extern "C" fn amun_verify(
 
     let pk = unsafe {
         let pk_slice = slice::from_raw_parts(public_key, 32);
-        if pk_slice.len() != 32 {
-            return ERR_INVALID_LENGTH;
-        }
         let mut pk = [0u8; 32];
         pk.copy_from_slice(pk_slice);
         pk
     };
 
-    let msg = unsafe { slice::from_raw_parts(message, message_len as usize) };
+    let msg = unsafe { slice::from_raw_parts(message, usize::try_from(message_len).unwrap_or(0)) };
 
     let sig = unsafe {
         let sig_slice = slice::from_raw_parts(signature, 64);
-        if sig_slice.len() != 64 {
-            return ERR_INVALID_LENGTH;
-        }
         let mut sig = [0u8; 64];
         sig.copy_from_slice(sig_slice);
         sig
