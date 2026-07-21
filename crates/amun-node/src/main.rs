@@ -182,3 +182,17 @@ fn main() {
         std::thread::sleep(std::time::Duration::from_millis(100));
     }
 }
+
+// ADR-022: Create NetworkNode from bootstrap context
+/// ADR-022: Create a fully initialized NetworkNode from a validated BootstrapContext.
+/// This function will become the primary initialization path in Phase 3C.
+/// Currently maintained as stable API for gradual migration.
+pub fn create_node_from_bootstrap(ctx: amun_bootstrap::BootstrapContext) -> NetworkNode {
+    let mut node = NetworkNode::new(ctx.peer_id.0);
+    node.keypair = Some(ctx.keypair);
+    if let Some(cert) = &ctx.certificate {
+        println!("Certificate verified for validator {:?}", &cert.validator_id.0[..4]);
+    }
+    node
+}
+

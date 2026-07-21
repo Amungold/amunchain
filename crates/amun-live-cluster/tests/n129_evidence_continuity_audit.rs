@@ -46,7 +46,7 @@ fn n129_4_evidence_continuity_audit() {
 
     // N129.4-A: Verify constitutional fields are non-zero
     for h in 1..=tip {
-        let record = store.load_height(h).expect(&format!("Missing block {}", h));
+        let record = store.load_height(h).unwrap_or_else(|| panic!("Missing block {}", h));
         assert_ne!(
             record.verdict_hash, [0u8; 32],
             "N129.4 FAIL: verdict_hash is zero at height {}",

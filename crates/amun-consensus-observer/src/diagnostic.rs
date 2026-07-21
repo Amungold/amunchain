@@ -120,3 +120,9 @@ impl N1023Diagnostic {
         println!("=================================================\n");
     }
 }
+
+impl Default for N1023Diagnostic {
+    fn default() -> Self {
+        Self::new()
+    }
+}

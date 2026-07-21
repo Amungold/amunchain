@@ -79,3 +79,9 @@ impl ConsensusObserver for RoundTracer {
         self.buffer.lock().clear();
     }
 }
+
+impl Default for RoundTracer {
+    fn default() -> Self {
+        Self::new()
+    }
+}

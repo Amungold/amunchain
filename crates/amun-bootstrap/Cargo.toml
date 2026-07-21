@@ -1,0 +1,23 @@
+[package]
+name = "amun-bootstrap"
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+edition = "2021"
+description = "ADR-022: Unified Bootstrap for AmunChain"
+
+[dependencies]
+serde_json = "1"
+amun-genesis = { path = "../amun-genesis" }
+amun-networking = { path = "../amun-networking" }
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+blake3.workspace = true
+getrandom = "0.2"
+
+# Optional: legacy adapter
+amun-live-cluster = { path = "../amun-live-cluster", optional = true }
+
+[features]
+default = []
+legacy-adapter = ["dep:amun-live-cluster"]
+consensus-observer = []

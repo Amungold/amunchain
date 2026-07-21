@@ -1,6 +1,7 @@
 use blake3::Hasher;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GenesisValidator {
     pub public_key: [u8; 32],
     pub stake: u64,
@@ -14,12 +15,7 @@ impl GenesisValidator {
         let hash = hasher.finalize();
         let mut address = [0u8; 20];
         address.copy_from_slice(&hash.as_bytes()[..20]);
-
-        Self {
-            public_key,
-            stake,
-            address,
-        }
+        Self { public_key, stake, address }
     }
 }
 

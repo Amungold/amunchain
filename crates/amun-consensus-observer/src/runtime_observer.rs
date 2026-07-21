@@ -3,7 +3,7 @@
 // Thin interface that ConsensusRuntime depends on (not N1023Diagnostic directly)
 // ============================================================================
 
-use crate::{ConsensusEvent, ConsensusEventKind, ObserverHub, RoundTracer};
+use crate::{ConsensusEvent, ConsensusEventKind, ObserverHub};
 use std::sync::Arc;
 
 /// Generic observer that ConsensusRuntime uses.

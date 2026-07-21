@@ -206,3 +206,9 @@ impl AuditViolation {
         }
     }
 }
+
+impl Default for RuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
