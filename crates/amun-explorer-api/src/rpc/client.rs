@@ -115,10 +115,7 @@ impl RpcClient {
             return Err(RpcError::Rpc {
                 http_status: StatusCode::BAD_GATEWAY,
                 code: None,
-                message: format!(
-                    "expected application/json but got '{}'",
-                    content_type
-                ),
+                message: format!("expected application/json but got '{}'", content_type),
             });
         }
 
@@ -134,9 +131,7 @@ impl RpcClient {
         } else {
             // 10. Try to parse structured error body from amun-rpc
             let error_text = match serde_json::from_slice::<RpcErrorBody>(&body_bytes) {
-                Ok(rpc_err) => rpc_err
-                    .message
-                    .unwrap_or_else(|| "no message".to_string()),
+                Ok(rpc_err) => rpc_err.message.unwrap_or_else(|| "no message".to_string()),
                 Err(_) => {
                     // Fallback: raw text
                     String::from_utf8_lossy(&body_bytes).into_owned()

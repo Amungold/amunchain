@@ -2,12 +2,12 @@
 // NEW ARCHITECTURE (active)
 // ============================================================
 pub mod config;
-pub mod state;
 pub mod error;
-pub mod rpc;
 pub mod handlers;
 pub mod middleware;
 pub mod response;
+pub mod rpc;
+pub mod state;
 
 // ============================================================
 // OLD ARCHITECTURE (disabled during migration)

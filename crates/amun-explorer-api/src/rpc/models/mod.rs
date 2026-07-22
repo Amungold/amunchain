@@ -1,6 +1,6 @@
-pub mod status;
-pub mod head;
 pub mod block;
-pub mod validators;
 pub mod constitutional;
+pub mod head;
 pub mod mempool;
+pub mod status;
+pub mod validators;

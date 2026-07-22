@@ -1,6 +1,6 @@
+use crate::validator::GenesisValidator;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
-use crate::validator::GenesisValidator;
 
 /// A trust anchor defined in the genesis configuration.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -38,15 +38,22 @@ impl Genesis {
 
     /// Validate the genesis document.
     pub fn validate(&self) -> Result<(), String> {
-        if self.chain_id.is_empty() { return Err("Chain ID must not be empty".into()); }
-        if self.validators.is_empty() { return Err("Validator set must not be empty".into()); }
+        if self.chain_id.is_empty() {
+            return Err("Chain ID must not be empty".into());
+        }
+        if self.validators.is_empty() {
+            return Err("Validator set must not be empty".into());
+        }
         let mut seen_pubkeys = HashSet::new();
         for (i, v) in self.validators.iter().enumerate() {
             if v.public_key == [0u8; 32] {
                 return Err(format!("Validator {} has empty public key", i));
             }
             if !seen_pubkeys.insert(v.public_key) {
-                return Err(format!("Duplicate validator public key: {:?}", &v.public_key[..4]));
+                return Err(format!(
+                    "Duplicate validator public key: {:?}",
+                    &v.public_key[..4]
+                ));
             }
         }
         for (i, v) in self.validators.iter().enumerate() {
@@ -60,10 +67,10 @@ impl Genesis {
 
 /// Load genesis from a JSON file.
 pub fn load_from_file(path: &std::path::Path) -> Result<Genesis, String> {
-    let content = std::fs::read_to_string(path)
-        .map_err(|e| format!("Cannot read genesis: {}", e))?;
-    let genesis: Genesis = serde_json::from_str(&content)
-        .map_err(|e| format!("Invalid genesis JSON: {}", e))?;
+    let content =
+        std::fs::read_to_string(path).map_err(|e| format!("Cannot read genesis: {}", e))?;
+    let genesis: Genesis =
+        serde_json::from_str(&content).map_err(|e| format!("Invalid genesis JSON: {}", e))?;
     genesis.validate()?;
     Ok(genesis)
 }
@@ -81,6 +88,13 @@ mod tests {
         }
     }
 
-    #[test] fn test_valid() { assert!(valid_genesis().validate().is_ok()); }
-    #[test] fn test_hash_deterministic() { let g = valid_genesis(); assert_eq!(g.genesis_hash(), g.genesis_hash()); }
+    #[test]
+    fn test_valid() {
+        assert!(valid_genesis().validate().is_ok());
+    }
+    #[test]
+    fn test_hash_deterministic() {
+        let g = valid_genesis();
+        assert_eq!(g.genesis_hash(), g.genesis_hash());
+    }
 }

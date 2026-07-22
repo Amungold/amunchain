@@ -21,14 +21,14 @@ fn test_node_config_roundtrip() {
         genesis_file: PathBuf::from("../genesis/test_genesis.json"),
         quorum_size: 3,
     };
-    
+
     // Validate
     assert!(config.validate().is_ok());
     assert_eq!(config.total_validators(), 3);
-    
+
     // Serialize to TOML (simulating config file)
     let toml_str = toml::to_string_pretty(&config).expect("serialize");
-    
+
     // Parse back (simulating main.rs loading)
     let loaded: AmunConfig = toml::from_str(&toml_str).expect("deserialize");
     assert_eq!(loaded.validator_id, config.validator_id);
@@ -39,7 +39,7 @@ fn test_node_config_roundtrip() {
 #[test]
 fn test_bootstrap_error_on_invalid_config() {
     let config = AmunConfig {
-        quorum_size: 0,  // Invalid
+        quorum_size: 0, // Invalid
         ..make_test_config()
     };
     assert!(config.validate().is_err());

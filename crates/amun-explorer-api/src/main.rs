@@ -1,8 +1,8 @@
 use amun_explorer_api::config::ExplorerConfig;
-use amun_explorer_api::state::AppState;
 use amun_explorer_api::rpc::client::RpcClient;
-use std::sync::Arc;
+use amun_explorer_api::state::AppState;
 use reqwest::Url;
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() {
@@ -17,18 +17,14 @@ async fn main() {
         .expect("failed to build HTTP client");
 
     // Build RPC client
-    let rpc_url = Url::parse(&config.rpc_base_url)
-        .expect("invalid AMUN_RPC_URL");
+    let rpc_url = Url::parse(&config.rpc_base_url).expect("invalid AMUN_RPC_URL");
     let rpc = Arc::new(RpcClient::new(rpc_url, http_client));
 
     // Store the base_url before moving into state
     let rpc_endpoint = rpc.base_url().clone();
 
     // Build application state
-    let _state = AppState {
-        config,
-        rpc,
-    };
+    let _state = AppState { config, rpc };
 
     println!("Amun Explorer API starting...");
     println!("RPC endpoint: {}", rpc_endpoint);

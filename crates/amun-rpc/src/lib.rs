@@ -1,7 +1,7 @@
 pub mod client;
-pub mod types;
-pub mod node_provider;
 pub mod faucet;
+pub mod node_provider;
+pub mod types;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use axum::{
@@ -266,9 +266,7 @@ async fn faucet_request(
     }))
 }
 
-async fn explorer_summary(
-    State(state): State<AppState>,
-) -> Json<serde_json::Value> {
+async fn explorer_summary(State(state): State<AppState>) -> Json<serde_json::Value> {
     let engine = state.engine.lock().unwrap();
     let store = state.store.lock().unwrap();
     let mempool = state.mempool.lock().unwrap();
@@ -287,18 +285,20 @@ async fn explorer_summary(
     }))
 }
 
-async fn explorer_validators(
-    State(state): State<AppState>,
-) -> Json<serde_json::Value> {
+async fn explorer_validators(State(state): State<AppState>) -> Json<serde_json::Value> {
     let engine = state.engine.lock().unwrap();
-    let validators: Vec<serde_json::Value> = engine.validator_ids.iter().map(|id| {
-        let power = engine.validator_powers.get(id).copied().unwrap_or(0);
-        serde_json::json!({
-            "id": hex::encode(id),
-            "voting_power": power,
-            "active": power > 0
+    let validators: Vec<serde_json::Value> = engine
+        .validator_ids
+        .iter()
+        .map(|id| {
+            let power = engine.validator_powers.get(id).copied().unwrap_or(0);
+            serde_json::json!({
+                "id": hex::encode(id),
+                "voting_power": power,
+                "active": power > 0
+            })
         })
-    }).collect();
+        .collect();
 
     Json(serde_json::json!({
         "total": validators.len(),

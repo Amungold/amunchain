@@ -40,9 +40,10 @@ impl RpcError {
 impl IntoResponse for RpcError {
     fn into_response(self) -> Response {
         let (status, body) = match &self {
-            Self::Network(e) => {
-                (StatusCode::BAD_GATEWAY, format!("{{\"error\": \"network: {e}\"}}"))
-            }
+            Self::Network(e) => (
+                StatusCode::BAD_GATEWAY,
+                format!("{{\"error\": \"network: {e}\"}}"),
+            ),
             Self::Json(e) => (
                 StatusCode::BAD_GATEWAY,
                 format!("{{\"error\": \"json: {e}\"}}"),

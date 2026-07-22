@@ -1,0 +1,300 @@
+// ============================================================================
+// ADR-022: Unified Bootstrap for AmunChain
+// ============================================================================
+
+use amun_genesis::Genesis;
+use amun_networking::crypto_identity::PeerKeyPair;
+use amun_networking::peer_identity::PeerId;
+use amun_networking::validator_certificate::ValidatorCertificate;
+use serde::{Deserialize, Serialize};
+use std::net::SocketAddr;
+use std::path::{Path, PathBuf};
+
+// ============================================================================
+// Unified Configuration
+// ============================================================================
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AmunConfig {
+    pub validator_id: [u8; 32],
+    pub key_file: PathBuf,
+    pub certificate_path: Option<PathBuf>,
+    pub listen_addr: SocketAddr,
+    pub peer_addresses: Vec<SocketAddr>,
+    pub data_dir: PathBuf,
+    pub genesis_file: PathBuf,
+    pub quorum_size: usize,
+}
+
+impl AmunConfig {
+    pub fn from_file(path: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let content = std::fs::read_to_string(path)?;
+        let config: Self = toml::from_str(&content)?;
+        config.validate()?;
+        Ok(config)
+    }
+
+    pub fn validate(&self) -> Result<(), String> {
+        if self.quorum_size == 0 {
+            return Err("quorum_size must be > 0".into());
+        }
+        if self.peer_addresses.is_empty() {
+            return Err("at least one peer address required".into());
+        }
+        Ok(())
+    }
+
+    pub fn total_validators(&self) -> usize {
+        self.peer_addresses.len() + 1
+    }
+}
+
+// ============================================================================
+// Bootstrap Error
+// ============================================================================
+
+#[derive(Debug)]
+pub enum BootstrapError {
+    Io(String),
+    Validation(String),
+    Genesis(String),
+    Certificate(String),
+}
+
+impl std::fmt::Display for BootstrapError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Io(e) => write!(f, "I/O error: {}", e),
+            Self::Validation(e) => write!(f, "Validation: {}", e),
+            Self::Genesis(e) => write!(f, "Genesis: {}", e),
+            Self::Certificate(e) => write!(f, "Certificate: {}", e),
+        }
+    }
+}
+
+impl std::error::Error for BootstrapError {}
+
+// ============================================================================
+// BootstrapContext (final, single version)
+// ============================================================================
+
+pub struct BootstrapContext {
+    pub config: AmunConfig,
+    pub keypair: PeerKeyPair,
+    pub peer_id: PeerId,
+    pub genesis: Genesis,
+    pub certificate: Option<ValidatorCertificate>,
+}
+
+// ============================================================================
+// Keypair
+// ============================================================================
+
+fn load_or_create_keypair(path: &Path) -> Result<PeerKeyPair, BootstrapError> {
+    use std::io::Read;
+    if path.exists() {
+        let mut file = std::fs::File::open(path).map_err(|e| BootstrapError::Io(e.to_string()))?;
+        let mut seed = [0u8; 32];
+        file.read_exact(&mut seed)
+            .map_err(|e| BootstrapError::Io(e.to_string()))?;
+        Ok(PeerKeyPair::from_seed(seed))
+    } else {
+        let keypair = PeerKeyPair::generate();
+        let seed = keypair.to_seed();
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| BootstrapError::Io(e.to_string()))?;
+        }
+        std::fs::write(path, seed).map_err(|e| BootstrapError::Io(e.to_string()))?;
+        Ok(keypair)
+    }
+}
+
+// ============================================================================
+// Genesis
+// ============================================================================
+
+fn load_genesis(path: &Path) -> Result<Genesis, BootstrapError> {
+    let content = std::fs::read_to_string(path).map_err(|e| BootstrapError::Io(e.to_string()))?;
+    let genesis: Genesis =
+        serde_json::from_str(&content).map_err(|e| BootstrapError::Genesis(e.to_string()))?;
+    genesis.validate().map_err(BootstrapError::Genesis)?;
+    Ok(genesis)
+}
+
+// ============================================================================
+// Certificate
+// ============================================================================
+
+fn load_certificate(path: &Path) -> Result<ValidatorCertificate, BootstrapError> {
+    let content = std::fs::read_to_string(path)
+        .map_err(|e| BootstrapError::Certificate(format!("Cannot read certificate: {}", e)))?;
+    let cert: ValidatorCertificate = serde_json::from_str(&content)
+        .map_err(|e| BootstrapError::Certificate(format!("Invalid certificate JSON: {}", e)))?;
+    Ok(cert)
+}
+
+fn verify_certificate(
+    cert: &ValidatorCertificate,
+    config: &AmunConfig,
+    _genesis: &Genesis,
+) -> Result<(), BootstrapError> {
+    // 1. Certificate must match the configured validator
+    if cert.validator_id.0 != config.validator_id {
+        return Err(BootstrapError::Certificate(format!(
+            "Certificate validator_id {:?} does not match config validator_id {:?}",
+            &cert.validator_id.0[..4],
+            &config.validator_id[..4]
+        )));
+    }
+
+    // 2. Public key must not be empty
+    if cert.public_key == [0u8; 32] {
+        return Err(BootstrapError::Certificate(
+            "Certificate has empty public key".into(),
+        ));
+    }
+
+    // 3. Time window check (if expiration is set)
+    if cert.valid_until != 0 {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+        if now < cert.valid_from {
+            return Err(BootstrapError::Certificate(
+                "Certificate not yet valid".into(),
+            ));
+        }
+        if now > cert.valid_until {
+            return Err(BootstrapError::Certificate("Certificate expired".into()));
+        }
+    }
+
+    // 4. valid_from must not exceed valid_until
+    if cert.valid_until != 0 && cert.valid_from > cert.valid_until {
+        return Err(BootstrapError::Certificate(
+            "Certificate valid_from > valid_until".into(),
+        ));
+    }
+
+    Ok(())
+}
+
+// ============================================================================
+// Single public bootstrap function
+// ============================================================================
+
+pub fn bootstrap(config: AmunConfig) -> Result<BootstrapContext, BootstrapError> {
+    let keypair = load_or_create_keypair(&config.key_file)?;
+    let peer_id = keypair.peer_id();
+    let genesis = load_genesis(&config.genesis_file)?;
+
+    let certificate = if let Some(ref cert_path) = config.certificate_path {
+        let cert = load_certificate(cert_path)?;
+        verify_certificate(&cert, &config, &genesis)?;
+        Some(cert)
+    } else {
+        None
+    };
+
+    std::fs::create_dir_all(&config.data_dir).map_err(|e| BootstrapError::Io(e.to_string()))?;
+
+    Ok(BootstrapContext {
+        config,
+        keypair,
+        peer_id,
+        genesis,
+        certificate,
+    })
+}
+
+// ============================================================================
+// Legacy Adapter
+// ============================================================================
+
+#[cfg(feature = "legacy-adapter")]
+impl From<amun_live_cluster::config::ValidatorConfig> for AmunConfig {
+    fn from(config: amun_live_cluster::config::ValidatorConfig) -> Self {
+        AmunConfig {
+            validator_id: config.validator_id,
+            key_file: PathBuf::from(format!("{}/key.bin", config.data_dir)),
+            certificate_path: None,
+            listen_addr: config.listen_addr,
+            peer_addresses: config.other_peers().iter().map(|p| p.address).collect(),
+            data_dir: PathBuf::from(&config.data_dir),
+            genesis_file: PathBuf::from("genesis.bin"),
+            quorum_size: config.quorum_size.unwrap_or(3),
+        }
+    }
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_test_config() -> AmunConfig {
+        AmunConfig {
+            validator_id: [0xAA; 32],
+            key_file: PathBuf::from("/tmp/key.bin"),
+            certificate_path: None,
+            listen_addr: "127.0.0.1:9000".parse().unwrap(),
+            peer_addresses: vec!["127.0.0.1:9001".parse().unwrap()],
+            data_dir: PathBuf::from("/tmp/test"),
+            genesis_file: PathBuf::from("genesis.json"),
+            quorum_size: 3,
+        }
+    }
+
+    #[test]
+    fn test_config_validation() {
+        assert!(make_test_config().validate().is_ok());
+    }
+    #[test]
+    fn test_config_rejects_zero_quorum() {
+        let mut c = make_test_config();
+        c.quorum_size = 0;
+        assert!(c.validate().is_err());
+    }
+    #[test]
+    fn test_roundtrip_toml() {
+        let c = make_test_config();
+        let s = toml::to_string(&c).unwrap();
+        let r: AmunConfig = toml::from_str(&s).unwrap();
+        assert_eq!(c.validator_id, r.validator_id);
+    }
+
+    #[test]
+    fn test_load_or_create_keypair() {
+        let tmp = std::env::temp_dir().join("test_kp.bin");
+        let _ = std::fs::remove_file(&tmp);
+        let kp = load_or_create_keypair(&tmp).unwrap();
+        assert!(tmp.exists());
+        let kp2 = load_or_create_keypair(&tmp).unwrap();
+        assert_eq!(kp.peer_id().0, kp2.peer_id().0);
+        let _ = std::fs::remove_file(&tmp);
+    }
+
+    #[test]
+    fn test_certificate_mismatched_validator_rejected() {
+        let cert = ValidatorCertificate {
+            validator_id: PeerId([0xBB; 32]),
+            public_key: [0xCC; 32],
+            issuer: PeerId([0xDD; 32]),
+            authority_id: [0xEE; 32],
+            authority_version: 1,
+            valid_from: 0,
+            valid_until: 0,
+            authority_signature: vec![],
+        };
+        let config = make_test_config();
+        let genesis = Genesis {
+            chain_id: "t".into(),
+            timestamp: 0,
+            validators: vec![amun_genesis::GenesisValidator::new([1u8; 32], 100)],
+            trust_anchors: vec![],
+        };
+        let result = verify_certificate(&cert, &config, &genesis);
