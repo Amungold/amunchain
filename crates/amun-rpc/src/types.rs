@@ -1,48 +1,57 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RpcRequest {
-    pub jsonrpc: String,
-    pub method: String,
-    pub params: serde_json::Value,
-    pub id: u64,
+pub struct StatusResponse {
+    pub height: u64,
+    pub qcs_formed: u64,
+    pub blocks_finalized: u64,
+    pub votes_received: u64,
+    pub peer_count: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RpcResponse {
-    pub jsonrpc: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub result: Option<serde_json::Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<RpcError>,
-    pub id: u64,
+pub struct HeadResponse {
+    pub height: u64,
+    pub block_hash: String,
+    pub state_root: String,
+    pub history_root: String,
+    pub timestamp: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RpcError {
-    pub code: i32,
-    pub message: String,
+pub struct BlockResponse {
+    pub height: u64,
+    pub block_hash: String,
+    pub state_root: String,
+    pub certificate_hash: String,
+    pub timestamp: u64,
 }
 
-impl RpcResponse {
-    pub fn success(id: u64, result: serde_json::Value) -> Self {
-        Self {
-            jsonrpc: "2.0".to_string(),
-            result: Some(result),
-            error: None,
-            id,
-        }
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RangeResponse {
+    pub blocks: Vec<BlockResponse>,
+}
 
-    pub fn error(id: u64, code: i32, message: &str) -> Self {
-        Self {
-            jsonrpc: "2.0".to_string(),
-            result: None,
-            error: Some(RpcError {
-                code,
-                message: message.to_string(),
-            }),
-            id,
-        }
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MetricsResponse {
+    pub height: u64,
+    pub qcs_formed: u64,
+    pub blocks_finalized: u64,
+    pub votes_received: u64,
+    pub rounds_active: usize,
+    pub peer_count: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AccountResponse {
+    pub address: String,
+    pub balance: u64,
+    pub nonce: u64,
+}
+
+#[derive(Debug)]
+pub enum RpcError {
+    NotFound,
+    Unavailable,
+    Internal(String),
 }

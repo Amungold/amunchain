@@ -1,4 +1,6 @@
 pub mod client;
+pub mod types;
+pub mod node_provider;
 pub mod faucet;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;

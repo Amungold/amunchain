@@ -3,63 +3,104 @@ mod genesis;
 mod peer_handshake;
 mod peer_registry;
 
-use amun_networking::node::NetworkNode;
-use amun_networking::tcp_transport::TcpTransport;
-use amun_networking::transport_trait::Transport;
+use amun_live_cluster::validator::LiveValidator;
+use amun_live_cluster::config::ValidatorConfig;
+use std::sync::Arc;
+use std::net::{TcpListener, TcpStream};
+use std::io::{Write, Read};
+use std::thread;
+
+fn handle_client(mut stream: TcpStream, validator: &LiveValidator) {
+    let mut buf = [0u8; 4096];
+    let _ = stream.read(&mut buf);
+    let request = String::from_utf8_lossy(&buf);
+    
+    let (status_code, json) = if request.contains("GET /head") {
+        let store = validator.store.lock().unwrap();
+        match store.load_tip() {
+            Some(r) => (200, serde_json::json!({
+                "height": r.height,
+                "block_hash": hex::encode(r.block_hash),
+                "state_root": hex::encode(r.state_root),
+                "history_root": hex::encode(r.history_root),
+                "timestamp": r.timestamp
+            }).to_string()),
+            None => (404, r#"{"error":"No blocks"}"#.to_string())
+        }
+    } else if request.contains("GET /block/") {
+        let height: u64 = request.split("/block/").nth(1)
+            .and_then(|s| s.split_whitespace().next())
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(0);
+        let store = validator.store.lock().unwrap();
+        match store.load_height(height) {
+            Some(r) => (200, serde_json::json!({
+                "height": r.height,
+                "block_hash": hex::encode(r.block_hash),
+                "state_root": hex::encode(r.state_root),
+                "certificate_hash": hex::encode(r.certificate_hash),
+                "timestamp": r.timestamp
+            }).to_string()),
+            None => (404, format!(r#"{{"error":"Block {} not found"}}"#, height))
+        }
+    } else {
+        let h = validator.current_height();
+        let engine = validator.engine.lock().unwrap();
+        let json = serde_json::json!({
+            "height": h,
+            "qcs_formed": engine.metrics.qcs_formed,
+            "blocks_finalized": engine.metrics.blocks_finalized,
+            "votes_received": engine.metrics.votes_received,
+            "peer_count": engine.total_validators
+        }).to_string();
+        (200, json)
+    };
+    
+    let response = format!(
+        "HTTP/1.1 {} OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+        status_code, json.len(), json
+    );
+    let _ = stream.write_all(response.as_bytes());
+    let _ = stream.flush();
+}
 
 fn main() {
-    println!("AmunChain Node v0.1 (ADR-022)");
+    println!("AmunChain Node v0.1 (ADR-022 + Full RPC)");
     
     let config_path = std::env::args().nth(1).unwrap_or_else(|| "config/node_unified.toml".to_string());
     let amun_config = amun_bootstrap::AmunConfig::from_file(&config_path).expect("Failed to load config");
-    let ctx = amun_bootstrap::bootstrap(amun_config).expect("Bootstrap failed");
     
-    let mut node = NetworkNode::new(ctx.peer_id.0);
-    node.keypair = Some(ctx.keypair);
+    let vconfig = ValidatorConfig {
+        validator_id: amun_config.validator_id,
+        listen_addr: amun_config.listen_addr,
+        cluster: amun_config.peer_addresses.iter().map(|addr| 
+            amun_live_cluster::config::ClusterPeer {
+                validator_id: [0u8; 32],
+                certificate_path: Some("/tmp/amun-vps0/key.bin".to_string()),
+                address: *addr,
+            }
+        ).collect(),
+        data_dir: amun_config.data_dir.to_str().unwrap().to_string(),
+        quorum_size: Some(amun_config.quorum_size),
+        authority_public_key: [0u8; 32],
+    };
     
-    let addr = ctx.config.listen_addr;
-    let mut transport = TcpTransport::new(addr);
-    transport.bind().expect("Failed to bind");
-    println!("Listening on {}", addr);
+    let validator = Arc::new(LiveValidator::new(vconfig));
+    validator.start().expect("Failed to start validator");
+    println!("Validator started. Height: {}", validator.current_height());
     
-    for peer_addr in &ctx.config.peer_addresses {
-        if *peer_addr != addr { transport.connect_to(*peer_addr); }
-    }
+    let rpc_validator = validator.clone();
+    let rpc_port = amun_config.listen_addr.port() + 70;
+    thread::spawn(move || {
+        let listener = TcpListener::bind(format!("0.0.0.0:{}", rpc_port)).unwrap();
+        println!("Full RPC on 0.0.0.0:{}", rpc_port);
+        for stream in listener.incoming() {
+            if let Ok(stream) = stream {
+                handle_client(stream, &rpc_validator);
+            }
+        }
+    });
     
-    let genesis_hash = ctx.genesis.genesis_hash();
     println!("Node ready.");
-    
-    let mut peer_registry = crate::peer_registry::PeerRegistry::new();
-    let mut tick_count: u64 = 0;
-    
-    loop {
-        transport.tick(100);
-        tick_count += 1;
-        while let Some(envelope) = transport.next_incoming() {
-            if envelope.message_type == "handshake" {
-                if let Ok(hs) = serde_json::from_slice::<crate::peer_handshake::HandshakeMessage>(&envelope.payload) {
-                    match hs.verify(&genesis_hash) {
-                        Ok(()) => { peer_registry.register(crate::peer_handshake::AuthenticatedPeer::from_handshake(&hs)); }
-                        Err(e) => eprintln!("Handshake rejected: {}", e),
-                    }
-                }
-            }
-        }
-        if tick_count % 50 == 0 {
-            if let Some(ref kp) = node.keypair {
-                if let Some(ref cert) = ctx.certificate {
-                    let hs = crate::peer_handshake::HandshakeMessage::new(kp, cert, genesis_hash, "amun-node", ctx.config.listen_addr.port());
-                    if let Ok(payload) = serde_json::to_vec(&hs) {
-                        for peer_addr in &ctx.config.peer_addresses {
-                            transport.send(amun_networking::envelope::Envelope {
-                                sender: hex::encode(kp.peer_id().0), recipient: peer_addr.to_string(),
-                                sequence: tick_count, timestamp: tick_count,
-                                message_type: "handshake".into(), payload: payload.clone(),
-                            });
-                        }
-                    }
-                }
-            }
-        }
-    }
+    loop { thread::sleep(std::time::Duration::from_secs(10)); }
 }
