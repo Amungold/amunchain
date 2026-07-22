@@ -1,15 +1,39 @@
-use amun_explorer_api::server;
-use amun_rpc::provider::LiveRpcProvider;
+use amun_explorer_api::config::ExplorerConfig;
+use amun_explorer_api::state::AppState;
+use amun_explorer_api::rpc::client::RpcClient;
 use std::sync::Arc;
+use reqwest::Url;
 
 #[tokio::main]
 async fn main() {
-    // Inject real RPC provider
-    let provider = Arc::new(LiveRpcProvider::new("127.0.0.1", 9070));
-    amun_explorer_api::services::chain_service::set_provider(provider.clone());
+    // Initialize configuration
+    let config = Arc::new(ExplorerConfig::from_env());
 
-    let app = server::build_app();
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:9072").await.unwrap();
-    println!("Explorer API listening on 9072");
-    axum::serve(listener, app).await.unwrap();
+    // Build reqwest client (timeouts, etc. configured here — not in RpcClient)
+    let http_client = reqwest::Client::builder()
+        .connect_timeout(std::time::Duration::from_secs(5))
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .expect("failed to build HTTP client");
+
+    // Build RPC client
+    let rpc_url = Url::parse(&config.rpc_base_url)
+        .expect("invalid AMUN_RPC_URL");
+    let rpc = Arc::new(RpcClient::new(rpc_url, http_client));
+
+    // Store the base_url before moving into state
+    let rpc_endpoint = rpc.base_url().clone();
+
+    // Build application state
+    let _state = AppState {
+        config,
+        rpc,
+    };
+
+    println!("Amun Explorer API starting...");
+    println!("RPC endpoint: {}", rpc_endpoint);
+    println!("Ready (server not yet wired — Phase 5+)");
+
+    // TODO: Phase 5 — wire up axum router with new handlers
+    // TODO: Phase 6 — bind to listen_addr and serve
 }

@@ -27,3 +27,23 @@ pub fn chain_routes() -> Router {
         .route("/block/{hash}", get(get_block_by_hash))
         .route("/transaction/{hash}", get(get_transaction))
 }
+
+pub fn validator_routes() -> axum::Router {
+    use axum::routing::get;
+    use axum::Json;
+    use serde_json::json;
+    axum::Router::new()
+        .route("/validators", get(|| async { 
+            Json(json!({"validators":[], "total":0}))
+        }))
+}
+
+pub fn mempool_routes() -> axum::Router {
+    use axum::routing::get;
+    use axum::Json;
+    use serde_json::json;
+    axum::Router::new()
+        .route("/count", get(|| async { 
+            Json(json!({"pending_transactions": 0}))
+        }))
+}
