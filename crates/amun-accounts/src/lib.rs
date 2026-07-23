@@ -169,6 +169,7 @@ mod tests {
 #[cfg(test)]
 mod canonical_tests {
     use super::*;
+    use amun_canonical_codec::CanonicalEncode;
 
     #[test]
     fn test_account_canonical_deterministic() {
