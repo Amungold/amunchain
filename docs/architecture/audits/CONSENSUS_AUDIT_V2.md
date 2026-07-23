@@ -29,6 +29,24 @@
 | Suspended Validators | ValidatorStatusRegistry | ✅ |
 | Vote Binding | N109.9 enforcement | ✅ |
 
+
+## Scope
+
+This audit reviews the implemented consensus architecture and verifies the
+presence of core safety, liveness, signature validation, quorum formation,
+fork safety, and Byzantine defense mechanisms in the current implementation.
+
+This audit is an engineering implementation review. It does not constitute a
+formal mathematical proof of consensus correctness.
+
+The following activities remain future work and are outside the scope of this audit:
+
+- Formal specification (e.g. TLA+)
+- Model checking
+- Extended adversarial testnet campaigns
+- Consensus fuzzing beyond the current automated test suite
+
+
 ## Recommendations
 
 1. Formal TLA+ model of safety/liveness for Mainnet readiness
