@@ -1,17 +1,13 @@
+use crate::config::ValidatorConfig;
 use amun_authority_registry::AuthorityRegistry;
 use amun_networking::peer_identity::PeerId;
 use amun_networking::validator_certificate::ValidatorCertificate;
-use crate::config::ValidatorConfig;
 
 /// Issue a self-signed certificate using the genesis authority.
-pub fn issue_self_certificate(
-    pk: [u8; 32],
-    registry: &AuthorityRegistry,
-) -> ValidatorCertificate {
+pub fn issue_self_certificate(pk: [u8; 32], registry: &AuthorityRegistry) -> ValidatorCertificate {
     let active_authority = registry.active().expect("No active authority");
     let my_peer_id = PeerId::from_bytes(pk);
-    let genesis_authority_kp =
-        amun_networking::crypto_identity::PeerKeyPair::from_seed([0x42; 32]);
+    let genesis_authority_kp = amun_networking::crypto_identity::PeerKeyPair::from_seed([0x42; 32]);
     ValidatorCertificate::issue_v2(
         my_peer_id,
         pk,
@@ -24,10 +20,7 @@ pub fn issue_self_certificate(
 }
 
 /// Verify a self-signed certificate against the registry at height 0.
-pub fn verify_self_certificate(
-    cert: &ValidatorCertificate,
-    registry: &AuthorityRegistry,
-) {
+pub fn verify_self_certificate(cert: &ValidatorCertificate, registry: &AuthorityRegistry) {
     if !registry.verify_certificate_at(cert, 0) {
         panic!("Self certificate verification failed");
     }

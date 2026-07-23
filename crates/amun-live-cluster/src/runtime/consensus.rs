@@ -1,20 +1,21 @@
+use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant, SystemTime};
-use std::net::SocketAddr;
 
+use amun_authority_registry::transaction::GovernanceState;
+use amun_authority_registry::AuthorityRegistry;
+use amun_block_builder::BlockBuilder;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
-use amun_block_builder::BlockBuilder;
-use amun_mempool::Mempool;
-use amun_authority_registry::AuthorityRegistry;
-use amun_authority_registry::transaction::GovernanceState;
 use amun_constitutional_enforcement::ConstitutionalEnforcementKernel;
+use amun_mempool::Mempool;
 use amun_validator_identity::vote_signing_payload;
 use ed25519_dalek::Signer;
 
 use crate::sync::catchup::SyncRuntime;
+use amun_history::compute_history_root;
 
 /// ConsensusRuntime owns the main consensus loop thread.
 ///
@@ -29,7 +30,9 @@ pub struct ConsensusRuntime {
     governance: Arc<Mutex<GovernanceState>>,
     authority_registry: Arc<Mutex<AuthorityRegistry>>,
     certificate_gossip: Arc<Mutex<amun_consensus_network::CertificateGossip>>,
-    staking_adapter: Arc<Mutex<amun_consensus_network::StakingAdapter<amun_consensus_network::RealStakingExecutor>>>,
+    staking_adapter: Arc<
+        Mutex<amun_consensus_network::StakingAdapter<amun_consensus_network::RealStakingExecutor>>,
+    >,
     applied_slashing_certificates: Arc<Mutex<std::collections::HashSet<[u8; 32]>>>,
     slashing_ledger: Arc<Mutex<amun_consensus_network::SlashingLedger>>,
     constitutional_kernel: Arc<Mutex<ConstitutionalEnforcementKernel>>,
@@ -52,7 +55,11 @@ impl ConsensusRuntime {
         governance: Arc<Mutex<GovernanceState>>,
         authority_registry: Arc<Mutex<AuthorityRegistry>>,
         certificate_gossip: Arc<Mutex<amun_consensus_network::CertificateGossip>>,
-        staking_adapter: Arc<Mutex<amun_consensus_network::StakingAdapter<amun_consensus_network::RealStakingExecutor>>>,
+        staking_adapter: Arc<
+            Mutex<
+                amun_consensus_network::StakingAdapter<amun_consensus_network::RealStakingExecutor>,
+            >,
+        >,
         applied_slashing_certificates: Arc<Mutex<std::collections::HashSet<[u8; 32]>>>,
         slashing_ledger: Arc<Mutex<amun_consensus_network::SlashingLedger>>,
         constitutional_kernel: Arc<Mutex<ConstitutionalEnforcementKernel>>,
@@ -110,13 +117,10 @@ impl ConsensusRuntime {
 
         thread::spawn(move || {
             while *running.lock().unwrap() {
-                let (height, _needs_sync) = {
+                // ADR-023: SyncRuntime owns needs_catchup flag exclusively
+                let height = {
                     let eng = engine.lock().unwrap();
-                    let h = eng.current_height + 1;
-                    let sync = eng.needs_catchup.load(std::sync::atomic::Ordering::SeqCst);
-                    eng.needs_catchup
-                        .store(false, std::sync::atomic::Ordering::SeqCst);
-                    (h, sync)
+                    eng.current_height + 1
                 };
 
                 // Sync check
@@ -165,8 +169,7 @@ impl ConsensusRuntime {
                     );
                     {
                         let ledger = slashing_ledger.lock().unwrap();
-                        block.slashing_root =
-                            amun_consensus_network::merkle_root(&ledger.history);
+                        block.slashing_root = amun_consensus_network::merkle_root(&ledger.history);
                     }
                     let hash = block.block_hash();
                     let root = block.state_root;
@@ -266,7 +269,9 @@ impl ConsensusRuntime {
                     thread::sleep(Duration::from_millis(10));
                 }
 
-                let history_root = state_root;
+                // ADR-024: Chain commitment derived from block hash
+                let prev_history_root = engine.lock().unwrap().history_root;
+                let history_root = compute_history_root(prev_history_root, block_hash);
                 let cert = {
                     let mut eng = engine.lock().unwrap();
                     eng.try_advance(height, history_root)
@@ -292,7 +297,9 @@ impl ConsensusRuntime {
                                 .all(|c| !c.evidence_ids.is_empty())
                         };
                         let governance_valid = true;
-                        let replay_deterministic = cert.state_root == history_root;
+                        // ADR-024: replay_deterministic compares state_root from cert vs computed state_root
+                        // (history_root is now a chain commitment, not state_root)
+                        let replay_deterministic = cert.state_root == state_root;
                         let finality_supermajority = {
                             let eng = engine.lock().unwrap();
                             eng.total_voting_power > 0
@@ -341,8 +348,8 @@ impl ConsensusRuntime {
                         verdict_hash.copy_from_slice(&hasher.finalize().as_bytes()[..32]);
 
                         use amun_constitutional_enforcement::evidence_records::{
-                            SignatureEvidence, DoubleSpendEvidence, GovernanceEvidence,
-                            ReplayEvidence, ConstitutionalEvidenceRecord,
+                            ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence,
+                            ReplayEvidence, SignatureEvidence,
                         };
                         let sig_ev = SignatureEvidence::new(
                             if signatures_valid { 1 } else { 0 },
@@ -448,5 +455,24 @@ impl ConsensusRuntime {
                 thread::sleep(Duration::from_millis(50));
             }
         })
+    }
+}
+
+// ============================================================================
+// RuntimeService implementation for ConsensusRuntime
+// ============================================================================
+use crate::runtime::lifecycle::RuntimeService;
+
+impl RuntimeService for ConsensusRuntime {
+    fn start(&self) -> Result<Vec<std::thread::JoinHandle<()>>, String> {
+        Ok(vec![self.spawn()])
+    }
+
+    fn stop(&self) {
+        // The running flag is shared, set by NodeRuntime::stop_all()
+    }
+
+    fn is_running(&self) -> bool {
+        *self.running.lock().unwrap()
     }
 }

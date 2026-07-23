@@ -1,6 +1,6 @@
-use ed25519_dalek::SigningKey;
-use amun_validator_identity::derive_validator_id;
 use crate::config::ValidatorConfig;
+use amun_validator_identity::derive_validator_id;
+use ed25519_dalek::SigningKey;
 
 /// Bootstrap identity from config.
 /// Returns the signing key and derived validator ID.
@@ -24,6 +24,9 @@ mod tests {
         let (sk1, id1) = initialize_identity(&config);
         let (sk2, id2) = initialize_identity(&config);
         assert_eq!(id1, id2);
-        assert_eq!(sk1.verifying_key().to_bytes(), sk2.verifying_key().to_bytes());
+        assert_eq!(
+            sk1.verifying_key().to_bytes(),
+            sk2.verifying_key().to_bytes()
+        );
     }
 }

@@ -108,10 +108,8 @@ fn main() {
     thread::spawn(move || {
         let listener = TcpListener::bind(format!("0.0.0.0:{}", rpc_port)).unwrap();
         println!("Full RPC on 0.0.0.0:{}", rpc_port);
-        for stream in listener.incoming() {
-            if let Ok(stream) = stream {
-                handle_client(stream, &rpc_validator);
-            }
+        for stream in listener.incoming().flatten() {
+            handle_client(stream, &rpc_validator);
         }
     });
 

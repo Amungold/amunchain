@@ -8,8 +8,7 @@ use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
 use amun_sync::protocol::{
-    MSG_TIP_REQUEST, MSG_TIP_RESPONSE,
-    MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE,
+    MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE,
 };
 
 /// NetworkingRuntime owns the TCP listener and handles all incoming P2P messages.
@@ -160,5 +159,24 @@ impl NetworkingRuntime {
                 }
             }
         }
+    }
+}
+
+// ============================================================================
+// RuntimeService implementation for NetworkingRuntime
+// ============================================================================
+use crate::runtime::lifecycle::RuntimeService;
+
+impl RuntimeService for NetworkingRuntime {
+    fn start(&self) -> Result<Vec<std::thread::JoinHandle<()>>, String> {
+        Ok(vec![self.spawn_listener()])
+    }
+
+    fn stop(&self) {
+        // The running flag is shared, set by NodeRuntime::stop_all()
+    }
+
+    fn is_running(&self) -> bool {
+        *self.running.lock().unwrap()
     }
 }

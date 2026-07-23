@@ -1,7 +1,7 @@
-use ed25519_dalek::SigningKey;
+use crate::config::ValidatorConfig;
 use amun_authority_registry::AuthorityRegistry;
 use amun_consensus_network::engine::ConsensusEngine;
-use crate::config::ValidatorConfig;
+use ed25519_dalek::SigningKey;
 
 use super::bootstrap;
 use super::certificates;
@@ -30,12 +30,7 @@ impl IdentityService {
         certificates::verify_self_certificate(&self_cert, &registry);
 
         // 4. Register self in engine
-        engine.register_validator_identity(
-            self_cert.validator_id.0,
-            validator_id,
-            pk,
-            100,
-        );
+        engine.register_validator_identity(self_cert.validator_id.0, validator_id, pk, 100);
         engine.validator_id = validator_id;
 
         // 5. Load and verify peer certificates, register them

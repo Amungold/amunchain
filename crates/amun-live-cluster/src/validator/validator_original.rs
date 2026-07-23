@@ -13,38 +13,25 @@ use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 
-use crate::sync::catchup::SyncRuntime;
-use crate::identity::service::IdentityService;
-use crate::runtime::consensus::ConsensusRuntime;
+use crate::runtime::lifecycle::NodeRuntime;
+use crate::validator::builder::{LiveValidatorBuilder, RuntimeParts};
 
+#[cfg(test)]
+use amun_networking::crypto_identity::PeerKeyPair;
 #[cfg(test)]
 use amun_networking::peer_identity::PeerId;
 #[cfg(test)]
 use amun_networking::validator_certificate::ValidatorCertificate;
-#[cfg(test)]
-use amun_networking::crypto_identity::PeerKeyPair;
-
 
 #[cfg(test)]
-use amun_constitutional_enforcement::{
-    evidence_records::{
-        ConstitutionalEvidenceRecord, DoubleSpendEvidence, GovernanceEvidence, ReplayEvidence,
-        SignatureEvidence,
-    },
-    ConstitutionalVerdict,
-};
 #[cfg(test)]
-use amun_evidence_root::EvidenceRoot;
 #[cfg(test)]
-use amun_validator_identity::vote_signing_payload;
 #[cfg(test)]
-use std::io::Write;
 #[cfg(test)]
-use std::time::{Duration, Instant, SystemTime};
-#[cfg(test)]
-use amun_chain_store::record::FinalizedChainRecord;
 #[cfg(test)]
 use std::thread;
+#[cfg(test)]
+use std::time::Duration;
 
 pub struct LiveValidator {
     pub config: ValidatorConfig,
@@ -73,81 +60,66 @@ pub struct LiveValidator {
 
 impl LiveValidator {
     pub fn new(config: ValidatorConfig) -> Self {
-        let store = ChainStore::open(&config.data_dir)
-            .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").unwrap());
-        let recovered_height = store.latest_height();
-        let recovered_root = store
-            .load_tip()
-            .map(|r| r.history_root)
-            .unwrap_or([0u8; 32]);
-        let mut engine = ConsensusEngine::new(config.validator_id, config.total_validators());
-        if recovered_height > 0 {
-            engine.current_height = recovered_height;
-            engine.history_root = recovered_root;
-        }
-        // ADR-023 Phase 3: Identity handled by IdentityService
-        let (signing_key, validator_id, registry) =
-            IdentityService::initialize(&config, &mut engine);
-        let my_true_id = validator_id;
+        let parts = LiveValidatorBuilder::new(config)
+            .build()
+            .expect("Failed to build runtime parts");
+        Self::from_parts(parts)
+    }
+
+    /// Construct LiveValidator from pre-built RuntimeParts.
+    /// ADR-023 Phase 5: Separates construction from assembly.
+    pub fn from_parts(parts: RuntimeParts) -> Self {
         Self {
-            config,
-            engine: Arc::new(Mutex::new(engine)),
-            store: Arc::new(Mutex::new(store)),
-            running: Arc::new(Mutex::new(false)),
+            config: parts.config,
+            engine: parts.engine,
+            store: parts.store,
+            running: parts.running,
             handles: Mutex::new(Vec::new()),
-            signing_key: signing_key.clone(),
-            validator_id: my_true_id,
-            mempool: Arc::new(Mutex::new(Mempool::new())),
-            builder: Arc::new(Mutex::new(BlockBuilder::new())),
-            governance: Arc::new(Mutex::new(GovernanceState::new())),
-            authority_registry: Arc::new(Mutex::new(registry)),
-            certificate_gossip: Arc::new(Mutex::new(
-                amun_consensus_network::CertificateGossip::new(),
-            )),
-            applied_slashing_certificates: Arc::new(Mutex::new(std::collections::HashSet::new())),
-            slashing_ledger: Arc::new(Mutex::new(amun_consensus_network::SlashingLedger::new())),
-            constitutional_kernel: Arc::new(Mutex::new(ConstitutionalEnforcementKernel::new())),
-            previous_evidence_root: Arc::new(Mutex::new([0u8; 32])),
-            staking_adapter: Arc::new(Mutex::new(StakingAdapter::new(
-                amun_consensus_network::MisbehaviorRegistry::new(
-                    amun_consensus_network::MisbehaviorThresholds::default(),
-                ),
-                RealStakingExecutor::new({
-                    // Use fully-qualified path to avoid ambiguity with amun_networking::validator_registry
-                    amun_staking::validator::ValidatorRegistry::new()
-                }),
-            ))),
+            signing_key: parts.signing_key,
+            validator_id: parts.validator_id,
+            mempool: parts.mempool,
+            builder: parts.block_builder,
+            governance: parts.governance,
+            authority_registry: parts.authority_registry,
+            certificate_gossip: parts.certificate_gossip,
+            staking_adapter: parts.staking_adapter,
+            applied_slashing_certificates: parts.applied_slashing_certificates,
+            slashing_ledger: parts.slashing_ledger,
+            constitutional_kernel: parts.constitutional_kernel,
+            previous_evidence_root: parts.previous_evidence_root,
         }
     }
 
     pub fn start(&self) -> Result<(), String> {
-        *self.running.lock().unwrap() = true;
+        // Build runtime services from existing parts
         let engine = self.engine.clone();
         let store = self.store.clone();
-        let peers: Vec<_> = self.config.other_peers().into_iter().cloned().collect();
-        let peer_addrs: Vec<SocketAddr> = peers.iter().map(|p| p.address).collect();
-        let sync_runtime = SyncRuntime::new(
+        let peer_addrs: Vec<SocketAddr> = self
+            .config
+            .other_peers()
+            .iter()
+            .map(|p| p.address)
+            .collect();
+        let sync_runtime = std::sync::Arc::new(crate::sync::catchup::SyncRuntime::new(
             engine.clone(),
             store.clone(),
             peer_addrs.clone(),
-        );
-        let _total = self.config.total_validators();
-        let running = self.running.clone();
+        ));
         let signing_key_clone = self.signing_key.clone();
         let validator_id = self.validator_id;
         let my_index = self.config.validator_id[0];
 
-        // Listen thread - extracted to NetworkingRuntime (ADR-023 Phase 1)
-        let networking = crate::runtime::networking::NetworkingRuntime::new(
-            &self.config.listen_addr.to_string(),
-            engine.clone(),
-            store.clone(),
-            running.clone(),
-        ).expect("Failed to create NetworkingRuntime");
-        let h1 = networking.spawn_listener();
+        let networking = Box::new(
+            crate::runtime::networking::NetworkingRuntime::new(
+                &self.config.listen_addr.to_string(),
+                engine.clone(),
+                store.clone(),
+                self.running.clone(),
+            )
+            .expect("Failed to create NetworkingRuntime"),
+        );
 
-        // ADR-023 Phase 4: Consensus handled by ConsensusRuntime
-        let consensus = ConsensusRuntime::new(
+        let consensus = Box::new(crate::runtime::consensus::ConsensusRuntime::new(
             engine.clone(),
             store.clone(),
             self.mempool.clone(),
@@ -163,14 +135,19 @@ impl LiveValidator {
             signing_key_clone,
             validator_id,
             my_index,
-            Arc::new(sync_runtime),
+            sync_runtime,
             peer_addrs.clone(),
-            running.clone(),
-        );
-        let h2 = consensus.spawn();
+            self.running.clone(),
+        ));
 
-        self.handles.lock().unwrap().push(h1);
-        self.handles.lock().unwrap().push(h2);
+        // ADR-023 Phase 6: NodeRuntime manages all services
+        let mut node = NodeRuntime::new(self.running.clone());
+        node.register(networking);
+        node.register(consensus);
+        let handles = node.start_all()?;
+        for h in handles {
+            self.handles.lock().unwrap().push(h);
+        }
         Ok(())
     }
 
@@ -430,7 +407,7 @@ mod tests {
         use amun_authority_registry::governance::{GovernanceAction, GovernanceProposal};
         use amun_authority_registry::transaction::GovernanceTransaction;
         use amun_authority_registry::voting::GovernanceVote;
-                        
+
         let ports = next_ports();
         let config = ValidatorConfig::test_cluster(0, &ports).with_quorum(3);
         let v = LiveValidator::new(config);
