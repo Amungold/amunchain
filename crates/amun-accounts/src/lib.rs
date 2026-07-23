@@ -1,4 +1,5 @@
 use blake3::Hasher;
+use amun_canonical_codec::CanonicalEncode;
 use std::collections::BTreeMap;
 
 /// A constitutional account holding balance and nonce.
@@ -11,6 +12,15 @@ pub struct Account {
 impl Account {
     pub fn new(balance: u64) -> Self {
         Self { balance, nonce: 0 }
+    }
+}
+
+impl amun_canonical_codec::CanonicalEncode for Account {
+    fn canonical_encode(&self) -> Vec<u8> {
+        let mut w = amun_canonical_codec::CanonicalWriter::new();
+        w.write_u64(self.balance);
+        w.write_u64(self.nonce);
+        w.into_bytes()
     }
 }
 
@@ -154,5 +164,32 @@ mod tests {
         s1.create_account([1u8; 32], 1000);
         s2.create_account([1u8; 32], 999);
         assert_ne!(s1.state_root(), s2.state_root());
+    }
+}
+
+#[cfg(test)]
+mod canonical_tests {
+    use super::*;
+
+    #[test]
+    fn test_account_canonical_deterministic() {
+        let a = Account { balance: 100, nonce: 5 };
+        let enc1 = a.canonical_encode();
+        let enc2 = a.canonical_encode();
+        assert_eq!(enc1, enc2);
+    }
+
+    #[test]
+    fn test_account_canonical_changes_with_field() {
+        let a1 = Account { balance: 100, nonce: 5 };
+        let a2 = Account { balance: 200, nonce: 5 };
+        assert_ne!(a1.canonical_encode(), a2.canonical_encode());
+    }
+
+    #[test]
+    fn test_account_canonical_changes_with_nonce() {
+        let a1 = Account { balance: 100, nonce: 0 };
+        let a2 = Account { balance: 100, nonce: 1 };
+        assert_ne!(a1.canonical_encode(), a2.canonical_encode());
     }
 }
