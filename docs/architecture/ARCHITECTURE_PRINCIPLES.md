@@ -1,194 +1,58 @@
 # AmunChain Architecture Principles
 
-**Status:** Active
-**Version:** 1.1
-**Last Updated:** ADR-024 era
+Version: 1.1
 
-This document defines the architectural principles that govern all
-AmunChain development. Every ADR, PR, and design decision must be
-consistent with these principles.
+## Core Principles
 
----
+1. Determinism First
 
-## 1. Single Source of Truth
-
-Every protocol concept MUST have exactly one reference implementation.
-
-| Concept | Crate | Domain |
-|---------|-------|--------|
-| HistoryRoot | `amun-history` | Chain commitment |
-| Merkle Trees | `amun-merkle` | Cryptographic proofs |
-| State Root | `amun-smt` | World state commitment |
-| Block Hash | `amun-block-builder` | Block identity |
-| Signatures | `amun-crypto` | Ed25519 operations |
-
-**Rule:** No duplicate implementations of the same algorithm.
-If a crate already provides a protocol function, all other crates
-must depend on it rather than reimplementing.
+All nodes MUST produce identical results.
 
 ---
 
-## 2. Layer Independence
+2. Canonical Encoding
 
-Crates are organized in layers. Dependencies must flow downward:
-
-```text
-Networking
-▲
-Consensus
-▲
-Execution
-▲
-History / Identity / Crypto
-```
-
-**Rule:** A lower-layer crate MUST NOT depend on a higher-layer crate.
-For example, `amun-history` must never import from `amun-consensus-network`.
-Violating this creates circular dependencies and prevents reuse.
+All protocol-visible data SHALL use the Amun Canonical Codec.
 
 ---
 
-## 3. Specification Before Implementation
+3. Domain Separation
 
-Any change that affects the following MUST have an approved ADR
-before implementation begins:
-
-- Block Header format
-- Consensus rules (QC, voting, finality)
-- Serialization format (canonical encoding)
-- Cryptographic primitives or hash algorithms
-- Storage format (FinalizedChainRecord, ChainStore)
-
-**Rule:** No ADR, no implementation. The ADR must contain:
-problem statement, scope, specification, affected components,
-implementation plan, test requirements, and acceptance criteria.
+Every cryptographic commitment SHALL define an independent domain.
 
 ---
 
-## 4. Backward Compatibility
+4. Protocol Stability
 
-Any change to the following MUST explicitly state a compatibility
-strategy chosen from:
+Breaking protocol changes require:
 
-| Strategy | When to use |
-|----------|-------------|
-| **Versioning** | New format coexists with old (e.g., version byte) |
-| **Migration** | Old data is converted on startup |
-| **Hard Fork** | Old and new are incompatible; requires coordinated upgrade |
-
-Applies to:
-
-- Block format
-- FinalizedChainRecord
-- Snapshots
-- RPC protocol
-
-**Rule:** Compatibility strategy must be stated in the ADR.
-"Do nothing" is not an acceptable strategy.
+- ADR
+- Version bump
+- Constitutional Hard Fork
 
 ---
 
-## 5. Determinism First
+5. Backward Compatibility
 
-Any code that enters the consensus-critical path MUST be:
-
-- Fully deterministic
-- Time-independent (no `SystemTime::now()` in consensus logic)
-- Memory-order-independent (no iteration over `HashMap` without sorting)
-- Platform-independent (same result on x86_64 and ARM)
-- Replayable (same input → same output, always)
-
-**Rule:** Non-deterministic code (logging, metrics, diagnostics)
-must be clearly separated from consensus logic and annotated with
-`// NON-DETERMINISTIC:` comments.
+No silent protocol changes are permitted.
 
 ---
 
-## 6. Security by Design
+6. Specification Before Implementation
 
-Security-sensitive code MUST:
+Protocol specifications precede implementation.
 
-- Fail closed rather than fail open
-- Validate all external inputs at trust boundaries
-- Avoid implicit trust between modules
-- Keep cryptographic verification separate from business logic
-
-Security reviews are required for changes affecting:
-
-- Consensus
-- Networking
-- Cryptography
-- Identity
-- Storage integrity
-
-**Rule:** Security assumptions must be documented.
-"Trust me" is not a security assumption.
+Implementation follows specification.
 
 ---
 
-## 7. ADR Discipline
+7. Test Before Mainnet
 
-Every ADR MUST contain, at minimum:
-
-| Section | Content |
-|---------|---------|
-| Problem | What is broken or missing |
-| Goal | What this ADR intends to achieve |
-| Out of Scope | What is explicitly NOT changed |
-| Specification | Implementation-agnostic algorithm definition |
-| Affected Components | Which crates/modules change |
-| Implementation Plan | Ordered steps |
-| Test Requirements | Minimum tests before acceptance |
-| Acceptance Criteria | How to verify completion |
-
-Accepted ADRs SHOULD NOT be modified except for editorial corrections.
-Behavioral or architectural changes require either a superseding ADR
-or a versioned amendment.
+Every protocol rule SHALL be covered by automated tests.
 
 ---
 
-## 8. Performance Budget
+8. Security by Design
 
-Protocol-critical changes MUST document:
-
-- Expected asymptotic complexity
-- Memory impact
-- Network impact (messages per round, bytes per message)
-- Storage impact (bytes per block, growth rate)
-
-Performance regressions require explicit justification in the ADR.
-
----
-
-## 9. Observability
-
-All long-running services SHOULD expose:
-
-- Metrics (counters, histograms)
-- Structured logs (JSON format)
-- Health checks (liveness/readiness)
-
-Observability code MUST NOT affect consensus determinism.
-Metrics collection must be separable from consensus logic.
-
----
-
-## 10. Crate Design Rules
-
-Every new crate must:
-
-1. Have a single, clearly defined responsibility
-2. Contain its own unit tests
-3. Not depend on higher layers
-4. Export only its public API (minimize `pub` surface)
-5. Include a `README.md` stating its purpose and layer
-
----
-
-## Revision History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | ADR-024 era | Initial architecture governance policy |
-| 1.1 | ADR-024 era | Added Security by Design, Performance Budget, Observability principles; relaxed ADR immutability rule |
-
+Security properties are protocol requirements,
+not implementation details.
