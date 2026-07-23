@@ -170,7 +170,10 @@ impl ConsensusRuntime {
                         // P2.2: Pass the previous block's evidence root
                         // This chains evidence commitments across blocks
                         *previous_evidence_root.lock().unwrap(),
-                        [0u8; 32], // P3: validator_set_root
+                        {
+                            let eng = engine.lock().unwrap();
+                            amun_merkle::validator_set_root(&eng.validator_ids)
+                        }, // P3.2: real validator set root
                     );
                     {
                         let ledger = slashing_ledger.lock().unwrap();

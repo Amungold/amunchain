@@ -109,6 +109,21 @@ pub fn transactions_root(tx_hashes: &[[u8; 32]]) -> [u8; 32] {
 }
 
 /// Compute the receipts root from receipt hashes (ADR-027).
+// ADR-P3: Validator Set Root domain constants
+pub const VALIDATOR_LEAF_DOMAIN: &[u8] = b"AMUN_VALIDATOR_LEAF_V1";
+pub const VALIDATOR_NODE_DOMAIN: &[u8] = b"AMUN_VALIDATOR_NODE_V1";
+
+/// Compute the validator set root from validator IDs (ADR-P3).
+pub fn validator_set_root(validator_ids: &[[u8; 32]]) -> [u8; 32] {
+    if validator_ids.is_empty() {
+        return [0u8; 32];
+    }
+    // Sort for determinism
+    let mut sorted = validator_ids.to_vec();
+    sorted.sort();
+    merkle_root(&sorted, VALIDATOR_LEAF_DOMAIN, VALIDATOR_NODE_DOMAIN, [0u8; 32])
+}
+
 pub fn receipts_root(receipt_hashes: &[[u8; 32]]) -> [u8; 32] {
     merkle_root(
         receipt_hashes,
