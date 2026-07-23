@@ -149,7 +149,8 @@ impl ConsensusRuntime {
                 let (block_hash, state_root) = if is_proposer && !already_proposed {
                     let mut mp = mempool.lock().unwrap();
                     let mut bld = builder.lock().unwrap();
-                    let parent = engine.lock().unwrap().history_root;
+                    // ADR-025: parent_hash is the previous block_hash, not history_root
+                    let parent = engine.lock().unwrap().last_finalized_block_hash;
                     let pending_certs: Vec<amun_consensus_network::SlashingCertificate> =
                         certificate_gossip
                             .lock()

@@ -221,6 +221,8 @@ pub struct ConsensusEngine {
     pub validator_ids: Vec<[u8; 32]>,
     pub current_height: u64,
     pub history_root: [u8; 32],
+    /// ADR-025: The block_hash of the last finalized block.
+    pub last_finalized_block_hash: [u8; 32],
     pub metrics: ConsensusMetrics,
     pub rounds: HashMap<u64, ConsensusRound>,
     pub needs_catchup: AtomicBool,
@@ -241,6 +243,7 @@ impl ConsensusEngine {
             validator_ids: Vec::new(),
             current_height: 0,
             history_root: [0u8; 32],
+            last_finalized_block_hash: [0u8; 32],
             metrics: ConsensusMetrics::new(),
             rounds: HashMap::new(),
             needs_catchup: AtomicBool::new(false),
@@ -467,6 +470,7 @@ impl ConsensusEngine {
         self.metrics.record_qc_formed(height);
         self.metrics.record_block_finalized(height);
         self.finality_chain.push(cert.clone());
+        self.last_finalized_block_hash = cert.block_hash;
         let keep_from = height.saturating_sub(64);
         self.rounds.retain(|h, _| *h >= keep_from);
         Some(cert)

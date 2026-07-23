@@ -4,6 +4,7 @@ use amun_execution::ExecutionEngine;
 use amun_mempool::Mempool;
 use amun_transactions::{Transaction, TransactionReceipt};
 use blake3::Hasher;
+use amun_merkle::transactions_root;
 
 /// A constitutional block containing transactions and their execution results.
 #[derive(Debug, Clone)]
@@ -13,6 +14,8 @@ pub struct Block {
     pub transactions: Vec<Transaction>,
     pub receipts: Vec<TransactionReceipt>,
     pub state_root: [u8; 32],
+    /// ADR-026: Merkle root of transactions in execution order.
+    pub transactions_root: [u8; 32],
     pub proposer: [u8; 32],
     pub timestamp: u64,
     /// N110.4: Slashing certificates included in this block
@@ -71,6 +74,7 @@ impl Block {
         hasher.update(&self.height.to_le_bytes());
         hasher.update(&self.parent_hash);
         hasher.update(&self.state_root);
+        hasher.update(&self.transactions_root);
         hasher.update(&self.proposer);
         hasher.update(&self.timestamp.to_le_bytes());
         for tx in &self.transactions {
@@ -139,12 +143,17 @@ impl BlockBuilder {
         let receipts = self.engine.execute_block(&transactions);
         let state_root = self.engine.state.state_root();
 
+        // ADR-026: Compute transactions_root before moving transactions into Block
+        let tx_hashes: Vec<[u8; 32]> = transactions.iter().map(|tx| tx.tx_hash()).collect();
+        let tx_root = transactions_root(&tx_hashes);
+
         Block {
             height,
             parent_hash,
             transactions,
             receipts,
             state_root,
+            transactions_root: tx_root,
             proposer,
             timestamp,
             slashing_certificates,
