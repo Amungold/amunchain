@@ -412,7 +412,7 @@ impl ConsensusRuntime {
                             slashing_root: [0u8; 32],
                             verdict_hash,
                             evidence_record_hash,
-                            evidence_root: evidence_root, // P2: from EvidenceRoot::compute
+                            evidence_root, // P2: from EvidenceRoot::compute
                             timestamp: SystemTime::now()
                                 .duration_since(SystemTime::UNIX_EPOCH)
                                 .unwrap()

@@ -5,7 +5,7 @@
 
 use amun_block_builder::{Block, BlockBuilder};
 use amun_mempool::Mempool;
-use amun_transactions::{Transaction, TransactionPayload, TransactionReceipt, TransferPayload};
+use amun_transactions::{Transaction, TransactionPayload, TransferPayload};
 use ed25519_dalek::SigningKey;
 
 fn make_tx(seed: u8, nonce: u64) -> Transaction {
