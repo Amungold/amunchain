@@ -29,7 +29,7 @@ fn make_valid_certificate(validator_id: [u8; 32]) -> SlashingCertificate {
 fn build_test_block(certs: Vec<SlashingCertificate>) -> Block {
     let mut builder = BlockBuilder::new();
     let mut mempool = Mempool::new();
-    builder.build_block_with_certificates(1, [0u8; 32], &mut mempool, 10, [0u8; 32], 1000, certs)
+    builder.build_block_with_certificates(1, [0u8; 32], &mut mempool, 10, [0u8; 32], 1000, certs, [0u8; 32])
 }
 
 // ============================================================================

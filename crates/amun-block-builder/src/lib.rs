@@ -128,6 +128,7 @@ impl BlockBuilder {
             proposer,
             timestamp,
             vec![],
+            [0u8; 32],
         )
     }
 
@@ -144,6 +145,7 @@ impl BlockBuilder {
         proposer: [u8; 32],
         timestamp: u64,
         slashing_certificates: Vec<SlashingCertificate>,
+        evidence_root: [u8; 32],
     ) -> Block {
         let transactions = mempool.take_for_block(max_txs);
         let receipts = self.engine.execute_block(&transactions);
@@ -167,7 +169,7 @@ impl BlockBuilder {
             timestamp,
             slashing_certificates,
             slashing_root: [0u8; 32],
-            evidence_root: [0u8; 32], // P2: computed from evidence // N120.2: computed after ledger update
+            evidence_root, // N120.2: computed after ledger update
         }
     }
 

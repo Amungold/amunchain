@@ -49,7 +49,14 @@ fn build_block(
         mempool.add_transaction(tx.clone()).ok();
     }
     let mut block = builder.build_block_with_certificates(
-        height, parent_hash, &mut mempool, txs.len(), [0u8; 32], 1000, vec![],
+        height,
+        parent_hash,
+        &mut mempool,
+        txs.len(),
+        [0u8; 32],
+        1000,
+        vec![],
+        [0u8; 32],
     );
     // Override transactions and receipts for testing
     block.transactions = txs;
