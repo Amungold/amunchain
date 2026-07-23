@@ -75,6 +75,14 @@ pub struct TransactionReceipt {
     pub gas_used: u64,
 }
 
+/// ADR-027: Canonical receipt hash for protocol commitments.
+impl TransactionReceipt {
+    pub fn receipt_hash(&self) -> [u8; 32] {
+        let encoded = serde_json::to_vec(self).unwrap_or_default();
+        blake3::hash(&encoded).into()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -181,4 +189,41 @@ mod tests {
         assert!(!r.success);
         assert_eq!(r.error_code, Some(1));
     }
+}
+
+// ADR-027: receipt_hash protocol tests
+#[cfg(test)]
+#[test]
+fn test_receipt_hash_deterministic() {
+    let r = crate::TransactionReceipt {
+        tx_hash: [1u8; 32],
+        success: true,
+        error_code: None,
+        sender: [2u8; 32],
+        nonce: 42,
+        gas_used: 1000,
+    };
+    assert_eq!(r.receipt_hash(), r.receipt_hash());
+}
+
+#[cfg(test)]
+#[test]
+fn test_receipt_hash_changes_with_field() {
+    let r1 = crate::TransactionReceipt {
+        tx_hash: [1u8; 32],
+        success: true,
+        error_code: None,
+        sender: [2u8; 32],
+        nonce: 42,
+        gas_used: 1000,
+    };
+    let r2 = crate::TransactionReceipt {
+        tx_hash: [1u8; 32],
+        success: true,
+        error_code: None,
+        sender: [2u8; 32],
+        nonce: 42,
+        gas_used: 2000,
+    };
+    assert_ne!(r1.receipt_hash(), r2.receipt_hash());
 }

@@ -14,15 +14,29 @@ use std::sync::LazyLock;
 pub const TX_LEAF_DOMAIN: &[u8] = b"AMUN_TX_LEAF_V1";
 pub const TX_NODE_DOMAIN: &[u8] = b"AMUN_TX_NODE_V1";
 
+// ADR-027: Receipts Root domain constants
+pub const RECEIPT_LEAF_DOMAIN: &[u8] = b"AMUN_RECEIPT_LEAF_V1";
+pub const RECEIPT_NODE_DOMAIN: &[u8] = b"AMUN_RECEIPT_NODE_V1";
+
 /// Pre-computed empty transactions root (internal).
 static EMPTY_TX_ROOT: LazyLock<[u8; 32]> = LazyLock::new(|| {
     let hash = blake3::hash(b"AMUN_EMPTY_TX_ROOT_V1");
     *hash.as_bytes()
 });
 
+static EMPTY_RECEIPT_ROOT: LazyLock<[u8; 32]> = LazyLock::new(|| {
+    let hash = blake3::hash(b"AMUN_EMPTY_RECEIPT_ROOT_V1");
+    *hash.as_bytes()
+});
+
 /// Return the protocol-defined empty transactions root.
 pub fn empty_tx_root() -> [u8; 32] {
     *EMPTY_TX_ROOT
+}
+
+/// Return the protocol-defined empty receipts root.
+pub fn empty_receipt_root() -> [u8; 32] {
+    *EMPTY_RECEIPT_ROOT
 }
 
 // ============================================================================
@@ -94,6 +108,11 @@ pub fn transactions_root(tx_hashes: &[[u8; 32]]) -> [u8; 32] {
     merkle_root(tx_hashes, TX_LEAF_DOMAIN, TX_NODE_DOMAIN, empty_tx_root())
 }
 
+/// Compute the receipts root from receipt hashes (ADR-027).
+pub fn receipts_root(receipt_hashes: &[[u8; 32]]) -> [u8; 32] {
+    merkle_root(receipt_hashes, RECEIPT_LEAF_DOMAIN, RECEIPT_NODE_DOMAIN, empty_receipt_root())
+}
+
 // ============================================================================
 // Tests (ADR-026 §7)
 // ============================================================================
@@ -159,5 +178,19 @@ mod tests {
         let direct = merkle_root(&tx_hashes, TX_LEAF_DOMAIN, TX_NODE_DOMAIN, empty_root());
         let wrapped = transactions_root(&tx_hashes);
         assert_eq!(direct, wrapped);
+    }
+
+    #[test]
+    fn test_receipt_root_differs_from_tx_root() {
+        let hashes = [[1u8; 32], [2u8; 32]];
+        let tx_r = transactions_root(&hashes);
+        let rec_r = receipts_root(&hashes);
+        assert_ne!(tx_r, rec_r, "Different domains must produce different roots");
+    }
+
+    #[test]
+    fn test_receipt_root_empty() {
+        let root = receipts_root(&[]);
+        assert_eq!(root, empty_receipt_root());
     }
 }
