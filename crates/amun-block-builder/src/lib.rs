@@ -26,6 +26,8 @@ pub struct Block {
     pub slashing_root: [u8; 32],
     /// P2: Merkle root of constitutional evidence.
     pub evidence_root: [u8; 32],
+    /// P3: Merkle root of the active validator set.
+    pub validator_set_root: [u8; 32],
 }
 
 impl Block {
@@ -92,6 +94,7 @@ impl Block {
         // N120.2: Include slashing root in block hash
         hasher.update(&self.slashing_root);
         hasher.update(&self.evidence_root);
+        hasher.update(&self.validator_set_root);
         hasher.finalize().into()
     }
 }
@@ -169,7 +172,8 @@ impl BlockBuilder {
             timestamp,
             slashing_certificates,
             slashing_root: [0u8; 32],
-            evidence_root, // N120.2: computed after ledger update
+            evidence_root,
+            validator_set_root: [0u8; 32], // N120.2: computed after ledger update
         }
     }
 
