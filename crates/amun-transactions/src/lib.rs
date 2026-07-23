@@ -1,10 +1,25 @@
 use blake3::Hasher;
+use amun_canonical_codec::CanonicalEncode;
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TransactionPayload {
     Transfer(TransferPayload),
+}
+
+impl amun_canonical_codec::CanonicalEncode for TransactionPayload {
+    fn canonical_encode(&self) -> Vec<u8> {
+        let mut w = amun_canonical_codec::CanonicalWriter::new();
+        match self {
+            TransactionPayload::Transfer(t) => {
+                w.write_u8(0);
+                w.write_hash(&t.to);
+                w.write_u64(t.amount);
+            }
+        }
+        w.into_bytes()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,9 +44,7 @@ impl Transaction {
         hasher.update(&self.version.to_le_bytes());
         hasher.update(&self.sender);
         hasher.update(&self.nonce.to_le_bytes());
-        if let Ok(payload_bytes) = serde_json::to_vec(&self.payload) {
-            hasher.update(&payload_bytes);
-        }
+        hasher.update(&self.payload.canonical_encode());
         hasher.finalize().into()
     }
 
@@ -39,9 +52,7 @@ impl Transaction {
         let mut data = Vec::new();
         data.extend_from_slice(&self.version.to_le_bytes());
         data.extend_from_slice(&self.nonce.to_le_bytes());
-        if let Ok(payload_bytes) = serde_json::to_vec(&self.payload) {
-            data.extend_from_slice(&payload_bytes);
-        }
+        data.extend_from_slice(&self.payload.canonical_encode());
         data
     }
 
@@ -78,8 +89,24 @@ pub struct TransactionReceipt {
 /// ADR-027: Canonical receipt hash for protocol commitments.
 impl TransactionReceipt {
     pub fn receipt_hash(&self) -> [u8; 32] {
-        let encoded = serde_json::to_vec(self).unwrap_or_default();
+        let encoded = self.canonical_encode();
         blake3::hash(&encoded).into()
+    }
+}
+
+impl amun_canonical_codec::CanonicalEncode for TransactionReceipt {
+    fn canonical_encode(&self) -> Vec<u8> {
+        let mut w = amun_canonical_codec::CanonicalWriter::new();
+        w.write_hash(&self.tx_hash);
+        w.write_bool(self.success);
+        match self.error_code {
+            Some(code) => { w.write_bool(true); w.write_u32(code); }
+            None => { w.write_bool(false); }
+        }
+        w.write_hash(&self.sender);
+        w.write_u64(self.nonce);
+        w.write_u64(self.gas_used);
+        w.into_bytes()
     }
 }
 
