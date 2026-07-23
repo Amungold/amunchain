@@ -1,5 +1,4 @@
 use blake3::Hasher;
-use amun_canonical_codec::CanonicalEncode;
 use std::collections::BTreeMap;
 
 /// A constitutional account holding balance and nonce.
