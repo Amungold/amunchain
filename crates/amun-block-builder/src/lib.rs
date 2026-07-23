@@ -2,9 +2,9 @@ use amun_accounts::AccountStore;
 use amun_consensus_network::SlashingCertificate;
 use amun_execution::ExecutionEngine;
 use amun_mempool::Mempool;
+use amun_merkle::{receipts_root, transactions_root};
 use amun_transactions::{Transaction, TransactionReceipt};
 use blake3::Hasher;
-use amun_merkle::{transactions_root, receipts_root};
 
 /// A constitutional block containing transactions and their execution results.
 #[derive(Debug, Clone)]

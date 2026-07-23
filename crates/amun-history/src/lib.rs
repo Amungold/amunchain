@@ -120,7 +120,12 @@ mod tests {
         assert_eq!(chain.len(), 100);
         // Every root must be different from its predecessor
         for i in 1..chain.len() {
-            assert_ne!(chain[i], chain[i-1], "Root at index {} must differ from previous", i);
+            assert_ne!(
+                chain[i],
+                chain[i - 1],
+                "Root at index {} must differ from previous",
+                i
+            );
         }
         // Every root must be non-zero
         for (i, root) in chain.iter().enumerate() {
@@ -147,7 +152,10 @@ mod tests {
         prev = compute_history_root(prev, b1);
         let root_b = compute_history_root(prev, b2);
 
-        assert_ne!(root_a, root_b, "Forked chains must produce different final roots");
+        assert_ne!(
+            root_a, root_b,
+            "Forked chains must produce different final roots"
+        );
     }
 
     #[test]
@@ -167,8 +175,10 @@ mod tests {
         hasher2.update(&hash);
         let without_domain: [u8; 32] = hasher2.finalize().into();
 
-        assert_ne!(with_domain, without_domain,
-            "Domain separator must change the hash output");
+        assert_ne!(
+            with_domain, without_domain,
+            "Domain separator must change the hash output"
+        );
     }
 
     #[test]
@@ -182,8 +192,11 @@ mod tests {
         }
         let elapsed = start.elapsed();
         // 100k BLAKE3 hashes should complete in well under 1 second
-        assert!(elapsed.as_millis() < 1000,
-            "100k history roots took {}ms, expected <1000ms", elapsed.as_millis());
+        assert!(
+            elapsed.as_millis() < 1000,
+            "100k history roots took {}ms, expected <1000ms",
+            elapsed.as_millis()
+        );
         assert_ne!(prev, [0u8; 32], "Final root must be non-zero");
     }
 }

@@ -87,7 +87,7 @@ pub fn merkle_root(
         .collect();
 
     while current.len() > 1 {
-        if current.len() % 2 != 0 {
+        if !current.len().is_multiple_of(2) {
             current.push(current[current.len() - 1]);
         }
         let mut next = Vec::with_capacity(current.len() / 2);
@@ -110,7 +110,12 @@ pub fn transactions_root(tx_hashes: &[[u8; 32]]) -> [u8; 32] {
 
 /// Compute the receipts root from receipt hashes (ADR-027).
 pub fn receipts_root(receipt_hashes: &[[u8; 32]]) -> [u8; 32] {
-    merkle_root(receipt_hashes, RECEIPT_LEAF_DOMAIN, RECEIPT_NODE_DOMAIN, empty_receipt_root())
+    merkle_root(
+        receipt_hashes,
+        RECEIPT_LEAF_DOMAIN,
+        RECEIPT_NODE_DOMAIN,
+        empty_receipt_root(),
+    )
 }
 
 // ============================================================================
@@ -185,7 +190,10 @@ mod tests {
         let hashes = [[1u8; 32], [2u8; 32]];
         let tx_r = transactions_root(&hashes);
         let rec_r = receipts_root(&hashes);
-        assert_ne!(tx_r, rec_r, "Different domains must produce different roots");
+        assert_ne!(
+            tx_r, rec_r,
+            "Different domains must produce different roots"
+        );
     }
 
     #[test]
