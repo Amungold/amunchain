@@ -167,7 +167,9 @@ impl ConsensusRuntime {
                         validator_id,
                         timestamp,
                         pending_certs,
-                        [0u8; 32], // P2: evidence_root from previous block
+                        // P2.2: Pass the previous block's evidence root
+                        // This chains evidence commitments across blocks
+                        *previous_evidence_root.lock().unwrap()
                     );
                     {
                         let ledger = slashing_ledger.lock().unwrap();
