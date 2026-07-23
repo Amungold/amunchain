@@ -17,3 +17,18 @@ This directory contains the architectural documentation of AmunChain.
 4. Implement
 5. Verify
 6. Update ADR Index
+
+## ADR-029
+
+State Commitment V2
+
+Sparse Merkle Tree based state commitment.
+
+Status:
+
+Design Complete
+
+Implementation:
+
+ADR-029.2
+
