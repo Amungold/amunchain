@@ -298,6 +298,8 @@ impl ConsensusEngine {
             return Err(format!("Validator {:?} is suspended", &vote.voter_id[..4]));
         }
         // N105.3: Verify signature if registry populated
+        eprintln!("[PHASE3] VOTE: voter_id={:?} lookup_key_exists={}", 
+            &vote.voter_id[..4], self.validator_keys.get(&vote.voter_id).is_some());
         if !self.validator_keys.is_empty() {
             let pk = self
                 .validator_keys

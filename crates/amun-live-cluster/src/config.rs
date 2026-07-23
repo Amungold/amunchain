@@ -91,9 +91,10 @@ impl ValidatorConfig {
     }
 
     pub fn other_peers(&self) -> Vec<&ClusterPeer> {
+        let my_port = self.listen_addr.port();
         self.cluster
             .iter()
-            .filter(|p| p.validator_id != self.validator_id)
+            .filter(|p| p.address.port() != my_port)
             .collect()
     }
 
