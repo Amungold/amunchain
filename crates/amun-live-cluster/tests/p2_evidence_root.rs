@@ -37,6 +37,7 @@ fn build_block_with_evidence(
     mempool.add_transaction(tx.clone()).ok();
     builder.build_block_with_certificates(
         height, parent_hash, &mut mempool, 1, [0u8; 32], 1000, vec![], evidence_root,
+        [0u8; 32],
     )
 }
 

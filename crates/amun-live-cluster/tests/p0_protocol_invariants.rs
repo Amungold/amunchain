@@ -57,6 +57,7 @@ fn build_block(
         1000,
         vec![],
         [0u8; 32],
+        [0u8; 32],
     );
     // Override transactions and receipts for testing
     block.transactions = txs;
