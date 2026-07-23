@@ -1,38 +1,8 @@
 [package]
 name = "amun-fuzz"
 version = "0.1.0"
-license = "MIT OR Apache-2.0"
 edition = "2021"
 
-[lib]
-name = "amun_fuzz"
-path = "src/lib.rs"
-crate-type = ["rlib"]
 [dependencies]
-amun-resource-core = { path = "../crates/amun-resource-core" }
-amun-snapshot-constitution = { path = "../crates/amun-snapshot-constitution" }
-amun-wal = { path = "../crates/amun-wal" }
-amun-protocol-event = { path = "../crates/amun-protocol-event" }
-amun-chain-position = { path = "../crates/amun-chain-position" }
-tempfile = "3"
-libfuzzer-sys = "0.4"
-[package.metadata]
-cargo-fuzz = true
-
-[[bin]]
-name = "snapshot"
-path = "fuzz_targets/snapshot.rs"
-test = false
-doc = false
-
-[[bin]]
-name = "wal"
-path = "fuzz_targets/wal.rs"
-test = false
-doc = false
-
-[[bin]]
-name = "resource_registry"
-path = "fuzz_targets/resource_registry.rs"
-test = false
-doc = false
+amun-canonical-codec = { path = "../crates/amun-canonical-codec" }
+amun-merkle = { path = "../crates/amun-merkle" }

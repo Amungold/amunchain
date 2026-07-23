@@ -76,13 +76,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "amun-binary-codec"
-version = "1.0.0"
-dependencies = [
- "amun-chain-position",
-]
-
-[[package]]
 name = "amun-block-builder"
 version = "0.1.0"
 dependencies = [
@@ -196,14 +189,6 @@ dependencies = [
  "hex",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "amun-chain-position"
-version = "1.0.0"
-dependencies = [
- "blake3",
- "serde",
 ]
 
 [[package]]
@@ -573,10 +558,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "amun-deterministic-allocator"
-version = "1.0.0"
-
-[[package]]
 name = "amun-dual-verification"
 version = "0.1.0"
 dependencies = [
@@ -732,13 +713,8 @@ dependencies = [
 name = "amun-fuzz"
 version = "0.1.0"
 dependencies = [
- "amun-chain-position",
- "amun-protocol-event",
- "amun-resource-core",
- "amun-snapshot-constitution",
- "amun-wal",
- "libfuzzer-sys",
- "tempfile",
+ "amun-canonical-codec",
+ "amun-merkle",
 ]
 
 [[package]]
@@ -1107,15 +1083,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "amun-protocol-event"
-version = "1.0.0"
-dependencies = [
- "amun-binary-codec",
- "amun-chain-position",
- "blake3",
-]
-
-[[package]]
 name = "amun-recovery"
 version = "0.1.0"
 dependencies = [
@@ -1259,17 +1226,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "amun-snapshot-constitution"
-version = "1.0.0"
-dependencies = [
- "amun-canonical",
- "amun-chain-position",
- "amun-deterministic-allocator",
- "amun-state-transition",
- "blake3",
-]
-
-[[package]]
 name = "amun-snapshot-engine"
 version = "1.0.0"
 dependencies = [
@@ -1325,16 +1281,6 @@ dependencies = [
  "serde_json",
  "tempfile",
  "thiserror 1.0.69",
-]
-
-[[package]]
-name = "amun-state-transition"
-version = "1.0.0"
-dependencies = [
- "amun-canonical",
- "amun-chain-position",
- "amun-deterministic-allocator",
- "blake3",
 ]
 
 [[package]]
@@ -1512,16 +1458,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "amun-wal"
-version = "1.0.0"
-dependencies = [
- "crc32fast",
- "serde",
- "serde_json",
- "sha2",
-]
-
-[[package]]
 name = "amun-wallet-api"
 version = "0.1.0"
 dependencies = [
@@ -1566,12 +1502,6 @@ name = "anstyle"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
-
-[[package]]
-name = "arbitrary"
-version = "1.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3d036a3c4ab069c7b410a2ce876bd74808d2d0888a82667669f8e783a898bf1"
 
 [[package]]
 name = "argon2"
@@ -1789,8 +1719,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c89588d05638b5b4594a3348a2d6c20277e43a7f5c5202b05cc56888475a47b8"
 dependencies = [
  "find-msvc-tools",
- "jobserver",
- "libc",
  "shlex",
 ]
 
@@ -2671,16 +2599,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
-name = "jobserver"
-version = "0.1.35"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c00acbd29eabad4a2392fa0e921c874934dbbf4194312ad20f04a0ed67a3cb3"
-dependencies = [
- "getrandom 0.4.3",
- "libc",
-]
-
-[[package]]
 name = "js-sys"
 version = "0.3.103"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2696,16 +2614,6 @@ name = "libc"
 version = "0.2.189"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
-
-[[package]]
-name = "libfuzzer-sys"
-version = "0.4.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9fd2f41a1cba099f79a0b6b6c35656cf7c03351a7bae8ff0f28f25270f929d2"
-dependencies = [
- "arbitrary",
- "cc",
-]
 
 [[package]]
 name = "linux-raw-sys"
