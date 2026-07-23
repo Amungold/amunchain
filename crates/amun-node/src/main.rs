@@ -90,13 +90,13 @@ fn main() {
             .iter()
             .map(|addr| amun_live_cluster::config::ClusterPeer {
                 validator_id: [0u8; 32],
-                certificate_path: Some("/tmp/amun-vps0/key.bin".to_string()),
+                certificate_path: None, // ADR-030: auto-discovered from genesis
                 address: *addr,
             })
             .collect(),
         data_dir: amun_config.data_dir.to_str().unwrap().to_string(),
         quorum_size: Some(amun_config.quorum_size),
-        authority_public_key: [0u8; 32],
+        authority_public_key: [0u8; 32], // ADR-030: loaded from genesis
     };
 
     let validator = Arc::new(LiveValidator::new(vconfig));

@@ -28,6 +28,9 @@ pub struct ValidatorConfig {
 pub struct ClusterPeer {
     pub validator_id: [u8; 32],
     #[serde(default)]
+    /// ADR-030.1: Path to peer certificate file.
+    /// None = auto-discovered via network (default for dynamic clusters).
+    /// Some(path) = load from disk (useful for static/test configurations).
     pub certificate_path: Option<String>,
     pub address: SocketAddr,
 }

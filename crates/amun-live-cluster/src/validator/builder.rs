@@ -110,7 +110,7 @@ impl LiveValidatorBuilder {
 
     fn build_storage(&self) -> Result<(ChainStore, u64, [u8; 32]), String> {
         let store = ChainStore::open(&self.config.data_dir)
-            .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").unwrap());
+            .unwrap_or_else(|_| ChainStore::open("/tmp/amun-fallback").expect("Fatal: cannot open fallback store"));
         let recovered_height = store.latest_height();
         let recovered_root = store
             .load_tip()
