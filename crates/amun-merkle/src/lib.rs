@@ -121,7 +121,12 @@ pub fn validator_set_root(validator_ids: &[[u8; 32]]) -> [u8; 32] {
     // Sort for determinism
     let mut sorted = validator_ids.to_vec();
     sorted.sort();
-    merkle_root(&sorted, VALIDATOR_LEAF_DOMAIN, VALIDATOR_NODE_DOMAIN, [0u8; 32])
+    merkle_root(
+        &sorted,
+        VALIDATOR_LEAF_DOMAIN,
+        VALIDATOR_NODE_DOMAIN,
+        [0u8; 32],
+    )
 }
 
 pub fn receipts_root(receipt_hashes: &[[u8; 32]]) -> [u8; 32] {

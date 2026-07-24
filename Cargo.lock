@@ -850,6 +850,7 @@ dependencies = [
  "amun-accounts",
  "amun-authority-registry",
  "amun-block-builder",
+ "amun-block-store",
  "amun-canonical-codec",
  "amun-chain-store",
  "amun-consensus-network",
@@ -858,6 +859,7 @@ dependencies = [
  "amun-history",
  "amun-kernel-types",
  "amun-mempool",
+ "amun-mempool-gossip",
  "amun-merkle",
  "amun-network-transport",
  "amun-networking",
@@ -952,6 +954,7 @@ dependencies = [
 name = "amun-node"
 version = "0.1.0"
 dependencies = [
+ "amun-accounts",
  "amun-bootstrap",
  "amun-bytecode",
  "amun-chain-checkpoint",
@@ -975,6 +978,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
+ "tokio",
  "toml",
 ]
 
@@ -1177,6 +1181,7 @@ name = "amun-rpc"
 version = "0.1.0"
 dependencies = [
  "amun-accounts",
+ "amun-block-store",
  "amun-chain-store",
  "amun-consensus-network",
  "amun-mempool",

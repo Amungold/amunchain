@@ -2,6 +2,7 @@ use crate::config::ValidatorConfig;
 use amun_authority_registry::transaction::GovernanceState;
 use amun_authority_registry::AuthorityRegistry;
 use amun_block_builder::BlockBuilder;
+use amun_block_store::BlockStore;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
@@ -41,6 +42,7 @@ pub struct LiveValidator {
     handles: Mutex<Vec<JoinHandle<()>>>,
     signing_key: SigningKey,
     pub validator_id: [u8; 32],
+    pub block_store: Arc<Mutex<BlockStore>>,
     pub mempool: Arc<Mutex<Mempool>>,
     pub builder: Arc<Mutex<BlockBuilder>>,
     pub governance: Arc<Mutex<GovernanceState>>,
@@ -70,6 +72,7 @@ impl LiveValidator {
     /// ADR-023 Phase 5: Separates construction from assembly.
     pub fn from_parts(parts: RuntimeParts) -> Self {
         Self {
+            block_store: parts.block_store.clone(),
             config: parts.config,
             engine: parts.engine,
             store: parts.store,
@@ -114,6 +117,7 @@ impl LiveValidator {
                 &self.config.listen_addr.to_string(),
                 engine.clone(),
                 store.clone(),
+                self.mempool.clone(),
                 self.running.clone(),
             )
             .expect("Failed to create NetworkingRuntime"),
@@ -122,6 +126,7 @@ impl LiveValidator {
         let consensus = Box::new(crate::runtime::consensus::ConsensusRuntime::new(
             engine.clone(),
             store.clone(),
+            self.block_store.clone(),
             self.mempool.clone(),
             self.builder.clone(),
             self.governance.clone(),

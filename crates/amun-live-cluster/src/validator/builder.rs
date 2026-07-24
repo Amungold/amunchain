@@ -4,6 +4,7 @@ use std::sync::{Arc, Mutex};
 use amun_authority_registry::transaction::GovernanceState;
 use amun_authority_registry::AuthorityRegistry;
 use amun_block_builder::BlockBuilder;
+use amun_block_store::BlockStore;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::{RealStakingExecutor, StakingAdapter};
@@ -24,6 +25,7 @@ pub struct RuntimeParts {
     pub running: Arc<Mutex<bool>>,
     pub signing_key: SigningKey,
     pub validator_id: [u8; 32],
+    pub block_store: Arc<Mutex<BlockStore>>,
     pub mempool: Arc<Mutex<Mempool>>,
     pub block_builder: Arc<Mutex<BlockBuilder>>,
     pub governance: Arc<Mutex<GovernanceState>>,
@@ -63,6 +65,10 @@ impl LiveValidatorBuilder {
 
         // Stage 4: Supporting services (mempool, governance, slashing, etc.)
         let running = Arc::new(Mutex::new(false));
+        let block_store = Arc::new(Mutex::new(BlockStore::new(&format!(
+            "{}/blocks.json",
+            self.config.data_dir
+        ))));
         let mempool = Arc::new(Mutex::new(Mempool::new()));
         let block_builder = Arc::new(Mutex::new(BlockBuilder::new()));
         let governance = Arc::new(Mutex::new(GovernanceState::new()));
@@ -88,6 +94,7 @@ impl LiveValidatorBuilder {
             .collect();
 
         Ok(RuntimeParts {
+            block_store,
             config: self.config,
             engine: Arc::new(Mutex::new(engine)),
             store: Arc::new(Mutex::new(store)),

@@ -46,8 +46,12 @@ fn p1_reject_future_vote_beyond_window() {
     };
     let result = engine.process_vote(vote);
     assert!(result.is_err(), "Far-future vote must be rejected");
-    assert!(engine.needs_catchup.load(std::sync::atomic::Ordering::SeqCst),
-        "Far-future vote must trigger catchup flag");
+    assert!(
+        engine
+            .needs_catchup
+            .load(std::sync::atomic::Ordering::SeqCst),
+        "Far-future vote must trigger catchup flag"
+    );
 }
 
 #[test]
@@ -66,7 +70,10 @@ fn p1_reject_duplicate_voter() {
         commitment: None,
     };
     assert!(engine.process_vote(vote.clone()).is_ok());
-    assert!(engine.process_vote(vote).is_err(), "Duplicate voter must be rejected");
+    assert!(
+        engine.process_vote(vote).is_err(),
+        "Duplicate voter must be rejected"
+    );
 }
 
 #[test]
@@ -95,7 +102,10 @@ fn p1_reject_equivocation() {
         commitment: None,
     };
     assert!(engine.process_vote(vote_a).is_ok());
-    assert!(engine.process_vote(vote_b).is_err(), "Equivocation must be rejected");
+    assert!(
+        engine.process_vote(vote_b).is_err(),
+        "Equivocation must be rejected"
+    );
 }
 
 // ============================================================================
@@ -152,19 +162,24 @@ fn p1_no_qc_without_quorum() {
     engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
 
     // Only 1 vote out of 4 (< 2/3)
-    engine.process_vote(ConsensusVote {
-        voter_id: [1u8; 32], height: 1,
-        block_hash: [0xAA; 32], state_root: [0xBB; 32],
-        approve: true, signature: [0u8; 64], timestamp: 1000,
-        commitment: None,
-    }).unwrap();
+    engine
+        .process_vote(ConsensusVote {
+            voter_id: [1u8; 32],
+            height: 1,
+            block_hash: [0xAA; 32],
+            state_root: [0xBB; 32],
+            approve: true,
+            signature: [0u8; 64],
+            timestamp: 1000,
+            commitment: None,
+        })
+        .unwrap();
 
     let active = engine.active_validator_count();
-    let qc = engine.round_mut(1).unwrap().try_form_qc(
-        active,
-        &std::collections::HashMap::new(),
-        0,
-    );
+    let qc = engine
+        .round_mut(1)
+        .unwrap()
+        .try_form_qc(active, &std::collections::HashMap::new(), 0);
     assert!(qc.is_none(), "QC must not form without 2/3 quorum");
 }
 
@@ -175,19 +190,24 @@ fn p1_qc_forms_with_supermajority() {
     engine.round_mut(1).unwrap().propose([0xAA; 32], [0xBB; 32]);
 
     for id in 1..=3u8 {
-        engine.process_vote(ConsensusVote {
-            voter_id: [id; 32], height: 1,
-            block_hash: [0xAA; 32], state_root: [0xBB; 32],
-            approve: true, signature: [0u8; 64], timestamp: 1000,
-            commitment: None,
-        }).unwrap();
+        engine
+            .process_vote(ConsensusVote {
+                voter_id: [id; 32],
+                height: 1,
+                block_hash: [0xAA; 32],
+                state_root: [0xBB; 32],
+                approve: true,
+                signature: [0u8; 64],
+                timestamp: 1000,
+                commitment: None,
+            })
+            .unwrap();
     }
 
     let active = engine.active_validator_count();
-    let qc = engine.round_mut(1).unwrap().try_form_qc(
-        active,
-        &std::collections::HashMap::new(),
-        0,
-    );
+    let qc = engine
+        .round_mut(1)
+        .unwrap()
+        .try_form_qc(active, &std::collections::HashMap::new(), 0);
     assert!(qc.is_some(), "QC must form with 3/4 > 2/3 quorum");
 }

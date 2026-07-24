@@ -173,7 +173,10 @@ mod canonical_tests {
 
     #[test]
     fn test_account_canonical_deterministic() {
-        let a = Account { balance: 100, nonce: 5 };
+        let a = Account {
+            balance: 100,
+            nonce: 5,
+        };
         let enc1 = a.canonical_encode();
         let enc2 = a.canonical_encode();
         assert_eq!(enc1, enc2);
@@ -181,15 +184,27 @@ mod canonical_tests {
 
     #[test]
     fn test_account_canonical_changes_with_field() {
-        let a1 = Account { balance: 100, nonce: 5 };
-        let a2 = Account { balance: 200, nonce: 5 };
+        let a1 = Account {
+            balance: 100,
+            nonce: 5,
+        };
+        let a2 = Account {
+            balance: 200,
+            nonce: 5,
+        };
         assert_ne!(a1.canonical_encode(), a2.canonical_encode());
     }
 
     #[test]
     fn test_account_canonical_changes_with_nonce() {
-        let a1 = Account { balance: 100, nonce: 0 };
-        let a2 = Account { balance: 100, nonce: 1 };
+        let a1 = Account {
+            balance: 100,
+            nonce: 0,
+        };
+        let a2 = Account {
+            balance: 100,
+            nonce: 1,
+        };
         assert_ne!(a1.canonical_encode(), a2.canonical_encode());
     }
 }

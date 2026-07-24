@@ -22,7 +22,6 @@ pub trait CanonicalDecode: Sized {
     fn canonical_decode(data: &[u8]) -> Result<Self, String>;
 }
 
-
 pub const CANONICAL_CODEC_VERSION: u16 = 1;
 pub const MAX_CANONICAL_ALLOCATION: u64 = 64 * 1024 * 1024; // 64MB constitutional limit
 

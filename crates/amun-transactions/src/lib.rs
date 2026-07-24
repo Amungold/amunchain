@@ -1,5 +1,5 @@
-use blake3::Hasher;
 use amun_canonical_codec::CanonicalEncode;
+use blake3::Hasher;
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use serde::{Deserialize, Serialize};
 
@@ -100,8 +100,13 @@ impl amun_canonical_codec::CanonicalEncode for TransactionReceipt {
         w.write_hash(&self.tx_hash);
         w.write_bool(self.success);
         match self.error_code {
-            Some(code) => { w.write_bool(true); w.write_u32(code); }
-            None => { w.write_bool(false); }
+            Some(code) => {
+                w.write_bool(true);
+                w.write_u32(code);
+            }
+            None => {
+                w.write_bool(false);
+            }
         }
         w.write_hash(&self.sender);
         w.write_u64(self.nonce);

@@ -11,6 +11,9 @@ use amun_sync::protocol::{
     MSG_BLOCK_RANGE_REQUEST, MSG_BLOCK_RANGE_RESPONSE, MSG_TIP_REQUEST, MSG_TIP_RESPONSE,
 };
 
+/// Transaction message type (ADR-030: Load Generator compatibility)
+const MSG_TRANSACTION: u8 = 0x10;
+
 /// NetworkingRuntime owns the TCP listener and handles all incoming P2P messages.
 ///
 /// ADR-023: This is a standalone service. It depends on ConsensusEngine and ChainStore
@@ -24,6 +27,7 @@ pub struct NetworkingRuntime {
     listener: TcpListener,
     engine: Arc<Mutex<ConsensusEngine>>,
     store: Arc<Mutex<ChainStore>>,
+    mempool: Arc<Mutex<amun_mempool::Mempool>>,
     running: Arc<Mutex<bool>>,
 }
 
@@ -32,6 +36,7 @@ impl NetworkingRuntime {
         listen_addr: &str,
         engine: Arc<Mutex<ConsensusEngine>>,
         store: Arc<Mutex<ChainStore>>,
+        mempool: Arc<Mutex<amun_mempool::Mempool>>,
         running: Arc<Mutex<bool>>,
     ) -> Result<Self, String> {
         let listener = TcpListener::bind(listen_addr)
@@ -43,6 +48,7 @@ impl NetworkingRuntime {
             listener,
             engine,
             store,
+            mempool,
             running,
         })
     }
@@ -52,6 +58,7 @@ impl NetworkingRuntime {
         let listener = self.listener.try_clone().expect("Failed to clone listener");
         let engine = self.engine.clone();
         let store = self.store.clone();
+        let mempool = self.mempool.clone();
         let running = self.running.clone();
 
         thread::spawn(move || {
@@ -59,7 +66,7 @@ impl NetworkingRuntime {
                 match listener.accept() {
                     Ok((mut stream, _)) => {
                         let _ = stream.set_nonblocking(false);
-                        Self::handle_connection(&mut stream, &engine, &store);
+                        Self::handle_connection(&mut stream, &engine, &store, &mempool);
                     }
                     Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                         thread::sleep(Duration::from_millis(10));
@@ -77,6 +84,7 @@ impl NetworkingRuntime {
         stream: &mut TcpStream,
         engine: &Arc<Mutex<ConsensusEngine>>,
         store: &Arc<Mutex<ChainStore>>,
+        mempool: &Arc<Mutex<amun_mempool::Mempool>>,
     ) {
         let mut peek_buf = [0u8; 1];
         if stream.peek(&mut peek_buf).is_err() {
@@ -87,6 +95,8 @@ impl NetworkingRuntime {
             Self::handle_tip_request(stream, store);
         } else if peek_buf[0] == MSG_BLOCK_RANGE_REQUEST {
             Self::handle_block_range_request(stream, store);
+        } else if peek_buf[0] == MSG_TRANSACTION {
+            Self::handle_transaction(stream, mempool);
         } else {
             Self::handle_vote(stream, engine);
         }
@@ -136,6 +146,29 @@ impl NetworkingRuntime {
         let _ = stream.write_all(&response);
         let _ = stream.flush();
         eprintln!("SYNC_SERVED: sent {} records", records.len());
+    }
+
+    fn handle_transaction(stream: &mut TcpStream, mempool: &Arc<Mutex<amun_mempool::Mempool>>) {
+        let mut len_buf = [0u8; 4];
+        if stream.read_exact(&mut len_buf).is_err() {
+            return;
+        }
+        let len = u32::from_be_bytes(len_buf) as usize;
+        if len >= 1024 * 1024 {
+            return;
+        }
+        let mut buf = vec![0u8; len];
+        if stream.read_exact(&mut buf).is_err() {
+            return;
+        }
+        // Accept any transaction that can be deserialized
+        // The mempool validates the transaction internally
+        if let Ok(tx) = postcard::from_bytes::<amun_transactions::Transaction>(&buf) {
+            let mut mp = mempool.lock().unwrap();
+            if let Err(e) = mp.add_transaction(tx) {
+                eprintln!("MEMPOOL_REJECT: {}", e);
+            }
+        }
     }
 
     fn handle_vote(stream: &mut TcpStream, engine: &Arc<Mutex<ConsensusEngine>>) {

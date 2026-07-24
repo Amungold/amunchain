@@ -10,12 +10,6 @@ pub struct StoredBlock {
     pub parent_hash: String,
     pub state_root: String,
     pub evidence_root: String,
-    /// Hex-encoded transaction hashes for mempool cleanup
-    #[serde(default)]
-    pub tx_hashes: Vec<String>,
-    /// Number of transactions in this block
-    #[serde(default)]
-    pub transaction_count: u32,
 }
 
 /// Persistent store for block history.
@@ -74,8 +68,6 @@ mod tests {
             parent_hash: format!("parent{}", h.saturating_sub(1)),
             state_root: format!("state{}", h),
             evidence_root: format!("evidence{}", h),
-            tx_hashes: vec![],
-            transaction_count: 0,
         }
     }
 

@@ -4,17 +4,22 @@
 
 use amun_block_builder::{Block, BlockBuilder};
 use amun_mempool::Mempool;
+use amun_merkle;
 use amun_transactions::{Transaction, TransactionPayload, TransferPayload};
 use ed25519_dalek::SigningKey;
-use amun_merkle;
 
 fn make_tx(seed: u8, nonce: u64) -> Transaction {
     let s = [seed; 32];
     let sk = SigningKey::from_bytes(&s);
     let sender = sk.verifying_key().to_bytes();
     let mut tx = Transaction {
-        version: 1, sender, nonce,
-        payload: TransactionPayload::Transfer(TransferPayload { to: [2u8; 32], amount: 100 }),
+        version: 1,
+        sender,
+        nonce,
+        payload: TransactionPayload::Transfer(TransferPayload {
+            to: [2u8; 32],
+            amount: 100,
+        }),
         signature: vec![],
     };
     tx.sign(&sk);
@@ -27,8 +32,15 @@ fn build_block_with_validator_set(vs_root: [u8; 32]) -> Block {
     let tx = make_tx(1, 1);
     mempool.add_transaction(tx.clone()).ok();
     builder.build_block_with_certificates(
-        1, [0u8; 32], &mut mempool, 1, [0u8; 32], 1000, vec![],
-        [0u8; 32], vs_root,
+        1,
+        [0u8; 32],
+        &mut mempool,
+        1,
+        [0u8; 32],
+        1000,
+        vec![],
+        [0u8; 32],
+        vs_root,
     )
 }
 

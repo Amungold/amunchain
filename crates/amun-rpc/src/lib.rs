@@ -2,6 +2,7 @@ pub mod client;
 pub mod faucet;
 pub mod node_provider;
 pub mod types;
+use amun_block_store::BlockStore;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use axum::{
@@ -16,6 +17,7 @@ use std::sync::{Arc, Mutex};
 #[derive(Clone)]
 pub struct AppState {
     pub store: Arc<Mutex<ChainStore>>,
+    pub block_store: Arc<Mutex<BlockStore>>,
     pub engine: Arc<Mutex<ConsensusEngine>>,
     pub mempool: Arc<Mutex<amun_mempool::Mempool>>,
     pub faucet: Arc<Mutex<crate::faucet::FaucetState>>,
@@ -38,6 +40,8 @@ pub struct HeadResponse {
     pub state_root: String,
     pub history_root: String,
     pub timestamp: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transaction_count: Option<u32>,
 }
 
 #[derive(Serialize)]
@@ -47,6 +51,10 @@ pub struct BlockResponse {
     pub state_root: String,
     pub certificate_hash: String,
     pub timestamp: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transaction_count: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transactions: Option<Vec<String>>,
 }
 
 #[derive(Serialize)]
@@ -78,13 +86,25 @@ async fn status(State(state): State<AppState>) -> Json<StatusResponse> {
 async fn head(State(state): State<AppState>) -> Result<Json<HeadResponse>, StatusCode> {
     let store = state.store.lock().unwrap();
     match store.load_tip() {
-        Some(record) => Ok(Json(HeadResponse {
-            height: record.height,
-            block_hash: hex::encode(record.block_hash),
-            state_root: hex::encode(record.state_root),
-            history_root: hex::encode(record.history_root),
-            timestamp: record.timestamp,
-        })),
+        Some(record) => {
+            let transaction_count = state
+                .block_store
+                .lock()
+                .unwrap()
+                .load_height(record.height)
+                .ok()
+                .flatten()
+                .map(|sb| Some(sb.transaction_count))
+                .unwrap_or(None);
+            Ok(Json(HeadResponse {
+                height: record.height,
+                block_hash: hex::encode(record.block_hash),
+                state_root: hex::encode(record.state_root),
+                history_root: hex::encode(record.history_root),
+                timestamp: record.timestamp,
+                transaction_count,
+            }))
+        }
         None => Err(StatusCode::NOT_FOUND),
     }
 }
@@ -95,13 +115,26 @@ async fn block(
 ) -> Result<Json<BlockResponse>, StatusCode> {
     let store = state.store.lock().unwrap();
     match store.load_height(height) {
-        Some(record) => Ok(Json(BlockResponse {
-            height: record.height,
-            block_hash: hex::encode(record.block_hash),
-            state_root: hex::encode(record.state_root),
-            certificate_hash: hex::encode(record.certificate_hash),
-            timestamp: record.timestamp,
-        })),
+        Some(record) => {
+            let (transaction_count, transactions) = state
+                .block_store
+                .lock()
+                .unwrap()
+                .load_height(height)
+                .ok()
+                .flatten()
+                .map(|sb| (Some(sb.transaction_count), Some(sb.tx_hashes)))
+                .unwrap_or((None, None));
+            Ok(Json(BlockResponse {
+                height: record.height,
+                block_hash: hex::encode(record.block_hash),
+                state_root: hex::encode(record.state_root),
+                certificate_hash: hex::encode(record.certificate_hash),
+                timestamp: record.timestamp,
+                transaction_count,
+                transactions,
+            }))
+        }
         None => Err(StatusCode::NOT_FOUND),
     }
 }
@@ -114,13 +147,27 @@ async fn block_range(
     let end = std::cmp::min(to, store.latest_height());
     let start = std::cmp::max(from, 1);
     let blocks: Vec<BlockResponse> = (start..=end)
-        .filter_map(|h| store.load_height(h))
-        .map(|r| BlockResponse {
-            height: r.height,
-            block_hash: hex::encode(r.block_hash),
-            state_root: hex::encode(r.state_root),
-            certificate_hash: hex::encode(r.certificate_hash),
-            timestamp: r.timestamp,
+        .filter_map(|h| {
+            store.load_height(h).map(|r| {
+                let (transaction_count, transactions) = state
+                    .block_store
+                    .lock()
+                    .unwrap()
+                    .load_height(h)
+                    .ok()
+                    .flatten()
+                    .map(|sb| (Some(sb.transaction_count), Some(sb.tx_hashes)))
+                    .unwrap_or((None, None));
+                BlockResponse {
+                    height: r.height,
+                    block_hash: hex::encode(r.block_hash),
+                    state_root: hex::encode(r.state_root),
+                    certificate_hash: hex::encode(r.certificate_hash),
+                    timestamp: r.timestamp,
+                    transaction_count,
+                    transactions,
+                }
+            })
         })
         .collect();
     Json(RangeResponse { blocks })
@@ -248,8 +295,24 @@ async fn faucet_request(
     };
     let tx_hash = hex::encode(tx.tx_hash());
     {
+        
+println!(
+    "RPC node={} mempool Arc={:p}",
+    std::env::var("AMUN_NODE_ID").unwrap_or_else(|_| "unknown".into()),
+    std::sync::Arc::as_ptr(&state.mempool)
+);
+
+
         let mut mp = state.mempool.lock().unwrap();
-        let _ = mp.add_transaction(tx);
+
+        println!("RPC before add = {}", mp.pending_count());
+
+        match mp.add_transaction(tx) {
+            Ok(_) => println!("RPC add_transaction OK"),
+            Err(e) => println!("RPC add_transaction ERR: {:?}", e),
+        }
+
+        println!("RPC after add = {}", mp.pending_count());
     }
 
     // Record

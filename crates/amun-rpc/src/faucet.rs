@@ -149,8 +149,14 @@ async fn handle_faucet_request(
     let tx_hash = tx.tx_hash();
     let tx_hash_hex = hex::encode(tx_hash);
     {
+        println!("FAUCET mempool Arc={:p}", std::sync::Arc::as_ptr(&state.mempool));
         let mut mp = state.mempool.lock().unwrap();
-        let _ = mp.add_transaction(tx);
+        
+match mp.add_transaction(tx) {
+    Ok(_) => eprintln!("add_transaction OK"),
+    Err(e) => eprintln!("add_transaction ERR: {:?}", e),
+}
+eprintln!("after add: {}", mp.pending_count());
     }
 
     // Record the request

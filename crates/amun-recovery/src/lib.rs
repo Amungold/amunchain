@@ -111,6 +111,8 @@ mod tests {
             parent_hash: "block41".into(),
             state_root: "state42".into(),
             evidence_root: "evidence42".into(),
+            tx_hashes: vec![],
+            transaction_count: 0,
         };
 
         let record = ReplayRecord {
@@ -169,6 +171,8 @@ mod tests {
                 parent_hash: format!("block{}", i.saturating_sub(1)),
                 state_root: format!("state{}", i),
                 evidence_root: format!("evidence{}", i),
+                tx_hashes: vec![],
+                transaction_count: 0,
             };
             let record = ReplayRecord {
                 height: i,

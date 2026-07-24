@@ -15,6 +15,7 @@ async fn main() {
     let state = AppState {
         store: validator.store.clone(),
         engine: validator.engine.clone(),
+        block_store: validator.block_store.clone(),
         mempool: validator.mempool.clone(),
         faucet: Arc::new(Mutex::new(amun_rpc::faucet::FaucetState::default())),
         account_store: Arc::new(Mutex::new(amun_accounts::AccountStore::new())),

@@ -49,9 +49,15 @@ pub fn load_and_verify_peer_certificates(
     registry: &AuthorityRegistry,
 ) -> Vec<(amun_networking::peer_identity::PeerId, [u8; 32], [u8; 32])> {
     let mut result = Vec::new();
-    eprintln!("[PHASE3] CERTS: iterating {} peers", config.other_peers().len());
+    eprintln!(
+        "[PHASE3] CERTS: iterating {} peers",
+        config.other_peers().len()
+    );
     for peer in config.other_peers() {
-        eprintln!("[PHASE3] CERTS: peer {} cert_path={:?}", peer.address, peer.certificate_path);
+        eprintln!(
+            "[PHASE3] CERTS: peer {} cert_path={:?}",
+            peer.address, peer.certificate_path
+        );
         eprintln!("[PHASE3] CERTS: resolving cert_path...");
         let cert_path = match &peer.certificate_path {
             Some(p) => p.clone(),
@@ -59,7 +65,11 @@ pub fn load_and_verify_peer_certificates(
                 let port = peer.address.port();
                 let dir = format!("data/vps{}", port - 9000);
                 let auto = std::path::PathBuf::from(&dir).join("certificate.json");
-                if auto.exists() { auto.to_str().unwrap().to_string() } else { continue; }
+                if auto.exists() {
+                    auto.to_str().unwrap().to_string()
+                } else {
+                    continue;
+                }
             }
         };
         let peer_cert = load_peer_certificate(&cert_path);

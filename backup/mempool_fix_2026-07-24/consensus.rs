@@ -6,7 +6,6 @@ use std::time::{Duration, Instant, SystemTime};
 use amun_authority_registry::transaction::GovernanceState;
 use amun_authority_registry::AuthorityRegistry;
 use amun_block_builder::BlockBuilder;
-use amun_block_store::BlockStore;
 use amun_chain_store::store::ChainStore;
 use amun_consensus_network::engine::ConsensusEngine;
 use amun_consensus_network::messages::ConsensusVote;
@@ -26,7 +25,6 @@ use amun_history::compute_history_root;
 pub struct ConsensusRuntime {
     engine: Arc<Mutex<ConsensusEngine>>,
     store: Arc<Mutex<ChainStore>>,
-    block_store: Arc<Mutex<BlockStore>>,
     mempool: Arc<Mutex<Mempool>>,
     builder: Arc<Mutex<BlockBuilder>>,
     governance: Arc<Mutex<GovernanceState>>,
@@ -52,7 +50,6 @@ impl ConsensusRuntime {
     pub fn new(
         engine: Arc<Mutex<ConsensusEngine>>,
         store: Arc<Mutex<ChainStore>>,
-        block_store: Arc<Mutex<BlockStore>>,
         mempool: Arc<Mutex<Mempool>>,
         builder: Arc<Mutex<BlockBuilder>>,
         governance: Arc<Mutex<GovernanceState>>,
@@ -77,7 +74,6 @@ impl ConsensusRuntime {
         Self {
             engine,
             store,
-            block_store,
             mempool,
             builder,
             governance,
@@ -103,7 +99,6 @@ impl ConsensusRuntime {
         let engine = self.engine.clone();
         let store = self.store.clone();
         let mempool = self.mempool.clone();
-        let block_store = self.block_store.clone();
         let builder = self.builder.clone();
         let governance = self.governance.clone();
         let authority_registry = self.authority_registry.clone();
@@ -151,13 +146,7 @@ impl ConsensusRuntime {
                         .is_some()
                 };
 
-                let mut proposed_tx_hashes: Option<Vec<[u8; 32]>> = None;
                 let (block_hash, state_root) = if is_proposer && !already_proposed {
-                    println!("CONSENSUS mempool Arc={:p}", Arc::as_ptr(&mempool));
-                    println!(
-                        "CONSENSUS mempool Arc={:p}",
-                        std::sync::Arc::as_ptr(&mempool)
-                    );
                     let mut mp = mempool.lock().unwrap();
                     let mut bld = builder.lock().unwrap();
                     // ADR-025: parent_hash is the previous block_hash, not history_root
@@ -192,8 +181,6 @@ impl ConsensusRuntime {
                     }
                     let hash = block.block_hash();
                     let root = block.state_root;
-                    proposed_tx_hashes =
-                        Some(block.transactions.iter().map(|tx| tx.tx_hash()).collect());
                     let mut eng = engine.lock().unwrap();
                     eng.start_round(height, validator_id);
                     if let Some(round) = eng.round_mut(height) {
@@ -249,7 +236,7 @@ impl ConsensusRuntime {
                 {
                     let mut eng = engine.lock().unwrap();
                     if !eng.rounds.contains_key(&height) {
-                        eng.start_round(height, validator_id);
+                        eng.start_round(height, [(proposer_idx + 1) as u8; 32]);
                     }
                     let _ = eng.process_vote(my_vote.clone());
                 }
@@ -434,66 +421,6 @@ impl ConsensusRuntime {
 
                         if let Err(e) = store.lock().unwrap().append(record) {
                             eprintln!("STORE ERROR: {}", e);
-                        } else {
-                            // Try to get tx_hashes from proposal, or fall back to BlockStore
-                            let tx_hashes = if let Some(hashes) = proposed_tx_hashes.take() {
-                                // Proposer path: we already have tx_hashes
-                                // Store them in BlockStore for other nodes
-                                let hex_hashes: Vec<String> =
-                                    hashes.iter().map(|h| hex::encode(h)).collect();
-                                let stored_block = amun_block_store::StoredBlock {
-                                    height,
-                                    hash: hex::encode(cert.block_hash),
-                                    parent_hash: hex::encode(
-                                        engine.lock().unwrap().last_finalized_block_hash,
-                                    ),
-                                    state_root: hex::encode(cert.state_root),
-                                    evidence_root: hex::encode(evidence_root),
-                                    tx_hashes: hex_hashes,
-                                    transaction_count: hashes.len() as u32,
-                                };
-                                if let Err(e) = block_store.lock().unwrap().append(&stored_block) {
-                                    eprintln!("BLOCK_STORE ERROR: {}", e);
-                                }
-                                Some(hashes)
-                            } else {
-                                // Non-proposer path: load from BlockStore
-                                match block_store.lock().unwrap().load_height(height) {
-                                    Ok(Some(stored)) => {
-                                        let hashes: Vec<[u8; 32]> = stored
-                                            .tx_hashes
-                                            .iter()
-                                            .filter_map(|h| {
-                                                let mut buf = [0u8; 32];
-                                                if let Ok(bytes) = hex::decode(h) {
-                                                    if bytes.len() == 32 {
-                                                        buf.copy_from_slice(&bytes);
-                                                        return Some(buf);
-                                                    }
-                                                }
-                                                None
-                                            })
-                                            .collect();
-                                        if !hashes.is_empty() {
-                                            Some(hashes)
-                                        } else {
-                                            None
-                                        }
-                                    }
-                                    _ => None,
-                                }
-                            };
-
-                            // Clean mempool if we have tx_hashes
-                            if let Some(hashes) = tx_hashes {
-                                let pending_before = mempool.lock().unwrap().pending_count();
-                                mempool.lock().unwrap().remove_committed(&hashes);
-                                let pending_after = mempool.lock().unwrap().pending_count();
-                                eprintln!(
-                                    "MEMPOOL_CLEANUP node={:?} height={} removed={} pending_before={} after={}",
-                                    validator_id, height, hashes.len(), pending_before, pending_after
-                                );
-                            }
                         }
                     }
 

@@ -43,6 +43,11 @@ impl Mempool {
         self.pending.retain(|tx| !hash_set.contains(&tx.tx_hash()));
     }
 
+    /// Preview transactions without removing them (for block building)
+    pub fn peek_for_block(&self, max: usize) -> Vec<Transaction> {
+        self.pending.iter().take(max).cloned().collect()
+    }
+
     /// Check if the mempool is empty.
     pub fn is_empty(&self) -> bool {
         self.pending.is_empty()

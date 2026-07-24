@@ -59,10 +59,8 @@ impl SparseMerkleTree {
         }
 
         // Collect all leaf hashes at their positions
-        let mut current_level: Vec<([u8; 32], [u8; 32])> = leaves
-            .iter()
-            .map(|(k, v)| (*k, leaf_hash(k, v)))
-            .collect();
+        let mut current_level: Vec<([u8; 32], [u8; 32])> =
+            leaves.iter().map(|(k, v)| (*k, leaf_hash(k, v))).collect();
 
         // Build tree bottom-up, merging adjacent keys
         while current_level.len() > 1 {

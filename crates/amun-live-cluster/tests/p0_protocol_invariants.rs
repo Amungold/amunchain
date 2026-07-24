@@ -83,10 +83,15 @@ fn i1_transaction_mutation_changes_tx_root_and_block_hash() {
     let block1 = build_block(1, parent, vec![tx1.clone()], vec![receipt.clone()]);
     let block2 = build_block(1, parent, vec![tx2.clone()], vec![receipt]);
 
-    assert_ne!(block1.transactions_root, block2.transactions_root,
-        "I1: Different txs must produce different transactions_root");
-    assert_ne!(block1.block_hash(), block2.block_hash(),
-        "I1: Different transactions_root must produce different block_hash");
+    assert_ne!(
+        block1.transactions_root, block2.transactions_root,
+        "I1: Different txs must produce different transactions_root"
+    );
+    assert_ne!(
+        block1.block_hash(),
+        block2.block_hash(),
+        "I1: Different transactions_root must produce different block_hash"
+    );
 }
 
 // ============================================================================
@@ -102,10 +107,15 @@ fn i2_receipt_mutation_changes_receipt_root_and_block_hash() {
     let block1 = build_block(1, parent, vec![tx.clone()], vec![r1]);
     let block2 = build_block(1, parent, vec![tx], vec![r2]);
 
-    assert_ne!(block1.receipts_root, block2.receipts_root,
-        "I2: Different receipts must produce different receipts_root");
-    assert_ne!(block1.block_hash(), block2.block_hash(),
-        "I2: Different receipts_root must produce different block_hash");
+    assert_ne!(
+        block1.receipts_root, block2.receipts_root,
+        "I2: Different receipts must produce different receipts_root"
+    );
+    assert_ne!(
+        block1.block_hash(),
+        block2.block_hash(),
+        "I2: Different receipts_root must produce different block_hash"
+    );
 }
 
 // ============================================================================
@@ -121,10 +131,15 @@ fn i3_state_mutation_changes_state_root_and_block_hash() {
     let mut block2 = build_block(1, parent, vec![tx], vec![receipt]);
     block2.state_root = [1u8; 32]; // Simulate different state
 
-    assert_ne!(block1.state_root, block2.state_root,
-        "I3: Different state must produce different state_root");
-    assert_ne!(block1.block_hash(), block2.block_hash(),
-        "I3: Different state_root must produce different block_hash");
+    assert_ne!(
+        block1.state_root, block2.state_root,
+        "I3: Different state must produce different state_root"
+    );
+    assert_ne!(
+        block1.block_hash(),
+        block2.block_hash(),
+        "I3: Different state_root must produce different block_hash"
+    );
 }
 
 // ============================================================================
@@ -142,8 +157,10 @@ fn i4_block_hash_change_updates_history_root() {
     let hr1 = amun_history::compute_history_root([0u8; 32], block1.block_hash());
     let hr2 = amun_history::compute_history_root([0u8; 32], block2.block_hash());
 
-    assert_ne!(hr1, hr2,
-        "I4: Different block_hash must produce different history_root");
+    assert_ne!(
+        hr1, hr2,
+        "I4: Different block_hash must produce different history_root"
+    );
 }
 
 // ============================================================================
@@ -157,7 +174,12 @@ fn i5_historical_change_propagates_history() {
     // Chain A: block1_a → block2
     let block1_a = build_block(1, [0u8; 32], vec![tx.clone()], vec![receipt.clone()]);
     let hr1_a = amun_history::compute_history_root([0u8; 32], block1_a.block_hash());
-    let block2 = build_block(2, block1_a.block_hash(), vec![tx.clone()], vec![receipt.clone()]);
+    let block2 = build_block(
+        2,
+        block1_a.block_hash(),
+        vec![tx.clone()],
+        vec![receipt.clone()],
+    );
     let hr2_a = amun_history::compute_history_root(hr1_a, block2.block_hash());
 
     // Chain B: block1_b (different tx) → block2
@@ -166,8 +188,10 @@ fn i5_historical_change_propagates_history() {
     let hr1_b = amun_history::compute_history_root([0u8; 32], block1_b.block_hash());
     let hr2_b = amun_history::compute_history_root(hr1_b, block2.block_hash());
 
-    assert_ne!(hr2_a, hr2_b,
-        "I5: Different block1 must change all subsequent history_root values");
+    assert_ne!(
+        hr2_a, hr2_b,
+        "I5: Different block1 must change all subsequent history_root values"
+    );
 }
 
 // ============================================================================
@@ -182,8 +206,11 @@ fn i6_deterministic_block_hash() {
     let block1 = build_block(1, parent, vec![tx.clone()], vec![receipt.clone()]);
     let block2 = build_block(1, parent, vec![tx], vec![receipt]);
 
-    assert_eq!(block1.block_hash(), block2.block_hash(),
-        "I6: Same inputs must produce identical block_hash");
+    assert_eq!(
+        block1.block_hash(),
+        block2.block_hash(),
+        "I6: Same inputs must produce identical block_hash"
+    );
 }
 
 // ============================================================================
@@ -196,8 +223,10 @@ fn i7_only_genesis_has_zero_parent() {
 
     // Genesis (height 1) with zero parent is valid
     let genesis = build_block(1, [0u8; 32], vec![tx.clone()], vec![receipt.clone()]);
-    assert_eq!(genesis.parent_hash, [0u8; 32],
-        "I7: Genesis block must have zero parent_hash");
+    assert_eq!(
+        genesis.parent_hash, [0u8; 32],
+        "I7: Genesis block must have zero parent_hash"
+    );
 
     // Non-genesis with zero parent should still compute (validation is caller's responsibility)
     // The invariant is that only genesis has this property
@@ -205,8 +234,10 @@ fn i7_only_genesis_has_zero_parent() {
     // This block has parent_hash = 0 but height != 1.
     // It would be rejected by consensus, but structurally it's possible.
     // The test verifies the invariant is documentable.
-    assert_eq!(non_genesis.parent_hash, [0u8; 32],
-        "Block 2 with zero parent is structurally possible but invalid per protocol");
+    assert_eq!(
+        non_genesis.parent_hash, [0u8; 32],
+        "Block 2 with zero parent is structurally possible but invalid per protocol"
+    );
 }
 
 // ============================================================================
@@ -225,12 +256,18 @@ fn i8_commitments_are_independent() {
     block2.transactions_root = [1u8; 32];
 
     // receipts_root must NOT change
-    assert_eq!(block1.receipts_root, block2.receipts_root,
-        "I8: Changing transactions_root must not change receipts_root");
+    assert_eq!(
+        block1.receipts_root, block2.receipts_root,
+        "I8: Changing transactions_root must not change receipts_root"
+    );
     // state_root must NOT change
-    assert_eq!(block1.state_root, block2.state_root,
-        "I8: Changing transactions_root must not change state_root");
+    assert_eq!(
+        block1.state_root, block2.state_root,
+        "I8: Changing transactions_root must not change state_root"
+    );
     // slashing_root must NOT change
-    assert_eq!(block1.slashing_root, block2.slashing_root,
-        "I8: Changing transactions_root must not change slashing_root");
+    assert_eq!(
+        block1.slashing_root, block2.slashing_root,
+        "I8: Changing transactions_root must not change slashing_root"
+    );
 }

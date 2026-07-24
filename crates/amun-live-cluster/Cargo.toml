@@ -6,6 +6,7 @@ description = "Live multi-validator cluster running over real TCP"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
+amun-block-store = { path = "../amun-block-store" }
 amun-replay-verifier = { path = "../amun-replay-verifier" }
 amun-constitutional-enforcement = { path = "../amun-constitutional-enforcement" }
 amun-accounts = { path = "../amun-accounts" }
@@ -26,6 +27,8 @@ hex = "0.4.3"
 amun-validator-identity = { path = "../amun-validator-identity" }
 amun-history = { path = "../amun-history" }
 amun-merkle = { path = "../amun-merkle" }
+amun-mempool-gossip = { path = "../amun-mempool-gossip" }
+amun-transactions = { path = "../amun-transactions" }
 ed25519-dalek = { version = "2", features = ["rand_core"] }
 rand = "0.8"
 amun-networking = { path = "../amun-networking" }
@@ -48,5 +51,5 @@ path = "src/bin/rpc_server.rs"
 
 [dev-dependencies]
 amun-canonical-codec = { path = "../amun-canonical-codec" }
-amun-transactions = { path = "../amun-transactions" }
 amun-merkle = { path = "../amun-merkle" }
+amun-mempool-gossip = { path = "../amun-mempool-gossip" }
