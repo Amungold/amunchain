@@ -49,16 +49,13 @@ enum NetworkMessage {
 // ============================================================================
 
 fn make_test_proposal(height: u64, parent: [u8; 32]) -> BlockProposal {
-    let mut hasher = blake3::Hasher::new();
-    hasher.update(b"TEST_BLOCK_V1");
-    hasher.update(&height.to_le_bytes());
-    hasher.update(&parent);
-    let block_bytes = hasher.finalize().as_bytes().to_vec();
-    let block_hash: [u8; 32] = blake3::hash(&block_bytes).into();
-    let mut state_hasher = blake3::Hasher::new();
-    state_hasher.update(b"STATE_V1");
-    state_hasher.update(&height.to_le_bytes());
-    let state_root: [u8; 32] = state_hasher.finalize().into();
+    // R2.2: Use a real Block for canonical hash compatibility
+    let mut builder = amun_block_builder::BlockBuilder::new();
+    let mut mempool = amun_mempool::Mempool::new();
+    let block = builder.build_block(height, parent, &mut mempool, 0, [1u8; 32], 1000 * height);
+    let block_hash = block.block_hash();
+    let state_root = block.state_root;
+    let block_bytes = postcard::to_stdvec(&block).unwrap();
     BlockProposal {
         proposer_id: [1u8; 32],
         height,
@@ -68,6 +65,12 @@ fn make_test_proposal(height: u64, parent: [u8; 32]) -> BlockProposal {
         state_root,
         block_bytes,
     }
+}
+
+fn canonical_hash_fn(bytes: &[u8]) -> Result<[u8; 32], String> {
+    let block: amun_block_builder::Block = postcard::from_bytes(bytes)
+        .map_err(|e| format!("Deserialize: {}", e))?;
+    Ok(block.block_hash())
 }
 
 fn validate_basic_testable(
@@ -92,7 +95,7 @@ fn validate_basic_testable(
     if p.timestamp < now_secs.saturating_sub(60) {
         return Err("TIMESTAMP_PAST".into());
     }
-    let computed: [u8; 32] = blake3::hash(&p.block_bytes).into();
+    let computed = canonical_hash_fn(&p.block_bytes)?;
     if computed != p.block_hash {
         return Err(format!(
             "HASH_INTEGRITY: stated={} computed={}",
@@ -126,10 +129,12 @@ fn n109_proposal_roundtrip() {
 #[test]
 fn n109_block_hash_matches_serialized_block() {
     let proposal = make_test_proposal(42, [0xAB; 32]);
-    let computed: [u8; 32] = blake3::hash(&proposal.block_bytes).into();
+    // R2.2: Use canonical hash via Block::block_hash()
+    let block: amun_block_builder::Block = postcard::from_bytes(&proposal.block_bytes).unwrap();
+    let computed = block.block_hash();
     assert_eq!(
         proposal.block_hash, computed,
-        "GATEKEEPER: block_hash != blake3(block_bytes)"
+        "GATEKEEPER: block_hash != canonical Block::block_hash()"
     );
 }
 
@@ -306,9 +311,11 @@ fn n109_validate_basic_rejects_hash_mismatch() {
     p.block_bytes = vec![0xFF; 100];
     let result = validate_basic_testable(&p, 0, &[0u8; 32], 1000);
     assert!(result.is_err(), "N109.6 FAIL: should reject hash mismatch");
+    let err = result.unwrap_err();
     assert!(
-        result.unwrap_err().contains("HASH_INTEGRITY"),
-        "error must mention HASH_INTEGRITY"
+        err.contains("HASH_INTEGRITY") || err.contains("Deserialize"),
+        "error must mention HASH_INTEGRITY or Deserialize, got: {}",
+        err
     );
 }
 

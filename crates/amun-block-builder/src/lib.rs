@@ -53,7 +53,7 @@ pub struct Block {
     /// N110.4: Slashing certificates included in this block
     /// N110.4: Slashing certificates included in this block (serialized internally).
     #[serde(with = "serde_bytes_vec")]
-    slashing_certificates: Vec<Vec<u8>>,
+    pub(crate) slashing_certificates: Vec<Vec<u8>>,
     /// N120.2: Merkle root of the slashing ledger after this block
     pub slashing_root: [u8; 32],
     /// P2: Merkle root of constitutional evidence.
@@ -346,3 +346,100 @@ mod tests {
         assert_ne!(block1.block_hash(), block2.block_hash());
     }
 }
+
+#[cfg(test)]
+mod r2_2_canonical_hash_tests {
+    use super::*;
+    use super::*;
+    use amun_consensus_network::messages::N109BlockProposal;
+
+    /// Helper: build a minimal block and create an N109BlockProposal from it.
+    fn build_test_proposal() -> (Block, N109BlockProposal) {
+        let mut builder = BlockBuilder::new();
+        let mut mempool = Mempool::new();
+        let block = builder.build_block(
+            1,
+            [0u8; 32],
+            &mut mempool,
+            0,
+            [0xAA; 32],
+            1000,
+        );
+        let block_bytes = postcard::to_stdvec(&block).unwrap();
+        let block_hash = block.block_hash();
+        let proposal = N109BlockProposal {
+            proposer_id: [0xAA; 32],
+            height: 1,
+            timestamp: 1000,
+            block_hash,
+            parent_root: [0u8; 32],
+            state_root: block.state_root,
+            block_bytes,
+        };
+        (block, proposal)
+    }
+
+    /// Canonical hash function for validation.
+    fn canonical_hash_fn(bytes: &[u8]) -> Result<[u8; 32], String> {
+        let block: super::Block = postcard::from_bytes(bytes)
+            .map_err(|e| format!("Deserialize: {}", e))?;
+        Ok(block.block_hash())
+    }
+
+    #[test]
+    fn r2_2_valid_proposal_passes_validation() {
+        let (_block, proposal) = build_test_proposal();
+        let result = proposal.validate_basic(0, &[0u8; 32], 1000, canonical_hash_fn);
+        assert!(result.is_ok(), "Valid proposal should pass: {:?}", result);
+    }
+
+    #[test]
+    fn r2_2_tampered_block_bytes_rejected() {
+        let (_block, mut proposal) = build_test_proposal();
+        // Tamper with block_bytes
+        proposal.block_bytes[0] ^= 0xFF;
+        let result = proposal.validate_basic(0, &[0u8; 32], 1000, canonical_hash_fn);
+        assert!(result.is_err(), "Tampered bytes should be rejected");
+        let err = result.unwrap_err();
+        assert!(
+            err.contains("HASH_INTEGRITY") || err.contains("Deserialize"),
+            "Expected HASH_INTEGRITY or Deserialize error, got: {}",
+            err
+        );
+    }
+
+    #[test]
+    fn r2_2_tampered_block_hash_rejected() {
+        let (_block, mut proposal) = build_test_proposal();
+        proposal.block_hash[0] ^= 0xFF;
+        let result = proposal.validate_basic(0, &[0u8; 32], 1000, canonical_hash_fn);
+        assert!(result.is_err(), "Tampered hash should be rejected");
+    }
+
+    #[test]
+    fn r2_2_wrong_height_rejected() {
+        let (_block, proposal) = build_test_proposal();
+        let result = proposal.validate_basic(5, &[0u8; 32], 1000, canonical_hash_fn);
+        assert!(result.is_err(), "Wrong height should be rejected");
+        assert!(result.unwrap_err().contains("HEIGHT"));
+    }
+
+    #[test]
+    fn r2_2_wrong_parent_rejected() {
+        let (_block, proposal) = build_test_proposal();
+        let result = proposal.validate_basic(0, &[0xFF; 32], 1000, canonical_hash_fn);
+        assert!(result.is_err(), "Wrong parent should be rejected");
+        assert!(result.unwrap_err().contains("PARENT"));
+    }
+
+    #[test]
+    fn r2_2_roundtrip_serialize_deserialize_hash() {
+        let (block, proposal) = build_test_proposal();
+        // Deserialize from proposal
+        let deserialized: Block = postcard::from_bytes(&proposal.block_bytes).unwrap();
+        // Hash must match
+        assert_eq!(deserialized.block_hash(), proposal.block_hash);
+        assert_eq!(deserialized.block_hash(), block.block_hash());
+    }
+}
+
