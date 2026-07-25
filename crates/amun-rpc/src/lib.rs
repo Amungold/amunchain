@@ -14,6 +14,31 @@ use axum::{
 use serde::Serialize;
 use std::sync::{Arc, Mutex};
 
+use std::io::Write;
+use std::net::TcpStream;
+
+const MSG_TRANSACTION: u8 = 0x10;
+
+fn broadcast_transaction(tx: &amun_transactions::Transaction, peers: &[std::net::SocketAddr]) {
+    let tx_bytes = postcard::to_stdvec(tx).unwrap_or_default();
+    let tx_len = tx_bytes.len() as u32;
+    for peer in peers {
+        for _retry in 0..3 {
+            if let Ok(mut stream) = TcpStream::connect(peer) {
+                let _ = stream.set_nonblocking(false);
+                let _ = stream.write_all(&[MSG_TRANSACTION]);
+                let _ = stream.write_all(&tx_len.to_be_bytes());
+                let _ = stream.write_all(&tx_bytes);
+                let _ = stream.flush();
+                eprintln!("BROADCAST_OK to {}", peer);
+                break;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+        eprintln!("BROADCAST_FAIL to {} after 3 retries", peer);
+    }
+}
+
 #[derive(Clone)]
 pub struct AppState {
     pub store: Arc<Mutex<ChainStore>>,
@@ -22,6 +47,7 @@ pub struct AppState {
     pub mempool: Arc<Mutex<amun_mempool::Mempool>>,
     pub faucet: Arc<Mutex<crate::faucet::FaucetState>>,
     pub account_store: Arc<Mutex<amun_accounts::AccountStore>>,
+    pub peers: Vec<std::net::SocketAddr>,
 }
 
 #[derive(Serialize)]
@@ -211,8 +237,9 @@ async fn submit_tx(
         .mempool
         .lock()
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    mp.add_transaction(tx)
+    mp.add_transaction(tx.clone())
         .map_err(|_| StatusCode::BAD_REQUEST)?;
+    broadcast_transaction(&tx, &state.peers);
 
     Ok(Json(serde_json::json!({
         "hash": hex::encode(hash),
@@ -295,20 +322,25 @@ async fn faucet_request(
     };
     let tx_hash = hex::encode(tx.tx_hash());
     {
-        
-println!(
-    "RPC node={} mempool Arc={:p}",
-    std::env::var("AMUN_NODE_ID").unwrap_or_else(|_| "unknown".into()),
-    std::sync::Arc::as_ptr(&state.mempool)
-);
-
+        println!(
+            "RPC node={} mempool Arc={:p}",
+            std::env::var("AMUN_NODE_ID").unwrap_or_else(|_| "unknown".into()),
+            std::sync::Arc::as_ptr(&state.mempool)
+        );
 
         let mut mp = state.mempool.lock().unwrap();
 
+        println!("RPC peers = {:?}", state.peers);
+
         println!("RPC before add = {}", mp.pending_count());
 
+        let tx_clone = tx.clone();
+
         match mp.add_transaction(tx) {
-            Ok(_) => println!("RPC add_transaction OK"),
+            Ok(_) => {
+                println!("RPC add_transaction OK");
+                broadcast_transaction(&tx_clone, &state.peers);
+            }
             Err(e) => println!("RPC add_transaction ERR: {:?}", e),
         }
 

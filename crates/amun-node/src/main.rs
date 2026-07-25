@@ -3,78 +3,11 @@ mod peer_registry;
 
 use amun_live_cluster::config::ValidatorConfig;
 use amun_live_cluster::validator::LiveValidator;
-use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
-use std::sync::Arc;
-use std::thread;
-
-fn handle_client(mut stream: TcpStream, validator: &LiveValidator) {
-    let mut buf = [0u8; 4096];
-    let _ = stream.read(&mut buf);
-    let request = String::from_utf8_lossy(&buf);
-
-    let (status_code, json) = if request.contains("GET /head") {
-        let store = validator.store.lock().unwrap();
-        match store.load_tip() {
-            Some(r) => (
-                200,
-                serde_json::json!({
-                    "height": r.height,
-                    "block_hash": hex::encode(r.block_hash),
-                    "state_root": hex::encode(r.state_root),
-                    "history_root": hex::encode(r.history_root),
-                    "timestamp": r.timestamp
-                })
-                .to_string(),
-            ),
-            None => (404, r#"{"error":"No blocks"}"#.to_string()),
-        }
-    } else if request.contains("GET /block/") {
-        let height: u64 = request
-            .split("/block/")
-            .nth(1)
-            .and_then(|s| s.split_whitespace().next())
-            .and_then(|s| s.parse().ok())
-            .unwrap_or(0);
-        let store = validator.store.lock().unwrap();
-        match store.load_height(height) {
-            Some(r) => (
-                200,
-                serde_json::json!({
-                    "height": r.height,
-                    "block_hash": hex::encode(r.block_hash),
-                    "state_root": hex::encode(r.state_root),
-                    "certificate_hash": hex::encode(r.certificate_hash),
-                    "timestamp": r.timestamp
-                })
-                .to_string(),
-            ),
-            None => (404, format!(r#"{{"error":"Block {} not found"}}"#, height)),
-        }
-    } else {
-        let h = validator.current_height();
-        let engine = validator.engine.lock().unwrap();
-        let json = serde_json::json!({
-            "height": h,
-            "qcs_formed": engine.metrics.qcs_formed,
-            "blocks_finalized": engine.metrics.blocks_finalized,
-            "votes_received": engine.metrics.votes_received,
-            "peer_count": engine.total_validators
-        })
-        .to_string();
-        (200, json)
-    };
-
-    let response = format!(
-        "HTTP/1.1 {} OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
-        status_code, json.len(), json
-    );
-    let _ = stream.write_all(response.as_bytes());
-    let _ = stream.flush();
-}
+use amun_rpc::{serve, AppState};
+use std::sync::{Arc, Mutex};
 
 fn main() {
-    println!("AmunChain Node v0.1 (ADR-022 + Full RPC)");
+    println!("AmunChain Node v0.2 (Unified RPC)");
 
     let config_path = std::env::args()
         .nth(1)
@@ -88,33 +21,36 @@ fn main() {
         cluster: amun_config
             .peer_addresses
             .iter()
+            .copied()
             .map(|addr| amun_live_cluster::config::ClusterPeer {
                 validator_id: [0u8; 32],
-                certificate_path: None, // ADR-030: auto-discovered from genesis
-                address: *addr,
+                certificate_path: None,
+                address: addr,
             })
             .collect(),
         data_dir: amun_config.data_dir.to_str().unwrap().to_string(),
         quorum_size: Some(amun_config.quorum_size),
-        authority_public_key: [0u8; 32], // ADR-030: loaded from genesis
+        authority_public_key: [0u8; 32],
     };
 
     let validator = Arc::new(LiveValidator::new(vconfig));
     validator.start().expect("Failed to start validator");
     println!("Validator started. Height: {}", validator.current_height());
 
-    let rpc_validator = validator.clone();
-    let rpc_port = amun_config.listen_addr.port() + 70;
-    thread::spawn(move || {
-        let listener = TcpListener::bind(format!("0.0.0.0:{}", rpc_port)).unwrap();
-        println!("Full RPC on 0.0.0.0:{}", rpc_port);
-        for stream in listener.incoming().flatten() {
-            handle_client(stream, &rpc_validator);
-        }
-    });
+    let gossip_peers: Vec<std::net::SocketAddr> = amun_config.peer_addresses.to_vec();
 
-    println!("Node ready.");
-    loop {
-        thread::sleep(std::time::Duration::from_secs(10));
-    }
+    let state = AppState {
+        store: validator.store.clone(),
+        block_store: validator.block_store.clone(),
+        engine: validator.engine.clone(),
+        mempool: validator.mempool.clone(),
+        faucet: Arc::new(Mutex::new(amun_rpc::faucet::FaucetState::default())),
+        account_store: Arc::new(Mutex::new(amun_accounts::AccountStore::new())),
+        peers: gossip_peers,
+    };
+
+    let rpc_port = amun_config.listen_addr.port() + 70;
+    let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
+    println!("Unified RPC on 0.0.0.0:{}", rpc_port);
+    rt.block_on(serve(state, rpc_port));
 }

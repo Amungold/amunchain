@@ -45,6 +45,12 @@ impl ConsensusRound {
     /// Add a validator's vote. Rejects duplicate voters.
     pub fn add_vote(&mut self, vote: ConsensusVote) -> Result<(), String> {
         if self.proposed_block_hash.is_none() {
+            eprintln!(
+                "ADD_VOTE_SETS_PROPOSAL height={} voter={:?} hash={:?}",
+                vote.height,
+                &vote.voter_id[..4],
+                &vote.block_hash[..4]
+            );
             self.proposed_block_hash = Some(vote.block_hash);
             self.proposed_state_root = Some(vote.state_root);
         }
@@ -486,7 +492,7 @@ impl ConsensusEngine {
         let base = ((height - 1) as usize) % self.total_validators;
         let mut idx = base;
         for _ in 0..self.total_validators {
-            let validator_id = [(idx + 1) as u8; 32];
+            let validator_id = [idx as u8; 32];
             if !self.is_suspended(&validator_id) {
                 return idx;
             }

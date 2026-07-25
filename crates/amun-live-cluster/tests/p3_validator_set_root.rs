@@ -4,7 +4,6 @@
 
 use amun_block_builder::{Block, BlockBuilder};
 use amun_mempool::Mempool;
-use amun_merkle;
 use amun_transactions::{Transaction, TransactionPayload, TransferPayload};
 use ed25519_dalek::SigningKey;
 

@@ -6,10 +6,11 @@ edition = "2021"
 description = "Live RPC server for AmunChain validators"
 
 [dependencies]
+postcard = "1"
 amun-block-store = { path = "../amun-block-store" }
 amun-wallet-management = { path = "../amun-wallet-management" }
 amun-accounts = { path = "../amun-accounts" }
-reqwest = { version = "0.12", features = ["blocking", "json"] }
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 amun-chain-store = { path = "../amun-chain-store" }
 amun-mempool = { path = "../amun-mempool" }
 amun-consensus-network = { path = "../amun-consensus-network" }

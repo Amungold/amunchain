@@ -152,7 +152,11 @@ impl BlockBuilder {
         evidence_root: [u8; 32],
         validator_set_root: [u8; 32],
     ) -> Block {
-        eprintln!("BUILD_BLOCK: height={} pending={}", height, mempool.pending_count());
+        eprintln!(
+            "BUILD_BLOCK: height={} pending={}",
+            height,
+            mempool.pending_count()
+        );
         let transactions = mempool.peek_for_block(max_txs);
         eprintln!("BUILD_BLOCK: selected={}", transactions.len());
         let receipts = self.engine.execute_block(&transactions);

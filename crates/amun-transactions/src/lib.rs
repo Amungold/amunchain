@@ -38,6 +38,31 @@ pub struct Transaction {
 }
 
 impl Transaction {
+    /// Stateless validation that does not depend on chain state.
+    /// Checks version, payload validity, and signature.
+    pub fn validate(&self) -> Result<(), &'static str> {
+        // Version check: only version 1 is supported
+        if self.version != 1 {
+            return Err("Unsupported transaction version");
+        }
+        
+        // Validate payload-specific constraints
+        match &self.payload {
+            TransactionPayload::Transfer(transfer) => {
+                if transfer.amount == 0 {
+                    return Err("Transfer amount must be greater than zero");
+                }
+            }
+            // Future payload types will have their own validation here
+        }
+        
+        // Verify cryptographic signature
+        if !self.verify() {
+            return Err("Invalid transaction signature");
+        }
+        
+        Ok(())
+    }
     pub fn tx_hash(&self) -> [u8; 32] {
         let mut hasher = Hasher::new();
         hasher.update(b"AMUN_TX_V1");

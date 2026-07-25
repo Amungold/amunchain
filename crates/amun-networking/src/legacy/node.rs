@@ -1,5 +1,5 @@
 use crate::envelope::Envelope;
-use crate::transport::MockTransport;
+use crate::legacy::transport::MockTransport;
 use amun_consensus::action::ConsensusAction;
 use amun_consensus::pacemaker::{FixedMultiplier, Pacemaker, PacemakerConfig};
 use amun_consensus::round_state_machine::RoundStateMachine;

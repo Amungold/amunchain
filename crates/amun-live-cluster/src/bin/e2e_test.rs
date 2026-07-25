@@ -19,6 +19,7 @@ async fn main() {
         mempool: validator.mempool.clone(),
         faucet: Arc::new(Mutex::new(amun_rpc::faucet::FaucetState::default())),
         account_store: Arc::new(Mutex::new(amun_accounts::AccountStore::new())),
+        peers: vec![],
     };
     tokio::spawn(async move { serve(state, 9070).await });
 

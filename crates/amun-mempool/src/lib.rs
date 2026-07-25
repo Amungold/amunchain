@@ -1,27 +1,52 @@
 use amun_transactions::Transaction;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// A constitutional mempool that holds pending transactions before block inclusion.
 #[derive(Debug, Clone, Default)]
 pub struct Mempool {
     /// Transactions ordered by insertion time.
     pending: Vec<Transaction>,
-    /// Tracks the latest nonce per sender for deduplication.
+    /// Tracks the highest nonce seen per sender to prevent replay.
+    /// This is a mempool-level index only: it resets on restart
+    /// and is cleaned up when transactions are committed.
+    /// Chain-level nonce validation should happen in block execution.
     nonce_index: HashMap<[u8; 32], u64>,
+    /// Prevents duplicate transaction hashes.
+    hash_index: HashSet<[u8; 32]>,
 }
+
+/// Maximum number of transactions allowed in the mempool.
+const MAX_MEMPOOL_TXS: usize = 10_000;
 
 impl Mempool {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            pending: Vec::new(),
+            nonce_index: HashMap::new(),
+            hash_index: HashSet::new(),
+        }
     }
 
     /// Add a transaction to the mempool. Rejects if nonce is not greater than the last seen.
     pub fn add_transaction(&mut self, tx: Transaction) -> Result<(), &'static str> {
+        let tx_hash = tx.tx_hash();
+
+        // Check for duplicate transaction hash
+        if self.hash_index.contains(&tx_hash) {
+            return Err("Transaction already in mempool");
+        }
+
+        // Check mempool size limit
+        if self.pending.len() >= MAX_MEMPOOL_TXS {
+            return Err("Mempool is full");
+        }
+
         let current_nonce = self.nonce_index.get(&tx.sender).copied().unwrap_or(0);
         if tx.nonce <= current_nonce {
             return Err("Transaction nonce too low");
         }
         self.nonce_index.insert(tx.sender, tx.nonce);
+        self.hash_index.insert(tx_hash);
         self.pending.push(tx);
         Ok(())
     }
@@ -41,6 +66,16 @@ impl Mempool {
     pub fn remove_committed(&mut self, tx_hashes: &[[u8; 32]]) {
         let hash_set: std::collections::HashSet<[u8; 32]> = tx_hashes.iter().copied().collect();
         self.pending.retain(|tx| !hash_set.contains(&tx.tx_hash()));
+        // Clean up hash index for removed transactions
+        self.hash_index.retain(|h| !hash_set.contains(h));
+        // Rebuild nonce_index from remaining transactions.
+        // Committed nonces are intentionally removed from the mempool index.
+        // Chain-level nonce enforcement during block execution prevents replay
+        // of committed transactions across restarts.
+        self.nonce_index.clear();
+        for tx in &self.pending {
+            self.nonce_index.insert(tx.sender, tx.nonce);
+        }
     }
 
     /// Preview transactions without removing them (for block building)

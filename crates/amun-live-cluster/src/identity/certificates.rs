@@ -38,7 +38,7 @@ pub fn load_peer_certificate(path: &str) -> ValidatorCertificate {
 pub fn verify_peer_certificate(
     cert: &ValidatorCertificate,
     registry: &AuthorityRegistry,
-    path: &str,
+    _path: &str,
 ) -> bool {
     registry.verify_certificate_at(cert, 0)
 }

@@ -149,11 +149,14 @@ impl NetworkingRuntime {
     }
 
     fn handle_transaction(stream: &mut TcpStream, mempool: &Arc<Mutex<amun_mempool::Mempool>>) {
+        let _ = stream.read_exact(&mut [0u8; 1]);
+
         let mut len_buf = [0u8; 4];
         if stream.read_exact(&mut len_buf).is_err() {
             return;
         }
         let len = u32::from_be_bytes(len_buf) as usize;
+        eprintln!("TX_RX len={}", len);
         if len >= 1024 * 1024 {
             return;
         }
@@ -164,9 +167,15 @@ impl NetworkingRuntime {
         // Accept any transaction that can be deserialized
         // The mempool validates the transaction internally
         if let Ok(tx) = postcard::from_bytes::<amun_transactions::Transaction>(&buf) {
+            if !tx.verify() {
+                eprintln!("TX_VERIFY_FAILED");
+                return;
+            }
+            eprintln!("TX_VERIFY_OK");
             let mut mp = mempool.lock().unwrap();
-            if let Err(e) = mp.add_transaction(tx) {
-                eprintln!("MEMPOOL_REJECT: {}", e);
+            match mp.add_transaction(tx) {
+                Ok(_) => eprintln!("MEMPOOL_ADD_OK count={}", mp.pending_count()),
+                Err(e) => eprintln!("MEMPOOL_REJECT: {}", e),
             }
         }
     }

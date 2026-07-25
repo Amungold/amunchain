@@ -1,5 +1,3 @@
-use amun_merkle;
-
 #[test]
 fn fuzz_merkle_power_of_two_sizes() {
     for n in [0, 1, 2, 4, 8, 16, 32, 64] {

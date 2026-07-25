@@ -440,7 +440,7 @@ impl ConsensusRuntime {
                                 // Proposer path: we already have tx_hashes
                                 // Store them in BlockStore for other nodes
                                 let hex_hashes: Vec<String> =
-                                    hashes.iter().map(|h| hex::encode(h)).collect();
+                                    hashes.iter().map(hex::encode).collect();
                                 let stored_block = amun_block_store::StoredBlock {
                                     height,
                                     hash: hex::encode(cert.block_hash),

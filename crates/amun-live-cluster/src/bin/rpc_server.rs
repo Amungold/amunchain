@@ -30,6 +30,7 @@ async fn main() {
         mempool: validator.mempool.clone(),
         faucet: Arc::new(Mutex::new(amun_rpc::faucet::FaucetState::default())),
         account_store: Arc::new(Mutex::new(amun_accounts::AccountStore::new())),
+        peers: vec![],
     };
 
     eprintln!("RPC server on port {}", rpc_port);
