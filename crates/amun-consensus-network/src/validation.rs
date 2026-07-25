@@ -1,6 +1,5 @@
 // N109.6: Basic proposal validation
 use crate::messages::N109BlockProposal;
-
 impl N109BlockProposal {
     pub fn validate_basic(
         &self,

@@ -1,43 +1,13 @@
 use amun_accounts::AccountStore;
+use amun_consensus_network::SlashingCertificate;
 use amun_execution::ExecutionEngine;
 use amun_mempool::Mempool;
 use amun_merkle::{receipts_root, transactions_root};
 use amun_transactions::{Transaction, TransactionReceipt};
-use serde::{Serialize, Deserialize};
-
-/// Serde module for Vec<Vec<u8>> serialization.
-mod serde_bytes_vec {
-    pub fn serialize<S: serde::Serializer>(v: &Vec<Vec<u8>>, s: S) -> Result<S::Ok, S::Error> {
-        use serde::ser::SerializeSeq;
-        let mut seq = s.serialize_seq(Some(v.len()))?;
-        for bytes in v {
-            seq.serialize_element(&serde_bytes::Bytes::new(bytes))?;
-        }
-        seq.end()
-    }
-    
-    pub fn deserialize<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Vec<Vec<u8>>, D::Error> {
-        struct VecVecU8Visitor;
-        impl<'de> serde::de::Visitor<'de> for VecVecU8Visitor {
-            type Value = Vec<Vec<u8>>;
-            fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-                write!(f, "a sequence of byte arrays")
-            }
-            fn visit_seq<A: serde::de::SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
-                let mut v = Vec::new();
-                while let Some(bytes) = seq.next_element::<serde_bytes::ByteBuf>()? {
-                    v.push(bytes.to_vec());
-                }
-                Ok(v)
-            }
-        }
-        d.deserialize_seq(VecVecU8Visitor)
-    }
-}
 use blake3::Hasher;
 
 /// A constitutional block containing transactions and their execution results.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Block {
     pub height: u64,
     pub parent_hash: [u8; 32],
@@ -51,9 +21,7 @@ pub struct Block {
     pub proposer: [u8; 32],
     pub timestamp: u64,
     /// N110.4: Slashing certificates included in this block
-    /// N110.4: Slashing certificates included in this block (serialized internally).
-    #[serde(with = "serde_bytes_vec")]
-    slashing_certificates: Vec<Vec<u8>>,
+    pub slashing_certificates: Vec<amun_consensus_network::SlashingCertificate>,
     /// N120.2: Merkle root of the slashing ledger after this block
     pub slashing_root: [u8; 32],
     /// P2: Merkle root of constitutional evidence.
@@ -63,46 +31,19 @@ pub struct Block {
 }
 
 impl Block {
-    /// Add a slashing certificate to the block.
-    pub fn add_slashing_certificate(
-        &mut self,
-        cert: &amun_consensus_network::SlashingCertificate,
-    ) -> Result<(), String> {
-        let bytes = postcard::to_stdvec(cert)
-            .map_err(|e| format!("Failed to serialize certificate: {}", e))?;
-        self.slashing_certificates.push(bytes);
-        Ok(())
-    }
-
-    /// Return an iterator over deserialized slashing certificates.
-    pub fn slashing_certificates(
-        &self,
-    ) -> impl Iterator<Item = Result<amun_consensus_network::SlashingCertificate, String>> + '_ {
-        self.slashing_certificates.iter().map(|bytes| {
-            postcard::from_bytes(bytes)
-                .map_err(|e| format!("Failed to deserialize certificate: {}", e))
-        })
-    }
-
-    /// Return the count of slashing certificates.
-    pub fn slashing_certificate_count(&self) -> usize {
-        self.slashing_certificates.len()
-    }
     /// N110.4b: Verify all slashing certificates in this block.
     pub fn verify_slashing_certificates(&self) -> Result<(), String> {
         const MAX_CERTS_PER_BLOCK: usize = 10;
 
-        let count = self.slashing_certificate_count();
-        if count > MAX_CERTS_PER_BLOCK {
+        if self.slashing_certificates.len() > MAX_CERTS_PER_BLOCK {
             return Err(format!(
                 "Too many slashing certificates ({} > {})",
-                count,
+                self.slashing_certificates.len(),
                 MAX_CERTS_PER_BLOCK
             ));
         }
 
-        for (i, cert_result) in self.slashing_certificates().enumerate() {
-            let cert = cert_result.map_err(|e| format!("Certificate {} deserialize: {}", i, e))?;
+        for (i, cert) in self.slashing_certificates.iter().enumerate() {
             cert.verify()
                 .map_err(|e| format!("Certificate {} invalid: {}", i, e))?;
 
@@ -147,10 +88,8 @@ impl Block {
             hasher.update(&tx.tx_hash());
         }
         // N110.4: Include slashing certificates in block hash
-        for cert_result in self.slashing_certificates() {
-            if let Ok(cert) = cert_result {
-                hasher.update(&cert.certificate_hash);
-            }
+        for cert in &self.slashing_certificates {
+            hasher.update(&cert.certificate_hash);
         }
         // N120.2: Include slashing root in block hash
         hasher.update(&self.slashing_root);
@@ -209,7 +148,7 @@ impl BlockBuilder {
         max_txs: usize,
         proposer: [u8; 32],
         timestamp: u64,
-        slashing_certificates: Vec<amun_consensus_network::SlashingCertificate>,
+        slashing_certificates: Vec<SlashingCertificate>,
         evidence_root: [u8; 32],
         validator_set_root: [u8; 32],
     ) -> Block {
@@ -229,10 +168,6 @@ impl BlockBuilder {
         let receipt_hashes: Vec<[u8; 32]> = receipts.iter().map(|r| r.receipt_hash()).collect();
         let rec_root = receipts_root(&receipt_hashes);
 
-        let serialized_certs: Vec<Vec<u8>> = slashing_certificates
-            .iter()
-            .map(|c| postcard::to_stdvec(c).unwrap_or_default())
-            .collect();
         Block {
             height,
             parent_hash,
@@ -243,7 +178,7 @@ impl BlockBuilder {
             receipts_root: rec_root,
             proposer,
             timestamp,
-            slashing_certificates: serialized_certs,
+            slashing_certificates,
             slashing_root: [0u8; 32],
             evidence_root,
             validator_set_root, // N120.2: computed after ledger update
